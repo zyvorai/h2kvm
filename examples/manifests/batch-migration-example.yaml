@@ -10,7 +10,7 @@ defaults:
     password: secret
     dc_name: DC1
 
-  output_dir: /var/lib/hyper2kvm/output
+  output_dir: /var/lib/h2kvm/output
   output_format: qcow2
   apply_network_fixes: true
   validate_after_conversion: true

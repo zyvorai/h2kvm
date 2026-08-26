@@ -120,7 +120,7 @@ Comprehensive migration workflows, playbooks, and batch migration features for V
 docs/guides/migration/quick-reference.md
 
 # 2. Run simple migration
-hyper2kvm local \
+h2kvm local \
   --vmdk /vms/source.vmdk \
   --output-dir /vms/migrated \
   --to-output vm.qcow2
@@ -156,7 +156,7 @@ cat > migrations.json <<EOF
 EOF
 
 # 4. Execute batch
-hyper2kvm local \
+h2kvm local \
   --batch-manifest migrations.json \
   --batch-parallel 4 \
   --batch-continue-on-error
@@ -190,7 +190,7 @@ profile:
 EOF
 
 # 4. Execute with profile
-hyper2kvm local \
+h2kvm local \
   --vmdk /vms/db-server.vmdk \
   --profile db-profile.yaml
 ```
@@ -211,7 +211,7 @@ hyper2kvm local \
 
 **Command**:
 ```bash
-hyper2kvm local --vmdk /path/to/vm.vmdk --output-dir /output
+h2kvm local --vmdk /path/to/vm.vmdk --output-dir /output
 ```
 
 ---
@@ -227,7 +227,7 @@ hyper2kvm local --vmdk /path/to/vm.vmdk --output-dir /output
 
 **Command**:
 ```bash
-hyper2kvm fetch-and-fix \
+h2kvm fetch-and-fix \
   --host esxi.example.com \
   --user root \
   --identity ~/.ssh/id_rsa \
@@ -246,7 +246,7 @@ hyper2kvm fetch-and-fix \
 
 **Command**:
 ```bash
-hyper2kvm ova \
+h2kvm ova \
   --ova /path/to/vm.ova \
   --output-dir /output
 ```
@@ -264,7 +264,7 @@ hyper2kvm ova \
 
 **AWS Command**:
 ```bash
-hyper2kvm ami \
+h2kvm ami \
   --ami ami-12345678 \
   --region us-east-1 \
   --output-dir /output
@@ -272,7 +272,7 @@ hyper2kvm ami \
 
 **Azure Command**:
 ```bash
-hyper2kvm azure \
+h2kvm azure \
   --vhd https://storage.blob.core.windows.net/vhds/vm.vhd \
   --output-dir /output
 ```
@@ -289,7 +289,7 @@ hyper2kvm azure \
 
 **Command**:
 ```bash
-hyper2kvm live-fix \
+h2kvm live-fix \
   --host source-vm.example.com \
   --user root \
   --identity ~/.ssh/id_rsa
@@ -303,7 +303,7 @@ hyper2kvm live-fix \
 
 **Execute multiple migrations in parallel**:
 ```bash
-hyper2kvm local \
+h2kvm local \
   --batch-manifest migrations.json \
   --batch-parallel 4 \
   --batch-continue-on-error
@@ -365,7 +365,7 @@ hooks:
 
 **Import from existing libvirt domains**:
 ```bash
-hyper2kvm libvirt-import \
+h2kvm libvirt-import \
   --domain-xml /etc/libvirt/qemu/vm.xml \
   --output-dir /output
 ```
@@ -438,7 +438,7 @@ hyper2kvm libvirt-import \
 ## Related Documentation
 
 ### Getting Started
-- **[Installation Guide](../../getting-started/01-Installation.md)** - Install Hyper2KVM
+- **[Installation Guide](../../getting-started/01-Installation.md)** - Install H2KVM
 - **[Quick Start](../../getting-started/02-Quick-Start.md)** - First migration
 - **[Beginner Tutorial](../../tutorials/01-beginner-migration.md)** - Step-by-step walkthrough
 

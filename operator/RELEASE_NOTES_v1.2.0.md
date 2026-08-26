@@ -225,7 +225,7 @@ Ready for OperatorHub.io and OpenShift marketplace:
 
 3. **operator-sdk CLI:**
    ```bash
-   operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v1.2.0
+   operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v1.2.0
    ```
 
 4. **Private Catalog (Air-gapped):**
@@ -317,7 +317,7 @@ Direct upgrade supported (version skipping enabled):
 ```bash
 # Update operator image
 kubectl set image deployment/hyperconversion-operator-controller-manager \
-  manager=ghcr.io/ssahani/hyper2kvm-operator:v1.2.0 \
+  manager=ghcr.io/ssahani/h2kvm-operator:v1.2.0 \
   -n hyperconversion-system
 ```
 
@@ -426,7 +426,7 @@ spec:
 
 ## Known Issues
 
-None critical. See [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues) for minor enhancements.
+None critical. See [GitHub Issues](https://github.com/ssahani/h2kvm/issues) for minor enhancements.
 
 ---
 
@@ -452,12 +452,12 @@ None.
 ## Container Images
 
 ### Operator
-- `ghcr.io/ssahani/hyper2kvm-operator:v1.2.0`
+- `ghcr.io/ssahani/h2kvm-operator:v1.2.0`
 - Architectures: amd64, arm64, s390x, ppc64le
 - Size: ~50MB (compressed)
 
 ### Bundle
-- `ghcr.io/ssahani/hyper2kvm-operator-bundle:v1.2.0`
+- `ghcr.io/ssahani/h2kvm-operator-bundle:v1.2.0`
 - Architectures: amd64, arm64, s390x, ppc64le
 - Size: ~2MB
 
@@ -502,8 +502,8 @@ Potential features for future releases:
 
 ## Support
 
-- **Documentation**: https://github.com/ssahani/hyper2kvm
-- **Issues**: https://github.com/ssahani/hyper2kvm/issues
+- **Documentation**: https://github.com/ssahani/h2kvm
+- **Issues**: https://github.com/ssahani/h2kvm/issues
 - **Email**: susant@visioncodex.com
 
 ---
@@ -523,11 +523,11 @@ Apache 2.0
 kubectl create -f https://operatorhub.io/install/hyperconversion-operator.yaml
 
 # Or install CRDs + operator directly
-kubectl apply -f https://github.com/ssahani/hyper2kvm/releases/download/v1.2.0/install.yaml
+kubectl apply -f https://github.com/ssahani/h2kvm/releases/download/v1.2.0/install.yaml
 
 # Create a VM migration
 cat <<EOF | kubectl apply -f -
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: example-migration

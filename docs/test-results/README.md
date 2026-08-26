@@ -157,13 +157,13 @@ Windows Systems:      115 migrations (94% success rate)
 
 ```bash
 # Install test dependencies
-pip install "hyper2kvm[test]"
+pip install "h2kvm[test]"
 
 # Run all tests
 pytest
 
 # Run with coverage
-pytest --cov=hyper2kvm --cov-report=html
+pytest --cov=h2kvm --cov-report=html
 ```
 
 ### Integration Tests
@@ -196,7 +196,7 @@ If you encounter issues during migration:
 
 1. Check [Troubleshooting Guide](../guides/troubleshooting.md)
 2. Review relevant test results in this directory
-3. Report at [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
+3. Report at [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
 
 Include:
 - OS and version

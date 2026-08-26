@@ -118,7 +118,7 @@ export function MigrationEntryPage() {
       </div>
 
       <p className="text-[11px] text-white/45 mt-6 text-center">
-        All paths use hyper2kvm (h2kvmctl). Libvirt deploy is virsh define — not virt-install.
+        All paths use h2kvm (h2kvmctl). Libvirt deploy is virsh define — not virt-install.
       </p>
     </div>
   );

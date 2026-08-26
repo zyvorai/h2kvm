@@ -25,7 +25,7 @@ Parallel mounting uses ThreadPoolExecutor to mount multiple filesystems concurre
 #### Basic Usage
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 g = VMCraft("ubuntu-server.vmdk")
 g.launch()

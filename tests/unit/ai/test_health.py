@@ -2,14 +2,14 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Unit tests for hyper2kvm.ai.health.HealthEngine."""
+"""Unit tests for h2kvm.ai.health.HealthEngine."""
 
 from __future__ import annotations
 
 import pytest
 
-from hyper2kvm.ai.health import HealthEngine, HEALTH_CHECKS
-from hyper2kvm.ai.models import HealthStatus
+from h2kvm.ai.health import HealthEngine, HEALTH_CHECKS
+from h2kvm.ai.models import HealthStatus
 
 
 # ---------------------------------------------------------------------------
@@ -295,31 +295,31 @@ class TestStatusAggregation:
 
 class TestHealthReportModel:
     def test_passed_returns_true_for_pass(self):
-        from hyper2kvm.ai.models import HealthReport
+        from h2kvm.ai.models import HealthReport
 
         report = HealthReport(overall_status=HealthStatus.PASS)
         assert report.passed() is True
 
     def test_passed_returns_true_for_skip(self):
-        from hyper2kvm.ai.models import HealthReport
+        from h2kvm.ai.models import HealthReport
 
         report = HealthReport(overall_status=HealthStatus.SKIP)
         assert report.passed() is True
 
     def test_passed_returns_false_for_fail(self):
-        from hyper2kvm.ai.models import HealthReport
+        from h2kvm.ai.models import HealthReport
 
         report = HealthReport(overall_status=HealthStatus.FAIL)
         assert report.passed() is False
 
     def test_passed_returns_false_for_warn(self):
-        from hyper2kvm.ai.models import HealthReport
+        from h2kvm.ai.models import HealthReport
 
         report = HealthReport(overall_status=HealthStatus.WARN)
         assert report.passed() is False
 
     def test_summary_counts_statuses(self):
-        from hyper2kvm.ai.models import HealthCheck, HealthReport
+        from h2kvm.ai.models import HealthCheck, HealthReport
 
         report = HealthReport(
             checks=[

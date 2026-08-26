@@ -1,6 +1,6 @@
-# Shell Completion for hyper2kvm
+# Shell Completion for h2kvm
 
-This directory contains shell completion scripts for the `hyper2kvm` command. Shell completion provides intelligent command-line tab completion for all hyper2kvm arguments, options, and flags.
+This directory contains shell completion scripts for the `h2kvm` command. Shell completion provides intelligent command-line tab completion for all h2kvm arguments, options, and flags.
 
 ## Features
 
@@ -48,39 +48,39 @@ sudo pacman -S python-argcomplete     # Arch Linux
 
 **System-wide installation:**
 ```bash
-sudo cp completions/hyper2kvm.bash /etc/bash_completion.d/hyper2kvm
+sudo cp completions/h2kvm.bash /etc/bash_completion.d/h2kvm
 ```
 
 **User-local installation:**
 ```bash
 mkdir -p ~/.bash_completion.d
-cp completions/hyper2kvm.bash ~/.bash_completion.d/hyper2kvm
-echo '[ -f ~/.bash_completion.d/hyper2kvm ] && source ~/.bash_completion.d/hyper2kvm' >> ~/.bashrc
+cp completions/h2kvm.bash ~/.bash_completion.d/h2kvm
+echo '[ -f ~/.bash_completion.d/h2kvm ] && source ~/.bash_completion.d/h2kvm' >> ~/.bashrc
 source ~/.bashrc
 ```
 
 **Temporary installation (current session only):**
 ```bash
-source completions/hyper2kvm.bash
+source completions/h2kvm.bash
 ```
 
 ### Zsh
 
 **System-wide installation:**
 ```bash
-sudo cp completions/hyper2kvm.zsh /usr/share/zsh/site-functions/_hyper2kvm
+sudo cp completions/h2kvm.zsh /usr/share/zsh/site-functions/_h2kvm
 exec zsh
 ```
 
 **User-local installation:**
 ```bash
 mkdir -p ~/.zsh/completion
-cp completions/hyper2kvm.zsh ~/.zsh/completion/_hyper2kvm
+cp completions/h2kvm.zsh ~/.zsh/completion/_h2kvm
 
 # Add to ~/.zshrc (if not already present)
 cat >> ~/.zshrc << 'EOF'
 
-# hyper2kvm completion
+# h2kvm completion
 fpath=(~/.zsh/completion $fpath)
 autoload -Uz compinit && compinit
 EOF
@@ -92,47 +92,47 @@ exec zsh
 
 **System-wide installation:**
 ```bash
-sudo cp completions/hyper2kvm.fish /usr/share/fish/vendor_completions.d/
+sudo cp completions/h2kvm.fish /usr/share/fish/vendor_completions.d/
 ```
 
 **User-local installation:**
 ```bash
 mkdir -p ~/.config/fish/completions
-cp completions/hyper2kvm.fish ~/.config/fish/completions/
+cp completions/h2kvm.fish ~/.config/fish/completions/
 ```
 
 Fish completions are loaded automatically and take effect immediately.
 
 ## Usage
 
-After installation, you can use tab completion with the `hyper2kvm` command:
+After installation, you can use tab completion with the `h2kvm` command:
 
 ```bash
 # Press TAB to see available options
-hyper2kvm --<TAB>
+h2kvm --<TAB>
 
 # Press TAB to complete option names
-hyper2kvm --vm<TAB>
-# Completes to: hyper2kvm --vmdk
+h2kvm --vm<TAB>
+# Completes to: h2kvm --vmdk
 
 # Press TAB to complete paths
-hyper2kvm --vmdk /path/to/<TAB>
+h2kvm --vmdk /path/to/<TAB>
 
 # Works with all arguments
-hyper2kvm --vcenter <TAB>
+h2kvm --vcenter <TAB>
 ```
 
 ## Verifying Installation
 
 To verify that completion is working:
 
-1. **Bash/Zsh**: Type `hyper2kvm --` and press TAB twice. You should see a list of available options.
-2. **Fish**: Type `hyper2kvm --` and press TAB once. You should see completions appear.
+1. **Bash/Zsh**: Type `h2kvm --` and press TAB twice. You should see a list of available options.
+2. **Fish**: Type `h2kvm --` and press TAB once. You should see completions appear.
 
 If completion doesn't work:
 
 1. Verify `argcomplete` is installed: `pip show argcomplete`
-2. Verify `hyper2kvm` is in your PATH: `which hyper2kvm`
+2. Verify `h2kvm` is in your PATH: `which h2kvm`
 3. For bash, ensure bash-completion is installed: `apt install bash-completion` or `dnf install bash-completion`
 4. Check that the completion script is sourced in your shell configuration file
 
@@ -153,9 +153,9 @@ If completion doesn't work:
 
 3. Manually source the completion file:
    ```bash
-   source /etc/bash_completion.d/hyper2kvm
+   source /etc/bash_completion.d/h2kvm
    # or
-   source ~/.bash_completion.d/hyper2kvm
+   source ~/.bash_completion.d/h2kvm
    ```
 
 ### Zsh: Completion not working
@@ -181,9 +181,9 @@ If completion doesn't work:
 
 2. Verify completion file location:
    ```bash
-   ls ~/.config/fish/completions/hyper2kvm.fish
+   ls ~/.config/fish/completions/h2kvm.fish
    # or
-   ls /usr/share/fish/vendor_completions.d/hyper2kvm.fish
+   ls /usr/share/fish/vendor_completions.d/h2kvm.fish
    ```
 
 ### Python argcomplete not found
@@ -204,23 +204,23 @@ To remove shell completions:
 
 **Bash:**
 ```bash
-sudo rm /etc/bash_completion.d/hyper2kvm
+sudo rm /etc/bash_completion.d/h2kvm
 # or
-rm ~/.bash_completion.d/hyper2kvm
+rm ~/.bash_completion.d/h2kvm
 ```
 
 **Zsh:**
 ```bash
-sudo rm /usr/share/zsh/site-functions/_hyper2kvm
+sudo rm /usr/share/zsh/site-functions/_h2kvm
 # or
-rm ~/.zsh/completion/_hyper2kvm
+rm ~/.zsh/completion/_h2kvm
 ```
 
 **Fish:**
 ```bash
-sudo rm /usr/share/fish/vendor_completions.d/hyper2kvm.fish
+sudo rm /usr/share/fish/vendor_completions.d/h2kvm.fish
 # or
-rm ~/.config/fish/completions/hyper2kvm.fish
+rm ~/.config/fish/completions/h2kvm.fish
 ```
 
 ## How It Works
@@ -228,8 +228,8 @@ rm ~/.config/fish/completions/hyper2kvm.fish
 The completion scripts use [argcomplete](https://github.com/kislyuk/argcomplete), which provides intelligent shell completion for Python argparse-based CLI tools. When you press TAB:
 
 1. The shell calls `register-python-argcomplete`
-2. argcomplete invokes `hyper2kvm` with special environment variables
-3. hyper2kvm's argument parser provides completion suggestions
+2. argcomplete invokes `h2kvm` with special environment variables
+3. h2kvm's argument parser provides completion suggestions
 4. The shell displays the suggestions
 
 ## Development
@@ -240,13 +240,13 @@ To test completion during development:
 # Activate development environment
 source venv/bin/activate
 
-# Install hyper2kvm in development mode
+# Install h2kvm in development mode
 pip install -e .
 
 # Source the completion script
-source completions/hyper2kvm.bash  # for bash
+source completions/h2kvm.bash  # for bash
 # or
-source completions/hyper2kvm.zsh   # for zsh
+source completions/h2kvm.zsh   # for zsh
 ```
 
 ## References
@@ -258,4 +258,4 @@ source completions/hyper2kvm.zsh   # for zsh
 
 ## License
 
-These completion scripts are part of hyper2kvm and are licensed under Apache-2.0.
+These completion scripts are part of h2kvm and are licensed under Apache-2.0.

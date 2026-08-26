@@ -1,19 +1,19 @@
 #!/bin/bash
-# Build hyper2kvm migration container image
+# Build h2kvm migration container image
 # This image is used by MigrationJob to run migrations inside Kubernetes
 
 set -euo pipefail
 
 # Configuration
-IMAGE_NAME="${IMAGE_NAME:-ghcr.io/hyper2kvm/migration}"
+IMAGE_NAME="${IMAGE_NAME:-ghcr.io/h2kvm/migration}"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
-DOCKERFILE="hyper2kvm/daemon/Dockerfile.migration"
+DOCKERFILE="h2kvm/daemon/Dockerfile.migration"
 PLATFORMS="${PLATFORMS:-linux/amd64,linux/arm64}"
 PUSH="${PUSH:-false}"
 
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🐳 Building hyper2kvm Migration Container"
+echo "🐳 Building h2kvm Migration Container"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo -e "  Image: ${IMAGE_NAME}:${IMAGE_TAG}"
@@ -53,7 +53,7 @@ if $BUILD_CMD \
     echo ""
     echo -e "Usage in MigrationJob:"
     echo ""
-    echo -e "  Update hyper2kvm/operator/migrationjob_controller.py:"
+    echo -e "  Update h2kvm/operator/migrationjob_controller.py:"
     echo -e "  MIGRATION_IMAGE = \"${IMAGE_NAME}:${IMAGE_TAG}\""
     echo ""
 else

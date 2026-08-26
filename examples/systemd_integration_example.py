@@ -4,7 +4,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 """
-Example: Using systemd tools in hyper2kvm.
+Example: Using systemd tools in h2kvm.
 
 This script demonstrates how to use the systemd integration module
 to leverage systemd command-line tools for VM migration tasks.
@@ -12,7 +12,7 @@ to leverage systemd command-line tools for VM migration tasks.
 
 from pathlib import Path
 
-from hyper2kvm.systemd import (
+from h2kvm.systemd import (
     SystemdDetectVirt,
     SystemdDissect,
     systemd_escape,

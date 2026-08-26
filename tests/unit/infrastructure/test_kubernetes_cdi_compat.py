@@ -4,7 +4,7 @@
 
 """CDI upload compatibility helpers (qcow2 compression vs older importer qemu-img)."""
 
-from hyper2kvm.infrastructure.deployers.kubernetes import (
+from h2kvm.infrastructure.deployers.kubernetes import (
     _qcow2_json_compression_type,
     _qcow2_json_uses_zstd,
     _stderr_suggests_cdi_pvc_not_ready,

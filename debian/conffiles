@@ -1,5 +1,5 @@
-/etc/hyper2kvm/config.yaml
-/etc/hyper2kvm/daemon.yaml
-/etc/modprobe.d/hyper2kvm-nbd.conf
-/etc/sysctl.d/99-hyper2kvm-nbd.conf
-/etc/systemd/system.conf.d/hyper2kvm-limits.conf
+/etc/h2kvm/config.yaml
+/etc/h2kvm/daemon.yaml
+/etc/modprobe.d/h2kvm-nbd.conf
+/etc/sysctl.d/99-h2kvm-nbd.conf
+/etc/systemd/system.conf.d/h2kvm-limits.conf

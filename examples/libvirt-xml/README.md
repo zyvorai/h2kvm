@@ -43,9 +43,9 @@ virsh define linux-bios.xml
 virsh start linux-vm-bios
 ```
 
-### Method 2: Use as Template for hyper2kvm
+### Method 2: Use as Template for h2kvm
 
-The `hyper2kvm` tool can automatically generate similar XML during migration.
+The `h2kvm` tool can automatically generate similar XML during migration.
 
 ## Customization Guide
 
@@ -58,4 +58,4 @@ The `hyper2kvm` tool can automatically generate similar XML during migration.
 
 ## License
 
-Apache-2.0 (same as hyper2kvm)
+Apache-2.0 (same as h2kvm)

@@ -1,6 +1,6 @@
 # Configuration Guide
 
-Advanced configuration options for Hyper2KVM.
+Advanced configuration options for H2KVM.
 
 ---
 
@@ -12,7 +12,7 @@ Advanced configuration options for Hyper2KVM.
 
 ## Configuration Sources
 
-Hyper2KVM can be configured via:
+H2KVM can be configured via:
 
 1. **YAML Files** - Primary configuration method
 2. **JSON Files** - Alternative format

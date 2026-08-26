@@ -7,4 +7,4 @@ compress: true
 fstab_mode: stabilize-all
 regen_initramfs: true
 allowed_dirs:
-- /home/ssahani/tt/hyper2kvm
+- /home/ssahani/tt/h2kvm

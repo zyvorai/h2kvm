@@ -6,11 +6,11 @@
 #   h2kvmctl --config examples/yaml/50-daemon/daemon-watch.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config examples/yaml/50-daemon/daemon-watch.yaml
+#   h2kvm --config examples/yaml/50-daemon/daemon-watch.yaml
 #
 # Or with systemd:
-#   sudo cp examples/yaml/50-daemon/daemon-watch.yaml /etc/hyper2kvm/daemon.yaml
-#   sudo systemctl enable --now hyper2kvm@daemon.service
+#   sudo cp examples/yaml/50-daemon/daemon-watch.yaml /etc/h2kvm/daemon.yaml
+#   sudo systemctl enable --now h2kvm@daemon.service
 
 command: daemon
 daemon: true

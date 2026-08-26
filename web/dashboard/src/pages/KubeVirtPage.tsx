@@ -218,7 +218,7 @@ export function KubeVirtPage() {
                         vm.os_type === 'rhel' ? 'bg-red-500/10 text-red-400 border-red-500/30' :
                         'bg-green-500/10 text-green-400 border-green-500/30'
                       }`}><OSIcon os={vm.os_type} /> {vm.os_type}</span>
-                      {vm.labels?.['hyper2kvm.io/migrated'] && (
+                      {vm.labels?.['h2kvm.io/migrated'] && (
                         <span className="text-[10px] px-1.5 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-full">migrated</span>
                       )}
                     </div>

@@ -1,10 +1,10 @@
-# hyper2kvm
+# h2kvm
 
 ## Enterprise-Grade VM Migration Toolkit
 ### Any Hypervisor → KVM with Zero-Downtime & Automated Fixes
 
 **Author:** ZyvorAI Labs Private Limited
-**License:** Proprietary (Zyvor AI Labs) | **Python 3.10+** | **PyPI: hyper2kvm**
+**License:** Proprietary (Zyvor AI Labs) | **Python 3.10+** | **PyPI: h2kvm**
 
 ---
 
@@ -22,11 +22,11 @@ Traditional tools convert the disk and say *"boot and hope."*
 
 ---
 
-## The Solution: hyper2kvm
+## The Solution: h2kvm
 
 **Deterministic offline fixes** ensure **first-boot success**.
 
-| Traditional Tools | hyper2kvm |
+| Traditional Tools | h2kvm |
 |---|---|
 | Convert disk format only | Convert + deep inspection + repair |
 | "Boot and hope" | Deterministic first-boot success |
@@ -53,7 +53,7 @@ Traditional tools convert the disk and say *"boot and hope."*
 ## Architecture Overview
 
 ```
- Source VM                    hyper2kvm Pipeline                     Target
+ Source VM                    h2kvm Pipeline                     Target
 +-----------+    +--------------------------------------------+    +----------+
 | VMware    |    |  1. Disk Conversion (qemu-img)             |    | KVM      |
 | Hyper-V   | -> |  2. VMCraft Inspection (OS, drivers, boot) | -> | libvirt  |
@@ -67,7 +67,7 @@ Traditional tools convert the disk and say *"boot and hope."*
 
 ## VMCraft Engine
 
-The core of hyper2kvm — a **pure Python** VM manipulation engine.
+The core of h2kvm — a **pure Python** VM manipulation engine.
 
 **480+ API methods** for comprehensive VM inspection and modification.
 
@@ -84,7 +84,7 @@ The core of hyper2kvm — a **pure Python** VM manipulation engine.
 ### Quick Example
 
 ```python
-from hyper2kvm.core.vmcraft import VMCraft
+from h2kvm.core.vmcraft import VMCraft
 
 with VMCraft() as g:
     g.add_disk("/vms/server.qcow2")
@@ -221,7 +221,7 @@ sudo h2kvmctl --config migration.yaml --deploy-k8s \
 ### The Risk
 Activating LVM inside a migrated disk image can accidentally activate **host** volume groups — potentially corrupting the host OS.
 
-### hyper2kvm's Solution
+### h2kvm's Solution
 - **Sandboxed activation** — only target VG is activated
 - **Host VG exclusion** — automatic detection and protection
 - **7x faster** — 0.71s activation (down from ~5s)
@@ -232,7 +232,7 @@ Activating LVM inside a migrated disk image can accidentally activate **host** v
 ## Project Structure
 
 ```
-hyper2kvm/
+h2kvm/
   cli/            # CLI interface (Click-based)
   core/           # Core engine, VMCraft, progress
   converters/     # Disk format converters (qemu-img)
@@ -258,7 +258,7 @@ hyper2kvm/
 ### Installation
 
 ```bash
-pip install "hyper2kvm[full]"
+pip install "h2kvm[full]"
 ```
 
 ### System Dependencies (Optional)
@@ -275,7 +275,7 @@ sudo dnf install -y ntfs-3g libhivex-bin
 
 ```bash
 h2kvmctl --version          # Interactive CLI
-hyper2kvm --version         # Daemon / systemd mode
+h2kvm --version         # Daemon / systemd mode
 ```
 
 Both commands are functionally identical.
@@ -284,7 +284,7 @@ Both commands are functionally identical.
 
 ## Summary
 
-**hyper2kvm** is a production-ready, enterprise-grade toolkit that eliminates the pain of VM migration:
+**h2kvm** is a production-ready, enterprise-grade toolkit that eliminates the pain of VM migration:
 
 - **Deterministic** — no more "boot and hope"
 - **Comprehensive** — 35+ OS versions, 8 input formats
@@ -296,10 +296,10 @@ Both commands are functionally identical.
 
 ### Links
 
-- **PyPI:** https://pypi.org/project/hyper2kvm/
-- **GitHub:** https://github.com/ssahani/hyper2kvm
+- **PyPI:** https://pypi.org/project/h2kvm/
+- **GitHub:** https://github.com/ssahani/h2kvm
 - **License:** Proprietary (Zyvor AI Labs)
 
 ---
 
-*hyper2kvm — Migrate Once, Boot Right.*
+*h2kvm — Migrate Once, Boot Right.*

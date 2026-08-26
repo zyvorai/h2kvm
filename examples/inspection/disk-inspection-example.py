@@ -17,7 +17,7 @@ import logging
 import sys
 from pathlib import Path
 
-from hyper2kvm.vmcraft.nbd import NBDDeviceManager
+from h2kvm.vmcraft.nbd import NBDDeviceManager
 
 
 def setup_logging():

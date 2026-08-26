@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Hyper-V Migration with hyper2kvm + hypersdk — Complete Guide</title>
+<title>Hyper-V Migration with h2kvm + hypersdk — Complete Guide</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -63,7 +63,7 @@
 <!-- COVER -->
 <div class="cover">
   <h1><span>Hyper-V</span> Migration</h1>
-  <h2>Migrate from Microsoft Hyper-V to KVM/KubeVirt with hyper2kvm + hypersdk</h2>
+  <h2>Migrate from Microsoft Hyper-V to KVM/KubeVirt with h2kvm + hypersdk</h2>
   <p class="sub">Move Windows and Linux VMs from Hyper-V to open-source KVM infrastructure. Automatic Hyper-V Integration Components removal, VirtIO driver injection, VHD/VHDX to QCOW2 conversion, and boot verification. Eliminate Windows Server Datacenter licensing overhead and gain platform independence.</p>
   <div class="badge">VHD/VHDX Native | Hyper-V IC Removal | VirtIO Auto-Inject | $0 License | Proprietary (Zyvor AI Labs)</div>
 </div>
@@ -138,7 +138,7 @@
 <!-- PAGE 2: Migration Paths -->
 <div class="page page-light">
   <h2 class="st">Migration <span>Paths</span></h2>
-  <p class="sub">hyper2kvm handles both Windows and Linux VMs from Hyper-V with source-specific fixes.</p>
+  <p class="sub">h2kvm handles both Windows and Linux VMs from Hyper-V with source-specific fixes.</p>
 
   <h3>Windows VMs on Hyper-V &rarr; KVM</h3>
   <div class="flow">
@@ -167,9 +167,9 @@
     <div class="flow-step flow-ok">On-Prem KVM / KubeVirt</div>
   </div>
 
-  <h3>What hyper2kvm Fixes — Hyper-V Specific</h3>
+  <h3>What h2kvm Fixes — Hyper-V Specific</h3>
   <table>
-    <tr><th style="width:22%">Component</th><th style="width:25%">Hyper-V Original</th><th style="width:25%">KVM Replacement</th><th style="width:28%">hyper2kvm Action</th></tr>
+    <tr><th style="width:22%">Component</th><th style="width:25%">Hyper-V Original</th><th style="width:25%">KVM Replacement</th><th style="width:28%">h2kvm Action</th></tr>
     <tr><td><strong>Storage controller</strong></td><td>storvsc (Hyper-V synthetic)</td><td>virtio-blk / virtio-scsi</td><td class="check">Inject VirtIO storage driver + registry/initramfs fix</td></tr>
     <tr><td><strong>Network adapter</strong></td><td>netvsc (Hyper-V synthetic)</td><td>virtio-net (NetKVM)</td><td class="check">Inject VirtIO network driver + clean NIC configs</td></tr>
     <tr><td><strong>Memory balloon</strong></td><td>Dynamic Memory (Hyper-V)</td><td>virtio-balloon</td><td class="check">Install balloon driver for KVM memory management</td></tr>
@@ -204,7 +204,7 @@
 
   <h3>VHD/VHDX Format Support</h3>
   <table>
-    <tr><th style="width:18%">Format</th><th style="width:22%">Description</th><th style="width:20%">Max Size</th><th style="width:20%">hyper2kvm Support</th><th style="width:20%">Notes</th></tr>
+    <tr><th style="width:18%">Format</th><th style="width:22%">Description</th><th style="width:20%">Max Size</th><th style="width:20%">h2kvm Support</th><th style="width:20%">Notes</th></tr>
     <tr><td><strong>VHD Fixed</strong></td><td>Pre-allocated, full size on disk</td><td>2 TB</td><td class="check">Full support</td><td>Fastest conversion — direct mapping</td></tr>
     <tr><td><strong>VHD Dynamic</strong></td><td>Grows as data is written</td><td>2 TB</td><td class="check">Full support</td><td>Sparse conversion — only used blocks</td></tr>
     <tr><td><strong>VHD Differencing</strong></td><td>Delta from parent VHD</td><td>2 TB</td><td class="check">Full support</td><td>Auto-flatten to single image</td></tr>
@@ -233,7 +233,7 @@
         <li>Exports VM config + VHD/VHDX + snapshots</li>
         <li>PowerShell: <code>Export-VM -Name "vm01" -Path "D:\exports"</code></li>
         <li>Preserves checkpoint chain</li>
-        <li>hyper2kvm auto-flattens checkpoints</li>
+        <li>h2kvm auto-flattens checkpoints</li>
         <li><strong>Best for:</strong> VMs with checkpoints/snapshots</li>
       </ul>
     </div>
@@ -287,12 +287,12 @@ boot_test: true
 
   <div class="alert">
     <h4>Without VirtIO injection, Windows VMs from Hyper-V will BSOD on KVM</h4>
-    <p>Windows boots with <code>storvsc.sys</code> (Hyper-V synthetic storage). KVM uses VirtIO. Without pre-injecting VirtIO drivers into the offline disk, Windows can't see the boot volume and crashes with <strong>INACCESSIBLE_BOOT_DEVICE (0x7B)</strong>. hyper2kvm handles this automatically.</p>
+    <p>Windows boots with <code>storvsc.sys</code> (Hyper-V synthetic storage). KVM uses VirtIO. Without pre-injecting VirtIO drivers into the offline disk, Windows can't see the boot volume and crashes with <strong>INACCESSIBLE_BOOT_DEVICE (0x7B)</strong>. h2kvm handles this automatically.</p>
   </div>
 
   <h3>Windows Hyper-V &rarr; KVM Fix Pipeline</h3>
   <table>
-    <tr><th style="width:5%">#</th><th style="width:20%">Step</th><th style="width:40%">What hyper2kvm Does</th><th style="width:35%">Why It's Needed</th></tr>
+    <tr><th style="width:5%">#</th><th style="width:20%">Step</th><th style="width:40%">What h2kvm Does</th><th style="width:35%">Why It's Needed</th></tr>
     <tr><td>1</td><td><strong>Mount disk offline</strong></td><td>qemu-nbd attaches VHDX, mounts Windows partition</td><td>All fixes applied without booting the broken VM</td></tr>
     <tr><td>2</td><td><strong>Detect Windows version</strong></td><td>Reads registry: CurrentVersion, CurrentBuild</td><td>Selects correct VirtIO driver set for the OS</td></tr>
     <tr><td>3</td><td><strong>Inject VirtIO storage</strong></td><td>Copies viostor.sys/vioscsi.sys + .inf, sets Start=0 in registry</td><td>VM can see boot disk on KVM (prevents 0x7B BSOD)</td></tr>
@@ -339,11 +339,11 @@ boot_test: true
 <!-- PAGE 5: Linux on Hyper-V -->
 <div class="page page-dark">
   <h2 class="st" style="color:#e8e6df;">Linux on <span>Hyper-V &rarr; KVM</span></h2>
-  <p class="sub">Linux VMs on Hyper-V use hv_* kernel modules. hyper2kvm swaps them for VirtIO automatically.</p>
+  <p class="sub">Linux VMs on Hyper-V use hv_* kernel modules. h2kvm swaps them for VirtIO automatically.</p>
 
   <h3>Linux Hyper-V &rarr; KVM Fix Pipeline</h3>
   <table>
-    <tr><th style="width:5%">#</th><th style="width:18%">Fix</th><th style="width:40%">What hyper2kvm Does</th><th style="width:37%">Technical Detail</th></tr>
+    <tr><th style="width:5%">#</th><th style="width:18%">Fix</th><th style="width:40%">What h2kvm Does</th><th style="width:37%">Technical Detail</th></tr>
     <tr><td>1</td><td><strong>initramfs rebuild</strong></td><td>Replaces hv_storvsc/hv_netvsc with virtio_blk/virtio_scsi/virtio_net</td><td>Chroot: dracut --add-drivers "virtio_blk virtio_scsi virtio_net virtio_pci" or update-initramfs</td></tr>
     <tr><td>2</td><td><strong>fstab UUID repair</strong></td><td>Converts /dev/sda entries to UUID-based mounts</td><td>Reads blkid, replaces device paths in /etc/fstab</td></tr>
     <tr><td>3</td><td><strong>GRUB update</strong></td><td>Fixes root= parameter for KVM device naming</td><td>Updates /etc/default/grub, regenerates grub.cfg</td></tr>
@@ -375,7 +375,7 @@ boot_test: true
         <li><strong>initramfs tool:</strong> update-initramfs</li>
         <li>Most common Linux on Hyper-V</li>
         <li>Microsoft provides optimized kernels</li>
-        <li>hyper2kvm replaces MS kernel config</li>
+        <li>h2kvm replaces MS kernel config</li>
       </ul>
     </div>
     <div class="card">
@@ -454,7 +454,7 @@ boot_test: true
 <!-- PAGE 7: Enterprise Workloads & Tool Comparison -->
 <div class="page page-dark">
   <h2 class="st" style="color:#e8e6df;">Enterprise Workloads <span>&amp; Scenarios</span></h2>
-  <p class="sub">Common Hyper-V workloads migrated safely with hyper2kvm.</p>
+  <p class="sub">Common Hyper-V workloads migrated safely with h2kvm.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -501,7 +501,7 @@ boot_test: true
 
   <h3>Hyper-V Migration Tool Comparison</h3>
   <table>
-    <tr><th style="width:22%">Capability</th><th style="width:16%">hyper2kvm</th><th style="width:16%">virt-v2v</th><th style="width:16%">MTV</th><th style="width:15%">Manual</th><th style="width:15%">DVMS</th></tr>
+    <tr><th style="width:22%">Capability</th><th style="width:16%">h2kvm</th><th style="width:16%">virt-v2v</th><th style="width:16%">MTV</th><th style="width:15%">Manual</th><th style="width:15%">DVMS</th></tr>
     <tr><td><strong>VHD/VHDX conversion</strong></td><td class="check">&#10003; Native</td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="partial">qemu-img</td><td class="check">&#10003;</td></tr>
     <tr><td><strong>Hyper-V IC removal</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="partial">Manual</td><td class="partial">Partial</td></tr>
     <tr><td><strong>VirtIO injection (Windows)</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="partial">Limited</td><td class="partial">Manual</td><td class="partial">Partial</td></tr>
@@ -520,7 +520,7 @@ boot_test: true
 <!-- PAGE 8: Real-World Scenarios & Summary -->
 <div class="page page-light">
   <h2 class="st">Real-World <span>Scenarios</span></h2>
-  <p class="sub">Enterprise Hyper-V migration projects powered by hyper2kvm.</p>
+  <p class="sub">Enterprise Hyper-V migration projects powered by h2kvm.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -529,7 +529,7 @@ boot_test: true
         <li><strong>Source:</strong> 2-host Hyper-V cluster, Windows Server 2019 Datacenter</li>
         <li><strong>VMs:</strong> 25 Windows (AD, SQL, IIS, file), 15 Linux (web, DB, Docker)</li>
         <li><strong>Target:</strong> 2-host KVM cluster on RHEL 9</li>
-        <li><strong>Process:</strong> Export VHDX, hyper2kvm converts + fixes, boot verified</li>
+        <li><strong>Process:</strong> Export VHDX, h2kvm converts + fixes, boot verified</li>
         <li><strong>Timeline:</strong> 3 weeks</li>
         <li><strong>Savings:</strong> <strong>$200K/yr</strong> (Datacenter + SCVMM + CALs eliminated)</li>
       </ul>
@@ -551,7 +551,7 @@ boot_test: true
         <li><strong>Source:</strong> Azure VMs (Hyper-V based internally)</li>
         <li><strong>VMs:</strong> .NET web apps, SQL Server, file shares</li>
         <li><strong>Target:</strong> On-prem KVM (data sovereignty)</li>
-        <li><strong>Process:</strong> hypersdk exports managed disks (VHD), hyper2kvm removes waagent + Hyper-V IC, injects VirtIO</li>
+        <li><strong>Process:</strong> hypersdk exports managed disks (VHD), h2kvm removes waagent + Hyper-V IC, injects VirtIO</li>
         <li><strong>Timeline:</strong> 2 weeks</li>
         <li><strong>Savings:</strong> <strong>$480K/yr</strong> in Azure compute + egress</li>
       </ul>
@@ -575,11 +575,11 @@ boot_test: true
       Native VHD/VHDX support. Automatic Hyper-V IC removal. VirtIO injection for Windows and Linux.<br>
       Eliminate Windows Server Datacenter licensing. Deploy to KVM and/or KubeVirt.<br>
       Azure VMs included (same Hyper-V stack under the hood).<br>
-      <strong>hyper2kvm: the complete Hyper-V exit toolkit. Free forever.</strong>
+      <strong>h2kvm: the complete Hyper-V exit toolkit. Free forever.</strong>
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

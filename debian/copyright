@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: hyper2kvm
+Upstream-Name: h2kvm
 Upstream-Contact: ZyvorAI Labs Private Limited <ssahani@zyvor.dev>
-Source: https://github.com/ssahani/hyper2kvm
+Source: https://github.com/ssahani/h2kvm
 
 Files: *
 Copyright: 2025-2026 ZyvorAI Labs Private Limited <ssahani@zyvor.dev>

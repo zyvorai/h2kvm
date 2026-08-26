@@ -14,7 +14,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/hyper2kvm/zkvm/internal/theme"
+	"github.com/h2kvm/zkvm/internal/theme"
 )
 
 // Maximum completions shown in the dropdown.
@@ -329,7 +329,7 @@ func NewFormData(pf Prefill) *FormData {
 			Fields: []Field{
 				{Label: "windows", Flag: "--windows", Type: FieldToggle, BoolValue: false},
 				{Label: "guest_os", Flag: "--guest-os", Type: FieldSelect, Options: []string{"linux", "windows"}, SelectedIdx: 0},
-				{Label: "virtio_win_iso", Flag: "--virtio-win-iso", Type: FieldText, Placeholder: "Auto-detected from /var/lib/hyper2kvm/", PathComplete: true, Extensions: []string{".iso"}},
+				{Label: "virtio_win_iso", Flag: "--virtio-win-iso", Type: FieldText, Placeholder: "Auto-detected from /var/lib/h2kvm/", PathComplete: true, Extensions: []string{".iso"}},
 				{Label: "win_stage", Flag: "--win-stage", Type: FieldSelect, Options: []string{"bootstrap", "final"}, SelectedIdx: 0, Placeholder: "SATA (bootstrap) or VirtIO (final)"},
 				{Label: "clock", Flag: "--clock", Type: FieldSelect, Options: []string{"utc", "localtime"}, SelectedIdx: 0},
 			},

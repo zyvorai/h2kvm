@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm/ai/orchestrator.py -- AIOrchestrator lifecycle and fail-safe behaviour."""
+"""Tests for h2kvm/ai/orchestrator.py -- AIOrchestrator lifecycle and fail-safe behaviour."""
 
 from __future__ import annotations
 
@@ -11,14 +11,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from hyper2kvm.ai.models import (
+from h2kvm.ai.models import (
     HealthStatus,
     MigrationFeatures,
     Prediction,
     WorkloadProfile,
     WorkloadType,
 )
-from hyper2kvm.ai.orchestrator import AIOrchestrator
+from h2kvm.ai.orchestrator import AIOrchestrator
 
 
 # ---------------------------------------------------------------------------

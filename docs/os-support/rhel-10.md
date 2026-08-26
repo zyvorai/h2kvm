@@ -30,7 +30,7 @@
 
 Before migrating this platform, ensure:
 
-- ✓ hyper2kvm installed ([Installation Guide](02-Installation.md))
+- ✓ h2kvm installed ([Installation Guide](02-Installation.md))
 - ✓ Familiarity with [Quick Start Guide](03-Quick-Start.md)
 - ✓ Root/sudo access
 - ✓ Source VM accessible

@@ -3,7 +3,7 @@
 **Test Date**: February 14, 2026, 17:00-17:10
 **Test Image**: `esx8.0-rhel8.8-with-thin-provision-disk1.vmdk` (3.88 GB, 16GB virtual)
 **Config**: `test-rhel88.yaml` (local mode, flatten, compress, fstab stabilization, initramfs regen)
-**Test Environment**: Fedora system with hyper2kvm
+**Test Environment**: Fedora system with h2kvm
 
 ---
 
@@ -99,7 +99,7 @@ These are likely import/dependency issues where the VMCraft backend is missing s
 ### 3. NBD Connection ✅
 
 ```
-17:05:05 ✅ INFO Connecting /home/ssahani/tt/hyper2kvm/output/work/working-flattened-20260214-170333.qcow2 to /dev/nbd0...
+17:05:05 ✅ INFO Connecting /home/ssahani/tt/h2kvm/output/work/working-flattened-20260214-170333.qcow2 to /dev/nbd0...
 17:05:05 ✅ INFO Successfully connected to /dev/nbd0
 17:05:05 ✅ INFO    NBD connected: /dev/nbd0 (1.34s)
 ```
@@ -174,7 +174,7 @@ for vg in ['rhel']:  # Only VGs from NBD device
 
 ### 1. Missing Service Functions in VMCraft
 
-**File**: `hyper2kvm/core/vmcraft/mount.py` or similar
+**File**: `h2kvm/core/vmcraft/mount.py` or similar
 
 **Issue**: VMCraft backend doesn't implement:
 - `svc_list_partitions_cached()`
@@ -190,7 +190,7 @@ from .services.device_metadata import svc_list_partitions_cached
 
 ### 2. Mount Code Path Mismatch
 
-**File**: `hyper2kvm/fixers/offline/mount.py`
+**File**: `h2kvm/fixers/offline/mount.py`
 
 **Issue**: Code expects guestfs interface but VMCraft backend uses different APIs
 
@@ -298,11 +298,11 @@ The **LVM safety improvements are working correctly**:
 ## Test Logs
 
 Full logs available at:
-- `/tmp/hyper2kvm-test.log` (133 lines)
+- `/tmp/h2kvm-test.log` (133 lines)
 - Working files: `output/work/working-flattened-20260214-170333.qcow2` (8.22 GB)
 
 ---
 
 **Tester**: Claude Code
-**Environment**: Fedora with hyper2kvm development environment
+**Environment**: Fedora with h2kvm development environment
 **Test Type**: Integration test with real RHEL 8.8 VMDK from ESXi 8.0

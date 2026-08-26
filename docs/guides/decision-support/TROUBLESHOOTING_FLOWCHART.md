@@ -1,6 +1,6 @@
 # Troubleshooting Flowchart
 
-Visual decision trees for diagnosing and fixing common Hyper2KVM issues.
+Visual decision trees for diagnosing and fixing common H2KVM issues.
 
 ---
 
@@ -63,20 +63,20 @@ Migration Failed?
 │
 └─ Error: "Python/Module not found"
    │
-   └─→ Reinstall hyper2kvm
+   └─→ Reinstall h2kvm
       ```bash
-      pip install --upgrade --force-reinstall "hyper2kvm[full]"
+      pip install --upgrade --force-reinstall "h2kvm[full]"
       ```
 ```
 
 **Quick Fixes**:
 ```bash
 # Check logs
-journalctl -u hyper2kvm -f
+journalctl -u h2kvm -f
 
 # Verify installation
 h2kvmctl --version
-pip list | grep hyper2kvm
+pip list | grep h2kvm
 
 # Test basic functionality
 h2kvmctl --help
@@ -338,7 +338,7 @@ Migration Too Slow?
 **Performance Monitoring**:
 ```bash
 # During migration
-watch -n 1 'ps aux | grep hyper2kvm'
+watch -n 1 'ps aux | grep h2kvm'
 iostat -x 1
 iotop -o
 
@@ -440,21 +440,21 @@ Deployment Problems?
 │  │  │
 │  │  ├─ Check pod status
 │  │  │  ```bash
-│  │  │  kubectl get pods -n hyper2kvm-system
-│  │  │  kubectl describe pod <pod-name> -n hyper2kvm-system
+│  │  │  kubectl get pods -n h2kvm-system
+│  │  │  kubectl describe pod <pod-name> -n h2kvm-system
 │  │  │  ```
 │  │  │
 │  │  ├─ Image pull error?
 │  │  │  └─→ Check image exists
 │  │  │     ```bash
-│  │  │     kubectl get events -n hyper2kvm-system
+│  │  │     kubectl get events -n h2kvm-system
 │  │  │     ```
 │  │  │
 │  │  ├─ Permission issues?
 │  │  │  └─→ Check RBAC
 │  │  │     ```bash
-│  │  │     kubectl get rolebinding -n hyper2kvm-system
-│  │  │     kubectl get clusterrolebinding | grep hyper2kvm
+│  │  │     kubectl get rolebinding -n h2kvm-system
+│  │  │     kubectl get clusterrolebinding | grep h2kvm
 │  │  │     ```
 │  │  │
 │  │  └─ Resource limits?
@@ -468,7 +468,7 @@ Deployment Problems?
 │  │  │
 │  │  └─→ Check job logs
 │  │     ```bash
-│  │     kubectl logs -n hyper2kvm-system <job-pod>
+│  │     kubectl logs -n h2kvm-system <job-pod>
 │  │     kubectl describe migrationjob <job-name>
 │  │     ```
 │  │
@@ -476,8 +476,8 @@ Deployment Problems?
 │     │
 │     └─→ Check operator logs
 │        ```bash
-│        kubectl logs -n hyper2kvm-system \
-│          deployment/hyper2kvm-operator
+│        kubectl logs -n h2kvm-system \
+│          deployment/h2kvm-operator
 │        ```
 │
 ├─ Helm Installation Failed?
@@ -485,14 +485,14 @@ Deployment Problems?
 │  ├─ Chart not found?
 │  │  └─→ Add repo
 │  │     ```bash
-│  │     helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm-charts
+│  │     helm repo add h2kvm https://ssahani.github.io/h2kvm-charts
 │  │     helm repo update
 │  │     ```
 │  │
 │  └─ Values error?
 │     └─→ Validate values
 │        ```bash
-│        helm template hyper2kvm hyper2kvm/hyper2kvm \
+│        helm template h2kvm h2kvm/h2kvm \
 │          -f values.yaml --debug
 │        ```
 │
@@ -501,8 +501,8 @@ Deployment Problems?
    ├─ Daemon won't start?
    │  └─→ Check systemd
    │     ```bash
-   │     systemctl status hyper2kvm
-   │     journalctl -u hyper2kvm -f
+   │     systemctl status h2kvm
+   │     journalctl -u h2kvm -f
    │     ```
    │
    └─ Job submission fails?
@@ -516,15 +516,15 @@ Deployment Problems?
 **Deployment Diagnostics**:
 ```bash
 # Kubernetes
-kubectl get all -n hyper2kvm-system
-kubectl get events -n hyper2kvm-system --sort-by='.lastTimestamp'
+kubectl get all -n h2kvm-system
+kubectl get events -n h2kvm-system --sort-by='.lastTimestamp'
 
 # Helm
-helm list -n hyper2kvm-system
-helm get values hyper2kvm -n hyper2kvm-system
+helm list -n h2kvm-system
+helm get values h2kvm -n h2kvm-system
 
 # Daemon
-systemctl status hyper2kvm
+systemctl status h2kvm
 ss -tlnp | grep 8080
 ```
 
@@ -535,7 +535,7 @@ ss -tlnp | grep 8080
 ### Step 1: Gather Information
 
 ```bash
-# Hyper2KVM version
+# H2KVM version
 h2kvmctl --version
 
 # System information
@@ -545,7 +545,7 @@ cat /etc/os-release
 # Check dependencies
 qemu-img --version
 python3 --version
-pip list | grep hyper2kvm
+pip list | grep h2kvm
 
 # Disk space
 df -h
@@ -554,7 +554,7 @@ df -h
 free -h
 
 # Logs
-journalctl -u hyper2kvm -n 100 --no-pager
+journalctl -u h2kvm -n 100 --no-pager
 ```
 
 ### Step 2: Enable Debug Logging
@@ -572,8 +572,8 @@ log_file: /tmp/migration-debug.log
 
 Or via environment:
 ```bash
-export HYPER2KVM_LOG_LEVEL=DEBUG
-export HYPER2KVM_LOG_FILE=/tmp/debug.log
+export H2KVM_LOG_LEVEL=DEBUG
+export H2KVM_LOG_FILE=/tmp/debug.log
 h2kvmctl --config migration.yaml
 ```
 
@@ -594,7 +594,7 @@ ping -c 4 <remote-host>
 ssh user@host "echo test"
 
 # Test VMCraft
-python3 -c "from hyper2kvm.vmcraft import VMCraft; print('OK')"
+python3 -c "from h2kvm.vmcraft import VMCraft; print('OK')"
 ```
 
 ### Step 4: Minimal Test Case
@@ -643,14 +643,14 @@ h2kvmctl --config minimal-test.yaml
 - [Failure Modes](reference/failure-modes.md) - Known issues
 
 ### 2. Search GitHub Issues
-- [Existing Issues](https://github.com/ssahani/hyper2kvm/issues)
+- [Existing Issues](https://github.com/ssahani/h2kvm/issues)
 - Search for your error message
 
 ### 3. Create Detailed Issue
 
 Include:
 ```
-**Hyper2KVM Version**: (h2kvmctl --version)
+**H2KVM Version**: (h2kvmctl --version)
 **OS**: (cat /etc/os-release)
 **Python**: (python3 --version)
 
@@ -676,8 +676,8 @@ Include:
 ```
 
 ### 4. Community Support
-- [GitHub Discussions](https://github.com/ssahani/hyper2kvm/discussions)
-- Stack Overflow (tag: hyper2kvm)
+- [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
+- Stack Overflow (tag: h2kvm)
 
 ---
 

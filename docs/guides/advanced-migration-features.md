@@ -1,6 +1,6 @@
 # 🚀 Advanced Migration Features
 
-hyper2kvm provides enterprise-grade features for complex migration scenarios.
+h2kvm provides enterprise-grade features for complex migration scenarios.
 
 ## 📊 Table of Contents
 
@@ -15,65 +15,65 @@ hyper2kvm provides enterprise-grade features for complex migration scenarios.
 
 ### Overview
 
-hyper2kvm exports comprehensive Prometheus metrics for observability and monitoring.
+h2kvm exports comprehensive Prometheus metrics for observability and monitoring.
 
 ### Available Metrics
 
 #### Migration Lifecycle
 ```promql
 # Total migrations created
-hyper2kvm_migrations_total{namespace="default", source_type="vmdk-url"}
+h2kvm_migrations_total{namespace="default", source_type="vmdk-url"}
 
 # Successful migrations
-hyper2kvm_migrations_succeeded_total{namespace="default", source_type="vmdk-url"}
+h2kvm_migrations_succeeded_total{namespace="default", source_type="vmdk-url"}
 
 # Failed migrations
-hyper2kvm_migrations_failed_total{namespace="default", source_type="vmdk-url", reason="upload_failed"}
+h2kvm_migrations_failed_total{namespace="default", source_type="vmdk-url", reason="upload_failed"}
 
 # Active migrations by phase
-hyper2kvm_migrations_active{namespace="default", phase="Migrating"}
+h2kvm_migrations_active{namespace="default", phase="Migrating"}
 
 # Migration duration (histogram)
-hyper2kvm_migration_duration_seconds{namespace="default", source_type="vmdk-url"}
+h2kvm_migration_duration_seconds{namespace="default", source_type="vmdk-url"}
 ```
 
 #### Multi-Disk Metrics
 ```promql
 # Multi-disk migrations
-hyper2kvm_multi_disk_migrations_total{namespace="default", disk_count="3"}
+h2kvm_multi_disk_migrations_total{namespace="default", disk_count="3"}
 
 # Per-disk migration duration
-hyper2kvm_disk_migration_duration_seconds{namespace="default", disk_index="0"}
+h2kvm_disk_migration_duration_seconds{namespace="default", disk_index="0"}
 ```
 
 #### Dry-Run Metrics
 ```promql
 # Dry-run validations
-hyper2kvm_dry_run_validations_total{namespace="default", result="success"}
+h2kvm_dry_run_validations_total{namespace="default", result="success"}
 
 # Issues found during dry-run
-hyper2kvm_dry_run_issues_found_total{namespace="default", issue_type="insufficient_storage"}
+h2kvm_dry_run_issues_found_total{namespace="default", issue_type="insufficient_storage"}
 ```
 
 #### Compression Metrics
 ```promql
 # Compression ratio achieved
-hyper2kvm_conversion_compression_ratio{namespace="default", format="qcow2"}
+h2kvm_conversion_compression_ratio{namespace="default", format="qcow2"}
 ```
 
 #### VM Metrics
 ```promql
 # VMs created
-hyper2kvm_vms_created_total{namespace="default", auto_started="true"}
+h2kvm_vms_created_total{namespace="default", auto_started="true"}
 
 # VMs currently running
-hyper2kvm_vms_running{namespace="default"}
+h2kvm_vms_running{namespace="default"}
 ```
 
 #### Webhook Metrics
 ```promql
 # Webhook validations
-hyper2kvm_operator_webhook_validations_total{result="allowed"}
+h2kvm_operator_webhook_validations_total{result="allowed"}
 ```
 
 ### Setup
@@ -92,12 +92,12 @@ helm install prometheus prometheus-community/kube-prometheus-stack
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-system
+  name: h2kvm-operator
+  namespace: h2kvm-system
 spec:
   selector:
     matchLabels:
-      app: hyper2kvm-operator
+      app: h2kvm-operator
   endpoints:
     - port: metrics
       interval: 30s
@@ -106,11 +106,11 @@ spec:
 #### 3. Deploy Grafana Dashboard
 
 ```bash
-kubectl create configmap hyper2kvm-dashboard \\
+kubectl create configmap h2kvm-dashboard \\
   --from-file=k8s/monitoring/grafana-dashboard.json \\
   -n monitoring
 
-kubectl label configmap hyper2kvm-dashboard \\
+kubectl label configmap h2kvm-dashboard \\
   grafana_dashboard=1 \\
   -n monitoring
 ```
@@ -134,20 +134,20 @@ The included Grafana dashboard (`k8s/monitoring/grafana-dashboard.json`) provide
 
 **Success Rate (Last 5m)**:
 ```promql
-sum(rate(hyper2kvm_migrations_succeeded_total[5m])) /
-sum(rate(hyper2kvm_migrations_total[5m])) * 100
+sum(rate(h2kvm_migrations_succeeded_total[5m])) /
+sum(rate(h2kvm_migrations_total[5m])) * 100
 ```
 
 **Average Migration Duration**:
 ```promql
-avg(rate(hyper2kvm_migration_duration_seconds_sum[5m]) /
-    rate(hyper2kvm_migration_duration_seconds_count[5m]))
+avg(rate(h2kvm_migration_duration_seconds_sum[5m]) /
+    rate(h2kvm_migration_duration_seconds_count[5m]))
 ```
 
 **P99 Migration Duration**:
 ```promql
 histogram_quantile(0.99,
-  sum(rate(hyper2kvm_migration_duration_seconds_bucket[5m])) by (le)
+  sum(rate(h2kvm_migration_duration_seconds_bucket[5m])) by (le)
 )
 ```
 
@@ -157,15 +157,15 @@ histogram_quantile(0.99,
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: hyper2kvm-alerts
+  name: h2kvm-alerts
 spec:
   groups:
-    - name: hyper2kvm
+    - name: h2kvm
       rules:
         - alert: HighMigrationFailureRate
           expr: |
-            (sum(rate(hyper2kvm_migrations_failed_total[5m])) /
-             sum(rate(hyper2kvm_migrations_total[5m]))) > 0.2
+            (sum(rate(h2kvm_migrations_failed_total[5m])) /
+             sum(rate(h2kvm_migrations_total[5m]))) > 0.2
           for: 10m
           labels:
             severity: warning
@@ -175,7 +175,7 @@ spec:
 
         - alert: MigrationStuck
           expr: |
-            hyper2kvm_migrations_active{phase!="Completed"} > 0
+            h2kvm_migrations_active{phase!="Completed"} > 0
           for: 2h
           labels:
             severity: warning
@@ -185,7 +185,7 @@ spec:
 
         - alert: NoActiveWorkers
           expr: |
-            hyper2kvm_operator_workers_available == 0
+            h2kvm_operator_workers_available == 0
           for: 5m
           labels:
             severity: critical
@@ -230,11 +230,11 @@ Admission webhooks validate MigrationJob resources before creation, preventing i
 apiVersion: v1
 kind: Service
 metadata:
-  name: hyper2kvm-webhook
-  namespace: hyper2kvm-system
+  name: h2kvm-webhook
+  namespace: h2kvm-system
 spec:
   selector:
-    app: hyper2kvm-operator
+    app: h2kvm-operator
   ports:
     - port: 443
       targetPort: 8443
@@ -246,20 +246,20 @@ spec:
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
-  name: hyper2kvm-validation
+  name: h2kvm-validation
 webhooks:
-  - name: validate.migrationjobs.hyper2kvm.io
+  - name: validate.migrationjobs.h2kvm.io
     admissionReviewVersions: ["v1"]
     sideEffects: None
     rules:
       - operations: ["CREATE", "UPDATE"]
-        apiGroups: ["hyper2kvm.io"]
+        apiGroups: ["h2kvm.io"]
         apiVersions: ["v1alpha1"]
         resources: ["migrationjobs"]
     clientConfig:
       service:
-        name: hyper2kvm-webhook
-        namespace: hyper2kvm-system
+        name: h2kvm-webhook
+        namespace: h2kvm-system
         path: /validate
       caBundle: <base64-ca-cert>
     failurePolicy: Fail
@@ -271,7 +271,7 @@ webhooks:
 $ kubectl apply -f invalid-migration.yaml
 
 Error from server (Invalid): error when creating "invalid-migration.yaml":
-admission webhook "validate.migrationjobs.hyper2kvm.io" denied the request:
+admission webhook "validate.migrationjobs.h2kvm.io" denied the request:
 Validation failed:
   - source.vmdk.url is required for source.type=vmdk-url
   - destination.size is required
@@ -312,7 +312,7 @@ When detected, the Linux domain XML uses `.secboot.fd` OVMF firmware and adds `s
 ### Example
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: multi-disk-vm
@@ -382,11 +382,11 @@ kubectl get migrationjob multi-disk-vm -o yaml | grep -A 20 multiDiskProgress
 
 ```promql
 # Multi-disk migrations
-hyper2kvm_multi_disk_migrations_total{disk_count="2"}
+h2kvm_multi_disk_migrations_total{disk_count="2"}
 
 # Per-disk duration
-hyper2kvm_disk_migration_duration_seconds{disk_index="0"}  # First disk
-hyper2kvm_disk_migration_duration_seconds{disk_index="1"}  # Second disk
+h2kvm_disk_migration_duration_seconds{disk_index="0"}  # First disk
+h2kvm_disk_migration_duration_seconds{disk_index="1"}  # Second disk
 ```
 
 ### Best Practices
@@ -411,7 +411,7 @@ Validate migrations without executing them. Perfect for:
 ### Example
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: validate-migration
@@ -541,10 +541,10 @@ migrate-vm:
 
 ```promql
 # Dry-run validations
-hyper2kvm_dry_run_validations_total{result="success"}
+h2kvm_dry_run_validations_total{result="success"}
 
 # Issues found
-hyper2kvm_dry_run_issues_found_total{issue_type="insufficient_storage"}
+h2kvm_dry_run_issues_found_total{issue_type="insufficient_storage"}
 ```
 
 ---
@@ -554,7 +554,7 @@ hyper2kvm_dry_run_issues_found_total{issue_type="insufficient_storage"}
 ### Example: Multi-Disk + Dry-Run
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: validate-multi-disk
@@ -592,13 +592,13 @@ spec:
 
 ```promql
 # Monitor multi-disk migration
-sum(hyper2kvm_migrations_active{phase="Migrating"}) by (namespace)
+sum(h2kvm_migrations_active{phase="Migrating"}) by (namespace)
 
 # Check disk-specific progress
-hyper2kvm_disk_migration_duration_seconds
+h2kvm_disk_migration_duration_seconds
 
 # Compression ratio per disk
-hyper2kvm_conversion_compression_ratio{format="qcow2"}
+h2kvm_conversion_compression_ratio{format="qcow2"}
 ```
 
 ---

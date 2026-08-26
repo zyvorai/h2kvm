@@ -20,7 +20,7 @@ Instead, please report them via one of the following methods:
 
 Report vulnerabilities through GitHub's private vulnerability reporting:
 
-1. Go to https://github.com/ssahani/hyper2kvm/security/advisories
+1. Go to https://github.com/ssahani/h2kvm/security/advisories
 2. Click "Report a vulnerability"
 3. Fill in the details
 
@@ -46,7 +46,7 @@ Include the following information:
 
 ## Security Measures
 
-hyper2kvm implements several security measures:
+h2kvm implements several security measures:
 
 ### Code Quality
 
@@ -57,7 +57,7 @@ hyper2kvm implements several security measures:
 
 ### Runtime Security
 
-- **Path Traversal Protection**: All file paths validated (see `hyper2kvm/vmware/utils/vmdk_parser.py`)
+- **Path Traversal Protection**: All file paths validated (see `h2kvm/vmware/utils/vmdk_parser.py`)
 - **Command Injection Prevention**: No shell=True in subprocess calls
 - **Input Validation**: All user inputs sanitized
 - **TLS Verification**: Certificate validation enforced for VMware/Azure connections
@@ -87,30 +87,30 @@ hyper2kvm implements several security measures:
 1. **Run with Least Privilege**
    ```bash
    # Don't run as root unless absolutely necessary
-   sudo -u vmadmin hyper2kvm vsphere ...
+   sudo -u vmadmin h2kvm vsphere ...
    ```
 
 2. **Network Security**
    ```bash
    # Use VPN/bastion for vSphere access
    # Verify TLS certificates
-   hyper2kvm vsphere --verify-ssl ...
+   h2kvm vsphere --verify-ssl ...
    ```
 
 3. **Credential Management**
    ```bash
    # Use environment variables, not command-line args
    export VCENTER_PASSWORD="..."
-   hyper2kvm vsphere --username admin
+   h2kvm vsphere --username admin
 
    # Or use credential files with restricted permissions
-   chmod 600 ~/.hyper2kvm/credentials.yaml
+   chmod 600 ~/.h2kvm/credentials.yaml
    ```
 
 4. **Audit Logging**
    ```bash
    # Enable detailed logging for audit trails
-   hyper2kvm --log-level debug --log-file /var/log/hyper2kvm/migration.log ...
+   h2kvm --log-level debug --log-file /var/log/h2kvm/migration.log ...
    ```
 
 ### Development
@@ -139,7 +139,7 @@ hyper2kvm implements several security measures:
 
 ### 1. System Dependencies
 
-hyper2kvm uses VMCraft by default (with `qemu-img` and `qemu-nbd`). These tools run with elevated privileges:
+h2kvm uses VMCraft by default (with `qemu-img` and `qemu-nbd`). These tools run with elevated privileges:
 
 - **Risk**: Potential privilege escalation
 - **Mitigation**: Only use trusted disk images, validate inputs
@@ -202,7 +202,7 @@ We recognize security researchers who responsibly disclose vulnerabilities:
 
 For security inquiries: **ssahani@zyvor.dev**
 
-For general support: https://github.com/ssahani/hyper2kvm/issues
+For general support: https://github.com/ssahani/h2kvm/issues
 
 ---
 

@@ -54,7 +54,7 @@
 <!-- PAGE 1 -->
 <div class="page page-dark">
   <h2 class="st" style="color:#e8e6df;">DR Architecture <span>Overview</span></h2>
-  <p class="sub">RPO/RTO tiers, VMware DR costs vs KVM, and hyper2kvm's role in DR strategy.</p>
+  <p class="sub">RPO/RTO tiers, VMware DR costs vs KVM, and h2kvm's role in DR strategy.</p>
 
   <h3>DR Tier Definitions</h3>
   <table>
@@ -88,7 +88,7 @@
         <li>Pacemaker (included in RHEL): $0</li>
         <li>Velero (open source): $0</li>
         <li>BorgBackup / Restic (open source): $0</li>
-        <li>hyper2kvm for initial migration: included*</li>
+        <li>h2kvm for initial migration: included*</li>
         <li><strong>Annual Total: $0-$13,000</strong></li>
         <li><strong>3-Year Total: $0-$39,000</strong></li>
       </ul>
@@ -96,7 +96,7 @@
   </div>
 
   <div class="highlight">
-    <h3>hyper2kvm's Role in DR</h3>
+    <h3>h2kvm's Role in DR</h3>
     <p><strong>Initial migration:</strong> Convert VMware VMs to KVM for the DR site. <strong>Ongoing:</strong> Nightly automated pipeline exports changed VMDKs and converts to QCOW2 on KVM DR hosts. <strong>Failover:</strong> KVM DR VMs are pre-converted and ready to boot — RTO drops from hours (re-converting) to minutes (just boot).</p>
   </div>
 </div>
@@ -557,7 +557,7 @@ velero schedule create kubevirt-backup \
     <tr><th>Week</th><th>Activity</th><th>Deliverable</th></tr>
     <tr><td>1-2</td><td>Assessment: inventory VMs, classify RPO/RTO tiers, select DR strategy</td><td>DR plan document, VM classification matrix</td></tr>
     <tr><td>3-4</td><td>Infrastructure: deploy DR site servers, install OS, configure Ceph cluster</td><td>3-node Ceph cluster operational, storage pools created</td></tr>
-    <tr><td>5-6</td><td>Migration: use hyper2kvm to convert VMware VMs to KVM on DR site</td><td>All VMs converted, boot-tested on DR hosts</td></tr>
+    <tr><td>5-6</td><td>Migration: use h2kvm to convert VMware VMs to KVM on DR site</td><td>All VMs converted, boot-tested on DR hosts</td></tr>
     <tr><td>7</td><td>HA setup: configure Pacemaker cluster, fencing, VM resources</td><td>Pacemaker cluster with automatic failover tested</td></tr>
     <tr><td>8</td><td>Replication: enable Ceph mirroring, configure backup schedules</td><td>Ceph mirroring active, Borg/Restic backups running</td></tr>
     <tr><td>9</td><td>Testing: full DR drill — simulate primary failure, measure RTO</td><td>DR drill report, measured RTO vs target</td></tr>
@@ -566,10 +566,10 @@ velero schedule create kubevirt-backup \
 
   <div class="verdict">
     <h3>Open-Source DR Saves $623K Over 3 Years While Matching VMware SRM Capabilities</h3>
-    <p>Ceph RBD mirroring achieves the same RPO as vSphere Replication (seconds with journal mode). Pacemaker provides equivalent automatic failover to VMware HA. Live migration matches vMotion. The only difference: $0 in software licensing vs $618K for VMware SRM. hyper2kvm bridges the gap — convert once, protect forever.</p>
+    <p>Ceph RBD mirroring achieves the same RPO as vSphere Replication (seconds with journal mode). Pacemaker provides equivalent automatic failover to VMware HA. Live migration matches vMotion. The only difference: $0 in software licensing vs $618K for VMware SRM. h2kvm bridges the gap — convert once, protect forever.</p>
   </div>
 
-  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Disaster Recovery &amp; Business Continuity Guide</div>
+  <div class="footer">h2kvm.io | Proprietary (Zyvor AI Labs) | Disaster Recovery &amp; Business Continuity Guide</div>
 </div>
 
 </body>

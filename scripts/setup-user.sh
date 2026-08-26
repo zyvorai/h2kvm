@@ -1,9 +1,9 @@
 #!/bin/bash
 # ============================================
-# Setup user permissions for hyper2kvm
+# Setup user permissions for h2kvm
 # ============================================
 # Adds a user to all required groups for running
-# hyper2kvm, libvirt, QEMU, KVM, and container tools
+# h2kvm, libvirt, QEMU, KVM, and container tools
 # without needing sudo for every command.
 #
 # Usage:
@@ -74,11 +74,11 @@ EOF
     info "  Created polkit rule: $POLKIT_RULE"
 fi
 
-# ── Sudoers for hyper2kvm commands (passwordless) ──
-SUDOERS_FILE="/etc/sudoers.d/hyper2kvm-${TARGET_USER}"
+# ── Sudoers for h2kvm commands (passwordless) ──
+SUDOERS_FILE="/etc/sudoers.d/h2kvm-${TARGET_USER}"
 if [ ! -f "$SUDOERS_FILE" ]; then
     cat > "$SUDOERS_FILE" << EOF
-# Allow $TARGET_USER to run hyper2kvm migration tools without password
+# Allow $TARGET_USER to run h2kvm migration tools without password
 $TARGET_USER ALL=(ALL) NOPASSWD: /usr/local/sbin/h2kvmctl
 $TARGET_USER ALL=(ALL) NOPASSWD: /usr/local/bin/h2kvmctl
 $TARGET_USER ALL=(ALL) NOPASSWD: /usr/bin/h2kvmctl
@@ -87,10 +87,10 @@ $TARGET_USER ALL=(ALL) NOPASSWD: /usr/bin/qemu-nbd
 $TARGET_USER ALL=(ALL) NOPASSWD: /usr/bin/virsh
 $TARGET_USER ALL=(ALL) NOPASSWD: /usr/bin/virt-install
 $TARGET_USER ALL=(ALL) NOPASSWD: /usr/sbin/modprobe
-# mount/umount restricted to NBD devices and hyper2kvm temp dirs only
-# (trade-off: allows passwordless mount of any NBD partition to /tmp/hyper2kvm-*)
-$TARGET_USER ALL=(ALL) NOPASSWD: /usr/bin/mount /dev/nbd* /tmp/hyper2kvm-*
-$TARGET_USER ALL=(ALL) NOPASSWD: /usr/bin/umount /tmp/hyper2kvm-*
+# mount/umount restricted to NBD devices and h2kvm temp dirs only
+# (trade-off: allows passwordless mount of any NBD partition to /tmp/h2kvm-*)
+$TARGET_USER ALL=(ALL) NOPASSWD: /usr/bin/mount /dev/nbd* /tmp/h2kvm-*
+$TARGET_USER ALL=(ALL) NOPASSWD: /usr/bin/umount /tmp/h2kvm-*
 EOF
     chmod 0440 "$SUDOERS_FILE"
     visudo -cf "$SUDOERS_FILE" &>/dev/null || {
@@ -101,7 +101,7 @@ EOF
 fi
 
 # ── Set ACLs on common directories ──
-for dir in /var/lib/libvirt/images /var/lib/hyper2kvm /var/log/hyper2kvm; do
+for dir in /var/lib/libvirt/images /var/lib/h2kvm /var/log/h2kvm; do
     if [ -d "$dir" ]; then
         setfacl -m "u:${TARGET_USER}:rwx" "$dir" 2>/dev/null || \
             chmod 775 "$dir" 2>/dev/null || true

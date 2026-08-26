@@ -1,4 +1,4 @@
-# ARCHITECTURE.md — hyper2kvm Internal Architecture
+# ARCHITECTURE.md — h2kvm Internal Architecture
 
 
 ## Table of Contents
@@ -58,7 +58,7 @@
   - [Key Capabilities](#key-capabilities)
   - [Integration with Pipeline](#integration-with-pipeline)
   - [Performance](#performance)
-  - [Usage in hyper2kvm](#usage-in-hyper2kvm)
+  - [Usage in h2kvm](#usage-in-h2kvm)
   - [Essential Utilities](#essential-utilities)
     - [Guest Identity (`guest_identity.py`)](#guest-identity-guest_identitypy)
     - [Recovery Manager (`recovery_manager.py`)](#recovery-manager-recovery_managerpy)
@@ -122,14 +122,14 @@
 ---
 ## Purpose
 
-This document provides an in-depth exploration of **hyper2kvm's module-level architecture**, execution flow, and core architectural principles.
+This document provides an in-depth exploration of **h2kvm's module-level architecture**, execution flow, and core architectural principles.
 
 It's designed for:
 * **Contributors** wanting to understand the codebase structure
 * **Reviewers** evaluating design decisions and implementation quality
 * **Power users** seeking to extend or customize the migration pipeline
 
-hyper2kvm is laser-focused on fixing "successful" conversions that fail at boot, lose network connectivity, or exhibit instability post-migration. This architecture document explains how the modular design achieves reliability through:
+h2kvm is laser-focused on fixing "successful" conversions that fail at boot, lose network connectivity, or exhibit instability post-migration. This architecture document explains how the modular design achieves reliability through:
 
 * **Deterministic inspection** over assumption-based heuristics
 * **Offline-first fixing** to avoid runtime dependencies
@@ -253,7 +253,7 @@ flowchart LR
 This reflects the **actual codebase structure** as of the latest refactor:
 
 ```bash
-hyper2kvm/
+h2kvm/
 ├── __init__.py                       # Package root
 ├── __main__.py                       # Entry point (h2kvmctl)
 │
@@ -867,7 +867,7 @@ The foundational layer providing infrastructure for all other modules.
 
 **Version:** v9.0
 
-VMCraft is hyper2kvm's pure Python disk image manipulation platform, serving as the primary VM inspection and modification engine.
+VMCraft is h2kvm's pure Python disk image manipulation platform, serving as the primary VM inspection and modification engine.
 
 ### Architecture
 
@@ -944,10 +944,10 @@ VMCraft integrates into the migration pipeline at these stages:
 | File Read | <50ms | Direct filesystem access |
 | Registry Read | ~150ms | Windows offline registry |
 
-### Usage in hyper2kvm
+### Usage in h2kvm
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 with VMCraft() as g:
     g.add_drive_opts("/path/to/disk.vmdk", readonly=False)
@@ -1289,8 +1289,8 @@ Real-time progress tracking and performance metrics.
 ### Example 1: Basic Pipeline Usage
 
 ```python
-from hyper2kvm.orchestrator.disk_processor import DiskProcessor
-from hyper2kvm.core.guest_identity import GuestIdentity
+from h2kvm.orchestrator.disk_processor import DiskProcessor
+from h2kvm.core.guest_identity import GuestIdentity
 
 # Initialize processor
 processor = DiskProcessor()
@@ -1312,7 +1312,7 @@ print(f"Firmware: {identity.firmware_type}")
 ### Example 2: Custom Fixer
 
 ```python
-from hyper2kvm.fixers.offline_fixer import OfflineFixer
+from h2kvm.fixers.offline_fixer import OfflineFixer
 
 # Create fixer instance
 fixer = OfflineFixer('/data/vm.qcow2')
@@ -1329,7 +1329,7 @@ fixer.validate()
 ### Example 3: vSphere Integration
 
 ```python
-from hyper2kvm.vmware.clients.client import VMwareClient
+from h2kvm.vmware.clients.client import VMwareClient
 
 # Connect to vCenter
 client = VMwareClient(
@@ -1362,7 +1362,7 @@ When proposing architectural changes:
 
 ## Summary
 
-hyper2kvm's architecture achieves **reliable, repeatable VM migrations** through:
+h2kvm's architecture achieves **reliable, repeatable VM migrations** through:
 
 1. **Deterministic pipeline** (FETCH → FLATTEN → INSPECT → PLAN → FIX → CONVERT → TEST)
 2. **Offline-first fixing** (guestfs backend via VMCraft, no runtime dependencies)

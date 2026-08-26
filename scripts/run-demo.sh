@@ -1,8 +1,8 @@
 #!/bin/bash
 # ============================================
-# hyper2kvm Demo — Download, Convert, Boot
+# h2kvm Demo — Download, Convert, Boot
 # ============================================
-# Downloads a small cloud image, converts it with hyper2kvm,
+# Downloads a small cloud image, converts it with h2kvm,
 # and boots it on libvirt — shows a running VM in under 5 minutes.
 #
 # Usage:
@@ -31,7 +31,7 @@ usage() {
     cat <<EOF
 Usage: sudo $0 [options]
 
-Download a cloud image, convert with hyper2kvm, and boot on libvirt.
+Download a cloud image, convert with h2kvm, and boot on libvirt.
 
 Options:
   --photon       VMware Photon OS (default, ~300MB)
@@ -54,7 +54,7 @@ EOF
 }
 
 DEMO_DIR="./demo-output"
-DEMO_NAME="hyper2kvm-demo"
+DEMO_NAME="h2kvm-demo"
 IMAGE_TYPE="${1:---photon}"
 LOCAL_DISK=""
 
@@ -223,7 +223,7 @@ download_image() {
 
 # ── Convert and boot ──
 convert_and_boot() {
-    step "Converting with hyper2kvm..."
+    step "Converting with h2kvm..."
 
     # Detect format
     local fmt
@@ -328,7 +328,7 @@ YAMLEOF
     virsh undefine "$DEMO_NAME" --nvram 2>/dev/null || true
     virsh undefine "$DEMO_NAME" 2>/dev/null || true
 
-    # Run hyper2kvm
+    # Run h2kvm
     h2kvmctl --config "$config"
 
     # Set root password and enable SSH for demo access
@@ -338,12 +338,12 @@ YAMLEOF
         virsh destroy "$DEMO_NAME" 2>/dev/null || true
         sleep 2
         virt-customize -a "$output_qcow2" \
-            --root-password password:hyper2kvm \
+            --root-password password:h2kvm \
             --run-command "sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config" \
             --run-command "sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config" \
             2>/dev/null
         virsh start "$DEMO_NAME" 2>/dev/null || true
-        info "Root password set to: hyper2kvm"
+        info "Root password set to: h2kvm"
         # Wait for VM to boot and get IP
         sleep 15
     fi
@@ -414,7 +414,7 @@ show_results() {
         echo "  Login: cirros / gocubsgo"
         echo ""
     else
-        echo "  Login: root / hyper2kvm"
+        echo "  Login: root / h2kvm"
         echo ""
     fi
 
@@ -434,7 +434,7 @@ show_results() {
         read -p "  Connect via SSH now? [Y/n] " -n 1 -r
         echo ""
         if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-            SSHPASS='hyper2kvm' sshpass -e ssh -o StrictHostKeyChecking=no root@"$vm_ip"
+            SSHPASS='h2kvm' sshpass -e ssh -o StrictHostKeyChecking=no root@"$vm_ip"
         fi
     elif [ -n "${vm_ip:-}" ]; then
         echo "  Install sshpass for auto-login: dnf install sshpass (or apt install sshpass)"
@@ -462,7 +462,7 @@ fi
 
 echo ""
 echo "============================================"
-echo " hyper2kvm Demo ($IMAGE_TYPE)"
+echo " h2kvm Demo ($IMAGE_TYPE)"
 echo "============================================"
 echo ""
 

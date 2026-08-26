@@ -1,10 +1,10 @@
 # Upgrade Guide: Live Migration Features
 
-This guide helps you upgrade from hyper2kvm v1.x to v2.0 with live migration features.
+This guide helps you upgrade from h2kvm v1.x to v2.0 with live migration features.
 
 ## Overview of Changes
 
-hyper2kvm v2.0 introduces:
+h2kvm v2.0 introduces:
 - **MigrationPolicy CRD** - New cluster-scoped CRD
 - **Extended MigrationJob CRD** - New optional fields in `spec.createVM`
 - **New Controllers** - Live migration, VM lifecycle, storage migration
@@ -33,8 +33,8 @@ kubectl apply -f k8s/operator/crds/migrationpolicy.yaml
 kubectl apply -f k8s/operator/migrationjob-crd.yaml
 
 # Verify CRDs
-kubectl get crd migrationpolicies.hyper2kvm.io
-kubectl get crd migrationjobs.hyper2kvm.io
+kubectl get crd migrationpolicies.h2kvm.io
+kubectl get crd migrationjobs.h2kvm.io
 ```
 
 ### 2. Update RBAC
@@ -46,15 +46,15 @@ The operator requires additional permissions:
 kubectl apply -f k8s/operator/deployment.yaml
 
 # Verify permissions
-kubectl auth can-i create virtualmachineinstancemigrations --as=system:serviceaccount:hyper2kvm-system:hyper2kvm-operator
-kubectl auth can-i get migrationpolicies --as=system:serviceaccount:hyper2kvm-system:hyper2kvm-operator
+kubectl auth can-i create virtualmachineinstancemigrations --as=system:serviceaccount:h2kvm-system:h2kvm-operator
+kubectl auth can-i get migrationpolicies --as=system:serviceaccount:h2kvm-system:h2kvm-operator
 ```
 
 New permissions added:
 - `kubevirt.io/virtualmachines` - Full access
 - `kubevirt.io/virtualmachineinstances` - Full access
 - `kubevirt.io/virtualmachineinstancemigrations` - Full access
-- `hyper2kvm.io/migrationpolicies` - Read/write access
+- `h2kvm.io/migrationpolicies` - Read/write access
 - `persistentvolumeclaims` - Full access
 
 ### 3. Deploy Updated Operator
@@ -64,10 +64,10 @@ New permissions added:
 kubectl apply -f k8s/operator/deployment.yaml
 
 # Wait for rollout
-kubectl rollout status deployment/hyper2kvm-operator -n hyper2kvm-system
+kubectl rollout status deployment/h2kvm-operator -n h2kvm-system
 
 # Check logs
-kubectl logs -n hyper2kvm-system deployment/hyper2kvm-operator -f
+kubectl logs -n h2kvm-system deployment/h2kvm-operator -f
 ```
 
 Expected log messages:
@@ -95,16 +95,16 @@ kubectl describe migrationpolicy default-migration-policy
 Check that new metrics are exposed:
 
 ```bash
-kubectl port-forward -n hyper2kvm-system deployment/hyper2kvm-operator 8080:8080
+kubectl port-forward -n h2kvm-system deployment/h2kvm-operator 8080:8080
 
 # In another terminal
-curl http://localhost:8080/metrics | grep hyper2kvm_live_migration
+curl http://localhost:8080/metrics | grep h2kvm_live_migration
 ```
 
 Expected metrics:
-- `hyper2kvm_live_migrations_total`
-- `hyper2kvm_live_migrations_active`
-- `hyper2kvm_migration_policy_violations_total`
+- `h2kvm_live_migrations_total`
+- `h2kvm_live_migrations_active`
+- `h2kvm_migration_policy_violations_total`
 - etc.
 
 ## Migrating Existing VMs
@@ -114,7 +114,7 @@ Expected metrics:
 For new migrations, use the extended spec:
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: upgraded-vm
@@ -183,7 +183,7 @@ done
 Apply migration policy without recreating:
 
 ```bash
-kubectl annotate vm my-vm hyper2kvm.io/migration-policy=default-migration-policy
+kubectl annotate vm my-vm h2kvm.io/migration-policy=default-migration-policy
 ```
 
 ## Testing the Upgrade
@@ -221,10 +221,10 @@ kubectl get virtualmachineinstancemigrations -w
 
 ```bash
 # Port forward to operator
-kubectl port-forward -n hyper2kvm-system deployment/hyper2kvm-operator 8080:8080
+kubectl port-forward -n h2kvm-system deployment/h2kvm-operator 8080:8080
 
 # Query metrics
-curl http://localhost:8080/metrics | grep -E 'hyper2kvm_(live_migrations|migration_policy)'
+curl http://localhost:8080/metrics | grep -E 'h2kvm_(live_migrations|migration_policy)'
 ```
 
 ### Test 4: Policy Validation
@@ -232,7 +232,7 @@ curl http://localhost:8080/metrics | grep -E 'hyper2kvm_(live_migrations|migrati
 ```bash
 # Try to create invalid policy
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationPolicy
 metadata:
   name: invalid-policy
@@ -252,12 +252,12 @@ If issues occur, rollback:
 
 ```bash
 # Rollback to previous version
-kubectl rollout undo deployment/hyper2kvm-operator -n hyper2kvm-system
+kubectl rollout undo deployment/h2kvm-operator -n h2kvm-system
 
 # Or deploy specific version
-kubectl set image deployment/hyper2kvm-operator \
-  hyper2kvm-operator=ghcr.io/your-org/hyper2kvm-operator:v1.5.0 \
-  -n hyper2kvm-system
+kubectl set image deployment/h2kvm-operator \
+  h2kvm-operator=ghcr.io/your-org/h2kvm-operator:v1.5.0 \
+  -n h2kvm-system
 ```
 
 ### 2. Keep CRDs (Recommended)
@@ -279,7 +279,7 @@ kubectl get migrationpolicies
 kubectl delete migrationpolicies --all
 
 # Remove CRD (optional)
-kubectl delete crd migrationpolicies.hyper2kvm.io
+kubectl delete crd migrationpolicies.h2kvm.io
 ```
 
 ## Common Issues
@@ -296,7 +296,7 @@ Error: failed to create client: forbidden
 **Solution:**
 ```bash
 kubectl apply -f k8s/operator/deployment.yaml
-kubectl delete pod -n hyper2kvm-system -l app=hyper2kvm-operator
+kubectl delete pod -n h2kvm-system -l app=h2kvm-operator
 ```
 
 ### Issue: MigrationPolicy not applied to VMs
@@ -336,14 +336,14 @@ Reason: InsufficientResourcesForMigration
 
 ### Issue: Metrics not appearing
 
-**Symptoms:** No `hyper2kvm_live_migration_*` metrics.
+**Symptoms:** No `h2kvm_live_migration_*` metrics.
 
 **Cause:** Controllers not initialized.
 
 **Solution:**
 ```bash
 # Check operator logs
-kubectl logs -n hyper2kvm-system deployment/hyper2kvm-operator | grep -i "controller\|metrics"
+kubectl logs -n h2kvm-system deployment/h2kvm-operator | grep -i "controller\|metrics"
 
 # Look for:
 # - "Live migration controller loaded"
@@ -371,7 +371,7 @@ Before upgrading to production:
 
 **Default (Conservative):**
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationPolicy
 metadata:
   name: default
@@ -385,7 +385,7 @@ spec:
 
 **Production (Balanced):**
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationPolicy
 metadata:
   name: production
@@ -402,7 +402,7 @@ spec:
 
 **Critical (Aggressive):**
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationPolicy
 metadata:
   name: critical
@@ -440,27 +440,27 @@ Example Prometheus alerts:
 
 ```yaml
 groups:
-- name: hyper2kvm-live-migration
+- name: h2kvm-live-migration
   rules:
   - alert: HighMigrationFailureRate
     expr: |
-      rate(hyper2kvm_live_migrations_failed_total[5m]) /
-      rate(hyper2kvm_live_migrations_total[5m]) > 0.1
+      rate(h2kvm_live_migrations_failed_total[5m]) /
+      rate(h2kvm_live_migrations_total[5m]) > 0.1
     for: 10m
     annotations:
       summary: "High migration failure rate (>10%)"
 
   - alert: MigrationPolicyViolations
-    expr: rate(hyper2kvm_migration_policy_violations_total[5m]) > 0
+    expr: rate(h2kvm_migration_policy_violations_total[5m]) > 0
     for: 5m
     annotations:
       summary: "Migration policy violations detected"
 
   - alert: MigrationStuck
     expr: |
-      hyper2kvm_live_migrations_active{phase="Running"} > 0
+      h2kvm_live_migrations_active{phase="Running"} > 0
       and
-      increase(hyper2kvm_live_migration_duration_seconds[30m]) == 0
+      increase(h2kvm_live_migration_duration_seconds[30m]) == 0
     for: 30m
     annotations:
       summary: "Migration stuck in Running phase for >30m"
@@ -480,10 +480,10 @@ groups:
 
 If you encounter issues:
 
-1. Check logs: `kubectl logs -n hyper2kvm-system deployment/hyper2kvm-operator`
+1. Check logs: `kubectl logs -n h2kvm-system deployment/h2kvm-operator`
 2. Review events: `kubectl get events --sort-by='.lastTimestamp' | grep -i migration`
 3. Check metrics: `curl http://localhost:8080/metrics`
-4. File issue: https://github.com/anthropics/hyper2kvm/issues
+4. File issue: https://github.com/anthropics/h2kvm/issues
 
 ## Summary
 

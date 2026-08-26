@@ -16,8 +16,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hyper2kvm/web/internal/domain"
-	"github.com/hyper2kvm/web/internal/ports"
+	"github.com/h2kvm/web/internal/domain"
+	"github.com/h2kvm/web/internal/ports"
 
 	"gopkg.in/yaml.v3"
 )
@@ -224,7 +224,7 @@ func findBinary(override string) string {
 		return override
 	}
 
-	for _, name := range []string{"h2kvmctl", "hyper2kvm"} {
+	for _, name := range []string{"h2kvmctl", "h2kvm"} {
 		if p, err := exec.LookPath(name); err == nil {
 			return p
 		}

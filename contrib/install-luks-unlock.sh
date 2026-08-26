@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: Apache-2.0
 #
-# Hyper2KVM LUKS Auto-Unlock Installation Script
+# H2KVM LUKS Auto-Unlock Installation Script
 #
 # This script installs and configures LUKS auto-unlock with TPM2.
 #
@@ -12,7 +12,7 @@
 #   --tpm-handle HANDLE    TPM2 persistent handle (default: 0x81000010)
 #   --vault-addr ADDR      Vault server address (optional)
 #   --vault-token TOKEN    Vault token (optional)
-#   --vault-path PATH      Vault secret path (default: secret/hyper2kvm/luks)
+#   --vault-path PATH      Vault secret path (default: secret/h2kvm/luks)
 #   --keyfile PATH         Path to existing LUKS keyfile
 #   --device DEVICE        LUKS device to unlock (e.g., /dev/sda1)
 #   --skip-seal            Skip sealing key to TPM
@@ -28,7 +28,7 @@ NC='\033[0m' # No Color
 
 # Defaults
 TPM_HANDLE="0x81000010"
-VAULT_PATH="secret/hyper2kvm/luks"
+VAULT_PATH="secret/h2kvm/luks"
 SKIP_SEAL=false
 SKIP_DRACUT=false
 
@@ -98,37 +98,37 @@ check_tpm() {
     return 0
 }
 
-install_hyper2kvm() {
-    log_info "Installing hyper2kvm LUKS module..."
+install_h2kvm() {
+    log_info "Installing h2kvm LUKS module..."
 
     # Install Python dependencies
     pip3 install --upgrade cryptography hvac
 
-    # Install hyper2kvm
+    # Install h2kvm
     if [ -f setup.py ]; then
         pip3 install -e .
     else
-        log_error "setup.py not found - run from hyper2kvm repository root"
+        log_error "setup.py not found - run from h2kvm repository root"
         exit 1
     fi
 
     # Make CLI executable
-    chmod +x bin/hyper2kvm-luks
+    chmod +x bin/h2kvm-luks
 
     # Copy to /usr/bin if not already there
-    if [ ! -L /usr/bin/hyper2kvm-luks ]; then
-        ln -sf "$(pwd)/bin/hyper2kvm-luks" /usr/bin/hyper2kvm-luks
+    if [ ! -L /usr/bin/h2kvm-luks ]; then
+        ln -sf "$(pwd)/bin/h2kvm-luks" /usr/bin/h2kvm-luks
     fi
 
-    log_info "✓ Hyper2KVM LUKS module installed"
+    log_info "✓ H2KVM LUKS module installed"
 }
 
 create_config() {
     log_info "Creating configuration..."
 
-    mkdir -p /etc/hyper2kvm
+    mkdir -p /etc/h2kvm
 
-    local config="/etc/hyper2kvm/luks.json"
+    local config="/etc/h2kvm/luks.json"
 
     # Build config
     cat > "$config" <<EOF
@@ -183,7 +183,7 @@ seal_key_to_tpm() {
     fi
 
     # Seal to TPM
-    hyper2kvm-luks seal "$KEYFILE" --handle "$TPM_HANDLE" --pcr 0 1 2 3 7
+    h2kvm-luks seal "$KEYFILE" --handle "$TPM_HANDLE" --pcr 0 1 2 3 7
 
     log_info "✓ Key sealed to TPM2 handle $TPM_HANDLE"
 }
@@ -205,10 +205,10 @@ install_dracut_module() {
     fi
 
     # Copy dracut module
-    local dracut_dir="/usr/lib/dracut/modules.d/90hyper2kvm-luks"
+    local dracut_dir="/usr/lib/dracut/modules.d/90h2kvm-luks"
     mkdir -p "$dracut_dir"
 
-    cp -r contrib/dracut/90hyper2kvm-luks/* "$dracut_dir/"
+    cp -r contrib/dracut/90h2kvm-luks/* "$dracut_dir/"
     chmod +x "$dracut_dir"/*.sh
 
     log_info "✓ dracut module installed"
@@ -251,13 +251,13 @@ print_summary() {
     echo ""
     echo "✓ Installation complete!"
     echo ""
-    echo "Configuration: /etc/hyper2kvm/luks.json"
+    echo "Configuration: /etc/h2kvm/luks.json"
     echo "TPM Handle:    $TPM_HANDLE"
     echo ""
     echo "Next steps:"
-    echo "1. Verify configuration: cat /etc/hyper2kvm/luks.json"
-    echo "2. Test unlock:         hyper2kvm-luks unlock -v"
-    echo "3. Check status:        hyper2kvm-luks status"
+    echo "1. Verify configuration: cat /etc/h2kvm/luks.json"
+    echo "2. Test unlock:         h2kvm-luks unlock -v"
+    echo "3. Check status:        h2kvm-luks status"
     echo "4. Reboot to test automatic unlock"
     echo ""
 }
@@ -304,7 +304,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --tpm-handle HANDLE    TPM2 persistent handle (default: 0x81000010)"
             echo "  --vault-addr ADDR      Vault server address"
             echo "  --vault-token TOKEN    Vault token"
-            echo "  --vault-path PATH      Vault secret path (default: secret/hyper2kvm/luks)"
+            echo "  --vault-path PATH      Vault secret path (default: secret/h2kvm/luks)"
             echo "  --keyfile PATH         Path to LUKS keyfile"
             echo "  --device DEVICE        LUKS device (e.g., /dev/sda1)"
             echo "  --skip-seal            Skip sealing key to TPM"
@@ -322,13 +322,13 @@ done
 
 # Main installation
 main() {
-    log_info "Starting Hyper2KVM LUKS Auto-Unlock installation"
+    log_info "Starting H2KVM LUKS Auto-Unlock installation"
     echo ""
 
     check_root
     check_dependencies
     check_tpm
-    install_hyper2kvm
+    install_h2kvm
     create_config
     add_key_to_luks
     seal_key_to_tpm

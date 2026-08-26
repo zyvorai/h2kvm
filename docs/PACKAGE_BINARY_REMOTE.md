@@ -1,24 +1,24 @@
-# Package hyper2kvm as a Linux client bundle (remote build)
+# Package h2kvm as a Linux client bundle (remote build)
 
-Ship **hyper2kvm**, **h2kvmctl**, **h2kweb**, and the dashboard UI as a tarball—without running full `deploy-remote.sh` (systemd, daemon install).
+Ship **h2kvm**, **h2kvmctl**, **h2kweb**, and the dashboard UI as a tarball—without running full `deploy-remote.sh` (systemd, daemon install).
 
 **Distribution model:** this product uses a **Python venv bundle** (type C in `VMRogue/docs/CLIENT_BUNDLE_POLICY.md`), not a single static ELF like Rust/Go products. The customer tarball contains `venv/` + wrapper scripts; **no source tree** and no `pip install` on the customer host (unless they rebuild the venv themselves).
 
 ## What you get
 
 ```
-~/hyper2kvm-dist/
-  hyper2kvm-<version>-linux-amd64/
-    bin/hyper2kvm        wrapper → `venv/bin/python -m hyper2kvm`
+~/h2kvm-dist/
+  h2kvm-<version>-linux-amd64/
+    bin/h2kvm        wrapper → `venv/bin/python -m h2kvm`
     bin/h2kvmctl
     bin/h2kweb
     venv/                Python 3.10+ env with package installed
     web/dashboard/       static UI
-    config.example.yaml  (from examples/hyper2kvm-tools.yaml.example)
+    config.example.yaml  (from examples/h2kvm-tools.yaml.example)
     h2kweb.env.example
     README.txt
-  hyper2kvm-<version>-linux-amd64.tar.gz
-  hyper2kvm-<version>-linux-amd64.tar.gz.sha256
+  h2kvm-<version>-linux-amd64.tar.gz
+  h2kvm-<version>-linux-amd64.tar.gz.sha256
 ```
 
 With `--fetch`, files copy to **`dist/`** locally.
@@ -61,18 +61,18 @@ First run: **10–25 minutes** (pip + npm + Go). Later:
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `DEPLOY_HOST` / `DEPLOY_USER` | — / `sus` | When omitted |
-| `HYPER2KVM_PACKAGE_DIR` | `~/hyper2kvm-dist` | Remote output |
-| `HYPER2KVM_PACKAGE_VERSION` | `pyproject.toml` | Archive version |
-| `HYPER2KVM_REMOTE_SKIP_SSH_CHECK=1` | off | Skip SSH preflight |
+| `H2KVM_PACKAGE_DIR` | `~/h2kvm-dist` | Remote output |
+| `H2KVM_PACKAGE_VERSION` | `pyproject.toml` | Archive version |
+| `H2KVM_REMOTE_SKIP_SSH_CHECK=1` | off | Skip SSH preflight |
 
 ## Client quick start
 
 ```bash
-tar xzf hyper2kvm-*-linux-amd64.tar.gz
-cd hyper2kvm-*-linux-amd64
+tar xzf h2kvm-*-linux-amd64.tar.gz
+cd h2kvm-*-linux-amd64
 ./bin/h2kweb --addr 0.0.0.0:5070 --static-dir "$(pwd)/web/dashboard"
 # http://<host>:5070
-./bin/hyper2kvm --help
+./bin/h2kvm --help
 ```
 
 Install OS packages on the target host first (`./install.sh --deps-only` from a full checkout, or match your distro libvirt/qemu packages).

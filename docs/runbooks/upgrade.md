@@ -1,7 +1,7 @@
 # Operator and Worker Upgrade
 
 ## Scenario
-Upgrading hyper2kvm operator, worker images, or dependencies (KubeVirt, CDI) to new versions.
+Upgrading h2kvm operator, worker images, or dependencies (KubeVirt, CDI) to new versions.
 
 **Upgrade types:**
 - Patch upgrade (0.3.0 → 0.3.1): bug fixes, minimal risk
@@ -17,7 +17,7 @@ Upgrading hyper2kvm operator, worker images, or dependencies (KubeVirt, CDI) to 
 cat CHANGELOG.md
 
 # Review GitHub release notes
-# https://github.com/ssahani/hyper2kvm/releases
+# https://github.com/ssahani/h2kvm/releases
 
 # Check for breaking changes
 grep -i "breaking" CHANGELOG.md
@@ -26,11 +26,11 @@ grep -i "breaking" CHANGELOG.md
 ### 2. Identify current versions
 ```bash
 # Operator version
-kubectl get deployment hyperconversion-operator -n hyper2kvm-system \
+kubectl get deployment hyperconversion-operator -n h2kvm-system \
   -o jsonpath='{.spec.template.spec.containers[0].image}'
 
 # Worker version
-kubectl get daemonset hyper2kvm-worker -n hyper2kvm-workers \
+kubectl get daemonset h2kvm-worker -n h2kvm-workers \
   -o jsonpath='{.spec.template.spec.containers[0].image}'
 
 # KubeVirt version
@@ -47,7 +47,7 @@ h2kvmctl --version
 ```bash
 # Check for active migrations
 kubectl get hc -A
-kubectl get jobs -n hyper2kvm-migration | grep -v Complete
+kubectl get jobs -n h2kvm-migration | grep -v Complete
 
 # Estimate downtime
 # - Operator upgrade: 2-5 minutes (no downtime for running VMs)
@@ -62,16 +62,16 @@ kubectl get jobs -n hyper2kvm-migration | grep -v Complete
 ```bash
 # Backup operator resources
 kubectl get deployment,configmap,secret,serviceaccount \
-  -n hyper2kvm-system -o yaml > operator-backup-$(date +%Y%m%d).yaml
+  -n h2kvm-system -o yaml > operator-backup-$(date +%Y%m%d).yaml
 
 # Backup CRDs
-kubectl get crd -o yaml | grep -A9999 "hyper2kvm.io" > crds-backup-$(date +%Y%m%d).yaml
+kubectl get crd -o yaml | grep -A9999 "h2kvm.io" > crds-backup-$(date +%Y%m%d).yaml
 
 # Backup HyperConversion resources
 kubectl get hc -A -o yaml > hyperconversions-backup-$(date +%Y%m%d).yaml
 
 # Collect full debug bundle
-./scripts/collect-debug-bundle.sh /var/backups/hyper2kvm-pre-upgrade-$(date +%Y%m%d)
+./scripts/collect-debug-bundle.sh /var/backups/h2kvm-pre-upgrade-$(date +%Y%m%d)
 ```
 
 ### 2. Check for active migrations
@@ -80,13 +80,13 @@ kubectl get hc -A -o yaml > hyperconversions-backup-$(date +%Y%m%d).yaml
 kubectl get hc -A | grep -vE "Ready|Succeeded"
 
 # List running jobs
-kubectl get jobs -n hyper2kvm-migration | grep -v Complete
+kubectl get jobs -n h2kvm-migration | grep -v Complete
 
 # Option A: Wait for completion
 kubectl get hc -A --watch
 
 # Option B: Pause/cancel active migrations (if acceptable)
-kubectl delete hc <active-migration> -n hyper2kvm-migration
+kubectl delete hc <active-migration> -n h2kvm-migration
 ```
 
 ### 3. Run health check
@@ -94,8 +94,8 @@ kubectl delete hc <active-migration> -n hyper2kvm-migration
 ./scripts/health-check.sh
 
 # Verify all components healthy
-kubectl get pods -n hyper2kvm-system
-kubectl get pods -n hyper2kvm-workers
+kubectl get pods -n h2kvm-system
+kubectl get pods -n h2kvm-workers
 kubectl get pods -n kubevirt
 kubectl get pods -n cdi
 
@@ -129,14 +129,14 @@ kubectl debug node/<node-name> -it --image=ubuntu -- chroot /host df -h
 # CRDs must be updated BEFORE operator
 # New operator expects updated CRD schemas
 
-cd /path/to/hyper2kvm
+cd /path/to/h2kvm
 
 # Apply new CRDs
-kubectl apply -f operator/config/crd/bases/hyper2kvm.io_hyperconversions.yaml
-kubectl apply -f operator/config/crd/bases/hyper2kvm.io_validations.yaml
+kubectl apply -f operator/config/crd/bases/h2kvm.io_hyperconversions.yaml
+kubectl apply -f operator/config/crd/bases/h2kvm.io_validations.yaml
 
 # Verify CRD versions
-kubectl get crd hyperconversions.hyper2kvm.io -o yaml | grep "version:"
+kubectl get crd hyperconversions.h2kvm.io -o yaml | grep "version:"
 ```
 
 ### Step 2: Upgrade Operator
@@ -150,60 +150,60 @@ vi operator/charts/hyperconversion-operator/values.yaml
 # Upgrade via Helm
 helm upgrade hyperconversion-operator \
   operator/charts/hyperconversion-operator/ \
-  -n hyper2kvm-system \
+  -n h2kvm-system \
   --wait --timeout 5m
 
 # Verify upgrade
-helm list -n hyper2kvm-system
-kubectl rollout status deployment hyperconversion-operator -n hyper2kvm-system
+helm list -n h2kvm-system
+kubectl rollout status deployment hyperconversion-operator -n h2kvm-system
 ```
 
 #### Option B: Using Kubectl (Manual)
 ```bash
 # Build new operator image
 cd operator
-docker build -t hyper2kvm-operator:v0.4.0 -f Dockerfile .
+docker build -t h2kvm-operator:v0.4.0 -f Dockerfile .
 
 # For k3d/k3s development cluster
-k3d image import hyper2kvm-operator:v0.4.0 -c <cluster-name>
+k3d image import h2kvm-operator:v0.4.0 -c <cluster-name>
 
 # Update deployment image
 kubectl set image deployment/hyperconversion-operator \
-  manager=hyper2kvm-operator:v0.4.0 \
-  -n hyper2kvm-system
+  manager=h2kvm-operator:v0.4.0 \
+  -n h2kvm-system
 
 # Or edit deployment directly
-kubectl edit deployment hyperconversion-operator -n hyper2kvm-system
+kubectl edit deployment hyperconversion-operator -n h2kvm-system
 # Update: spec.template.spec.containers[0].image
 
 # Wait for rollout
-kubectl rollout status deployment hyperconversion-operator -n hyper2kvm-system
+kubectl rollout status deployment hyperconversion-operator -n h2kvm-system
 
 # Verify new version
-kubectl get pods -n hyper2kvm-system -o wide
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager | grep "version\|starting"
+kubectl get pods -n h2kvm-system -o wide
+kubectl logs -n h2kvm-system -l control-plane=controller-manager | grep "version\|starting"
 ```
 
 ### Step 3: Upgrade Workers (Rolling Update)
 
 ```bash
 # Build new worker image
-cd /path/to/hyper2kvm
-docker build -t hyper2kvm:worker-v0.4.0 -f Dockerfile --target worker .
+cd /path/to/h2kvm
+docker build -t h2kvm:worker-v0.4.0 -f Dockerfile --target worker .
 
 # For k3d/k3s
-k3d image import hyper2kvm:worker-v0.4.0 -c <cluster-name>
+k3d image import h2kvm:worker-v0.4.0 -c <cluster-name>
 
 # Update DaemonSet image
-kubectl set image daemonset/hyper2kvm-worker \
-  worker=hyper2kvm:worker-v0.4.0 \
-  -n hyper2kvm-workers
+kubectl set image daemonset/h2kvm-worker \
+  worker=h2kvm:worker-v0.4.0 \
+  -n h2kvm-workers
 
 # Monitor rolling update (one node at a time)
-kubectl rollout status daemonset hyper2kvm-worker -n hyper2kvm-workers
+kubectl rollout status daemonset h2kvm-worker -n h2kvm-workers
 
 # Verify all workers updated
-kubectl get pods -n hyper2kvm-workers -o custom-columns=\
+kubectl get pods -n h2kvm-workers -o custom-columns=\
 NAME:.metadata.name,\
 NODE:.spec.nodeName,\
 IMAGE:.spec.containers[0].image,\
@@ -214,17 +214,17 @@ STATUS:.status.phase
 
 ```bash
 # Pull latest code
-cd /path/to/hyper2kvm
+cd /path/to/h2kvm
 git pull origin main
 
 # Uninstall old version
-pip uninstall -y hyper2kvm
+pip uninstall -y h2kvm
 
 # Install new version (editable mode for development)
 pip install -e .
 
 # Or install from PyPI (when published)
-pip install --upgrade hyper2kvm
+pip install --upgrade h2kvm
 
 # Verify version
 h2kvmctl --version
@@ -237,7 +237,7 @@ h2kvmctl --version
 ./scripts/health-check.sh
 
 # Check operator logs for errors
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager --tail=50
+kubectl logs -n h2kvm-system -l control-plane=controller-manager --tail=50
 
 # Test migration (dry-run)
 h2kvmctl --cmd local \
@@ -247,11 +247,11 @@ h2kvmctl --cmd local \
 
 # Or test HyperConversion CR
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: upgrade-test
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
 spec:
   sourceVmdk: "/path/to/test.vmdk"
   outputFormat: qcow2
@@ -259,11 +259,11 @@ spec:
 EOF
 
 # Wait and check status
-kubectl get hc upgrade-test -n hyper2kvm-migration
-kubectl describe hc upgrade-test -n hyper2kvm-migration
+kubectl get hc upgrade-test -n h2kvm-migration
+kubectl describe hc upgrade-test -n h2kvm-migration
 
 # Clean up test
-kubectl delete hc upgrade-test -n hyper2kvm-migration
+kubectl delete hc upgrade-test -n h2kvm-migration
 ```
 
 ## Upgrading Dependencies
@@ -274,7 +274,7 @@ kubectl delete hc upgrade-test -n hyper2kvm-migration
 # Check current version
 kubectl get kubevirt kubevirt -n kubevirt -o yaml | grep "kubevirt.io/version"
 
-# Check compatibility with hyper2kvm
+# Check compatibility with h2kvm
 # See: operator/go.mod for tested versions
 
 # Set target version
@@ -320,7 +320,7 @@ kubectl get cdi cdi -o yaml | grep phase
 
 ### Kubernetes Cluster Upgrade
 
-**Important:** Upgrade Kubernetes BEFORE hyper2kvm to ensure compatibility.
+**Important:** Upgrade Kubernetes BEFORE h2kvm to ensure compatibility.
 
 ```bash
 # For k3s (example)
@@ -340,10 +340,10 @@ k3d cluster create <cluster-name> --image rancher/k3s:v1.28.0-k3s1
 
 ```bash
 # Rollback to previous version via kubectl
-kubectl rollout undo deployment hyperconversion-operator -n hyper2kvm-system
+kubectl rollout undo deployment hyperconversion-operator -n h2kvm-system
 
 # Verify rollback
-kubectl rollout status deployment hyperconversion-operator -n hyper2kvm-system
+kubectl rollout status deployment hyperconversion-operator -n h2kvm-system
 
 # Or restore from backup
 kubectl apply -f operator-backup-<date>.yaml
@@ -356,10 +356,10 @@ kubectl apply -f operator-backup-<date>.yaml
 
 ```bash
 # Rollback DaemonSet
-kubectl rollout undo daemonset hyper2kvm-worker -n hyper2kvm-workers
+kubectl rollout undo daemonset h2kvm-worker -n h2kvm-workers
 
 # Monitor rollback
-kubectl rollout status daemonset hyper2kvm-worker -n hyper2kvm-workers
+kubectl rollout status daemonset h2kvm-worker -n h2kvm-workers
 ```
 
 ### Scenario C: CRD Rollback
@@ -371,29 +371,29 @@ kubectl rollout status daemonset hyper2kvm-worker -n hyper2kvm-workers
 kubectl apply -f crds-backup-<date>.yaml
 
 # Delete HyperConversions using new fields (if any)
-kubectl delete hc <name-with-new-fields> -n hyper2kvm-migration
+kubectl delete hc <name-with-new-fields> -n h2kvm-migration
 
 # Rollback operator to match old CRD version
-kubectl rollout undo deployment hyperconversion-operator -n hyper2kvm-system
+kubectl rollout undo deployment hyperconversion-operator -n h2kvm-system
 ```
 
 ### Scenario D: Full Rollback (All Components)
 
 ```bash
 # 1. Delete new HyperConversions (incompatible with old version)
-kubectl delete hc --all -n hyper2kvm-migration
+kubectl delete hc --all -n h2kvm-migration
 
 # 2. Rollback CRDs
 kubectl apply -f crds-backup-<date>.yaml
 
 # 3. Rollback operator
-kubectl rollout undo deployment hyperconversion-operator -n hyper2kvm-system
+kubectl rollout undo deployment hyperconversion-operator -n h2kvm-system
 
 # 4. Rollback workers
-kubectl rollout undo daemonset hyper2kvm-worker -n hyper2kvm-workers
+kubectl rollout undo daemonset h2kvm-worker -n h2kvm-workers
 
 # 5. Verify all components back to old versions
-kubectl get deployment hyperconversion-operator -n hyper2kvm-system \
+kubectl get deployment hyperconversion-operator -n h2kvm-system \
   -o jsonpath='{.spec.template.spec.containers[0].image}'
 
 # 6. Run health check
@@ -405,7 +405,7 @@ kubectl get deployment hyperconversion-operator -n hyper2kvm-system \
 ### 1. Monitor for Issues
 ```bash
 # Watch operator logs for errors
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager --follow
+kubectl logs -n h2kvm-system -l control-plane=controller-manager --follow
 
 # Monitor pod restarts
 kubectl get events -A --watch --field-selector type=Warning
@@ -442,11 +442,11 @@ git commit -m "docs: update to version 0.4.0"
 ### 4. Clean Up Old Images (Optional)
 ```bash
 # List old images
-docker images | grep hyper2kvm
+docker images | grep h2kvm
 
 # Remove old tags
-docker rmi hyper2kvm-operator:v0.3.0
-docker rmi hyper2kvm:worker-v0.3.0
+docker rmi h2kvm-operator:v0.3.0
+docker rmi h2kvm:worker-v0.3.0
 
 # Or prune all unused images
 docker image prune -a -f
@@ -458,7 +458,7 @@ docker image prune -a -f
 ```yaml
 # Pin versions in Helm values.yaml
 image:
-  repository: hyper2kvm-operator
+  repository: h2kvm-operator
   tag: "v0.4.0"  # explicit version, not "latest"
   pullPolicy: IfNotPresent
 ```
@@ -466,15 +466,15 @@ image:
 ### Canary Deployments
 ```bash
 # Deploy new version to subset of nodes first
-kubectl label nodes worker-1 hyper2kvm-canary=true
+kubectl label nodes worker-1 h2kvm-canary=true
 
 # Update DaemonSet with nodeSelector
-kubectl patch daemonset hyper2kvm-worker -n hyper2kvm-workers -p '
+kubectl patch daemonset h2kvm-worker -n h2kvm-workers -p '
 spec:
   template:
     spec:
       nodeSelector:
-        hyper2kvm-canary: "true"
+        h2kvm-canary: "true"
 '
 
 # Run test migrations on canary nodes
@@ -484,7 +484,7 @@ spec:
 ### Automated Testing
 ```bash
 # Run test suite before upgrade
-cd /path/to/hyper2kvm
+cd /path/to/h2kvm
 python3 -m pytest tests/unit/ -x -q
 cd zkvm && go test ./...
 
@@ -496,15 +496,15 @@ cd zkvm && go test ./...
 ```yaml
 # Prometheus alerts for upgrade issues
 groups:
-- name: hyper2kvm-upgrade
+- name: h2kvm-upgrade
   rules:
   - alert: OperatorCrashLoop
-    expr: rate(kube_pod_container_status_restarts_total{namespace="hyper2kvm-system"}[5m]) > 0
+    expr: rate(kube_pod_container_status_restarts_total{namespace="h2kvm-system"}[5m]) > 0
     annotations:
       summary: "Operator pod restarting after upgrade"
 
   - alert: WorkerImagePullFail
-    expr: kube_pod_container_status_waiting_reason{namespace="hyper2kvm-workers",reason="ImagePullBackOff"} > 0
+    expr: kube_pod_container_status_waiting_reason{namespace="h2kvm-workers",reason="ImagePullBackOff"} > 0
     annotations:
       summary: "Worker pods failing to pull new image"
 ```
@@ -521,7 +521,7 @@ groups:
 1. Collect debug bundle: `./scripts/collect-debug-bundle.sh`
 2. Save upgrade timeline and steps taken
 3. Document current state vs expected state
-4. Check GitHub issues: https://github.com/ssahani/hyper2kvm/issues
+4. Check GitHub issues: https://github.com/ssahani/h2kvm/issues
 5. Contact platform team or file GitHub issue with:
    - Old version → new version
    - Kubernetes version
@@ -530,7 +530,7 @@ groups:
 
 ## Version Compatibility Matrix
 
-| hyper2kvm | KubeVirt | CDI | Kubernetes | Notes |
+| h2kvm | KubeVirt | CDI | Kubernetes | Notes |
 |-----------|----------|-----|------------|-------|
 | 0.3.x | v1.0.0+ | v1.57.0+ | 1.25-1.28 | Current stable |
 | 0.4.x | v1.2.0+ | v1.58.0+ | 1.26-1.29 | Latest features |

@@ -2,7 +2,7 @@
 # =============================================================================
 # HyperSDK Integration Test Script
 # =============================================================================
-# Tests the integration between hyper2kvm workflow daemon and HyperSDK
+# Tests the integration between h2kvm workflow daemon and HyperSDK
 #
 # Components tested:
 # 1. Workflow daemon setup and operation
@@ -23,7 +23,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-TEST_DIR="/tmp/hyper2kvm-integration-test"
+TEST_DIR="/tmp/h2kvm-integration-test"
 WORKFLOW_DIR="$TEST_DIR/manifest-workflow"
 OUTPUT_DIR="$TEST_DIR/output"
 HYPERCTL="/home/ssahani/go/github/hypersdk/cmd/hyperctl/hyperctl"
@@ -369,8 +369,8 @@ fi
 print_test "Documentation Check"
 
 DOC_FILES=(
-    "/home/ssahani/tt/hyper2kvm/HYPERSDK_INTEGRATION.md"
-    "/home/ssahani/tt/hyper2kvm/WORKFLOW_INTEGRATION_COMPLETE.md"
+    "/home/ssahani/tt/h2kvm/HYPERSDK_INTEGRATION.md"
+    "/home/ssahani/tt/h2kvm/WORKFLOW_INTEGRATION_COMPLETE.md"
 )
 
 for file in "${DOC_FILES[@]}"; do
@@ -407,7 +407,7 @@ echo ""
 
 print_msg "$YELLOW" "Next Steps:"
 echo "1. Start the workflow daemon with:"
-echo "   python3 -m hyper2kvm --config $TEST_DIR/manifest-daemon.yaml"
+echo "   python3 -m h2kvm --config $TEST_DIR/manifest-daemon.yaml"
 echo ""
 echo "2. Submit manifests using hyperctl:"
 echo "   $HYPERCTL manifest submit -file test-manifest.json"

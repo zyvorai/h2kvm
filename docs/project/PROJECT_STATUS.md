@@ -1,4 +1,4 @@
-# hyper2kvm Project Status
+# h2kvm Project Status
 
 **Last Updated**: 2026-03-29
 **Version**: 0.3.0
@@ -65,7 +65,7 @@
 - ✅ **CHANGELOG.md** - Version history
 
 ### Code Quality
-- ✅ **Custom exception hierarchy** - Hyper2KvmError base
+- ✅ **Custom exception hierarchy** - H2KvmError base
 - ✅ **Structured logging** - Emoji/JSON support
 - ✅ **Type hints** - ~70% coverage (improving)
 - ✅ **Ruff configuration** - Modern linting
@@ -252,8 +252,8 @@ See [IMPROVEMENTS_ROADMAP.md](IMPROVEMENTS_ROADMAP.md) for detailed plan.
 ### For Developers
 ```bash
 # Quick setup
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 make quickstart  # Installs everything
 
 # Development workflow
@@ -360,7 +360,7 @@ Needed:
 
 ## 📝 Summary
 
-**hyper2kvm is a production-ready VM migration toolkit** with excellent architecture, security practices, and modern Python tooling. Recent modernization efforts have significantly improved the development experience and code quality automation.
+**h2kvm is a production-ready VM migration toolkit** with excellent architecture, security practices, and modern Python tooling. Recent modernization efforts have significantly improved the development experience and code quality automation.
 
 **Current focus**: Addressing critical code quality issues (bare excepts, assert statements) and restoring test coverage by investigating deleted test files.
 

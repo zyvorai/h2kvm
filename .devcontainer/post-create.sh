@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# Post-create script for hyper2kvm development container
+# Post-create script for h2kvm development container
 # Runs after the container is created to set up the development environment
 
 set -e
 
-echo "=== hyper2kvm Development Container Setup ==="
+echo "=== h2kvm Development Container Setup ==="
 echo
 
 # Install project in development mode
-echo "📦 Installing hyper2kvm in development mode..."
+echo "📦 Installing h2kvm in development mode..."
 pip install -e ".[dev,test]" --no-cache-dir
 
 echo
@@ -27,7 +27,7 @@ echo
 
 # Verify installation
 echo "🔍 Verifying installation..."
-python -c "import hyper2kvm; print(f'hyper2kvm version: {hyper2kvm.__version__}')" || echo "⚠️  hyper2kvm import failed"
+python -c "import h2kvm; print(f'h2kvm version: {h2kvm.__version__}')" || echo "⚠️  h2kvm import failed"
 
 echo
 
@@ -60,9 +60,9 @@ echo
 echo "📚 Helpful commands:"
 echo "   ruff format .              # Format code"
 echo "   ruff check .               # Lint code"
-echo "   mypy hyper2kvm/            # Type check"
+echo "   mypy h2kvm/            # Type check"
 echo "   pytest tests/unit/         # Run unit tests"
-echo "   pytest --cov=hyper2kvm     # Run tests with coverage"
+echo "   pytest --cov=h2kvm     # Run tests with coverage"
 echo "   pre-commit run --all-files # Run all pre-commit hooks"
 echo
 echo "🎉 Happy coding!"

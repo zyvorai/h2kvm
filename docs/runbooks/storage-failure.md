@@ -16,11 +16,11 @@ Storage subsystem failures during migration: PVC unavailable, provisioner down, 
 ### Kubernetes Migrations
 ```bash
 # Check PVC status (look for Pending, Lost, Failed)
-kubectl get pvc -n hyper2kvm-migration
+kubectl get pvc -n h2kvm-migration
 kubectl get pvc -A | grep -vE "Bound|Available"
 
 # Check for Pending PVCs with details
-kubectl describe pvc -n hyper2kvm-migration | grep -A10 "Events:"
+kubectl describe pvc -n h2kvm-migration | grep -A10 "Events:"
 
 # Check storage provisioner health
 kubectl get pods -n kube-system | grep -E "local-path|rook|nfs"
@@ -30,11 +30,11 @@ kubectl get sc
 kubectl describe sc <storage-class-name>
 
 # Check for I/O errors in pod logs
-kubectl logs -n hyper2kvm-migration <pod> | grep -iE "i/o error|read-only|no space left"
+kubectl logs -n h2kvm-migration <pod> | grep -iE "i/o error|read-only|no space left"
 
 # Check DataVolume status (CDI)
 kubectl get dv -A
-kubectl describe dv <name> -n hyper2kvm-migration | grep -A5 status
+kubectl describe dv <name> -n h2kvm-migration | grep -A5 status
 ```
 
 ### Node-Level Checks
@@ -82,7 +82,7 @@ rm <output-dir>/test-write
 ### 1. Identify storage backend
 ```bash
 # Determine storage class used by PVC
-kubectl get pvc <name> -n hyper2kvm-migration -o yaml | grep storageClassName
+kubectl get pvc <name> -n h2kvm-migration -o yaml | grep storageClassName
 
 # Check storage class provisioner
 kubectl get sc <storage-class> -o yaml | grep provisioner
@@ -125,8 +125,8 @@ du -sh /var/lib/rancher/k3s/storage/*  # k3s local-path
 du -sh /var/lib/kubelet/pods/*  # general kubelet storage
 
 # Check if migration output is consuming space
-ls -lh /tmp/hyper2kvm-*
-du -sh /tmp/hyper2kvm-*
+ls -lh /tmp/h2kvm-*
+du -sh /tmp/h2kvm-*
 ```
 
 ### 4. Check for I/O bottlenecks
@@ -148,7 +148,7 @@ sudo smartctl -H /dev/sda  # health summary
 
 #### 1. Diagnose binding issue
 ```bash
-kubectl describe pvc <pvc-name> -n hyper2kvm-migration
+kubectl describe pvc <pvc-name> -n h2kvm-migration
 # Look for: "waiting for first consumer", "no nodes available", "storage quota exceeded"
 ```
 
@@ -159,10 +159,10 @@ kubectl run pvc-binder --rm -i --restart=Never --image=busybox \
   --overrides='{"spec":{"containers":[{"name":"bind","image":"busybox",
   "command":["sleep","10"],"volumeMounts":[{"name":"vol","mountPath":"/data"}]}],
   "volumes":[{"name":"vol","persistentVolumeClaim":{"claimName":"<pvc-name>"}}]}}' \
-  -n hyper2kvm-migration
+  -n h2kvm-migration
 
 # Or annotate with target node (local-path specific)
-kubectl annotate pvc <pvc-name> -n hyper2kvm-migration \
+kubectl annotate pvc <pvc-name> -n h2kvm-migration \
   volume.kubernetes.io/selected-node=<node-name>
 ```
 
@@ -182,11 +182,11 @@ kubectl wait --for=condition=Available deployment/local-path-provisioner \
 #### 4. If quota exceeded
 ```bash
 # Check resource quota
-kubectl get resourcequota -n hyper2kvm-migration
-kubectl describe resourcequota -n hyper2kvm-migration
+kubectl get resourcequota -n h2kvm-migration
+kubectl describe resourcequota -n h2kvm-migration
 
 # Increase quota or clean up old PVCs
-kubectl delete pvc <old-pvc> -n hyper2kvm-migration
+kubectl delete pvc <old-pvc> -n h2kvm-migration
 ```
 
 ### Scenario B: Disk Full on Node
@@ -200,20 +200,20 @@ kubectl debug node/<node-name> -it --image=ubuntu
 chroot /host
 du -sh /* | sort -h | tail -10
 du -sh /var/lib/rancher/k3s/storage/* | sort -h | tail -10
-du -sh /tmp/hyper2kvm-* | sort -h | tail -10
+du -sh /tmp/h2kvm-* | sort -h | tail -10
 ```
 
 #### 2. Clean up migration artifacts
 ```bash
 # Delete completed migration PVCs
-kubectl get pvc -n hyper2kvm-migration
-kubectl delete pvc <completed-pvc> -n hyper2kvm-migration
+kubectl get pvc -n h2kvm-migration
+kubectl delete pvc <completed-pvc> -n h2kvm-migration
 
 # Delete completed jobs (keeps logs for 1 hour by default)
-kubectl delete jobs --field-selector=status.successful=1 -n hyper2kvm-migration
+kubectl delete jobs --field-selector=status.successful=1 -n h2kvm-migration
 
 # Clean up failed migrations
-kubectl delete hc --all -n hyper2kvm-migration  # if no active migrations
+kubectl delete hc --all -n h2kvm-migration  # if no active migrations
 ```
 
 #### 3. Clean up Docker/containerd cache
@@ -237,12 +237,12 @@ find /var/log -name "*.log" -mtime +7 -delete
 #### 4. Clean up temporary files
 ```bash
 # On the node
-rm -rf /tmp/hyper2kvm-*
-rm -rf /var/tmp/hyper2kvm-*
+rm -rf /tmp/h2kvm-*
+rm -rf /var/tmp/h2kvm-*
 
 # Or from kubectl
 kubectl debug node/<node-name> -it --image=ubuntu -- \
-  chroot /host sh -c "rm -rf /tmp/hyper2kvm-*"
+  chroot /host sh -c "rm -rf /tmp/h2kvm-*"
 ```
 
 #### 5. Expand disk (if applicable)
@@ -333,7 +333,7 @@ sudo exportfs -v
 #### 4. Remount storage (if stale)
 ```bash
 # Force remount NFS volumes
-kubectl delete pod <pod-with-nfs-mount> -n hyper2kvm-migration  # recreates pod
+kubectl delete pod <pod-with-nfs-mount> -n h2kvm-migration  # recreates pod
 ```
 
 ### Scenario E: I/O Errors or Filesystem Corruption
@@ -388,13 +388,13 @@ du -sh <output-dir>
 #### 2. Clean up or change output location
 ```bash
 # Clean up old migrations
-rm -rf /tmp/hyper2kvm-old-*
+rm -rf /tmp/h2kvm-old-*
 rm -rf <output-dir>/checkpoints/*  # if resuming not needed
 
 # Or use different output directory with more space
 h2kvmctl --cmd local \
   --vmdk /path/to/source.vmdk \
-  --output-dir /mnt/large-disk/hyper2kvm-output \
+  --output-dir /mnt/large-disk/h2kvm-output \
   --output-format qcow2
 ```
 
@@ -420,8 +420,8 @@ USED:.status.phase
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: hyper2kvm-quota
-  namespace: hyper2kvm-migration
+  name: h2kvm-quota
+  namespace: h2kvm-migration
 spec:
   hard:
     requests.storage: "500Gi"
@@ -436,7 +436,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: pvc-cleanup
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
 spec:
   schedule: "0 2 * * *"  # daily at 2 AM
   jobTemplate:
@@ -452,9 +452,9 @@ spec:
             - -c
             - |
               # Delete PVCs older than 7 days from completed migrations
-              kubectl get pvc -n hyper2kvm-migration -o json | \
+              kubectl get pvc -n h2kvm-migration -o json | \
               jq -r '.items[] | select(.metadata.creationTimestamp | fromdateiso8601 < now - 604800) | .metadata.name' | \
-              xargs -I {} kubectl delete pvc {} -n hyper2kvm-migration
+              xargs -I {} kubectl delete pvc {} -n h2kvm-migration
           restartPolicy: OnFailure
 EOF
 ```

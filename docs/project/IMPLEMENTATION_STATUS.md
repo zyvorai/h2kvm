@@ -1,4 +1,4 @@
-# Hyper2KVM Implementation Status
+# H2KVM Implementation Status
 
 ## ✅ COMPLETED - Backend Ecosystem
 
@@ -10,7 +10,7 @@
 
 ### 2. VMCraft Backend (Stable)
 - **Status:** ✅ Production-ready
-- **Code:** `hyper2kvm/vmcraft/lvm.py` (466 lines)
+- **Code:** `h2kvm/vmcraft/lvm.py` (466 lines)
 - **Features:**
   - Pure Python LVM module (enterprise-grade)
   - Caching + timeout protection
@@ -21,7 +21,7 @@
 
 ### 3. Namespace LVM Backend (Experimental)
 - **Status:** ⚠️ Experimental
-- **Code:** `hyper2kvm/vmcraft/namespace_lvm.py` (700 lines)
+- **Code:** `h2kvm/vmcraft/namespace_lvm.py` (700 lines)
 - **Features:**
   - Unshare-based namespace isolation
   - NBD device pooling
@@ -32,7 +32,7 @@
 
 ### 4. Safe Namespace Engine (Stable)
 - **Status:** ✅ Production-ready
-- **Code:** `hyper2kvm/vmcraft/safe_namespace_engine.py` (598 lines)
+- **Code:** `h2kvm/vmcraft/safe_namespace_engine.py` (598 lines)
 - **Features:**
   - **Complete unshare namespace isolation**
   - **OverlayFS copy-on-write protection**
@@ -46,7 +46,7 @@
 
 ### 5. Enterprise Parallel Manager (NEW - Production-Ready)
 - **Status:** 🆕 Production-ready
-- **Code:** `hyper2kvm/vmcraft/enterprise_parallel_manager.py` (1,000+ lines)
+- **Code:** `h2kvm/vmcraft/enterprise_parallel_manager.py` (1,000+ lines)
 - **Features:**
   - **Process-based parallelism** (ProcessPoolExecutor)
   - **Persistent namespaces** (unshare + nsenter pattern)
@@ -107,7 +107,7 @@
 ## 📁 Code Structure
 
 ```
-hyper2kvm/
+h2kvm/
 ├── vmcraft/
 │   ├── lvm.py                           (466 lines)   ✅ VMCraft LVM
 │   ├── namespace_lvm.py                 (700 lines)   ✅ Namespace LVM
@@ -287,7 +287,7 @@ modprobe nbd nbds_max=128 max_part=16
 ```python
 def convert_worker(image, nbd_id):
     nbd = f"/dev/nbd{nbd_id}"
-    lvm_dir = f"/tmp/hyper2kvm-lvm-{nbd_id}"
+    lvm_dir = f"/tmp/h2kvm-lvm-{nbd_id}"
 
     engine = NamespaceEngine(
         image=image,

@@ -1,6 +1,6 @@
 # Convert a disk and upload to OpenStack Glance (auth via clouds.yaml or OS_* env).
 #
-#   pip install 'hyper2kvm[openstack]'
+#   pip install 'h2kvm[openstack]'
 #   export OS_CLOUD=production   # or use --os-cloud on CLI
 #   sudo h2kvmctl --config examples/yaml/20-openstack/openstack-glance-upload.yaml
 #

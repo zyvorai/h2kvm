@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from hyper2kvm.systemd import (
+from h2kvm.systemd import (
     SystemdDetectVirt,
     SystemdId128,
     SystemdPath,
@@ -48,9 +48,9 @@ def main():
     path = SystemdPath()
     try:
         temp_dir = path.get_temporary_directory()
-        print(f"✅ Temporary workspace: {temp_dir}/hyper2kvm")
+        print(f"✅ Temporary workspace: {temp_dir}/h2kvm")
     except Exception:
-        print("✅ Temporary workspace: /tmp/hyper2kvm")
+        print("✅ Temporary workspace: /tmp/h2kvm")
 
     # Step 3: Generate unique identifiers
     print("\n🔑 Step 3: Generate Unique VM Identity")

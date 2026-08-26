@@ -1,0 +1,513 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.5
+  name: hyperconversions.h2kvm.io
+spec:
+  group: h2kvm.io
+  names:
+    kind: HyperConversion
+    listKind: HyperConversionList
+    plural: hyperconversions
+    shortNames:
+    - hc
+    - hconv
+    singular: hyperconversion
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.progress
+      name: Progress
+      type: integer
+    - jsonPath: .status.dataVolumeName
+      name: DataVolume
+      type: string
+    - jsonPath: .status.virtualMachineName
+      name: VM
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: HyperConversion is the Schema for the hyperconversions API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: HyperConversionSpec defines the desired state of HyperConversion
+            properties:
+              conversion:
+                description: Conversion defines conversion options like compression
+                  and offline fixes
+                properties:
+                  compression:
+                    default: zstd
+                    description: Compression type for qcow2 output (zstd, zlib, none)
+                    enum:
+                    - zstd
+                    - zlib
+                    - none
+                    type: string
+                  offlineFixes:
+                    description: |-
+                      OfflineFixes enables offline disk modifications (fstab, grub, initramfs)
+                      Requires Python worker integration
+                    type: boolean
+                  timeout:
+                    default: 60
+                    description: Timeout for conversion operations (in minutes)
+                    format: int32
+                    maximum: 1440
+                    minimum: 5
+                    type: integer
+                type: object
+              source:
+                description: Source defines the source disk image location and format
+                properties:
+                  checksum:
+                    description: |-
+                      Checksum for source validation (optional)
+                      Format: "md5:abc123" or "sha256:def456"
+                    type: string
+                  endpoint:
+                    description: |-
+                      Endpoint is the custom S3 endpoint URL (for MinIO, Ceph RGW, etc.)
+                      Only applicable when URL scheme is s3://
+                    type: string
+                  format:
+                    default: qcow2
+                    description: Format is the disk image format (vmdk, vdi, vhd,
+                      vhdx, qcow2, raw)
+                    enum:
+                    - vmdk
+                    - vdi
+                    - vhd
+                    - vhdx
+                    - qcow2
+                    - raw
+                    type: string
+                  region:
+                    description: |-
+                      Region is the S3 region (defaults to us-east-1 if not specified)
+                      Only applicable when URL scheme is s3://
+                    type: string
+                  secretRef:
+                    description: |-
+                      SecretRef references a Secret containing authentication credentials
+                      Expected keys: username, password (for HTTP basic auth) or accessKeyID, secretAccessKey (for S3)
+                    properties:
+                      name:
+                        description: |-
+                          Name of the referent.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  url:
+                    description: URL is the HTTP/HTTPS/S3 URL of the source disk image
+                    pattern: ^https?://.*$|^s3://.*$
+                    type: string
+                required:
+                - url
+                type: object
+              storage:
+                description: Storage defines the target storage configuration
+                properties:
+                  accessMode:
+                    default: ReadWriteOnce
+                    description: AccessMode defines the PVC access mode
+                    enum:
+                    - ReadWriteOnce
+                    - ReadWriteMany
+                    - ReadOnlyMany
+                    type: string
+                  size:
+                    anyOf:
+                    - type: integer
+                    - type: string
+                    description: |-
+                      Size is the requested storage size
+                      If not specified, attempts auto-detection via HTTP HEAD request
+                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                    x-kubernetes-int-or-string: true
+                  storageClass:
+                    description: |-
+                      StorageClass to use for the DataVolume PVC
+                      If not specified, uses cluster default StorageClass
+                    type: string
+                  volumeMode:
+                    default: Filesystem
+                    description: VolumeMode defines whether the volume is block or
+                      filesystem
+                    enum:
+                    - Block
+                    - Filesystem
+                    type: string
+                type: object
+              vm:
+                description: VM defines the VirtualMachine specification (optional
+                  - if omitted, only disk conversion is performed)
+                properties:
+                  additionalDisks:
+                    description: AdditionalDisks defines additional disks to attach
+                      to the VM beyond the root disk
+                    items:
+                      description: DiskSpec defines an additional disk configuration
+                      properties:
+                        bootOrder:
+                          description: |-
+                            BootOrder determines the order in which disks are tried for booting
+                            Lower numbers are tried first. Root disk defaults to bootOrder 1.
+                          type: integer
+                        bus:
+                          default: virtio
+                          description: Bus type (virtio, sata, scsi)
+                          enum:
+                          - virtio
+                          - sata
+                          - scsi
+                          type: string
+                        name:
+                          description: Name of the disk (must be unique within the
+                            VM)
+                          type: string
+                        size:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          description: Size of the disk (required for blank disks,
+                            optional for URL sources)
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        source:
+                          description: Source defines where the disk data comes from
+                          properties:
+                            blank:
+                              description: |-
+                                Blank creates an empty disk
+                                Mutually exclusive with URL and PVCName
+                                Requires Size to be specified in DiskSpec
+                              type: boolean
+                            format:
+                              description: |-
+                                Format of the disk image (vmdk, vdi, vhd, vhdx, qcow2, raw)
+                                Only applicable when URL is specified
+                              enum:
+                              - vmdk
+                              - vdi
+                              - vhd
+                              - vhdx
+                              - qcow2
+                              - raw
+                              type: string
+                            pvcName:
+                              description: |-
+                                PVCName references an existing PVC to use as the disk
+                                Mutually exclusive with URL and Blank
+                              type: string
+                            url:
+                              description: |-
+                                URL is the HTTP/HTTPS/S3 URL of a disk image to import
+                                Mutually exclusive with PVCName and Blank
+                              type: string
+                          type: object
+                        storageClass:
+                          description: StorageClass to use for the disk PVC
+                          type: string
+                      required:
+                      - name
+                      - source
+                      type: object
+                    type: array
+                  cloudInit:
+                    description: CloudInit contains cloud-init configuration
+                    properties:
+                      networkData:
+                        description: NetworkData contains cloud-init network data
+                        type: string
+                      networkDataSecretRef:
+                        description: NetworkDataSecretRef references a Secret containing
+                          network data
+                        properties:
+                          name:
+                            description: |-
+                              Name of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      userData:
+                        description: UserData contains cloud-init user data
+                        type: string
+                      userDataSecretRef:
+                        description: UserDataSecretRef references a Secret containing
+                          user data
+                        properties:
+                          name:
+                            description: |-
+                              Name of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    type: object
+                  cpu:
+                    description: CPU configuration
+                    properties:
+                      cores:
+                        default: 2
+                        description: Cores is the number of CPU cores
+                        format: int32
+                        maximum: 128
+                        minimum: 1
+                        type: integer
+                      sockets:
+                        default: 1
+                        description: Sockets is the number of CPU sockets
+                        format: int32
+                        minimum: 1
+                        type: integer
+                      threads:
+                        default: 1
+                        description: Threads is the number of threads per core
+                        format: int32
+                        minimum: 1
+                        type: integer
+                    required:
+                    - cores
+                    type: object
+                  evictionStrategy:
+                    default: LiveMigrateIfPossible
+                    description: EvictionStrategy defines VM behavior during node
+                      drain
+                    enum:
+                    - LiveMigrate
+                    - LiveMigrateIfPossible
+                    - None
+                    type: string
+                  firmware:
+                    default: bios
+                    description: Firmware configuration (bios, uefi, uefi-secure)
+                    enum:
+                    - bios
+                    - uefi
+                    - uefi-secure
+                    type: string
+                  memory:
+                    anyOf:
+                    - type: integer
+                    - type: string
+                    description: Memory is the amount of memory for the VM
+                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                    x-kubernetes-int-or-string: true
+                  name:
+                    description: Name of the VirtualMachine (defaults to HyperConversion
+                      name)
+                    type: string
+                  networks:
+                    description: Networks defines network interfaces
+                    items:
+                      description: NetworkSpec defines a network interface
+                      properties:
+                        macAddress:
+                          description: MacAddress to assign (optional)
+                          type: string
+                        model:
+                          default: virtio
+                          description: Model is the network interface model (virtio,
+                            e1000, e1000e, rtl8139)
+                          enum:
+                          - virtio
+                          - e1000
+                          - e1000e
+                          - rtl8139
+                          type: string
+                        name:
+                          description: Name of the network interface
+                          type: string
+                        networkName:
+                          description: NetworkName for bridge/multus networks (name
+                            of NetworkAttachmentDefinition)
+                          type: string
+                        type:
+                          default: pod
+                          description: Type of network (pod, bridge, sriov, multus)
+                          enum:
+                          - pod
+                          - bridge
+                          - sriov
+                          - multus
+                          type: string
+                      required:
+                      - name
+                      - type
+                      type: object
+                    type: array
+                  runStrategy:
+                    default: Always
+                    description: RunStrategy defines when the VM should be running
+                    enum:
+                    - Always
+                    - RerunOnFailure
+                    - Manual
+                    - Halted
+                    type: string
+                required:
+                - cpu
+                - memory
+                type: object
+            required:
+            - source
+            - storage
+            type: object
+          status:
+            description: HyperConversionStatus defines the observed state of HyperConversion
+            properties:
+              additionalDiskDataVolumes:
+                additionalProperties:
+                  type: string
+                description: AdditionalDiskDataVolumes maps disk name to DataVolume
+                  name for additional disks
+                type: object
+              completionTime:
+                description: CompletionTime is when the conversion completed
+                format: date-time
+                type: string
+              conditions:
+                description: Conditions represent the latest available observations
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              dataVolumeName:
+                description: DataVolumeName is the name of the created DataVolume
+                type: string
+              message:
+                description: Message contains human-readable details about the current
+                  state
+                type: string
+              fixerJobName:
+                description: FixerJobName is the name of the offline fixer Job
+                type: string
+              phase:
+                description: Phase represents the current phase of the conversion
+                enum:
+                - Pending
+                - Uploading
+                - Converting
+                - Fixing
+                - CreatingVM
+                - Ready
+                - Failed
+                type: string
+              progress:
+                description: Progress percentage (0-100)
+                format: int32
+                type: integer
+              startTime:
+                description: StartTime is when the conversion started
+                format: date-time
+                type: string
+              uploadProgress:
+                description: UploadProgress contains detailed upload progress information
+                properties:
+                  bytesUploaded:
+                    description: BytesUploaded is the number of bytes uploaded so
+                      far
+                    format: int64
+                    type: integer
+                  lastUpdateTime:
+                    description: LastUpdateTime is when progress was last updated
+                    format: date-time
+                    type: string
+                  speed:
+                    description: Speed is the current upload speed (bytes per second)
+                    format: int64
+                    type: integer
+                  totalBytes:
+                    description: TotalBytes is the total size in bytes
+                    format: int64
+                    type: integer
+                type: object
+              virtualMachineName:
+                description: VirtualMachineName is the name of the created VirtualMachine
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

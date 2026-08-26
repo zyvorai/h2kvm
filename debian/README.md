@@ -1,6 +1,6 @@
-# Debian/Ubuntu Packaging for hyper2kvm
+# Debian/Ubuntu Packaging for h2kvm
 
-This directory contains the Debian packaging files for hyper2kvm.
+This directory contains the Debian packaging files for h2kvm.
 
 ## Building the Package
 
@@ -20,14 +20,14 @@ sudo apt-get install debhelper-compat dh-python python3-all python3-setuptools \
 1. **Build source package:**
 
 ```bash
-cd /path/to/hyper2kvm
+cd /path/to/h2kvm
 debuild -us -uc -S
 ```
 
 2. **Build binary package:**
 
 ```bash
-cd /path/to/hyper2kvm
+cd /path/to/h2kvm
 debuild -us -uc -b
 ```
 
@@ -41,23 +41,23 @@ dpkg-buildpackage -us -uc -b
 
 ```bash
 sudo pbuilder create
-sudo pbuilder build ../hyper2kvm_*.dsc
+sudo pbuilder build ../h2kvm_*.dsc
 ```
 
 ### Package Files
 
 The built packages will be created in the parent directory:
 
-- `hyper2kvm_0.2.1-1_all.deb` - Binary package
-- `hyper2kvm_0.2.1-1.dsc` - Source package description
-- `hyper2kvm_0.2.1-1.tar.xz` - Source tarball
-- `hyper2kvm_0.2.1-1_amd64.buildinfo` - Build information
-- `hyper2kvm_0.2.1-1_amd64.changes` - Changes file
+- `h2kvm_0.2.1-1_all.deb` - Binary package
+- `h2kvm_0.2.1-1.dsc` - Source package description
+- `h2kvm_0.2.1-1.tar.xz` - Source tarball
+- `h2kvm_0.2.1-1_amd64.buildinfo` - Build information
+- `h2kvm_0.2.1-1_amd64.changes` - Changes file
 
 ## Installing the Package
 
 ```bash
-sudo dpkg -i hyper2kvm_0.2.1-1_all.deb
+sudo dpkg -i h2kvm_0.2.1-1_all.deb
 sudo apt-get install -f  # Install dependencies if needed
 ```
 
@@ -68,7 +68,7 @@ sudo apt-get install -f  # Install dependencies if needed
 Run lintian to check for common packaging issues:
 
 ```bash
-lintian ../hyper2kvm_0.2.1-1_all.deb
+lintian ../h2kvm_0.2.1-1_all.deb
 ```
 
 ### Package Contents
@@ -76,7 +76,7 @@ lintian ../hyper2kvm_0.2.1-1_all.deb
 List package contents:
 
 ```bash
-dpkg -c ../hyper2kvm_0.2.1-1_all.deb
+dpkg -c ../h2kvm_0.2.1-1_all.deb
 ```
 
 ### Installation Test
@@ -87,8 +87,8 @@ Test installation in a clean container:
 # Using Docker
 docker run -it --rm -v $(pwd)/..:/packages debian:latest bash
 apt-get update
-apt-get install -y /packages/hyper2kvm_0.2.1-1_all.deb
-hyper2kvm --version
+apt-get install -y /packages/h2kvm_0.2.1-1_all.deb
+h2kvm --version
 ```
 
 ## Packaging Files
@@ -103,8 +103,8 @@ hyper2kvm --version
 - **postinst** - Post-installation script
 - **prerm** - Pre-removal script
 - **postrm** - Post-removal script
-- **hyper2kvm.service** - Main systemd service
-- **hyper2kvm@.service** - Template systemd service
+- **h2kvm.service** - Main systemd service
+- **h2kvm@.service** - Template systemd service
 - **source/format** - Source package format
 - **watch** - Upstream version tracking
 
@@ -136,7 +136,7 @@ debuild -S -k<YOUR_GPG_KEY_ID>
 3. **Upload to PPA:**
 
 ```bash
-dput ppa ../hyper2kvm_0.2.1-1_source.changes
+dput ppa ../h2kvm_0.2.1-1_source.changes
 ```
 
 ## Contributing

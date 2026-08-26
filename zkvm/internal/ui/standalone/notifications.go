@@ -34,7 +34,7 @@ func SendNotification(cfg NotificationConfig, title, message string) {
 // sendDesktopNotification uses notify-send (Linux) to show a desktop alert.
 func sendDesktopNotification(title, message string) error {
 	if path, err := exec.LookPath("notify-send"); err == nil {
-		cmd := exec.Command(path, "--app-name=hyper2kvm", title, message)
+		cmd := exec.Command(path, "--app-name=h2kvm", title, message)
 		return cmd.Run()
 	}
 	return fmt.Errorf("notify-send not found — install libnotify for desktop notifications: sudo dnf install libnotify (Fedora/RHEL) or sudo apt install libnotify-bin (Debian/Ubuntu)")

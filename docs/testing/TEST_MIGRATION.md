@@ -1,6 +1,6 @@
 # Migration Pipeline Test Guide
 
-Complete guide for testing the hyper2kvm migration pipeline with vmspawn validation.
+Complete guide for testing the h2kvm migration pipeline with vmspawn validation.
 
 ## Quick Start
 
@@ -144,7 +144,7 @@ The migration pipeline runs these stages:
 Expected output:
 ```
 ======================================================================
-HYPER2KVM MIGRATION PIPELINE TEST
+H2KVM MIGRATION PIPELINE TEST
 ======================================================================
 
 Input:  ./esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
@@ -345,7 +345,7 @@ The JSON report contains:
 ```yaml
 - name: Test Migration
   run: |
-    pip install hyper2kvm
+    pip install h2kvm
     ./test_migration_cli.py migration-config.yaml
 
 - name: Upload Result
@@ -360,7 +360,7 @@ The JSON report contains:
 ```yaml
 test-migration:
   script:
-    - pip install hyper2kvm
+    - pip install h2kvm
     - ./test_migration_cli.py migration-config.yaml
   artifacts:
     paths:
@@ -425,6 +425,6 @@ After successful migration:
 
 ## Getting Help
 
-- Issues: https://github.com/ssahani/hyper2kvm/issues
-- Discussions: https://github.com/ssahani/hyper2kvm/discussions
-- Docs: https://hyper2kvm.io/docs
+- Issues: https://github.com/ssahani/h2kvm/issues
+- Discussions: https://github.com/ssahani/h2kvm/discussions
+- Docs: https://h2kvm.io/docs

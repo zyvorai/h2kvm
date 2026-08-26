@@ -52,14 +52,14 @@ jobs:
     - name: Get version from package
       id: get_version
       run: |
-        VERSION=$(python3 -c "import sys; sys.path.insert(0, '.'); from hyper2kvm import __version__; print(__version__)")
+        VERSION=$(python3 -c "import sys; sys.path.insert(0, '.'); from h2kvm import __version__; print(__version__)")
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Package version: $VERSION"
 
     - name: Create source tarball
       run: |
         VERSION="${{ steps.get_version.outputs.version }}"
-        TARBALL_NAME="hyper2kvm-${VERSION}"
+        TARBALL_NAME="h2kvm-${VERSION}"
 
         # Create tarball from git repository using git archive
         # This is the standard way for RPM packaging - clean source from VCS
@@ -79,13 +79,13 @@ jobs:
 
     - name: Copy spec file to rpmbuild SPECS
       run: |
-        cp hyper2kvm.spec ~/rpmbuild/SPECS/
+        cp h2kvm.spec ~/rpmbuild/SPECS/
         echo "Spec file copied to ~/rpmbuild/SPECS/"
 
     - name: Validate spec file
       run: |
         cd ~/rpmbuild/SPECS
-        rpmspec -P hyper2kvm.spec > /dev/null
+        rpmspec -P h2kvm.spec > /dev/null
         echo "✓ Spec file syntax is valid"
 
     - name: Install runtime dependencies
@@ -102,7 +102,7 @@ jobs:
     - name: Build RPM package
       run: |
         cd ~/rpmbuild/SPECS
-        rpmbuild -ba hyper2kvm.spec
+        rpmbuild -ba h2kvm.spec
 
         echo "RPM build completed!"
         echo "Binary RPMs:"
@@ -112,7 +112,7 @@ jobs:
 
     - name: Install RPM package
       run: |
-        dnf install -y ~/rpmbuild/RPMS/noarch/hyper2kvm-*.rpm
+        dnf install -y ~/rpmbuild/RPMS/noarch/h2kvm-*.rpm
         echo "✓ RPM installed successfully"
 
     - name: Test installed package
@@ -134,32 +134,32 @@ jobs:
 
         # Test 4: Check Python import
         echo "Test 4: Checking Python import..."
-        python3 -c "import hyper2kvm; print(f'hyper2kvm version: {hyper2kvm.__version__}')"
+        python3 -c "import h2kvm; print(f'h2kvm version: {h2kvm.__version__}')"
         echo "✓ Python import passed"
 
         # Test 5: Check man pages
         echo "Test 5: Checking man pages..."
-        man -w hyper2kvm
-        man -w hyper2kvm-local
-        man -w hyper2kvm-vsphere
-        man -w hyper2kvm-hyperv
-        man -w hyper2kvm-azure
-        man -w hyper2kvm.conf
+        man -w h2kvm
+        man -w h2kvm-local
+        man -w h2kvm-vsphere
+        man -w h2kvm-hyperv
+        man -w h2kvm-azure
+        man -w h2kvm.conf
         echo "✓ All man pages installed"
 
         # Test 6: Verify man page content
         echo "Test 6: Verifying man page content..."
-        man hyper2kvm | head -20
+        man h2kvm | head -20
         echo "✓ Man page content verified"
 
         # Test 7: Check documentation files
         echo "Test 7: Checking documentation..."
-        ls -la /usr/share/doc/hyper2kvm/
+        ls -la /usr/share/doc/h2kvm/
         echo "✓ Documentation files installed"
 
         # Test 8: Check examples
         echo "Test 8: Checking example configurations..."
-        ls -la /usr/share/doc/hyper2kvm/examples/
+        ls -la /usr/share/doc/h2kvm/examples/
         echo "✓ Example configurations installed"
 
         echo ""
@@ -181,12 +181,12 @@ jobs:
         echo "========================================="
         echo "Package Information"
         echo "========================================="
-        rpm -qip ~/rpmbuild/RPMS/noarch/hyper2kvm-*.rpm
+        rpm -qip ~/rpmbuild/RPMS/noarch/h2kvm-*.rpm
         echo ""
         echo "========================================="
         echo "Package Contents"
         echo "========================================="
-        rpm -qlp ~/rpmbuild/RPMS/noarch/hyper2kvm-*.rpm
+        rpm -qlp ~/rpmbuild/RPMS/noarch/h2kvm-*.rpm
 
   test-installation-methods:
     name: Test Different Installation Methods
@@ -216,7 +216,7 @@ jobs:
     - name: Test RPM installation
       run: |
         echo "Installing RPM package..."
-        dnf install -y ./noarch/hyper2kvm-*.rpm
+        dnf install -y ./noarch/h2kvm-*.rpm
 
         echo "Verifying installation..."
         h2kvmctl --version
@@ -226,7 +226,7 @@ jobs:
     - name: Test RPM upgrade
       run: |
         echo "Testing RPM upgrade (reinstall)..."
-        dnf reinstall -y ./noarch/hyper2kvm-*.rpm
+        dnf reinstall -y ./noarch/h2kvm-*.rpm
 
         echo "Verifying after upgrade..."
         h2kvmctl --version
@@ -236,7 +236,7 @@ jobs:
     - name: Test RPM removal
       run: |
         echo "Testing RPM removal..."
-        dnf remove -y hyper2kvm
+        dnf remove -y h2kvm
 
         echo "Verifying removal..."
         ! which h2kvmctl || (echo "✗ Command still exists after removal" && exit 1)

@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.config.pipeline_config (DiskProcessingConfig, MigrationConfig)."""
+"""Tests for h2kvm.config.pipeline_config (DiskProcessingConfig, MigrationConfig)."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import types
 
 import pytest
 
-from hyper2kvm.config.pipeline_config import DiskProcessingConfig, MigrationConfig, resolve_enable_rdp
+from h2kvm.config.pipeline_config import DiskProcessingConfig, MigrationConfig, resolve_enable_rdp
 
 
 # ---------------------------------------------------------------------------

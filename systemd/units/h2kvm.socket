@@ -1,0 +1,23 @@
+[Unit]
+Description=H2KVM Socket Activation
+Documentation=man:h2kvm(1) https://github.com/ssahani/h2kvm
+PartOf=h2kvm.service
+
+[Socket]
+ListenStream=/run/h2kvm/repair.sock
+SocketMode=0666
+SocketUser=root
+SocketGroup=root
+Accept=no
+RemoveOnStop=yes
+
+# Socket options
+Backlog=128
+KeepAlive=yes
+NoDelay=yes
+
+# Trigger service on connection
+Service=h2kvm.service
+
+[Install]
+WantedBy=sockets.target

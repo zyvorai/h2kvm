@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Quick Start &amp; POC Guide — hyper2kvm + hypersdk</title>
+<title>Quick Start &amp; POC Guide — h2kvm + hypersdk</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -54,14 +54,14 @@
 <div class="cover">
   <h1>Quick Start &amp; <span>POC Guide</span></h1>
   <h2>From Zero to Migrated VM in 30 Minutes</h2>
-  <p class="sub">Step-by-step hands-on guide for IT teams. Install hyper2kvm, run system checks, convert a local VMDK, migrate from vSphere, test Windows VMs, deploy to KubeVirt, and validate with the POC checklist. Everything you need to prove the migration works before committing to a full project.</p>
+  <p class="sub">Step-by-step hands-on guide for IT teams. Install h2kvm, run system checks, convert a local VMDK, migrate from vSphere, test Windows VMs, deploy to KubeVirt, and validate with the POC checklist. Everything you need to prove the migration works before committing to a full project.</p>
   <div class="badge">30 Minutes | 6 Labs | POC Checklist | Copy-Paste Commands | Proprietary (Zyvor AI Labs)</div>
 </div>
 
 <!-- PAGE 1: Install & System Check -->
 <div class="page page-dark">
   <h2 class="st" style="color:#e8e6df;">Lab 1: Install &amp; <span>System Check</span> <span class="time">5 min</span></h2>
-  <p class="sub">Get hyper2kvm running on any Linux machine.</p>
+  <p class="sub">Get h2kvm running on any Linux machine.</p>
 
   <h3>Prerequisites</h3>
   <p>Any Linux machine: Fedora 38+, RHEL 9+, Ubuntu 22.04+, Debian 12+. 4GB RAM minimum. 20GB free disk. Root or sudo access.</p>
@@ -69,7 +69,7 @@
   <div class="step">
     <div class="step-num">1</div>
     <div class="step-content">
-      <h4>Install dependencies + hyper2kvm</h4>
+      <h4>Install dependencies + h2kvm</h4>
       <pre># Option A: One-command quickstart (recommended)
 sudo ./scripts/quickstart.sh
 
@@ -79,8 +79,8 @@ sudo dnf install -y qemu-img qemu-system-x86 libvirt virt-install python3-pip
 # Ubuntu / Debian:
 sudo apt install -y qemu-utils qemu-system-x86 libvirt-daemon-system python3-pip
 
-# Install hyper2kvm
-git clone https://github.com/ssahani/hyper2kvm.git && cd hyper2kvm
+# Install h2kvm
+git clone https://github.com/ssahani/h2kvm.git && cd h2kvm
 pip3 install -e .
 
 # Install govc (for vSphere exports)
@@ -108,7 +108,7 @@ h2kvmctl doctor
     <div class="step-num">3</div>
     <div class="step-content">
       <h4>Verify installation</h4>
-      <pre>h2kvmctl --version          # hyper2kvm version
+      <pre>h2kvmctl --version          # h2kvm version
 govc version                # govc version
 zkvm --help 2>&1 | head -1  # zkvm TUI available
 virsh list --all            # libvirt running
@@ -466,7 +466,7 @@ sudo h2kvmctl --cmd local \
 <!-- PAGE 7: What's Next -->
 <div class="page page-green">
   <h2 class="st" style="color:#e8e6df;">POC Complete — <span>What's Next?</span></h2>
-  <p class="sub">You've proven hyper2kvm works. Here's how to move to production.</p>
+  <p class="sub">You've proven h2kvm works. Here's how to move to production.</p>
 
   <div class="card-grid-3">
     <div class="card">
@@ -523,13 +523,13 @@ sudo h2kvmctl --cmd local \
   <div class="verdict">
     <h3>You've Proven It Works. Now Scale It.</h3>
     <p style="font-size:0.92em;">
-      hyper2kvm converted your VMs. They booted on KVM. The pipeline is automated.<br>
+      h2kvm converted your VMs. They booted on KVM. The pipeline is automated.<br>
       The tool is licensed*. The savings start the day you cancel VMware licenses.<br>
       <strong>Take the POC results to leadership. Build the business case. Start the migration.</strong>
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm + hypersdk — Quick Start &amp; POC Guide | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Quick Start &amp; POC Guide | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

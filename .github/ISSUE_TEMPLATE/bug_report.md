@@ -31,7 +31,7 @@ Steps to reproduce the behavior:
 
 - OS: [e.g., Ubuntu 22.04, RHEL 9]
 - Python Version: [e.g., 3.11.5]
-- hyper2kvm Version: [e.g., 1.0.0]
+- h2kvm Version: [e.g., 1.0.0]
 - Hypervisor: [e.g., Hyper-V, VMware ESXi 7.0]
 - Installation Method: [pip, from source, etc.]
 

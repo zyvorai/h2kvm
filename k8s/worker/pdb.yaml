@@ -1,15 +1,15 @@
-# PodDisruptionBudget for hyper2kvm workers
+# PodDisruptionBudget for h2kvm workers
 # Ensures at least one worker remains available during node drains
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: hyper2kvm-worker-pdb
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker-pdb
+  namespace: h2kvm-workers
   labels:
-    app.kubernetes.io/name: hyper2kvm
+    app.kubernetes.io/name: h2kvm
     app.kubernetes.io/component: worker
 spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app: hyper2kvm-worker
+      app: h2kvm-worker

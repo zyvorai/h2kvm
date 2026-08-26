@@ -1,18 +1,18 @@
-# Hyper2KVM Frequently Asked Questions (FAQ)
+# H2KVM Frequently Asked Questions (FAQ)
 
-Common questions and answers about using Hyper2KVM for VM migration.
+Common questions and answers about using H2KVM for VM migration.
 
 ## Table of Contents
 
 ### General Questions
-- [What is Hyper2KVM?](#what-is-hyper2kvm)
+- [What is H2KVM?](#what-is-h2kvm)
 - [What makes it different from other tools?](#what-makes-it-different)
 - [Is it production-ready?](#is-it-production-ready)
 - [What platforms does it support?](#supported-platforms)
 - [Do I need to stop the source VM?](#vm-downtime)
 
 ### Installation & Setup
-- [How do I install Hyper2KVM?](#installation)
+- [How do I install H2KVM?](#installation)
 - [What are the system requirements?](#system-requirements)
 - [Do I need root access?](#root-access)
 - [Can I run it in a container?](#container-deployment)
@@ -30,10 +30,10 @@ Common questions and answers about using Hyper2KVM for VM migration.
 - [Can it handle snapshots?](#snapshots)
 - [What about thin-provisioned disks?](#thin-provisioning)
 - [Why does my OVA conversion use BIOS when the VM is UEFI?](#why-does-my-ova-conversion-use-bios-when-the-vm-is-uefi)
-- [Why is hyper2kvm using all host CPUs inside my container?](#why-is-hyper2kvm-using-all-host-cpus-inside-my-container)
+- [Why is h2kvm using all host CPUs inside my container?](#why-is-h2kvm-using-all-host-cpus-inside-my-container)
 - [Why can't I export VMs with independent disks via VDDK?](#why-cant-i-export-vms-with-independent-disks-via-vddk)
 - [How do I enable offline fixes in the Kubernetes operator?](#how-do-i-enable-offline-fixes-in-the-kubernetes-operator)
-- [Does hyper2kvm support VDS (vSphere Distributed Switch)?](#does-hyper2kvm-support-vds-vsphere-distributed-switch)
+- [Does h2kvm support VDS (vSphere Distributed Switch)?](#does-h2kvm-support-vds-vsphere-distributed-switch)
 
 ### Troubleshooting
 - [VM won't boot after migration](#boot-failure)
@@ -45,9 +45,9 @@ Common questions and answers about using Hyper2KVM for VM migration.
 
 ## General Questions
 
-### What is Hyper2KVM?
+### What is H2KVM?
 
-Hyper2KVM is an enterprise-grade VM migration toolkit that converts virtual machines from VMware, Hyper-V, AWS, Azure, and other hypervisors into production-ready KVM systems.
+H2KVM is an enterprise-grade VM migration toolkit that converts virtual machines from VMware, Hyper-V, AWS, Azure, and other hypervisors into production-ready KVM systems.
 
 **Key Features:**
 - **Automated Fixes**: Bootloader, fstab, initramfs regeneration
@@ -63,9 +63,9 @@ Hyper2KVM is an enterprise-grade VM migration toolkit that converts virtual mach
 
 ### What makes it different from other tools?
 
-Unlike traditional migration tools that "boot and hope," Hyper2KVM applies **deterministic offline fixes** to ensure **first-boot success**:
+Unlike traditional migration tools that "boot and hope," H2KVM applies **deterministic offline fixes** to ensure **first-boot success**:
 
-| Feature | virt-v2v | Other Tools | Hyper2KVM |
+| Feature | virt-v2v | Other Tools | H2KVM |
 |---------|----------|-------------|-----------|
 | **Offline Fixes** | Limited | None | Comprehensive |
 | **Windows VirtIO** | Manual | Manual | Automatic |
@@ -82,7 +82,7 @@ Unlike traditional migration tools that "boot and hope," Hyper2KVM applies **det
 
 ### Is it production-ready?
 
-**Yes!** Hyper2KVM v0.3.0 is production-ready:
+**Yes!** H2KVM v0.3.0 is production-ready:
 
 ✅ **Tested**:
 - 1387 automated tests (1271 Python + 116 Go)
@@ -169,14 +169,14 @@ Unlike traditional migration tools that "boot and hope," Hyper2KVM applies **det
 
 ```bash
 # Full installation (recommended)
-pip install "hyper2kvm[full]"
+pip install "h2kvm[full]"
 
 # Minimal installation
-pip install hyper2kvm
+pip install h2kvm
 
 # From source
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 pip install -e ".[full]"
 ```
 
@@ -184,7 +184,7 @@ pip install -e ".[full]"
 
 ```bash
 h2kvmctl --version
-hyper2kvm --version
+h2kvm --version
 ```
 
 **See**: [Installation Guide](getting-started/01-Installation.md)
@@ -215,7 +215,7 @@ hyper2kvm --version
 
 ### Can I migrate LUKS-encrypted disks?
 
-**Yes.** Pass `--luks-enable --luks-passphrase "password"` and hyper2kvm will:
+**Yes.** Pass `--luks-enable --luks-passphrase "password"` and h2kvm will:
 
 1. Auto-switch to libguestfs backend (supermin appliance)
 2. Unlock LUKS with `cryptsetup_open()` inside the appliance
@@ -262,12 +262,12 @@ h2kvmctl --config migration.yaml
 1. **Docker/Podman**
    ```bash
    podman run -d -v /data:/data \
-     ghcr.io/ssahani/hyper2kvm:2.1.0-worker
+     ghcr.io/ssahani/h2kvm:2.1.0-worker
    ```
 
 2. **Kubernetes**
    ```bash
-   helm install hyper2kvm-operator ./helm/hyper2kvm-operator
+   helm install h2kvm-operator ./helm/h2kvm-operator
    ```
 
 3. **OpenShift**
@@ -310,7 +310,7 @@ h2kvmctl --config migration.yaml
 **Yes! Full Windows support including:**
 
 ✅ **VirtIO Driver Injection**
-- Automatic driver installation (auto-discovered at `/var/lib/hyper2kvm/virtio-win.iso`)
+- Automatic driver installation (auto-discovered at `/var/lib/h2kvm/virtio-win.iso`)
 - Install drivers with `sudo ./scripts/install-deps.sh --virtio-win` — no `--virtio-drivers-dir` flag needed
 - Registry modification
 - Network adapter configuration
@@ -333,7 +333,7 @@ vmdk: /vmware/windows-server-2019.vmdk
 output_dir: /kvm/vms
 to_output: windows-server.qcow2
 
-# Windows-specific — VirtIO ISO auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+# Windows-specific — VirtIO ISO auto-discovered at /var/lib/h2kvm/virtio-win.iso
 windows_drivers: true
 # virtio_drivers_dir: /custom/path  # optional — only needed to override the standard path
 ```
@@ -540,7 +540,7 @@ compress: false
 - OVF descriptor sometimes omits firmware type
 - Depends on how the OVA was exported (govc vs. vSphere UI)
 
-**Solution**: Hyper2KVM auto-detects UEFI from multiple sources:
+**Solution**: H2KVM auto-detects UEFI from multiple sources:
 
 1. **OVF Metadata**: Checks `<vssd:VirtualSystemType>` for "uefi" or "efi"
 2. **Guest Disk Analysis**: Mounts the guest disk and inspects:
@@ -567,11 +567,11 @@ grep -A2 '<os>' output/vm.xml
 # Should show: <loader type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
 ```
 
-**See**: [OVF Extractor Source](../../hyper2kvm/converters/extractors/ovf.py)
+**See**: [OVF Extractor Source](../../h2kvm/converters/extractors/ovf.py)
 
 ---
 
-### Why is hyper2kvm using all host CPUs inside my container?
+### Why is h2kvm using all host CPUs inside my container?
 
 **Problem**: Python's `os.cpu_count()` returns physical CPU count, ignoring cgroup limits.
 
@@ -579,7 +579,7 @@ grep -A2 '<os>' output/vm.xml
 - Docker/Kubernetes set CPU limits via cgroups (e.g., `--cpus=2`)
 - `os.cpu_count()` reads `/proc/cpuinfo`, which shows host CPUs
 
-**Solution**: Hyper2KVM uses `effective_cpu_count()` to respect cgroups:
+**Solution**: H2KVM uses `effective_cpu_count()` to respect cgroups:
 
 ```python
 def effective_cpu_count() -> int:
@@ -606,12 +606,12 @@ def effective_cpu_count() -> int:
 
 ```bash
 # Inside container
-docker run --cpus=2 ghcr.io/ssahani/hyper2kvm:latest python3 -c \
-  "from hyper2kvm.utils import effective_cpu_count; print(effective_cpu_count())"
+docker run --cpus=2 ghcr.io/ssahani/h2kvm:latest python3 -c \
+  "from h2kvm.utils import effective_cpu_count; print(effective_cpu_count())"
 # Output: 2 (not 16+)
 ```
 
-**See**: [CPU Detector](../../hyper2kvm/utils/cpu.py)
+**See**: [CPU Detector](../../h2kvm/utils/cpu.py)
 
 ---
 
@@ -659,7 +659,7 @@ govc vm.info -json my-vm | jq '.VirtualMachines[].Config.Hardware.Device[] | sel
    h2kvmctl --cmd local --vmdk /vmware/my-vm.vmdk -o /kvm/vms
    ```
 
-**See**: [govc Export Implementation](../../hyper2kvm/converters/importers/govc_export.py)
+**See**: [govc Export Implementation](../../h2kvm/converters/importers/govc_export.py)
 
 ---
 
@@ -670,7 +670,7 @@ govc vm.info -json my-vm | jq '.VirtualMachines[].Config.Hardware.Device[] | sel
 **Example HyperConversion CR:**
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: migrate-web-server
@@ -717,7 +717,7 @@ kubectl get hyperconversion migrate-web-server -o yaml | grep -A5 status
 
 ---
 
-### Does hyper2kvm support VDS (vSphere Distributed Switch)?
+### Does h2kvm support VDS (vSphere Distributed Switch)?
 
 **Yes!** VDS networks are auto-detected and preserved during migration.
 
@@ -770,7 +770,7 @@ virsh net-start Production-VLAN100
 virsh net-autostart Production-VLAN100
 ```
 
-**See**: [Libvirt XML Extractor](../../hyper2kvm/converters/extractors/libvirt_xml.py)
+**See**: [Libvirt XML Extractor](../../h2kvm/converters/extractors/libvirt_xml.py)
 
 ---
 
@@ -916,8 +916,8 @@ cp /vmware/original.vmdk /backup/original.vmdk.backup
 - **[Troubleshooting](guides/troubleshooting.md)** - Fix common issues
 
 ### Support
-- **GitHub Issues**: [Report bugs](https://github.com/ssahani/hyper2kvm/issues)
-- **GitHub Discussions**: [Ask questions](https://github.com/ssahani/hyper2kvm/discussions)
+- **GitHub Issues**: [Report bugs](https://github.com/ssahani/h2kvm/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/ssahani/h2kvm/discussions)
 
 ### Examples
 - **[Migration Recipes](recipes/)** - Real-world examples
@@ -925,7 +925,7 @@ cp /vmware/original.vmdk /backup/original.vmdk.backup
 
 ---
 
-**Can't find your question?** [Ask on GitHub Discussions](https://github.com/ssahani/hyper2kvm/discussions)
+**Can't find your question?** [Ask on GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
 
 ---
 

@@ -1,10 +1,10 @@
 # Testing Guide
 
-**Comprehensive guide to hyper2kvm testing infrastructure and practices**
+**Comprehensive guide to h2kvm testing infrastructure and practices**
 
 ## Overview
 
-hyper2kvm maintains **100% test coverage** with 664 tests covering unit, integration, and end-to-end scenarios. This guide explains our testing strategy, how to run tests, and how to write new tests.
+h2kvm maintains **100% test coverage** with 664 tests covering unit, integration, and end-to-end scenarios. This guide explains our testing strategy, how to run tests, and how to write new tests.
 
 ### Test Statistics
 
@@ -75,7 +75,7 @@ pytest tests/unit/
 pytest tests/integration/
 
 # Run with coverage report
-pytest --cov=hyper2kvm --cov-report=html
+pytest --cov=h2kvm --cov-report=html
 
 # Run in parallel (faster)
 pytest -n auto
@@ -116,7 +116,7 @@ pytest --timeout=300
 pytest --junitxml=test-results.xml
 
 # Generate coverage badge
-pytest --cov=hyper2kvm --cov-report=term-missing
+pytest --cov=h2kvm --cov-report=term-missing
 
 # Parallel execution with live output
 pytest -n auto -v --tb=short
@@ -225,7 +225,7 @@ def test_pre_post_hooks():
 """Unit tests for feature X."""
 
 import pytest
-from hyper2kvm.module import Feature
+from h2kvm.module import Feature
 
 
 class TestFeature:
@@ -432,17 +432,17 @@ pytest -m "not vsphere"
 
 ```bash
 # Terminal report
-pytest --cov=hyper2kvm --cov-report=term-missing
+pytest --cov=h2kvm --cov-report=term-missing
 
 # HTML report (interactive)
-pytest --cov=hyper2kvm --cov-report=html
+pytest --cov=h2kvm --cov-report=html
 open htmlcov/index.html
 
 # XML report (for CI)
-pytest --cov=hyper2kvm --cov-report=xml
+pytest --cov=h2kvm --cov-report=xml
 
 # Combined report
-pytest --cov=hyper2kvm --cov-report=term-missing --cov-report=html
+pytest --cov=h2kvm --cov-report=term-missing --cov-report=html
 ```
 
 ### Coverage Configuration
@@ -451,7 +451,7 @@ pytest --cov=hyper2kvm --cov-report=term-missing --cov-report=html
 # pytest.ini or pyproject.toml
 [tool:pytest]
 addopts =
-    --cov=hyper2kvm
+    --cov=h2kvm
     --cov-report=term-missing
     --cov-report=html
     --cov-fail-under=95
@@ -461,10 +461,10 @@ addopts =
 
 ```bash
 # View coverage summary
-pytest --cov=hyper2kvm --cov-report=term
+pytest --cov=h2kvm --cov-report=term
 
 # Find uncovered lines
-pytest --cov=hyper2kvm --cov-report=term-missing | grep "TOTAL"
+pytest --cov=h2kvm --cov-report=term-missing | grep "TOTAL"
 ```
 
 ---
@@ -500,7 +500,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest --cov=hyper2kvm --cov-report=xml
+          pytest --cov=h2kvm --cov-report=xml
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -690,7 +690,7 @@ from unittest.mock import Mock, patch
 
 def test_with_mock():
     """Test with mocked dependency."""
-    with patch('hyper2kvm.module.external_call') as mock_call:
+    with patch('h2kvm.module.external_call') as mock_call:
         mock_call.return_value = "mocked_result"
 
         result = function_that_calls_external()
@@ -716,10 +716,10 @@ When updating code:
 
 ```bash
 # Before refactoring
-pytest --cov=hyper2kvm --cov-report=term > coverage_before.txt
+pytest --cov=h2kvm --cov-report=term > coverage_before.txt
 
 # After refactoring
-pytest --cov=hyper2kvm --cov-report=term > coverage_after.txt
+pytest --cov=h2kvm --cov-report=term > coverage_after.txt
 
 # Compare
 diff coverage_before.txt coverage_after.txt
@@ -738,4 +738,4 @@ diff coverage_before.txt coverage_after.txt
 
 **Last Updated:** 2026-03-29
 **Test Coverage:** 100% (664 tests passing)
-**Maintained by:** hyper2kvm team
+**Maintained by:** h2kvm team

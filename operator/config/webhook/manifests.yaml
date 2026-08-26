@@ -10,12 +10,12 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /mutate-hyper2kvm-io-v1alpha1-hyperconversion
+      path: /mutate-h2kvm-io-v1alpha1-hyperconversion
   failurePolicy: Fail
   name: mhyperconversion.kb.io
   rules:
   - apiGroups:
-    - hyper2kvm.io
+    - h2kvm.io
     apiVersions:
     - v1alpha1
     operations:
@@ -36,12 +36,12 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /validate-hyper2kvm-io-v1alpha1-hyperconversion
+      path: /validate-h2kvm-io-v1alpha1-hyperconversion
   failurePolicy: Fail
   name: vhyperconversion.kb.io
   rules:
   - apiGroups:
-    - hyper2kvm.io
+    - h2kvm.io
     apiVersions:
     - v1alpha1
     operations:

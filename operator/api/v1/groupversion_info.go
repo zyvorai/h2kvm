@@ -3,7 +3,7 @@
 // https://zyvor.dev · info@zyvor.dev
 
 /*
-Copyright 2024 hyper2kvm.
+Copyright 2024 h2kvm.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package v1 contains API Schema definitions for the hyper2kvm v1 API group
+// Package v1 contains API Schema definitions for the h2kvm v1 API group
 // +kubebuilder:object:generate=true
-// +groupName=hyper2kvm.io
+// +groupName=h2kvm.io
 package v1
 
 import (
@@ -30,7 +30,7 @@ import (
 
 var (
 	// GroupVersion is group version used to register these objects
-	GroupVersion = schema.GroupVersion{Group: "hyper2kvm.io", Version: "v1"}
+	GroupVersion = schema.GroupVersion{Group: "h2kvm.io", Version: "v1"}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = &scheme.Builder{GroupVersion: GroupVersion}

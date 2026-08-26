@@ -1,5 +1,5 @@
 # Image URL to use all building/pushing image targets
-IMG ?= ghcr.io/hyper2kvm/operator:latest
+IMG ?= ghcr.io/h2kvm/operator:latest
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -25,7 +25,7 @@ help: ## Display this help.
 
 .PHONY: manifests
 manifests: controller-gen ## Generate CRD manifests.
-	$(CONTROLLER_GEN) rbac:roleName=hyper2kvm-operator-role crd webhook paths="./..." output:crd:artifacts:config=config/crd output:rbac:artifacts:config=config/rbac
+	$(CONTROLLER_GEN) rbac:roleName=h2kvm-operator-role crd webhook paths="./..." output:crd:artifacts:config=config/crd output:rbac:artifacts:config=config/rbac
 
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.

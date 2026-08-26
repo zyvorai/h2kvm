@@ -11,18 +11,18 @@
 ### ✅ Successfully Validated
 
 1. **CRD Installation**
-   - ✅ `migrationjobs.hyper2kvm.io` CRD installed successfully
-   - ✅ `jobtemplates.hyper2kvm.io` CRD installed successfully
+   - ✅ `migrationjobs.h2kvm.io` CRD installed successfully
+   - ✅ `jobtemplates.h2kvm.io` CRD installed successfully
    - ✅ RBAC ClusterRole and ClusterRoleBinding created
 
 2. **OpenShift SecurityContextConstraints**
-   - ✅ Custom SCC `hyper2kvm-operator-scc` created
+   - ✅ Custom SCC `h2kvm-operator-scc` created
    - ✅ SCC validation working correctly
    - ✅ SCC properly enforces UID/GID ranges
    - ✅ Demonstrated need for OpenShift-specific UIDs (1000650000-1000659999)
 
 3. **Docker Image Build**
-   - ✅ Operator image built successfully: `hyper2kvm-operator:test`
+   - ✅ Operator image built successfully: `h2kvm-operator:test`
    - ✅ Multi-stage Dockerfile operator target verified
    - ✅ All operator dependencies installed (kopf, kubernetes, etc.)
 
@@ -84,28 +84,28 @@ Age: 65 days
 ### Resources Created
 ```bash
 # CRDs
-customresourcedefinition.apiextensions.k8s.io/migrationjobs.hyper2kvm.io
-customresourcedefinition.apiextensions.k8s.io/jobtemplates.hyper2kvm.io
+customresourcedefinition.apiextensions.k8s.io/migrationjobs.h2kvm.io
+customresourcedefinition.apiextensions.k8s.io/jobtemplates.h2kvm.io
 
 # RBAC
-clusterrole.rbac.authorization.k8s.io/hyper2kvm-operator-test
-clusterrolebinding.rbac.authorization.k8s.io/hyper2kvm-operator-test
-role.rbac.authorization.k8s.io/hyper2kvm-operator-leader-election
-rolebinding.rbac.authorization.k8s.io/hyper2kvm-operator-leader-election
+clusterrole.rbac.authorization.k8s.io/h2kvm-operator-test
+clusterrolebinding.rbac.authorization.k8s.io/h2kvm-operator-test
+role.rbac.authorization.k8s.io/h2kvm-operator-leader-election
+rolebinding.rbac.authorization.k8s.io/h2kvm-operator-leader-election
 
 # Security
-securitycontextconstraints.security.openshift.io/hyper2kvm-operator-scc
-serviceaccount/hyper2kvm-operator
+securitycontextconstraints.security.openshift.io/h2kvm-operator-scc
+serviceaccount/h2kvm-operator
 
 # Application
-deployment.apps/hyper2kvm-operator (created, pods blocked by disk pressure)
-service/hyper2kvm-operator
+deployment.apps/h2kvm-operator (created, pods blocked by disk pressure)
+service/h2kvm-operator
 ```
 
 ### SecurityContextConstraints Details
 ```yaml
-Name: hyper2kvm-operator-scc
-Users: system:serviceaccount:hyper2kvm-test:hyper2kvm-operator
+Name: h2kvm-operator-scc
+Users: system:serviceaccount:h2kvm-test:h2kvm-operator
 Privileged: false
 RunAsUser: MustRunAsRange (enforced OpenShift UID ranges)
 FSGroup: MustRunAs
@@ -123,7 +123,7 @@ RESULT: OpenShift SCC working as designed
 
 #### Image Build
 ```
-Image: hyper2kvm-operator:test
+Image: h2kvm-operator:test
 Size: ~500MB (with dependencies)
 Base: python:3.13-slim
 Dependencies: kopf, kubernetes, click, rich, pydantic, requests
@@ -178,15 +178,15 @@ users:
 
 1. **Use Helm Chart**
    ```bash
-   helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-     --namespace hyper2kvm-system \
+   helm install h2kvm-operator h2kvm/h2kvm-operator \
+     --namespace h2kvm-system \
      --set openshift.enabled=true \
      --set openshift.route.enabled=true
    ```
 
 2. **Or Use OLM Bundle**
    ```bash
-   operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0
+   operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
    ```
 
 3. **SecurityContextConstraints**
@@ -215,8 +215,8 @@ crc start
 **Option 3: Use k3d/kind with Kubernetes**
 ```bash
 k3d cluster create test --agents 2
-helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-system \
   --set openshift.enabled=false
 ```
 
@@ -247,8 +247,8 @@ helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
 2. **Deploy with Scripts**
    ```bash
    # Once disk space is available
-   ./scripts/deploy-to-openshift.sh 2.1.0 manual hyper2kvm-test
-   ./scripts/test-openshift-deployment.sh hyper2kvm-test
+   ./scripts/deploy-to-openshift.sh 2.1.0 manual h2kvm-test
+   ./scripts/test-openshift-deployment.sh h2kvm-test
    ```
 
 3. **Test on Real OpenShift Cluster**
@@ -260,7 +260,7 @@ helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
    ./scripts/deploy-to-openshift.sh 2.1.0 helm
 
    # Test
-   ./scripts/test-openshift-deployment.sh hyper2kvm-system
+   ./scripts/test-openshift-deployment.sh h2kvm-system
    ```
 
 ---

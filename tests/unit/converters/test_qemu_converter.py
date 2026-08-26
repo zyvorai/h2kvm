@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm/converters/qemu/converter.py (ConvertOptions, _build_convert_cmd, _fallback_plan, validate)."""
+"""Tests for h2kvm/converters/qemu/converter.py (ConvertOptions, _build_convert_cmd, _fallback_plan, validate)."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from hyper2kvm.converters.qemu.converter import Convert
+from h2kvm.converters.qemu.converter import Convert
 
 
 # ---------------------------------------------------------------------------
@@ -242,7 +242,7 @@ class TestValidate:
     """Convert.validate: mock subprocess, U.which, U.run_cmd."""
 
     @patch.object(Convert, "_prefer_descriptor_for_flat", side_effect=lambda _l, p: p)
-    @patch("hyper2kvm.converters.qemu.converter.U")
+    @patch("h2kvm.converters.qemu.converter.U")
     def test_validate_success(self, mock_u, _mock_pref, mock_logger, tmp_path):
         img = tmp_path / "disk.qcow2"
         img.write_bytes(b"\x00" * 64)
@@ -270,9 +270,9 @@ class TestValidate:
         assert "not found" in warning_msg.lower()
 
     @patch.object(Convert, "_prefer_descriptor_for_flat", side_effect=lambda _l, p: p)
-    @patch("hyper2kvm.converters.qemu.converter.U")
+    @patch("h2kvm.converters.qemu.converter.U")
     def test_validate_check_failure_strict(self, mock_u, _mock_pref, mock_logger, tmp_path):
-        from hyper2kvm.core.exceptions import DiskConversionError
+        from h2kvm.core.exceptions import DiskConversionError
 
         img = tmp_path / "disk.qcow2"
         img.write_bytes(b"\x00" * 64)
@@ -288,7 +288,7 @@ class TestValidate:
             Convert.validate(mock_logger, img, strict=True)
 
     @patch.object(Convert, "_prefer_descriptor_for_flat", side_effect=lambda _l, p: p)
-    @patch("hyper2kvm.converters.qemu.converter.U")
+    @patch("h2kvm.converters.qemu.converter.U")
     def test_validate_check_failure_non_strict_warns(self, mock_u, _mock_pref, mock_logger, tmp_path):
         img = tmp_path / "disk.qcow2"
         img.write_bytes(b"\x00" * 64)

@@ -3,7 +3,7 @@
 // https://zyvor.dev · info@zyvor.dev
 
 
-// zkvm is the Go-based Terminal User Interface for hyper2kvm.
+// zkvm is the Go-based Terminal User Interface for h2kvm.
 //
 // It communicates with the Python backend via a Unix domain socket
 // using a newline-delimited JSON protocol.
@@ -19,19 +19,19 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/hyper2kvm/zkvm/internal/models"
-	"github.com/hyper2kvm/zkvm/internal/theme"
-	"github.com/hyper2kvm/zkvm/internal/protocol"
-	"github.com/hyper2kvm/zkvm/internal/state"
-	"github.com/hyper2kvm/zkvm/internal/ui"
-	"github.com/hyper2kvm/zkvm/internal/ui/batch"
-	"github.com/hyper2kvm/zkvm/internal/ui/browser"
-	"github.com/hyper2kvm/zkvm/internal/ui/dashboard"
-	"github.com/hyper2kvm/zkvm/internal/ui/home"
-	"github.com/hyper2kvm/zkvm/internal/ui/migrations"
-	"github.com/hyper2kvm/zkvm/internal/ui/settings"
-	"github.com/hyper2kvm/zkvm/internal/ui/standalone"
-	"github.com/hyper2kvm/zkvm/internal/ui/wizard"
+	"github.com/h2kvm/zkvm/internal/models"
+	"github.com/h2kvm/zkvm/internal/theme"
+	"github.com/h2kvm/zkvm/internal/protocol"
+	"github.com/h2kvm/zkvm/internal/state"
+	"github.com/h2kvm/zkvm/internal/ui"
+	"github.com/h2kvm/zkvm/internal/ui/batch"
+	"github.com/h2kvm/zkvm/internal/ui/browser"
+	"github.com/h2kvm/zkvm/internal/ui/dashboard"
+	"github.com/h2kvm/zkvm/internal/ui/home"
+	"github.com/h2kvm/zkvm/internal/ui/migrations"
+	"github.com/h2kvm/zkvm/internal/ui/settings"
+	"github.com/h2kvm/zkvm/internal/ui/standalone"
+	"github.com/h2kvm/zkvm/internal/ui/wizard"
 )
 
 // version is set at build time via -ldflags.

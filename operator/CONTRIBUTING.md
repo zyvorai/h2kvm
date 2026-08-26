@@ -14,8 +14,8 @@ We welcome contributions! This guide will help you get started.
 ### Clone and Build
 
 ```bash
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm/operator
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm/operator
 
 # Download dependencies
 go mod download
@@ -72,13 +72,13 @@ make run
 
 ```bash
 # Build image
-make docker-build IMG=hyper2kvm-operator:dev
+make docker-build IMG=h2kvm-operator:dev
 
 # Load to k3d (if using k3d)
-k3d image import hyper2kvm-operator:dev
+k3d image import h2kvm-operator:dev
 
 # Deploy
-make deploy IMG=hyper2kvm-operator:dev
+make deploy IMG=h2kvm-operator:dev
 
 # Test with sample
 kubectl apply -f config/samples/simple-vmdk-to-vm.yaml

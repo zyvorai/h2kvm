@@ -12,8 +12,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-import hyper2kvm.core.structured_log as sl
-from hyper2kvm.core.structured_log import (
+import h2kvm.core.structured_log as sl
+from h2kvm.core.structured_log import (
     PrintLoggerFactory,
     TraceContext,
     _configure,
@@ -134,7 +134,7 @@ def test_log_audit_no_writer(sync_json_capture):
 def test_log_audit_context_vars(sync_json_capture):
     """Inside TraceContext -> trace_id + vm_id in audit writer record."""
     audit_buf = io.StringIO()
-    from hyper2kvm.core.structured_log import AsyncLogWriter
+    from h2kvm.core.structured_log import AsyncLogWriter
 
     audit_w = AsyncLogWriter(destination=audit_buf, maxsize=100)
     sl._audit_writer = audit_w

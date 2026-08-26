@@ -15,7 +15,7 @@ import pytest
 @pytest.fixture()
 def basic_logger():
     """Return a stdlib logger that writes to a NullHandler (no I/O)."""
-    logger = logging.getLogger("hyper2kvm.test")
+    logger = logging.getLogger("h2kvm.test")
     logger.handlers.clear()
     logger.addHandler(logging.NullHandler())
     logger.setLevel(logging.DEBUG)

@@ -1,4 +1,4 @@
-# Hyper2KVM Systemd Integration
+# H2KVM Systemd Integration
 
 Production-grade systemd integration for automated VM boot repair operations.
 
@@ -7,14 +7,14 @@ Production-grade systemd integration for automated VM boot repair operations.
 ```
 systemd/
 ├── units/                              # Systemd unit files
-│   ├── hyper2kvm.service              # Main daemon service
-│   ├── hyper2kvm.socket               # Socket activation
-│   ├── hyper2kvm.timer                # Scheduled repairs timer
-│   ├── hyper2kvm-scheduled.service    # Scheduled repair service
-│   ├── hyper2kvm.path                 # Path monitoring unit
-│   ├── hyper2kvm-path-trigger.service # Path trigger handler
-│   ├── hyper2kvm.target               # Combined target
-│   └── hyper2kvm@.service             # Per-VM template service
+│   ├── h2kvm.service              # Main daemon service
+│   ├── h2kvm.socket               # Socket activation
+│   ├── h2kvm.timer                # Scheduled repairs timer
+│   ├── h2kvm-scheduled.service    # Scheduled repair service
+│   ├── h2kvm.path                 # Path monitoring unit
+│   ├── h2kvm-path-trigger.service # Path trigger handler
+│   ├── h2kvm.target               # Combined target
+│   └── h2kvm@.service             # Per-VM template service
 └── README.md                           # This file
 ```
 
@@ -25,7 +25,7 @@ systemd/
 sudo ../scripts/systemd/install-systemd-integration.sh --enable-all
 
 # Check status
-systemctl status hyper2kvm.socket hyper2kvm.timer
+systemctl status h2kvm.socket h2kvm.timer
 ```
 
 ## Documentation

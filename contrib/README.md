@@ -1,6 +1,6 @@
-# Hyper2KVM Contrib Directory
+# H2KVM Contrib Directory
 
-Additional tools, integrations, and examples for Hyper2KVM.
+Additional tools, integrations, and examples for H2KVM.
 
 ---
 
@@ -10,18 +10,18 @@ Additional tools, integrations, and examples for Hyper2KVM.
 
 Production-grade LUKS auto-unlock system with TPM2, Vault, and Kubernetes support.
 
-#### dracut Module (`dracut/90hyper2kvm-luks/`)
+#### dracut Module (`dracut/90h2kvm-luks/`)
 
 Initramfs integration for boot-time LUKS unlock.
 
 **Files**:
 - `module-setup.sh` - dracut module installer
-- `hyper2kvm-luks-unlock.sh` - Boot-time unlock script
-- `hyper2kvm-luks-unlock.service` - systemd service
+- `h2kvm-luks-unlock.sh` - Boot-time unlock script
+- `h2kvm-luks-unlock.service` - systemd service
 
 **Installation**:
 ```bash
-sudo cp -r dracut/90hyper2kvm-luks /usr/lib/dracut/modules.d/
+sudo cp -r dracut/90h2kvm-luks /usr/lib/dracut/modules.d/
 sudo dracut -f
 ```
 
@@ -43,15 +43,15 @@ kubectl apply -f kubernetes/daemonset.yaml
 # Create Vault token secret
 kubectl create secret generic vault-token \
   --from-literal=token=s.xxx \
-  -n hyper2kvm-system
+  -n h2kvm-system
 
 # Label nodes with LUKS
-kubectl label node worker1 hyper2kvm.io/luks=true
+kubectl label node worker1 h2kvm.io/luks=true
 ```
 
 **Monitoring**:
 ```bash
-kubectl logs -n hyper2kvm-system daemonset/hyper2kvm-luks-unlocker
+kubectl logs -n h2kvm-system daemonset/h2kvm-luks-unlocker
 ```
 
 ---
@@ -65,12 +65,12 @@ Container images for Kubernetes deployment.
 
 **Build**:
 ```bash
-docker build -f docker/Dockerfile.luks-unlocker -t hyper2kvm/luks-unlocker:latest .
+docker build -f docker/Dockerfile.luks-unlocker -t h2kvm/luks-unlocker:latest .
 ```
 
 **Push**:
 ```bash
-docker push hyper2kvm/luks-unlocker:latest
+docker push h2kvm/luks-unlocker:latest
 ```
 
 ---
@@ -87,13 +87,13 @@ Configuration examples for different deployment scenarios.
 **Usage**:
 ```bash
 # Copy example
-sudo cp examples/luks-tpm.json /etc/hyper2kvm/luks.json
+sudo cp examples/luks-tpm.json /etc/h2kvm/luks.json
 
 # Edit configuration
-sudo vim /etc/hyper2kvm/luks.json
+sudo vim /etc/h2kvm/luks.json
 
 # Test
-hyper2kvm-luks unlock -v
+h2kvm-luks unlock -v
 ```
 
 ---
@@ -164,7 +164,7 @@ sudo reboot
 
 ```bash
 # 1. Store key in Vault
-vault kv put secret/hyper2kvm/luks \
+vault kv put secret/h2kvm/luks \
   key=$(xxd -p /root/luks.key | tr -d '\n')
 
 # 2. Install
@@ -185,7 +185,7 @@ sudo reboot
 
 ```bash
 # 1. Store key in Vault
-vault kv put secret/hyper2kvm/luks \
+vault kv put secret/h2kvm/luks \
   key=$(xxd -p /root/luks.key | tr -d '\n')
 
 # 2. Deploy DaemonSet
@@ -194,13 +194,13 @@ kubectl apply -f contrib/kubernetes/daemonset.yaml
 # 3. Create Vault token secret
 kubectl create secret generic vault-token \
   --from-literal=token=s.xxx \
-  -n hyper2kvm-system
+  -n h2kvm-system
 
 # 4. Label nodes
-kubectl label node worker1 worker2 worker3 hyper2kvm.io/luks=true
+kubectl label node worker1 worker2 worker3 h2kvm.io/luks=true
 
 # 5. Monitor
-kubectl logs -n hyper2kvm-system daemonset/hyper2kvm-luks-unlocker -f
+kubectl logs -n h2kvm-system daemonset/h2kvm-luks-unlocker -f
 
 # Nodes unlock LUKS devices automatically at boot!
 ```
@@ -218,14 +218,14 @@ kubectl logs -n hyper2kvm-system daemonset/hyper2kvm-luks-unlocker -f
    ↓
 3. Kernel + initramfs
    ↓
-4. dracut executes hyper2kvm-luks-unlock.sh
+4. dracut executes h2kvm-luks-unlock.sh
    ↓
 5. Try unlock methods:
    • TPM2 unseal (if configured)
    • Vault fetch (if configured)
    • Keyfile read (if configured)
    ↓
-6. cryptsetup open /dev/sdaX hyper2kvm-xxx
+6. cryptsetup open /dev/sdaX h2kvm-xxx
    ↓
 7. LVM activation
    ↓
@@ -287,30 +287,30 @@ curl -k https://vault:8200/v1/sys/health
 vault token lookup
 
 # Check secret
-vault kv get secret/hyper2kvm/luks
+vault kv get secret/h2kvm/luks
 ```
 
 ### Initramfs Issues
 
 ```bash
 # Check module
-ls /usr/lib/dracut/modules.d/90hyper2kvm-luks/
+ls /usr/lib/dracut/modules.d/90h2kvm-luks/
 
 # Rebuild with verbose
 dracut -f -v
 
 # Check contents
-lsinitrd | grep hyper2kvm
+lsinitrd | grep h2kvm
 ```
 
 ### Boot Logs
 
 ```bash
 # Current boot
-journalctl -b | grep hyper2kvm
+journalctl -b | grep h2kvm
 
 # Specific service
-journalctl -u hyper2kvm-luks-unlock
+journalctl -u h2kvm-luks-unlock
 ```
 
 ---
@@ -348,9 +348,9 @@ journalctl -u hyper2kvm-luks-unlock
 
 ## Support
 
-- **Documentation**: `hyper2kvm/luks/README.md`
-- **Issues**: https://github.com/anthropics/hyper2kvm/issues
-- **Security**: security@hyper2kvm.io
+- **Documentation**: `h2kvm/luks/README.md`
+- **Issues**: https://github.com/anthropics/h2kvm/issues
+- **Security**: security@h2kvm.io
 
 ---
 

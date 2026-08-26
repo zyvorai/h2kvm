@@ -1,15 +1,15 @@
-# hyper2kvm Worker API - Docker Image
+# h2kvm Worker API - Docker Image
 
-Production-ready Docker image for the hyper2kvm Worker Job Protocol REST API.
+Production-ready Docker image for the h2kvm Worker Job Protocol REST API.
 
 ## Quick Start
 
 ```bash
 # Pull from GitHub Container Registry
-docker pull ghcr.io/ssahani/hyper2kvm-worker-api:latest
+docker pull ghcr.io/ssahani/h2kvm-worker-api:latest
 
 # Run container
-docker run -p 8000:8000 ghcr.io/ssahani/hyper2kvm-worker-api:latest
+docker run -p 8000:8000 ghcr.io/ssahani/h2kvm-worker-api:latest
 ```
 
 Access:
@@ -21,11 +21,11 @@ Access:
 
 ```bash
 # From repository root
-docker build -t hyper2kvm-worker-api:latest -f images/worker-api/Dockerfile .
+docker build -t h2kvm-worker-api:latest -f images/worker-api/Dockerfile .
 
 # Multi-architecture build
 docker buildx build --platform linux/amd64,linux/arm64 \
-  -t ghcr.io/ssahani/hyper2kvm-worker-api:latest \
+  -t ghcr.io/ssahani/h2kvm-worker-api:latest \
   -f images/worker-api/Dockerfile \
   --push .
 ```
@@ -45,14 +45,14 @@ Mount for persistent state:
 
 ```bash
 docker run -p 8000:8000 \
-  -v /var/lib/hyper2kvm:/var/lib/hyper2kvm \
-  ghcr.io/ssahani/hyper2kvm-worker-api:latest
+  -v /var/lib/h2kvm:/var/lib/h2kvm \
+  ghcr.io/ssahani/h2kvm-worker-api:latest
 ```
 
 Directories:
-- `/var/lib/hyper2kvm/jobs` - Job state machines
-- `/var/lib/hyper2kvm/events` - Progress events
-- `/var/lib/hyper2kvm/queue` - Job queue
+- `/var/lib/h2kvm/jobs` - Job state machines
+- `/var/lib/h2kvm/events` - Progress events
+- `/var/lib/h2kvm/queue` - Job queue
 
 ## Production Deployment
 
@@ -63,11 +63,11 @@ version: '3.8'
 
 services:
   api:
-    image: ghcr.io/ssahani/hyper2kvm-worker-api:latest
+    image: ghcr.io/ssahani/h2kvm-worker-api:latest
     ports:
       - "8000:8000"
     volumes:
-      - hyper2kvm-data:/var/lib/hyper2kvm
+      - h2kvm-data:/var/lib/h2kvm
     environment:
       UVICORN_LOG_LEVEL: info
     restart: unless-stopped
@@ -78,7 +78,7 @@ services:
       retries: 3
 
 volumes:
-  hyper2kvm-data:
+  h2kvm-data:
 ```
 
 ### Kubernetes
@@ -87,25 +87,25 @@ volumes:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hyper2kvm-api
+  name: h2kvm-api
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: hyper2kvm-api
+      app: h2kvm-api
   template:
     metadata:
       labels:
-        app: hyper2kvm-api
+        app: h2kvm-api
     spec:
       containers:
       - name: api
-        image: ghcr.io/ssahani/hyper2kvm-worker-api:latest
+        image: ghcr.io/ssahani/h2kvm-worker-api:latest
         ports:
         - containerPort: 8000
         volumeMounts:
         - name: data
-          mountPath: /var/lib/hyper2kvm
+          mountPath: /var/lib/h2kvm
         livenessProbe:
           httpGet:
             path: /health
@@ -128,15 +128,15 @@ spec:
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: hyper2kvm-data
+          claimName: h2kvm-data
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: hyper2kvm-api
+  name: h2kvm-api
 spec:
   selector:
-    app: hyper2kvm-api
+    app: h2kvm-api
   ports:
   - port: 80
     targetPort: 8000
@@ -147,7 +147,7 @@ spec:
 
 ### Non-Root User
 
-Image runs as non-root user `hyper2kvm` (UID 1000) for security.
+Image runs as non-root user `h2kvm` (UID 1000) for security.
 
 ### Health Check
 
@@ -191,7 +191,7 @@ curl http://localhost:8000/health
 ```bash
 docker run -p 8000:8000 \
   -e UVICORN_LOG_LEVEL=debug \
-  ghcr.io/ssahani/hyper2kvm-worker-api:latest
+  ghcr.io/ssahani/h2kvm-worker-api:latest
 ```
 
 ### Access Shell
@@ -204,7 +204,7 @@ docker exec -it <container-id> /bin/bash
 
 - **Base:** python:3.11-slim
 - **Size:** ~150MB
-- **User:** hyper2kvm (UID 1000)
+- **User:** h2kvm (UID 1000)
 - **Exposed Ports:** 8000
 - **Architectures:** linux/amd64, linux/arm64
 

@@ -101,7 +101,7 @@ jobs:
 
           # Generate or update index
           cd gh-pages
-          helm repo index . --url https://ssahani.github.io/hyper2kvm
+          helm repo index . --url https://ssahani.github.io/h2kvm
 
           echo "Repository index updated:"
           cat index.yaml
@@ -134,34 +134,34 @@ jobs:
 
             Add the Helm repository:
             ```bash
-            helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+            helm repo add h2kvm https://ssahani.github.io/h2kvm
             helm repo update
             ```
 
             Install the operator:
             ```bash
-            helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-              --namespace hyper2kvm-system \
+            helm install h2kvm-operator h2kvm/h2kvm-operator \
+              --namespace h2kvm-system \
               --create-namespace
             ```
 
             Install the worker:
             ```bash
-            helm install hyper2kvm-worker hyper2kvm/hyper2kvm-worker \
-              --namespace hyper2kvm-workers \
+            helm install h2kvm-worker h2kvm/h2kvm-worker \
+              --namespace h2kvm-workers \
               --create-namespace
             ```
 
             ### Charts Included
 
-            - `hyper2kvm-operator` - Kubernetes Operator for automated job orchestration
-            - `hyper2kvm-worker` - Worker pods for VM migration execution
+            - `h2kvm-operator` - Kubernetes Operator for automated job orchestration
+            - `h2kvm-worker` - Worker pods for VM migration execution
 
             ### Documentation
 
-            - [Operator Chart README](https://github.com/ssahani/hyper2kvm/blob/main/helm/hyper2kvm-operator/README.md)
-            - [Worker Chart README](https://github.com/ssahani/hyper2kvm/blob/main/helm/hyper2kvm-worker/README.md)
-            - [Deployment Guide](https://github.com/ssahani/hyper2kvm/blob/main/docs/deployment/v1.6.0-helm-chart.md)
+            - [Operator Chart README](https://github.com/ssahani/h2kvm/blob/main/helm/h2kvm-operator/README.md)
+            - [Worker Chart README](https://github.com/ssahani/h2kvm/blob/main/helm/h2kvm-worker/README.md)
+            - [Deployment Guide](https://github.com/ssahani/h2kvm/blob/main/docs/deployment/v1.6.0-helm-chart.md)
 
   verify-release:
     needs: release-charts
@@ -178,16 +178,16 @@ jobs:
       - name: Verify Helm repository
         run: |
           echo "Adding Helm repository..."
-          helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+          helm repo add h2kvm https://ssahani.github.io/h2kvm
           helm repo update
 
           echo "Searching for charts..."
-          helm search repo hyper2kvm
+          helm search repo h2kvm
 
           echo "Verifying operator chart..."
-          helm show chart hyper2kvm/hyper2kvm-operator
+          helm show chart h2kvm/h2kvm-operator
 
           echo "Verifying worker chart..."
-          helm show chart hyper2kvm/hyper2kvm-worker || echo "Worker chart may not exist yet"
+          helm show chart h2kvm/h2kvm-worker || echo "Worker chart may not exist yet"
 
           echo "Helm repository verified successfully!"

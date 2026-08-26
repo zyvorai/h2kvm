@@ -6,7 +6,7 @@
 # Similar to cloud-init but simpler and more lightweight for specific use cases.
 #
 # Usage:
-#   hyper2kvm --config 97-linux-firstboot-scripts-examples.yaml local
+#   h2kvm --config 97-linux-firstboot-scripts-examples.yaml local
 #
 # Use Cases:
 #   ✅ Network configuration without cloud-init
@@ -18,11 +18,11 @@
 #   ✅ User/SSH key setup
 #
 # How It Works:
-#   1. Creates systemd oneshot service (hyper2kvm-firstboot.service)
-#   2. Service runs scripts in /usr/local/lib/hyper2kvm-firstboot/
+#   1. Creates systemd oneshot service (h2kvm-firstboot.service)
+#   2. Service runs scripts in /usr/local/lib/h2kvm-firstboot/
 #   3. Scripts execute in order on first boot
 #   4. Service disables itself after successful run
-#   5. Logs to /var/log/hyper2kvm-firstboot.log
+#   5. Logs to /var/log/h2kvm-firstboot.log
 #
 # ==============================================================================
 
@@ -511,20 +511,20 @@ network_suse_template: |
 # ==============================================================================
 #
 # If first-boot scripts don't run:
-#   1. Check service status: systemctl status hyper2kvm-firstboot.service
-#   2. View logs: journalctl -u hyper2kvm-firstboot.service
-#   3. Check script log: cat /var/log/hyper2kvm-firstboot.log
-#   4. Verify service is enabled: systemctl is-enabled hyper2kvm-firstboot.service
-#   5. Manually run: bash /usr/local/lib/hyper2kvm-firstboot/run-firstboot.sh
+#   1. Check service status: systemctl status h2kvm-firstboot.service
+#   2. View logs: journalctl -u h2kvm-firstboot.service
+#   3. Check script log: cat /var/log/h2kvm-firstboot.log
+#   4. Verify service is enabled: systemctl is-enabled h2kvm-firstboot.service
+#   5. Manually run: bash /usr/local/lib/h2kvm-firstboot/run-firstboot.sh
 #
 # To re-run first-boot scripts:
-#   1. Re-enable service: systemctl enable hyper2kvm-firstboot.service
-#   2. Reboot or run manually: systemctl start hyper2kvm-firstboot.service
+#   1. Re-enable service: systemctl enable h2kvm-firstboot.service
+#   2. Reboot or run manually: systemctl start h2kvm-firstboot.service
 #
 # To remove first-boot infrastructure:
-#   systemctl disable hyper2kvm-firstboot.service
-#   rm -f /etc/systemd/system/hyper2kvm-firstboot.service
-#   rm -rf /usr/local/lib/hyper2kvm-firstboot
+#   systemctl disable h2kvm-firstboot.service
+#   rm -f /etc/systemd/system/h2kvm-firstboot.service
+#   rm -rf /usr/local/lib/h2kvm-firstboot
 #   systemctl daemon-reload
 #
 # ==============================================================================

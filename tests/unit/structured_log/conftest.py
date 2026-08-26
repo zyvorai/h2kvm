@@ -11,7 +11,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from hyper2kvm.core import structured_log as sl
+from h2kvm.core import structured_log as sl
 
 
 @pytest.fixture(autouse=True)

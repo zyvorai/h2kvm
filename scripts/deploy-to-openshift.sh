@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deploy hyper2kvm operator to OpenShift cluster
+# Deploy h2kvm operator to OpenShift cluster
 # Usage: ./scripts/deploy-to-openshift.sh [VERSION] [METHOD] [NAMESPACE]
 
 set -euo pipefail
@@ -7,7 +7,7 @@ set -euo pipefail
 # Default values
 VERSION="${1:-0.3.0}"
 METHOD="${2:-helm}"  # helm, olm, or manual
-NAMESPACE="${3:-hyper2kvm-system}"
+NAMESPACE="${3:-h2kvm-system}"
 REGISTRY="${REGISTRY:-ghcr.io/ssahani}"
 
 # Color output
@@ -77,11 +77,11 @@ deploy_helm() {
 
     # Add helm repo
     echo_info "Adding Helm repository..."
-    helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm || true
+    helm repo add h2kvm https://ssahani.github.io/h2kvm || true
     helm repo update
 
     # Create values file for OpenShift
-    cat > /tmp/hyper2kvm-openshift-values.yaml <<EOF
+    cat > /tmp/h2kvm-openshift-values.yaml <<EOF
 global:
   namespace: ${NAMESPACE}
 
@@ -100,7 +100,7 @@ openshift:
   # SecurityContextConstraints
   scc:
     create: true
-    name: hyper2kvm-worker-scc
+    name: h2kvm-worker-scc
 
   # OAuth proxy for authenticated metrics
   oauth:
@@ -109,7 +109,7 @@ openshift:
 # Operator configuration
 operator:
   image:
-    repository: ${REGISTRY}/hyper2kvm
+    repository: ${REGISTRY}/h2kvm
     tag: "${VERSION}-operator"
   replicaCount: 2  # HA deployment
   leaderElection:
@@ -120,7 +120,7 @@ webhook:
   enabled: true
   replicaCount: 2  # HA deployment
   image:
-    repository: ${REGISTRY}/hyper2kvm
+    repository: ${REGISTRY}/h2kvm
     tag: "${VERSION}-operator"
 
 # Monitoring
@@ -132,9 +132,9 @@ monitoring:
 EOF
 
     echo_info "Installing operator with Helm..."
-    helm upgrade --install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
+    helm upgrade --install h2kvm-operator h2kvm/h2kvm-operator \
         --namespace ${NAMESPACE} \
-        --values /tmp/hyper2kvm-openshift-values.yaml \
+        --values /tmp/h2kvm-openshift-values.yaml \
         --wait \
         --timeout 10m
 
@@ -159,7 +159,7 @@ deploy_olm() {
 
     # Run bundle
     echo_info "Running OLM bundle..."
-    operator-sdk run bundle ${REGISTRY}/hyper2kvm-operator-bundle:v${VERSION} \
+    operator-sdk run bundle ${REGISTRY}/h2kvm-operator-bundle:v${VERSION} \
         --namespace ${NAMESPACE}
 
     echo_success "Operator installed via OLM"
@@ -182,8 +182,8 @@ deploy_manual() {
 
     # Apply SCC (render Helm template first, raw templates contain Go syntax)
     echo_info "Applying SecurityContextConstraints..."
-    if command -v helm &> /dev/null && [ -d helm/hyper2kvm-operator ]; then
-        helm template hyper2kvm-operator helm/hyper2kvm-operator \
+    if command -v helm &> /dev/null && [ -d helm/h2kvm-operator ]; then
+        helm template h2kvm-operator helm/h2kvm-operator \
             --set openshift.scc.create=true \
             --show-only templates/openshift-scc.yaml 2>/dev/null | oc apply -f -
     else
@@ -225,7 +225,7 @@ echo_info "Verifying deployment..."
 echo ""
 
 echo "Operator pods:"
-oc get pods -n ${NAMESPACE} -l app.kubernetes.io/name=hyper2kvm-operator
+oc get pods -n ${NAMESPACE} -l app.kubernetes.io/name=h2kvm-operator
 
 echo ""
 echo "Webhook pods:"
@@ -237,13 +237,13 @@ oc get routes -n ${NAMESPACE}
 
 echo ""
 echo "CRDs:"
-oc get crd | grep hyper2kvm
+oc get crd | grep h2kvm
 
 echo ""
 echo_info "Next steps:"
 echo ""
 echo "  1. Check operator logs:"
-echo "     oc logs -n ${NAMESPACE} -l app.kubernetes.io/name=hyper2kvm-operator -f"
+echo "     oc logs -n ${NAMESPACE} -l app.kubernetes.io/name=h2kvm-operator -f"
 echo ""
 echo "  2. Create a test migration job:"
 echo "     oc apply -f k8s/operator/examples/convert-job.yaml"
@@ -252,7 +252,7 @@ echo "  3. Watch job status:"
 echo "     oc get migrationjobs --watch"
 echo ""
 echo "  4. Access metrics (if OAuth enabled):"
-echo "     ROUTE=\$(oc get route hyper2kvm-operator-metrics -n ${NAMESPACE} -o jsonpath='{.spec.host}')"
+echo "     ROUTE=\$(oc get route h2kvm-operator-metrics -n ${NAMESPACE} -o jsonpath='{.spec.host}')"
 echo "     curl -k -H \"Authorization: Bearer \$(oc whoami -t)\" https://\$ROUTE/metrics"
 echo ""
 echo "  5. View in OpenShift Console:"

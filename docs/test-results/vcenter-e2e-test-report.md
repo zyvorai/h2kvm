@@ -1,13 +1,13 @@
 ---
-title: "hyper2kvm — vCenter End-to-End Migration Test Report"
+title: "h2kvm — vCenter End-to-End Migration Test Report"
 date: "March 18-19, 2026"
-author: "hyper2kvm Migration Team"
+author: "h2kvm Migration Team"
 ---
 
 # vCenter End-to-End Migration Test Report
 
 **Date:** March 18-19, 2026
-**Tool:** hyper2kvm v0.3.0
+**Tool:** h2kvm v0.3.0
 **Source:** VMware vCenter 10.73.213.134 (ESXi 8.0)
 **Target:** Fedora 43 (KVM/libvirt + K3s/KubeVirt)
 
@@ -32,7 +32,7 @@ author: "hyper2kvm Migration Team"
 | OS | Fedora 43 (kernel 6.18.13) |
 | CPU | Intel x86_64 |
 | Python | 3.14.3 |
-| hyper2kvm | 0.3.0 |
+| h2kvm | 0.3.0 |
 | govc | 0.44.0 |
 | OVF Tool | 5.0.0 (build-24927197) |
 | qemu-img | 10.1.4 |
@@ -166,7 +166,7 @@ sudo ./h2kvmctl --config photon-to-k3s.yaml
 | PVC created | photon-k3s-disk (10Gi, Bound) |
 | Image uploaded | via uploader pod |
 | VirtualMachine | photon-k3s (Created) |
-| VM started | Running on k3d-hyper2kvm-demo-agent-0 |
+| VM started | Running on k3d-h2kvm-demo-agent-0 |
 | VM IP | 10.42.0.12 |
 | Status | RUNNING, READY=True |
 

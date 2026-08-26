@@ -1,5 +1,5 @@
 #!/bin/bash
-# Hyper2KVM System Limits Setup Script
+# H2KVM System Limits Setup Script
 #
 # Configures system for reliable parallel VM conversions with NBD devices.
 # Fixes "Too many open files" and NBD I/O errors.
@@ -26,7 +26,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 echo "✅ =================================================="
-echo "✅ Hyper2KVM System Limits Setup"
+echo "✅ H2KVM System Limits Setup"
 echo "✅ =================================================="
 echo
 
@@ -40,11 +40,11 @@ ETC_DIR="$(dirname "$SCRIPT_DIR")/etc"
 
 echo "⚠️ [1/5] Configuring sysctl limits..."
 
-SYSCTL_CONF="$ETC_DIR/sysctl.d/99-hyper2kvm-nbd.conf"
+SYSCTL_CONF="$ETC_DIR/sysctl.d/99-h2kvm-nbd.conf"
 
 if [ -f "$SYSCTL_CONF" ]; then
   cp "$SYSCTL_CONF" /etc/sysctl.d/
-  echo "  ✓ Installed /etc/sysctl.d/99-hyper2kvm-nbd.conf"
+  echo "  ✓ Installed /etc/sysctl.d/99-h2kvm-nbd.conf"
 
   # Apply immediately
   sysctl --system > /dev/null 2>&1
@@ -90,13 +90,13 @@ fi
 
 echo "⚠️ [3/5] Configuring systemd limits..."
 
-SYSTEMD_CONF="$ETC_DIR/systemd/system.conf.d/hyper2kvm-limits.conf"
+SYSTEMD_CONF="$ETC_DIR/systemd/system.conf.d/h2kvm-limits.conf"
 
 mkdir -p /etc/systemd/system.conf.d/
 
 if [ -f "$SYSTEMD_CONF" ]; then
   cp "$SYSTEMD_CONF" /etc/systemd/system.conf.d/
-  echo "  ✓ Installed /etc/systemd/system.conf.d/hyper2kvm-limits.conf"
+  echo "  ✓ Installed /etc/systemd/system.conf.d/h2kvm-limits.conf"
 
   # Reload systemd
   systemctl daemon-reload

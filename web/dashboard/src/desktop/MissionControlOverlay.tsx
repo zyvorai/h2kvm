@@ -52,7 +52,7 @@ export function MissionControlOverlay({ currentView, onNavigate, wsConnected, se
           <div>
             <h1 className="text-xl font-bold text-white/95">Mission Control</h1>
             <p className="text-sm text-white/45 mt-0.5">
-              hyper2kvm desktop · {DESKTOP_TIER_LABELS[tier]} · {navLabelForView(currentView)}
+              h2kvm desktop · {DESKTOP_TIER_LABELS[tier]} · {navLabelForView(currentView)}
             </p>
           </div>
           <button

@@ -1,4 +1,4 @@
-# hyper2kvm Workflow Daemon Configuration
+# h2kvm Workflow Daemon Configuration
 # =========================================
 # 3-Directory workflow for production VM conversion processing
 #
@@ -14,10 +14,10 @@ daemon: true
 workflow_mode: true
 
 # Base directory for workflow (subdirectories created automatically)
-workflow_dir: /var/lib/hyper2kvm/workflow
+workflow_dir: /var/lib/h2kvm/workflow
 
 # Output directory for converted VMs
-output_dir: /var/lib/hyper2kvm/output
+output_dir: /var/lib/h2kvm/output
 
 # Worker pool settings
 max_concurrent_jobs: 3
@@ -32,5 +32,5 @@ fstab_mode: stabilize-all
 regen_initramfs: true
 
 # Logging
-log_file: /var/log/hyper2kvm/workflow-daemon.log
+log_file: /var/log/h2kvm/workflow-daemon.log
 verbose: 1

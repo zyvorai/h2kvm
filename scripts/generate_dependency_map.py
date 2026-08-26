@@ -3,13 +3,13 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Generate static dependency maps for hyper2kvm modules.
+"""Generate static dependency maps for h2kvm modules.
 
 This script parses Python imports using ``ast`` and emits:
 - JSON dependency graph (module-level + package-level)
 - Markdown summary table
 
-Only imports that resolve to ``hyper2kvm.*`` are tracked.
+Only imports that resolve to ``h2kvm.*`` are tracked.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE_ROOT = ROOT / "hyper2kvm"
+PACKAGE_ROOT = ROOT / "h2kvm"
 DEFAULT_JSON_OUT = ROOT / "docs" / "meta" / "dependency-map.json"
 DEFAULT_MD_OUT = ROOT / "docs" / "meta" / "dependency-map.md"
 
@@ -60,7 +60,7 @@ def collect_edges() -> set[tuple[str, str]]:
             if isinstance(node, ast.Import):
                 for alias in node.names:
                     name = alias.name
-                    if name.startswith("hyper2kvm"):
+                    if name.startswith("h2kvm"):
                         edges.add((src_mod, name))
             elif isinstance(node, ast.ImportFrom):
                 module = node.module or ""
@@ -69,7 +69,7 @@ def collect_edges() -> set[tuple[str, str]]:
                 else:
                     target_mod = module
 
-                if target_mod.startswith("hyper2kvm"):
+                if target_mod.startswith("h2kvm"):
                     edges.add((src_mod, target_mod))
 
     return edges
@@ -127,7 +127,7 @@ def to_markdown(graph: dict) -> str:
     lines.append("# Dependency Map")
     lines.append("")
     lines.append(
-        f"Generated from static imports in `hyper2kvm/` (modules: {graph['module_count']}, edges: {graph['edge_count']})."
+        f"Generated from static imports in `h2kvm/` (modules: {graph['module_count']}, edges: {graph['edge_count']})."
     )
     lines.append("")
 

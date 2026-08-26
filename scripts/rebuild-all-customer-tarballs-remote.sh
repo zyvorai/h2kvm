@@ -38,7 +38,7 @@ declare -a PRODUCTS=(
   "v9s:${TT}/v9s/scripts/package-binary-remote.sh"
   "guestkit:${TT}/guestkit/scripts/package-binary-remote.sh"
   "hypersdk-:${TT}/hypersdk-/scripts/package-binary-remote.sh"
-  "hyper2kvm-:${TT}/hyper2kvm-/scripts/package-binary-remote.sh"
+  "h2kvm-:${TT}/h2kvm-/scripts/package-binary-remote.sh"
   "packetwolf:${TT}/packetwolf/scripts/package-binary-remote.sh"
   "ragnarok:${TT}/ragnarok/scripts/package-binary-remote.sh"
   "Aether:${TT}/Aether/scripts/package-binary-remote.sh"

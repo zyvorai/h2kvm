@@ -30,7 +30,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from hyper2kvm.vmcraft.main import VMCraft
+from h2kvm.vmcraft.main import VMCraft
 
 
 class SystemdComparison:

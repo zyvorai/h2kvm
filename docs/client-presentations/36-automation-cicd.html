@@ -45,7 +45,7 @@
 <div class="cover">
   <h1>Automation &amp; <span>CI/CD</span> Integration</h1>
   <h2>Pipeline-Driven Migration at Scale</h2>
-  <p class="sub">Manual VM migration doesn't scale beyond 20 VMs. hyper2kvm's YAML-driven approach integrates with Ansible, Terraform, Jenkins, GitLab CI, and GitHub Actions for fully automated, repeatable, auditable migration pipelines. Migrate 500+ VMs with approval gates, rollback, and observability.</p>
+  <p class="sub">Manual VM migration doesn't scale beyond 20 VMs. h2kvm's YAML-driven approach integrates with Ansible, Terraform, Jenkins, GitLab CI, and GitHub Actions for fully automated, repeatable, auditable migration pipelines. Migrate 500+ VMs with approval gates, rollback, and observability.</p>
   <div class="badge">YAML Config | Ansible | Terraform | GitLab CI | Jenkins | Batch Orchestration | Prometheus</div>
 </div>
 
@@ -164,9 +164,9 @@ all:
   hosts: kvm_hosts
   become: true
   tasks:
-    - name: Install hyper2kvm
+    - name: Install h2kvm
       pip:
-        name: hyper2kvm
+        name: h2kvm
         state: present
 
     - name: Run doctor check
@@ -708,7 +708,7 @@ groups:
     <p>Manual migration at 2 hours/VM means 200 VMs = 400 hours = 50 person-days. Automated pipeline at 6 minutes/VM means 200 VMs = 20 hours unattended. The pipeline pays for itself after 10 VMs. Start with YAML + dry-run, add CI/CD for anything over 20 VMs.</p>
   </div>
 
-  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Automation &amp; CI/CD Integration Guide</div>
+  <div class="footer">h2kvm.io | Proprietary (Zyvor AI Labs) | Automation &amp; CI/CD Integration Guide</div>
 </div>
 
 </body>

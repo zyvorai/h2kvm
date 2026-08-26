@@ -18,7 +18,7 @@ The validation framework provides a comprehensive system for verifying converted
 ### Basic Usage
 
 ```python
-from hyper2kvm.validation import DiskValidator, XMLValidator, ValidationRunner
+from h2kvm.validation import DiskValidator, XMLValidator, ValidationRunner
 
 # Create runner
 runner = ValidationRunner()
@@ -68,7 +68,7 @@ context = {
 
 **Example**:
 ```python
-from hyper2kvm.validation import DiskValidator
+from h2kvm.validation import DiskValidator
 
 validator = DiskValidator()
 report = validator.validate({
@@ -104,7 +104,7 @@ context = {
 
 **Example**:
 ```python
-from hyper2kvm.validation import XMLValidator
+from h2kvm.validation import XMLValidator
 
 validator = XMLValidator()
 report = validator.validate({
@@ -119,7 +119,7 @@ print(f"XML validation: {report.passed_checks}/{report.total_checks} passed")
 ### ValidationSeverity Enum
 
 ```python
-from hyper2kvm.validation import ValidationSeverity
+from h2kvm.validation import ValidationSeverity
 
 ValidationSeverity.INFO      # Informational message
 ValidationSeverity.WARNING   # Non-critical issue
@@ -139,7 +139,7 @@ ValidationSeverity.CRITICAL  # Severe issue that will prevent VM boot
 ### Simple Custom Validator
 
 ```python
-from hyper2kvm.validation import BaseValidator, ValidationSeverity
+from h2kvm.validation import BaseValidator, ValidationSeverity
 
 class NetworkValidator(BaseValidator):
     """Validates network configuration."""
@@ -180,7 +180,7 @@ report = validator.validate({"network_count": 2})
 ### Advanced Custom Validator
 
 ```python
-from hyper2kvm.validation import BaseValidator, ValidationSeverity
+from h2kvm.validation import BaseValidator, ValidationSeverity
 from pathlib import Path
 
 class BootValidator(BaseValidator):
@@ -257,7 +257,7 @@ class BootValidator(BaseValidator):
 Individual check result:
 
 ```python
-from hyper2kvm.validation import ValidationResult, ValidationSeverity
+from h2kvm.validation import ValidationResult, ValidationSeverity
 
 result = ValidationResult(
     check_name="disk_size",
@@ -285,7 +285,7 @@ for suggestion in result.suggestions:
 Aggregate report from a validator:
 
 ```python
-from hyper2kvm.validation import DiskValidator
+from h2kvm.validation import DiskValidator
 
 validator = DiskValidator()
 report = validator.validate(context)
@@ -311,7 +311,7 @@ print(f"Warnings: {summary['warnings']}")
 print(f"Critical: {summary['critical']}")
 
 # Get issues by severity
-from hyper2kvm.validation import ValidationSeverity
+from h2kvm.validation import ValidationSeverity
 
 errors = report.get_issues_by_severity(ValidationSeverity.ERROR)
 for error in errors:
@@ -323,7 +323,7 @@ for error in errors:
 ### Running Multiple Validators
 
 ```python
-from hyper2kvm.validation import (
+from h2kvm.validation import (
     ValidationRunner,
     DiskValidator,
     XMLValidator,
@@ -390,7 +390,7 @@ for validator_summary in summary['validator_summaries']:
 ### Post-Conversion Validation
 
 ```python
-from hyper2kvm.validation import ValidationRunner, DiskValidator, XMLValidator
+from h2kvm.validation import ValidationRunner, DiskValidator, XMLValidator
 from pathlib import Path
 
 def validate_conversion(output_dir: Path, vm_name: str) -> bool:
@@ -433,7 +433,7 @@ def validate_conversion(output_dir: Path, vm_name: str) -> bool:
 ### Batch Validation
 
 ```python
-from hyper2kvm.validation import ValidationRunner, DiskValidator, XMLValidator
+from h2kvm.validation import ValidationRunner, DiskValidator, XMLValidator
 
 def validate_batch(vm_list: list[dict]) -> dict:
     """
@@ -601,8 +601,8 @@ def validate(self, context):
 ## Related Documentation
 
 - [Batch Migration Guide](../../docs/Batch-Migration-Features-Guide.md)
-- [Manifest Orchestrator](../../hyper2kvm/manifest/orchestrator.py)
-- [BaseValidator API](../../hyper2kvm/validation/validation_framework.py)
+- [Manifest Orchestrator](../../h2kvm/manifest/orchestrator.py)
+- [BaseValidator API](../../h2kvm/validation/validation_framework.py)
 
 ## Conclusion
 

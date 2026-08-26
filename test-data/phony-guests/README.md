@@ -1,7 +1,7 @@
 # Phony Guest Images for Testing
 
 Minimal disk images that fool the guestfs inspection API, used for
-testing hyper2kvm's conversion pipeline without needing real OS installs.
+testing h2kvm's conversion pipeline without needing real OS installs.
 
 ## Images
 

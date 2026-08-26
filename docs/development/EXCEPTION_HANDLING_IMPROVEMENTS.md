@@ -1,6 +1,6 @@
 # Exception Handling Improvements
 
-This document summarizes the comprehensive improvements made to exception handling across the hyper2kvm codebase to make errors more user-friendly and actionable.
+This document summarizes the comprehensive improvements made to exception handling across the h2kvm codebase to make errors more user-friendly and actionable.
 
 ## Summary
 
@@ -16,7 +16,7 @@ All exception handling has been systematically improved across **50+ files** to 
 ### 1. Critical Fixes (1 file)
 
 #### Fixed Bare Except Clause
-**File:** `hyper2kvm/vmcraft/storage_enhanced.py:539`
+**File:** `h2kvm/vmcraft/storage_enhanced.py:539`
 
 **Before:**
 ```python
@@ -38,25 +38,25 @@ except (FileNotFoundError, PermissionError, OSError) as e:
 ### 2. Systemd Wrappers (19 files)
 
 **Files Updated:**
-- `hyper2kvm/systemd/vmspawn.py`
-- `hyper2kvm/systemd/nspawn.py`
-- `hyper2kvm/systemd/dissect.py`
-- `hyper2kvm/systemd/creds.py`
-- `hyper2kvm/systemd/cryptenroll.py`
-- `hyper2kvm/systemd/run.py`
-- `hyper2kvm/systemd/analyze.py`
-- `hyper2kvm/systemd/mount.py`
-- `hyper2kvm/systemd/tmpfiles.py`
-- `hyper2kvm/systemd/notify.py`
-- `hyper2kvm/systemd/inhibit.py`
-- `hyper2kvm/systemd/cat.py`
-- `hyper2kvm/systemd/path.py`
-- `hyper2kvm/systemd/delta.py`
-- `hyper2kvm/systemd/cgtop.py`
-- `hyper2kvm/systemd/repart.py`
-- `hyper2kvm/systemd/detect_virt.py`
-- `hyper2kvm/systemd/machine_id.py`
-- `hyper2kvm/systemd/id128.py`
+- `h2kvm/systemd/vmspawn.py`
+- `h2kvm/systemd/nspawn.py`
+- `h2kvm/systemd/dissect.py`
+- `h2kvm/systemd/creds.py`
+- `h2kvm/systemd/cryptenroll.py`
+- `h2kvm/systemd/run.py`
+- `h2kvm/systemd/analyze.py`
+- `h2kvm/systemd/mount.py`
+- `h2kvm/systemd/tmpfiles.py`
+- `h2kvm/systemd/notify.py`
+- `h2kvm/systemd/inhibit.py`
+- `h2kvm/systemd/cat.py`
+- `h2kvm/systemd/path.py`
+- `h2kvm/systemd/delta.py`
+- `h2kvm/systemd/cgtop.py`
+- `h2kvm/systemd/repart.py`
+- `h2kvm/systemd/detect_virt.py`
+- `h2kvm/systemd/machine_id.py`
+- `h2kvm/systemd/id128.py`
 
 **Before:**
 ```python
@@ -80,7 +80,7 @@ raise SystemdError(
 ### 3. Configuration Errors (3 files)
 
 #### CLI Configuration
-**File:** `hyper2kvm/cli/config.py`
+**File:** `h2kvm/cli/config.py`
 
 **Improvements:**
 - Replaced `ValueError` with `ConfigurationError` for invalid configurations
@@ -108,7 +108,7 @@ raise ConfigurationError(
 ```
 
 #### SSH Configuration
-**File:** `hyper2kvm/infrastructure/ssh/ssh_config.py`
+**File:** `h2kvm/infrastructure/ssh/ssh_config.py`
 
 **Improvements:**
 - Replaced `ValueError` with `ConfigurationError` for SSH parameter validation
@@ -121,7 +121,7 @@ raise ConfigurationError(
 ### 4. Infrastructure Code (3 files)
 
 #### Kubernetes Deployer
-**File:** `hyper2kvm/infrastructure/deployers/kubernetes.py`
+**File:** `h2kvm/infrastructure/deployers/kubernetes.py`
 
 **Improvements:**
 - Replaced generic `RuntimeError` with `InfrastructureError`
@@ -153,7 +153,7 @@ raise InfrastructureError(
 ```
 
 #### Snapshot Manager
-**File:** `hyper2kvm/infrastructure/rollback/snapshot_manager.py`
+**File:** `h2kvm/infrastructure/rollback/snapshot_manager.py`
 
 **Improvements:**
 - Replaced `RuntimeError` with `DiskConversionError` for snapshot operations
@@ -167,8 +167,8 @@ raise InfrastructureError(
 ### 5. Windows Drivers (2 files)
 
 **Files Updated:**
-- `hyper2kvm/fixers/windows/network_fixer.py`
-- `hyper2kvm/fixers/windows/virtio/detection.py`
+- `h2kvm/fixers/windows/network_fixer.py`
+- `h2kvm/fixers/windows/virtio/detection.py`
 
 **Before:**
 ```python
@@ -190,7 +190,7 @@ raise AttributeError(
 
 ### 6. CLI Error Output
 
-**File:** `hyper2kvm/__main__.py`
+**File:** `h2kvm/__main__.py`
 
 **Improvements:**
 
@@ -201,11 +201,11 @@ raise AttributeError(
 
 2. **Smart Exception Handling**
    - `Fatal` exceptions: User-friendly message with proper exit code
-   - `Hyper2KvmError` exceptions: Formatted with solutions and causes
+   - `H2KvmError` exceptions: Formatted with solutions and causes
    - Unexpected exceptions: Suggests running with `-v` for details
 
 3. **Preserved Exit Codes**
-   - Extracts exit codes from `Hyper2KvmError` exceptions
+   - Extracts exit codes from `H2KvmError` exceptions
    - Maintains proper exit codes for different error types
 
 **Example Output:**
@@ -245,7 +245,7 @@ Traceback (most recent call last):
 The codebase now properly utilizes the existing exception hierarchy:
 
 ### Core Exceptions
-- **`Hyper2KvmError`** - Base class with exit codes, context, and secret redaction
+- **`H2KvmError`** - Base class with exit codes, context, and secret redaction
 - **`Fatal`** - Critical errors that should terminate execution
 - **`ConfigurationError`** - Invalid configuration or YAML/JSON parsing errors
 
@@ -318,7 +318,7 @@ Consider adding tests for:
 ## Migration Guide
 
 ### For External Tools
-If you're parsing hyper2kvm error output:
+If you're parsing h2kvm error output:
 
 1. **Exit Codes**: Now more specific (0=success, 1=general, 2=fatal, 38=not implemented, 66=disk error, 69=dependency, 73=conversion error, 78=config error, 127=missing command)
 
@@ -327,9 +327,9 @@ If you're parsing hyper2kvm error output:
 3. **Verbosity**: Use `-vv` to get full stack traces for debugging
 
 ### For Plugins/Extensions
-If you're extending hyper2kvm:
+If you're extending h2kvm:
 
-1. **Import exceptions**: `from hyper2kvm.core.exceptions import *`
+1. **Import exceptions**: `from h2kvm.core.exceptions import *`
 2. **Use specific types**: Prefer `DiskConversionError` over `RuntimeError`
 3. **Add context**: Always use `.with_context(solutions=[...])`
 4. **Set exit codes**: Provide meaningful exit codes in constructors
@@ -349,5 +349,5 @@ Potential enhancements:
 ---
 
 **Last Updated:** 2026-03-29
-**Scope:** 50+ files across the entire hyper2kvm codebase
+**Scope:** 50+ files across the entire h2kvm codebase
 **Impact:** Significantly improved user experience and debuggability

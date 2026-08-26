@@ -2,7 +2,7 @@
 #   h2kvmctl --config 00-common/common-strict.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config 00-common/common-strict.yaml
+#   h2kvm --config 00-common/common-strict.yaml
 
 verbose: 2
 dry_run: false

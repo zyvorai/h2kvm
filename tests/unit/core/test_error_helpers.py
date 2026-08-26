@@ -2,13 +2,13 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm/core/error_helpers.py — ErrorHelper builder and pre-defined helpers."""
+"""Tests for h2kvm/core/error_helpers.py — ErrorHelper builder and pre-defined helpers."""
 
 from __future__ import annotations
 
 import pytest
 
-from hyper2kvm.core.error_helpers import (
+from h2kvm.core.error_helpers import (
     DOCS_BASE,
     ErrorHelper,
     boot_failure_error,
@@ -31,7 +31,7 @@ from hyper2kvm.core.error_helpers import (
 
 
 def test_docs_base_constant():
-    assert DOCS_BASE == "https://github.com/ssahani/hyper2kvm/blob/main/docs"
+    assert DOCS_BASE == "https://github.com/ssahani/h2kvm/blob/main/docs"
 
 
 # ---------------------------------------------------------------------------

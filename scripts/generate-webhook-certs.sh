@@ -12,14 +12,14 @@
 #   ./generate-webhook-certs.sh [namespace] [service-name]
 #
 # Example:
-#   ./generate-webhook-certs.sh hyper2kvm-system hyper2kvm-webhook
+#   ./generate-webhook-certs.sh h2kvm-system h2kvm-webhook
 #
 
 set -euo pipefail
 
-NAMESPACE="${1:-hyper2kvm-system}"
-SERVICE_NAME="${2:-hyper2kvm-webhook}"
-SECRET_NAME="hyper2kvm-webhook-certs"
+NAMESPACE="${1:-h2kvm-system}"
+SERVICE_NAME="${2:-h2kvm-webhook}"
+SECRET_NAME="h2kvm-webhook-certs"
 WEBHOOK_CONFIG="k8s/operator/webhook-config.yaml"
 
 echo "=== Generating Webhook TLS Certificates ==="
@@ -42,7 +42,7 @@ openssl genrsa -out ca.key 2048
 echo "Generating CA certificate..."
 openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 \
   -out ca.crt \
-  -subj "/CN=hyper2kvm-webhook-ca"
+  -subj "/CN=h2kvm-webhook-ca"
 
 # Generate server private key
 echo "Generating server private key..."
@@ -139,10 +139,10 @@ echo ""
 echo "=== Certificate Generation Complete ==="
 echo ""
 echo "Verify webhook is running:"
-echo "  kubectl get pods -n $NAMESPACE -l app=hyper2kvm-webhook"
+echo "  kubectl get pods -n $NAMESPACE -l app=h2kvm-webhook"
 echo ""
 echo "Test webhook:"
 echo "  kubectl apply -f k8s/operator/examples/convert-job.yaml"
 echo ""
 echo "View webhook logs:"
-echo "  kubectl logs -n $NAMESPACE -l app=hyper2kvm-webhook -f"
+echo "  kubectl logs -n $NAMESPACE -l app=h2kvm-webhook -f"

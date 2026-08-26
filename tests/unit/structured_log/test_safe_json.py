@@ -12,7 +12,7 @@ import json
 import uuid
 from pathlib import Path
 
-from hyper2kvm.core.structured_log import SafeJSONEncoder, _safe_json_serializer
+from h2kvm.core.structured_log import SafeJSONEncoder, _safe_json_serializer
 
 
 class _Unserializable:

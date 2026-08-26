@@ -1,7 +1,7 @@
 ---
 # Simple VMDK to KubeVirt VM conversion
 # This example shows the most basic use case: convert a VMDK from HTTP URL to a running VM
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: simple-vmdk-to-vm

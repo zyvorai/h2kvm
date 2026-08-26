@@ -1,0 +1,8 @@
+[Unit]
+Description=H2KVM Service Target
+Documentation=man:h2kvm(1) https://github.com/ssahani/h2kvm
+Wants=h2kvm.service h2kvm.socket h2kvm.timer h2kvm.path
+After=network.target libvirtd.service
+
+[Install]
+WantedBy=multi-user.target

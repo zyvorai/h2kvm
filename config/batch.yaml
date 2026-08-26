@@ -1,8 +1,8 @@
-# hyper2kvm Batch Processing Configuration
+# h2kvm Batch Processing Configuration
 # This file is used by the batch service to process multiple VMs in parallel
 
 command: local
-batch_manifest: /etc/hyper2kvm/manifest.json
+batch_manifest: /etc/h2kvm/manifest.json
 
 # Number of parallel workers (adjust based on available CPU/memory)
 batch_parallel: 4

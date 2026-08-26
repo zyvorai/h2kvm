@@ -1,15 +1,15 @@
 #!/bin/bash
-# Hyper2KVM Kubernetes Deployment Script for CentOS 8
+# H2KVM Kubernetes Deployment Script for CentOS 8
 # Usage: ./deploy-k8s-centos8.sh [prepare|deploy|test|cleanup]
 
 set -euo pipefail
 
 # Configuration
-NAMESPACE="hyper2kvm-system"
+NAMESPACE="h2kvm-system"
 STORAGE_CLASS="${STORAGE_CLASS:-nfs-client}"
 VMWARE_STORAGE_SIZE="${VMWARE_STORAGE_SIZE:-500Gi}"
 KVM_STORAGE_SIZE="${KVM_STORAGE_SIZE:-1Ti}"
-NODE_LABEL="${NODE_LABEL:-hyper2kvm=enabled}"
+NODE_LABEL="${NODE_LABEL:-h2kvm=enabled}"
 
 log_info() {
     echo "[INFO] $1"
@@ -122,14 +122,14 @@ EOF
     log_info "  ssh <node> 'bash /tmp/prepare-node.sh'"
     log_info ""
     log_info "Then label the nodes:"
-    log_info "  kubectl label node <node-name> hyper2kvm=enabled"
+    log_info "  kubectl label node <node-name> h2kvm=enabled"
     log_info ""
     read -p "Press Enter when nodes are prepared..."
 }
 
-# Deploy Hyper2KVM
-deploy_hyper2kvm() {
-    log_info "=== Deploying Hyper2KVM to Kubernetes ==="
+# Deploy H2KVM
+deploy_h2kvm() {
+    log_info "=== Deploying H2KVM to Kubernetes ==="
 
     # Create namespace
     log_info "Creating namespace: $NAMESPACE"
@@ -142,14 +142,14 @@ deploy_hyper2kvm() {
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: hyper2kvm-worker
+  name: h2kvm-worker
   namespace: $NAMESPACE
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: hyper2kvm-worker-role
+  name: h2kvm-worker-role
   namespace: $NAMESPACE
 rules:
 - apiGroups: [""]
@@ -166,15 +166,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: hyper2kvm-worker-binding
+  name: h2kvm-worker-binding
   namespace: $NAMESPACE
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: hyper2kvm-worker-role
+  name: h2kvm-worker-role
 subjects:
 - kind: ServiceAccount
-  name: hyper2kvm-worker
+  name: h2kvm-worker
   namespace: $NAMESPACE
 EOF
 
@@ -188,7 +188,7 @@ metadata:
   name: vmware-storage
   namespace: $NAMESPACE
   labels:
-    app: hyper2kvm
+    app: h2kvm
     storage-type: source
 spec:
   accessModes:
@@ -205,7 +205,7 @@ metadata:
   name: kvm-storage
   namespace: $NAMESPACE
   labels:
-    app: hyper2kvm
+    app: h2kvm
     storage-type: destination
 spec:
   accessModes:
@@ -221,7 +221,7 @@ EOF
     kubectl wait --for=condition=Bound pvc/vmware-storage -n $NAMESPACE --timeout=300s
     kubectl wait --for=condition=Bound pvc/kvm-storage -n $NAMESPACE --timeout=300s
 
-    log_info "✅ Hyper2KVM deployed successfully!"
+    log_info "✅ H2KVM deployed successfully!"
     log_info ""
     log_info "Next steps:"
     log_info "1. Copy VMDKs to storage:"
@@ -249,20 +249,20 @@ spec:
   template:
     metadata:
       labels:
-        app: hyper2kvm
+        app: h2kvm
     spec:
-      serviceAccountName: hyper2kvm-worker
+      serviceAccountName: h2kvm-worker
       restartPolicy: Never
       nodeSelector:
-        hyper2kvm: enabled
+        h2kvm: enabled
       containers:
-      - name: hyper2kvm
-        image: ghcr.io/ssahani/hyper2kvm:latest
+      - name: h2kvm
+        image: ghcr.io/ssahani/h2kvm:latest
         command:
           - /bin/sh
           - -c
           - |
-            echo "=== Hyper2KVM Test ==="
+            echo "=== H2KVM Test ==="
             h2kvmctl --version
             echo "✅ Test passed!"
         resources:
@@ -292,7 +292,7 @@ EOF
 cleanup() {
     log_warn "=== Cleaning Up ==="
 
-    read -p "This will delete all Hyper2KVM resources. Continue? (yes/no): " confirm
+    read -p "This will delete all H2KVM resources. Continue? (yes/no): " confirm
     if [ "$confirm" != "yes" ]; then
         log_info "Cleanup cancelled."
         exit 0
@@ -312,7 +312,7 @@ cleanup() {
 
 # Show status
 show_status() {
-    log_info "=== Hyper2KVM Status ==="
+    log_info "=== H2KVM Status ==="
 
     echo ""
     echo "Namespace:"
@@ -320,7 +320,7 @@ show_status() {
 
     echo ""
     echo "Nodes:"
-    kubectl get nodes -l hyper2kvm=enabled
+    kubectl get nodes -l h2kvm=enabled
 
     echo ""
     echo "Storage:"
@@ -344,7 +344,7 @@ main() {
             ;;
         deploy)
             check_prerequisites
-            deploy_hyper2kvm
+            deploy_h2kvm
             ;;
         test)
             check_prerequisites
@@ -357,16 +357,16 @@ main() {
             cleanup
             ;;
         *)
-            echo "Hyper2KVM Kubernetes Deployment Script for CentOS 8"
+            echo "H2KVM Kubernetes Deployment Script for CentOS 8"
             echo ""
             echo "Usage: $0 [command]"
             echo ""
             echo "Commands:"
             echo "  prepare   - Prepare CentOS 8 nodes (generates script)"
-            echo "  deploy    - Deploy Hyper2KVM to Kubernetes"
+            echo "  deploy    - Deploy H2KVM to Kubernetes"
             echo "  test      - Run test migration"
             echo "  status    - Show deployment status"
-            echo "  cleanup   - Remove all Hyper2KVM resources"
+            echo "  cleanup   - Remove all H2KVM resources"
             echo ""
             echo "Environment variables:"
             echo "  STORAGE_CLASS         - Kubernetes StorageClass (default: nfs-client)"

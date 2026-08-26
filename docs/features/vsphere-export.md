@@ -1,6 +1,6 @@
 # vSphere Export Guide
 
-This guide covers hyper2kvm's direct export capabilities for VMware vSphere environments.
+This guide covers h2kvm's direct export capabilities for VMware vSphere environments.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ This guide covers hyper2kvm's direct export capabilities for VMware vSphere envi
 
 ## Overview
 
-hyper2kvm provides multiple methods to export VMs from vSphere environments:
+h2kvm provides multiple methods to export VMs from vSphere environments:
 
 1. **Direct Export** - Convert VMware disks directly to QCOW2/RAW using internal converters
 2. **HTTP Download** - Download VM folders via vSphere's HTTP API
@@ -33,7 +33,7 @@ All export modes support:
 
 ### 1. Direct Export (`export_mode="export"`)
 
-Converts VMware disks directly to KVM-compatible formats using hyper2kvm's internal converters.
+Converts VMware disks directly to KVM-compatible formats using h2kvm's internal converters.
 
 **Features:**
 - Guest OS detection and modification
@@ -45,7 +45,7 @@ Converts VMware disks directly to KVM-compatible formats using hyper2kvm's inter
 
 **Example:**
 ```python
-from hyper2kvm.vmware.clients.client import VMwareClient, ExportOptions
+from h2kvm.vmware.clients.client import VMwareClient, ExportOptions
 
 client = VMwareClient(
     vcenter_host='vcenter.example.com',
@@ -124,7 +124,7 @@ Exports VM as single OVA archive file.
 The `ExportOptions` class configures export behavior:
 
 ```python
-from hyper2kvm.vmware.clients.client import ExportOptions
+from h2kvm.vmware.clients.client import ExportOptions
 
 options = ExportOptions(
     # Required
@@ -182,7 +182,7 @@ options = ExportOptions(
 
 ```python
 import asyncio
-from hyper2kvm.vmware.clients.client import VMwareClient
+from h2kvm.vmware.clients.client import VMwareClient
 
 async def export_vm():
     client = VMwareClient(
@@ -203,7 +203,7 @@ asyncio.run(export_vm())
 ### Batch Export with Progress
 
 ```python
-from hyper2kvm.manifest.batch_progress import ProgressTracker
+from h2kvm.manifest.batch_progress import ProgressTracker
 
 async def batch_export(vm_list):
     client = VMwareClient(...)
@@ -305,7 +305,7 @@ output_dir: /data/exports
 ```
 
 ```bash
-hyper2kvm --config config.yaml --vm-name web-server-01
+h2kvm --config config.yaml --vm-name web-server-01
 ```
 
 ## Best Practices
@@ -338,7 +338,7 @@ compress=True
 Always validate exported disks:
 
 ```python
-from hyper2kvm.validation import DiskValidator
+from h2kvm.validation import DiskValidator
 
 validator = DiskValidator()
 report = validator.validate({
@@ -367,7 +367,7 @@ await client.async_delete_snapshot(
 Use progress tracking for visibility:
 
 ```python
-from hyper2kvm.manifest.batch_progress import ProgressTracker
+from h2kvm.manifest.batch_progress import ProgressTracker
 
 tracker = ProgressTracker(
     progress_file='/tmp/export-progress.json',
@@ -402,7 +402,7 @@ export VSPHERE_DEBUG=1
 1. Use `export_mode='download_only'` for raw files
 2. Increase `max_workers` for parallel downloads
 3. Use VDDK instead of HTTP for single disks
-4. Check network bandwidth between hyper2kvm host and vSphere
+4. Check network bandwidth between h2kvm host and vSphere
 
 ### Snapshot Failures
 

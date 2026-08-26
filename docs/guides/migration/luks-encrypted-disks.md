@@ -4,7 +4,7 @@ Guide for migrating VMs with LUKS-encrypted root filesystems from VMware to KVM.
 
 ## How It Works
 
-When hyper2kvm detects a LUKS-encrypted partition on the guest disk, it automatically:
+When h2kvm detects a LUKS-encrypted partition on the guest disk, it automatically:
 
 1. **Switches to libguestfs backend** — boots a supermin appliance VM with full device visibility
 2. **Unlocks the LUKS partition** — `g.cryptsetup_open()` inside the appliance
@@ -28,7 +28,7 @@ sudo h2kvmctl --cmd local \
   -o /output
 
 # Passphrase from environment variable
-export HYPER2KVM_LUKS_PASSPHRASE="your-passphrase"
+export H2KVM_LUKS_PASSPHRASE="your-passphrase"
 sudo h2kvmctl --cmd local --vmdk disk.vmdk --luks-enable ...
 
 # Passphrase from keyfile
@@ -66,7 +66,7 @@ Quick probe: detected LUKS on disk
   ↓
 Auto-switched to libguestfs backend (supermin appliance)
   ↓
-g.cryptsetup_open(/dev/sda3, passphrase, "hyper2kvm-crypt1")
+g.cryptsetup_open(/dev/sda3, passphrase, "h2kvm-crypt1")
   ↓
 g.lvm_scan(True) → discovers LVM inside LUKS
   ↓
@@ -89,7 +89,7 @@ This matches virt-v2v behavior. The guest's existing initramfs already contains:
 - Correct `root=UUID=...` in kernel cmdline
 
 Rebuilding inside libguestfs would break these references because the device
-mapper paths (`/dev/mapper/hyper2kvm-crypt1`) differ from what the guest expects
+mapper paths (`/dev/mapper/h2kvm-crypt1`) differ from what the guest expects
 (`dm-uuid-CRYPT-LUKS-<uuid>-<name>`).
 
 Virtio driver configs are written to disk but only take effect after the user
@@ -139,7 +139,7 @@ sudo dnf install libguestfs-tools python3-libguestfs    # Fedora/RHEL
 sudo apt install libguestfs-tools python3-guestfs       # Ubuntu/Debian
 ```
 
-libguestfs is auto-detected. If not installed, hyper2kvm falls back to VMCraft
+libguestfs is auto-detected. If not installed, h2kvm falls back to VMCraft
 with host-based `cryptsetup` (works but less robust).
 
 ## Tested Configurations

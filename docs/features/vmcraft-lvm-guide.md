@@ -78,7 +78,7 @@ All methods return audit dicts with `{attempted, ok, error}` pattern.
 ### 1. Create Simple LVM Setup
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 g = VMCraft("ubuntu-server.vmdk")
 g.launch()
@@ -554,7 +554,7 @@ g.vgcreate("vg_thin", ["/dev/nbd0p2"])
 # This requires extending VMCraft with thin pool support
 # For now, use shell commands:
 
-from hyper2kvm.core.utils import run_sudo
+from h2kvm.core.utils import run_sudo
 
 # Create thin pool (50 GiB)
 cmd = ["lvcreate", "-L", "50G", "-T", "vg_thin/thin_pool"]
@@ -581,7 +581,7 @@ run_sudo(g.logger, cmd, check=True)
 #!/usr/bin/env python3
 """Migrate VMware VM to KVM with LVM conversion."""
 
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -764,7 +764,7 @@ result = g.lvcreate("lv_data", "vg_system", extents="100%FREE")
 **Solution:**
 ```python
 # Activate LV manually
-from hyper2kvm.core.utils import run_sudo
+from h2kvm.core.utils import run_sudo
 run_sudo(g.logger, ["lvchange", "-ay", "/dev/vg_system/lv_data"], check=True)
 
 # Wait for udev

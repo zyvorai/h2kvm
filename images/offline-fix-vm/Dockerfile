@@ -30,8 +30,8 @@ RUN pip3 install --no-cache-dir \
 RUN mkdir -p /opt/offline-fix
 
 # Copy fixer code from Phase 3
-COPY hyper2kvm/fixers/offline_vm/*.py /opt/offline-fix/fixers/
-COPY hyper2kvm/worker/offline_fix_contract.py /opt/offline-fix/contract.py
+COPY h2kvm/fixers/offline_vm/*.py /opt/offline-fix/fixers/
+COPY h2kvm/worker/offline_fix_contract.py /opt/offline-fix/contract.py
 
 # Copy VM worker and entrypoint
 COPY images/offline-fix-vm/worker.py /opt/offline-fix/worker.py

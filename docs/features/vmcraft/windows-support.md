@@ -140,7 +140,7 @@ path1 = g.win_resolve_path("C:\\Windows\\System32\\drivers")
 path2 = g.win_resolve_path("C:\\WINDOWS\\system32\\DRIVERS")
 path3 = g.win_resolve_path("c:\\windows\\System32\\Drivers")
 
-# Returns: PosixPath('/tmp/hyper2kvm-guestfs-xyz/Windows/System32/drivers')
+# Returns: PosixPath('/tmp/h2kvm-guestfs-xyz/Windows/System32/drivers')
 ```
 
 **Features:**
@@ -231,7 +231,7 @@ sudo pacman -S \
 ### Example 1: Windows VM Driver Injection
 
 ```python
-from hyper2kvm.core.guestfs_factory import create_guestfs
+from h2kvm.core.guestfs_factory import create_guestfs
 
 # Mount Windows VMDK
 g = create_guestfs(backend='vmcraft')
@@ -275,7 +275,7 @@ g.close()
 ### Example 2: Windows Configuration Inspection
 
 ```python
-from hyper2kvm.core.guestfs_factory import create_guestfs
+from h2kvm.core.guestfs_factory import create_guestfs
 
 g = create_guestfs(backend='vmcraft')
 g.add_drive_opts('/vms/windows-server.vmdk', readonly=True)
@@ -322,7 +322,7 @@ g.close()
 ### Example 3: Windows File Operations
 
 ```python
-from hyper2kvm.core.guestfs_factory import create_guestfs
+from h2kvm.core.guestfs_factory import create_guestfs
 
 g = create_guestfs(backend='vmcraft')
 g.add_drive_opts('/vms/windows.vmdk', readonly=False)
@@ -499,6 +499,6 @@ The native GuestFS implementation now provides comprehensive Windows support for
 - ✅ **Lightweight**: Minimal dependencies and memory usage
 - ✅ **Complete**: Covers all common Windows operations
 - ✅ **Tested**: Integration tested with real Photon OS VMDK
-- ✅ **Production-ready**: Used in hyper2kvm for VMware to KVM migration
+- ✅ **Production-ready**: Used in h2kvm for VMware to KVM migration
 
 Combined with existing Linux support, this makes native GuestFS a comprehensive solution for cross-platform VM manipulation.

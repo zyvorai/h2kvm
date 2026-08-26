@@ -4,7 +4,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 """
-Example: Using the hyper2kvm Worker Job Protocol REST API.
+Example: Using the h2kvm Worker Job Protocol REST API.
 
 This demonstrates:
 1. Starting the API server
@@ -47,13 +47,13 @@ def start_server():
     """Start the FastAPI server."""
     import uvicorn
 
-    print("🚀 Starting hyper2kvm Worker API server...")
+    print("🚀 Starting h2kvm Worker API server...")
     print(f"📖 API Documentation: {API_BASE_URL}/docs")
     print(f"📖 ReDoc: {API_BASE_URL}/redoc")
     print()
 
     uvicorn.run(
-        "hyper2kvm.worker.api:app",
+        "h2kvm.worker.api:app",
         host="0.0.0.0",
         port=8000,
         reload=True,
@@ -193,7 +193,7 @@ async def register_worker():
     """Register a worker with the API."""
     print("📝 Registering worker...")
 
-    from hyper2kvm.runtime.worker.capabilities import CapabilityDetector
+    from h2kvm.runtime.worker.capabilities import CapabilityDetector
 
     detector = CapabilityDetector()
     capabilities = detector.detect()

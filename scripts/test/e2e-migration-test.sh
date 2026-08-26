@@ -34,7 +34,7 @@ done
 
 VMDK="${POSITIONAL[0]:?Usage: $0 <vmdk-path> [vm-name] [--keep]}"
 VM_NAME="${POSITIONAL[1]:-e2e-test-$(date +%s)}"
-OUTPUT_DIR="/var/lib/hyper2kvm/e2e-test/${VM_NAME}"
+OUTPUT_DIR="/var/lib/h2kvm/e2e-test/${VM_NAME}"
 TIMEOUT_BOOT=180   # seconds to wait for boot
 TIMEOUT_IP=120     # seconds to wait for IP
 
@@ -43,7 +43,7 @@ TIMEOUT_IP=120     # seconds to wait for IP
 
 echo ""
 echo "  ╔══════════════════════════════════════════════════╗"
-echo "  ║     hyper2kvm E2E Migration Test                 ║"
+echo "  ║     h2kvm E2E Migration Test                 ║"
 echo "  ╚══════════════════════════════════════════════════╝"
 echo ""
 echo "  Source:  $VMDK"
@@ -61,7 +61,7 @@ cleanup() {
         virsh undefine "$vm" 2>/dev/null || true
     done
     rm -rf "$OUTPUT_DIR"
-    rm -f "/var/lib/hyper2kvm/input/${VM_NAME}.*"
+    rm -f "/var/lib/h2kvm/input/${VM_NAME}.*"
 }
 ORIG_VM_NAME="$VM_NAME"
 

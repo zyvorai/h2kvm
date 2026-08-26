@@ -1,5 +1,5 @@
 {
-  "name": "hyper2kvm Development",
+  "name": "h2kvm Development",
   "build": {
     "dockerfile": "Dockerfile",
     "context": "..",

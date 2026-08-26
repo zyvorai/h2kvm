@@ -22,4 +22,4 @@ compute_checksums: true
 # - Device configuration
 #
 # Use the manifest with:
-#   hyper2kvm --manifest ./out/production-db-manifest.json
+#   h2kvm --manifest ./out/production-db-manifest.json

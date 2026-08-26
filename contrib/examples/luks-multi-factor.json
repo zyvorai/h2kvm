@@ -1,5 +1,5 @@
 {
-  "$schema": "https://hyper2kvm.io/schemas/luks-config.json",
+  "$schema": "https://h2kvm.io/schemas/luks-config.json",
   "description": "Multi-factor LUKS unlock (TPM2 + Vault)",
 
   "tpm_handle": "0x81000010",
@@ -7,7 +7,7 @@
   "vault": {
     "addr": "https://vault.example.com:8200",
     "token": "s.XXXXXXXXXXXXXXXXXXXXXX",
-    "path": "secret/hyper2kvm/luks"
+    "path": "secret/h2kvm/luks"
   },
 
   "comment": "Multi-factor: Both TPM AND Vault keys required.",

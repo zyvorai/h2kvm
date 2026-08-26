@@ -1,4 +1,4 @@
-# Hyper2KVM v2.1.0 - Deployment Status
+# H2KVM v2.1.0 - Deployment Status
 
 **Date:** 2026-01-30
 **Status:** ✅ PRODUCTION READY - AWAITING IMAGE PUSH
@@ -55,10 +55,10 @@
 ### 📦 Local Images Built
 
 ```
-ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0    54.8kB
-ghcr.io/ssahani/hyper2kvm-operator-bundle:latest    54.8kB
-hyper2kvm-operator:test                              2.08GB
-hyper2kvm:worker                                     2.03GB
+ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0    54.8kB
+ghcr.io/ssahani/h2kvm-operator-bundle:latest    54.8kB
+h2kvm-operator:test                              2.08GB
+h2kvm:worker                                     2.03GB
 ```
 
 **Status:** Local test images built, production images need multi-arch build
@@ -83,9 +83,9 @@ hyper2kvm:worker                                     2.03GB
 ./scripts/build-olm-bundle.sh 2.1.0 ghcr.io/ssahani
 
 # Verify images
-docker pull ghcr.io/ssahani/hyper2kvm:2.1.0-operator
-docker pull ghcr.io/ssahani/hyper2kvm:2.1.0-worker
-docker pull ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0
+docker pull ghcr.io/ssahani/h2kvm:2.1.0-operator
+docker pull ghcr.io/ssahani/h2kvm:2.1.0-worker
+docker pull ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
 ```
 
 **Prerequisites:**
@@ -103,11 +103,11 @@ docker pull ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0
 **Commands:**
 ```bash
 # Update versions
-sed -i 's/version: 1.6.0/version: 2.1.0/' helm/hyper2kvm-operator/Chart.yaml
-sed -i 's/appVersion: ".*"/appVersion: "0.3.0"/' helm/hyper2kvm-operator/Chart.yaml
+sed -i 's/version: 1.6.0/version: 2.1.0/' helm/h2kvm-operator/Chart.yaml
+sed -i 's/appVersion: ".*"/appVersion: "0.3.0"/' helm/h2kvm-operator/Chart.yaml
 
 # Lint and package
-helm lint helm/hyper2kvm-operator
+helm lint helm/h2kvm-operator
 ./scripts/package-charts.sh
 ```
 
@@ -133,7 +133,7 @@ git push origin v2.1.0
 3. Attach Helm chart artifacts
 
 **Steps:**
-1. Navigate to https://github.com/ssahani/hyper2kvm/releases/new
+1. Navigate to https://github.com/ssahani/h2kvm/releases/new
 2. Select tag: v2.1.0
 3. Title: "v2.1.0 - OpenShift Container Platform Support"
 4. Copy release notes template from RELEASE_CHECKLIST_v2.1.0.md
@@ -151,10 +151,10 @@ git push origin v2.1.0
 **Commands:**
 ```bash
 # Deploy to staging
-./scripts/deploy-to-openshift.sh 2.1.0 helm hyper2kvm-staging
+./scripts/deploy-to-openshift.sh 2.1.0 helm h2kvm-staging
 
 # Validate deployment
-./scripts/test-openshift-deployment.sh hyper2kvm-staging
+./scripts/test-openshift-deployment.sh h2kvm-staging
 
 # Test migration jobs
 kubectl apply -f k8s/operator/examples/inspect-job.yaml
@@ -178,10 +178,10 @@ kubectl get migrationjobs -w
 **Commands:**
 ```bash
 # Deploy to production
-./scripts/deploy-to-openshift.sh 2.1.0 helm hyper2kvm-system
+./scripts/deploy-to-openshift.sh 2.1.0 helm h2kvm-system
 
 # Validate
-./scripts/test-openshift-deployment.sh hyper2kvm-system
+./scripts/test-openshift-deployment.sh h2kvm-system
 
 # Configure monitoring
 kubectl apply -f monitoring/servicemonitor.yaml
@@ -374,8 +374,8 @@ Phase 7: Monitoring & Validation     [========] 24 hours
 - **On-call Support:** [Support Contact]
 
 ### Communication Channels
-- **Deployment Channel:** #hyper2kvm-deployment
-- **Incident Channel:** #hyper2kvm-incidents
+- **Deployment Channel:** #h2kvm-deployment
+- **Incident Channel:** #h2kvm-incidents
 - **Status Page:** [Status URL]
 
 ### Escalation Path

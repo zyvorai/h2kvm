@@ -58,7 +58,7 @@ class TestFstabStabilization:
 
     def test_stabilize_rhel9_fstab(self):
         """FstabStabilizer should convert /dev/sda1 to UUID= entry."""
-        from hyper2kvm.fixers.filesystem.fstab_stabilizer import FstabStabilizer
+        from h2kvm.fixers.filesystem.fstab_stabilizer import FstabStabilizer
 
         with writable_copy("rhel9.img") as copy:
             g = guestfs.GuestFS(python_return_dict=True)
@@ -107,7 +107,7 @@ class TestGuestIdentity:
 
     def _detect(self, name: str):
         """Detect guest using GuestDetector's inspection strategy."""
-        from hyper2kvm.core.guest_identity import GuestDetector
+        from h2kvm.core.guest_identity import GuestDetector
 
         with open_phony(name) as (g, root):
             guest_type = GuestDetector.detect_by_inspection(g, root)
@@ -116,7 +116,7 @@ class TestGuestIdentity:
 
     def test_detect_fedora(self):
         """GuestDetector should identify Fedora as Linux."""
-        from hyper2kvm.core.guest_identity import GuestType
+        from h2kvm.core.guest_identity import GuestType
 
         guest_type, distro = self._detect("fedora.img")
         assert guest_type == GuestType.LINUX
@@ -124,7 +124,7 @@ class TestGuestIdentity:
 
     def test_detect_ubuntu(self):
         """GuestDetector should identify Ubuntu as Linux."""
-        from hyper2kvm.core.guest_identity import GuestType
+        from h2kvm.core.guest_identity import GuestType
 
         guest_type, distro = self._detect("ubuntu.img")
         assert guest_type == GuestType.LINUX
@@ -132,7 +132,7 @@ class TestGuestIdentity:
 
     def test_detect_rhel(self):
         """GuestDetector should identify RHEL as Linux."""
-        from hyper2kvm.core.guest_identity import GuestType
+        from h2kvm.core.guest_identity import GuestType
 
         guest_type, distro = self._detect("rhel9.img")
         assert guest_type == GuestType.LINUX
@@ -140,14 +140,14 @@ class TestGuestIdentity:
 
     def test_detect_windows(self):
         """GuestDetector should identify Windows."""
-        from hyper2kvm.core.guest_identity import GuestType
+        from h2kvm.core.guest_identity import GuestType
 
         guest_type, _ = self._detect("windows.img")
         assert guest_type == GuestType.WINDOWS
 
     def test_indicator_detection_fedora(self):
         """GuestDetector.detect_by_indicators should score Linux highest for Fedora."""
-        from hyper2kvm.core.guest_identity import GuestDetector, GuestType
+        from h2kvm.core.guest_identity import GuestDetector, GuestType
 
         with open_phony("fedora.img") as (g, root):
             scores = GuestDetector.detect_by_indicators(g)
@@ -156,7 +156,7 @@ class TestGuestIdentity:
 
     def test_indicator_detection_windows(self):
         """GuestDetector.detect_by_indicators should score Windows highest."""
-        from hyper2kvm.core.guest_identity import GuestDetector, GuestType
+        from h2kvm.core.guest_identity import GuestDetector, GuestType
 
         with open_phony("windows.img") as (g, root):
             scores = GuestDetector.detect_by_indicators(g)
@@ -237,7 +237,7 @@ class TestDomainXMLEmission:
 
     def test_emit_linux_domain_bios(self):
         """Generate BIOS domain XML for Fedora phony guest."""
-        from hyper2kvm.libvirt.linux_domain import LinuxDomainConfig, emit_linux_domain
+        from h2kvm.libvirt.linux_domain import LinuxDomainConfig, emit_linux_domain
 
         img = phony_image("fedora.img")
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -259,7 +259,7 @@ class TestDomainXMLEmission:
 
     def test_emit_windows_domain_bootstrap(self):
         """Generate bootstrap (SATA) domain XML for Windows phony guest."""
-        from hyper2kvm.libvirt.windows_domain import (
+        from h2kvm.libvirt.windows_domain import (
             WindowsDomainConfig,
             emit_windows_domain,
         )
@@ -282,7 +282,7 @@ class TestDomainXMLEmission:
 
     def test_emit_windows_domain_with_boot_order(self):
         """Windows domain XML with disk_boot_order should set correct boot element."""
-        from hyper2kvm.libvirt.windows_domain import WinDomainSpec, render_windows_domain_xml
+        from h2kvm.libvirt.windows_domain import WinDomainSpec, render_windows_domain_xml
 
         spec = WinDomainSpec(
             name="win-multi",
@@ -306,7 +306,7 @@ class TestFormatConversion:
 
     def test_qcow2_to_raw(self):
         """Convert Fedora phony guest from qcow2 to raw."""
-        from hyper2kvm.converters.qemu.converter import Convert
+        from h2kvm.converters.qemu.converter import Convert
 
         img = phony_image("fedora.img")
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -327,7 +327,7 @@ class TestFormatConversion:
 
     def test_qcow2_compressed_copy(self):
         """Create a compressed qcow2 copy of Fedora phony guest."""
-        from hyper2kvm.converters.qemu.converter import Convert
+        from h2kvm.converters.qemu.converter import Convert
 
         img = phony_image("fedora.img")
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -1,9 +1,9 @@
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
 metadata:
-  name: hyper2kvm-operator-scc
+  name: h2kvm-operator-scc
   annotations:
-    kubernetes.io/description: "SCC for hyper2kvm operator allowing non-root with specific UID"
+    kubernetes.io/description: "SCC for h2kvm operator allowing non-root with specific UID"
 # Allow specific user ID for operator
 allowPrivilegedContainer: false
 allowHostNetwork: false
@@ -49,7 +49,7 @@ volumes:
 
 # Users and groups - grant to operator ServiceAccount
 users:
-  - system:serviceaccount:hyper2kvm-test:hyper2kvm-operator
+  - system:serviceaccount:h2kvm-test:h2kvm-operator
 groups: []
 
 priority: 10

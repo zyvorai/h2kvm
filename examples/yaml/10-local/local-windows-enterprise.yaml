@@ -18,7 +18,7 @@ report: windows-enterprise-report.md
 verbose: 2
 
 # VirtIO driver injection
-# optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+# optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 virtio_drivers_dir: /path/to/virtio-win
 enable_virtio_gpu: false
 enable_virtio_input: false

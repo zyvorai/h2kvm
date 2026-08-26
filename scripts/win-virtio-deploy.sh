@@ -159,7 +159,7 @@ if not ro: ro = h2.node_add_child(cv,'RunOnce')
 
 # Install cert first to avoid confirmation dialogs, then pnputil
 cmd = r'cmd.exe /c "for %d in (D E F G H) do if exist %d:\cert ( certutil -addstore TrustedPublisher %d:\cert\*.cer >nul 2>&1 & certutil -addstore Root %d:\cert\*.cer >nul 2>&1 & pnputil /add-driver %d:\*.inf /subdirs /install & if exist %d:\guest-agent\qemu-ga-x86_64.msi msiexec /i %d:\guest-agent\qemu-ga-x86_64.msi /quiet )"'
-h2.node_set_value(ro, {'key':'hyper2kvm-virtio','t':1,'value':(cmd+'\0').encode('utf-16-le')})
+h2.node_set_value(ro, {'key':'h2kvm-virtio','t':1,'value':(cmd+'\0').encode('utf-16-le')})
 print('  SOFTWARE: added RunOnce (certutil + pnputil from VirtIO CD)')
 
 h2.commit(f'{cfg}/SOFTWARE')
@@ -305,7 +305,7 @@ sys.path.insert(0, '.')
 
 # Mount the QCOW2 and check Windows registry for VirtIO services
 try:
-    from hyper2kvm.vmcraft import VMCraft
+    from h2kvm.vmcraft import VMCraft
     vm = VMCraft()
     vm.add_drive_opts('$QCOW2', readonly=True)
     vm.launch()

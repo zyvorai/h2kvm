@@ -17,8 +17,8 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from hyper2kvm.vmcraft.nbd_manager import NBDDevice, cleanup_all_nbd_devices
-from hyper2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine
+from h2kvm.vmcraft.nbd_manager import NBDDevice, cleanup_all_nbd_devices
+from h2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine
 
 # Configure logging
 logging.basicConfig(

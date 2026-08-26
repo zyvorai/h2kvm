@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: hyper2kvm-worker-state
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker-state
+  namespace: h2kvm-workers
 spec:
   accessModes:
     - ReadWriteOnce
@@ -15,8 +15,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: hyper2kvm-worker-events
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker-events
+  namespace: h2kvm-workers
 spec:
   accessModes:
     - ReadWriteOnce

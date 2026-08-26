@@ -1,6 +1,6 @@
 # macOS Docker Workflow
 
-hyper2kvm requires Linux for guest fixes (VMCraft uses qemu-nbd). On macOS,
+h2kvm requires Linux for guest fixes (VMCraft uses qemu-nbd). On macOS,
 use Docker to run the full pipeline.
 
 ## Setup
@@ -22,7 +22,7 @@ brew install qemu
 docker run --rm --privileged \
   -v $(pwd)/input:/input \
   -v $(pwd)/output:/output \
-  ghcr.io/ssahani/hyper2kvm:latest \
+  ghcr.io/ssahani/h2kvm:latest \
   --cmd local \
   --vmdk /input/vm.vmdk \
   --to-output /output/vm.qcow2 \
@@ -36,16 +36,16 @@ docker run --rm --privileged \
 
 ```bash
 # Clone repo
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 
 # Build container
-docker build -t hyper2kvm .
+docker build -t h2kvm .
 
 # Convert a VMDK
 docker run --rm --privileged \
   -v $(pwd):/workspace \
-  hyper2kvm \
+  h2kvm \
   --cmd local \
   --vmdk /workspace/photon.vmdk \
   --output-dir /workspace/output \
@@ -70,7 +70,7 @@ govc export.ovf -vm MyVM ./exports/
 docker run --rm --privileged \
   -v $(pwd)/exports:/input \
   -v $(pwd)/output:/output \
-  hyper2kvm \
+  h2kvm \
   --cmd local \
   --vmdk /input/MyVM/MyVM-disk-0.vmdk \
   --to-output /output/MyVM.qcow2 \

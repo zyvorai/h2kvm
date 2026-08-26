@@ -1,6 +1,6 @@
 # Failure Modes and Troubleshooting Guide
 
-This document covers common failure scenarios in VM migration and how hyper2kvm addresses them.
+This document covers common failure scenarios in VM migration and how h2kvm addresses them.
 
 ## Table of Contents
 
@@ -325,7 +325,7 @@ sudo h2kvmctl local \
 - Use volume license if available
 - Contact Microsoft if hardware-locked OEM license
 
-**Not a hyper2kvm issue** - this is expected Windows behavior.
+**Not a h2kvm issue** - this is expected Windows behavior.
 
 ---
 
@@ -562,7 +562,7 @@ If you encounter issues not covered here:
 
 1. **Enable debug logging:** `--log-level DEBUG`
 2. **Generate a report:** `--report issue-report.md`
-3. **Check GitHub Issues:** https://github.com/ssahani/hyper2kvm/issues
+3. **Check GitHub Issues:** https://github.com/ssahani/h2kvm/issues
 4. **Create a bug report:** Use the issue template
 
 ### Information to Include

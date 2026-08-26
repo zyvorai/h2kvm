@@ -13,7 +13,7 @@
 #   h2kvmctl --config examples/yaml/50-daemon/daemon-enhanced.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config examples/yaml/50-daemon/daemon-enhanced.yaml
+#   h2kvm --config examples/yaml/50-daemon/daemon-enhanced.yaml
 
 command: daemon
 daemon: true
@@ -24,13 +24,13 @@ daemon: true
 
 # Directory to watch for incoming disk files
 # Supports: .vmdk, .ova, .ovf, .vhd, .vhdx, .raw, .img, .ami
-watch_dir: /var/lib/hyper2kvm/queue
+watch_dir: /var/lib/h2kvm/queue
 
 # Output directory for converted VMs (organized by date)
-output_dir: /var/lib/hyper2kvm/output
+output_dir: /var/lib/h2kvm/output
 
 # Working directory for temporary files
-workdir: /var/lib/hyper2kvm/work
+workdir: /var/lib/h2kvm/work
 
 # ============================================================================
 # CONCURRENT PROCESSING (Improvement #1)
@@ -70,8 +70,8 @@ retry_policy:
 # HEALTH CHECK & CONTROL API (Improvement #5)
 # ============================================================================
 
-# Control socket: /run/hyper2kvm/control.sock
-# Use: python3 -m hyper2kvm.cli.daemon_ctl status
+# Control socket: /run/h2kvm/control.sock
+# Use: python3 -m h2kvm.cli.daemon_ctl status
 # Commands: status, stats, pause, resume, drain, stop
 
 # ============================================================================
@@ -94,9 +94,9 @@ notifications:
   email_enabled: false
   email_smtp_host: "smtp.gmail.com"
   email_smtp_port: 587
-  email_from: "hyper2kvm@example.com"
+  email_from: "h2kvm@example.com"
   email_to: "admin@example.com"
-  email_username: "hyper2kvm@example.com"
+  email_username: "h2kvm@example.com"
   email_password: "app-specific-password"
 
 # ============================================================================
@@ -155,7 +155,7 @@ win_hyperv: true
 # LOGGING
 # ============================================================================
 
-log_file: /var/log/hyper2kvm/daemon.log
+log_file: /var/log/h2kvm/daemon.log
 verbose: 2  # 0=errors only, 1=info, 2=debug, 3=trace
 
 # ============================================================================
@@ -172,21 +172,21 @@ vm_uefi: false
 # ============================================================================
 
 # Run manually:
-#   sudo python3 -m hyper2kvm --config daemon-enhanced.yaml
+#   sudo python3 -m h2kvm --config daemon-enhanced.yaml
 
 # Run with systemd:
-#   sudo cp daemon-enhanced.yaml /etc/hyper2kvm/production.yaml
-#   sudo systemctl enable --now hyper2kvm@production.service
+#   sudo cp daemon-enhanced.yaml /etc/h2kvm/production.yaml
+#   sudo systemctl enable --now h2kvm@production.service
 
 # Control daemon:
-#   python3 -m hyper2kvm.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output status
-#   python3 -m hyper2kvm.cli.daemon_ctl pause
-#   python3 -m hyper2kvm.cli.daemon_ctl resume
-#   python3 -m hyper2kvm.cli.daemon_ctl stats --json
+#   python3 -m h2kvm.cli.daemon_ctl --output-dir /var/lib/h2kvm/output status
+#   python3 -m h2kvm.cli.daemon_ctl pause
+#   python3 -m h2kvm.cli.daemon_ctl resume
+#   python3 -m h2kvm.cli.daemon_ctl stats --json
 
 # View stats:
-#   cat /var/lib/hyper2kvm/output/.daemon/stats.json
+#   cat /var/lib/h2kvm/output/.daemon/stats.json
 
 # View errors:
-#   ls -lh /var/lib/hyper2kvm/queue/.errors/
-#   cat /var/lib/hyper2kvm/queue/.errors/failed-vm.vmdk.error.json
+#   ls -lh /var/lib/h2kvm/queue/.errors/
+#   cat /var/lib/h2kvm/queue/.errors/failed-vm.vmdk.error.json

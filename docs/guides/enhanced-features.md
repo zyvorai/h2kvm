@@ -1,10 +1,10 @@
 # Enhanced Features with RHEL 10 Compatibility
 
-This guide covers the enhanced features added to hyper2kvm with full RHEL 10 compatibility through optional dependencies and stdlib fallbacks.
+This guide covers the enhanced features added to h2kvm with full RHEL 10 compatibility through optional dependencies and stdlib fallbacks.
 
 ## Overview
 
-hyper2kvm now includes enhanced features that provide better developer experience when optional dependencies are available, while maintaining **100% compatibility with RHEL 10** and other minimal environments through stdlib fallbacks.
+h2kvm now includes enhanced features that provide better developer experience when optional dependencies are available, while maintaining **100% compatibility with RHEL 10** and other minimal environments through stdlib fallbacks.
 
 ### Design Philosophy
 
@@ -17,9 +17,9 @@ hyper2kvm now includes enhanced features that provide better developer experienc
 
 | Feature | With Optional Deps | RHEL 10 (stdlib only) | Implementation |
 |---------|-------------------|----------------------|----------------|
-| **Configuration Validation** | Pydantic (type-safe) | Manual validation | `hyper2kvm.config.validation` |
-| **Retry Logic** | Tenacity (advanced) | Exponential backoff | `hyper2kvm.core.retry_enhanced` |
-| **Logging** | Built-in (excellent!) | Built-in (excellent!) | `hyper2kvm.core.logger` ✅ |
+| **Configuration Validation** | Pydantic (type-safe) | Manual validation | `h2kvm.config.validation` |
+| **Retry Logic** | Tenacity (advanced) | Exponential backoff | `h2kvm.core.retry_enhanced` |
+| **Logging** | Built-in (excellent!) | Built-in (excellent!) | `h2kvm.core.logger` ✅ |
 
 ## Installation Options
 
@@ -27,30 +27,30 @@ hyper2kvm now includes enhanced features that provide better developer experienc
 
 ```bash
 # All enhancements
-pip install hyper2kvm[enhanced]
+pip install h2kvm[enhanced]
 
 # Or install full (includes all optional deps)
-pip install hyper2kvm[full]
+pip install h2kvm[full]
 ```
 
 ### Selective Installation
 
 ```bash
 # Just validation enhancements
-pip install hyper2kvm[validation]
+pip install h2kvm[validation]
 
 # Just retry enhancements
-pip install hyper2kvm[retry]
+pip install h2kvm[retry]
 
 # Just daemon mode
-pip install hyper2kvm[daemon]
+pip install h2kvm[daemon]
 ```
 
 ### Minimal Installation (RHEL 10 Compatible)
 
 ```bash
 # Core only - everything still works!
-pip install hyper2kvm
+pip install h2kvm
 ```
 
 ## 1. Configuration Validation
@@ -62,7 +62,7 @@ Type-safe configuration validation with helpful error messages. Uses pydantic wh
 ### Usage
 
 ```python
-from hyper2kvm.config.validation import (
+from h2kvm.config.validation import (
     NetworkConfig,
     VMwareSourceConfig,
     DiskConfig,
@@ -146,7 +146,7 @@ except ConfigValidationError as e:
 ### Checking Availability
 
 ```python
-from hyper2kvm.core.optional_imports import PYDANTIC_AVAILABLE
+from h2kvm.core.optional_imports import PYDANTIC_AVAILABLE
 
 if PYDANTIC_AVAILABLE:
     print("Using pydantic for validation")
@@ -167,7 +167,7 @@ Robust retry logic with exponential backoff. Uses tenacity when available for ad
 For network operations (HTTP, SSH, etc.):
 
 ```python
-from hyper2kvm.core.retry_enhanced import retry_network_operation
+from h2kvm.core.retry_enhanced import retry_network_operation
 
 @retry_network_operation(max_attempts=5, min_wait=2.0, max_wait=30.0)
 def download_vmdk(url: str) -> bytes:
@@ -184,7 +184,7 @@ disk_data = download_vmdk("https://vcenter.example.com/disk.vmdk")
 For VMware vSphere API calls:
 
 ```python
-from hyper2kvm.core.retry_enhanced import retry_vmware_api
+from h2kvm.core.retry_enhanced import retry_vmware_api
 
 @retry_vmware_api(max_attempts=3, min_wait=4.0, max_wait=10.0)
 def get_vm_info(vmware_client, vm_name: str):
@@ -199,7 +199,7 @@ vm = get_vm_info(client, "web-server-01")
 For file system operations:
 
 ```python
-from hyper2kvm.core.retry_enhanced import retry_file_operation
+from h2kvm.core.retry_enhanced import retry_file_operation
 
 @retry_file_operation(max_attempts=3, wait_time=1.0)
 def write_config(path: Path, content: str):
@@ -215,7 +215,7 @@ write_config(Path("/tmp/config.yaml"), yaml_content)
 For manual retry control:
 
 ```python
-from hyper2kvm.core.retry_enhanced import RetryContext
+from h2kvm.core.retry_enhanced import RetryContext
 
 with RetryContext(max_attempts=3, wait_time=2.0) as retry:
     for attempt in retry:
@@ -232,8 +232,8 @@ with RetryContext(max_attempts=3, wait_time=2.0) as retry:
 ### Integration Example
 
 ```python
-from hyper2kvm.vmware.clients.client import VMwareClient
-from hyper2kvm.core.retry_enhanced import retry_vmware_api, retry_network_operation
+from h2kvm.vmware.clients.client import VMwareClient
+from h2kvm.core.retry_enhanced import retry_vmware_api, retry_network_operation
 
 class EnhancedVMwareClient(VMwareClient):
     """VMware client with automatic retry."""
@@ -257,7 +257,7 @@ class EnhancedVMwareClient(VMwareClient):
 ### Checking Availability
 
 ```python
-from hyper2kvm.core.optional_imports import TENACITY_AVAILABLE
+from h2kvm.core.optional_imports import TENACITY_AVAILABLE
 
 if TENACITY_AVAILABLE:
     print("Using tenacity for retry")
@@ -269,7 +269,7 @@ else:
 
 ### Overview
 
-hyper2kvm already has an **excellent logging system** in `core.logger` that provides:
+h2kvm already has an **excellent logging system** in `core.logger` that provides:
 
 - ✅ JSON structured logging (like structlog!)
 - ✅ Context-aware logging
@@ -283,7 +283,7 @@ hyper2kvm already has an **excellent logging system** in `core.logger` that prov
 ### Basic Usage
 
 ```python
-from hyper2kvm.core.logger import Log
+from h2kvm.core.logger import Log
 
 # Setup logger
 logger = Log.setup(
@@ -291,7 +291,7 @@ logger = Log.setup(
     json_logs=False,     # Set True for NDJSON output
     show_proc=True,      # Show process name (multiprocessing)
     show_pid=True,       # Show process ID
-    log_file="/var/log/hyper2kvm/migration.log"
+    log_file="/var/log/h2kvm/migration.log"
 )
 
 # Basic logging
@@ -359,7 +359,7 @@ logger.info("Migration started", extra={
 ```python
 logger = Log.setup(
     verbose=2,
-    log_file="/var/log/hyper2kvm/migration.log",  # Also writes to file
+    log_file="/var/log/h2kvm/migration.log",  # Also writes to file
     json_logs=True,     # JSON format in file too
 )
 
@@ -374,12 +374,12 @@ logger.info("Logged to both console and file")
 """Complete example using all enhanced features."""
 
 from pathlib import Path
-from hyper2kvm.config.validation import VMwareSourceConfig, ConfigValidationError
-from hyper2kvm.core.retry_enhanced import retry_vmware_api, retry_network_operation
-from hyper2kvm.core.logger import Log
+from h2kvm.config.validation import VMwareSourceConfig, ConfigValidationError
+from h2kvm.core.retry_enhanced import retry_vmware_api, retry_network_operation
+from h2kvm.core.logger import Log
 
 # Check what's available
-from hyper2kvm.core.optional_imports import PYDANTIC_AVAILABLE, TENACITY_AVAILABLE
+from h2kvm.core.optional_imports import PYDANTIC_AVAILABLE, TENACITY_AVAILABLE
 
 print(f"Pydantic: {PYDANTIC_AVAILABLE}, Tenacity: {TENACITY_AVAILABLE}")
 print("Note: Everything works even if both are False!")
@@ -450,7 +450,7 @@ pytest tests/unit/test_config/test_validation_compat.py
 pytest tests/unit/test_core/test_retry_compat.py
 
 # Run with coverage
-pytest --cov=hyper2kvm tests/
+pytest --cov=h2kvm tests/
 
 # Test RHEL 10 compatibility (uninstall optional deps)
 pip uninstall pydantic tenacity -y
@@ -462,7 +462,7 @@ pytest tests/  # Should still pass!
 ```python
 # tests/unit/test_config/test_validation_compat.py
 import pytest
-from hyper2kvm.core.optional_imports import PYDANTIC_AVAILABLE
+from h2kvm.core.optional_imports import PYDANTIC_AVAILABLE
 
 @pytest.mark.skipif(not PYDANTIC_AVAILABLE, reason="pydantic not available")
 def test_pydantic_specific_feature():
@@ -484,16 +484,16 @@ No migration needed! All existing code continues to work. To adopt enhanced feat
 
 1. **Add optional dependencies** (or don't for RHEL 10):
    ```bash
-   pip install hyper2kvm[enhanced]
+   pip install h2kvm[enhanced]
    ```
 
 2. **Use enhanced imports**:
    ```python
    # Old (still works)
-   from hyper2kvm.core.retry import retry_with_backoff
+   from h2kvm.core.retry import retry_with_backoff
 
    # New (enhanced, but falls back automatically)
-   from hyper2kvm.core.retry_enhanced import retry_network_operation
+   from h2kvm.core.retry_enhanced import retry_network_operation
    ```
 
 3. **Add configuration validation**:
@@ -502,7 +502,7 @@ No migration needed! All existing code continues to work. To adopt enhanced feat
    vmware_config = config_dict['vmware']
 
    # New (validated)
-   from hyper2kvm.config.validation import VMwareSourceConfig
+   from h2kvm.config.validation import VMwareSourceConfig
    vmware_config = VMwareSourceConfig(**config_dict['vmware'])
    ```
 
@@ -518,7 +518,7 @@ No migration needed! All existing code continues to work. To adopt enhanced feat
 
 ### Q: Is logging better with structlog?
 
-**A:** No need for structlog! The built-in `hyper2kvm.core.logger` already provides JSON logging, context binding, and all features you'd want from structlog.
+**A:** No need for structlog! The built-in `h2kvm.core.logger` already provides JSON logging, context binding, and all features you'd want from structlog.
 
 ### Q: What if pydantic/tenacity become available later?
 
@@ -528,7 +528,7 @@ No migration needed! All existing code continues to work. To adopt enhanced feat
 
 **A:** Yes:
 ```python
-from hyper2kvm.core.optional_imports import (
+from h2kvm.core.optional_imports import (
     PYDANTIC_AVAILABLE,
     TENACITY_AVAILABLE,
     WATCHDOG_AVAILABLE,

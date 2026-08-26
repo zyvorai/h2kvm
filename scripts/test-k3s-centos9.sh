@@ -1,10 +1,10 @@
 #!/bin/bash
-# Hyper2KVM K3s CentOS 9 Test Suite
+# H2KVM K3s CentOS 9 Test Suite
 # Tests migration of CentOS 9 VM to k3s cluster
 #
 # ⚠️  NOTE: This test script demonstrates MANUAL steps for educational purposes.
 #
-# 🚀 For production, use hyper2kvm's BUILT-IN automated deployment:
+# 🚀 For production, use h2kvm's BUILT-IN automated deployment:
 #     sudo ./h2kvmctl --config centos9.yaml --deploy-k8s
 #
 # The --deploy-k8s flag does ALL these steps automatically!
@@ -16,7 +16,7 @@ set -euo pipefail
 
 # Configuration
 AUTO_CONFIRM="${AUTO_CONFIRM:-false}"
-NAMESPACE="hyper2kvm-test"
+NAMESPACE="h2kvm-test"
 STORAGE_CLASS="${STORAGE_CLASS:-local-path}"  # k3s default
 VM_NAME="centos9-test"
 CONFIG_FILE="${CONFIG_FILE:-test-confs/test-centos9-k3s.yaml}"
@@ -105,8 +105,8 @@ test_prerequisites() {
         return 1
     fi
 
-    # Test 6: Check for hyper2kvm CLI
-    log_test "hyper2kvm CLI is available"
+    # Test 6: Check for h2kvm CLI
+    log_test "h2kvm CLI is available"
     # Prefer local development build
     if [ -x "./h2kvmctl" ]; then
         H2KVM_CMD="./h2kvmctl"
@@ -195,7 +195,7 @@ EOF
 test_migration() {
     log_info "=== Testing CentOS 9 VM Migration ==="
 
-    log_test "Run local migration with hyper2kvm"
+    log_test "Run local migration with h2kvm"
 
     # Run migration locally (requires root for mounting disk images)
     log_info "Running migration (this may take a few minutes)..."
@@ -374,7 +374,7 @@ test_cleanup() {
 generate_report() {
     echo ""
     echo "=========================================="
-    echo "   HYPER2KVM K3S CENTOS 9 TEST REPORT"
+    echo "   H2KVM K3S CENTOS 9 TEST REPORT"
     echo "=========================================="
     echo ""
     echo "Date: $(date)"
@@ -406,7 +406,7 @@ generate_report() {
 
 # Main test runner
 run_all_tests() {
-    log_info "Starting Hyper2KVM K3s CentOS 9 Test Suite"
+    log_info "Starting H2KVM K3s CentOS 9 Test Suite"
     echo ""
 
     test_prerequisites || return 1
@@ -461,7 +461,7 @@ case "${1:-all}" in
         test_cleanup
         ;;
     *)
-        echo "Hyper2KVM K3s CentOS 9 Test Suite"
+        echo "H2KVM K3s CentOS 9 Test Suite"
         echo ""
         echo "Usage: $0 [command]"
         echo ""

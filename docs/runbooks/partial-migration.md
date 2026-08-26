@@ -19,18 +19,18 @@ kubectl get hc -A
 # Look for: Converting, FixingBoot, CreatingVM (not progressing to Ready)
 
 # Check job completion status
-kubectl get jobs -n hyper2kvm-migration
+kubectl get jobs -n h2kvm-migration
 # Look for: 0/1 completions (stuck), or multiple jobs with only some completed
 
 # Check migration logs for errors
-kubectl logs -n hyper2kvm-migration -l job-name=migration --tail=100 | grep -E "ERROR|WARN|Failed"
+kubectl logs -n h2kvm-migration -l job-name=migration --tail=100 | grep -E "ERROR|WARN|Failed"
 
 # Check DataVolume status
-kubectl get dv -n hyper2kvm-migration
+kubectl get dv -n h2kvm-migration
 # Look for: Succeeded (DV ready) but VM not created
 
 # Check VM status
-kubectl get vm,vmi -n hyper2kvm-migration
+kubectl get vm,vmi -n h2kvm-migration
 # VM may be Created but VMI not Running
 ```
 
@@ -72,7 +72,7 @@ ls <output-dir>/*.qcow2
 ### 1. Identify completed stages
 ```bash
 # Kubernetes: check HyperConversion status
-kubectl describe hc <name> -n hyper2kvm-migration | grep -A30 status
+kubectl describe hc <name> -n h2kvm-migration | grep -A30 status
 # Look for: lastCompletedStage, failedStage, errorMessage
 
 # CLI: parse migration log
@@ -121,7 +121,7 @@ apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   name: manual-fix-vm
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
 spec:
   runStrategy: Always
   template:
@@ -149,10 +149,10 @@ spec:
 EOF
 
 # Wait for VM to start
-kubectl wait --for=condition=Ready vmi/manual-fix-vm -n hyper2kvm-migration --timeout=300s
+kubectl wait --for=condition=Ready vmi/manual-fix-vm -n h2kvm-migration --timeout=300s
 
 # Access console
-virtctl console manual-fix-vm -n hyper2kvm-migration
+virtctl console manual-fix-vm -n h2kvm-migration
 
 # Inside VM, fix issues manually:
 # 1. Fix fstab (remove VMware-specific mounts, use UUID)
@@ -225,7 +225,7 @@ apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   name: recovered-vm
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
 spec:
   runStrategy: Always
   template:
@@ -255,10 +255,10 @@ spec:
 EOF
 
 # Wait for VMI to start
-kubectl wait --for=condition=Ready vmi/recovered-vm -n hyper2kvm-migration --timeout=600s
+kubectl wait --for=condition=Ready vmi/recovered-vm -n h2kvm-migration --timeout=600s
 
 # Get IP and test
-kubectl get vmi recovered-vm -n hyper2kvm-migration -o yaml | grep -A5 interfaces
+kubectl get vmi recovered-vm -n h2kvm-migration -o yaml | grep -A5 interfaces
 ```
 
 ```bash
@@ -298,7 +298,7 @@ ls -lh <output-dir>/*.qcow2
 ```bash
 # Kubernetes: Delete and reapply HyperConversion
 # (operator detects existing PVCs, skips completed disks)
-kubectl delete hc <name> -n hyper2kvm-migration
+kubectl delete hc <name> -n h2kvm-migration
 kubectl apply -f <hyperconversion.yaml>
 
 # CLI: Re-run same command (checkpoint/resume)
@@ -369,8 +369,8 @@ virsh define <output-dir>/domain.xml
 
 #### 1. Check VMI status
 ```bash
-kubectl get vmi -n hyper2kvm-migration
-kubectl describe vmi <name> -n hyper2kvm-migration | grep -A20 Events
+kubectl get vmi -n h2kvm-migration
+kubectl describe vmi <name> -n h2kvm-migration | grep -A20 Events
 # Look for: Scheduling failures, resource constraints
 ```
 
@@ -383,14 +383,14 @@ kubectl describe nodes | grep -A10 "Allocated resources"
 #### 3. Fix and restart VM
 ```bash
 # Delete failed VMI
-kubectl delete vmi <name> -n hyper2kvm-migration
+kubectl delete vmi <name> -n h2kvm-migration
 
 # Edit VM resource requests
-kubectl edit vm <name> -n hyper2kvm-migration
+kubectl edit vm <name> -n h2kvm-migration
 # Reduce: cpu: 2, memory: 4Gi
 
 # Restart VM
-virtctl start <name> -n hyper2kvm-migration
+virtctl start <name> -n h2kvm-migration
 ```
 
 ## Prevention / Monitoring
@@ -432,7 +432,7 @@ kubectl get hc -A --watch
 # Alert on stuck phases (>30 min in same phase)
 # Prometheus alert example:
 # - alert: MigrationStuck
-#   expr: time() - hyper2kvm_phase_timestamp > 1800
+#   expr: time() - h2kvm_phase_timestamp > 1800
 ```
 
 ### Logging
@@ -441,7 +441,7 @@ kubectl get hc -A --watch
 h2kvmctl --verbose 2  # CLI
 
 # Kubernetes: increase operator log level
-kubectl set env deployment/hyperconversion-operator -n hyper2kvm-system LOG_LEVEL=debug
+kubectl set env deployment/hyperconversion-operator -n h2kvm-system LOG_LEVEL=debug
 ```
 
 ## Escalation Path
@@ -456,8 +456,8 @@ kubectl set env deployment/hyperconversion-operator -n hyper2kvm-system LOG_LEVE
 1. Collect debug bundle: `./scripts/collect-debug-bundle.sh`
 2. Save migration artifacts:
    ```bash
-   tar czf migration-debug.tar.gz <output-dir>/ /tmp/hyper2kvm-*/
+   tar czf migration-debug.tar.gz <output-dir>/ /tmp/h2kvm-*/
    ```
 3. Document completed vs failed stages
-4. Check for known issues: https://github.com/ssahani/hyper2kvm/issues
+4. Check for known issues: https://github.com/ssahani/h2kvm/issues
 5. Contact platform team with debug bundle and migration log

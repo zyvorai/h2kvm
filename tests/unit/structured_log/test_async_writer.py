@@ -12,7 +12,7 @@ import threading
 
 import pytest
 
-from hyper2kvm.core.structured_log import AsyncLogWriter, _AsyncLoggerFactory
+from h2kvm.core.structured_log import AsyncLogWriter, _AsyncLoggerFactory
 
 
 @pytest.fixture()

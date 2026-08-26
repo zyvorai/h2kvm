@@ -1,4 +1,4 @@
-# hyper2kvm Daemon Configuration
+# h2kvm Daemon Configuration
 # This file is used by the daemon service to watch a directory and automatically
 # process VM disk files (VMDK, OVA, VHD, etc.) as they appear.
 
@@ -31,7 +31,7 @@ regen_initramfs: true
 update_grub: true
 
 # Log file location
-log_file: /var/log/hyper2kvm/daemon.log
+log_file: /var/log/h2kvm/daemon.log
 
 # Verbosity level (0-3)
 verbose: 1

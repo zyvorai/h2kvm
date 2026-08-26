@@ -1,6 +1,6 @@
 # Systemd Integration Summary
 
-Complete integration of 20 systemd command-line tools into hyper2kvm for
+Complete integration of 20 systemd command-line tools into h2kvm for
 enhanced VM migration capabilities.
 
 ## 📊 Overview
@@ -101,11 +101,11 @@ if creds.has_tpm2():
     creds.encrypt(
         vcenter_password,
         "vcenter-password",
-        output=Path("/var/lib/hyper2kvm/vcenter.cred")
+        output=Path("/var/lib/h2kvm/vcenter.cred")
     )
 
 # Later, decrypt for use
-password = creds.decrypt(Path("/var/lib/hyper2kvm/vcenter.cred"))
+password = creds.decrypt(Path("/var/lib/h2kvm/vcenter.cred"))
 ```
 
 ### 3. Resource-Controlled Conversions
@@ -229,7 +229,7 @@ vmspawn.spawn_with_tpm(Path("vm.qcow2"), memory="4G")
 ## 📁 File Structure
 
 ```text
-hyper2kvm/systemd/
+h2kvm/systemd/
 ├── __init__.py                 # Module exports (all 20 tools)
 ├── README.md                   # Comprehensive documentation
 ├── analyze.py                  # systemd-analyze wrapper
@@ -280,7 +280,7 @@ examples/
 ## 🚀 Quick Start
 
 ```python
-from hyper2kvm.systemd import *
+from h2kvm.systemd import *
 
 # Example: Complete migration with monitoring
 inhibit = SystemdInhibit()
@@ -308,7 +308,7 @@ vmspawn.spawn(Path("target.qcow2"), cpus=2, memory="4G")
 
 ## 📚 Documentation
 
-- **Tool Documentation**: `hyper2kvm/systemd/README.md`
+- **Tool Documentation**: `h2kvm/systemd/README.md`
 - **API Reference**: Docstrings in each module
 - **Examples**: `examples/systemd_*.py`
 - **Tests**: `tests/unit/test_systemd/`
@@ -353,7 +353,7 @@ pytest tests/unit/test_systemd/ -v
 
 ## 🎉 Summary
 
-This integration provides hyper2kvm with comprehensive systemd tooling for:
+This integration provides h2kvm with comprehensive systemd tooling for:
 
 - ✅ Platform detection
 - ✅ Disk inspection and validation

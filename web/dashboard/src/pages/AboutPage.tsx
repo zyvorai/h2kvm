@@ -13,7 +13,7 @@ import {
   ZyvorInline,
 } from '../components/ZyvorBrand';
 
-const DOCS_BASE = 'https://github.com/ssahani/hyper2kvm-/tree/main/docs';
+const DOCS_BASE = 'https://github.com/ssahani/h2kvm-/tree/main/docs';
 
 type HelpLink = {
   labelKey: string;
@@ -27,7 +27,7 @@ const HELP_LINKS: HelpLink[] = [
   {
     labelKey: 'about.link.product',
     descKey: 'about.link.product_desc',
-    href: 'https://zyvor.dev/hyper2kvm',
+    href: 'https://zyvor.dev/h2kvm',
     icon: ExternalLink,
   },
   { labelKey: 'about.link.zyvor', descKey: 'about.link.zyvor_desc', href: ZYVOR_URL, icon: ExternalLink },
@@ -48,7 +48,7 @@ const HELP_LINKS: HelpLink[] = [
 
 export function AboutPage() {
   const metaRows = [
-    { label: t('about.product'), value: 'hyper2kvm' },
+    { label: t('about.product'), value: 'h2kvm' },
     { label: t('about.ui'), value: 'h2kweb dashboard' },
     { label: t('about.cli'), value: 'h2kvmctl' },
     { label: t('about.copyright'), value: ZYVOR_COPYRIGHT_FULL },

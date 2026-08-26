@@ -5,12 +5,12 @@ import { ensureLoggedIn, setDesktopTier } from './helpers/auth';
 
 test('Finder sidebar is visible on desktop', async ({ page }) => {
   await ensureLoggedIn(page, 'power');
-  await expect(page.getByLabel('hyper2kvm Finder')).toBeVisible();
+  await expect(page.getByLabel('h2kvm Finder')).toBeVisible();
 });
 
 test('normal tier shows providers in sidebar and dock', async ({ page }) => {
   await ensureLoggedIn(page, 'normal');
-  const sidebar = page.getByLabel('hyper2kvm Finder');
+  const sidebar = page.getByLabel('h2kvm Finder');
   await expect(sidebar).toBeVisible();
   await expect(sidebar.getByRole('button', { name: 'Providers' })).toBeVisible();
   await expect(page.locator('.mac-dock').getByRole('button', { name: 'Providers' })).toBeVisible();

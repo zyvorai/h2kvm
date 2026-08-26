@@ -1,0 +1,237 @@
+{{- if and .Values.webhook.enabled .Values.certJob.enabled (not .Values.webhook.tls.certManager.enabled) (not .Values.webhook.tls.existingSecret) }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "h2kvm-operator.fullname" . }}-cert-job
+  namespace: {{ include "h2kvm-operator.namespace" . }}
+  labels:
+    {{- include "h2kvm-operator.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "h2kvm-operator.fullname" . }}-cert-job
+  namespace: {{ include "h2kvm-operator.namespace" . }}
+  labels:
+    {{- include "h2kvm-operator.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - create
+      - update
+      - patch
+      - get
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - validatingwebhookconfigurations
+      - mutatingwebhookconfigurations
+    verbs:
+      - get
+      - update
+      - patch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "h2kvm-operator.fullname" . }}-cert-job
+  namespace: {{ include "h2kvm-operator.namespace" . }}
+  labels:
+    {{- include "h2kvm-operator.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "h2kvm-operator.fullname" . }}-cert-job
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "h2kvm-operator.fullname" . }}-cert-job
+    namespace: {{ include "h2kvm-operator.namespace" . }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "h2kvm-operator.fullname" . }}-cert-job
+  labels:
+    {{- include "h2kvm-operator.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+rules:
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - validatingwebhookconfigurations
+      - mutatingwebhookconfigurations
+    verbs:
+      - get
+      - update
+      - patch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "h2kvm-operator.fullname" . }}-cert-job
+  labels:
+    {{- include "h2kvm-operator.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "h2kvm-operator.fullname" . }}-cert-job
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "h2kvm-operator.fullname" . }}-cert-job
+    namespace: {{ include "h2kvm-operator.namespace" . }}
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "h2kvm-operator.fullname" . }}-cert-job
+  namespace: {{ include "h2kvm-operator.namespace" . }}
+  labels:
+    {{- include "h2kvm-operator.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  {{- if .Values.certJob.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ .Values.certJob.ttlSecondsAfterFinished }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "h2kvm-operator.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "h2kvm-operator.fullname" . }}-cert-job
+      restartPolicy: OnFailure
+      containers:
+        - name: cert-generator
+          image: {{ .Values.certJob.image.repository }}:{{ .Values.certJob.image.tag }}
+          imagePullPolicy: {{ .Values.certJob.image.pullPolicy }}
+          {{- with .Values.certJob.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: NAMESPACE
+              value: {{ include "h2kvm-operator.namespace" . }}
+            - name: SERVICE_NAME
+              value: {{ include "h2kvm-operator.webhookServiceName" . }}
+            - name: SECRET_NAME
+              value: {{ include "h2kvm-operator.webhookCertSecretName" . }}
+            - name: CERT_VALIDITY_DAYS
+              value: {{ .Values.webhook.tls.certValidity | quote }}
+            - name: VALIDATING_WEBHOOK_NAME
+              value: {{ include "h2kvm-operator.fullname" . }}-validating
+            - name: MUTATING_WEBHOOK_NAME
+              value: {{ include "h2kvm-operator.fullname" . }}-mutating
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "Generating TLS certificates for webhook..."
+
+              # Generate CA private key
+              openssl genrsa -out /tmp/ca.key 2048
+
+              # Generate CA certificate
+              openssl req -x509 -new -nodes -key /tmp/ca.key \
+                -subj "/CN=h2kvm-webhook-ca" \
+                -days ${CERT_VALIDITY_DAYS} \
+                -out /tmp/ca.crt
+
+              # Generate server private key
+              openssl genrsa -out /tmp/tls.key 2048
+
+              # Create certificate signing request
+              cat <<EOF > /tmp/csr.conf
+              [req]
+              req_extensions = v3_req
+              distinguished_name = req_distinguished_name
+              [req_distinguished_name]
+              [v3_req]
+              basicConstraints = CA:FALSE
+              keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+              extendedKeyUsage = serverAuth
+              subjectAltName = @alt_names
+              [alt_names]
+              DNS.1 = ${SERVICE_NAME}
+              DNS.2 = ${SERVICE_NAME}.${NAMESPACE}
+              DNS.3 = ${SERVICE_NAME}.${NAMESPACE}.svc
+              DNS.4 = ${SERVICE_NAME}.${NAMESPACE}.svc.cluster.local
+              EOF
+
+              # Generate CSR
+              openssl req -new -key /tmp/tls.key \
+                -subj "/CN=${SERVICE_NAME}.${NAMESPACE}.svc" \
+                -out /tmp/server.csr \
+                -config /tmp/csr.conf
+
+              # Generate server certificate
+              openssl x509 -req -in /tmp/server.csr \
+                -CA /tmp/ca.crt -CAkey /tmp/ca.key -CAcreateserial \
+                -out /tmp/tls.crt \
+                -days ${CERT_VALIDITY_DAYS} \
+                -extensions v3_req \
+                -extfile /tmp/csr.conf
+
+              echo "Certificates generated successfully"
+
+              # Install kubectl (apk for Alpine)
+              apk add --no-cache curl
+              curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+              chmod +x kubectl
+              mv kubectl /usr/local/bin/
+
+              # Create or update secret
+              kubectl create secret generic ${SECRET_NAME} \
+                --from-file=ca.crt=/tmp/ca.crt \
+                --from-file=tls.crt=/tmp/tls.crt \
+                --from-file=tls.key=/tmp/tls.key \
+                --namespace=${NAMESPACE} \
+                --dry-run=client -o yaml | kubectl apply -f -
+
+              echo "Secret created/updated: ${SECRET_NAME}"
+
+              # Patch webhook configurations with CA bundle
+              CA_BUNDLE=$(cat /tmp/ca.crt | base64 | tr -d '\n')
+
+              kubectl patch validatingwebhookconfiguration ${VALIDATING_WEBHOOK_NAME} \
+                --type='json' \
+                -p="[{'op': 'replace', 'path': '/webhooks/0/clientConfig/caBundle', 'value':'${CA_BUNDLE}'}]" \
+                || echo "Validating webhook not found yet, will be patched on creation"
+
+              kubectl patch mutatingwebhookconfiguration ${MUTATING_WEBHOOK_NAME} \
+                --type='json' \
+                -p="[{'op': 'replace', 'path': '/webhooks/0/clientConfig/caBundle', 'value':'${CA_BUNDLE}'}]" \
+                || echo "Mutating webhook not found yet, will be patched on creation"
+
+              echo "Certificate generation complete!"
+{{- end }}

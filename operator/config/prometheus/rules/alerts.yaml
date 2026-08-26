@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: hyperconversion-operator-alerts
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
   labels:
     app.kubernetes.io/name: hyperconversion-operator
     app.kubernetes.io/component: alerts

@@ -5,7 +5,7 @@
 # Downloads RHEL 10.1 VM files from vSphere using govc/govmomi
 #
 # Usage:
-#   hyper2kvm --config 11-vsphere-govc-rhel-10-download.yaml vsphere
+#   h2kvm --config 11-vsphere-govc-rhel-10-download.yaml vsphere
 #
 # Features:
 #   ✅ govc-based download (alternative to pyvmomi)

@@ -626,7 +626,7 @@ function ConfigBackupSection() {
       const blob = await res.blob();
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'hyper2kvm-config.json';
+      a.download = 'h2kvm-config.json';
       a.click();
       URL.revokeObjectURL(a.href);
     } catch {
@@ -791,14 +791,14 @@ function StorageCleanupSection() {
             <span className="text-xs text-white/55">Output (qcow2, xml, yaml)</span>
             <span className="text-xs font-mono text-white/75">{formatBytes(outputSize)}</span>
           </div>
-          <div className="text-xs text-white/45">{outputArtifacts.length} files in /var/lib/hyper2kvm/output/</div>
+          <div className="text-xs text-white/45">{outputArtifacts.length} files in /var/lib/h2kvm/output/</div>
         </div>
         <div className="p-3 tahoe-glass-card rounded-lg border border-white/[0.06]">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-white/55">Input (uploaded images)</span>
             <span className="text-xs font-mono text-white/75">{formatBytes(inputSize)}</span>
           </div>
-          <div className="text-xs text-white/45">{inputArtifacts.length} files in /var/lib/hyper2kvm/input/</div>
+          <div className="text-xs text-white/45">{inputArtifacts.length} files in /var/lib/h2kvm/input/</div>
         </div>
       </div>
 

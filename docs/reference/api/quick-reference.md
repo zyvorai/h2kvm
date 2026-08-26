@@ -1,12 +1,12 @@
-# hyper2kvm API Quick Reference
+# h2kvm API Quick Reference
 
-Quick reference guide for the most commonly used APIs in hyper2kvm.
+Quick reference guide for the most commonly used APIs in h2kvm.
 
 ## VMCraft - Disk Image Analysis
 
 ### Basic Usage
 ```python
-from hyper2kvm.vmcraft.main import VMCraft
+from h2kvm.vmcraft.main import VMCraft
 
 g = VMCraft()
 g.add_drive_opts('/path/to/disk.vmdk', readonly=True)
@@ -282,7 +282,7 @@ users = g.loginctl_list_users()
 
 ### Basic Usage
 ```python
-from hyper2kvm.core.guest_inspector import GuestInspector
+from h2kvm.core.guest_inspector import GuestInspector
 
 inspector = GuestInspector()
 vm_info = inspector.inspect_vm('/path/to/disk.vmdk')
@@ -367,7 +367,7 @@ vm_info = inspector.inspect_vm('/path/to/disk.vmdk')
 
 ### Basic Usage
 ```python
-from hyper2kvm.vmware.async_client.client import AsyncVMwareClient
+from h2kvm.vmware.async_client.client import AsyncVMwareClient
 
 async with AsyncVMwareClient(
     host='vcenter.example.com',
@@ -387,7 +387,7 @@ async with AsyncVMwareClient(
 
 ### Batch Operations
 ```python
-from hyper2kvm.vmware.async_client.operations import AsyncVMwareOperations
+from h2kvm.vmware.async_client.operations import AsyncVMwareOperations
 
 ops = AsyncVMwareOperations(client)
 

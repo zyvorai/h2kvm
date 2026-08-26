@@ -17,7 +17,7 @@ The OLM bundle provides:
 bundle/
 ├── manifests/
 │   ├── hyperconversion-operator.clusterserviceversion.yaml  # Operator metadata
-│   └── hyper2kvm.io_hyperconversions.yaml                   # CRD
+│   └── h2kvm.io_hyperconversions.yaml                   # CRD
 ├── metadata/
 │   └── annotations.yaml                                      # Bundle annotations
 └── tests/
@@ -39,7 +39,7 @@ kubectl create -f https://operatorhub.io/install/hyperconversion-operator.yaml
 kubectl get csv -n operators
 
 # Create a HyperConversion resource
-kubectl apply -f config/samples/hyper2kvm_v1alpha1_hyperconversion.yaml
+kubectl apply -f config/samples/h2kvm_v1alpha1_hyperconversion.yaml
 ```
 
 ### Method 2: OpenShift OperatorHub
@@ -63,7 +63,7 @@ Using operator-sdk directly:
 
 ```bash
 # Install the bundle
-operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v1.2.0
+operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v1.2.0
 
 # Verify
 kubectl get csv -A | grep hyperconversion
@@ -143,7 +143,7 @@ make bundle
 operator-sdk bundle validate ./bundle
 
 # 3. Build bundle image
-export BUNDLE_IMG=ghcr.io/ssahani/hyper2kvm-operator-bundle:v1.2.0
+export BUNDLE_IMG=ghcr.io/ssahani/h2kvm-operator-bundle:v1.2.0
 make bundle-build BUNDLE_IMG=$BUNDLE_IMG
 
 # 4. Push to registry
@@ -160,7 +160,7 @@ operator-sdk run bundle $BUNDLE_IMG
 docker buildx build \
   --platform linux/amd64,linux/arm64,linux/s390x,linux/ppc64le \
   --push \
-  --tag ghcr.io/ssahani/hyper2kvm-operator-bundle:v1.2.0 \
+  --tag ghcr.io/ssahani/h2kvm-operator-bundle:v1.2.0 \
   -f bundle.Dockerfile .
 ```
 
@@ -245,7 +245,7 @@ kubectl delete subscription hyperconversion-operator -n operators
 kubectl delete csv hyperconversion-operator.v1.2.0 -n operators
 
 # Clean up CRDs (optional, deletes all HyperConversion resources)
-kubectl delete crd hyperconversions.hyper2kvm.io
+kubectl delete crd hyperconversions.h2kvm.io
 ```
 
 ### Using operator-sdk
@@ -363,7 +363,7 @@ All container images must be declared:
 ```yaml
 relatedImages:
 - name: manager
-  image: ghcr.io/ssahani/hyper2kvm-operator:v1.2.0
+  image: ghcr.io/ssahani/h2kvm-operator:v1.2.0
 - name: kube-rbac-proxy
   image: gcr.io/kubebuilder/kube-rbac-proxy:v0.15.0
 ```

@@ -36,24 +36,24 @@ cd operator
 make install
 
 # 2. Build image (for local testing)
-make docker-build IMG=hyper2kvm-operator:dev
+make docker-build IMG=h2kvm-operator:dev
 
 # 3. Deploy operator
-make deploy IMG=hyper2kvm-operator:dev
+make deploy IMG=h2kvm-operator:dev
 ```
 
 ## Verify Deployment
 
 ```bash
 # Check operator pod
-kubectl get pods -n hyper2kvm-system
+kubectl get pods -n h2kvm-system
 
 # Expected output:
 # NAME                                        READY   STATUS    RESTARTS   AGE
 # hyperconversion-operator-xxxxxxxxxx-xxxxx   1/1     Running   0          30s
 
 # Check logs
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager
+kubectl logs -n h2kvm-system -l control-plane=controller-manager
 ```
 
 ## Create Your First HyperConversion
@@ -61,7 +61,7 @@ kubectl logs -n hyper2kvm-system -l control-plane=controller-manager
 ```bash
 # Create a simple conversion
 cat <<EOF | kubectl apply -f -
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: my-first-vm
@@ -139,7 +139,7 @@ kubectl get vm
 ### VMDK to KubeVirt VM with Offline Fixes
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: vmdk-migration
@@ -186,7 +186,7 @@ kubectl logs job/<name>-fixer
 ### Disk-Only Conversion
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: disk-only
@@ -202,7 +202,7 @@ spec:
 ### Multi-Network VM
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: multi-net
@@ -229,7 +229,7 @@ spec:
 
 ```bash
 # Check operator logs
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager
+kubectl logs -n h2kvm-system -l control-plane=controller-manager
 
 # Check RBAC
 kubectl get clusterrole manager-role
@@ -288,11 +288,11 @@ make uninstall
 | `kubectl describe hc <name>` | View detailed status |
 | `kubectl get datavolume` | List created DataVolumes |
 | `kubectl get vm` | List created VirtualMachines |
-| `kubectl logs -n hyper2kvm-system -l control-plane=controller-manager -f` | Follow operator logs |
+| `kubectl logs -n h2kvm-system -l control-plane=controller-manager -f` | Follow operator logs |
 | `kubectl get events --sort-by='.lastTimestamp'` | View recent events |
 
 ## Support
 
-- Issues: https://github.com/ssahani/hyper2kvm/issues
+- Issues: https://github.com/ssahani/h2kvm/issues
 - Documentation: [operator/README.md](README.md)
 - Examples: [config/samples/](config/samples/)

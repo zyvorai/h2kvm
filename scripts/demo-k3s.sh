@@ -2,8 +2,8 @@
 # demo-k3s.sh — Convert VMware VM and deploy to KubeVirt on K3s
 #
 # Usage:
-#   ./demo-k3s.sh /root/hyper2kvm/UbuntuServer_22.04_VM_LinuxVMImages.COM.vmdk
-#   ./demo-k3s.sh /root/hyper2kvm/some-vm.vmdk [vm-name]
+#   ./demo-k3s.sh /root/h2kvm/UbuntuServer_22.04_VM_LinuxVMImages.COM.vmdk
+#   ./demo-k3s.sh /root/h2kvm/some-vm.vmdk [vm-name]
 
 set -euo pipefail
 
@@ -95,7 +95,7 @@ if (( AVAIL_MB < NEEDED_MB )); then
 fi
 
 # Copy to safe working directory
-WORKDIR="/var/lib/hyper2kvm/input"
+WORKDIR="/var/lib/h2kvm/input"
 mkdir -p "$WORKDIR"
 SRC="$WORKDIR/$BASENAME"
 if [[ "$ORIG_SRC" != "$SRC" ]]; then
@@ -123,7 +123,7 @@ if [[ -n "${SUDO_USER:-}" ]]; then
 else
     _USER_HOME="${HOME:-$(eval echo ~"$(whoami)")}"
 fi
-OUTPUT_DIR="${HYPER2KVM_OUTPUT:-${_USER_HOME}/hyper2kvm/output}/${VM_NAME}-k3s"
+OUTPUT_DIR="${H2KVM_OUTPUT:-${_USER_HOME}/h2kvm/output}/${VM_NAME}-k3s"
 
 # Unique ports per VM: hash VM name to a stable offset (0-99)
 VM_PORT_OFFSET=$(( $(echo -n "$VM_NAME" | cksum | awk '{print $1}') % 100 ))
@@ -230,7 +230,7 @@ fi
 virsh destroy "$VM_NAME" 2>/dev/null || true
 virsh undefine "$VM_NAME" --nvram 2>/dev/null || virsh undefine "$VM_NAME" 2>/dev/null || true
 
-rm -rf "$OUTPUT_DIR" /var/lib/hyper2kvm/conversions/*
+rm -rf "$OUTPUT_DIR" /var/lib/h2kvm/conversions/*
 info "Cleaned up"
 
 # ── 3. Convert + Deploy to KubeVirt ──────────────────────────────────────

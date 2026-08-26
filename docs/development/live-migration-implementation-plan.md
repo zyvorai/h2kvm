@@ -12,12 +12,12 @@
 
 **Key Insight**: HyperSDK already provides multi-cloud provider support and live migration primitives.
 
-**hyper2kvm's Role**: Orchestrate live migration workflow and integrate with existing offline fixer pipeline.
+**h2kvm's Role**: Orchestrate live migration workflow and integrate with existing offline fixer pipeline.
 
 **Architecture**:
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                     hyper2kvm                           │
+│                     h2kvm                           │
 │  ┌─────────────────────────────────────────────────┐   │
 │  │  Live Migration Orchestrator                    │   │
 │  │  - Pre-migration analysis                        │   │
@@ -49,16 +49,16 @@
 
 ---
 
-## hyper2kvm Focus Areas
+## h2kvm Focus Areas
 
-Since HyperSDK handles the provider layer, hyper2kvm focuses on:
+Since HyperSDK handles the provider layer, h2kvm focuses on:
 
 ### 1. **Live Migration Decision Engine** (2 weeks)
 
 Determine if VM is suitable for live migration or needs offline approach.
 
 ```python
-# hyper2kvm/migration/live_migration_analyzer.py
+# h2kvm/migration/live_migration_analyzer.py
 
 class LiveMigrationAnalyzer:
     """Analyzes VMs to determine if live migration is feasible."""
@@ -161,7 +161,7 @@ class LiveMigrationAnalyzer:
 Integrate with HyperSDK's provider abstraction.
 
 ```python
-# hyper2kvm/migration/live_migration_manager.py
+# h2kvm/migration/live_migration_manager.py
 
 from hypersdk import HyperSDK  # Assuming HyperSDK is installed
 
@@ -186,13 +186,13 @@ class LiveMigrationManager:
                            pre_migration_fixes: bool = True,
                            fallback_to_offline: bool = True) -> dict:
         """
-        Perform live migration with hyper2kvm enhancements.
+        Perform live migration with h2kvm enhancements.
 
         Workflow:
-        1. Pre-migration analysis (hyper2kvm)
-        2. Optional pre-migration fixes (hyper2kvm)
+        1. Pre-migration analysis (h2kvm)
+        2. Optional pre-migration fixes (h2kvm)
         3. Live migration (HyperSDK)
-        4. Post-migration validation (hyper2kvm)
+        4. Post-migration validation (h2kvm)
         5. Fallback to offline if live fails
 
         Args:
@@ -308,7 +308,7 @@ class LiveMigrationManager:
         """
         Fallback to traditional offline migration.
 
-        Uses hyper2kvm's existing offline migration pipeline.
+        Uses h2kvm's existing offline migration pipeline.
         """
 
         logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
@@ -319,8 +319,8 @@ class LiveMigrationManager:
         logger.info("Powering off VM...")
         await self.hypersdk.power_off_vm(self.source_provider, vm_id)
 
-        # Use existing hyper2kvm offline migration
-        from hyper2kvm.migration.offline_migration import OfflineMigrationManager
+        # Use existing h2kvm offline migration
+        from h2kvm.migration.offline_migration import OfflineMigrationManager
 
         offline_mgr = OfflineMigrationManager()
         result = await offline_mgr.migrate(vm_id, target_host)
@@ -417,7 +417,7 @@ class HybridMigrationManager:
         logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
         logger.info("Offline fixes will be applied during next maintenance window")
-        logger.info("To apply fixes now, run: hyper2kvm fix --vm-id {vm_id}")
+        logger.info("To apply fixes now, run: h2kvm fix --vm-id {vm_id}")
 
         # Create maintenance task
         maintenance_task = {
@@ -444,25 +444,25 @@ class HybridMigrationManager:
 
 ### 4. **CLI Integration** (1-2 weeks)
 
-Add live migration commands to hyper2kvm CLI.
+Add live migration commands to h2kvm CLI.
 
 ```bash
 # Live migration commands
 
 # Analyze if VM can be migrated live
-hyper2kvm analyze-live --vm-id vm-123 --provider vmware
+h2kvm analyze-live --vm-id vm-123 --provider vmware
 
 # Perform live migration
-hyper2kvm migrate --vm-id vm-123 --target-host kvm01.company.local --mode live
+h2kvm migrate --vm-id vm-123 --target-host kvm01.company.local --mode live
 
 # Hybrid migration (live + scheduled offline fixes)
-hyper2kvm migrate --vm-id vm-123 --target-host kvm01.company.local --mode hybrid
+h2kvm migrate --vm-id vm-123 --target-host kvm01.company.local --mode hybrid
 
 # Fallback to offline if live fails
-hyper2kvm migrate --vm-id vm-123 --target-host kvm01.company.local --mode live --fallback-offline
+h2kvm migrate --vm-id vm-123 --target-host kvm01.company.local --mode live --fallback-offline
 
 # Monitor live migration progress
-hyper2kvm status --migration-id mig-456
+h2kvm status --migration-id mig-456
 ```
 
 **YAML Configuration**:
@@ -511,10 +511,10 @@ hybrid_mode:
 
 ## Integration with Existing Pipeline
 
-Live migration integrates seamlessly with existing hyper2kvm features:
+Live migration integrates seamlessly with existing h2kvm features:
 
 ```python
-# hyper2kvm/migration/orchestrator.py
+# h2kvm/migration/orchestrator.py
 
 class MigrationOrchestrator:
     """Unified orchestrator for all migration modes."""

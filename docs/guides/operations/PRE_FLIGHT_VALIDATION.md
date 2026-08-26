@@ -18,7 +18,7 @@ Complete validation checks to ensure your environment is ready for VM migrations
 ## Overview
 
 Run these validation checks before starting any migrations to:
-- ✅ Verify Hyper2KVM is properly installed
+- ✅ Verify H2KVM is properly installed
 - ✅ Confirm system meets requirements
 - ✅ Validate network connectivity
 - ✅ Check storage capacity
@@ -31,18 +31,18 @@ Run these validation checks before starting any migrations to:
 
 ## Installation Validation
 
-### 1. Verify Hyper2KVM Installation
+### 1. Verify H2KVM Installation
 
 ```bash
-# Check Hyper2KVM is installed
+# Check H2KVM is installed
 h2kvmctl --version
-hyper2kvm --version
+h2kvm --version
 
-# Expected output: hyper2kvm version 2.1.0 (or later)
+# Expected output: h2kvm version 2.1.0 (or later)
 ```
 
 **✅ Pass**: Version displays correctly
-**❌ Fail**: Command not found → [Install Hyper2KVM](getting-started/01-Installation.md)
+**❌ Fail**: Command not found → [Install H2KVM](getting-started/01-Installation.md)
 
 ---
 
@@ -61,9 +61,9 @@ python3 --version
 ```bash
 # Check pip
 pip --version
-pip list | grep hyper2kvm
+pip list | grep h2kvm
 
-# Expected: hyper2kvm package listed
+# Expected: h2kvm package listed
 ```
 
 ---
@@ -559,7 +559,7 @@ virsh console test-vm
 #!/bin/bash
 # pre-flight-check.sh - Automated validation
 
-echo "=== Hyper2KVM Pre-Flight Validation ==="
+echo "=== H2KVM Pre-Flight Validation ==="
 echo ""
 
 # Color codes
@@ -587,13 +587,13 @@ check_fail() {
     ((FAIL++))
 }
 
-# 1. Check Hyper2KVM installation
-echo "1. Checking Hyper2KVM installation..."
+# 1. Check H2KVM installation
+echo "1. Checking H2KVM installation..."
 if command -v h2kvmctl &> /dev/null; then
     VERSION=$(h2kvmctl --version 2>&1 | head -1)
-    check_pass "Hyper2KVM installed: $VERSION"
+    check_pass "H2KVM installed: $VERSION"
 else
-    check_fail "Hyper2KVM not found. Install with: pip install 'hyper2kvm[full]'"
+    check_fail "H2KVM not found. Install with: pip install 'h2kvm[full]'"
 fi
 
 # 2. Check Python version
@@ -753,7 +753,7 @@ Review warnings and decide if acceptable:
 Fix critical failures before proceeding:
 
 **Installation issues**:
-- Install Hyper2KVM: `pip install "hyper2kvm[full]"`
+- Install H2KVM: `pip install "h2kvm[full]"`
 - Install dependencies: `dnf install qemu-img qemu-system-x86`
 
 **Resource issues**:
@@ -774,10 +774,10 @@ Fix critical failures before proceeding:
 
 ```bash
 # Check if installed
-pip list | grep hyper2kvm
+pip list | grep h2kvm
 
 # If not installed
-pip install "hyper2kvm[full]"
+pip install "h2kvm[full]"
 
 # If installed but not in PATH
 export PATH=$PATH:~/.local/bin

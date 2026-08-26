@@ -41,8 +41,8 @@ type KubeconfigManager struct {
 	configDir string
 }
 
-const defaultKubeconfigDir = "/var/lib/hyper2kvm/kubeconfigs"
-const legacySingleKubeconfig = "/var/lib/hyper2kvm/kubeconfig"
+const defaultKubeconfigDir = "/var/lib/h2kvm/kubeconfigs"
+const legacySingleKubeconfig = "/var/lib/h2kvm/kubeconfig"
 
 // NewKubeconfigManager creates a new manager, ensuring the storage directory
 // exists and loading any previously persisted state from clusters.json.

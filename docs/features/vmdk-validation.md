@@ -6,7 +6,7 @@
 
 ## Overview
 
-Hyper2KVM provides built-in validation capabilities to check disk image integrity at multiple levels before attempting migration. This helps catch corruption, format issues, and filesystem problems early in the migration process.
+H2KVM provides built-in validation capabilities to check disk image integrity at multiple levels before attempting migration. This helps catch corruption, format issues, and filesystem problems early in the migration process.
 
 ### Validation Levels
 
@@ -36,7 +36,7 @@ sudo python scripts/validate_vmdk.py --full /path/to/disk.vmdk
 ### Python API
 
 ```python
-from hyper2kvm.vmcraft.nbd import NBDDeviceManager
+from h2kvm.vmcraft.nbd import NBDDeviceManager
 import logging
 
 logger = logging.getLogger(__name__)
@@ -250,7 +250,7 @@ report = nbd.inspect_disk(
 Validate images before starting migration:
 
 ```python
-from hyper2kvm.vmcraft.nbd import NBDDeviceManager
+from h2kvm.vmcraft.nbd import NBDDeviceManager
 import logging
 
 logger = logging.getLogger(__name__)

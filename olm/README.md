@@ -1,6 +1,6 @@
-# Hyper2KVM Operator - OLM Bundle
+# H2KVM Operator - OLM Bundle
 
-This directory contains the Operator Lifecycle Manager (OLM) bundle for deploying hyper2kvm-operator on OpenShift via OperatorHub.
+This directory contains the Operator Lifecycle Manager (OLM) bundle for deploying h2kvm-operator on OpenShift via OperatorHub.
 
 ## Directory Structure
 
@@ -8,7 +8,7 @@ This directory contains the Operator Lifecycle Manager (OLM) bundle for deployin
 olm/
 ├── bundle/                          # OLM bundle
 │   ├── manifests/                   # Manifests directory
-│   │   ├── hyper2kvm-operator.clusterserviceversion.yaml  # CSV
+│   │   ├── h2kvm-operator.clusterserviceversion.yaml  # CSV
 │   │   ├── migrationjob.yaml        # MigrationJob CRD
 │   │   └── jobtemplate.yaml         # JobTemplate CRD
 │   ├── metadata/                    # Bundle metadata
@@ -17,7 +17,7 @@ olm/
 │       └── scorecard/
 │           └── config.yaml
 ├── bundle.Dockerfile                # Bundle image Dockerfile
-├── hyper2kvm-operator.package.yaml  # Package manifest
+├── h2kvm-operator.package.yaml  # Package manifest
 └── README.md                        # This file
 ```
 
@@ -25,10 +25,10 @@ olm/
 
 ```bash
 # Build bundle image
-docker build -f olm/bundle.Dockerfile -t ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.0.0 olm/
+docker build -f olm/bundle.Dockerfile -t ghcr.io/ssahani/h2kvm-operator-bundle:v2.0.0 olm/
 
 # Push to registry
-docker push ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.0.0
+docker push ghcr.io/ssahani/h2kvm-operator-bundle:v2.0.0
 ```
 
 ## Validating the Bundle
@@ -53,12 +53,12 @@ operator-sdk scorecard olm/bundle
 ```bash
 # Create catalog using opm
 opm index add \
-  --bundles ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.0.0 \
-  --tag ghcr.io/ssahani/hyper2kvm-operator-catalog:latest \
+  --bundles ghcr.io/ssahani/h2kvm-operator-bundle:v2.0.0 \
+  --tag ghcr.io/ssahani/h2kvm-operator-catalog:latest \
   --container-tool docker
 
 # Push catalog
-docker push ghcr.io/ssahani/hyper2kvm-operator-catalog:latest
+docker push ghcr.io/ssahani/h2kvm-operator-catalog:latest
 ```
 
 2. **Create CatalogSource**:
@@ -67,13 +67,13 @@ docker push ghcr.io/ssahani/hyper2kvm-operator-catalog:latest
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
-  name: hyper2kvm-catalog
+  name: h2kvm-catalog
   namespace: openshift-marketplace
 spec:
   sourceType: grpc
-  image: ghcr.io/ssahani/hyper2kvm-operator-catalog:latest
-  displayName: Hyper2KVM Operators
-  publisher: Hyper2KVM Project
+  image: ghcr.io/ssahani/h2kvm-operator-catalog:latest
+  displayName: H2KVM Operators
+  publisher: H2KVM Project
   updateStrategy:
     registryPoll:
       interval: 30m
@@ -81,7 +81,7 @@ spec:
 
 3. **Install from OperatorHub UI**:
    - Navigate to **OperatorHub** in OpenShift Console
-   - Search for "Hyper2KVM"
+   - Search for "H2KVM"
    - Click **Install**
    - Select installation mode (namespace or all namespaces)
    - Choose update channel (stable or preview)
@@ -96,11 +96,11 @@ chmod +x operator-sdk_linux_amd64
 sudo mv operator-sdk_linux_amd64 /usr/local/bin/operator-sdk
 
 # Run bundle directly
-operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.0.0 \
-  --namespace hyper2kvm-system
+operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.0.0 \
+  --namespace h2kvm-system
 
 # Cleanup
-operator-sdk cleanup hyper2kvm-operator --namespace hyper2kvm-system
+operator-sdk cleanup h2kvm-operator --namespace h2kvm-system
 ```
 
 ### Method 3: Manual Subscription
@@ -109,26 +109,26 @@ operator-sdk cleanup hyper2kvm-operator --namespace hyper2kvm-system
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: hyper2kvm-system
+  name: h2kvm-system
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: hyper2kvm-operatorgroup
-  namespace: hyper2kvm-system
+  name: h2kvm-operatorgroup
+  namespace: h2kvm-system
 spec:
   targetNamespaces:
-    - hyper2kvm-system
+    - h2kvm-system
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-system
+  name: h2kvm-operator
+  namespace: h2kvm-system
 spec:
   channel: stable
-  name: hyper2kvm-operator
-  source: hyper2kvm-catalog
+  name: h2kvm-operator
+  source: h2kvm-catalog
   sourceNamespace: openshift-marketplace
   installPlanApproval: Automatic
 ```
@@ -160,9 +160,9 @@ The bundle supports disconnected environments:
 ```bash
 # Mirror operator images
 oc image mirror \
-  ghcr.io/ssahani/hyper2kvm:2.0.0-operator=internal-registry.example.com/hyper2kvm/operator:2.0.0 \
-  ghcr.io/ssahani/hyper2kvm:2.0.0-worker=internal-registry.example.com/hyper2kvm/worker:2.0.0 \
-  ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.0.0=internal-registry.example.com/hyper2kvm/bundle:v2.0.0
+  ghcr.io/ssahani/h2kvm:2.0.0-operator=internal-registry.example.com/h2kvm/operator:2.0.0 \
+  ghcr.io/ssahani/h2kvm:2.0.0-worker=internal-registry.example.com/h2kvm/worker:2.0.0 \
+  ghcr.io/ssahani/h2kvm-operator-bundle:v2.0.0=internal-registry.example.com/h2kvm/bundle:v2.0.0
 ```
 
 2. Create ImageContentSourcePolicy:
@@ -171,11 +171,11 @@ oc image mirror \
 apiVersion: operator.openshift.io/v1alpha1
 kind: ImageContentSourcePolicy
 metadata:
-  name: hyper2kvm-mirror
+  name: h2kvm-mirror
 spec:
   repositoryDigestMirrors:
     - mirrors:
-        - internal-registry.example.com/hyper2kvm
+        - internal-registry.example.com/h2kvm
       source: ghcr.io/ssahani
 ```
 
@@ -184,21 +184,21 @@ spec:
 ### Via OperatorHub UI
 
 1. Navigate to **Installed Operators**
-2. Find **Hyper2KVM Operator**
+2. Find **H2KVM Operator**
 3. Click **Uninstall**
 
 ### Via CLI
 
 ```bash
 # Delete subscription
-oc delete subscription hyper2kvm-operator -n hyper2kvm-system
+oc delete subscription h2kvm-operator -n h2kvm-system
 
 # Delete CSV
-oc delete csv hyper2kvm-operator.v2.0.0 -n hyper2kvm-system
+oc delete csv h2kvm-operator.v2.0.0 -n h2kvm-system
 
 # Delete CRDs (optional - this deletes all MigrationJobs!)
-oc delete crd migrationjobs.hyper2kvm.io
-oc delete crd jobtemplates.hyper2kvm.io
+oc delete crd migrationjobs.h2kvm.io
+oc delete crd jobtemplates.h2kvm.io
 ```
 
 ## Troubleshooting
@@ -207,22 +207,22 @@ oc delete crd jobtemplates.hyper2kvm.io
 
 ```bash
 # Check subscription
-oc get subscription hyper2kvm-operator -n hyper2kvm-system -o yaml
+oc get subscription h2kvm-operator -n h2kvm-system -o yaml
 
 # Check install plan
-oc get installplan -n hyper2kvm-system
+oc get installplan -n h2kvm-system
 
 # Check CSV
-oc get csv -n hyper2kvm-system
+oc get csv -n h2kvm-system
 
 # Check operator pod
-oc get pods -n hyper2kvm-system -l app.kubernetes.io/name=hyper2kvm-operator
+oc get pods -n h2kvm-system -l app.kubernetes.io/name=h2kvm-operator
 ```
 
 ### View operator logs
 
 ```bash
-oc logs -n hyper2kvm-system -l app.kubernetes.io/name=hyper2kvm-operator -f
+oc logs -n h2kvm-system -l app.kubernetes.io/name=h2kvm-operator -f
 ```
 
 ### Common issues
@@ -236,4 +236,4 @@ oc logs -n hyper2kvm-system -l app.kubernetes.io/name=hyper2kvm-operator -f
 - [Operator SDK Documentation](https://sdk.operatorframework.io/docs/)
 - [OLM Documentation](https://olm.operatorframework.io/)
 - [OpenShift Operators](https://docs.openshift.com/container-platform/latest/operators/index.html)
-- [Hyper2KVM Documentation](https://github.com/ssahani/hyper2kvm/tree/main/docs)
+- [H2KVM Documentation](https://github.com/ssahani/h2kvm/tree/main/docs)

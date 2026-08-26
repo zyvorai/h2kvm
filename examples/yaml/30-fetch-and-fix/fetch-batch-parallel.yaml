@@ -2,7 +2,7 @@
 #   h2kvmctl --config 30-fetch-and-fix/fetch-batch-parallel.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config 30-fetch-and-fix/fetch-batch-parallel.yaml
+#   h2kvm --config 30-fetch-and-fix/fetch-batch-parallel.yaml
 
 command: fetch-and-fix
 flatten: true

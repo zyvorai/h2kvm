@@ -33,7 +33,7 @@ jobs:
 
       - name: Create k3d cluster (K8s ${{ matrix.k3s-version }})
         run: |
-          k3d cluster create hyper2kvm-test \
+          k3d cluster create h2kvm-test \
             --image rancher/k3s:${{ matrix.k3s-version }} \
             --agents 1 \
             --k3s-arg "--disable=traefik@server:0" \
@@ -58,7 +58,7 @@ jobs:
         env:
           SKIP_BUILD: "false"
           SKIP_IMAGE_LOAD: "false"
-          CLUSTER_NAME: hyper2kvm-test
+          CLUSTER_NAME: h2kvm-test
           CENTOS9_VMDK: ""  # Skip actual VM migration in CI
         run: |
           bash scripts/test-centos9-e2e-k8s.sh
@@ -67,9 +67,9 @@ jobs:
         if: failure()
         run: |
           echo "=== Operator Logs ==="
-          kubectl logs -n hyper2kvm-system -l app=hyper2kvm-operator --tail=100 || true
+          kubectl logs -n h2kvm-system -l app=h2kvm-operator --tail=100 || true
           echo "=== Worker Logs ==="
-          kubectl logs -n hyper2kvm-workers -l app=hyper2kvm-worker --tail=100 || true
+          kubectl logs -n h2kvm-workers -l app=h2kvm-worker --tail=100 || true
           echo "=== Pod Status ==="
           kubectl get pods -A || true
           echo "=== Events ==="
@@ -78,4 +78,4 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          k3d cluster delete hyper2kvm-test || true
+          k3d cluster delete h2kvm-test || true

@@ -1,4 +1,4 @@
-module github.com/hyper2kvm/zkvm
+module github.com/h2kvm/zkvm
 
 go 1.25.0
 

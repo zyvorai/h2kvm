@@ -25,7 +25,7 @@ export function DesktopMobileJumpNav({ currentView, onNavigate }: Props) {
       aria-label="Jump navigation"
     >
       <label htmlFor="h2kweb-mobile-jump-select" className="sr-only">
-        Navigate hyper2kvm
+        Navigate h2kvm
       </label>
       <div className="flex items-center gap-2 px-4 py-2.5">
         <Compass className="h-4 w-4 shrink-0 text-sky-400/80" aria-hidden />

@@ -385,7 +385,7 @@ See `batch_migration_example.json` for batch config example.
 
 ### Support
 
-- Report issues: https://github.com/ssahani/hyper2kvm/issues
+- Report issues: https://github.com/ssahani/h2kvm/issues
 - Email: (your support email)
 
 ---

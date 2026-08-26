@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-# hyper2kvm Windows YAML examples: VirtIO drivers + Windows network override variants
+# h2kvm Windows YAML examples: VirtIO drivers + Windows network override variants
 #
 # These are *examples* of the shapes you can support. Your orchestrator can:
 #  - read `windows_virtio` (drivers + PNP IDs) and build the injection plan

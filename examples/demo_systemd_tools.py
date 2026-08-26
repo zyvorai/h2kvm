@@ -6,17 +6,17 @@
 """
 Systemd Tools Demo - Live demonstration with photon.vmdk
 
-This script demonstrates the 20 systemd tools integrated into hyper2kvm
+This script demonstrates the 20 systemd tools integrated into h2kvm
 for enhanced VM migration workflows.
 """
 
 import sys
 from pathlib import Path
 
-# Add hyper2kvm to path
+# Add h2kvm to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from hyper2kvm.systemd import (
+from h2kvm.systemd import (
     SystemdAnalyze,
     SystemdCgtop,
     SystemdDetectVirt,
@@ -284,7 +284,7 @@ def demo_7_migration_workflow(image_path: Path):
 def main():
     """Run the systemd tools demonstration."""
     print("\n" + "=" * 70)
-    print("  🎯 Systemd Tools Integration Demo - Hyper2KVM")
+    print("  🎯 Systemd Tools Integration Demo - H2KVM")
     print("=" * 70)
     print("\n📦 20 Systemd Tools Integrated for VM Migration Workflows")
     print("🐧 Demonstrating with: photon.vmdk (VMware Photon OS)")
@@ -315,7 +315,7 @@ def main():
     print("   - Comparison Guide: docs/SYSTEMD_COMPARISON.md")
     print("   - Complete Example: examples/systemd_complete_migration.py")
 
-    print("\n🔗 Documentation: https://github.com/ssahani/hyper2kvm")
+    print("\n🔗 Documentation: https://github.com/ssahani/h2kvm")
     print()
 
     return 0

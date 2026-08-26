@@ -1,7 +1,7 @@
 # Dry-Run MigrationJob Example
 # Validates migration without executing it
 
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: validate-centos9-migration
@@ -55,7 +55,7 @@ spec:
 # After validation passes, create the actual migration job
 # (Remove dryRun: true or set it to false)
 
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: centos9-migration

@@ -31,7 +31,7 @@ export type MenubarMenu = {
 function staticMenus(): MenubarMenu[] {
   return [
     {
-      label: 'hyper2kvm',
+      label: 'h2kvm',
       items: [
         { label: t('menu.about_app'), action: 'about' },
         { label: t('nav.settings'), action: 'settings' },

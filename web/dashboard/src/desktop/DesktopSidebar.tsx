@@ -44,12 +44,12 @@ export function DesktopSidebar({ currentView, onNavigate }: Props) {
       className={`mac-finder-sidebar tahoe-sidebar-expanded platform-sidebar glass glass-elevated hidden lg:flex flex-col shrink-0 border-r border-white/[0.06] ${
         sidebarCollapsed ? 'w-[60px]' : 'w-[280px]'
       }`}
-      aria-label="hyper2kvm Finder"
+      aria-label="h2kvm Finder"
     >
       {!sidebarCollapsed && (
         <div className="px-5 py-4 border-b border-white/[0.06]">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Desktop</p>
-          <p className="text-sm text-white/75 mt-1">hyper2kvm</p>
+          <p className="text-sm text-white/75 mt-1">h2kvm</p>
         </div>
       )}
       <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-2 min-h-0">

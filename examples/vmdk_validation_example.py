@@ -6,7 +6,7 @@
 """
 VMDK Validation Example
 
-Demonstrates how to use hyper2kvm's built-in image validation
+Demonstrates how to use h2kvm's built-in image validation
 capabilities to check disk image integrity before migration.
 
 This example shows:
@@ -19,7 +19,7 @@ import logging
 import sys
 from pathlib import Path
 
-from hyper2kvm.vmcraft.nbd import NBDDeviceManager
+from h2kvm.vmcraft.nbd import NBDDeviceManager
 
 
 def setup_logging():

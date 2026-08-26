@@ -1,6 +1,6 @@
 # Systemd Integration Guide
 
-Complete guide to Hyper2KVM's deep systemd integration for production deployments.
+Complete guide to H2KVM's deep systemd integration for production deployments.
 
 ## Table of Contents
 
@@ -20,7 +20,7 @@ Complete guide to Hyper2KVM's deep systemd integration for production deployment
 
 ## Overview
 
-Hyper2KVM provides deep integration with systemd, enabling production-grade VM boot repair operations with service management, resource control, automated scheduling, and comprehensive logging.
+H2KVM provides deep integration with systemd, enabling production-grade VM boot repair operations with service management, resource control, automated scheduling, and comprehensive logging.
 
 ### Key Benefits
 
@@ -131,7 +131,7 @@ sudo ./scripts/systemd/install-systemd-integration.sh --enable-all --dry-run
 
 ```bash
 # Create directories
-sudo mkdir -p /var/lib/hyper2kvm /var/log/hyper2kvm /run/hyper2kvm /etc/hyper2kvm
+sudo mkdir -p /var/lib/h2kvm /var/log/h2kvm /run/h2kvm /etc/h2kvm
 
 # Copy unit files
 sudo cp systemd/units/*.service /etc/systemd/system/
@@ -144,16 +144,16 @@ sudo cp systemd/units/*.target /etc/systemd/system/
 sudo systemctl daemon-reload
 
 # Enable services
-sudo systemctl enable hyper2kvm.socket
-sudo systemctl enable hyper2kvm.timer
-sudo systemctl start hyper2kvm.socket
+sudo systemctl enable h2kvm.socket
+sudo systemctl enable h2kvm.timer
+sudo systemctl start h2kvm.socket
 ```
 
 ## Configuration
 
 ### Main Configuration File
 
-`/etc/hyper2kvm/hyper2kvm.conf`:
+`/etc/h2kvm/h2kvm.conf`:
 
 ```bash
 # VM image directories to monitor (comma-separated)
@@ -176,7 +176,7 @@ LOG_LEVEL=INFO
 JOURNAL_LOGGING=true
 
 # Socket settings
-SOCKET_PATH=/run/hyper2kvm/repair.sock
+SOCKET_PATH=/run/h2kvm/repair.sock
 SOCKET_TIMEOUT=30
 
 # Timer settings
@@ -190,22 +190,22 @@ TIMER_RANDOM_DELAY=30min
 
 ```bash
 # Start the main service
-sudo systemctl start hyper2kvm.service
+sudo systemctl start h2kvm.service
 
 # Check service status
-sudo systemctl status hyper2kvm.service
+sudo systemctl status h2kvm.service
 
 # View service logs
-journalctl -u hyper2kvm.service -f
+journalctl -u h2kvm.service -f
 
 # Restart service
-sudo systemctl restart hyper2kvm.service
+sudo systemctl restart h2kvm.service
 ```
 
 ### Socket Activation
 
 ```python
-from hyper2kvm.systemd import RepairSocketClient
+from h2kvm.systemd import RepairSocketClient
 
 client = RepairSocketClient()
 
@@ -221,7 +221,7 @@ print(response)
 ### Resource Control
 
 ```python
-from hyper2kvm.systemd import SystemdResourceControl, ResourceLimits
+from h2kvm.systemd import SystemdResourceControl, ResourceLimits
 
 rc = SystemdResourceControl()
 
@@ -240,7 +240,7 @@ rc.apply_limits(pid=12345, limits=limits)
 ### Resource Monitoring
 
 ```python
-from hyper2kvm.systemd import ResourceMonitor
+from h2kvm.systemd import ResourceMonitor
 
 monitor = ResourceMonitor(pid=12345, interval=1.0)
 monitor.start_monitoring()
@@ -260,7 +260,7 @@ monitor.stop_monitoring()
 ### Path Monitoring
 
 ```python
-from hyper2kvm.systemd import VMPathMonitor
+from h2kvm.systemd import VMPathMonitor
 
 def on_file_change(event):
     print(f"File changed: {event.path / event.filename}")
@@ -276,7 +276,7 @@ monitor.start()
 ### Journal Logging
 
 ```python
-from hyper2kvm.systemd import JournalLogger
+from h2kvm.systemd import JournalLogger
 
 logger = JournalLogger(vm_name='web-server-01', operation='migration')
 
@@ -289,7 +289,7 @@ logger.log_success(duration=120.5)
 
 ## Systemd Units
 
-### hyper2kvm.service
+### h2kvm.service
 
 Main daemon service with:
 - Type: notify (supports systemd notifications)
@@ -297,14 +297,14 @@ Main daemon service with:
 - Security hardening enabled
 - Watchdog support (60s timeout)
 
-### hyper2kvm.socket
+### h2kvm.socket
 
 Socket activation unit:
-- Unix domain socket at `/run/hyper2kvm/repair.sock`
+- Unix domain socket at `/run/h2kvm/repair.sock`
 - Mode 0666 (all users can connect)
 - Auto-starts service on connection
 
-### hyper2kvm.timer
+### h2kvm.timer
 
 Scheduled repair timer:
 - Default: Daily at 2 AM
@@ -312,7 +312,7 @@ Scheduled repair timer:
 - Random delay: 30 minutes
 - Persistent (runs missed timers)
 
-### hyper2kvm@.service
+### h2kvm@.service
 
 Template service for per-VM repairs:
 - Instance-based (one per VM)
@@ -325,8 +325,8 @@ Template service for per-VM repairs:
 
 ```bash
 # Check for errors
-systemctl status hyper2kvm.service
-journalctl -u hyper2kvm.service -n 50
+systemctl status h2kvm.service
+journalctl -u h2kvm.service -n 50
 
 # Verify Python packages
 python3 -c "import systemd.daemon; import dbus; import psutil"
@@ -336,10 +336,10 @@ python3 -c "import systemd.daemon; import dbus; import psutil"
 
 ```bash
 # Check socket exists
-ls -l /run/hyper2kvm/repair.sock
+ls -l /run/h2kvm/repair.sock
 
 # Check permissions
-stat /run/hyper2kvm/repair.sock
+stat /run/h2kvm/repair.sock
 ```
 
 ### Path Monitoring Not Working

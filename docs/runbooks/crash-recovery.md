@@ -14,18 +14,18 @@ Worker pod crashes, node reboots, or h2kvmctl process terminates unexpectedly du
 ### Kubernetes Deployments
 ```bash
 # Check for failed or crashlooping pods
-kubectl get pods -n hyper2kvm-migration --field-selector=status.phase=Failed
-kubectl get pods -n hyper2kvm-migration | grep -E 'CrashLoopBackOff|Error|OOMKilled'
+kubectl get pods -n h2kvm-migration --field-selector=status.phase=Failed
+kubectl get pods -n h2kvm-migration | grep -E 'CrashLoopBackOff|Error|OOMKilled'
 
 # Check for stuck jobs (running >4 hours)
-kubectl get jobs -n hyper2kvm-migration | grep -v Complete
+kubectl get jobs -n h2kvm-migration | grep -v Complete
 
 # Check HyperConversion status (stuck in Converting or CreatingVM)
 kubectl get hc -A
-kubectl describe hc <name> -n hyper2kvm-migration | grep -A10 Status
+kubectl describe hc <name> -n h2kvm-migration | grep -A10 Status
 
 # Check pod events for crash details
-kubectl describe pod -n hyper2kvm-migration -l job-name=migration | grep -A10 Events
+kubectl describe pod -n h2kvm-migration -l job-name=migration | grep -A10 Events
 ```
 
 ### CLI Migrations
@@ -52,7 +52,7 @@ dmesg | grep -i "out of memory"
 ### 1. Determine crash type
 ```bash
 # Check if OOM killed
-kubectl describe pod <pod> -n hyper2kvm-migration | grep "OOMKilled"
+kubectl describe pod <pod> -n h2kvm-migration | grep "OOMKilled"
 dmesg | grep -i "killed process"
 
 # Check node status (was it rebooted?)
@@ -63,18 +63,18 @@ uptime  # check system uptime
 journalctl -k | grep -i panic
 
 # Check disk full errors
-kubectl logs <pod> -n hyper2kvm-migration | grep -i "no space left"
+kubectl logs <pod> -n h2kvm-migration | grep -i "no space left"
 df -h
 ```
 
 ### 2. Identify migration stage at crash
 ```bash
 # Check migration logs for last operation
-kubectl logs <pod> -n hyper2kvm-migration --tail=100 | grep -E "PROGRESS|Converting|Fixing"
+kubectl logs <pod> -n h2kvm-migration --tail=100 | grep -E "PROGRESS|Converting|Fixing"
 
 # For CLI migrations, check output directory
-ls -lh /tmp/hyper2kvm-*/
-cat /tmp/hyper2kvm-*/migration.log | tail -50
+ls -lh /tmp/h2kvm-*/
+cat /tmp/h2kvm-*/migration.log | tail -50
 ```
 
 ### 3. Check for data corruption
@@ -94,19 +94,19 @@ ls -lh <output-dir>/  # compare sizes with expected
 #### 1. Assess current state
 ```bash
 # Check if PVC with partial output exists
-kubectl get pvc -n hyper2kvm-migration
+kubectl get pvc -n h2kvm-migration
 
 # Examine HyperConversion CR status
-kubectl get hc <name> -n hyper2kvm-migration -o yaml | grep -A20 status
+kubectl get hc <name> -n h2kvm-migration -o yaml | grep -A20 status
 ```
 
 #### 2. Clean up orphaned resources
 ```bash
 # Delete failed job (keeps PVC)
-kubectl delete job migration -n hyper2kvm-migration
+kubectl delete job migration -n h2kvm-migration
 
 # If pod is stuck terminating
-kubectl delete pod <pod> -n hyper2kvm-migration --force --grace-period=0
+kubectl delete pod <pod> -n h2kvm-migration --force --grace-period=0
 ```
 
 #### 3. Resume migration
@@ -115,16 +115,16 @@ kubectl delete pod <pod> -n hyper2kvm-migration --force --grace-period=0
 kubectl apply -f <hyperconversion.yaml>
 
 # Option 2: Delete and recreate (if reconciliation fails)
-kubectl delete hc <name> -n hyper2kvm-migration
+kubectl delete hc <name> -n h2kvm-migration
 kubectl apply -f <hyperconversion.yaml>
 ```
 
 #### 4. If migration cannot resume (data corrupted)
 ```bash
 # Clean up all resources
-kubectl delete hc <name> -n hyper2kvm-migration
-kubectl delete job --all -n hyper2kvm-migration
-kubectl delete pvc qcow2-output -n hyper2kvm-migration
+kubectl delete hc <name> -n h2kvm-migration
+kubectl delete job --all -n h2kvm-migration
+kubectl delete pvc qcow2-output -n h2kvm-migration
 
 # Start fresh migration
 kubectl apply -f <hyperconversion.yaml>
@@ -174,7 +174,7 @@ h2kvmctl --cmd local \
 # If no checkpoints, start fresh with different output dir
 h2kvmctl --cmd local \
   --vmdk /path/to/source.vmdk \
-  --output-dir /tmp/hyper2kvm-retry \
+  --output-dir /tmp/h2kvm-retry \
   --output-format qcow2
 ```
 
@@ -203,10 +203,10 @@ dmsetup ls  # should show no orphaned devices
 #### 3. Resume migration
 ```bash
 # Check if job rescheduled automatically
-kubectl get pods -n hyper2kvm-migration -o wide
+kubectl get pods -n h2kvm-migration -o wide
 
 # If not, delete and reapply HyperConversion
-kubectl delete hc <name> -n hyper2kvm-migration
+kubectl delete hc <name> -n h2kvm-migration
 kubectl apply -f <hyperconversion.yaml>
 ```
 
@@ -239,7 +239,7 @@ terminationGracePeriodSeconds: 7200  # 2 hours
 ### Monitoring
 ```bash
 # Set up alerts for pod restarts
-kubectl get events -n hyper2kvm-migration --watch | grep -E 'Killing|OOMKilled'
+kubectl get events -n h2kvm-migration --watch | grep -E 'Killing|OOMKilled'
 
 # Monitor node health
 kubectl top nodes
@@ -252,10 +252,10 @@ h2kvmctl --enable-recovery --checkpoint-interval 300  # every 5 min
 ### Backups
 ```bash
 # Backup operator state before maintenance
-./scripts/collect-debug-bundle.sh /var/backups/hyper2kvm-state-$(date +%Y%m%d)
+./scripts/collect-debug-bundle.sh /var/backups/h2kvm-state-$(date +%Y%m%d)
 
 # Snapshot PVCs with partial migrations
-kubectl get pvc -n hyper2kvm-migration -o yaml > pvc-backup.yaml
+kubectl get pvc -n h2kvm-migration -o yaml > pvc-backup.yaml
 ```
 
 ## Escalation Path

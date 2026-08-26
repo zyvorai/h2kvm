@@ -19,7 +19,7 @@ Example:
 
 import sys
 from pathlib import Path
-from hyper2kvm.vmcraft.main import VMCraft
+from h2kvm.vmcraft.main import VMCraft
 
 
 def print_section(title):

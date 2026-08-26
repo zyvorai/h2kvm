@@ -85,7 +85,7 @@ Successfully implemented a production-ready Go operator for automated VM migrati
   - `disk-only-conversion.yaml` - Disk conversion without VM
   - `advanced-multi-network.yaml` - Multi-network VM with UEFI Secure Boot
   - `ubuntu-with-cloudinit.yaml` - Ubuntu VM with cloud-init
-  - `hyper2kvm_v1alpha1_hyperconversion.yaml` - Default sample
+  - `h2kvm_v1alpha1_hyperconversion.yaml` - Default sample
 - [x] Created `tests/integration/e2e_test.sh` - E2E test script with:
   - Prerequisite checking (kubectl, CDI, KubeVirt)
   - Operator deployment
@@ -117,7 +117,7 @@ Successfully implemented a production-ready Go operator for automated VM migrati
 ### ⏭️ Phase 9: Python Worker Integration (Optional - Future Work)
 - [ ] Not implemented in initial version
 - [ ] Can be added later for offline fixes
-- [ ] Would create Kubernetes Jobs running hyper2kvm-migration container
+- [ ] Would create Kubernetes Jobs running h2kvm-migration container
 - [ ] Triggered when `spec.conversion.offlineFixes = true`
 
 ## Project Structure
@@ -151,7 +151,7 @@ operator/
 │       ├── disk-only-conversion.yaml
 │       ├── advanced-multi-network.yaml
 │       ├── ubuntu-with-cloudinit.yaml
-│       └── hyper2kvm_v1alpha1_hyperconversion.yaml
+│       └── h2kvm_v1alpha1_hyperconversion.yaml
 ├── controllers/
 │   └── hyperconversion_controller.go (500+ lines)
 ├── hack/
@@ -263,9 +263,9 @@ docs/operator/
 
 ### For Production Use
 1. **Generate CRDs**: Run `make manifests` to generate CRD YAML
-2. **Build Image**: Run `make docker-build IMG=<registry>/hyper2kvm-operator:v1.0.0`
+2. **Build Image**: Run `make docker-build IMG=<registry>/h2kvm-operator:v1.0.0`
 3. **Push Image**: Push to container registry
-4. **Deploy**: Run `make deploy IMG=<registry>/hyper2kvm-operator:v1.0.0`
+4. **Deploy**: Run `make deploy IMG=<registry>/h2kvm-operator:v1.0.0`
 5. **Test**: Apply sample CRs and verify functionality
 
 ### Future Enhancements

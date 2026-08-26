@@ -45,7 +45,7 @@
 <div class="cover">
   <h1>Network <span>Architecture</span></h1>
   <h2>From VMware vSwitch to Linux Bridge, OVS &amp; SR-IOV</h2>
-  <p class="sub">Network configuration is the most critical aspect of VM migration. This guide maps VMware virtual networking concepts to Linux equivalents — bridges, OVS, VLANs, bonds, SR-IOV, and firewall rules. hyper2kvm auto-generates network configs from OVF metadata.</p>
+  <p class="sub">Network configuration is the most critical aspect of VM migration. This guide maps VMware virtual networking concepts to Linux equivalents — bridges, OVS, VLANs, bonds, SR-IOV, and firewall rules. h2kvm auto-generates network configs from OVF metadata.</p>
   <div class="badge">Linux Bridge | OVS | SR-IOV | VLAN Mapping | Bond Modes | nftables | MAC Preservation</div>
 </div>
 
@@ -581,7 +581,7 @@ h2kvmctl convert --source vm.ova --emit-domain-xml --mac-prefix 52:54:00
     <p>90% of post-migration network issues are caused by three things: MTU mismatch, missing IP forwarding, or wrong bridge assignment. h2kvmctl auto-maps VMware network topology to Linux equivalents, preserves MAC addresses, and generates ready-to-use libvirt network XML. Run the 8-point verification checklist after each VM migration.</p>
   </div>
 
-  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Network Architecture &amp; Migration Guide</div>
+  <div class="footer">h2kvm.io | Proprietary (Zyvor AI Labs) | Network Architecture &amp; Migration Guide</div>
 </div>
 
 </body>

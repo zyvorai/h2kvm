@@ -1,19 +1,19 @@
-# Installing hyper2kvm in a Virtual Environment
+# Installing h2kvm in a Virtual Environment
 
-Install hyper2kvm in an isolated Python virtual environment on any Linux distribution. This avoids conflicts with system packages and works on Fedora, RHEL, CentOS, Rocky, Alma, Ubuntu, Debian, and SUSE.
+Install h2kvm in an isolated Python virtual environment on any Linux distribution. This avoids conflicts with system packages and works on Fedora, RHEL, CentOS, Rocky, Alma, Ubuntu, Debian, and SUSE.
 
 ## Quick Install
 
 ```bash
 # Clone the repo
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 
-# Install to /opt/hyper2kvm (recommended)
+# Install to /opt/h2kvm (recommended)
 sudo ./scripts/install-venv.sh
 
 # Or install to a custom path
-sudo ./scripts/install-venv.sh /srv/hyper2kvm
+sudo ./scripts/install-venv.sh /srv/h2kvm
 
 # Or install per-user (no sudo needed)
 ./scripts/install-venv.sh --user
@@ -22,10 +22,10 @@ sudo ./scripts/install-venv.sh /srv/hyper2kvm
 ## What It Does
 
 1. **Detects your distro** and installs system dependencies (python3, qemu-img, libguestfs-tools, python3-libguestfs)
-2. **Creates a Python venv** at `/opt/hyper2kvm` with `--system-site-packages`
-3. **Installs hyper2kvm** in editable mode from the source tree
-4. **Creates symlinks** in `/usr/local/sbin/` (h2kvmctl, hyper2kvm)
-5. **Installs system configs** (/etc/hyper2kvm/, modprobe, systemd units)
+2. **Creates a Python venv** at `/opt/h2kvm` with `--system-site-packages`
+3. **Installs h2kvm** in editable mode from the source tree
+4. **Creates symlinks** in `/usr/local/sbin/` (h2kvmctl, h2kvm)
+5. **Installs system configs** (/etc/h2kvm/, modprobe, systemd units)
 
 ## Verify
 
@@ -34,7 +34,7 @@ h2kvmctl --version
 # 0.3.0
 
 which h2kvmctl
-# /usr/local/sbin/h2kvmctl -> /opt/hyper2kvm/bin/h2kvmctl
+# /usr/local/sbin/h2kvmctl -> /opt/h2kvm/bin/h2kvmctl
 ```
 
 ## Distro-Specific Notes
@@ -75,7 +75,7 @@ sudo ./scripts/install-venv.sh
 ## Per-User Install (No Root)
 
 ```bash
-# Install to ~/.local/hyper2kvm
+# Install to ~/.local/h2kvm
 ./scripts/install-venv.sh --user
 
 # Symlinks go to ~/.local/bin/
@@ -92,7 +92,7 @@ Note: system dependencies (qemu-img, libguestfs-tools) still need root to instal
 Re-run the installer — it upgrades in place:
 
 ```bash
-cd hyper2kvm
+cd h2kvm
 git pull
 sudo ./scripts/install-venv.sh
 ```
@@ -104,10 +104,10 @@ sudo ./scripts/install-venv.sh --uninstall
 ```
 
 This removes:
-- The venv directory (`/opt/hyper2kvm`)
+- The venv directory (`/opt/h2kvm`)
 - Symlinks in `/usr/local/sbin/` and `~/.local/bin/`
 
-System configs in `/etc/hyper2kvm/` are preserved.
+System configs in `/etc/h2kvm/` are preserved.
 
 ## Testing the Install
 
@@ -116,7 +116,7 @@ System configs in `/etc/hyper2kvm/` are preserved.
 cat > /tmp/test.yaml <<'EOF'
 cmd: local
 vmdk: /path/to/your.vmdk
-output_dir: /tmp/hyper2kvm-test
+output_dir: /tmp/h2kvm-test
 flatten: true
 out_format: qcow2
 regen_initramfs: true

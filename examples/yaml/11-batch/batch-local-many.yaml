@@ -2,7 +2,7 @@
 #   h2kvmctl --config 11-batch/batch-local-many.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config 11-batch/batch-local-many.yaml
+#   h2kvm --config 11-batch/batch-local-many.yaml
 
 command: local
 flatten: true

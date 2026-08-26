@@ -5,8 +5,8 @@ cmd: local
 vmdk: /home/ssahani/vmware/win11/win11.vmdk
 
 # Output Configuration
-output_dir: /home/ssahani/tt/hyper2kvm/output-win11-pipeline
-to_output: /home/ssahani/tt/hyper2kvm/output-win11-pipeline/win11-pipeline.qcow2
+output_dir: /home/ssahani/tt/h2kvm/output-win11-pipeline
+to_output: /home/ssahani/tt/h2kvm/output-win11-pipeline/win11-pipeline.qcow2
 out_format: qcow2
 
 # Windows Configuration

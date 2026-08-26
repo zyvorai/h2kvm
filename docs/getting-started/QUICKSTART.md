@@ -1,26 +1,26 @@
 # Quick Start Guide
 
-Get started with hyper2kvm in minutes.
+Get started with h2kvm in minutes.
 
 ## Installation
 
 ### From PyPI
 
 ```bash
-pip install hyper2kvm
+pip install h2kvm
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 pip install -e .
 ```
 
 ### System Dependencies
 
-hyper2kvm requires systemd tools for VM validation:
+h2kvm requires systemd tools for VM validation:
 
 **Debian/Ubuntu:**
 ```bash
@@ -39,7 +39,7 @@ sudo dnf install systemd-container qemu-system-x86 qemu-img
 Quickly validate a VM image boots correctly:
 
 ```bash
-hyper2kvm validate /path/to/image.qcow2
+h2kvm validate /path/to/image.qcow2
 ```
 
 This will:
@@ -53,7 +53,7 @@ This will:
 Validate a Kubernetes node image:
 
 ```bash
-hyper2kvm validate /path/to/k8s-node.qcow2 --kubernetes
+h2kvm validate /path/to/k8s-node.qcow2 --kubernetes
 ```
 
 This checks:
@@ -68,7 +68,7 @@ Validate multiple VMs in parallel:
 
 ```python
 import asyncio
-from hyper2kvm.vmspawn import AsyncVMManager, MachineConfig
+from h2kvm.vmspawn import AsyncVMManager, MachineConfig
 
 async def validate_batch():
     manager = AsyncVMManager(max_parallel=10)
@@ -92,16 +92,16 @@ asyncio.run(validate_batch())
 
 ```bash
 # Install CRDs
-kubectl apply -f https://github.com/ssahani/hyper2kvm/releases/latest/download/crd.yaml
+kubectl apply -f https://github.com/ssahani/h2kvm/releases/latest/download/crd.yaml
 
 # Install operator
-kubectl apply -f https://github.com/ssahani/hyper2kvm/releases/latest/download/operator.yaml
+kubectl apply -f https://github.com/ssahani/h2kvm/releases/latest/download/operator.yaml
 ```
 
 ### Create Validation
 
 ```yaml
-apiVersion: hyper2kvm.io/v1
+apiVersion: h2kvm.io/v1
 kind: Validation
 metadata:
   name: my-vm-validation
@@ -128,7 +128,7 @@ kubectl describe validation my-vm-validation
 ### Create KubeVirt VM After Validation
 
 ```yaml
-apiVersion: hyper2kvm.io/v1
+apiVersion: h2kvm.io/v1
 kind: Validation
 metadata:
   name: k8s-node-validation
@@ -156,7 +156,7 @@ spec:
 Test a VM boots and network works:
 
 ```bash
-hyper2kvm validate vm.qcow2 --timeout 60
+h2kvm validate vm.qcow2 --timeout 60
 ```
 
 ### Workflow 2: Kubernetes Node Testing
@@ -164,7 +164,7 @@ hyper2kvm validate vm.qcow2 --timeout 60
 Validate a K8s node image before deploying:
 
 ```bash
-hyper2kvm validate k8s-node.qcow2 \
+h2kvm validate k8s-node.qcow2 \
     --kubernetes \
     --timeout 300 \
     --memory 4096 \
@@ -174,8 +174,8 @@ hyper2kvm validate k8s-node.qcow2 \
 ### Workflow 3: Batch Validation with Reporting
 
 ```python
-from hyper2kvm.vmspawn import VMValidator, KubernetesNodeValidator
-from hyper2kvm.vmspawn import MachineConfig
+from h2kvm.vmspawn import VMValidator, KubernetesNodeValidator
+from h2kvm.vmspawn import MachineConfig
 
 # Basic VM validation
 config = MachineConfig(name="test", image="test.qcow2")
@@ -245,7 +245,7 @@ sudo usermod -a -G kvm $USER
 Increase timeout for slow images:
 
 ```bash
-hyper2kvm validate vm.qcow2 --timeout 600
+h2kvm validate vm.qcow2 --timeout 600
 ```
 
 Or in Python:
@@ -274,6 +274,6 @@ If empty, nodes need KVM device plugin.
 
 ## Getting Help
 
-- Issues: https://github.com/ssahani/hyper2kvm/issues
-- Discussions: https://github.com/ssahani/hyper2kvm/discussions
-- Email: contact@hyper2kvm.io
+- Issues: https://github.com/ssahani/h2kvm/issues
+- Discussions: https://github.com/ssahani/h2kvm/discussions
+- Email: contact@h2kvm.io

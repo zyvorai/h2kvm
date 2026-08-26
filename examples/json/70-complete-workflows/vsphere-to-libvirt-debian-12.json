@@ -97,6 +97,6 @@
   "log_level": "INFO",
   "verbose": true,
   "enable_recovery": true,
-  "recovery_checkpoint_dir": "/tmp/hyper2kvm-checkpoints",
+  "recovery_checkpoint_dir": "/tmp/h2kvm-checkpoints",
   "post_migration_script": "#!/bin/bash\nset -e\n\n# Import domain\nvirsh define /data/kvm/debian-12-app-server.xml\n\n# Start VM\nvirsh start debian-12-app-server\n\n# Wait for boot\necho \"Waiting for VM to boot...\"\nsleep 45\n\n# Check VM status\nvirsh list | grep debian-12-app-server\n\necho \"Debian 12 migration complete\"\necho \"Connect via: virsh console debian-12-app-server\"\n"
 }

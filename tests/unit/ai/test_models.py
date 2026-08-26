@@ -2,14 +2,14 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.ai.models module.
+"""Tests for h2kvm.ai.models module.
 
 Dataclass models and enumerations used by the AI migration-intelligence module.
 """
 
 from __future__ import annotations
 
-from hyper2kvm.ai.models import (
+from h2kvm.ai.models import (
     AIConfig,
     AnomalyResult,
     Diagnosis,
@@ -342,7 +342,7 @@ def test_workload_profile_defaults():
 def test_ai_config_defaults():
     cfg = AIConfig()
     assert cfg.enabled is True
-    assert cfg.knowledge_base_path == "~/.cache/hyper2kvm/ai/knowledge.db"
+    assert cfg.knowledge_base_path == "~/.cache/h2kvm/ai/knowledge.db"
     assert cfg.min_history_for_prediction == 3
     assert cfg.anomaly_z_threshold == 2.5
     assert cfg.max_similar_lookback == 100

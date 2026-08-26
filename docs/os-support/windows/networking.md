@@ -1,10 +1,10 @@
-#  Windows Network & Driver Configuration in hyper2kvm
+#  Windows Network & Driver Configuration in h2kvm
 
 > **Declarative. Explicit. Boring (in the best way).**
 > Windows conversions fail when networking and drivers are left to luck.
-> hyper2kvm makes both **fully declarative** using **YAML + JSON**, with no hidden magic.
+> h2kvm makes both **fully declarative** using **YAML + JSON**, with no hidden magic.
 
-This document explains **how Windows networking and drivers are configured**, how **YAML references JSON**, and how everything fits into the larger hyper2kvm pipeline.
+This document explains **how Windows networking and drivers are configured**, how **YAML references JSON**, and how everything fits into the larger h2kvm pipeline.
 
 ---
 
@@ -12,7 +12,7 @@ This document explains **how Windows networking and drivers are configured**, ho
 
 For Windows VM migration, you need:
 
-- ✓ hyper2kvm installed ([Installation Guide](02-Installation.md))
+- ✓ h2kvm installed ([Installation Guide](02-Installation.md))
 - ✓ VirtIO drivers ISO downloaded
 - ✓ Windows source VM disk (VMDK, VHD, etc.)
 - ✓ Understanding of [Windows Boot Cycle](11-Windows-Boot-Cycle.md)
@@ -82,7 +82,7 @@ flowchart TD
 ---
 ##  Design Philosophy
 
-hyper2kvm follows a strict separation of concerns:
+h2kvm follows a strict separation of concerns:
 
 | Layer | Responsibility              | Format |
 | ----- | --------------------------- | ------ |
@@ -115,7 +115,7 @@ These mechanisms apply when:
 #  Windows Network Configuration (Retention & Overrides)
 
 Windows networking is **not modified directly offline**.
-Instead, hyper2kvm **stages a first-boot configuration** that is applied once Windows boots under KVM.
+Instead, h2kvm **stages a first-boot configuration** that is applied once Windows boots under KVM.
 
 This avoids registry archaeology and matches how Windows actually wants to be configured.
 
@@ -154,7 +154,7 @@ win_net_override: ./net/windows-network.json
 2. File is staged into the guest (example):
 
    ```
-   C:\hyper2kvm\net\network_override.json
+   C:\h2kvm\net\network_override.json
    ```
 3. A first-boot helper applies it using:
 
@@ -353,5 +353,5 @@ For Windows migrations:
 ## Getting Help
 
 - [Troubleshooting Guide](90-Failure-Modes.md)
-- [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
+- [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
 

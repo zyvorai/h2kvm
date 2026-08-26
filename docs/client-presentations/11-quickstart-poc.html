@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>hyper2kvm — Quick Start &amp; POC Guide</title>
+<title>h2kvm — Quick Start &amp; POC Guide</title>
 <style>
   @page { size: A4; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,9 +59,9 @@ sudo apt install -y qemu-utils libguestfs-tools  # Ubuntu/Debian</pre>
   <div class="step">
     <div class="step-num">2</div>
     <div class="step-content">
-      <h4>Install hyper2kvm</h4>
-      <pre>git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+      <h4>Install h2kvm</h4>
+      <pre>git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 pip3 install -e .
 # OR use the quickstart script:
 sudo ./scripts/quickstart.sh</pre>
@@ -239,7 +239,7 @@ virsh console migrated-test-vm   # Check console</pre>
     <tr><td>Windows BSOD</td><td>Add <code>--windows --virtio-win-iso /path/to/virtio-win.iso</code></td></tr>
   </table>
 
-  <div class="footer">hyper2kvm Quick Start &amp; POC Guide | Total time: ~30 minutes | Proprietary (Zyvor AI Labs)</div>
+  <div class="footer">h2kvm Quick Start &amp; POC Guide | Total time: ~30 minutes | Proprietary (Zyvor AI Labs)</div>
 </div>
 </body>
 </html>

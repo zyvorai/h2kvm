@@ -1,6 +1,6 @@
 # CLI Guides
 
-Complete command-line interface documentation for Hyper2KVM CLI tools.
+Complete command-line interface documentation for H2KVM CLI tools.
 
 ---
 
@@ -8,14 +8,14 @@ Complete command-line interface documentation for Hyper2KVM CLI tools.
 
 ### 🎯 CLI Tools
 - **[h2kvmctl Guide](h2kvmctl-guide.md)** - Primary CLI for interactive workflows (kubectl-style)
-- **[CLI Reference](reference.md)** - Complete hyper2kvm command reference (config-driven)
+- **[CLI Reference](reference.md)** - Complete h2kvm command reference (config-driven)
 - **[YAML Examples](yaml-examples.md)** - Configuration file examples
 
 ---
 
 ## CLI Tools Overview
 
-Hyper2KVM provides two complementary CLI commands serving different use cases:
+H2KVM provides two complementary CLI commands serving different use cases:
 
 ### h2kvmctl - Interactive CLI Tool
 **File**: [h2kvmctl-guide.md](h2kvmctl-guide.md)
@@ -44,7 +44,7 @@ h2kvmctl convert \
 
 ---
 
-### hyper2kvm - Daemon and Service CLI
+### h2kvm - Daemon and Service CLI
 **File**: [reference.md](reference.md)
 
 **Purpose**: Primary for **daemon mode and services**
@@ -64,14 +64,14 @@ h2kvmctl convert \
 
 **Example**:
 ```bash
-hyper2kvm --config migration.yaml
+h2kvm --config migration.yaml
 ```
 
 ---
 
 ## CLI Tool Comparison
 
-| Feature | h2kvmctl | hyper2kvm |
+| Feature | h2kvmctl | h2kvm |
 |---------|----------|-----------|
 | **Primary Use** | Interactive CLI | Daemon/Service |
 | **Style** | Flag-based | Config-driven |
@@ -133,7 +133,7 @@ virsh start vm
 
 **Goal**: Set up repeatable, automated migrations
 
-**Tool**: hyper2kvm
+**Tool**: h2kvm
 
 ```bash
 # 1. Read CLI reference
@@ -155,11 +155,11 @@ libvirt_test: true
 EOF
 
 # 3. Run migration
-hyper2kvm --config migration.yaml
+h2kvm --config migration.yaml
 
 # 4. Setup as systemd service (optional)
-sudo systemctl enable hyper2kvm-daemon
-sudo systemctl start hyper2kvm-daemon
+sudo systemctl enable h2kvm-daemon
+sudo systemctl start h2kvm-daemon
 ```
 
 **Documentation**: [CLI Reference](reference.md) + [YAML Examples](yaml-examples.md)
@@ -182,7 +182,7 @@ sudo systemctl start hyper2kvm-daemon
 ---
 
 ### Use Case 2: Production Automation
-**Recommended Tool**: hyper2kvm
+**Recommended Tool**: h2kvm
 
 **Workflow**:
 1. Create YAML configuration files
@@ -195,7 +195,7 @@ sudo systemctl start hyper2kvm-daemon
 ---
 
 ### Use Case 3: Batch Migration
-**Recommended Tool**: hyper2kvm
+**Recommended Tool**: h2kvm
 
 **Workflow**:
 1. Create batch manifest (JSON)
@@ -247,24 +247,24 @@ h2kvmctl list --vsphere-host HOST
 
 ---
 
-### hyper2kvm Commands
+### h2kvm Commands
 
 **Config-Driven**:
 ```bash
-hyper2kvm --config FILE
-hyper2kvm --config base.yaml --config override.yaml
+h2kvm --config FILE
+h2kvm --config base.yaml --config override.yaml
 ```
 
 **Daemon Mode**:
 ```bash
-hyper2kvm daemon [OPTIONS]
-hyper2kvm --daemon --config FILE
+h2kvm daemon [OPTIONS]
+h2kvm --daemon --config FILE
 ```
 
 **Inspection**:
 ```bash
-hyper2kvm --show-config --config FILE
-hyper2kvm --show-args --config FILE
+h2kvm --show-config --config FILE
+h2kvm --show-args --config FILE
 ```
 
 **Documentation**: [CLI Reference](reference.md)
@@ -334,8 +334,8 @@ batch_continue_on_error: true
 # h2kvmctl (interactive)
 h2kvmctl convert --vmdk /vms/vm.vmdk --output /vms/vm.qcow2
 
-# hyper2kvm (config-driven)
-hyper2kvm --config <(cat <<EOF
+# h2kvm (config-driven)
+h2kvm --config <(cat <<EOF
 command: local
 vmdk: /vms/vm.vmdk
 output_dir: /vms
@@ -355,7 +355,7 @@ h2kvmctl fetch \
   --identity ~/.ssh/id_rsa \
   --remote /vmfs/volumes/datastore1/vm/vm.vmdk
 
-# hyper2kvm (config-driven)
+# h2kvm (config-driven)
 cat > fetch.yaml <<EOF
 command: fetch-and-fix
 host: esxi.example.com
@@ -364,14 +364,14 @@ identity: ~/.ssh/id_rsa
 remote: /vmfs/volumes/datastore1/vm/vm.vmdk
 output_dir: /vms
 EOF
-hyper2kvm --config fetch.yaml
+h2kvm --config fetch.yaml
 ```
 
 ---
 
 ### Pattern 3: Batch Migration
 ```bash
-# Only hyper2kvm supports batch (config-driven)
+# Only h2kvm supports batch (config-driven)
 cat > batch.yaml <<EOF
 command: local
 batch_manifest: migrations.json
@@ -379,7 +379,7 @@ batch_parallel: 4
 batch_continue_on_error: true
 output_dir: /vms
 EOF
-hyper2kvm --config batch.yaml
+h2kvm --config batch.yaml
 ```
 
 ---
@@ -389,20 +389,20 @@ hyper2kvm --config batch.yaml
 # h2kvmctl (interactive)
 h2kvmctl convert --ova /vms/vm.ova --output-dir /vms
 
-# hyper2kvm (config-driven)
+# h2kvm (config-driven)
 cat > ova.yaml <<EOF
 command: ova
 ova: /vms/vm.ova
 output_dir: /vms
 EOF
-hyper2kvm --config ova.yaml
+h2kvm --config ova.yaml
 ```
 
 ---
 
 ## Tool Selection Guide
 
-| Scenario | Use h2kvmctl | Use hyper2kvm |
+| Scenario | Use h2kvmctl | Use h2kvm |
 |----------|-------------|---------------|
 | **Quick test** | ✅ Yes | ❌ No |
 | **One-off migration** | ✅ Yes | ⚠️ Optional |
@@ -418,7 +418,7 @@ hyper2kvm --config ova.yaml
 ## Integration with Other Documentation
 
 ### Before Using CLI
-- **[Installation Guide](../../getting-started/01-Installation.md)** - Install Hyper2KVM
+- **[Installation Guide](../../getting-started/01-Installation.md)** - Install H2KVM
 - **[Quick Start](../../getting-started/02-Quick-Start.md)** - First migration
 - **[Migration Decision Tree](../decision-support/MIGRATION_DECISION_TREE.md)** - Choose approach
 
@@ -439,21 +439,21 @@ hyper2kvm --config ova.yaml
 
 ### Daemon Mode Setup
 
-**Using hyper2kvm as systemd service**:
+**Using h2kvm as systemd service**:
 ```bash
 # 1. Create service config
-cat > /etc/hyper2kvm/daemon.yaml <<EOF
+cat > /etc/h2kvm/daemon.yaml <<EOF
 command: daemon
 daemon_port: 8080
 daemon_workers: 4
 EOF
 
 # 2. Enable and start service
-sudo systemctl enable hyper2kvm-daemon
-sudo systemctl start hyper2kvm-daemon
+sudo systemctl enable h2kvm-daemon
+sudo systemctl start h2kvm-daemon
 
 # 3. Check status
-sudo systemctl status hyper2kvm-daemon
+sudo systemctl status h2kvm-daemon
 ```
 
 **Documentation**: [CLI Reference](reference.md) - Daemon section
@@ -478,7 +478,7 @@ libvirt_test: true
 EOF
 
 # Merge configs
-hyper2kvm --config base.yaml --config prod.yaml --config migration.yaml
+h2kvm --config base.yaml --config prod.yaml --config migration.yaml
 ```
 
 **Documentation**: [CLI Reference](reference.md) - Config merging section
@@ -506,7 +506,7 @@ hyper2kvm --config base.yaml --config prod.yaml --config migration.yaml
 
 **3 comprehensive CLI guides** covering:
 - ✅ h2kvmctl - Modern interactive CLI (kubectl-style)
-- ✅ hyper2kvm - Config-driven daemon/service CLI
+- ✅ h2kvm - Config-driven daemon/service CLI
 - ✅ YAML configuration examples
 
 **Both CLI tools actively maintained for complementary use cases**
@@ -515,6 +515,6 @@ hyper2kvm --config base.yaml --config prod.yaml --config migration.yaml
 
 **Last Updated**: March 2026
 **Documentation Version**: 0.3.0
-**CLI Tools**: 2 (h2kvmctl + hyper2kvm)
+**CLI Tools**: 2 (h2kvmctl + h2kvm)
 
 **Quick Navigation**: [Guides Hub](../README.md) | [Documentation Hub](../../index.md) | [Migration Guides](../migration/)

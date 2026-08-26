@@ -10,4 +10,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: hyperconversion-operator
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system

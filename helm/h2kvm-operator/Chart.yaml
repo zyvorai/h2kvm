@@ -1,0 +1,28 @@
+apiVersion: v2
+name: h2kvm-operator
+description: Kubernetes Operator for automated VM migration job orchestration
+type: application
+version: 2.1.0
+appVersion: "0.3.0"
+
+keywords:
+  - vm-migration
+  - kubernetes-operator
+  - vmware
+  - kvm
+  - qemu
+  - automation
+
+home: https://github.com/ssahani/h2kvm
+sources:
+  - https://github.com/ssahani/h2kvm
+
+maintainers:
+  - name: ZyvorAI Labs Private Limited
+    email: ssahani@zyvor.dev
+
+icon: https://raw.githubusercontent.com/ssahani/h2kvm/main/docs/logo.png
+
+annotations:
+  category: Infrastructure
+  operator.io/version: v2.1.0

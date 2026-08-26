@@ -4,13 +4,13 @@
 
 # Operator image configuration
 image:
-  repository: hyper2kvm-operator
+  repository: h2kvm-operator
   pullPolicy: IfNotPresent
   tag: "latest"
 
 # Fixer image for offline disk fixes (LVM, initramfs, fstab)
 fixerImage:
-  repository: hyper2kvm/fixer
+  repository: h2kvm/fixer
   tag: "0.3.0"
 
 imagePullSecrets: []

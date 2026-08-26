@@ -4,27 +4,27 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: hyper2kvm-alerts
+  name: h2kvm-alerts
   namespace: vm-migration
   labels:
     prometheus: kube-prometheus
     role: alert-rules
 spec:
   groups:
-    - name: hyper2kvm
+    - name: h2kvm
       interval: 30s
       rules:
-        - alert: Hyper2kvmDaemonDown
-          expr: up{job="hyper2kvm-daemon"} == 0
+        - alert: H2kvmDaemonDown
+          expr: up{job="h2kvm-daemon"} == 0
           for: 5m
           labels:
             severity: critical
           annotations:
-            summary: "Hyper2kvm daemon is down on {{ $labels.instance }}"
-            description: "Hyper2kvm daemon has been down for more than 5 minutes"
+            summary: "H2kvm daemon is down on {{ $labels.instance }}"
+            description: "H2kvm daemon has been down for more than 5 minutes"
 
-        - alert: Hyper2kvmHighFailureRate
-          expr: rate(hyper2kvm_migration_failures_total[5m]) > 0.1
+        - alert: H2kvmHighFailureRate
+          expr: rate(h2kvm_migration_failures_total[5m]) > 0.1
           for: 10m
           labels:
             severity: warning
@@ -32,8 +32,8 @@ spec:
             summary: "High migration failure rate detected"
             description: "Migration failure rate is {{ $value }} failures/sec over the last 5 minutes"
 
-        - alert: Hyper2kvmDiskSpaceLow
-          expr: hyper2kvm_conversion_temp_usage_bytes / hyper2kvm_conversion_temp_total_bytes > 0.85
+        - alert: H2kvmDiskSpaceLow
+          expr: h2kvm_conversion_temp_usage_bytes / h2kvm_conversion_temp_total_bytes > 0.85
           for: 5m
           labels:
             severity: warning
@@ -41,8 +41,8 @@ spec:
             summary: "Conversion temp space running low"
             description: "Conversion temp space is {{ $value | humanizePercentage }} full"
 
-        - alert: Hyper2kvmLongRunningMigration
-          expr: hyper2kvm_migration_duration_seconds > 3600
+        - alert: H2kvmLongRunningMigration
+          expr: h2kvm_migration_duration_seconds > 3600
           for: 15m
           labels:
             severity: info

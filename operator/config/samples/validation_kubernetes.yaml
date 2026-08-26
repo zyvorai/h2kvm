@@ -1,4 +1,4 @@
-apiVersion: hyper2kvm.io/v1
+apiVersion: h2kvm.io/v1
 kind: Validation
 metadata:
   name: k8s-node-validation

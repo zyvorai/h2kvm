@@ -2,7 +2,7 @@
 #   h2kvmctl --config 10-local/local-linux-dry-run-preview.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config 10-local/local-linux-dry-run-preview.yaml
+#   h2kvm --config 10-local/local-linux-dry-run-preview.yaml
 
 command: local
 vmdk: /path/to/linux.vmdk

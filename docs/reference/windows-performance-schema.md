@@ -212,7 +212,7 @@ windows:
       schedule_optimization: true
 ```
 
-**Scheduled Task**: `\Microsoft\Windows\Defrag\Hyper2KVM TRIM Optimization`
+**Scheduled Task**: `\Microsoft\Windows\Defrag\H2KVM TRIM Optimization`
 
 ---
 
@@ -512,7 +512,7 @@ windows:
 All optimizations generate PowerShell verification scripts:
 
 ```
-C:\hyper2kvm\performance\
+C:\h2kvm\performance\
 ├── balloon-verify.ps1      # Verify balloon configuration
 ├── trim-verify.ps1         # Verify TRIM enablement
 ├── trim-optimize.ps1       # Schedule TRIM optimization
@@ -522,7 +522,7 @@ C:\hyper2kvm\performance\
 **Run After Migration**:
 ```powershell
 # Verify all optimizations
-cd C:\hyper2kvm\performance
+cd C:\h2kvm\performance
 .\balloon-verify.ps1
 .\trim-verify.ps1
 .\msi-verify.ps1

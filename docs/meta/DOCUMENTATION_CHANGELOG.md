@@ -1,6 +1,6 @@
 # Documentation Changelog
 
-Track major changes to Hyper2KVM documentation.
+Track major changes to H2KVM documentation.
 
 ---
 
@@ -24,7 +24,7 @@ Track major changes to Hyper2KVM documentation.
 - Fixed 12 broken documentation links across README.md, docs/README.md, docs/index.md
 - Updated "Last Updated" dates across 80+ documentation files
 - Fixed debian/copyright: wrong Source URL and LGPL license text (now Apache-2.0)
-- Fixed GitHub org references in systemd units, debian/watch, CI workflows (hyper2kvm/hyper2kvm → ssahani/hyper2kvm)
+- Fixed GitHub org references in systemd units, debian/watch, CI workflows (h2kvm/h2kvm → ssahani/h2kvm)
 - Updated test counts in PROJECT_STATUS.md, FAQ.md (149 → 1387 tests)
 - Fixed version in ECOSYSTEM.md (1.0.0 → 0.3.0)
 
@@ -375,8 +375,8 @@ Thanks to all users who provided feedback, reported issues, and suggested improv
 
 Found an issue or have a suggestion?
 
-1. **Documentation Issues**: [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues) - Tag with `documentation`
-2. **Suggestions**: [GitHub Discussions](https://github.com/ssahani/hyper2kvm/discussions)
+1. **Documentation Issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues) - Tag with `documentation`
+2. **Suggestions**: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
 3. **Quick Fixes**: Submit a PR directly
 4. **Questions**: Check [FAQ](FAQ.md) first, then ask in Discussions
 
@@ -406,4 +406,4 @@ This changelog follows these conventions:
 
 **Last Updated**: March 29, 2026
 **Documentation Version**: 0.3.0
-**Maintained By**: Hyper2KVM Documentation Team
+**Maintained By**: H2KVM Documentation Team

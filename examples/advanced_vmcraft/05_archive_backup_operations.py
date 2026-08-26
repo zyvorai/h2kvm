@@ -32,7 +32,7 @@ import logging
 import tempfile
 from pathlib import Path
 
-from hyper2kvm.vmcraft.main import VMCraft
+from h2kvm.vmcraft.main import VMCraft
 
 
 def setup_logging():

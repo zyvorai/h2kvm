@@ -1,6 +1,6 @@
-# hyper2kvm - Kubernetes Deployment
+# h2kvm - Kubernetes Deployment
 
-Production-ready Kubernetes deployment for hyper2kvm Worker Job Protocol v1.
+Production-ready Kubernetes deployment for h2kvm Worker Job Protocol v1.
 
 ## Performance Highlights (v2.2.0+)
 
@@ -18,7 +18,7 @@ See [LVM Enterprise Improvements](../docs/LVM_AND_ENTERPRISE_IMPROVEMENTS.md) fo
 
 ```bash
 # Clone repository
-cd /path/to/hyper2kvm
+cd /path/to/h2kvm
 
 # Build and deploy (production)
 cd k8s
@@ -111,7 +111,7 @@ make status
 
 ```bash
 # 1. Create namespace
-kubectl create namespace hyper2kvm-workers
+kubectl create namespace h2kvm-workers
 
 # 2. Deploy RBAC
 kubectl apply -f worker/rbac.yaml
@@ -123,7 +123,7 @@ kubectl apply -f worker/configmap.yaml
 kubectl apply -f worker/pvc-templates.yaml
 
 # 5. Label nodes
-kubectl label nodes worker-01 hyper2kvm.io/worker-enabled=true
+kubectl label nodes worker-01 h2kvm.io/worker-enabled=true
 
 # 6. Deploy workers
 kubectl apply -f worker/daemonset-production.yaml
@@ -136,17 +136,17 @@ kubectl apply -f monitoring/servicemonitor.yaml
 
 ```bash
 # Create k3d cluster
-k3d cluster create hyper2kvm-test --servers 1 --agents 2
+k3d cluster create h2kvm-test --servers 1 --agents 2
 
 # Build and load image
 make build-image
-make load-image-k3d CLUSTER_NAME=hyper2kvm-test
+make load-image-k3d CLUSTER_NAME=h2kvm-test
 
 # Deploy (k3d version without NBD init container)
 make deploy-all-k3d
 
 # Label nodes
-make label-nodes NODE_NAMES="k3d-hyper2kvm-test-agent-0 k3d-hyper2kvm-test-agent-1"
+make label-nodes NODE_NAMES="k3d-h2kvm-test-agent-0 k3d-h2kvm-test-agent-1"
 
 # Check status
 make status
@@ -177,7 +177,7 @@ Edit `worker/pvc-templates.yaml` to adjust:
 kubectl apply -f worker/pvc-templates.yaml
 
 # Check status
-kubectl get pvc -n hyper2kvm-workers
+kubectl get pvc -n h2kvm-workers
 ```
 
 ---
@@ -193,7 +193,7 @@ cd k8s/worker
 ./submit-job.sh --follow examples/convert-job.json
 
 # Submit to specific worker
-./submit-job.sh --worker hyper2kvm-worker-abc123 examples/inspect-job.json
+./submit-job.sh --worker h2kvm-worker-abc123 examples/inspect-job.json
 ```
 
 ### Using Makefile
@@ -213,14 +213,14 @@ make job-events JOB_ID=convert-example-001
 
 ```bash
 # 1. Find a worker pod
-POD=$(kubectl get pods -n hyper2kvm-workers -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}')
+POD=$(kubectl get pods -n h2kvm-workers -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}')
 
 # 2. Copy job spec to pod
-kubectl cp worker/examples/convert-job.json hyper2kvm-workers/$POD:/var/lib/hyper2kvm/job.json
+kubectl cp worker/examples/convert-job.json h2kvm-workers/$POD:/var/lib/h2kvm/job.json
 
 # 3. Execute job
-kubectl exec -n hyper2kvm-workers $POD -- \
-  python3 -m hyper2kvm.worker.cli run /var/lib/hyper2kvm/job.json --follow
+kubectl exec -n h2kvm-workers $POD -- \
+  python3 -m h2kvm.worker.cli run /var/lib/h2kvm/job.json --follow
 ```
 
 ---
@@ -236,28 +236,28 @@ If Prometheus Operator is installed:
 kubectl apply -f monitoring/servicemonitor.yaml
 
 # Check metrics endpoint
-POD=$(kubectl get pods -n hyper2kvm-workers -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}')
-kubectl port-forward -n hyper2kvm-workers $POD 9090:9090
+POD=$(kubectl get pods -n h2kvm-workers -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}')
+kubectl port-forward -n h2kvm-workers $POD 9090:9090
 
 # Open browser: http://localhost:9090/metrics
 ```
 
 **Metrics exposed:**
-- `hyper2kvm_migration_total` - Total migrations by status
-- `hyper2kvm_migration_duration_seconds` - Migration duration histogram
-- `hyper2kvm_migration_failures_total` - Migration failures
-- `hyper2kvm_worker_info` - Worker information
-- `hyper2kvm_worker_jobs_active` - Active jobs count
-- `hyper2kvm_vmdk_size_bytes` - VMDK size distribution
-- `hyper2kvm_conversion_temp_usage_bytes` - Temp storage usage
+- `h2kvm_migration_total` - Total migrations by status
+- `h2kvm_migration_duration_seconds` - Migration duration histogram
+- `h2kvm_migration_failures_total` - Migration failures
+- `h2kvm_worker_info` - Worker information
+- `h2kvm_worker_jobs_active` - Active jobs count
+- `h2kvm_vmdk_size_bytes` - VMDK size distribution
+- `h2kvm_conversion_temp_usage_bytes` - Temp storage usage
 
 ### Alerts
 
 Prometheus alerts are defined in `monitoring/servicemonitor.yaml`:
-- `Hyper2KVMWorkerDown` - Worker pod is down
-- `Hyper2KVMJobFailed` - Job failures detected
-- `Hyper2KVMMigrationSlow` - Migration taking too long
-- `Hyper2KVMTempStorageFull` - Temp storage nearly full
+- `H2KVMWorkerDown` - Worker pod is down
+- `H2KVMJobFailed` - Job failures detected
+- `H2KVMMigrationSlow` - Migration taking too long
+- `H2KVMTempStorageFull` - Temp storage nearly full
 
 ---
 
@@ -273,10 +273,10 @@ make status
 make logs
 
 # View specific pod logs
-make logs POD_NAME=hyper2kvm-worker-abc123
+make logs POD_NAME=h2kvm-worker-abc123
 
 # Follow logs
-kubectl logs -n hyper2kvm-workers -l app=hyper2kvm-worker -f
+kubectl logs -n h2kvm-workers -l app=h2kvm-worker -f
 ```
 
 ### Worker Management
@@ -292,28 +292,28 @@ make list-jobs
 make restart-workers
 
 # Exec into worker
-make exec POD_NAME=hyper2kvm-worker-abc123
+make exec POD_NAME=h2kvm-worker-abc123
 
 # Describe worker
-make describe-worker POD_NAME=hyper2kvm-worker-abc123
+make describe-worker POD_NAME=h2kvm-worker-abc123
 ```
 
 ### Troubleshooting
 
 ```bash
 # Check pod events
-kubectl describe pod -n hyper2kvm-workers hyper2kvm-worker-abc123
+kubectl describe pod -n h2kvm-workers h2kvm-worker-abc123
 
 # Check PVC status
-kubectl get pvc -n hyper2kvm-workers
+kubectl get pvc -n h2kvm-workers
 
 # Check storage class
 kubectl get sc
 
 # View worker capabilities
-POD=$(kubectl get pods -n hyper2kvm-workers -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}')
-kubectl exec -n hyper2kvm-workers $POD -- \
-  python3 -m hyper2kvm.worker.cli capabilities
+POD=$(kubectl get pods -n h2kvm-workers -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -n h2kvm-workers $POD -- \
+  python3 -m h2kvm.worker.cli capabilities
 ```
 
 ---
@@ -383,7 +383,7 @@ resources:
 Scale worker count by labeling more nodes:
 
 ```bash
-kubectl label nodes worker-04 worker-05 hyper2kvm.io/worker-enabled=true
+kubectl label nodes worker-04 worker-05 h2kvm.io/worker-enabled=true
 ```
 
 ---
@@ -395,10 +395,10 @@ kubectl label nodes worker-04 worker-05 hyper2kvm.io/worker-enabled=true
 make cleanup
 
 # Or manually
-kubectl delete namespace hyper2kvm-workers
+kubectl delete namespace h2kvm-workers
 
 # Delete k3d cluster
-k3d cluster delete hyper2kvm-test
+k3d cluster delete h2kvm-test
 ```
 
 ---
@@ -417,19 +417,19 @@ Scale workers based on queue depth:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: hyper2kvm-worker-hpa
+  name: h2kvm-worker-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: DaemonSet
-    name: hyper2kvm-worker
+    name: h2kvm-worker
   minReplicas: 2
   maxReplicas: 10
   metrics:
   - type: Pods
     pods:
       metric:
-        name: hyper2kvm_worker_jobs_active
+        name: h2kvm_worker_jobs_active
       target:
         type: AverageValue
         averageValue: "2"
@@ -476,7 +476,7 @@ affinity:
 - **Quick Start:** [docs/worker/QUICKSTART.md](../docs/worker/QUICKSTART.md)
 - **LVM Performance:** [docs/LVM_AND_ENTERPRISE_IMPROVEMENTS.md](../docs/LVM_AND_ENTERPRISE_IMPROVEMENTS.md)
 - **Test Results:** [docs/test-results/LVM_ENTERPRISE_IMPROVEMENTS_TEST_RESULTS.md](../docs/test-results/LVM_ENTERPRISE_IMPROVEMENTS_TEST_RESULTS.md)
-- **Issues:** https://github.com/ssahani/hyper2kvm/issues
+- **Issues:** https://github.com/ssahani/h2kvm/issues
 
 ---
 

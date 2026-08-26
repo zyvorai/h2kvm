@@ -1,6 +1,6 @@
 # Best Practices Guide
 
-Comprehensive best practices for VM migrations with Hyper2KVM based on real-world experience and lessons learned.
+Comprehensive best practices for VM migrations with H2KVM based on real-world experience and lessons learned.
 
 ---
 
@@ -204,7 +204,7 @@ qemu-img convert -O qcow2 -o encrypt.format=luks,encrypt.key-secret=sec0 \
 ```yaml
 # Enable detailed logging
 log_level: INFO
-log_file: /var/log/hyper2kvm/migration-${VM_NAME}.log
+log_file: /var/log/h2kvm/migration-${VM_NAME}.log
 
 # Keep logs for compliance
 # Archive logs for audit trail
@@ -212,7 +212,7 @@ log_file: /var/log/hyper2kvm/migration-${VM_NAME}.log
 
 ```bash
 # Review logs after migration
-grep -i "error\|warning" /var/log/hyper2kvm/*.log
+grep -i "error\|warning" /var/log/h2kvm/*.log
 ```
 
 **❌ DON'T**:
@@ -338,7 +338,7 @@ batch_parallel: 10  # On 4-core system - BAD!
 **✅ DO**:
 ```bash
 # Monitor during migration
-watch -n 2 'ps aux | grep hyper2kvm; iostat -x 1 1; free -h'
+watch -n 2 'ps aux | grep h2kvm; iostat -x 1 1; free -h'
 
 # Check for bottlenecks
 # CPU: Should be high (80-95%)
@@ -397,7 +397,7 @@ iperf3 -c esxi.example.com
 h2kvmctl --config migration.yaml
 
 # If migration fails, fix issue and re-run same command
-# Hyper2KVM is designed to be idempotent
+# H2KVM is designed to be idempotent
 ```
 
 **❌ DON'T**:

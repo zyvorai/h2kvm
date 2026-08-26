@@ -2,14 +2,14 @@
 #
 # Prerequisites:
 #   1. Configure AWS: aws configure
-#   2. Create S3 bucket: aws s3 mb s3://my-hyper2kvm-exports
+#   2. Create S3 bucket: aws s3 mb s3://my-h2kvm-exports
 #   3. Create vmimport role: https://docs.aws.amazon.com/vm-import/latest/userguide/required-permissions.html
 #   4. Install boto3: pip install boto3
 #
 # Run:
 #   python3 examples/aws_ec2_migration.py \
 #     --instance-id i-0abc123def456 \
-#     --bucket my-hyper2kvm-exports \
+#     --bucket my-h2kvm-exports \
 #     --region us-east-1
 #
 # Or use this YAML with h2kvmctl after downloading the exported image:
@@ -20,7 +20,7 @@ command: local
 
 # Source: downloaded from S3 after EC2 export
 # Replace with your actual exported disk path
-vmdk: /tmp/hyper2kvm/i-0abc123.vmdk
+vmdk: /tmp/h2kvm/i-0abc123.vmdk
 
 output_dir: ./out
 to_output: aws-vm.qcow2

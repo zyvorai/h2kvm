@@ -44,7 +44,7 @@ These errors made VM conversion **unreliable (60-70% success rate)** and **preve
 
 ### 1. Production-Grade NBD Manager
 
-**File:** `hyper2kvm/vmcraft/nbd_manager.py` (600+ lines)
+**File:** `h2kvm/vmcraft/nbd_manager.py` (600+ lines)
 
 **Features:**
 
@@ -114,7 +114,7 @@ with NBDDevice("disk.vmdk") as nbd:
 
 ### 2. System Configuration Files
 
-#### Sysctl Configuration (`etc/sysctl.d/99-hyper2kvm-nbd.conf`)
+#### Sysctl Configuration (`etc/sysctl.d/99-h2kvm-nbd.conf`)
 
 ```ini
 # Inotify watches (prevents "Too many open files")
@@ -143,7 +143,7 @@ options nbd nbds_max=128                     # Was: 16
 options nbd max_part=16                      # Was: 0
 ```
 
-#### Systemd Limits (`etc/systemd/system.conf.d/hyper2kvm-limits.conf`)
+#### Systemd Limits (`etc/systemd/system.conf.d/h2kvm-limits.conf`)
 
 ```ini
 [Manager]
@@ -177,11 +177,11 @@ sudo ./scripts/setup-system-limits.sh
 **Output:**
 ```
 ==================================================
-Hyper2KVM System Limits Setup
+H2KVM System Limits Setup
 ==================================================
 
 [1/5] Configuring sysctl limits...
-  ✓ Installed /etc/sysctl.d/99-hyper2kvm-nbd.conf
+  ✓ Installed /etc/sysctl.d/99-h2kvm-nbd.conf
   ✓ Applied sysctl configuration
 
 [2/5] Configuring NBD module...
@@ -190,7 +190,7 @@ Hyper2KVM System Limits Setup
   ✓ NBD configuration: nbds_max=128, max_part=16
 
 [3/5] Configuring systemd limits...
-  ✓ Installed /etc/systemd/system.conf.d/hyper2kvm-limits.conf
+  ✓ Installed /etc/systemd/system.conf.d/h2kvm-limits.conf
   ✓ Reloaded systemd configuration
 
 [4/5] Cleaning up orphaned NBD devices...
@@ -260,7 +260,7 @@ Hyper2KVM System Limits Setup
 ### Basic Usage
 
 ```python
-from hyper2kvm.vmcraft.nbd_manager import NBDDevice
+from h2kvm.vmcraft.nbd_manager import NBDDevice
 
 # Simple VM conversion
 with NBDDevice("disk.vmdk") as nbd:
@@ -286,8 +286,8 @@ with NBDDevice(
 ### With Safe Namespace Engine
 
 ```python
-from hyper2kvm.vmcraft.nbd_manager import NBDDevice
-from hyper2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine
+from h2kvm.vmcraft.nbd_manager import NBDDevice
+from h2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine
 
 with NBDDevice("disk.vmdk") as nbd:
     engine = SafeNamespaceEngine(nbd.device)
@@ -304,7 +304,7 @@ with NBDDevice("disk.vmdk") as nbd:
 ### Cleanup Orphaned Devices
 
 ```python
-from hyper2kvm.vmcraft.nbd_manager import cleanup_all_nbd_devices
+from h2kvm.vmcraft.nbd_manager import cleanup_all_nbd_devices
 
 # At application startup
 cleaned = cleanup_all_nbd_devices()
@@ -314,7 +314,7 @@ print(f"Cleaned up {cleaned} orphaned devices")
 ### Emergency Cleanup
 
 ```python
-from hyper2kvm.vmcraft.nbd_manager import cleanup_all_nbd_devices
+from h2kvm.vmcraft.nbd_manager import cleanup_all_nbd_devices
 
 # If system is in bad state
 cleanup_all_nbd_devices(max_devices=128)
@@ -327,8 +327,8 @@ cleanup_all_nbd_devices(max_devices=128)
 The NBD manager is designed to integrate seamlessly with the enterprise parallel manager:
 
 ```python
-from hyper2kvm.vmcraft.nbd_manager import NBDDevice
-from hyper2kvm.vmcraft.enterprise_parallel_manager import (
+from h2kvm.vmcraft.nbd_manager import NBDDevice
+from h2kvm.vmcraft.enterprise_parallel_manager import (
     EnterpriseParallelManager,
     ConversionJob
 )
@@ -350,7 +350,7 @@ def convert_vm(job, nbd_device_path, namespace):
 ### Quick Setup (Recommended)
 
 ```bash
-cd /path/to/hyper2kvm
+cd /path/to/h2kvm
 sudo ./scripts/setup-system-limits.sh
 ```
 
@@ -358,7 +358,7 @@ sudo ./scripts/setup-system-limits.sh
 
 ```bash
 # 1. Sysctl limits
-sudo cp etc/sysctl.d/99-hyper2kvm-nbd.conf /etc/sysctl.d/
+sudo cp etc/sysctl.d/99-h2kvm-nbd.conf /etc/sysctl.d/
 sudo sysctl --system
 
 # 2. NBD module
@@ -368,7 +368,7 @@ sudo modprobe nbd
 
 # 3. Systemd limits
 sudo mkdir -p /etc/systemd/system.conf.d/
-sudo cp etc/systemd/system.conf.d/hyper2kvm-limits.conf /etc/systemd/system.conf.d/
+sudo cp etc/systemd/system.conf.d/h2kvm-limits.conf /etc/systemd/system.conf.d/
 sudo systemctl daemon-reexec
 
 # 4. Verify
@@ -405,13 +405,13 @@ sudo python3 test_nbd_manager.py
 ## 📚 Files Created
 
 ### Core Implementation
-- `hyper2kvm/vmcraft/nbd_manager.py` (600 lines)
+- `h2kvm/vmcraft/nbd_manager.py` (600 lines)
   * NBDDevice class
   * Orphan detection
   * Safe cleanup sequence
 
 ### System Configuration
-- `etc/sysctl.d/99-hyper2kvm-nbd.conf`
+- `etc/sysctl.d/99-h2kvm-nbd.conf`
   * Inotify limits
   * File descriptor limits
 
@@ -419,7 +419,7 @@ sudo python3 test_nbd_manager.py
   * NBD device count
   * Partition support
 
-- `etc/systemd/system.conf.d/hyper2kvm-limits.conf`
+- `etc/systemd/system.conf.d/h2kvm-limits.conf`
   * Systemd service limits
 
 ### Scripts

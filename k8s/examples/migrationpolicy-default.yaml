@@ -1,5 +1,5 @@
 ---
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationPolicy
 metadata:
   name: default-migration-policy

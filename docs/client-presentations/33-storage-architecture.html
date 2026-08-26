@@ -378,7 +378,7 @@ allowVolumeExpansion: true</pre>
 
   <h3>QCOW2 Compression Savings (Post-Migration)</h3>
   <pre>
-# Compress during migration (hyper2kvm --compress)
+# Compress during migration (h2kvm --compress)
 $ h2kvmctl convert --source vm.vmdk --format qcow2 --compress --output /var/lib/libvirt/images/
 
 # Before compression: 42.8 GB on disk (100 GB virtual)
@@ -395,10 +395,10 @@ $ qemu-img convert -c -O qcow2 vm.qcow2 vm-compressed.qcow2</pre>
       <strong>Single server / Edge:</strong> Local NVMe + LVM thin (simplest, fastest).<br>
       <strong>3-node HA cluster:</strong> Longhorn or ZFS + replication (K8s-native, easy).<br>
       <strong>Enterprise / 100+ VMs:</strong> Ceph/Rook (proven at scale, self-healing).<br>
-      <strong>hyper2kvm outputs QCOW2 by default — thin provisioned, snapshot-ready, compression-optional.</strong>
+      <strong>h2kvm outputs QCOW2 by default — thin provisioned, snapshot-ready, compression-optional.</strong>
     </p>
   </div>
-  <div class="footer"><p>hyper2kvm &mdash; Storage Architecture Guide | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm &mdash; Storage Architecture Guide | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

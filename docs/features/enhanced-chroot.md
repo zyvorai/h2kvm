@@ -23,7 +23,7 @@ awk: fatal: cannot open file `/proc/self/mountinfo'
 
 ### Background
 
-During offline VM migrations, hyper2kvm uses a **chroot environment** to execute commands within the guest filesystem without booting the VM. This is essential for:
+During offline VM migrations, h2kvm uses a **chroot environment** to execute commands within the guest filesystem without booting the VM. This is essential for:
 
 - Regenerating GRUB configuration (`grub2-mkconfig`)
 - Installing bootloader to disk (`grub2-install`)
@@ -71,7 +71,7 @@ The enhanced chroot implementation (`command_with_mounts()` method) follows this
 
 ### Implementation Details
 
-**Location**: `hyper2kvm/vmcraft/main.py`
+**Location**: `h2kvm/vmcraft/main.py`
 
 **Key Features**:
 - ✅ **Automatic bind mounting**: Creates `/proc`, `/dev`, `/sys` bind mounts
@@ -87,7 +87,7 @@ The enhanced chroot implementation (`command_with_mounts()` method) follows this
 
 The GRUB fixer automatically detects bootloader commands and uses enhanced chroot:
 
-**Location**: `hyper2kvm/fixers/bootloader/grub.py:132-169`
+**Location**: `h2kvm/fixers/bootloader/grub.py:132-169`
 
 **Detected Commands** (8 total):
 - `grub2-mkconfig`, `grub-mkconfig`
@@ -120,7 +120,7 @@ The implementation is fully backward compatible:
 **Example**:
 ```bash
 # Enhanced chroot is used automatically
-hyper2kvm migrate vm.vmdk \
+h2kvm migrate vm.vmdk \
   --output vm.qcow2 \
   --regen-initramfs \
   --update-grub
@@ -131,7 +131,7 @@ hyper2kvm migrate vm.vmdk \
 For custom scripts using VMCraft directly:
 
 ```python
-from hyper2kvm.vmcraft.main import VMCraft
+from h2kvm.vmcraft.main import VMCraft
 
 with VMCraft() as g:
     g.add_drive_opts("/path/to/disk.qcow2", readonly=False)
@@ -298,11 +298,11 @@ finally:
 **Solution**:
 ```bash
 # Verify VMCraft version
-python3 -c "from hyper2kvm.vmcraft.main import VMCraft; print(hasattr(VMCraft, 'command_with_mounts'))"
+python3 -c "from h2kvm.vmcraft.main import VMCraft; print(hasattr(VMCraft, 'command_with_mounts'))"
 # Should print: True
 
-# If False, update hyper2kvm:
-pip install --upgrade hyper2kvm
+# If False, update h2kvm:
+pip install --upgrade h2kvm
 ```
 
 ### Symptom: "Device or resource busy" during unmount
@@ -312,7 +312,7 @@ pip install --upgrade hyper2kvm
 **Solution**: This is handled automatically by reverse-order unmount. If issues persist:
 ```bash
 # Check for processes in the mount
-sudo lsof | grep /tmp/hyper2kvm-guestfs-
+sudo lsof | grep /tmp/h2kvm-guestfs-
 ```
 
 ### Symptom: Performance degradation during migrations

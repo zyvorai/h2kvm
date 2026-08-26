@@ -2,14 +2,14 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.core.xml_utils module.
+"""Tests for h2kvm.core.xml_utils module.
 
 Pure logic tests for xml_escape, xml_escape_attr, and xml_escape_text.
 """
 
 from __future__ import annotations
 
-from hyper2kvm.core.xml_utils import xml_escape, xml_escape_attr, xml_escape_text
+from h2kvm.core.xml_utils import xml_escape, xml_escape_attr, xml_escape_text
 
 
 # --- xml_escape ---

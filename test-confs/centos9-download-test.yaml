@@ -7,11 +7,11 @@ cmd: local
 vmdk: /home/ssahani/Downloads/centos9/64bit/centos9.vmdk
 
 # Output Configuration
-output_dir: /home/ssahani/tt/hyper2kvm/out/centos9-download-test
-to_output: /home/ssahani/tt/hyper2kvm/out/centos9-download-test/centos9.qcow2
+output_dir: /home/ssahani/tt/h2kvm/out/centos9-download-test
+to_output: /home/ssahani/tt/h2kvm/out/centos9-download-test/centos9.qcow2
 out_format: qcow2
 compress: true
-workdir: /home/ssahani/tt/hyper2kvm/out/centos9-download-test/work
+workdir: /home/ssahani/tt/h2kvm/out/centos9-download-test/work
 
 # Core Linux Fixes
 fstab_fixes_enable: true
@@ -42,7 +42,7 @@ libvirt_disk_bus: virtio
 libvirt_import: true  # Auto-import to libvirt
 
 # Reporting
-report: /home/ssahani/tt/hyper2kvm/out/centos9-download-test/migration-report.md
-log_file: /home/ssahani/tt/hyper2kvm/out/centos9-download-test/migration.log
+report: /home/ssahani/tt/h2kvm/out/centos9-download-test/migration-report.md
+log_file: /home/ssahani/tt/h2kvm/out/centos9-download-test/migration.log
 verbose: 2
 dry_run: false

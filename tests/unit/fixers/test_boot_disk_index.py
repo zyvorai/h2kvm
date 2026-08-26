@@ -19,7 +19,7 @@ import pytest
 @pytest.fixture
 def fixer():
     """Create a minimal OfflineFSFixer-like object for testing."""
-    from hyper2kvm.fixers.offline_fixer import OfflineFSFix
+    from h2kvm.fixers.offline_fixer import OfflineFSFix
 
     with patch.object(OfflineFSFix, "__init__", lambda self: None):
         obj = OfflineFSFix.__new__(OfflineFSFix)
@@ -126,7 +126,7 @@ class TestWindowsDomainBootOrder:
 
     def test_boot_order_in_xml(self):
         """disk_boot_order should appear in generated XML."""
-        from hyper2kvm.libvirt.windows_domain import WinDomainSpec
+        from h2kvm.libvirt.windows_domain import WinDomainSpec
 
         spec = WinDomainSpec(
             name="test-win",
@@ -138,7 +138,7 @@ class TestWindowsDomainBootOrder:
 
     def test_default_boot_order_is_none(self):
         """Default disk_boot_order should be None."""
-        from hyper2kvm.libvirt.windows_domain import WinDomainSpec
+        from h2kvm.libvirt.windows_domain import WinDomainSpec
 
         spec = WinDomainSpec(
             name="test-win",

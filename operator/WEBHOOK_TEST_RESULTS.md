@@ -1,7 +1,7 @@
 # Webhook Testing Results - k3d Cluster
 
 **Date**: 2026-02-17
-**Cluster**: k3d hyper2kvm-test
+**Cluster**: k3d h2kvm-test
 **Operator Version**: webhook-test
 **Status**: ✅ **ALL TESTS PASSED**
 
@@ -20,7 +20,7 @@ kubectl wait --for=condition=Available deployment/cert-manager -n cert-manager
 ### 2. Operator Deployment with Webhooks ✅
 
 **Components Deployed**:
-- ✅ CRD: `hyperconversions.hyper2kvm.io`
+- ✅ CRD: `hyperconversions.h2kvm.io`
 - ✅ RBAC: ClusterRole, ClusterRoleBinding, ServiceAccount
 - ✅ Certificate: `serving-cert` (self-signed)
 - ✅ Secret: `webhook-server-cert` (TLS certificate)
@@ -32,9 +32,9 @@ kubectl wait --for=condition=Available deployment/cert-manager -n cert-manager
 **Operator Logs** (confirming webhook initialization):
 ```
 INFO  controller-runtime.builder  Registering a mutating webhook
-INFO  controller-runtime.webhook  Registering webhook  path=/mutate-hyper2kvm-io-v1alpha1-hyperconversion
+INFO  controller-runtime.webhook  Registering webhook  path=/mutate-h2kvm-io-v1alpha1-hyperconversion
 INFO  controller-runtime.builder  Registering a validating webhook
-INFO  controller-runtime.webhook  Registering webhook  path=/validate-hyper2kvm-io-v1alpha1-hyperconversion
+INFO  controller-runtime.webhook  Registering webhook  path=/validate-h2kvm-io-v1alpha1-hyperconversion
 INFO  setup  webhooks enabled for HyperConversion
 INFO  controller-runtime.webhook  Starting webhook server
 INFO  controller-runtime.webhook  Serving webhook server  host="" port=9443
@@ -48,7 +48,7 @@ INFO  controller-runtime.webhook  Serving webhook server  host="" port=9443
 
 **Input CR**:
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: test-invalid-url
@@ -94,7 +94,7 @@ spec.vm.cpu.cores in body should be less than or equal to 128
 
 **Input CR**:
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: test-warnings
@@ -117,7 +117,7 @@ spec:
 Warning: storage.size is less than 1GB, this may be too small for most VM images
 Warning: vm.memory is less than 512MB, this may be too small for most VMs
 Warning: LiveMigrate eviction strategy requires ReadWriteMany access mode for shared storage
-hyperconversion.hyper2kvm.io/test-warnings created
+hyperconversion.h2kvm.io/test-warnings created
 ```
 
 **Validations**:
@@ -133,7 +133,7 @@ hyperconversion.hyper2kvm.io/test-warnings created
 
 **Input CR** (minimal configuration):
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: test-minimal-defaults
@@ -220,8 +220,8 @@ Certificate: serving-cert
   Status: Ready
   Secret: webhook-server-cert
   DNS Names:
-    - webhook-service.hyper2kvm-system.svc
-    - webhook-service.hyper2kvm-system.svc.cluster.local
+    - webhook-service.h2kvm-system.svc
+    - webhook-service.h2kvm-system.svc.cluster.local
   Issuer: selfsigned-issuer (self-signed)
   Age: 3m35s
 ```
@@ -236,7 +236,7 @@ Certificate: serving-cert
 ```yaml
 metadata:
   annotations:
-    cert-manager.io/inject-ca-from: hyper2kvm-system/serving-cert
+    cert-manager.io/inject-ca-from: h2kvm-system/serving-cert
 ```
 
 **Result**: TLS handshake successful ✅
@@ -319,28 +319,28 @@ hyperconversion-operator-6c67fbd87b-tbx5m   1/1     Running   0          5m
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
 
 # Apply CRD and RBAC
-kubectl apply -f config/crd/bases/hyper2kvm.io_hyperconversions.yaml
+kubectl apply -f config/crd/bases/h2kvm.io_hyperconversions.yaml
 kubectl apply -f config/rbac/
 
 # Create certificates
-sed 's/namespace: system/namespace: hyper2kvm-system/g' config/certmanager/certificate.yaml | kubectl apply -f -
+sed 's/namespace: system/namespace: h2kvm-system/g' config/certmanager/certificate.yaml | kubectl apply -f -
 
 # Deploy operator with webhooks
 kubectl apply -f /tmp/operator-with-webhooks.yaml
 
 # Apply webhook configurations
-sed 's/namespace: system/namespace: hyper2kvm-system/g' config/webhook/manifests.yaml | kubectl apply -f -
+sed 's/namespace: system/namespace: h2kvm-system/g' config/webhook/manifests.yaml | kubectl apply -f -
 
 # Inject CA bundle
-kubectl annotate validatingwebhookconfigurations validating-webhook-configuration cert-manager.io/inject-ca-from=hyper2kvm-system/serving-cert
-kubectl annotate mutatingwebhookconfigurations mutating-webhook-configuration cert-manager.io/inject-ca-from=hyper2kvm-system/serving-cert
+kubectl annotate validatingwebhookconfigurations validating-webhook-configuration cert-manager.io/inject-ca-from=h2kvm-system/serving-cert
+kubectl annotate mutatingwebhookconfigurations mutating-webhook-configuration cert-manager.io/inject-ca-from=h2kvm-system/serving-cert
 ```
 
 ### Test Validation
 ```bash
 # Test invalid URL
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: test
@@ -357,7 +357,7 @@ EOF
 ```bash
 # Apply minimal CR
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: test

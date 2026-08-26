@@ -18,7 +18,7 @@ import (
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 
-	"github.com/hyper2kvm/web/internal/domain"
+	"github.com/h2kvm/web/internal/domain"
 )
 
 // Provider implements ports.ComputeProvider for VMware vSphere.

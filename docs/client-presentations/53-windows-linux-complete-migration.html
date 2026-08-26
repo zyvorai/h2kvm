@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Complete Windows &amp; Linux VM Migration — hyper2kvm Full Feature Guide</title>
+<title>Complete Windows &amp; Linux VM Migration — h2kvm Full Feature Guide</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -74,7 +74,7 @@
 <!-- COVER -->
 <div class="cover">
   <h1>Complete <span class="win">Windows</span> &amp; <span class="lin">Linux</span><br>VM Migration</h1>
-  <h2>The Definitive hyper2kvm Feature Guide</h2>
+  <h2>The Definitive h2kvm Feature Guide</h2>
   <p class="sub">Every migration capability in one deck: VirtIO driver injection, initramfs rebuild, registry fixes, BSOD prevention, GRUB repair, SELinux relabeling, fstab UUID repair, boot verification, KubeVirt deployment, batch migration, interactive TUI, and more. From VMware, Hyper-V, AWS, Azure, GCP to KVM &mdash; every OS, every source, every workload.</p>
   <div class="badge-row">
     <div class="stat-pill"><div class="num">15+</div><div class="label">Linux Distros</div></div>
@@ -89,7 +89,7 @@
 <!-- PAGE 1: Platform Overview -->
 <div class="page page-dark">
   <h2 class="st">Platform <span>Overview</span></h2>
-  <p class="sub">hyper2kvm is a complete VM migration toolkit: convert, fix, deploy, and verify &mdash; Windows and Linux, any source, any target.</p>
+  <p class="sub">h2kvm is a complete VM migration toolkit: convert, fix, deploy, and verify &mdash; Windows and Linux, any source, any target.</p>
 
   <div class="card-grid-4">
     <div class="stat-box card"><div class="num" style="color:#38bdf8;">Windows</div><div class="label">Server 2016-2025<br>Windows 10/11<br>BIOS + UEFI + TPM</div></div>
@@ -152,20 +152,20 @@
 
   <h3>hypersdk (Cloud Export Daemon)</h3>
   <div class="highlight">
-    <p style="margin-bottom:0;">Go daemon with hexagonal architecture supporting <strong>10 cloud providers</strong>: AWS, Azure, GCP, VMware vSphere, Hyper-V, Oracle Cloud, IBM Cloud, Alibaba Cloud, DigitalOcean, Hetzner. Exports VMs as raw disk images for hyper2kvm to convert and fix. REST API for automation.</p>
+    <p style="margin-bottom:0;">Go daemon with hexagonal architecture supporting <strong>10 cloud providers</strong>: AWS, Azure, GCP, VMware vSphere, Hyper-V, Oracle Cloud, IBM Cloud, Alibaba Cloud, DigitalOcean, Hetzner. Exports VMs as raw disk images for h2kvm to convert and fix. REST API for automation.</p>
   </div>
 </div>
 
 <!-- PAGE 2: The Boot Problem — Both OS -->
 <div class="page page-light">
   <h2 class="st">The Boot <span>Problem</span></h2>
-  <p class="sub">Why VMs crash after migration &mdash; and how hyper2kvm prevents every failure for both Windows and Linux.</p>
+  <p class="sub">Why VMs crash after migration &mdash; and how h2kvm prevents every failure for both Windows and Linux.</p>
 
   <div class="dual-col">
     <div class="col-win">
       <h3 class="win">Windows Failures</h3>
       <table>
-        <tr><th class="win-h" style="width:35%">Failure</th><th class="win-h">hyper2kvm Fix</th></tr>
+        <tr><th class="win-h" style="width:35%">Failure</th><th class="win-h">h2kvm Fix</th></tr>
         <tr><td><strong>BSOD 0x7B</strong> — boot disk invisible</td><td class="check">Injects viostor/vioscsi from virtio-win ISO</td></tr>
         <tr><td><strong>No network</strong> — VMXNET3/netvsc gone</td><td class="check">Injects NetKVM VirtIO network driver</td></tr>
         <tr><td><strong>VMware Tools crash</strong></td><td class="check">Removes services, drivers, tray applet</td></tr>
@@ -180,7 +180,7 @@
     <div class="col-lin">
       <h3 class="lin">Linux Failures</h3>
       <table>
-        <tr><th class="lin-h" style="width:35%">Failure</th><th class="lin-h">hyper2kvm Fix</th></tr>
+        <tr><th class="lin-h" style="width:35%">Failure</th><th class="lin-h">h2kvm Fix</th></tr>
         <tr><td><strong>Kernel panic</strong> — VFS mount fail</td><td class="check">Rebuilds initramfs with VirtIO modules</td></tr>
         <tr><td><strong>Root mount fail</strong> — /dev/sda gone</td><td class="check">Converts fstab to UUID-based mounts</td></tr>
         <tr><td><strong>GRUB rescue</strong> — wrong root=</td><td class="check">Regenerates grub.cfg with correct device</td></tr>
@@ -195,7 +195,7 @@
   </div>
 
   <div class="highlight">
-    <p style="margin-bottom:0;"><strong>All fixes applied offline</strong> &mdash; hyper2kvm mounts the disk via qemu-nbd, modifies the Windows registry / Linux filesystem directly, then unmounts. VMs never boot in a broken state. <strong>20+ failure modes eliminated automatically.</strong></p>
+    <p style="margin-bottom:0;"><strong>All fixes applied offline</strong> &mdash; h2kvm mounts the disk via qemu-nbd, modifies the Windows registry / Linux filesystem directly, then unmounts. VMs never boot in a broken state. <strong>20+ failure modes eliminated automatically.</strong></p>
   </div>
 </div>
 
@@ -776,7 +776,7 @@ h2kvmctl -c config.yaml -v</pre>
   <div class="card-grid">
     <div class="card">
       <h4>Automated Boot Test</h4>
-      <p>After conversion, hyper2kvm starts the VM on KVM, monitors boot progress, and confirms it reaches login (Windows) or shell (Linux). <strong>No human needs to watch.</strong> Fails are reported immediately with the error.</p>
+      <p>After conversion, h2kvm starts the VM on KVM, monitors boot progress, and confirms it reaches login (Windows) or shell (Linux). <strong>No human needs to watch.</strong> Fails are reported immediately with the error.</p>
     </div>
     <div class="card">
       <h4>VNC/noVNC Console</h4>
@@ -824,10 +824,10 @@ h2kvmctl -c config.yaml -v</pre>
 <!-- PAGE 12: Competitive Comparison -->
 <div class="page page-dark">
   <h2 class="st">Tool <span>Comparison</span></h2>
-  <p class="sub">hyper2kvm vs. every alternative &mdash; for both Windows and Linux migration.</p>
+  <p class="sub">h2kvm vs. every alternative &mdash; for both Windows and Linux migration.</p>
 
   <table>
-    <tr><th style="width:22%">Capability</th><th style="width:13%">hyper2kvm</th><th style="width:13%">virt-v2v</th><th style="width:13%">Red Hat MTV</th><th style="width:13%">AWS MGN</th><th style="width:13%">Azure Migrate</th><th style="width:13%">Manual</th></tr>
+    <tr><th style="width:22%">Capability</th><th style="width:13%">h2kvm</th><th style="width:13%">virt-v2v</th><th style="width:13%">Red Hat MTV</th><th style="width:13%">AWS MGN</th><th style="width:13%">Azure Migrate</th><th style="width:13%">Manual</th></tr>
     <tr><td><strong>Windows VirtIO injection</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">N/A</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
     <tr><td><strong>Linux initramfs rebuild</strong></td><td class="check">&#10003; All distros</td><td class="check">&#10003;</td><td class="partial">Limited</td><td class="cross">N/A</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
     <tr><td><strong>Windows registry fix</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="partial">Basic</td><td class="cross">N/A</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
@@ -849,7 +849,7 @@ h2kvmctl -c config.yaml -v</pre>
 
   <div class="verdict">
     <h3>The Only Tool That Does It All</h3>
-    <p style="font-size:0.9em;">hyper2kvm is the only tool that migrates <strong>both Windows &amp; Linux</strong> from <strong>VMware + Hyper-V + 10 clouds</strong>, deploys to <strong>KVM + KubeVirt</strong>, includes <strong>automated boot verification</strong>, needs <strong>no libguestfs</strong>, has an <strong>interactive TUI</strong>, and costs <strong>$0</strong>.</p>
+    <p style="font-size:0.9em;">h2kvm is the only tool that migrates <strong>both Windows &amp; Linux</strong> from <strong>VMware + Hyper-V + 10 clouds</strong>, deploys to <strong>KVM + KubeVirt</strong>, includes <strong>automated boot verification</strong>, needs <strong>no libguestfs</strong>, has an <strong>interactive TUI</strong>, and costs <strong>$0</strong>.</p>
   </div>
 </div>
 
@@ -891,7 +891,7 @@ h2kvmctl -c config.yaml -v</pre>
         <li>30 AWS + 25 Azure + 15 GCP + 30 VMware &mdash; mixed Win/Linux</li>
         <li>Target: centralized KVM cluster + edge K3s (KubeVirt)</li>
         <li>hypersdk exports from all 4 sources in parallel</li>
-        <li>hyper2kvm applies source-specific + OS-specific fixes</li>
+        <li>h2kvm applies source-specific + OS-specific fixes</li>
         <li>Dual-target deploy: libvirt + KubeVirt per workload</li>
         <li>Savings: <strong>$1.5M/yr</strong> consolidated infrastructure</li>
       </ul>
@@ -914,7 +914,7 @@ h2kvmctl -c config.yaml -v</pre>
         <li>Source: Azure D/E-series VMs</li>
         <li>Motivation: data sovereignty + cost control</li>
         <li>hypersdk exports managed disks</li>
-        <li>hyper2kvm removes Azure agent + Hyper-V IC</li>
+        <li>h2kvm removes Azure agent + Hyper-V IC</li>
         <li>Savings: <strong>$720K/yr</strong> in Azure compute + egress</li>
       </ul>
     </div>
@@ -924,10 +924,10 @@ h2kvmctl -c config.yaml -v</pre>
 <!-- PAGE 14: Cost Savings & ROI -->
 <div class="page page-purple">
   <h2 class="st">Cost Savings <span>&amp; ROI</span></h2>
-  <p class="sub">Eliminate hypervisor licensing, reduce cloud spend, cut SQL Server costs &mdash; hyper2kvm pays for itself immediately.</p>
+  <p class="sub">Eliminate hypervisor licensing, reduce cloud spend, cut SQL Server costs &mdash; h2kvm pays for itself immediately.</p>
 
   <div class="card-grid-4">
-    <div class="stat-box card"><div class="num">Licensed*</div><div class="label">hyper2kvm license<br>(Proprietary (Zyvor AI Labs))</div></div>
+    <div class="stat-box card"><div class="num">Licensed*</div><div class="label">h2kvm license<br>(Proprietary (Zyvor AI Labs))</div></div>
     <div class="stat-box card"><div class="num">$0</div><div class="label">KVM hypervisor<br>license cost</div></div>
     <div class="stat-box card"><div class="num">20-40%</div><div class="label">SQL Server savings<br>with CPU pinning</div></div>
     <div class="stat-box card"><div class="num">50-80%</div><div class="label">Cloud cost savings<br>on repatriation</div></div>
@@ -935,7 +935,7 @@ h2kvmctl -c config.yaml -v</pre>
 
   <h3>3-Year TCO Comparison: 100 VM Estate (Mixed Win/Linux)</h3>
   <table>
-    <tr><th style="width:25%">Cost Item</th><th style="width:20%">VMware vSphere</th><th style="width:20%">AWS/Azure Cloud</th><th style="width:20%">KVM (hyper2kvm)</th><th style="width:15%">Best Savings</th></tr>
+    <tr><th style="width:25%">Cost Item</th><th style="width:20%">VMware vSphere</th><th style="width:20%">AWS/Azure Cloud</th><th style="width:20%">KVM (h2kvm)</th><th style="width:15%">Best Savings</th></tr>
     <tr><td><strong>Hypervisor licensing</strong></td><td>$450,000</td><td>N/A</td><td class="check">$0</td><td class="check">$450,000</td></tr>
     <tr><td><strong>Compute costs</strong></td><td>$180,000 (hardware)</td><td>$2,400,000</td><td>$180,000 (hardware)</td><td class="check">$2,220,000</td></tr>
     <tr><td><strong>SQL Server (10 VMs)</strong></td><td>$1,263,600</td><td>$1,263,600</td><td>$631,200 (pinned)</td><td class="check">$632,400</td></tr>
@@ -1067,7 +1067,7 @@ h2kvmctl -c config.yaml -v</pre>
 <!-- PAGE 16: Summary & Call to Action -->
 <div class="page page-dark">
   <h2 class="st">Complete Feature <span>Summary</span></h2>
-  <p class="sub">Everything hyper2kvm does &mdash; in one view.</p>
+  <p class="sub">Everything h2kvm does &mdash; in one view.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -1142,12 +1142,12 @@ h2kvmctl -c config.yaml -v</pre>
   </div>
 
   <div class="card-grid-3" style="margin-top:1em;">
-    <div class="stat-box card"><div class="num" style="font-size:1.3em;">github.com/ssahani/hyper2kvm</div><div class="label">Source Code</div></div>
+    <div class="stat-box card"><div class="num" style="font-size:1.3em;">github.com/ssahani/h2kvm</div><div class="label">Source Code</div></div>
     <div class="stat-box card"><div class="num" style="font-size:1.3em;">h2kvmctl -c config.yaml</div><div class="label">Get Started</div></div>
     <div class="stat-box card"><div class="num" style="font-size:1.3em;">zkvm</div><div class="label">Interactive TUI</div></div>
   </div>
 
-  <div class="footer"><p>hyper2kvm + hypersdk &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs)</p></div>
+  <div class="footer"><p>h2kvm + hypersdk &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs)</p></div>
 </div>
 
 </body>

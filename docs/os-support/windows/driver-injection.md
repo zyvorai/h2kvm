@@ -1,10 +1,10 @@
 # Windows VirtIO Driver Injection Guide
 
-This document explains how hyper2kvm injects VirtIO drivers into Windows VMs during VMware to KVM migration.
+This document explains how h2kvm injects VirtIO drivers into Windows VMs during VMware to KVM migration.
 
 ## Overview
 
-hyper2kvm uses a **multi-stage offline injection** approach:
+h2kvm uses a **multi-stage offline injection** approach:
 
 1. **Offline pre-staging** — Copy driver files + register in DriverStore before first KVM boot
 2. **Bootstrap boot** — Boot with SATA disk + VirtIO NIC/balloon/serial + VirtIO ISO
@@ -27,7 +27,7 @@ hyper2kvm uses a **multi-stage offline injection** approach:
 The VirtIO drivers ISO is **automatically discovered** at the standard path:
 
 ```
-/var/lib/hyper2kvm/virtio-win.iso
+/var/lib/h2kvm/virtio-win.iso
 ```
 
 To download it, run once:
@@ -36,7 +36,7 @@ To download it, run once:
 sudo ./scripts/install-deps.sh --virtio-win
 ```
 
-After that, no `--virtio-drivers-dir` flag or `virtio_drivers_dir` YAML key is needed -- hyper2kvm finds the ISO automatically. Use `--virtio-drivers-dir` only if you need to override with a custom path.
+After that, no `--virtio-drivers-dir` flag or `virtio_drivers_dir` YAML key is needed -- h2kvm finds the ISO automatically. Use `--virtio-drivers-dir` only if you need to override with a custom path.
 
 ## Quick Start
 
@@ -54,7 +54,7 @@ windows: true
 guest_os: windows
 vm_name: my-windows-vm
 
-# VirtIO ISO -- optional if ISO is at /var/lib/hyper2kvm/virtio-win.iso (auto-discovered)
+# VirtIO ISO -- optional if ISO is at /var/lib/h2kvm/virtio-win.iso (auto-discovered)
 # virtio_drivers_dir: /custom/path/to/virtio-win.iso
 
 # Enable multi-stage boot deployment
@@ -149,7 +149,7 @@ Build-based detection (handles Win11 reporting as "Windows 10"):
 
 ## Win11 OOBE Handling
 
-Win11 enforces network during OOBE. hyper2kvm handles this with:
+Win11 enforces network during OOBE. h2kvm handles this with:
 
 1. **BypassNRO** registry key — adds "I don't have internet" option
 2. **SkipMachineOOBE + SkipUserOOBE** — prevents dynamic update loop
@@ -166,7 +166,7 @@ and RunOnce installs all drivers automatically.
 | `--virtio-deploy-boot` | Enable multi-stage VirtIO boot deployment |
 | `--virtio-deploy-timeout N` | Guest agent wait timeout in seconds (default: 180) |
 | `--no-virtio-deploy-start-final` | Don't auto-start the final VM |
-| `--virtio-drivers-dir PATH` | Path to VirtIO ISO file (override; auto-discovered at `/var/lib/hyper2kvm/virtio-win.iso`) |
+| `--virtio-drivers-dir PATH` | Path to VirtIO ISO file (override; auto-discovered at `/var/lib/h2kvm/virtio-win.iso`) |
 
 ## Verification
 

@@ -1,4 +1,4 @@
-# hyper2kvm: Daemon vs CLI Mode
+# h2kvm: Daemon vs CLI Mode
 
 ## Architecture Overview
 
@@ -37,7 +37,7 @@ User → Command → Process → Result → Exit
 
 ### Example
 ```bash
-hyper2kvm local \
+h2kvm local \
   --source vm.vmdk \
   --output /vms/converted.qcow2 \
   --compress
@@ -64,7 +64,7 @@ Drop File → Auto-Detect → Process → Archive → Repeat
 ### Example
 ```bash
 # Start daemon
-hyper2kvm --config daemon.yaml
+h2kvm --config daemon.yaml
 
 # Drop files and they're auto-processed
 cp *.vmdk /queue/
@@ -182,14 +182,14 @@ graph LR
 ### Deployment Commands
 ```bash
 # Install daemon
-sudo cp daemon.yaml /etc/hyper2kvm/
-sudo systemctl enable --now hyper2kvm.service
+sudo cp daemon.yaml /etc/h2kvm/
+sudo systemctl enable --now h2kvm.service
 
 # Monitor
-sudo journalctl -u hyper2kvm.service -f
+sudo journalctl -u h2kvm.service -f
 
 # Drop VMs
-cp exports/*.vmdk /var/lib/hyper2kvm/queue/
+cp exports/*.vmdk /var/lib/h2kvm/queue/
 ```
 
 ---

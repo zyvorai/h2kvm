@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-# Variables passed from hyper2kvm via environment
+# Variables passed from h2kvm via environment
 VM_NAME="${VM_NAME:-unknown}"
 MANIFEST_PATH="${MANIFEST_PATH:-unknown}"
 TIMESTAMP="${TIMESTAMP:-$(date -Iseconds)}"
@@ -21,7 +21,7 @@ echo "════════════════════════�
 # echo "Migration starting for $VM_NAME" | mail -s "VM Migration: $VM_NAME" admin@example.com
 
 # Example: Write to syslog
-logger -t hyper2kvm "Migration starting for VM: $VM_NAME"
+logger -t h2kvm "Migration starting for VM: $VM_NAME"
 
 # Example: Update monitoring system
 # curl -X POST https://monitoring.example.com/api/events \

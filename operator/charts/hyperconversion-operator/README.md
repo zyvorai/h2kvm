@@ -15,13 +15,13 @@ Kubernetes operator for automated VM migration to KubeVirt using CDI DataVolumes
 
 ```bash
 # Add the repository (if published)
-helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+helm repo add h2kvm https://ssahani.github.io/h2kvm
 
 # Install with default configuration
-helm install hyperconversion hyper2kvm/hyperconversion-operator
+helm install hyperconversion h2kvm/hyperconversion-operator
 
 # Install with custom values
-helm install hyperconversion hyper2kvm/hyperconversion-operator \
+helm install hyperconversion h2kvm/hyperconversion-operator \
   --set image.tag=v1.0.0 \
   --set webhooks.enabled=true \
   --set metrics.serviceMonitor.enabled=true
@@ -35,7 +35,7 @@ See `values.yaml` for all configuration options.
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `image.repository` | Operator image repository | `hyper2kvm-operator` |
+| `image.repository` | Operator image repository | `h2kvm-operator` |
 | `image.tag` | Operator image tag | `latest` |
 | `replicaCount` | Number of operator replicas | `1` |
 | `webhooks.enabled` | Enable admission webhooks | `true` |
@@ -47,7 +47,7 @@ See `values.yaml` for all configuration options.
 ## Upgrading
 
 ```bash
-helm upgrade hyperconversion hyper2kvm/hyperconversion-operator
+helm upgrade hyperconversion h2kvm/hyperconversion-operator
 ```
 
 ## Uninstalling
@@ -58,5 +58,5 @@ helm uninstall hyperconversion
 
 Note: CRDs are kept by default. To remove them:
 ```bash
-kubectl delete crd hyperconversions.hyper2kvm.io
+kubectl delete crd hyperconversions.h2kvm.io
 ```

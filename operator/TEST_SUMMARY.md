@@ -2,7 +2,7 @@
 
 **Date**: 2026-02-17
 **Operator Version**: v1.0.0-alpha1
-**Test Environment**: k3d cluster (hyper2kvm-test)
+**Test Environment**: k3d cluster (h2kvm-test)
 **Overall Status**: ✅ **ALL TESTS PASSED**
 
 ---

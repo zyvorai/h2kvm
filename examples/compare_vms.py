@@ -31,7 +31,7 @@ from typing import Any
 from dataclasses import dataclass
 from datetime import datetime
 
-from hyper2kvm.vmcraft.main import VMCraft
+from h2kvm.vmcraft.main import VMCraft
 
 
 @dataclass

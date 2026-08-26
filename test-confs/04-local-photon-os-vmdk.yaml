@@ -30,7 +30,7 @@
 cmd: local
 
 # Source VMDK
-vmdk: /home/ssahani/tt/hyper2kvm/photon.vmdk
+vmdk: /home/ssahani/tt/h2kvm/photon.vmdk
 
 # Output Configuration
 output_dir: /home/ssahani/by-path/out
@@ -72,10 +72,10 @@ dry_run: false
 verbose: 2
 
 # Optional logfile
-log_file: /home/ssahani/by-path/out/hyper2kvm.log
+log_file: /home/ssahani/by-path/out/h2kvm.log
 
 # Optional Markdown report
-report: /home/ssahani/by-path/out/hyper2kvm-report.md
+report: /home/ssahani/by-path/out/h2kvm-report.md
 
 # Optional Smoke Tests
 libvirt_test: true

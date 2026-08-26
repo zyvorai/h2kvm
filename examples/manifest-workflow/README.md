@@ -32,13 +32,13 @@ manifest_workflow_dir/
 
 ```bash
 # Using config file
-sudo hyper2kvm --config manifest-daemon.yaml
+sudo h2kvm --config manifest-daemon.yaml
 
 # Or via command line
-sudo hyper2kvm daemon \
+sudo h2kvm daemon \
   --manifest-workflow-mode \
-  --manifest-workflow-dir /var/lib/hyper2kvm/manifest-workflow \
-  --output-dir /var/lib/hyper2kvm/output \
+  --manifest-workflow-dir /var/lib/h2kvm/manifest-workflow \
+  --output-dir /var/lib/h2kvm/output \
   --max-concurrent-jobs 2
 ```
 
@@ -62,20 +62,20 @@ Create a manifest file describing your conversion:
 Drop it into the queue:
 
 ```bash
-cp my-vm-manifest.json /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+cp my-vm-manifest.json /var/lib/h2kvm/manifest-workflow/to_be_processed/
 ```
 
 ### 3. Monitor Progress
 
 ```bash
 # Watch directories
-watch ls -lh /var/lib/hyper2kvm/manifest-workflow/*/
+watch ls -lh /var/lib/h2kvm/manifest-workflow/*/
 
 # Check logs
-tail -f /var/log/hyper2kvm/manifest-daemon.log
+tail -f /var/log/h2kvm/manifest-daemon.log
 
 # View completed reports
-cat /var/lib/hyper2kvm/manifest-workflow/processed/2026-01-24/my-vm.json.report.json
+cat /var/lib/h2kvm/manifest-workflow/processed/2026-01-24/my-vm.json.report.json
 ```
 
 ## Manifest Format
@@ -108,10 +108,10 @@ For batch migrations, use one manifest file per VM and drop them all into the wa
 
 ```bash
 # vm1-manifest.json
-cp vm1-manifest.json /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+cp vm1-manifest.json /var/lib/h2kvm/manifest-workflow/to_be_processed/
 
 # vm2-manifest.json
-cp vm2-manifest.json /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+cp vm2-manifest.json /var/lib/h2kvm/manifest-workflow/to_be_processed/
 ```
 
 Example manifest for vm1:
@@ -245,16 +245,16 @@ This directory contains:
 ## Systemd Integration
 
 ```bash
-# /etc/systemd/system/hyper2kvm-manifest.service
+# /etc/systemd/system/h2kvm-manifest.service
 [Unit]
-Description=hyper2kvm Manifest Workflow Daemon
+Description=h2kvm Manifest Workflow Daemon
 After=network.target
 
 [Service]
 Type=simple
-User=hyper2kvm
-Group=hyper2kvm
-ExecStart=/usr/bin/python3 -m hyper2kvm --config /etc/hyper2kvm/manifest-daemon.yaml
+User=h2kvm
+Group=h2kvm
+ExecStart=/usr/bin/python3 -m h2kvm --config /etc/h2kvm/manifest-daemon.yaml
 Restart=on-failure
 RestartSec=10s
 
@@ -297,18 +297,18 @@ python -c "import yaml; yaml.safe_load(open('my-manifest.yaml'))"
 
 ```bash
 # List active manifests
-ls -lh /var/lib/hyper2kvm/manifest-workflow/processing/
+ls -lh /var/lib/h2kvm/manifest-workflow/processing/
 
 # View error details
-cat /var/lib/hyper2kvm/manifest-workflow/failed/2026-01-24/my-vm.json.error.json
+cat /var/lib/h2kvm/manifest-workflow/failed/2026-01-24/my-vm.json.error.json
 ```
 
 ### Reprocess Failed Manifest
 
 ```bash
 # Move back to to_be_processed
-mv /var/lib/hyper2kvm/manifest-workflow/failed/2026-01-24/my-vm.json \
-   /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+mv /var/lib/h2kvm/manifest-workflow/failed/2026-01-24/my-vm.json \
+   /var/lib/h2kvm/manifest-workflow/to_be_processed/
 ```
 
 ## See Also

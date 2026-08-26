@@ -65,7 +65,7 @@ Error: source.url must use http, https, or s3 scheme, got: ftp
 $ kubectl apply -f test.yaml
 Warning: storage.size is less than 1GB, this may be too small
 Warning: LiveMigrate requires ReadWriteMany for shared storage
-hyperconversion.hyper2kvm.io/test created
+hyperconversion.h2kvm.io/test created
 ```
 
 ### 2. Prometheus Integration ✅
@@ -207,7 +207,7 @@ spec:
 
 **Standard (No Webhooks)**:
 ```bash
-make deploy IMG=hyper2kvm-operator:latest
+make deploy IMG=h2kvm-operator:latest
 ```
 
 **With Webhooks**:
@@ -252,7 +252,7 @@ kubectl apply -k config/network
 ├─────────────────────────────────────────────────────────────┤
 │                                                               │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │              hyper2kvm-system Namespace              │    │
+│  │              h2kvm-system Namespace              │    │
 │  ├──────────────────────────────────────────────────────┤    │
 │  │                                                       │    │
 │  │  ┌─────────────────────────────────────────────┐    │    │
@@ -297,11 +297,11 @@ kubectl apply -k config/network
 │  │                                                       │    │
 │  │  ValidatingWebhookConfiguration                      │    │
 │  │  └─ vhyperconversion.kb.io                           │    │
-│  │     Path: /validate-hyper2kvm-io-v1alpha1-...        │    │
+│  │     Path: /validate-h2kvm-io-v1alpha1-...        │    │
 │  │                                                       │    │
 │  │  MutatingWebhookConfiguration                        │    │
 │  │  └─ mhyperconversion.kb.io                           │    │
-│  │     Path: /mutate-hyper2kvm-io-v1alpha1-...          │    │
+│  │     Path: /mutate-h2kvm-io-v1alpha1-...          │    │
 │  │                                                       │    │
 │  └───────────────────────────────────────────────────────    │
 │                                                               │
@@ -350,7 +350,7 @@ Request Flow:
 ```bash
 # Should fail - invalid URL scheme
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: test-validation
@@ -365,7 +365,7 @@ EOF
 
 # Should pass with warnings
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: test-warnings
@@ -391,7 +391,7 @@ EOF
 ```bash
 # Minimal CR - defaults should be set
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: test-defaults
@@ -421,7 +421,7 @@ kubectl get hc test-defaults -o yaml | grep -A20 "spec:"
 
 ```bash
 # Port-forward to operator
-kubectl port-forward -n hyper2kvm-system deployment/hyperconversion-operator 8443:8443
+kubectl port-forward -n h2kvm-system deployment/hyperconversion-operator 8443:8443
 
 # Query metrics (in another terminal)
 curl -k https://localhost:8443/metrics | grep controller_runtime
@@ -435,8 +435,8 @@ curl -k https://localhost:8443/metrics | grep controller_runtime
 
 ```bash
 # Check PDB status
-kubectl get pdb -n hyper2kvm-system
-kubectl describe pdb hyperconversion-operator-pdb -n hyper2kvm-system
+kubectl get pdb -n h2kvm-system
+kubectl describe pdb hyperconversion-operator-pdb -n h2kvm-system
 
 # Should show:
 # Min Available: 1
@@ -462,14 +462,14 @@ kubectl get hc -w
 
 ```bash
 # Check certificate status
-kubectl get certificate -n hyper2kvm-system
-kubectl describe certificate serving-cert -n hyper2kvm-system
+kubectl get certificate -n h2kvm-system
+kubectl describe certificate serving-cert -n h2kvm-system
 
 # Check secret created
-kubectl get secret -n hyper2kvm-system webhook-server-cert
+kubectl get secret -n h2kvm-system webhook-server-cert
 
 # View certificate details
-kubectl get secret webhook-server-cert -n hyper2kvm-system \
+kubectl get secret webhook-server-cert -n h2kvm-system \
   -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -text -noout
 
 # Should show:
@@ -486,7 +486,7 @@ kubectl get secret webhook-server-cert -n hyper2kvm-system \
 
 ```bash
 cd operator
-make deploy IMG=hyper2kvm-operator:latest
+make deploy IMG=h2kvm-operator:latest
 ```
 
 ### Production Deployment (With All Features)
@@ -501,13 +501,13 @@ cd operator
 kustomize build config/default_with_webhooks | kubectl apply -f -
 
 # 3. Verify deployment
-kubectl get pods -n hyper2kvm-system
+kubectl get pods -n h2kvm-system
 kubectl get validatingwebhookconfigurations | grep hyperconversion
 kubectl get mutatingwebhookconfigurations | grep hyperconversion
-kubectl get certificate -n hyper2kvm-system
-kubectl get pdb -n hyper2kvm-system
-kubectl get netpol -n hyper2kvm-system
-kubectl get servicemonitor -n hyper2kvm-system
+kubectl get certificate -n h2kvm-system
+kubectl get pdb -n h2kvm-system
+kubectl get netpol -n h2kvm-system
+kubectl get servicemonitor -n h2kvm-system
 
 # 4. Test webhooks
 kubectl apply -f config/samples/simple-vmdk-to-vm.yaml
@@ -518,7 +518,7 @@ kubectl get hc -w
 
 ```bash
 # Deploy base operator
-make deploy IMG=hyper2kvm-operator:latest
+make deploy IMG=h2kvm-operator:latest
 
 # Add webhooks (requires cert-manager)
 kubectl apply -f config/webhook/

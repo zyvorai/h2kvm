@@ -4,12 +4,12 @@ Complete guide for deploying the migrated RHEL 8.8 VM to KubeVirt on k3d.
 
 ## 📋 Overview
 
-This deployment takes the RHEL 8.8 VM that was migrated from VMware ESXi using hyper2kvm and runs it on KubeVirt (Kubernetes-native virtualization).
+This deployment takes the RHEL 8.8 VM that was migrated from VMware ESXi using h2kvm and runs it on KubeVirt (Kubernetes-native virtualization).
 
 **Architecture:**
 ```
 VMware ESXi (VMDK)
-    ↓ [hyper2kvm migration]
+    ↓ [h2kvm migration]
 libvirt (QCOW2)
     ↓ [KubeVirt deployment]
 Kubernetes/KubeVirt (VM as Pod)
@@ -427,5 +427,5 @@ Your migration is successful if:
 
 ---
 
-**Migrated with hyper2kvm** 🚀
+**Migrated with h2kvm** 🚀
 VMware ESXi → libvirt → KubeVirt

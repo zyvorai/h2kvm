@@ -1,0 +1,110 @@
+# H2KVM System-Wide Configuration
+# Located at: /etc/h2kvm/config.yaml
+#
+# This configuration is used by default for all migrations.
+# Individual migration YAMLs can override these settings.
+
+# Security: Allowed directories for VM image access
+# Add directories where your VM images are stored
+allowed_dirs:
+  - /var/lib/libvirt/images
+  # - /home/user/VMs
+  # - /mnt/vms
+
+# Conversion settings
+conversion:
+  # Directory for temporary conversions (needs lots of space!)
+  # Default: /root/.cache/h2kvm/conversions
+  cache_dir: /var/lib/h2kvm/conversions
+
+  # Keep converted images in cache for faster re-runs
+  keep_cache: true
+
+  # Maximum cache size in GB (0 = unlimited)
+  max_cache_size_gb: 100
+
+# Backend settings
+# Backend for offline guest fixes: vmcraft (fast pure-Python, default), guestfs (proven), namespace (experimental, isolated)
+backend: vmcraft
+
+# Container isolation for LVM operations
+# Runs LVM activation inside a Podman/Docker container for stronger isolation.
+# This prevents LVM metadata from host volumes from interfering with guest LVM.
+# Disable with: container_isolation: false (or --no-container-isolation on CLI)
+container_isolation: true
+
+# Default libvirt settings
+libvirt:
+  # Default network for VMs
+  default_network: default
+
+  # Default machine type
+  default_machine: q35
+
+  # Auto-start VMs after migration
+  autostart: false
+
+  # Default resources
+  default_vcpus: 2
+  default_memory_mb: 2048
+
+# Logging
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR
+  level: INFO
+
+  # Log file location
+  log_file: /var/log/h2kvm/migrations.log
+
+  # Keep logs for N days
+  log_retention_days: 30
+
+# AI migration intelligence
+# Predicts outcomes, diagnoses errors, suggests remediations, and learns
+# from every migration.  Pure-Python, zero external dependencies.
+ai:
+  # Enable/disable AI features globally
+  enabled: true
+
+  # SQLite knowledge base for migration history
+  knowledge_base_path: ~/.cache/h2kvm/ai/knowledge.db
+
+  # Minimum historical migrations required for predictions
+  min_history_for_prediction: 3
+
+  # Z-score threshold for anomaly detection
+  anomaly_z_threshold: 2.5
+
+  # Maximum similar migrations to look up for predictions
+  max_similar_lookback: 100
+
+  # Auto-apply safe remediations (requires auto_remediate_risk_max)
+  auto_remediate: false
+
+  # Maximum risk level for auto-remediation: low, medium, high, critical
+  auto_remediate_risk_max: low
+
+  # Sampling rate for telemetry events (0.0 - 1.0)
+  telemetry_sampling_rate: 1.0
+
+# zkvm (Terminal User Interface) settings
+zkvm:
+  # Custom Unix socket path for zkvm ↔ backend communication
+  # Default: /run/h2kvm/zkvm.sock (root) or $XDG_RUNTIME_DIR/h2kvm/zkvm.sock (user)
+  # socket_path: /run/h2kvm/zkvm.sock
+
+  # Path to the zkvm binary (auto-detected if on $PATH)
+  # binary_path: /usr/local/bin/zkvm
+
+# Daemon mode settings (for future use)
+daemon:
+  enabled: false
+  watch_dirs:
+    - /var/lib/h2kvm/incoming
+
+  # Auto-migrate new VMs placed in watch directories
+  auto_migrate: false
+
+  # Notification settings
+  notify_on_success: true
+  notify_on_failure: true

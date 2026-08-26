@@ -1,14 +1,14 @@
 # CentOS 9 Migration Testing Results
 
 **Date:** 2026-01-31
-**Version:** Hyper2KVM v0.3.1
+**Version:** H2KVM v0.3.1
 **Test Image:** CentOS Stream 9 (2.11 GiB VMDK)
 
 ---
 
 ## Executive Summary
 
-Successfully completed CentOS 9 VMDK to QCOW2 migration testing using Hyper2KVM v2.1.0. The test validates both basic conversion and full offline fixes for KVM boot preparation.
+Successfully completed CentOS 9 VMDK to QCOW2 migration testing using H2KVM v2.1.0. The test validates both basic conversion and full offline fixes for KVM boot preparation.
 
 **Test Status:** ✅ **PASSED**
 
@@ -29,7 +29,7 @@ Successfully completed CentOS 9 VMDK to QCOW2 migration testing using Hyper2KVM 
 **Host System:**
 - OS: Fedora 43
 - Kernel: 6.18.7-200.fc43.x86_64
-- Hyper2KVM: v2.1.0 (CLI mode)
+- H2KVM: v2.1.0 (CLI mode)
 
 **Source VMDK:**
 - Path: `/home/ssahani/Downloads/centos9/64bit/centos9.vmdk`
@@ -67,7 +67,7 @@ Successfully completed CentOS 9 VMDK to QCOW2 migration testing using Hyper2KVM 
 sudo h2kvmctl \
   --cmd local \
   --vmdk /home/ssahani/Downloads/centos9/64bit/centos9.vmdk \
-  --output-dir /tmp/centos9-hyper2kvm-1769799835 \
+  --output-dir /tmp/centos9-h2kvm-1769799835 \
   --to-output centos9.qcow2 \
   --out-format qcow2 \
   --compress
@@ -92,7 +92,7 @@ sudo h2kvmctl \
 **Validation:**
 ```bash
 $ qemu-img info centos9.qcow2
-image: /tmp/centos9-hyper2kvm-1769799835/centos9.qcow2
+image: /tmp/centos9-h2kvm-1769799835/centos9.qcow2
 file format: qcow2
 virtual size: 500 GiB (536870912000 bytes)
 disk size: 1.18 GiB
@@ -114,7 +114,7 @@ Format specific information:
 sudo h2kvmctl \
   --cmd local \
   --vmdk /home/ssahani/Downloads/centos9/64bit/centos9.vmdk \
-  --output-dir /tmp/centos9-hyper2kvm-1769799835 \
+  --output-dir /tmp/centos9-h2kvm-1769799835 \
   --to-output centos9-fixed.qcow2 \
   --out-format qcow2 \
   --compress \
@@ -282,7 +282,7 @@ sudo h2kvmctl \
 ## File Comparison
 
 ```bash
-$ ls -lh /tmp/centos9-hyper2kvm-1769799835/
+$ ls -lh /tmp/centos9-h2kvm-1769799835/
 total 2.4G
 -rw-r--r-- 1 root root 1.2G Jan 31 00:39 centos9-fixed.qcow2
 -rw-r--r-- 1 root root 1.2G Jan 31 00:36 centos9.qcow2
@@ -308,7 +308,7 @@ total 2.4G
   - Disk: No disk pressure taints
 
 **Image Registry:**
-- Container images pushed to: `ghcr.io/ssahani/hyper2kvm:2.1.0-*`
+- Container images pushed to: `ghcr.io/ssahani/h2kvm:2.1.0-*`
 - Authentication: Image pull secret required (ghcr.io)
 
 ### Step 1: Install CRDs
@@ -318,17 +318,17 @@ kubectl apply -f k8s/operator/crds/
 ```
 
 **CRDs Installed:**
-- `migrationjobs.hyper2kvm.io`
-- `jobtemplates.hyper2kvm.io`
+- `migrationjobs.h2kvm.io`
+- `jobtemplates.h2kvm.io`
 
 ### Step 2: Create Namespace and RBAC
 
 ```bash
-kubectl create namespace hyper2kvm-centos-test
-kubectl label namespace hyper2kvm-centos-test app=hyper2kvm test=centos9
+kubectl create namespace h2kvm-centos-test
+kubectl label namespace h2kvm-centos-test app=h2kvm test=centos9
 
 # Create service account
-kubectl create serviceaccount hyper2kvm-operator -n hyper2kvm-centos-test
+kubectl create serviceaccount h2kvm-operator -n h2kvm-centos-test
 
 # Apply cluster role and binding (see manifests)
 ```
@@ -340,7 +340,7 @@ kubectl create secret docker-registry ghcr-secret \
   --docker-server=ghcr.io \
   --docker-username=<github-username> \
   --docker-password=<github-pat> \
-  -n hyper2kvm-centos-test
+  -n h2kvm-centos-test
 ```
 
 ### Step 4: Deploy Operator
@@ -349,24 +349,24 @@ kubectl create secret docker-registry ghcr-secret \
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-centos-test
+  name: h2kvm-operator
+  namespace: h2kvm-centos-test
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hyper2kvm-operator
+      app: h2kvm-operator
   template:
     metadata:
       labels:
-        app: hyper2kvm-operator
+        app: h2kvm-operator
     spec:
-      serviceAccountName: hyper2kvm-operator
+      serviceAccountName: h2kvm-operator
       imagePullSecrets:
         - name: ghcr-secret
       containers:
         - name: operator
-          image: ghcr.io/ssahani/hyper2kvm:2.1.0-operator
+          image: ghcr.io/ssahani/h2kvm:2.1.0-operator
           imagePullPolicy: IfNotPresent
           resources:
             requests:
@@ -377,7 +377,7 @@ spec:
               memory: 512Mi
           env:
             - name: WORKER_IMAGE
-              value: ghcr.io/ssahani/hyper2kvm:2.1.0-worker
+              value: ghcr.io/ssahani/h2kvm:2.1.0-worker
 ```
 
 ### Step 5: Create Storage for VMDK
@@ -389,7 +389,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: centos9-vmdk-pvc
-  namespace: hyper2kvm-centos-test
+  namespace: h2kvm-centos-test
 spec:
   accessModes:
     - ReadWriteOnce
@@ -402,16 +402,16 @@ spec:
 Upload VMDK:
 ```bash
 # Create a helper pod
-kubectl run -n hyper2kvm-centos-test vmdk-uploader \
+kubectl run -n h2kvm-centos-test vmdk-uploader \
   --image=busybox --restart=Never \
   --overrides='{"spec":{"containers":[{"name":"vmdk-uploader","image":"busybox","command":["sleep","3600"],"volumeMounts":[{"name":"data","mountPath":"/data"}]}],"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"centos9-vmdk-pvc"}}]}}'
 
 # Copy VMDK
 kubectl cp /home/ssahani/Downloads/centos9/64bit/centos9.vmdk \
-  hyper2kvm-centos-test/vmdk-uploader:/data/centos9.vmdk
+  h2kvm-centos-test/vmdk-uploader:/data/centos9.vmdk
 
 # Cleanup
-kubectl delete pod vmdk-uploader -n hyper2kvm-centos-test
+kubectl delete pod vmdk-uploader -n h2kvm-centos-test
 ```
 
 **Option B: HostPath (development only)**
@@ -436,11 +436,11 @@ spec:
 **Job 1: Inspection**
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: centos9-inspect
-  namespace: hyper2kvm-centos-test
+  namespace: h2kvm-centos-test
 spec:
   operation: inspect
 
@@ -463,11 +463,11 @@ spec:
 **Job 2: Conversion**
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: centos9-convert
-  namespace: hyper2kvm-centos-test
+  namespace: h2kvm-centos-test
 spec:
   operation: convert
 
@@ -493,11 +493,11 @@ spec:
 **Job 3: Offline Fix**
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: centos9-offline-fix
-  namespace: hyper2kvm-centos-test
+  namespace: h2kvm-centos-test
 spec:
   operation: offline_fix
 
@@ -528,35 +528,35 @@ spec:
 
 ```bash
 # Watch all jobs
-kubectl get migrationjobs -n hyper2kvm-centos-test -w
+kubectl get migrationjobs -n h2kvm-centos-test -w
 
 # Check specific job status
-kubectl describe migrationjob centos9-inspect -n hyper2kvm-centos-test
+kubectl describe migrationjob centos9-inspect -n h2kvm-centos-test
 
 # View worker pod logs
-kubectl logs -n hyper2kvm-centos-test <worker-pod-name>
+kubectl logs -n h2kvm-centos-test <worker-pod-name>
 
 # Check progress
-kubectl get migrationjob centos9-convert -n hyper2kvm-centos-test -o jsonpath='{.status.progress.percentage}'
+kubectl get migrationjob centos9-convert -n h2kvm-centos-test -o jsonpath='{.status.progress.percentage}'
 ```
 
 ### Step 8: Retrieve Results
 
 ```bash
 # Create retrieval pod
-kubectl run -n hyper2kvm-centos-test result-retriever \
+kubectl run -n h2kvm-centos-test result-retriever \
   --image=busybox --restart=Never \
   --overrides='{"spec":{"containers":[{"name":"retriever","image":"busybox","command":["sleep","3600"],"volumeMounts":[{"name":"output","mountPath":"/data"}]}],"volumes":[{"name":"output","persistentVolumeClaim":{"claimName":"centos9-output-pvc"}}]}}'
 
 # List results
-kubectl exec -n hyper2kvm-centos-test result-retriever -- ls -lh /data
+kubectl exec -n h2kvm-centos-test result-retriever -- ls -lh /data
 
 # Download QCOW2
-kubectl cp hyper2kvm-centos-test/result-retriever:/data/centos9-fixed.qcow2 \
+kubectl cp h2kvm-centos-test/result-retriever:/data/centos9-fixed.qcow2 \
   ./centos9-fixed.qcow2
 
 # Cleanup
-kubectl delete pod result-retriever -n hyper2kvm-centos-test
+kubectl delete pod result-retriever -n h2kvm-centos-test
 ```
 
 ---
@@ -636,7 +636,7 @@ securityContext:
 
 **OpenShift SCC:**
 ```bash
-oc adm policy add-scc-to-user privileged -z hyper2kvm-operator
+oc adm policy add-scc-to-user privileged -z h2kvm-operator
 ```
 
 ---
@@ -651,7 +651,7 @@ virt-install \
   --name centos9-migrated \
   --memory 2048 \
   --vcpus 2 \
-  --disk path=/tmp/centos9-hyper2kvm-1769799835/centos9-fixed.qcow2,bus=virtio \
+  --disk path=/tmp/centos9-h2kvm-1769799835/centos9-fixed.qcow2,bus=virtio \
   --network network=default,model=virtio \
   --graphics none \
   --console pty,target_type=serial \
@@ -681,7 +681,7 @@ apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   name: centos9-test
-  namespace: hyper2kvm-centos-test
+  namespace: h2kvm-centos-test
 spec:
   running: true
   template:
@@ -766,8 +766,8 @@ spec:
 ## Artifacts
 
 **Generated Files:**
-- `/tmp/centos9-hyper2kvm-1769799835/centos9.qcow2` (basic conversion)
-- `/tmp/centos9-hyper2kvm-1769799835/centos9-fixed.qcow2` (KVM-ready)
+- `/tmp/centos9-h2kvm-1769799835/centos9.qcow2` (basic conversion)
+- `/tmp/centos9-h2kvm-1769799835/centos9-fixed.qcow2` (KVM-ready)
 - `/tmp/centos9-openshift-test.yaml` (OpenShift deployment manifests)
 - `/tmp/centos9-migrationjob.yaml` (MigrationJob CRs)
 - `/tmp/centos-proper-test.sh` (test automation script)
@@ -781,7 +781,7 @@ spec:
 
 ## Conclusion
 
-Hyper2KVM v2.1.0 successfully migrated CentOS Stream 9 from VMware VMDK to KVM-ready QCOW2 format with comprehensive offline fixes. The migration is production-ready and validated for:
+H2KVM v2.1.0 successfully migrated CentOS Stream 9 from VMware VMDK to KVM-ready QCOW2 format with comprehensive offline fixes. The migration is production-ready and validated for:
 
 - ✅ Partition layout preservation
 - ✅ Filesystem integrity (XFS)

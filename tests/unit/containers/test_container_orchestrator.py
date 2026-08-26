@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.platforms.containers.orchestrator module."""
+"""Tests for h2kvm.platforms.containers.orchestrator module."""
 
 from __future__ import annotations
 
@@ -11,11 +11,11 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from hyper2kvm.platforms.containers.detector import (
+from h2kvm.platforms.containers.detector import (
     ContainerInfo,
     ContainerRuntime,
 )
-from hyper2kvm.platforms.containers.orchestrator import (
+from h2kvm.platforms.containers.orchestrator import (
     ContainerExtractionOrchestrator,
 )
 
@@ -93,10 +93,10 @@ def orchestrator(
 class TestInit:
     """Tests for ContainerExtractionOrchestrator initialisation."""
 
-    @patch("hyper2kvm.platforms.containers.orchestrator.KubernetesManifestGenerator")
-    @patch("hyper2kvm.platforms.containers.orchestrator.PodmanExtractor")
-    @patch("hyper2kvm.platforms.containers.orchestrator.DockerExtractor")
-    @patch("hyper2kvm.platforms.containers.orchestrator.ContainerDetector")
+    @patch("h2kvm.platforms.containers.orchestrator.KubernetesManifestGenerator")
+    @patch("h2kvm.platforms.containers.orchestrator.PodmanExtractor")
+    @patch("h2kvm.platforms.containers.orchestrator.DockerExtractor")
+    @patch("h2kvm.platforms.containers.orchestrator.ContainerDetector")
     def test_init_creates_collaborators(self, MockDetector, MockDocker, MockPodman, MockK8s, mock_logger):
         orch = ContainerExtractionOrchestrator(mock_logger)
         MockDetector.assert_called_once_with(mock_logger)

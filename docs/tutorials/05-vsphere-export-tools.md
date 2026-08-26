@@ -1,7 +1,7 @@
 # Tutorial: Exporting VMs from vSphere with govc and OVF Tool
 
 This tutorial covers installing and using **govc** and **VMware OVF Tool** to export
-VMs from vSphere/ESXi, and how hyper2kvm uses them internally via the NFC protocol.
+VMs from vSphere/ESXi, and how h2kvm uses them internally via the NFC protocol.
 
 ## Prerequisites
 
@@ -91,7 +91,7 @@ export GOVC_PASSWORD='your-password'
 export GOVC_INSECURE=1              # Skip TLS verification (self-signed certs)
 export GOVC_DATACENTER='Datacenter' # Your datacenter name
 
-# For hyper2kvm (vc_password_env)
+# For h2kvm (vc_password_env)
 export VC_PASSWORD='your-password'
 ```
 
@@ -108,9 +108,9 @@ govc ls /Datacenter/vm/
 # Get VM details
 govc vm.info MyVM
 
-# Get VM details as JSON (used by hyper2kvm for hardware extraction)
+# Get VM details as JSON (used by h2kvm for hardware extraction)
 govc vm.info -json MyVM
-# hyper2kvm extracts: memory (MiB), vCPUs, NIC count, total disk size
+# h2kvm extracts: memory (MiB), vCPUs, NIC count, total disk size
 # These are propagated to the domain emitter for accurate libvirt XML generation
 ```
 
@@ -214,7 +214,7 @@ ovftool \
 Both govc and OVF Tool use VMware's **Network File Copy (NFC)** protocol:
 
 ```
-Client (govc / ovftool / hyper2kvm)
+Client (govc / ovftool / h2kvm)
   │
   │ vSphere API: VirtualMachine.ExportVm()
   ▼
@@ -235,14 +235,14 @@ Key points:
 - Disk data flows **ESXi → client** directly (not via vCenter)
 - Supports thick VMDK, thin VMDK, and snapshot chains
 
-hyper2kvm has a dedicated NFC module (`hyper2kvm/providers/vmware/clients/nfc_lease.py`)
+h2kvm has a dedicated NFC module (`h2kvm/providers/vmware/clients/nfc_lease.py`)
 that handles lease management, retries, and progress reporting.
 
 ---
 
-## 9. Using hyper2kvm for the Full Pipeline
+## 9. Using h2kvm for the Full Pipeline
 
-hyper2kvm combines export + conversion + guest fixes in a single command:
+h2kvm combines export + conversion + guest fixes in a single command:
 
 ### Using YAML config
 
@@ -306,9 +306,9 @@ conversion, and import. Just run one `h2kvmctl --config` command.
 
 After exporting and converting a VM, you need to define and start it in libvirt.
 
-### Generate libvirt domain XML with hyper2kvm
+### Generate libvirt domain XML with h2kvm
 
-hyper2kvm can generate the domain XML automatically during conversion:
+h2kvm can generate the domain XML automatically during conversion:
 
 ```bash
 sudo -E h2kvmctl \
@@ -341,7 +341,7 @@ virsh console my-rhel-vm
 virsh domdisplay my-rhel-vm
 ```
 
-### Manual libvirt import (without hyper2kvm XML generation)
+### Manual libvirt import (without h2kvm XML generation)
 
 If you exported and converted the disk manually, use `virt-install`:
 
@@ -470,14 +470,14 @@ ovftool --noSSLVerify "vi://..." /tmp/output.ova
 ```
 
 ### NFC lease timeout
-Exports of large disks can time out if progress isn't reported. hyper2kvm handles
+Exports of large disks can time out if progress isn't reported. h2kvm handles
 keepalives automatically. For manual govc use, this is handled internally.
 
 ### "pyvmomi not installed"
 ```bash
 pip install pyvmomi
 # Or
-pip install hyper2kvm[vsphere]
+pip install h2kvm[vsphere]
 ```
 
 ### libvirt: "cannot access storage file"

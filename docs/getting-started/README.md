@@ -1,18 +1,18 @@
-# Getting Started with Hyper2KVM
+# Getting Started with H2KVM
 
-Welcome to Hyper2KVM! This section will guide you through installation and your first VM migration.
+Welcome to H2KVM! This section will guide you through installation and your first VM migration.
 
 ## Quick Navigation
 
 ### 📖 Essential Guides
-- **[Installation Guide](01-Installation.md)** ⭐ **START HERE** - Install Hyper2KVM in 5 minutes
+- **[Installation Guide](01-Installation.md)** ⭐ **START HERE** - Install H2KVM in 5 minutes
 - **[Quick Start](02-Quick-Start.md)** - Your first migration in 10 minutes
 - **[Getting Started](03-Getting-Started.md)** - Comprehensive introduction and concepts
 
 ## Learning Path
 
 ### Step 1: Installation (5 minutes)
-Install Hyper2KVM and verify your setup.
+Install H2KVM and verify your setup.
 
 **[→ Go to Installation Guide](01-Installation.md)**
 
@@ -34,7 +34,7 @@ Run your first VM migration with a simple example.
 - Importing to libvirt
 
 ### Step 3: Comprehensive Guide (30 minutes)
-Deep dive into Hyper2KVM concepts and workflows.
+Deep dive into H2KVM concepts and workflows.
 
 **[→ Go to Getting Started Guide](03-Getting-Started.md)**
 
@@ -50,18 +50,18 @@ Deep dive into Hyper2KVM concepts and workflows.
 
 ```bash
 # Install with all features
-pip install "hyper2kvm[full]"
+pip install "h2kvm[full]"
 
 # Verify installation
 h2kvmctl --version
-hyper2kvm --version
+h2kvm --version
 ```
 
 ### Option 2: Minimal Installation
 
 ```bash
 # Core features only
-pip install hyper2kvm
+pip install h2kvm
 
 # Verify installation
 h2kvmctl --version
@@ -71,8 +71,8 @@ h2kvmctl --version
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 
 # Install in development mode
 pip install -e ".[full]"
@@ -106,7 +106,7 @@ compress: true
 # Using h2kvmctl (recommended for CLI)
 sudo h2kvmctl --config migration.yaml
 
-# Or using hyper2kvm
+# Or using h2kvm
 sudo h2kvmctl --config migration.yaml
 ```
 
@@ -242,11 +242,11 @@ sudo h2kvmctl --config migration.yaml
 ERROR: Could not install packages due to an EnvironmentError: [Errno 13] Permission denied
 
 # Solution
-pip install --user "hyper2kvm[full]"
+pip install --user "h2kvm[full]"
 # Or use virtual environment
 python -m venv venv
 source venv/bin/activate
-pip install "hyper2kvm[full]"
+pip install "h2kvm[full]"
 ```
 
 ### Issue 2: Missing System Dependencies
@@ -266,7 +266,7 @@ sudo apt-get install -y qemu-utils qemu-system-x86
 
 ```bash
 # Problem
-ERROR: hyper2kvm requires Python >=3.10
+ERROR: h2kvm requires Python >=3.10
 
 # Solution
 # Install Python 3.11+ from your distribution
@@ -283,8 +283,8 @@ ERROR: hyper2kvm requires Python >=3.10
 - **[FAQ](../FAQ.md)** - Frequently asked questions
 
 ### Community Support
-- **GitHub Issues**: [Report bugs](https://github.com/ssahani/hyper2kvm/issues)
-- **GitHub Discussions**: [Ask questions](https://github.com/ssahani/hyper2kvm/discussions)
+- **GitHub Issues**: [Report bugs](https://github.com/ssahani/h2kvm/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/ssahani/h2kvm/discussions)
 
 ### Examples
 - **[Migration Recipes](../recipes/)** - Real-world examples

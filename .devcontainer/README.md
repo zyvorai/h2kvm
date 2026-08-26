@@ -1,6 +1,6 @@
 # Development Container
 
-Pre-configured development environment for hyper2kvm using VS Code Dev Containers
+Pre-configured development environment for h2kvm using VS Code Dev Containers
 or GitHub Codespaces.
 
 ## Features
@@ -58,8 +58,8 @@ Automatically installed:
 
    ```bash
    # Clone repository
-   git clone https://github.com/ssahani/hyper2kvm.git
-   cd hyper2kvm
+   git clone https://github.com/ssahani/h2kvm.git
+   cd h2kvm
 
    # Open in VS Code
    code .
@@ -95,7 +95,7 @@ Automatically installed:
 pytest tests/unit/
 
 # With coverage
-pytest --cov=hyper2kvm --cov-report=html
+pytest --cov=h2kvm --cov-report=html
 
 # Specific test
 pytest tests/unit/test_vmcraft/test_block_device.py -v
@@ -117,7 +117,7 @@ ruff check .
 ruff check --fix .
 
 # Type check
-mypy hyper2kvm/
+mypy h2kvm/
 
 # Run all pre-commit hooks
 pre-commit run --all-files
@@ -130,7 +130,7 @@ pre-commit run --all-files
 git checkout -b feature/my-feature
 
 # Make changes
-vim hyper2kvm/mymodule.py
+vim h2kvm/mymodule.py
 
 # Run quality checks (automatic on commit)
 git add .
@@ -340,5 +340,5 @@ Add to `devcontainer.json`:
 
 For issues or questions:
 
-- GitHub Issues: <https://github.com/ssahani/hyper2kvm/issues>
+- GitHub Issues: <https://github.com/ssahani/h2kvm/issues>
 - Documentation: [HACKING.md](../docs/HACKING.md)

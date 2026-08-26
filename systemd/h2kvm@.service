@@ -1,0 +1,42 @@
+[Unit]
+Description=h2kvm daemon for %I
+Documentation=man:h2kvm(1) man:h2kvm.conf(5)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# Configuration file path - customize with instance name
+# Example: /etc/h2kvm/production.yaml for h2kvm@production.service
+Environment="CONFIG_FILE=/etc/h2kvm/%i.yaml"
+
+# Working directory for temporary files
+WorkingDirectory=/var/lib/h2kvm
+
+# Runtime directory for NBD locks and sockets
+RuntimeDirectory=h2kvm
+RuntimeDirectoryMode=0755
+
+# Command to run h2kvm in daemon/watch mode
+# The config file should specify: command: daemon, watch_dir: <path>
+# This watches for incoming disk files and processes them automatically
+ExecStart=/usr/local/bin/h2kvmctl --config ${CONFIG_FILE}
+
+# Restart policy
+Restart=on-failure
+RestartSec=30s
+TimeoutStartSec=5min
+TimeoutStopSec=30s
+
+# Resource limits
+MemoryMax=4G
+TasksMax=100
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=h2kvm-%i
+
+[Install]
+WantedBy=multi-user.target

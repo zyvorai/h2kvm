@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 import pytest
 
-from hyper2kvm.core.structured_log import (
+from h2kvm.core.structured_log import (
     DropEvent,
     _sampling_processor,
     configure_sampling,
@@ -71,7 +71,7 @@ def test_configure_replaces_rules():
     configure_sampling({"a": 0.5})
     configure_sampling({"b": 0.5})
 
-    import hyper2kvm.core.structured_log as sl
+    import h2kvm.core.structured_log as sl
 
     assert "a" not in sl._sampling_rules
     assert "b" in sl._sampling_rules

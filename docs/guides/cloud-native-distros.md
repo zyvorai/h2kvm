@@ -91,7 +91,7 @@ nc -zv <IP> 22                          # Test SSH
 ```
 
 **Explanation:**
-1. hyper2kvm attempts to rebuild initramfs with virtio drivers
+1. h2kvm attempts to rebuild initramfs with virtio drivers
 2. dracut detects the drivers are **already present**
 3. No changes made (mtime and size unchanged)
 4. Warning logged for transparency

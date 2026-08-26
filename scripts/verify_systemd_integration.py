@@ -22,7 +22,7 @@ def verify_imports():
     print("=" * 60)
 
     try:
-        from hyper2kvm.infrastructure.systemd import (
+        from h2kvm.infrastructure.systemd import (
             SystemdBootIntegration,
             SystemdRepartManager,
             SystemdGrowfsManager,
@@ -46,7 +46,7 @@ def verify_pipeline_integration():
     print("=" * 60)
 
     try:
-        from hyper2kvm.fixers.offline_fixer import OfflineFSFix
+        from h2kvm.fixers.offline_fixer import OfflineFSFix
 
         # Check method exists
         if hasattr(OfflineFSFix, "apply_systemd_boot_integration"):
@@ -81,9 +81,9 @@ def verify_files_exist():
     base_dir = Path(__file__).parent.parent
 
     files_to_check = [
-        "hyper2kvm/systemd/boot.py",
-        "hyper2kvm/systemd/cli.py",
-        "hyper2kvm/systemd/README.md",
+        "h2kvm/systemd/boot.py",
+        "h2kvm/systemd/cli.py",
+        "h2kvm/systemd/README.md",
         "docs/features/SYSTEMD_BOOT_INTEGRATION.md",
         "examples/systemd_boot_integration_examples.py",
         "tests/test_systemd_boot_integration.py",
@@ -112,7 +112,7 @@ def verify_documentation():
 
     base_dir = Path(__file__).parent.parent
 
-    readme = base_dir / "hyper2kvm/systemd/README.md"
+    readme = base_dir / "h2kvm/systemd/README.md"
     if readme.exists():
         content = readme.read_text()
         required_sections = [
@@ -182,7 +182,7 @@ def verify_cli_tool():
     print("=" * 60)
 
     try:
-        from hyper2kvm.infrastructure.systemd import cli
+        from h2kvm.infrastructure.systemd import cli
         import inspect
 
         # Check main function exists
@@ -263,7 +263,7 @@ def main():
         print("\nSystemd boot integration is properly integrated and ready to use.")
         print("\nNext steps:")
         print("  1. Run unit tests: pytest tests/test_systemd_boot_integration.py -v")
-        print("  2. Test with real VM: hyper2kvm --vmdk /path/to/vm.vmdk --output-dir /output")
+        print("  2. Test with real VM: h2kvm --vmdk /path/to/vm.vmdk --output-dir /output")
         print("  3. Check migration report for systemd_boot_integration section")
         return 0
     else:

@@ -1,6 +1,6 @@
 # Worker Protocol & Job Management
 
-The Hyper2KVM Worker Job Protocol provides a REST API and job management system for running VM migration tasks in Kubernetes and OpenShift environments.
+The H2KVM Worker Job Protocol provides a REST API and job management system for running VM migration tasks in Kubernetes and OpenShift environments.
 
 ## Quick Links
 
@@ -87,13 +87,13 @@ The Worker Job Protocol is a production-ready system for:
 
 ```bash
 # Install worker
-helm install hyper2kvm-worker ./helm/hyper2kvm-worker \
-  --namespace hyper2kvm-system \
+helm install h2kvm-worker ./helm/h2kvm-worker \
+  --namespace h2kvm-system \
   --create-namespace
 
 # Submit a job
 cat <<EOF | kubectl apply -f -
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: convert-vm
@@ -110,7 +110,7 @@ EOF
 
 # Check status
 kubectl get migrationjobs
-kubectl logs -l app=hyper2kvm-worker -f
+kubectl logs -l app=h2kvm-worker -f
 ```
 
 ### Option 2: REST API
@@ -269,25 +269,25 @@ GET    /metrics                  # Prometheus metrics
 - [Batch Jobs](../../examples/batch/)
 
 ### Example Helm Values
-- See [Helm Chart README](../../helm/hyper2kvm-worker/README.md)
+- See [Helm Chart README](../../helm/h2kvm-worker/README.md)
 
 ## Monitoring
 
 ### Prometheus Metrics
 ```
 # Job metrics
-hyper2kvm_jobs_total{status="completed|failed|cancelled"}
-hyper2kvm_job_duration_seconds{operation="inspect|convert|offline-fix"}
-hyper2kvm_queue_size{priority="high|normal|low"}
+h2kvm_jobs_total{status="completed|failed|cancelled"}
+h2kvm_job_duration_seconds{operation="inspect|convert|offline-fix"}
+h2kvm_queue_size{priority="high|normal|low"}
 
 # Worker metrics
-hyper2kvm_worker_pool_size
-hyper2kvm_worker_utilization_percent
-hyper2kvm_worker_active_jobs
+h2kvm_worker_pool_size
+h2kvm_worker_utilization_percent
+h2kvm_worker_active_jobs
 
 # System metrics
-hyper2kvm_api_requests_total{endpoint="/api/v1/jobs",method="POST"}
-hyper2kvm_api_request_duration_seconds
+h2kvm_api_requests_total{endpoint="/api/v1/jobs",method="POST"}
+h2kvm_api_request_duration_seconds
 ```
 
 ### Grafana Dashboard
@@ -312,8 +312,8 @@ pytest tests/test_rest_api.py
 ### Integration Tests
 ```bash
 # Deploy to k3d
-k3d cluster create hyper2kvm-test
-helm install hyper2kvm-worker ./helm/hyper2kvm-worker
+k3d cluster create h2kvm-test
+helm install h2kvm-worker ./helm/h2kvm-worker
 
 # Run tests
 ./scripts/test-worker-integration.sh
@@ -323,8 +323,8 @@ helm install hyper2kvm-worker ./helm/hyper2kvm-worker
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ssahani/hyper2kvm/discussions)
+- **Issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
 - **Documentation**: [Main Index](../index.md)
 
 ## Contributing

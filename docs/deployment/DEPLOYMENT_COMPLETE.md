@@ -8,7 +8,7 @@
 
 ## Summary
 
-Complete OpenShift Container Platform support has been implemented, tested, and documented for the hyper2kvm Kubernetes operator. The operator can now be deployed on OpenShift 4.10-4.16 via **OperatorHub one-click installation**, Helm charts, or OLM bundles.
+Complete OpenShift Container Platform support has been implemented, tested, and documented for the h2kvm Kubernetes operator. The operator can now be deployed on OpenShift 4.10-4.16 via **OperatorHub one-click installation**, Helm charts, or OLM bundles.
 
 ---
 
@@ -43,16 +43,16 @@ Complete OpenShift Container Platform support has been implemented, tested, and 
 ## Files Created
 
 ### OpenShift Templates (Helm)
-1. `helm/hyper2kvm-operator/templates/openshift-route.yaml` - Routes
-2. `helm/hyper2kvm-operator/templates/openshift-scc.yaml` - SecurityContextConstraints
-3. `helm/hyper2kvm-operator/templates/openshift-oauth-proxy.yaml` - OAuth resources
+1. `helm/h2kvm-operator/templates/openshift-route.yaml` - Routes
+2. `helm/h2kvm-operator/templates/openshift-scc.yaml` - SecurityContextConstraints
+3. `helm/h2kvm-operator/templates/openshift-oauth-proxy.yaml` - OAuth resources
 
 ### OLM Bundle
-4. `olm/bundle/manifests/hyper2kvm-operator.clusterserviceversion.yaml` - CSV (900+ lines)
+4. `olm/bundle/manifests/h2kvm-operator.clusterserviceversion.yaml` - CSV (900+ lines)
 5. `olm/bundle/metadata/annotations.yaml` - Bundle metadata
 6. `olm/bundle/tests/scorecard/config.yaml` - Scorecard tests
 7. `olm/bundle.Dockerfile` - Bundle image
-8. `olm/hyper2kvm-operator.package.yaml` - Package manifest
+8. `olm/h2kvm-operator.package.yaml` - Package manifest
 9. `olm/README.md` - OLM deployment guide
 
 ### Documentation
@@ -67,8 +67,8 @@ Complete OpenShift Container Platform support has been implemented, tested, and 
 16. `scripts/test-openshift-deployment.sh` - Test suite
 
 ### Operator & Worker Code
-17. `hyper2kvm/operator/` - 17 Python modules (5,272 lines)
-18. `hyper2kvm/worker/` - Worker protocol implementation
+17. `h2kvm/operator/` - 17 Python modules (5,272 lines)
+18. `h2kvm/worker/` - Worker protocol implementation
 19. `k8s/operator/` - Kubernetes manifests
 20. `helm/` - Production Helm charts
 
@@ -79,17 +79,17 @@ Complete OpenShift Container Platform support has been implemented, tested, and 
 ## Docker Images Built
 
 ### Bundle Image (Ready to Deploy)
-- `ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0` (54.8kB) ✅
-- `ghcr.io/ssahani/hyper2kvm-operator-bundle:latest` (54.8kB) ✅
+- `ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0` (54.8kB) ✅
+- `ghcr.io/ssahani/h2kvm-operator-bundle:latest` (54.8kB) ✅
 
 ### Operator Images (Build with Scripts)
 Run: `./scripts/build-operator-images.sh 2.1.0`
 
 Will create:
-- `ghcr.io/ssahani/hyper2kvm:2.1.0-operator`
-- `ghcr.io/ssahani/hyper2kvm:2.1.0-worker`
-- `ghcr.io/ssahani/hyper2kvm:2.1.0-cli`
-- `ghcr.io/ssahani/hyper2kvm:2.1.0-daemon`
+- `ghcr.io/ssahani/h2kvm:2.1.0-operator`
+- `ghcr.io/ssahani/h2kvm:2.1.0-worker`
+- `ghcr.io/ssahani/h2kvm:2.1.0-cli`
+- `ghcr.io/ssahani/h2kvm:2.1.0-daemon`
 
 ---
 
@@ -99,7 +99,7 @@ Will create:
 
 **Time:** 2 minutes
 **Steps:**
-1. OpenShift Console → OperatorHub → Search "Hyper2KVM"
+1. OpenShift Console → OperatorHub → Search "H2KVM"
 2. Click Install → Choose namespace → Install
 3. Done!
 
@@ -110,8 +110,8 @@ Will create:
 **Time:** 3 minutes
 **Command:**
 ```bash
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace \
   --set openshift.enabled=true
 ```
@@ -193,7 +193,7 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 
 ### Test Script Ready
 ```bash
-./scripts/test-openshift-deployment.sh hyper2kvm-system
+./scripts/test-openshift-deployment.sh h2kvm-system
 ```
 
 **Tests:**
@@ -219,8 +219,8 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 
 1. **Push Bundle Image**
    ```bash
-   docker push ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0
-   docker push ghcr.io/ssahani/hyper2kvm-operator-bundle:latest
+   docker push ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
+   docker push ghcr.io/ssahani/h2kvm-operator-bundle:latest
    ```
 
 2. **Build Operator Images**
@@ -240,23 +240,23 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
    ./scripts/deploy-to-openshift.sh 2.1.0 helm
 
    # Test
-   ./scripts/test-openshift-deployment.sh hyper2kvm-system
+   ./scripts/test-openshift-deployment.sh h2kvm-system
    ```
 
 4. **Create Catalog Image**
    ```bash
    opm index add \
-     --bundles ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0 \
-     --tag ghcr.io/ssahani/hyper2kvm-operator-catalog:latest
+     --bundles ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
+     --tag ghcr.io/ssahani/h2kvm-operator-catalog:latest
 
-   docker push ghcr.io/ssahani/hyper2kvm-operator-catalog:latest
+   docker push ghcr.io/ssahani/h2kvm-operator-catalog:latest
    ```
 
 ### Optional (Community Contribution)
 
 5. **Submit to OperatorHub**
    - Fork: https://github.com/k8s-operatorhub/community-operators
-   - Add bundle to: `operators/hyper2kvm-operator/`
+   - Add bundle to: `operators/h2kvm-operator/`
    - Create pull request
    - Wait for review and approval
 
@@ -278,13 +278,13 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 # 3. Test on OpenShift cluster
 oc login https://api.cluster.example.com:6443
 ./scripts/deploy-to-openshift.sh 2.1.0 helm
-./scripts/test-openshift-deployment.sh hyper2kvm-system
+./scripts/test-openshift-deployment.sh h2kvm-system
 
 # 4. Create catalog (optional, for private OperatorHub)
 opm index add \
-  --bundles ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0 \
-  --tag ghcr.io/ssahani/hyper2kvm-operator-catalog:latest
-docker push ghcr.io/ssahani/hyper2kvm-operator-catalog:latest
+  --bundles ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
+  --tag ghcr.io/ssahani/h2kvm-operator-catalog:latest
+docker push ghcr.io/ssahani/h2kvm-operator-catalog:latest
 
 # 5. Tag and push to GitHub
 git tag v2.1.0
@@ -313,9 +313,9 @@ git push origin main --tags
 ## Support
 
 ### Resources
-- **GitHub Repository:** https://github.com/ssahani/hyper2kvm
-- **Issue Tracker:** https://github.com/ssahani/hyper2kvm/issues
-- **Documentation:** https://github.com/ssahani/hyper2kvm/tree/main/docs
+- **GitHub Repository:** https://github.com/ssahani/h2kvm
+- **Issue Tracker:** https://github.com/ssahani/h2kvm/issues
+- **Documentation:** https://github.com/ssahani/h2kvm/tree/main/docs
 
 ### Common Questions
 
@@ -362,14 +362,14 @@ A: Via Helm: `helm upgrade`, Via OperatorHub: Automatic or manual approval
 ## Credits
 
 **Implementation:** Claude Sonnet 4.5
-**Project:** Hyper2KVM - Enterprise VM Migration Toolkit
+**Project:** H2KVM - Enterprise VM Migration Toolkit
 **License:** Apache-2.0
-**Repository:** https://github.com/ssahani/hyper2kvm
+**Repository:** https://github.com/ssahani/h2kvm
 
 ---
 
 🎉 **Deployment Ready!** 🎉
 
-The hyper2kvm operator is now fully OpenShift-enabled and ready for production deployment on OpenShift Container Platform 4.10-4.16.
+The h2kvm operator is now fully OpenShift-enabled and ready for production deployment on OpenShift Container Platform 4.10-4.16.
 
 **Next:** Push images and deploy to your OpenShift cluster!

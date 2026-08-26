@@ -1,6 +1,6 @@
-# hyper2kvm API Reference
+# h2kvm API Reference
 
-Complete API documentation for using hyper2kvm as a Python library.
+Complete API documentation for using h2kvm as a Python library.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ Complete API documentation for using hyper2kvm as a Python library.
 
 ## Core API
 
-### `hyper2kvm.core`
+### `h2kvm.core`
 
 Main entry point for programmatic VM conversion.
 
@@ -26,7 +26,7 @@ Main entry point for programmatic VM conversion.
 Convert a VM image from VMware format to KVM-compatible format.
 
 ```python
-from hyper2kvm.core import convert_vm
+from h2kvm.core import convert_vm
 
 result = convert_vm(
     input_path="/path/to/vm.vmdk",
@@ -63,7 +63,7 @@ result = {
 Inspect a VM image to determine OS type and configuration.
 
 ```python
-from hyper2kvm.core import inspect_image
+from h2kvm.core import inspect_image
 
 info = inspect_image("/path/to/vm.vmdk")
 ```
@@ -84,14 +84,14 @@ info = inspect_image("/path/to/vm.vmdk")
 
 ## Converters
 
-### `hyper2kvm.converters.qemu`
+### `h2kvm.converters.qemu`
 
 QEMU-based image conversion.
 
 #### `QEMUConverter`
 
 ```python
-from hyper2kvm.converters.qemu import QEMUConverter
+from h2kvm.converters.qemu import QEMUConverter
 
 converter = QEMUConverter(
     input_format="vmdk",
@@ -136,14 +136,14 @@ info = converter.get_info("/path/to/image.qcow2")
 
 ## Fixers
 
-### `hyper2kvm.fixers.bootloader`
+### `h2kvm.fixers.bootloader`
 
 Bootloader configuration fixers.
 
 #### `GRUBFixer`
 
 ```python
-from hyper2kvm.fixers.bootloader.grub import GRUBFixer
+from h2kvm.fixers.bootloader.grub import GRUBFixer
 import guestfs
 
 g = guestfs.GuestFS(python_return_dict=True)
@@ -181,20 +181,20 @@ Detect installed GRUB version.
 For systemd-boot systems.
 
 ```python
-from hyper2kvm.fixers.bootloader.systemdboot import SystemdBootFixer
+from h2kvm.fixers.bootloader.systemdboot import SystemdBootFixer
 
 fixer = SystemdBootFixer(root="/dev/sda1", g=g)
 result = fixer.fix()
 ```
 
-### `hyper2kvm.fixers.network`
+### `h2kvm.fixers.network`
 
 Network configuration fixers.
 
 #### `NetworkFixer`
 
 ```python
-from hyper2kvm.fixers.network import NetworkFixer
+from h2kvm.fixers.network import NetworkFixer
 
 fixer = NetworkFixer(root="/dev/sda1", g=g, distro="rhel")
 result = fixer.fix_network_config()
@@ -228,17 +228,17 @@ Detect network management system.
 
 ## Orchestrator
 
-### `hyper2kvm.orchestrator`
+### `h2kvm.orchestrator`
 
 High-level orchestration for complete VM migrations.
 
 #### `MigrationOrchestrator`
 
 ```python
-from hyper2kvm.orchestrator import MigrationOrchestrator
+from h2kvm.orchestrator import MigrationOrchestrator
 
 orchestrator = MigrationOrchestrator(
-    config_file="/etc/hyper2kvm/config.yaml"
+    config_file="/etc/h2kvm/config.yaml"
 )
 
 result = orchestrator.migrate_vm(
@@ -313,14 +313,14 @@ Save detailed report to file.
 
 ## Manifest API
 
-### `hyper2kvm.manifest`
+### `h2kvm.manifest`
 
 Artifact Manifest v1.0 API for declarative workflows.
 
 #### `ManifestLoader`
 
 ```python
-from hyper2kvm.manifest import ManifestLoader
+from h2kvm.manifest import ManifestLoader
 
 loader = ManifestLoader()
 manifest = loader.load_from_file("/path/to/manifest.json")
@@ -382,7 +382,7 @@ Convert to dictionary.
 Execute conversion based on manifest.
 
 ```python
-from hyper2kvm.manifest import ManifestExecutor
+from h2kvm.manifest import ManifestExecutor
 
 executor = ManifestExecutor(manifest)
 result = executor.execute(
@@ -408,14 +408,14 @@ Execute manifest-driven conversion.
 
 ## VMware Integration
 
-### `hyper2kvm.vmware`
+### `h2kvm.vmware`
 
 vSphere integration for direct VM exports.
 
 #### `VSphereClient`
 
 ```python
-from hyper2kvm.vmware import VSphereClient
+from h2kvm.vmware import VSphereClient
 
 client = VSphereClient(
     host="vcenter.example.com",
@@ -467,16 +467,16 @@ Get VM information.
 
 ## Configuration
 
-### `hyper2kvm.config`
+### `h2kvm.config`
 
 Configuration management.
 
 #### `Config`
 
 ```python
-from hyper2kvm.config import Config
+from h2kvm.config import Config
 
-config = Config.load_from_file("/etc/hyper2kvm/config.yaml")
+config = Config.load_from_file("/etc/h2kvm/config.yaml")
 
 # Or create programmatically
 config = Config(
@@ -520,7 +520,7 @@ Validate configuration.
 ### Exception Classes
 
 ```python
-from hyper2kvm.exceptions import (
+from h2kvm.exceptions import (
     ConversionError,
     ImageInspectionError,
     DriverInjectionError,
@@ -569,8 +569,8 @@ Raised when manifest validation fails.
 ### Example 1: Programmatic Conversion with Custom Options
 
 ```python
-from hyper2kvm.core import convert_vm
-from hyper2kvm.config import Config
+from h2kvm.core import convert_vm
+from h2kvm.config import Config
 
 # Create custom configuration
 config = Config(
@@ -578,7 +578,7 @@ config = Config(
     compression=True,
     inject_drivers=True,
     log_level="DEBUG",
-    temp_dir="/tmp/hyper2kvm"
+    temp_dir="/tmp/h2kvm"
 )
 
 # Convert VM
@@ -599,7 +599,7 @@ else:
 ### Example 2: Manifest-Driven Workflow
 
 ```python
-from hyper2kvm.manifest import ManifestLoader, ManifestExecutor
+from h2kvm.manifest import ManifestLoader, ManifestExecutor
 
 # Load manifest
 loader = ManifestLoader()
@@ -620,14 +620,14 @@ result = executor.execute(
 )
 
 # Save detailed report
-result.save_report("/var/log/hyper2kvm/report.json")
+result.save_report("/var/log/h2kvm/report.json")
 ```
 
 ### Example 3: Batch Migration from vSphere
 
 ```python
-from hyper2kvm.vmware import VSphereClient
-from hyper2kvm.orchestrator import MigrationOrchestrator
+from h2kvm.vmware import VSphereClient
+from h2kvm.orchestrator import MigrationOrchestrator
 
 # Connect to vSphere
 client = VSphereClient(
@@ -668,8 +668,8 @@ print(f"Migrated {successful}/{len(results)} VMs successfully")
 
 ```python
 import guestfs
-from hyper2kvm.fixers.bootloader.grub import GRUBFixer
-from hyper2kvm.fixers.network import NetworkFixer
+from h2kvm.fixers.bootloader.grub import GRUBFixer
+from h2kvm.fixers.network import NetworkFixer
 
 # Open image
 g = guestfs.GuestFS(python_return_dict=True)
@@ -700,12 +700,12 @@ print(f"Network: {network_result['interfaces_updated']}")
 
 ## Type Hints
 
-hyper2kvm includes comprehensive type hints for IDE auto-completion:
+h2kvm includes comprehensive type hints for IDE auto-completion:
 
 ```python
 from typing import List, Dict, Optional
-from hyper2kvm.core import convert_vm
-from hyper2kvm.types import ConversionResult, VMInfo
+from h2kvm.core import convert_vm
+from h2kvm.types import ConversionResult, VMInfo
 
 def batch_convert(vms: List[VMInfo]) -> List[ConversionResult]:
     results = []
@@ -727,7 +727,7 @@ Configure logging for library usage:
 
 ```python
 import logging
-from hyper2kvm import set_log_level
+from h2kvm import set_log_level
 
 # Set log level
 set_log_level("DEBUG")
@@ -738,7 +738,7 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
-logger = logging.getLogger('hyper2kvm')
+logger = logging.getLogger('h2kvm')
 logger.setLevel(logging.DEBUG)
 ```
 

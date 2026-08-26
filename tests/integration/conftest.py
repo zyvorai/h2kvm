@@ -88,7 +88,7 @@ def writable_copy(name: str):
 
 def make_fixer():
     """Create a mock OfflineFSFix instance with required attributes."""
-    from hyper2kvm.fixers.offline_fixer import OfflineFSFix
+    from h2kvm.fixers.offline_fixer import OfflineFSFix
 
     with patch.object(OfflineFSFix, "__init__", lambda self: None):
         fixer = OfflineFSFix.__new__(OfflineFSFix)

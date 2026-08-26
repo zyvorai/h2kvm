@@ -1,6 +1,6 @@
-# Contributing to hyper2kvm
+# Contributing to h2kvm
 
-Thank you for your interest in contributing to hyper2kvm! This guide will help you get started.
+Thank you for your interest in contributing to h2kvm! This guide will help you get started.
 
 ## Table of Contents
 
@@ -22,13 +22,13 @@ This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.
 1. **Fork the repository** on GitHub
 2. **Clone your fork**:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/hyper2kvm.git
-   cd hyper2kvm
+   git clone https://github.com/YOUR_USERNAME/h2kvm.git
+   cd h2kvm
    ```
 
 3. **Add upstream remote**:
    ```bash
-   git remote add upstream https://github.com/ssahani/hyper2kvm.git
+   git remote add upstream https://github.com/ssahani/h2kvm.git
    ```
 
 ## Development Setup
@@ -107,10 +107,10 @@ All new code should include tests:
 pytest
 
 # Run specific test file
-pytest hyper2kvm/vmspawn/tests/test_machine.py
+pytest h2kvm/vmspawn/tests/test_machine.py
 
 # Run with coverage
-pytest --cov=hyper2kvm
+pytest --cov=h2kvm
 ```
 
 **Go tests:**
@@ -154,7 +154,7 @@ make test-coverage
 **Unit tests:**
 ```python
 import pytest
-from hyper2kvm.vmspawn import Machine, MachineConfig
+from h2kvm.vmspawn import Machine, MachineConfig
 
 def test_machine_creation():
     """Test basic machine creation."""
@@ -182,12 +182,12 @@ Run benchmarks before and after changes:
 
 ```bash
 # Baseline
-pytest hyper2kvm/vmspawn/tests/test_performance.py \
+pytest h2kvm/vmspawn/tests/test_performance.py \
     --benchmark-only \
     --benchmark-save=before
 
 # After changes
-pytest hyper2kvm/vmspawn/tests/test_performance.py \
+pytest h2kvm/vmspawn/tests/test_performance.py \
     --benchmark-only \
     --benchmark-compare=before
 ```
@@ -200,16 +200,16 @@ We use **ruff** for linting and formatting:
 
 ```bash
 # Check code style
-ruff check hyper2kvm/
+ruff check h2kvm/
 
 # Fix automatically
-ruff check --fix hyper2kvm/
+ruff check --fix h2kvm/
 
 # Format code
-ruff format hyper2kvm/
+ruff format h2kvm/
 
 # Type checking
-mypy hyper2kvm/
+mypy h2kvm/
 ```
 
 **Style guidelines:**
@@ -426,7 +426,7 @@ Include:
 - **Email**: info@lilotechnologies.com
 - **Phone**: +91 9999379738
 
-Bug reports and feature requests: https://github.com/ssahani/hyper2kvm/issues
+Bug reports and feature requests: https://github.com/ssahani/h2kvm/issues
 
 ## License
 
@@ -434,4 +434,4 @@ By contributing, you agree that your contributions will be licensed under the Pr
 
 ## Thank You!
 
-Your contributions make hyper2kvm better for everyone. Thank you for taking the time to contribute!
+Your contributions make h2kvm better for everyone. Thank you for taking the time to contribute!

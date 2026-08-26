@@ -4,7 +4,7 @@
 
 """Integration tests using phony guest images.
 
-These tests exercise the full hyper2kvm pipeline (inspection, fstab
+These tests exercise the full h2kvm pipeline (inspection, fstab
 stabilization, boot order detection, domain XML emission) against
 minimal disk images that fool the guestfs inspection API.
 

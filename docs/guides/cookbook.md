@@ -14,7 +14,7 @@ If something matters, put it in YAML.
 Before following this guide, you should have:
 
 - ✓ Completed the [Installation](02-Installation.md)
-- ✓ Familiarity with basic hyper2kvm concepts
+- ✓ Familiarity with basic h2kvm concepts
 - ✓ Root/sudo access to your system
 - ✓ Source VM files ready for migration
 
@@ -103,14 +103,14 @@ verbose: 1
 
 ## 2. Local mode — Windows VMDK with VirtIO pre-staging
 
-> **Standard path**: `quickstart.sh` installs `virtio-win.iso` to `/var/lib/hyper2kvm/virtio-win.iso`.
-> When the ISO is at the standard path, hyper2kvm auto-discovers it — no `--virtio-drivers-dir` flag needed.
+> **Standard path**: `quickstart.sh` installs `virtio-win.iso` to `/var/lib/h2kvm/virtio-win.iso`.
+> When the ISO is at the standard path, h2kvm auto-discovers it — no `--virtio-drivers-dir` flag needed.
 > Use `--virtio-drivers-dir` only to override with a custom location.
 
 ### CLI
 
 ```bash
-# If virtio-win.iso is at /var/lib/hyper2kvm/virtio-win.iso, omit --virtio-drivers-dir:
+# If virtio-win.iso is at /var/lib/h2kvm/virtio-win.iso, omit --virtio-drivers-dir:
 sudo h2kvmctl \
   --output-dir ./out \
   local \
@@ -142,7 +142,7 @@ vmdk: /path/to/windows.vmdk
 to_output: windows-fixed.qcow2
 
 flatten: true
-# optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+# optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 virtio_drivers_dir: /path/to/virtio-win
 
 checksum: true
@@ -434,7 +434,7 @@ h2kvmctl vsphere \
   --disk 0 \
   --local-path ./downloads/myVM-disk0.vmdk \
   --enable-cbt \
-  --snapshot-name hyper2kvm-cbt \
+  --snapshot-name h2kvm-cbt \
   --change-id "*"
 ```bash
 
@@ -454,7 +454,7 @@ disk: 0
 local_path: ./downloads/myVM-disk0.vmdk
 
 enable_cbt: true
-snapshot_name: hyper2kvm-cbt
+snapshot_name: h2kvm-cbt
 change_id: "*"
 ```bash
 
@@ -514,5 +514,5 @@ Continue your migration journey:
 
 ## Getting Help
 
-Found an issue? [Report it on GitHub](https://github.com/ssahani/hyper2kvm/issues)
+Found an issue? [Report it on GitHub](https://github.com/ssahani/h2kvm/issues)
 

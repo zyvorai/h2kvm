@@ -142,7 +142,7 @@ sudo h2kvmctl --batch-manifest batch.json --batch-parallel 8
 
 ### Custom Profile
 
-Create `/etc/hyper2kvm/profiles/custom.yaml`:
+Create `/etc/h2kvm/profiles/custom.yaml`:
 
 ```yaml
 extends: "production"
@@ -158,7 +158,7 @@ Use in manifest:
 ```json
 {
   "profile": "custom",
-  "custom_profile_path": "/etc/hyper2kvm/profiles"
+  "custom_profile_path": "/etc/h2kvm/profiles"
 }
 ```
 
@@ -358,7 +358,7 @@ sudo h2kvmctl --config /work/vm1/manifest.json -vv
 
 ```bash
 # List available profiles
-python3 -c "from hyper2kvm.profiles import ProfileLoader; \
+python3 -c "from h2kvm.profiles import ProfileLoader; \
             print(ProfileLoader().list_available_profiles())"
 
 # Dump merged config
@@ -430,7 +430,7 @@ sudo h2kvmctl --config manifest.json -vvv
 
 - **Full Guide**: `docs/Batch-Migration-Features-Guide.md`
 - **Batch Examples**: `examples/batch/`
-- **Profile Guide**: `hyper2kvm/profiles/README.md`
+- **Profile Guide**: `h2kvm/profiles/README.md`
 - **Hooks Guide**: `examples/hooks/README.md`
 - **Libvirt Guide**: `examples/libvirt-xml/README.md`
 - **Testing Guide**: `tests/BATCH_MIGRATION_TESTING_GUIDE.md`
@@ -439,6 +439,6 @@ sudo h2kvmctl --config manifest.json -vvv
 ## Support
 
 For issues or questions:
-- File bug: `https://github.com/anthropics/hyper2kvm/issues`
+- File bug: `https://github.com/anthropics/h2kvm/issues`
 - Documentation: `docs/` directory
 - Examples: `examples/` directory

@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.vmcraft.base_analyzer.BaseAnalyzer."""
+"""Tests for h2kvm.vmcraft.base_analyzer.BaseAnalyzer."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from hyper2kvm.vmcraft.base_analyzer import BaseAnalyzer
+from h2kvm.vmcraft.base_analyzer import BaseAnalyzer
 
 
 # ---------------------------------------------------------------------------

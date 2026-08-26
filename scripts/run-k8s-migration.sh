@@ -3,7 +3,7 @@
 # One-shot RHEL 8.8 Migration on k3s/k3d
 # =============================================================================
 # Automates the full pipeline:
-#   1. Build hyper2kvm container image
+#   1. Build h2kvm container image
 #   2. Load image into k3d cluster
 #   3. Deploy PVCs and copy VMDK into cluster
 #   4. Run h2kvmctl migration as a Kubernetes Job
@@ -21,8 +21,8 @@ set -euo pipefail
 
 
 SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-CLUSTER_NAME="${K3D_CLUSTER:-hyper2kvm-test}"
-NAMESPACE="hyper2kvm-migration"
+CLUSTER_NAME="${K3D_CLUSTER:-h2kvm-test}"
+NAMESPACE="h2kvm-migration"
 VMDK_FILE="esx8.0-rhel8.8-with-thin-provision-disk1.vmdk"
 MANIFEST="$SCRIPT_DIR/k8s/migration/rhel88-k3s-migration.yaml"
 SKIP_BUILD=false
@@ -55,10 +55,10 @@ ok "Prerequisites OK"
 # ─── Step 1: Build container image ──────────────────────────────────────────
 
 if [ "$SKIP_BUILD" = false ]; then
-    log "Building hyper2kvm:cli container image..."
+    log "Building h2kvm:cli container image..."
     cd "$SCRIPT_DIR"
-    docker build --target cli -t hyper2kvm:cli -f Dockerfile . 2>&1 | tail -3
-    ok "Container image built: hyper2kvm:cli"
+    docker build --target cli -t h2kvm:cli -f Dockerfile . 2>&1 | tail -3
+    ok "Container image built: h2kvm:cli"
 else
     warn "Skipping image build (--skip-build)"
 fi
@@ -66,7 +66,7 @@ fi
 # ─── Step 2: Load image into k3d ───────────────────────────────────────────
 
 log "Loading image into k3d cluster '$CLUSTER_NAME'..."
-k3d image import hyper2kvm:cli -c "$CLUSTER_NAME" 2>&1 | tail -1
+k3d image import h2kvm:cli -c "$CLUSTER_NAME" 2>&1 | tail -1
 ok "Image loaded into k3d"
 
 # ─── Step 3: Deploy namespace, PVCs, config ────────────────────────────────
@@ -78,7 +78,7 @@ kubectl apply -f - <<'EOF'
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: hyper2kvm-migration
+  name: h2kvm-migration
 EOF
 kubectl apply -f "$MANIFEST" 2>&1 | head -20
 ok "Resources created"

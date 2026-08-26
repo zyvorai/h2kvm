@@ -1,4 +1,4 @@
-# hyper2kvm- User Stories
+# h2kvm- User Stories
 
 **Product:** Enterprise VM migration — any hypervisor to KVM
 
@@ -56,7 +56,7 @@ Cross-reference: [Documentation index](README.md) · [Main README](../README.md)
 
 ### Story 5 — K8s operator deploy
 
-**As Jordan** (K8s Platform), I want run hyper2kvm as in-cluster operator, **so that** I deliver reliable outcomes.
+**As Jordan** (K8s Platform), I want run h2kvm as in-cluster operator, **so that** I deliver reliable outcomes.
 
 | Criterion | Notes |
 |-----------|-------|

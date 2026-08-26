@@ -183,8 +183,8 @@ spec:
 Then manually cleanup:
 ```bash
 # List resources
-kubectl get pvc -l migration.hyper2kvm.io/job=migrate-centos9
-kubectl get pod -l migration.hyper2kvm.io/job=migrate-centos9
+kubectl get pvc -l migration.h2kvm.io/job=migrate-centos9
+kubectl get pod -l migration.h2kvm.io/job=migrate-centos9
 
 # Delete when done
 kubectl delete migrationjob migrate-centos9
@@ -221,7 +221,7 @@ kubectl get events --field-selector involvedObject.name=migrate-centos9 --watch
 
 ```bash
 # Migration pod logs
-kubectl logs -l migration.hyper2kvm.io/job=migrate-centos9
+kubectl logs -l migration.h2kvm.io/job=migrate-centos9
 
 # Uploader pod logs (for vmdk-url source)
 kubectl logs uploader-migrate-centos9-source
@@ -296,7 +296,7 @@ migrations/
 
 **base/migrationjob-template.yaml:**
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: app-migration
@@ -364,10 +364,10 @@ kubectl apply -k prod/
 
 Check if nodes are NBD-capable:
 ```bash
-kubectl get nodes -l hyper2kvm.io/nbd-capable=true
+kubectl get nodes -l h2kvm.io/nbd-capable=true
 
 # If no nodes, label them:
-kubectl label nodes worker-1 hyper2kvm.io/nbd-capable=true
+kubectl label nodes worker-1 h2kvm.io/nbd-capable=true
 ```
 
 ### Migration Failed

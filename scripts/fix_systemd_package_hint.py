@@ -34,7 +34,7 @@ FILE_TO_HINT = {
 
 
 def main():
-    systemd_dir = Path(__file__).parent.parent / "hyper2kvm" / "systemd"
+    systemd_dir = Path(__file__).parent.parent / "h2kvm" / "systemd"
 
     updated_count = 0
     for file_name, hint in FILE_TO_HINT.items():

@@ -39,7 +39,7 @@ compress: true
 
 # HIPAA compliance settings
 verbose: 2  # Detailed audit logs
-log_file: /var/log/hyper2kvm/ehr-migration-{timestamp}.log
+log_file: /var/log/h2kvm/ehr-migration-{timestamp}.log
 report: /secure/migrations/ehr/migration-report.md
 
 # Guest OS fixes (RHEL 9 healthcare)

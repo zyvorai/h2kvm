@@ -1,6 +1,6 @@
-# Building and Testing hyper2kvm
+# Building and Testing h2kvm
 
-This document explains how to build, test, and develop hyper2kvm using the modern Python toolchain.
+This document explains how to build, test, and develop h2kvm using the modern Python toolchain.
 
 ## Quick Start
 
@@ -19,7 +19,7 @@ hatch build        # Build package
 
 ## Build System
 
-hyper2kvm uses a **hybrid build system**:
+h2kvm uses a **hybrid build system**:
 
 - **Hatch** - Modern Python project manager (primary)
 - **Makefile** - Enterprise-friendly wrapper around Hatch
@@ -47,9 +47,9 @@ sudo apt install libguestfs-tools python3-guestfs qemu-utils    # Ubuntu/Debian
 
 ```bash
 # Works on Fedora, RHEL, Ubuntu, Debian, SUSE
-sudo ./scripts/install-venv.sh              # /opt/hyper2kvm
+sudo ./scripts/install-venv.sh              # /opt/h2kvm
 sudo ./scripts/install-venv.sh /custom/path # custom location
-./scripts/install-venv.sh --user            # ~/.local/hyper2kvm (no root)
+./scripts/install-venv.sh --user            # ~/.local/h2kvm (no root)
 ```
 
 See [venv-install.md](venv-install.md) for full details.
@@ -59,8 +59,8 @@ See [venv-install.md](venv-install.md) for full details.
 ```bash
 sudo rm -rf dist/ build/ *.egg-info
 python3 -m build --wheel --no-isolation
-rpmbuild -bb hyper2kvm.spec
-sudo rpm -Uvh ~/rpmbuild/RPMS/noarch/hyper2kvm-*.rpm
+rpmbuild -bb h2kvm.spec
+sudo rpm -Uvh ~/rpmbuild/RPMS/noarch/h2kvm-*.rpm
 ```
 
 See [rpm-build.md](rpm-build.md) for full details.
@@ -70,7 +70,7 @@ See [rpm-build.md](rpm-build.md) for full details.
 ```bash
 # Build inside container (works from any host)
 ./scripts/build-deb.sh ubuntu:24.04
-sudo apt install -y ./dist/hyper2kvm_*.deb
+sudo apt install -y ./dist/h2kvm_*.deb
 ```
 
 See [deb-build.md](deb-build.md) for full details.
@@ -113,7 +113,7 @@ hatch run test-cov-all      # Coverage for all tests
 
 ```bash
 pytest tests/unit/ -v
-pytest tests/unit/ --cov=hyper2kvm --cov-report=html
+pytest tests/unit/ --cov=h2kvm --cov-report=html
 pytest tests/integration/ -v
 ```
 
@@ -153,7 +153,7 @@ hatch build
 python -m build
 ```
 
-Output: `dist/hyper2kvm-{version}.tar.gz` and `dist/hyper2kvm-{version}-py3-none-any.whl`
+Output: `dist/h2kvm-{version}.tar.gz` and `dist/h2kvm-{version}-py3-none-any.whl`
 
 ### RPM Package (Fedora/RHEL)
 
@@ -163,7 +163,7 @@ make rpm
 
 # Manually
 python3 -m build --sdist
-rpmbuild -ba hyper2kvm.spec
+rpmbuild -ba h2kvm.spec
 ```
 
 ## Publishing
@@ -217,8 +217,8 @@ make check       # test + lint + security (without coverage)
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 
 # Install in development mode
 make dev-install
@@ -228,7 +228,7 @@ pip install -e .[dev,full]
 
 ### 2. Make Changes
 
-Edit code in `hyper2kvm/` directory.
+Edit code in `h2kvm/` directory.
 
 ### 3. Test Changes
 
@@ -378,8 +378,8 @@ If you're migrating from the old setup:
 ```bash
 # Old way
 pytest tests/unit/ -v
-ruff check hyper2kvm/
-mypy hyper2kvm/
+ruff check h2kvm/
+mypy h2kvm/
 
 # New way (Make)
 make test

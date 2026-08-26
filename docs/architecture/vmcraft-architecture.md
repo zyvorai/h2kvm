@@ -1,10 +1,10 @@
 # VMCraft Architecture Overview
 
-hyper2kvm uses **VMCraft** - a native Pure-Python implementation for guest filesystem manipulation.
+h2kvm uses **VMCraft** - a native Pure-Python implementation for guest filesystem manipulation.
 
 ## Why VMCraft?
 
-| Aspect | VMCraft (hyper2kvm native) |
+| Aspect | VMCraft (h2kvm native) |
 |--------|----------------------------|
 | **Language** | Pure Python |
 | **Startup Time** | ~2 seconds |
@@ -13,7 +13,7 @@ hyper2kvm uses **VMCraft** - a native Pure-Python implementation for guest files
 | **Methods** | 480+ methods (enterprise-grade API) |
 | **Debugging** | Easy (pure Python) |
 | **Dependencies** | qemu-nbd, filesystem tools |
-| **Maintenance** | Native to hyper2kvm |
+| **Maintenance** | Native to h2kvm |
 
 ## Architecture
 
@@ -108,7 +108,7 @@ VMCraft provides an enterprise-grade guestfs-compatible API:
 
 ```python
 # VMCraft usage
-from hyper2kvm.core.guestfs_factory import create_guestfs
+from h2kvm.core.guestfs_factory import create_guestfs
 
 # VMCraft (default)
 g = create_guestfs()
@@ -139,7 +139,7 @@ g.shutdown()
 
 ### VMCraft Module Structure
 ```
-hyper2kvm/core/vmcraft/
+h2kvm/core/vmcraft/
 +-- main.py                  # Main VMCraft class
 +-- nbd.py                   # NBD device management
 +-- storage.py               # LVM/LUKS handling
@@ -166,8 +166,8 @@ hyper2kvm/core/vmcraft/
 
 ## Learning More
 
-- See `hyper2kvm/core/vmcraft/README.md` for detailed API docs
-- See `hyper2kvm/core/guestfs_factory.py` for backend selection
+- See `h2kvm/core/vmcraft/README.md` for detailed API docs
+- See `h2kvm/core/guestfs_factory.py` for backend selection
 - See `docs/guides/offline-fixes.md` for examples of VMCraft in action
 
 ## Real-World Impact

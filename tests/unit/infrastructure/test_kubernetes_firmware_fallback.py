@@ -9,7 +9,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from hyper2kvm.infrastructure.deployers.kubernetes import KubernetesDeployer
+from h2kvm.infrastructure.deployers.kubernetes import KubernetesDeployer
 
 
 def _make_deployer(**args_kw):
@@ -49,7 +49,7 @@ class TestMaybeFirmwareFallback:
     def test_no_retry_when_serial_healthy(self):
         dep = _make_deployer(uefi=True, firmware_alternate="bios")
         with patch.object(dep, "_capture_serial_boot_output", return_value="systemd started"):
-            with patch("hyper2kvm.infrastructure.deployers.kubernetes.time.sleep"):
+            with patch("h2kvm.infrastructure.deployers.kubernetes.time.sleep"):
                 with patch.object(dep, "_patch_vm_firmware") as patch_fw:
                     dep._maybe_firmware_fallback_after_deploy()
         patch_fw.assert_not_called()
@@ -61,7 +61,7 @@ class TestMaybeFirmwareFallback:
             "SeaBIOS booting kernel",
         ]
         with patch.object(dep, "_capture_serial_boot_output", side_effect=serials):
-            with patch("hyper2kvm.infrastructure.deployers.kubernetes.time.sleep"):
+            with patch("h2kvm.infrastructure.deployers.kubernetes.time.sleep"):
                 with patch.object(dep, "_virtctl_stop_vm") as stop:
                     with patch.object(dep, "_wait_until_vmi_gone") as gone:
                         with patch.object(dep, "_patch_vm_firmware") as patch_fw:
@@ -83,7 +83,7 @@ class TestMaybeFirmwareFallback:
             "_capture_serial_boot_output",
             side_effect=[bios_fail, uefi_fail],
         ):
-            with patch("hyper2kvm.infrastructure.deployers.kubernetes.time.sleep"):
+            with patch("h2kvm.infrastructure.deployers.kubernetes.time.sleep"):
                 with patch.object(dep, "_virtctl_stop_vm"):
                     with patch.object(dep, "_wait_until_vmi_gone"):
                         with patch.object(dep, "_patch_vm_firmware"):
@@ -119,7 +119,7 @@ class TestPatchVmFirmware:
 class TestCaptureSerialBootOutput:
     def test_returns_empty_when_virtctl_missing(self):
         dep = _make_deployer()
-        with patch("hyper2kvm.infrastructure.deployers.kubernetes.shutil.which", return_value=None):
+        with patch("h2kvm.infrastructure.deployers.kubernetes.shutil.which", return_value=None):
             assert dep._capture_serial_boot_output() == ""
 
     def test_returns_combined_stdout_stderr(self):
@@ -128,11 +128,11 @@ class TestCaptureSerialBootOutput:
         dep._kubeconfig_resolved_path = None
         proc = Mock(returncode=0, stdout="boot log", stderr="warn")
         with patch(
-            "hyper2kvm.infrastructure.deployers.kubernetes.shutil.which", return_value="/usr/bin/virtctl"
+            "h2kvm.infrastructure.deployers.kubernetes.shutil.which", return_value="/usr/bin/virtctl"
         ):
             with patch.object(dep, "_find_kubeconfig", return_value=None):
                 with patch(
-                    "hyper2kvm.infrastructure.deployers.kubernetes.subprocess.run", return_value=proc
+                    "h2kvm.infrastructure.deployers.kubernetes.subprocess.run", return_value=proc
                 ):
                     out = dep._capture_serial_boot_output(timeout_s=10)
         assert out == "boot logwarn"

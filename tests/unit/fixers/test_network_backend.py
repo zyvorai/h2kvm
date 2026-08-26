@@ -11,8 +11,8 @@ import textwrap
 
 import pytest
 
-from hyper2kvm.fixers.network.backend import NetworkFixersBackend
-from hyper2kvm.fixers.network.model import FixLevel, FixResult, NetworkConfig, NetworkConfigType
+from h2kvm.fixers.network.backend import NetworkFixersBackend
+from h2kvm.fixers.network.model import FixLevel, FixResult, NetworkConfig, NetworkConfigType
 
 
 def _make_backend(fix_level: FixLevel = FixLevel.MODERATE) -> NetworkFixersBackend:
@@ -287,7 +287,7 @@ class TestIfcfgRhDhcpNormalization:
 
     def test_bond_slave_no_dhcp(self):
         """Bond slave should NOT get DHCP added."""
-        from hyper2kvm.fixers.network.model import TopoEdge, TopologyGraph
+        from h2kvm.fixers.network.model import TopoEdge, TopologyGraph
 
         backend = _make_backend()
         config = _cfg(
@@ -595,7 +595,7 @@ class TestValidation:
     """Tests for network fix validation."""
 
     def test_missing_device_rejected(self):
-        from hyper2kvm.fixers.network.validation import NetworkValidation
+        from h2kvm.fixers.network.validation import NetworkValidation
 
         validator = NetworkValidation(logging.getLogger("test"))
         errors = validator.validate_fix(
@@ -605,12 +605,12 @@ class TestValidation:
         )
         assert any("ifcfg missing DEVICE" in e for e in errors)
 
-    def test_device_commented_by_hyper2kvm_allowed(self):
-        from hyper2kvm.fixers.network.validation import NetworkValidation
+    def test_device_commented_by_h2kvm_allowed(self):
+        from h2kvm.fixers.network.validation import NetworkValidation
 
         validator = NetworkValidation(logging.getLogger("test"))
         fixed = (
-            "# DEVICE=ens192  # VMware NIC name (vmware-ens-pattern) removed by hyper2kvm\nTYPE=Ethernet\n"
+            "# DEVICE=ens192  # VMware NIC name (vmware-ens-pattern) removed by h2kvm\nTYPE=Ethernet\n"
         )
         errors = validator.validate_fix(
             original="DEVICE=ens192\nTYPE=Ethernet\n",

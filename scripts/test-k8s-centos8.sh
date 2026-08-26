@@ -1,12 +1,12 @@
 #!/bin/bash
-# Hyper2KVM Kubernetes CentOS 8 Test Suite
+# H2KVM Kubernetes CentOS 8 Test Suite
 # Comprehensive testing and validation script
 # Usage: ./test-k8s-centos8.sh [all|prereq|deploy|migrate|cleanup]
 
 set -e
 
 # Configuration
-NAMESPACE="hyper2kvm-test"
+NAMESPACE="h2kvm-test"
 TEST_VM_SIZE="100M"  # Small test VM
 STORAGE_CLASS="${STORAGE_CLASS:-nfs-client}"
 
@@ -150,13 +150,13 @@ test_node_preparation() {
 
     # Test 2: qemu-img availability
     log_test "qemu-img is installed on node"
-    QEMU_CHECK=$(kubectl run qemu-check-$RANDOM --image=ghcr.io/ssahani/hyper2kvm:latest --rm -i --restart=Never \
+    QEMU_CHECK=$(kubectl run qemu-check-$RANDOM --image=ghcr.io/ssahani/h2kvm:latest --rm -i --restart=Never \
         --overrides='{
             "spec": {
                 "nodeSelector": {"kubernetes.io/hostname": "'$TEST_NODE'"},
                 "containers": [{
                     "name": "qemu-check",
-                    "image": "ghcr.io/ssahani/hyper2kvm:latest",
+                    "image": "ghcr.io/ssahani/h2kvm:latest",
                     "command": ["sh", "-c", "qemu-img --version && echo OK || echo MISSING"]
                 }]
             }
@@ -191,14 +191,14 @@ test_deployment() {
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: hyper2kvm-worker
+  name: h2kvm-worker
   namespace: $NAMESPACE
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: hyper2kvm-worker-role
+  name: h2kvm-worker-role
   namespace: $NAMESPACE
 rules:
 - apiGroups: [""]
@@ -212,15 +212,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: hyper2kvm-worker-binding
+  name: h2kvm-worker-binding
   namespace: $NAMESPACE
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: hyper2kvm-worker-role
+  name: h2kvm-worker-role
 subjects:
 - kind: ServiceAccount
-  name: hyper2kvm-worker
+  name: h2kvm-worker
   namespace: $NAMESPACE
 EOF
 
@@ -299,7 +299,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: create-vmdk
-        image: ghcr.io/ssahani/hyper2kvm:latest
+        image: ghcr.io/ssahani/h2kvm:latest
         command:
           - /bin/bash
           - -c
@@ -372,13 +372,13 @@ spec:
   template:
     metadata:
       labels:
-        app: hyper2kvm-test
+        app: h2kvm-test
     spec:
-      serviceAccountName: hyper2kvm-worker
+      serviceAccountName: h2kvm-worker
       restartPolicy: Never
       containers:
-      - name: hyper2kvm
-        image: ghcr.io/ssahani/hyper2kvm:latest
+      - name: h2kvm
+        image: ghcr.io/ssahani/h2kvm:latest
         command:
           - h2kvmctl
           - --cmd
@@ -451,7 +451,7 @@ EOF
         # Show pod status
         echo ""
         log_info "=== Pod Status ==="
-        kubectl get pods -n $NAMESPACE -l app=hyper2kvm-test
+        kubectl get pods -n $NAMESPACE -l app=h2kvm-test
 
         # Show logs
         echo ""
@@ -503,13 +503,13 @@ test_validation() {
     fi
 
     log_test "Verify QCOW2 file integrity"
-    INTEGRITY=$(kubectl run integrity-check-$RANDOM --image=ghcr.io/ssahani/hyper2kvm:latest --rm -i --restart=Never \
+    INTEGRITY=$(kubectl run integrity-check-$RANDOM --image=ghcr.io/ssahani/h2kvm:latest --rm -i --restart=Never \
         --namespace=$NAMESPACE \
         --overrides='{
             "spec": {
                 "containers": [{
                     "name": "integrity",
-                    "image": "ghcr.io/ssahani/hyper2kvm:latest",
+                    "image": "ghcr.io/ssahani/h2kvm:latest",
                     "command": ["sh", "-c", "qemu-img check /mnt/kvm/test-vm.qcow2 && echo OK || echo FAILED"],
                     "volumeMounts": [{
                         "name": "kvm-storage",
@@ -549,7 +549,7 @@ test_cleanup() {
 generate_report() {
     echo ""
     echo "=========================================="
-    echo "      HYPER2KVM CENTOS 8 TEST REPORT"
+    echo "      H2KVM CENTOS 8 TEST REPORT"
     echo "=========================================="
     echo ""
     echo "Date: $(date)"
@@ -564,7 +564,7 @@ generate_report() {
     if [ $TESTS_FAILED -eq 0 ]; then
         echo "✅ ALL TESTS PASSED!"
         echo ""
-        echo "Hyper2KVM is ready for production use on this cluster!"
+        echo "H2KVM is ready for production use on this cluster!"
         return 0
     else
         echo "❌ SOME TESTS FAILED"
@@ -580,7 +580,7 @@ generate_report() {
 
 # Main test runner
 run_all_tests() {
-    log_info "Starting Hyper2KVM CentOS 8 Test Suite"
+    log_info "Starting H2KVM CentOS 8 Test Suite"
     echo ""
 
     test_prerequisites || true
@@ -634,7 +634,7 @@ case "${1:-all}" in
         test_cleanup
         ;;
     *)
-        echo "Hyper2KVM Kubernetes CentOS 8 Test Suite"
+        echo "H2KVM Kubernetes CentOS 8 Test Suite"
         echo ""
         echo "Usage: $0 [command]"
         echo ""

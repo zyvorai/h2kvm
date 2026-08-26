@@ -16,7 +16,7 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from hyper2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine, create_safe_namespace
+from h2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine, create_safe_namespace
 
 # Configure logging
 logging.basicConfig(

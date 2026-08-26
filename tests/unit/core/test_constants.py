@@ -2,14 +2,14 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.core.constants module.
+"""Tests for h2kvm.core.constants module.
 
 Pure value checks verifying that global constants are set to their expected values.
 """
 
 from __future__ import annotations
 
-from hyper2kvm.core.constants import (
+from h2kvm.core.constants import (
     DEFAULT_BOOT_TIMEOUT,
     DEFAULT_COMPRESSION_LEVEL,
     DEFAULT_MACHINE_TYPE,

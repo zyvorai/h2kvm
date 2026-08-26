@@ -24,7 +24,7 @@
 **Single VM conversion with full isolation**
 
 ```python
-from hyper2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine
+from h2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine
 
 engine = SafeNamespaceEngine("/dev/nbd0")
 try:
@@ -66,7 +66,7 @@ finally:
 **Multi-threaded conversion with NBD device pool**
 
 ```python
-from hyper2kvm.vmcraft.parallel_converter import (
+from h2kvm.vmcraft.parallel_converter import (
     ParallelConversionManager,
     ConversionJob,
 )
@@ -113,7 +113,7 @@ results = manager.run(jobs, conversion_func)
 **Process-based conversion with persistent namespaces**
 
 ```python
-from hyper2kvm.vmcraft.enterprise_parallel_manager import (
+from h2kvm.vmcraft.enterprise_parallel_manager import (
     EnterpriseParallelManager,
     ConversionJob,
 )
@@ -307,7 +307,7 @@ CPU:
 **Recommended: Safe Namespace Engine**
 
 ```python
-from hyper2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine
+from h2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine
 
 with SafeNamespaceEngine("/dev/nbd0") as engine:
     engine.run("dracut --force")
@@ -323,7 +323,7 @@ with SafeNamespaceEngine("/dev/nbd0") as engine:
 **Recommended: Thread-Based Parallel Manager**
 
 ```python
-from hyper2kvm.vmcraft.parallel_converter import (
+from h2kvm.vmcraft.parallel_converter import (
     ParallelConversionManager,
     ConversionJob,
 )
@@ -342,7 +342,7 @@ results = manager.run(jobs, conversion_func)
 **Recommended: Enterprise Parallel Manager**
 
 ```python
-from hyper2kvm.vmcraft.enterprise_parallel_manager import (
+from h2kvm.vmcraft.enterprise_parallel_manager import (
     EnterpriseParallelManager,
     ConversionJob,
 )
@@ -362,7 +362,7 @@ results = manager.run(jobs, conversion_func)
 
 ```python
 import time
-from hyper2kvm.vmcraft.enterprise_parallel_manager import EnterpriseParallelManager
+from h2kvm.vmcraft.enterprise_parallel_manager import EnterpriseParallelManager
 
 manager = EnterpriseParallelManager(max_workers=16)
 
@@ -515,9 +515,9 @@ manager = EnterpriseParallelManager(max_workers=16)  # Was: ParallelConversionMa
 
 ## 📚 References
 
-- **Safe Namespace Engine**: [safe_namespace_engine.py](../../hyper2kvm/vmcraft/safe_namespace_engine.py)
-- **Thread-Based Manager**: [parallel_converter.py](../../hyper2kvm/vmcraft/parallel_converter.py)
-- **Enterprise Manager**: [enterprise_parallel_manager.py](../../hyper2kvm/vmcraft/enterprise_parallel_manager.py)
+- **Safe Namespace Engine**: [safe_namespace_engine.py](../../h2kvm/vmcraft/safe_namespace_engine.py)
+- **Thread-Based Manager**: [parallel_converter.py](../../h2kvm/vmcraft/parallel_converter.py)
+- **Enterprise Manager**: [enterprise_parallel_manager.py](../../h2kvm/vmcraft/enterprise_parallel_manager.py)
 - **Architecture Guide**: [SAFE_NAMESPACE_ARCHITECTURE.md](SAFE_NAMESPACE_ARCHITECTURE.md)
 
 ---

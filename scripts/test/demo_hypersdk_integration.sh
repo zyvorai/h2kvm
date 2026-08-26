@@ -2,7 +2,7 @@
 # =============================================================================
 # HyperSDK Integration Demo Script
 # =============================================================================
-# Demonstrates the HyperSDK + hyper2kvm workflow integration
+# Demonstrates the HyperSDK + h2kvm workflow integration
 #
 # This script shows:
 # 1. Setting up workflow directories
@@ -23,13 +23,13 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 # Configuration
-DEMO_DIR="/tmp/hyper2kvm-demo"
+DEMO_DIR="/tmp/h2kvm-demo"
 WORKFLOW_DIR="$DEMO_DIR/manifest-workflow"
 OUTPUT_DIR="$DEMO_DIR/output"
 HYPERCTL="/home/ssahani/go/github/hypersdk/cmd/hyperctl/hyperctl"
 
 echo -e "${BLUE}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║   HyperSDK + hyper2kvm Workflow Integration Demo         ║${NC}"
+echo -e "${BLUE}║   HyperSDK + h2kvm Workflow Integration Demo         ║${NC}"
 echo -e "${BLUE}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
@@ -190,7 +190,7 @@ echo ""
 
 echo -e "${YELLOW}Creating daemon configuration...${NC}"
 cat > "$DEMO_DIR/manifest-daemon.yaml" <<EOF
-# hyper2kvm Manifest Workflow Daemon
+# h2kvm Manifest Workflow Daemon
 command: daemon
 daemon: true
 manifest_workflow_mode: true
@@ -279,12 +279,12 @@ echo ""
 
 echo -e "${YELLOW}To start the workflow daemon manually:${NC}"
 echo ""
-echo "  $ python3 -m hyper2kvm --config $DEMO_DIR/manifest-daemon.yaml"
+echo "  $ python3 -m h2kvm --config $DEMO_DIR/manifest-daemon.yaml"
 echo ""
 echo -e "${YELLOW}Or use systemd (production):${NC}"
 echo ""
-echo "  $ sudo systemctl start hyper2kvm-workflow@manifest.service"
-echo "  $ sudo systemctl status hyper2kvm-workflow@manifest.service"
+echo "  $ sudo systemctl start h2kvm-workflow@manifest.service"
+echo "  $ sudo systemctl status h2kvm-workflow@manifest.service"
 echo ""
 
 # =============================================================================
@@ -380,7 +380,7 @@ echo ""
 echo "1. Update source_path in manifests to point to real VM disks"
 echo ""
 echo "2. Start the workflow daemon:"
-echo "   python3 -m hyper2kvm --config $DEMO_DIR/manifest-daemon.yaml"
+echo "   python3 -m h2kvm --config $DEMO_DIR/manifest-daemon.yaml"
 echo ""
 echo "3. Monitor with hyperctl:"
 echo "   $HYPERCTL workflow -op watch"

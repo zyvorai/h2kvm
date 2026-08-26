@@ -1,16 +1,16 @@
 # h2kvmctl - Primary CLI Command Guide
 
-**Modern, concise CLI for interactive Hyper2KVM workflows following the kubectl naming pattern**
+**Modern, concise CLI for interactive H2KVM workflows following the kubectl naming pattern**
 
 ---
 
 ## Overview
 
-`h2kvmctl` (Hyper2KVM Control) is the primary command for **interactive CLI and command-line usage**, designed to provide a modern, concise interface following established patterns from kubectl, helmctl, and similar tools.
+`h2kvmctl` (H2KVM Control) is the primary command for **interactive CLI and command-line usage**, designed to provide a modern, concise interface following established patterns from kubectl, helmctl, and similar tools.
 
 ### Command Purpose Distinction
 
-Hyper2KVM provides two commands serving complementary purposes:
+H2KVM provides two commands serving complementary purposes:
 
 - **`h2kvmctl`** - Primary for **interactive CLI workflows**
   - Command-line migrations and scripting
@@ -18,8 +18,8 @@ Hyper2KVM provides two commands serving complementary purposes:
   - Developer-friendly for quick tasks
   - Follows kubectl-style naming pattern
 
-- **`hyper2kvm`** - Primary for **daemon mode and services**
-  - Systemd service units (`hyper2kvm daemon`)
+- **`h2kvm`** - Primary for **daemon mode and services**
+  - Systemd service units (`h2kvm daemon`)
   - Background processing and automation
   - Traditional daemon naming convention
   - Better suited for service contexts
@@ -28,7 +28,7 @@ Hyper2KVM provides two commands serving complementary purposes:
 
 ### Why h2kvmctl for CLI?
 
-- **Shorter**: 4 characters less than `hyper2kvm` (saves typing)
+- **Shorter**: 4 characters less than `h2kvm` (saves typing)
 - **Modern**: Follows industry-standard `*ctl` naming pattern
 - **Memorable**: Easy to remember (`h2kvm` + `ctl`)
 - **Professional**: Aligns with Kubernetes ecosystem conventions
@@ -38,41 +38,41 @@ Hyper2KVM provides two commands serving complementary purposes:
 
 ## Installation
 
-Both `h2kvmctl` and `hyper2kvm` are installed together:
+Both `h2kvmctl` and `h2kvm` are installed together:
 
 ```bash
 # Install via pip
-pip install hyper2kvm
+pip install h2kvm
 
 # Both commands are now available
 h2kvmctl --version          # For interactive CLI usage (recommended)
-hyper2kvm --version         # For daemon mode and services
+h2kvm --version         # For daemon mode and services
 ```
 
 ---
 
 ## Command Equivalence
 
-**Important**: `h2kvmctl` and `hyper2kvm` are **functionally identical** - they call the same Python function with zero performance difference.
+**Important**: `h2kvmctl` and `h2kvm` are **functionally identical** - they call the same Python function with zero performance difference.
 
 ```bash
 # These work exactly the same for CLI usage
 h2kvmctl --config migration.yaml
-hyper2kvm --config migration.yaml
+h2kvm --config migration.yaml
 
 # Same for all operations
 h2kvmctl --cmd local --vmdk /vms/vm.vmdk
-hyper2kvm --cmd local --vmdk /vms/vm.vmdk
+h2kvm --cmd local --vmdk /vms/vm.vmdk
 
 # Same for TUI
 h2kvmctl-tui
-hyper2kvm-tui
+h2kvm-tui
 ```
 
 **When to use which**:
 - **Interactive migrations**: `h2kvmctl --config migration.yaml` (shorter, clearer)
-- **Daemon mode**: `hyper2kvm daemon --config daemon.yaml` (traditional daemon naming)
-- **Systemd services**: Use `hyper2kvm` in ExecStart (daemon convention)
+- **Daemon mode**: `h2kvm daemon --config daemon.yaml` (traditional daemon naming)
+- **Systemd services**: Use `h2kvm` in ExecStart (daemon convention)
 
 ---
 
@@ -184,7 +184,7 @@ Launch the Terminal User Interface:
 h2kvmctl-tui
 
 # Legacy command (still works)
-hyper2kvm-tui
+h2kvm-tui
 ```
 
 The TUI provides:
@@ -202,8 +202,8 @@ The TUI provides:
 **Existing automation continues to work** - both commands coexist:
 
 ```bash
-# Old scripts using hyper2kvm - still work!
-hyper2kvm --config migration.yaml    # ✅ Works
+# Old scripts using h2kvm - still work!
+h2kvm --config migration.yaml    # ✅ Works
 
 # New scripts using h2kvmctl - recommended
 h2kvmctl --config migration.yaml     # ✅ Works
@@ -211,7 +211,7 @@ h2kvmctl --config migration.yaml     # ✅ Works
 
 ### Gradual Adoption
 
-1. **Existing CI/CD**: Keep using `hyper2kvm` (no changes needed)
+1. **Existing CI/CD**: Keep using `h2kvm` (no changes needed)
 2. **New Projects**: Start with `h2kvmctl` (modern, concise)
 3. **Documentation**: Gradually update examples to `h2kvmctl`
 4. **No Deprecation**: Both commands maintained indefinitely
@@ -292,7 +292,7 @@ sudo h2kvmctl --config fetch.yaml
 ### ✅ Recommended
 
 1. **Use h2kvmctl for CLI work**: Shorter, modern, perfect for interactive use
-2. **Use hyper2kvm for daemon mode**: Traditional naming for background services
+2. **Use h2kvm for daemon mode**: Traditional naming for background services
 3. **YAML configs over CLI flags**: More maintainable
 4. **Enable compression**: Saves disk space
 5. **Use stabilize-all for fstab**: Prevents mount failures
@@ -300,7 +300,7 @@ sudo h2kvmctl --config fetch.yaml
 
 ### ⚠️ Cautions
 
-1. **Choose the right command**: `h2kvmctl` for CLI, `hyper2kvm` for daemons (but both work anywhere)
+1. **Choose the right command**: `h2kvmctl` for CLI, `h2kvm` for daemons (but both work anywhere)
 2. **Don't skip backups**: Use `no_backup` carefully
 3. **Don't force-push broken configs**: Test locally first
 
@@ -353,7 +353,7 @@ sudo h2kvmctl --config migration.yaml --dry-run -vv
 ```bash
 # Create systemd service for daemon mode
 sudo h2kvmctl --cmd generate-systemd \
-    --systemd-output /etc/systemd/system/hyper2kvm-daemon.service
+    --systemd-output /etc/systemd/system/h2kvm-daemon.service
 ```
 
 ---
@@ -384,9 +384,9 @@ h2kvmctl --config migration.yaml --dump-args
 
 ---
 
-## Comparison: h2kvmctl vs hyper2kvm
+## Comparison: h2kvmctl vs h2kvm
 
-| Feature | h2kvmctl | hyper2kvm |
+| Feature | h2kvmctl | h2kvm |
 |---------|----------|-----------|
 | **Primary Use** | Interactive CLI work | Daemon mode & services |
 | **Length** | 8 chars | 12 chars |
@@ -399,7 +399,7 @@ h2kvmctl --config migration.yaml --dump-args
 
 **Verdict**:
 - Use `h2kvmctl` for interactive CLI work (shorter, modern)
-- Use `hyper2kvm` for daemon mode and systemd services (traditional daemon naming)
+- Use `h2kvm` for daemon mode and systemd services (traditional daemon naming)
 - Neither is deprecated - both actively maintained for their respective purposes
 
 ---
@@ -410,7 +410,7 @@ h2kvmctl --config migration.yaml --dump-args
 
 ```bash
 # After pip install, if command not found:
-pip show hyper2kvm          # Verify installation
+pip show h2kvm          # Verify installation
 which h2kvmctl              # Check if in PATH
 
 # Development mode:

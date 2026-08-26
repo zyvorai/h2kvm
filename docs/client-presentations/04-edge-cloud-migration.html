@@ -70,7 +70,7 @@
   <h1><span>Edge</span> Computing Migration</h1>
   <h2>VMware &amp; Cloud to KVM/KubeVirt at the Edge</h2>
   <p class="sub">How enterprises are eliminating VMware licensing at remote sites, repatriating cloud workloads, and deploying lightweight KVM + K3s infrastructure — saving 80%+ on edge compute costs.</p>
-  <div class="badge">hyper2kvm + hypersdk | Proprietary (Zyvor AI Labs)</div>
+  <div class="badge">h2kvm + hypersdk | Proprietary (Zyvor AI Labs)</div>
 </div>
 
 <!-- PAGE: EDGE COMPUTING CHALLENGE -->
@@ -120,7 +120,7 @@
 <!-- PAGE: CLOUD REPATRIATION -->
 <div class="page page-light">
   <h2 class="st">Cloud <span>Repatriation</span></h2>
-  <p class="sub">Why enterprises are bringing workloads back from AWS, Azure, and GCP — and how hyper2kvm makes it painless.</p>
+  <p class="sub">Why enterprises are bringing workloads back from AWS, Azure, and GCP — and how h2kvm makes it painless.</p>
 
   <div class="compare-box">
     <div class="compare-left">
@@ -159,7 +159,7 @@
     <tr><td><strong>3-Year Total</strong></td><td><strong>$1,026,000</strong></td><td><strong>$110,000</strong></td><td><strong class="check">$916,000</strong></td></tr>
   </table>
 
-  <div class="quote">"We moved 20 VMs from AWS to on-prem KVM and saved $900K over 3 years. The migration took 2 weeks with hyper2kvm."</div>
+  <div class="quote">"We moved 20 VMs from AWS to on-prem KVM and saved $900K over 3 years. The migration took 2 weeks with h2kvm."</div>
 </div>
 
 <!-- PAGE: EDGE ARCHITECTURE -->
@@ -170,7 +170,7 @@
   <div class="flow">
     <div class="flow-step">VMware / Cloud VMs</div>
     <div class="flow-arrow">&#8594;</div>
-    <div class="flow-step">hyper2kvm export</div>
+    <div class="flow-step">h2kvm export</div>
     <div class="flow-arrow">&#8594;</div>
     <div class="flow-step">K3s + KubeVirt</div>
     <div class="flow-arrow">&#8594;</div>
@@ -190,7 +190,7 @@
     </div>
     <div class="card">
       <div class="icon">📦</div>
-      <h4>hyper2kvm Convert</h4>
+      <h4>h2kvm Convert</h4>
       <p>Export from vSphere/cloud, convert to qcow2, upload to PVC. One YAML config per site. Fully automated.</p>
     </div>
   </div>
@@ -203,7 +203,7 @@
     <tr><td>Kubernetes</td><td>K3s</td><td>$0</td></tr>
     <tr><td>VM Runtime</td><td>KubeVirt + KVM</td><td>$0</td></tr>
     <tr><td>Storage</td><td>local-path / Longhorn</td><td>$0</td></tr>
-    <tr><td>Migration Tool</td><td>hyper2kvm</td><td>Contact for pricing*</td></tr>
+    <tr><td>Migration Tool</td><td>h2kvm</td><td>Contact for pricing*</td></tr>
     <tr><td><strong>Total per site</strong></td><td></td><td><strong>$1,000-3,500</strong></td></tr>
   </table>
 
@@ -229,7 +229,7 @@
       <div class="icon">🏪</div>
       <h4>Retail / Point of Sale</h4>
       <p><strong>Challenge:</strong> POS and inventory VMs in 200 stores on aging ESXi hosts.<br>
-      <strong>Solution:</strong> Mini PC with K3s at each store. hyper2kvm converts VMDKs centrally, ship qcow2 images.<br>
+      <strong>Solution:</strong> Mini PC with K3s at each store. h2kvm converts VMDKs centrally, ship qcow2 images.<br>
       <strong>Savings:</strong> $1.2M/yr. Standardized deployments, remote management.</p>
     </div>
     <div class="card">
@@ -371,7 +371,7 @@ spec:
   <div class="flow">
     <div class="flow-step">1. Export from vSphere</div>
     <div class="flow-arrow">&#8594;</div>
-    <div class="flow-step">2. Convert (hyper2kvm)</div>
+    <div class="flow-step">2. Convert (h2kvm)</div>
     <div class="flow-arrow">&#8594;</div>
     <div class="flow-step">3. Push to Registry</div>
     <div class="flow-arrow">&#8594;</div>
@@ -483,7 +483,7 @@ virtctl image-upload dv factory-scada-disk \
     <div class="card">
       <div class="icon">2️⃣</div>
       <h4>Single-Site Pilot</h4>
-      <p>Pick one edge site. Deploy K3s + KubeVirt. Migrate 3-5 VMs with hyper2kvm. Validate: boot, network, application, performance.</p>
+      <p>Pick one edge site. Deploy K3s + KubeVirt. Migrate 3-5 VMs with h2kvm. Validate: boot, network, application, performance.</p>
     </div>
     <div class="card">
       <div class="icon">3️⃣</div>
@@ -501,11 +501,11 @@ virtctl image-upload dv factory-scada-disk \
     <h3>Save $1.87M Over 3 Years</h3>
     <p>Replace VMware at the edge with open source KVM + KubeVirt.<br>
     Zero license fees. GitOps management. Production-proven at scale.</p>
-    <p style="margin-top: 1em; font-weight: 600;">hyper2kvm + hypersdk — github.com/ssahani/hyper2kvm</p>
+    <p style="margin-top: 1em; font-weight: 600;">h2kvm + hypersdk — github.com/ssahani/h2kvm</p>
   </div>
 
   <div class="footer">
-    <p>hyper2kvm + hypersdk — Enterprise VM Migration Platform<br>Proprietary (Zyvor AI Labs)</p>
+    <p>h2kvm + hypersdk — Enterprise VM Migration Platform<br>Proprietary (Zyvor AI Labs)</p>
   </div>
 </div>
 

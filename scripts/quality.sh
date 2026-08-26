@@ -37,7 +37,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-echo "🔍 === hyper2kvm Code Quality Checker ==="
+echo "🔍 === h2kvm Code Quality Checker ==="
 echo
 
 # Function to run a check
@@ -71,19 +71,19 @@ fi
 
 # 3. Mypy type checking
 if [ "$STRICT_MODE" = true ]; then
-    run_check "Mypy Type Check (strict)" "mypy hyper2kvm/ --strict"
+    run_check "Mypy Type Check (strict)" "mypy h2kvm/ --strict"
 else
-    run_check "Mypy Type Check" "mypy hyper2kvm/"
+    run_check "Mypy Type Check" "mypy h2kvm/"
 fi
 
 # 4. Security check with bandit
-run_check "Bandit Security Scan" "bandit -r hyper2kvm/ -ll -q"
+run_check "Bandit Security Scan" "bandit -r h2kvm/ -ll -q"
 
 # 5. Check for common issues
 echo "🔎 Checking for common issues..."
 
 # Check for TODO without issue numbers
-if grep -rn "TODO:" hyper2kvm/ --include="*.py" | grep -v "TODO("; then
+if grep -rn "TODO:" h2kvm/ --include="*.py" | grep -v "TODO("; then
     echo "⚠️  Found TODO comments without issue reference"
     if [ "$STRICT_MODE" = true ]; then
         FAILED_CHECKS=$((FAILED_CHECKS + 1))
@@ -94,7 +94,7 @@ fi
 echo
 
 # Check for print statements (should use logging)
-if grep -rn "print(" hyper2kvm/ --include="*.py" | grep -v "# noqa"; then
+if grep -rn "print(" h2kvm/ --include="*.py" | grep -v "# noqa"; then
     echo "⚠️  Found print() statements (use logging instead)"
     if [ "$STRICT_MODE" = true ]; then
         FAILED_CHECKS=$((FAILED_CHECKS + 1))
@@ -105,7 +105,7 @@ fi
 echo
 
 # Check for debugger statements
-if grep -rn "breakpoint()\|pdb.set_trace()\|ipdb.set_trace()" hyper2kvm/ \
+if grep -rn "breakpoint()\|pdb.set_trace()\|ipdb.set_trace()" h2kvm/ \
    --include="*.py"; then
     echo "❌ Found debugger statements"
     FAILED_CHECKS=$((FAILED_CHECKS + 1))

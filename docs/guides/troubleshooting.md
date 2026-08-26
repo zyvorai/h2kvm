@@ -1,4 +1,4 @@
-# hyper2kvm Troubleshooting Guide
+# h2kvm Troubleshooting Guide
 
 Comprehensive troubleshooting guide for common issues and their solutions.
 
@@ -327,7 +327,7 @@ qemu-img convert \
 **Diagnosis:**
 ```bash
 # Monitor memory
-watch -n 1 'ps aux | grep hyper2kvm | head -5'
+watch -n 1 'ps aux | grep h2kvm | head -5'
 
 # Check for memory leaks
 valgrind --leak-check=full h2kvmctl ...
@@ -351,7 +351,7 @@ h2kvmctl --config batch.yaml  # reduce batch_size in config
 
 ### Problem: virtio Drivers Not Found
 
-> **Note:** If you haven't installed the VirtIO drivers ISO yet, run `sudo ./scripts/install-deps.sh --virtio-win` to download it to the standard path `/var/lib/hyper2kvm/virtio-win.iso`. When the ISO is at this location, hyper2kvm auto-discovers it — no `--virtio-drivers-dir` flag is needed. Use `--virtio-drivers-dir` only to override the standard path.
+> **Note:** If you haven't installed the VirtIO drivers ISO yet, run `sudo ./scripts/install-deps.sh --virtio-win` to download it to the standard path `/var/lib/h2kvm/virtio-win.iso`. When the ISO is at this location, h2kvm auto-discovers it — no `--virtio-drivers-dir` flag is needed. Use `--virtio-drivers-dir` only to override the standard path.
 
 **Symptom:**
 ```
@@ -644,7 +644,7 @@ virt-customize -a output.qcow2 --run-command '
 # Environment variables
 export LIBGUESTFS_DEBUG=1
 export LIBGUESTFS_TRACE=1
-export HYPER2KVM_DEBUG=1
+export H2KVM_DEBUG=1
 
 # Run with verbose output
 h2kvmctl local --vmdk input.vmdk --to-output output.qcow2 -v
@@ -654,13 +654,13 @@ h2kvmctl local --vmdk input.vmdk --to-output output.qcow2 -v
 
 ```bash
 # Full debug log
-hyper2kvm --debug --log-file /tmp/hyper2kvm-debug.log ...
+h2kvm --debug --log-file /tmp/h2kvm-debug.log ...
 
 # With strace
-strace -f -o /tmp/strace.log hyper2kvm ...
+strace -f -o /tmp/strace.log h2kvm ...
 
 # With ltrace
-ltrace -o /tmp/ltrace.log hyper2kvm ...
+ltrace -o /tmp/ltrace.log h2kvm ...
 ```
 
 ### Interactive Debugging
@@ -692,14 +692,14 @@ virt-customize -a output.qcow2 --run-command 'dracut -f'
 
 If you cannot resolve the issue:
 
-1. **Check documentation**: https://docs.hyper2kvm.io
-2. **Search GitHub issues**: https://github.com/yourorg/hyper2kvm/issues
-3. **Ask on discussions**: https://github.com/yourorg/hyper2kvm/discussions
-4. **Report a bug**: https://github.com/yourorg/hyper2kvm/issues/new
+1. **Check documentation**: https://docs.h2kvm.io
+2. **Search GitHub issues**: https://github.com/yourorg/h2kvm/issues
+3. **Ask on discussions**: https://github.com/yourorg/h2kvm/discussions
+4. **Report a bug**: https://github.com/yourorg/h2kvm/issues/new
 
 **When reporting issues, include:**
 - Operating system and version
-- hyper2kvm version (`hyper2kvm --version`)
+- h2kvm version (`h2kvm --version`)
 - Full error message
 - Debug logs (`--debug --log-file debug.log`)
 - Steps to reproduce
@@ -737,7 +737,7 @@ export LIBGUESTFS_DEBUG=1          # Enable guestfs backend debug
 export LIBGUESTFS_TRACE=1          # Enable guestfs backend trace
 export LIBGUESTFS_MEMSIZE=2048     # Set memory (MB)
 export LIBGUESTFS_BACKEND=direct   # Use direct backend
-export HYPER2KVM_DEBUG=1           # Enable hyper2kvm debug
+export H2KVM_DEBUG=1           # Enable h2kvm debug
 export VSPHERE_USERNAME=admin      # vSphere username
 export VSPHERE_PASSWORD=pass       # vSphere password
 ```

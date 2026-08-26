@@ -1,6 +1,6 @@
 # Tutorials
 
-Step-by-step tutorials for common hyper2kvm use cases.
+Step-by-step tutorials for common h2kvm use cases.
 
 ## Tutorial 1: First VM Validation
 
@@ -8,7 +8,7 @@ Learn to validate a VM image in 5 minutes.
 
 ### Prerequisites
 
-- hyper2kvm installed: `pip install hyper2kvm`
+- h2kvm installed: `pip install h2kvm`
 - systemd-container package
 - A VM image (qcow2, raw, vmdk, etc.)
 
@@ -16,7 +16,7 @@ Learn to validate a VM image in 5 minutes.
 
 ```bash
 # Validate a simple VM image
-hyper2kvm validate /path/to/ubuntu-22.04.qcow2
+h2kvm validate /path/to/ubuntu-22.04.qcow2
 ```
 
 Expected output:
@@ -33,7 +33,7 @@ Validation passed in 45.2 seconds
 
 ```bash
 # Customize memory and CPUs
-hyper2kvm validate ubuntu.qcow2 \
+h2kvm validate ubuntu.qcow2 \
     --memory 4096 \
     --cpus 4 \
     --timeout 300
@@ -43,7 +43,7 @@ hyper2kvm validate ubuntu.qcow2 \
 
 ```bash
 # Validate with TPM emulation (for secure boot testing)
-hyper2kvm validate ubuntu.qcow2 --tpm
+h2kvm validate ubuntu.qcow2 --tpm
 ```
 
 ### Troubleshooting
@@ -57,7 +57,7 @@ If validation fails:
 
 2. Increase timeout:
    ```bash
-   hyper2kvm validate ubuntu.qcow2 --timeout 600
+   h2kvm validate ubuntu.qcow2 --timeout 600
    ```
 
 3. Check systemd-vmspawn:
@@ -79,7 +79,7 @@ Validate a Kubernetes node image before deployment.
 ### Step 1: Basic K8s Validation
 
 ```bash
-hyper2kvm validate k8s-node.qcow2 \
+h2kvm validate k8s-node.qcow2 \
     --kubernetes \
     --memory 4096 \
     --cpus 4 \
@@ -89,7 +89,7 @@ hyper2kvm validate k8s-node.qcow2 \
 ### Step 2: Python API
 
 ```python
-from hyper2kvm.vmspawn import KubernetesNodeValidator, MachineConfig
+from h2kvm.vmspawn import KubernetesNodeValidator, MachineConfig
 
 # Configure VM
 config = MachineConfig(
@@ -130,14 +130,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install hyper2kvm
+      - name: Install h2kvm
         run: |
           sudo apt install systemd-container
-          pip install hyper2kvm
+          pip install h2kvm
       
       - name: Validate image
         run: |
-          hyper2kvm validate images/k8s-node.qcow2 \
+          h2kvm validate images/k8s-node.qcow2 \
             --kubernetes \
             --timeout 600
 ```
@@ -151,7 +151,7 @@ Validate 100 VMs in parallel.
 ```python
 # batch_validate.py
 import asyncio
-from hyper2kvm.vmspawn import AsyncVMManager, MachineConfig
+from h2kvm.vmspawn import AsyncVMManager, MachineConfig
 
 async def main():
     # Create manager with parallelism limit
@@ -236,20 +236,20 @@ Deploy validation as Kubernetes CRDs.
 
 ```bash
 # Install CRDs
-kubectl apply -f https://github.com/ssahani/hyper2kvm/releases/latest/download/crd.yaml
+kubectl apply -f https://github.com/ssahani/h2kvm/releases/latest/download/crd.yaml
 
 # Install operator
-kubectl apply -f https://github.com/ssahani/hyper2kvm/releases/latest/download/operator.yaml
+kubectl apply -f https://github.com/ssahani/h2kvm/releases/latest/download/operator.yaml
 
 # Verify installation
-kubectl get pods -n hyper2kvm-system
+kubectl get pods -n h2kvm-system
 ```
 
 ### Step 2: Create Validation
 
 ```yaml
 # validation-example.yaml
-apiVersion: hyper2kvm.io/v1
+apiVersion: h2kvm.io/v1
 kind: Validation
 metadata:
   name: ubuntu-test
@@ -278,14 +278,14 @@ kubectl get validations -w
 kubectl describe validation ubuntu-test
 
 # View pod logs
-kubectl logs -f $(kubectl get pods -l hyper2kvm.io/validation=ubuntu-test -o name)
+kubectl logs -f $(kubectl get pods -l h2kvm.io/validation=ubuntu-test -o name)
 ```
 
 ### Step 4: Create KubeVirt VM
 
 ```yaml
 # validation-with-vm.yaml
-apiVersion: hyper2kvm.io/v1
+apiVersion: h2kvm.io/v1
 kind: Validation
 metadata:
   name: k8s-node-vm
@@ -343,7 +343,7 @@ Optimize validation performance for your workload.
 pip install pytest-benchmark
 
 # Run benchmarks
-pytest hyper2kvm/vmspawn/tests/test_performance.py --benchmark-only
+pytest h2kvm/vmspawn/tests/test_performance.py --benchmark-only
 ```
 
 ### Step 2: Find Optimal Parallelism
@@ -352,7 +352,7 @@ pytest hyper2kvm/vmspawn/tests/test_performance.py --benchmark-only
 # find_optimal.py
 import asyncio
 import time
-from hyper2kvm.vmspawn import AsyncVMManager, MachineConfig
+from h2kvm.vmspawn import AsyncVMManager, MachineConfig
 
 async def test_concurrency(concurrency):
     manager = AsyncVMManager(max_parallel=concurrency)
@@ -438,9 +438,9 @@ validate-images:
   before_script:
     - apt-get update
     - apt-get install -y systemd-container qemu-utils python3-pip
-    - pip3 install hyper2kvm
+    - pip3 install h2kvm
   script:
-    - hyper2kvm validate images/*.qcow2
+    - h2kvm validate images/*.qcow2
   artifacts:
     reports:
       junit: validation-report.xml
@@ -456,8 +456,8 @@ pipeline {
         stage('Validate Images') {
             steps {
                 sh '''
-                    pip install hyper2kvm
-                    hyper2kvm validate images/*.qcow2 --report-format junit
+                    pip install h2kvm
+                    h2kvm validate images/*.qcow2 --report-format junit
                 '''
             }
         }
@@ -486,14 +486,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup hyper2kvm
+      - name: Setup h2kvm
         run: |
           sudo apt install systemd-container
-          pip install hyper2kvm
+          pip install h2kvm
       
       - name: Validate images
         run: |
-          hyper2kvm validate images/*.qcow2 \
+          h2kvm validate images/*.qcow2 \
             --report-format github
 ```
 
@@ -502,4 +502,4 @@ jobs:
 - Explore [API Reference](API_REFERENCE.md) for detailed API docs
 - Check [Performance Guide](performance/BENCHMARKS.md) for optimization
 - Review [Examples](../examples/) for more code samples
-- Join [Discussions](https://github.com/ssahani/hyper2kvm/discussions) for help
+- Join [Discussions](https://github.com/ssahani/h2kvm/discussions) for help

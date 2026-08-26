@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>hyper2kvm + hypersdk — Technical Architecture</title>
+<title>h2kvm + hypersdk — Technical Architecture</title>
 <style>
   @page { size: A4; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -55,7 +55,7 @@
 <!-- PAGE: TWO-LAYER ARCHITECTURE -->
 <div class="page page-dark">
   <h2 class="st">Two-Layer <span>Architecture</span></h2>
-  <p class="sub">hypersdk handles cloud APIs. hyper2kvm handles disk conversion and guest fixes.</p>
+  <p class="sub">hypersdk handles cloud APIs. h2kvm handles disk conversion and guest fixes.</p>
 
   <div class="arch-box">
     <pre>
@@ -70,7 +70,7 @@
    +-----+------------+
          |  VMDK / OVA / VHD / RAW
    +-----v-----------+
-   |    hyper2kvm     |   Python — disk conversion + guest fixes
+   |    h2kvm     |   Python — disk conversion + guest fixes
    |                  |   Format conversion (qcow2/raw)
    |  VMCraft engine  |   Offline OS repair (fstab, initramfs, drivers)
    |  libguestfs      |   Libvirt domain generation
@@ -91,7 +91,7 @@
     </div>
     <div class="card">
       <div class="icon">🟠</div>
-      <h4>hyper2kvm (Python)</h4>
+      <h4>h2kvm (Python)</h4>
       <p>Disk processing engine. Converts formats, applies offline guest fixes, generates libvirt XML, deploys to KubeVirt. 1,273 tests. Interactive TUI (zkvm).</p>
     </div>
   </div>
@@ -191,9 +191,9 @@ type Provider interface {
   </div>
 </div>
 
-<!-- PAGE: HYPER2KVM PIPELINE -->
+<!-- PAGE: H2KVM PIPELINE -->
 <div class="page page-light">
-  <h2 class="st">hyper2kvm: <span>Conversion Pipeline</span></h2>
+  <h2 class="st">h2kvm: <span>Conversion Pipeline</span></h2>
   <p class="sub">What happens to a VM disk from export to first boot.</p>
 
   <div class="flow">
@@ -324,7 +324,7 @@ type Provider interface {
   </div>
 
   <div class="footer">
-    <p>hyper2kvm + hypersdk — Enterprise VM Migration Platform<br>Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p>
+    <p>h2kvm + hypersdk — Enterprise VM Migration Platform<br>Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p>
   </div>
 </div>
 

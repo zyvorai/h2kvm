@@ -46,7 +46,7 @@ func (r *HyperConversion) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// +kubebuilder:webhook:path=/mutate-hyper2kvm-io-v1alpha1-hyperconversion,mutating=true,failurePolicy=fail,sideEffects=None,groups=hyper2kvm.io,resources=hyperconversions,verbs=create;update,versions=v1alpha1,name=mhyperconversion.kb.io,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/mutate-h2kvm-io-v1alpha1-hyperconversion,mutating=true,failurePolicy=fail,sideEffects=None,groups=h2kvm.io,resources=hyperconversions,verbs=create;update,versions=v1alpha1,name=mhyperconversion.kb.io,admissionReviewVersions=v1
 
 // hyperConversionDefaulter implements webhook.CustomDefaulter.
 type hyperConversionDefaulter struct{}
@@ -135,7 +135,7 @@ func (d *hyperConversionDefaulter) Default(_ context.Context, obj runtime.Object
 	return nil
 }
 
-// +kubebuilder:webhook:path=/validate-hyper2kvm-io-v1alpha1-hyperconversion,mutating=false,failurePolicy=fail,sideEffects=None,groups=hyper2kvm.io,resources=hyperconversions,verbs=create;update,versions=v1alpha1,name=vhyperconversion.kb.io,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/validate-h2kvm-io-v1alpha1-hyperconversion,mutating=false,failurePolicy=fail,sideEffects=None,groups=h2kvm.io,resources=hyperconversions,verbs=create;update,versions=v1alpha1,name=vhyperconversion.kb.io,admissionReviewVersions=v1
 
 // hyperConversionValidator implements webhook.CustomValidator.
 type hyperConversionValidator struct{}

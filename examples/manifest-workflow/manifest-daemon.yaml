@@ -1,4 +1,4 @@
-# hyper2kvm Manifest Workflow Daemon Configuration
+# h2kvm Manifest Workflow Daemon Configuration
 # ================================================
 # 3-Directory workflow for declarative manifest processing
 #
@@ -14,14 +14,14 @@ daemon: true
 manifest_workflow_mode: true
 
 # Base directory for manifest workflow
-manifest_workflow_dir: /var/lib/hyper2kvm/manifest-workflow
+manifest_workflow_dir: /var/lib/h2kvm/manifest-workflow
 
 # Output directory for converted VMs
-output_dir: /var/lib/hyper2kvm/output
+output_dir: /var/lib/h2kvm/output
 
 # Worker pool settings
 max_concurrent_jobs: 2
 
 # Logging
-log_file: /var/log/hyper2kvm/manifest-daemon.log
+log_file: /var/log/h2kvm/manifest-daemon.log
 verbose: 1

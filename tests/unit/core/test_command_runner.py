@@ -11,8 +11,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from hyper2kvm.core.command_runner import CommandResult, CommandRunner
-from hyper2kvm.core.exceptions import CommandError
+from h2kvm.core.command_runner import CommandResult, CommandRunner
+from h2kvm.core.exceptions import CommandError
 
 
 # ---------------------------------------------------------------------------
@@ -142,8 +142,8 @@ class TestCommandRunnerInit:
 
 
 class TestRunBasic:
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_run_string_command_success(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 1.5]
         mock_subproc.return_value = _make_process(0, "output", "")
@@ -157,8 +157,8 @@ class TestRunBasic:
         assert result.duration == 1.5
         assert result.command == "echo hello"
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_run_list_command(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "ok", "")
@@ -170,8 +170,8 @@ class TestRunBasic:
         call_kwargs = mock_subproc.call_args
         assert call_kwargs[1]["shell"] is False
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_run_failed_command_no_check(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.2]
         mock_subproc.return_value = _make_process(1, "", "error msg")
@@ -203,7 +203,7 @@ class TestRunDryRun:
         result = dry_runner.run("rm -rf /")
         assert result.command == "rm -rf /"
 
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_dry_run_does_not_call_subprocess(self, mock_subproc, dry_runner):
         dry_runner.run("echo hello")
         mock_subproc.assert_not_called()
@@ -215,8 +215,8 @@ class TestRunDryRun:
 
 
 class TestRunSudo:
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_sudo_prepended_to_string(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "", "")
@@ -228,8 +228,8 @@ class TestRunSudo:
         call_args = mock_subproc.call_args[0][0]
         assert call_args.startswith("sudo ")
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_sudo_prepended_to_list(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "", "")
@@ -251,8 +251,8 @@ class TestRunSudo:
 
 
 class TestRunTimeout:
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_default_timeout_used(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "", "")
@@ -262,8 +262,8 @@ class TestRunTimeout:
         call_kwargs = mock_subproc.call_args[1]
         assert call_kwargs["timeout"] == 300.0
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_custom_timeout(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "", "")
@@ -273,8 +273,8 @@ class TestRunTimeout:
         call_kwargs = mock_subproc.call_args[1]
         assert call_kwargs["timeout"] == 60.0
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_timeout_zero_means_no_timeout(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "", "")
@@ -284,8 +284,8 @@ class TestRunTimeout:
         call_kwargs = mock_subproc.call_args[1]
         assert call_kwargs["timeout"] is None
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_timeout_expired_raises_command_error(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0]
         mock_subproc.side_effect = subprocess.TimeoutExpired("cmd", 10)
@@ -305,8 +305,8 @@ class TestRunTimeout:
 
 
 class TestRunCheck:
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_check_true_raises_on_failure(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(1, "out", "err")
@@ -320,8 +320,8 @@ class TestRunCheck:
         assert err.context["stdout"] == "out"
         assert err.context["stderr"] == "err"
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_check_true_no_raise_on_success(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "ok", "")
@@ -329,8 +329,8 @@ class TestRunCheck:
         result = runner.run("good", check=True)
         assert result.success is True
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_check_false_returns_result_on_failure(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(2, "", "err")
@@ -339,8 +339,8 @@ class TestRunCheck:
         assert result.failed is True
         assert result.exit_code == 2
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_check_truncates_long_output_in_error(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(1, "o" * 1000, "e" * 1000)
@@ -358,8 +358,8 @@ class TestRunCheck:
 
 
 class TestRunRetry:
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_no_retry_by_default(self, mock_subproc, mock_time, runner):
         """With default retries=0 and no check, a failed command returns immediately."""
         mock_time.time.side_effect = [0.0, 0.1]
@@ -370,8 +370,8 @@ class TestRunRetry:
         assert mock_subproc.call_count == 1
         assert result.retries == 0
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_retry_on_nonzero_exit_with_retries(self, mock_subproc, mock_time, runner):
         """With retries>0, non-zero exit codes are retried even without check=True."""
         mock_time.time.side_effect = [0.0, 0.1] * 5
@@ -384,8 +384,8 @@ class TestRunRetry:
         assert mock_subproc.call_count == 4  # 1 initial + 3 retries
         assert result.failed is True
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_retry_with_check_succeeds_on_second_attempt(self, mock_subproc, mock_time, runner):
         """check=True raises CommandError on failure, which triggers retry."""
         mock_time.time.side_effect = [0.0, 0.1, 0.2, 0.3]
@@ -402,8 +402,8 @@ class TestRunRetry:
         assert mock_subproc.call_count == 2
         mock_time.sleep.assert_called_once_with(1.0)
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_retry_exponential_backoff_with_timeout(self, mock_subproc, mock_time, retry_runner):
         """TimeoutExpired triggers retry with exponential backoff delays."""
         # time.time() calls: attempt 0 start, attempt 1 start, attempt 2 start + end
@@ -424,8 +424,8 @@ class TestRunRetry:
         mock_time.sleep.assert_any_call(1.0)
         mock_time.sleep.assert_any_call(2.0)
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_retry_exhausted_raises_with_check(self, mock_subproc, mock_time, runner):
         """When all retries fail with check=True, the final exception propagates."""
         mock_time.time.side_effect = [0.0, 0.1, 0.2, 0.3]
@@ -437,8 +437,8 @@ class TestRunRetry:
 
         assert mock_subproc.call_count == 2
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_retry_with_timeout_expired_then_success(self, mock_subproc, mock_time, runner):
         """TimeoutExpired on first attempt, success on second."""
         mock_time.time.side_effect = [0.0, 0.1, 0.2]
@@ -454,8 +454,8 @@ class TestRunRetry:
         assert mock_subproc.call_count == 2
         mock_time.sleep.assert_called_once()
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_retry_timeout_exhausted_raises(self, mock_subproc, mock_time, runner):
         """All retry attempts time out -- raises CommandError with code=124."""
         mock_time.time.side_effect = [0.0, 0.1]
@@ -470,8 +470,8 @@ class TestRunRetry:
 
         assert exc_info.value.code == 124
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_default_retries_used_with_timeout(self, mock_subproc, mock_time, retry_runner):
         """When retries=None, the runner's default_retries (2) is used."""
         mock_time.time.side_effect = [0.0, 0.1, 0.2, 0.3]
@@ -489,8 +489,8 @@ class TestRunRetry:
         assert mock_subproc.call_count == 3
         assert exc_info.value.code == 124
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_retry_records_attempt_count(self, mock_subproc, mock_time, runner):
         """The retries field in CommandResult reflects the attempt number."""
         mock_time.time.side_effect = [0.0, 0.1, 0.2]
@@ -511,8 +511,8 @@ class TestRunRetry:
 
 
 class TestRunOptions:
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_capture_output_false(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "ignored", "ignored")
@@ -524,8 +524,8 @@ class TestRunOptions:
         assert result.stdout == ""
         assert result.stderr == ""
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_cwd_passed_through(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "", "")
@@ -535,8 +535,8 @@ class TestRunOptions:
         call_kwargs = mock_subproc.call_args[1]
         assert call_kwargs["cwd"] == "/tmp"
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_env_passed_through(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "", "")
@@ -547,8 +547,8 @@ class TestRunOptions:
         call_kwargs = mock_subproc.call_args[1]
         assert call_kwargs["env"] == {"FOO": "bar"}
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_shell_false_splits_string(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "", "")
@@ -567,8 +567,8 @@ class TestRunOptions:
 
 
 class TestRunChecked:
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_run_checked_raises_on_failure(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(1, "", "err")
@@ -576,8 +576,8 @@ class TestRunChecked:
         with pytest.raises(CommandError):
             runner.run_checked("bad_cmd")
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_run_checked_returns_result_on_success(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "output", "")
@@ -587,8 +587,8 @@ class TestRunChecked:
         assert result.success is True
         assert result.stdout == "output"
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_run_checked_passes_kwargs(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "", "")
@@ -606,8 +606,8 @@ class TestRunChecked:
 
 
 class TestRunSilent:
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_run_silent_returns_tuple(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "out", "err")
@@ -618,8 +618,8 @@ class TestRunSilent:
         assert stdout == "out"
         assert stderr == "err"
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_run_silent_failure_tuple(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(127, "", "not found")
@@ -630,8 +630,8 @@ class TestRunSilent:
         assert stdout == ""
         assert stderr == "not found"
 
-    @patch("hyper2kvm.core.command_runner.time")
-    @patch("hyper2kvm.core.command_runner.subprocess.run")
+    @patch("h2kvm.core.command_runner.time")
+    @patch("h2kvm.core.command_runner.subprocess.run")
     def test_run_silent_passes_kwargs(self, mock_subproc, mock_time, runner):
         mock_time.time.side_effect = [0.0, 0.1]
         mock_subproc.return_value = _make_process(0, "", "")

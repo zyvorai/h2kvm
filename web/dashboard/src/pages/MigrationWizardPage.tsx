@@ -80,7 +80,7 @@ const CONFIG_CATEGORIES = [
     ],
   },
   {
-    name: 'Libvirt (hyper2kvm · virsh define)',
+    name: 'Libvirt (h2kvm · virsh define)',
     expanded: false,
     fields: [
       { key: 'emit_domain_xml', label: 'Emit Domain XML', type: 'toggle' },
@@ -579,12 +579,12 @@ function ConfigField({ field, value, onChange, inputClass, labelClass }: {
               if (!file) return;
               const form = new FormData();
               form.append('file', file);
-              form.append('dest_dir', '/var/lib/hyper2kvm/keys');
+              form.append('dest_dir', '/var/lib/h2kvm/keys');
               try {
                 const res = await fetch('/api/v1/upload', { method: 'POST', body: form });
                 if (res.ok) {
                   const data = await res.json();
-                  onChange(data.path || `/var/lib/hyper2kvm/keys/${file.name}`);
+                  onChange(data.path || `/var/lib/h2kvm/keys/${file.name}`);
                 }
               } catch { /* silent */ }
             }} />

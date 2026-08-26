@@ -5,7 +5,7 @@ metadata:
     alm-examples: |-
       [
         {
-          "apiVersion": "hyper2kvm.io/v1alpha1",
+          "apiVersion": "h2kvm.io/v1alpha1",
           "kind": "HyperConversion",
           "metadata": {
             "name": "example-migration",
@@ -34,10 +34,10 @@ metadata:
     capabilities: Full Lifecycle
     categories: "Virtualization,Modernization,Integration & Delivery"
     certified: "false"
-    containerImage: ghcr.io/ssahani/hyper2kvm-operator:v1.2.0
+    containerImage: ghcr.io/ssahani/h2kvm-operator:v1.2.0
     createdAt: "2026-02-17T00:00:00Z"
     description: Automated VM-to-KubeVirt migration operator with multi-disk support and cloud-init integration
-    repository: https://github.com/ssahani/hyper2kvm
+    repository: https://github.com/ssahani/h2kvm
     support: Community
     operators.operatorframework.io/builder: operator-sdk-v1.34.1
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
@@ -50,7 +50,7 @@ spec:
     - description: HyperConversion manages the conversion and migration of VM disks to KubeVirt VirtualMachines
       displayName: HyperConversion
       kind: HyperConversion
-      name: hyperconversions.hyper2kvm.io
+      name: hyperconversions.h2kvm.io
       version: v1alpha1
       specDescriptors:
       - description: Source disk image location and format
@@ -177,7 +177,7 @@ spec:
 
     2. Create a HyperConversion resource:
        ```yaml
-       apiVersion: hyper2kvm.io/v1alpha1
+       apiVersion: h2kvm.io/v1alpha1
        kind: HyperConversion
        metadata:
          name: my-vm-migration
@@ -235,15 +235,15 @@ spec:
 
     ### Documentation
 
-    - [Getting Started Guide](https://github.com/ssahani/hyper2kvm/blob/main/operator/README.md)
-    - [Cloud-Init Templates](https://github.com/ssahani/hyper2kvm/blob/main/operator/templates/cloud-init/README.md)
-    - [Multi-Disk Configuration](https://github.com/ssahani/hyper2kvm/blob/main/operator/docs/MULTI_DISK.md)
-    - [Multi-Architecture Support](https://github.com/ssahani/hyper2kvm/blob/main/operator/docs/MULTI_ARCH.md)
+    - [Getting Started Guide](https://github.com/ssahani/h2kvm/blob/main/operator/README.md)
+    - [Cloud-Init Templates](https://github.com/ssahani/h2kvm/blob/main/operator/templates/cloud-init/README.md)
+    - [Multi-Disk Configuration](https://github.com/ssahani/h2kvm/blob/main/operator/docs/MULTI_DISK.md)
+    - [Multi-Architecture Support](https://github.com/ssahani/h2kvm/blob/main/operator/docs/MULTI_ARCH.md)
 
     ### Support
 
-    - GitHub Issues: [https://github.com/ssahani/hyper2kvm/issues](https://github.com/ssahani/hyper2kvm/issues)
-    - Documentation: [https://github.com/ssahani/hyper2kvm](https://github.com/ssahani/hyper2kvm)
+    - GitHub Issues: [https://github.com/ssahani/h2kvm/issues](https://github.com/ssahani/h2kvm/issues)
+    - Documentation: [https://github.com/ssahani/h2kvm](https://github.com/ssahani/h2kvm)
 
   displayName: HyperConversion Operator
   icon:
@@ -297,7 +297,7 @@ spec:
           - update
           - watch
         - apiGroups:
-          - hyper2kvm.io
+          - h2kvm.io
           resources:
           - hyperconversions
           verbs:
@@ -309,13 +309,13 @@ spec:
           - update
           - watch
         - apiGroups:
-          - hyper2kvm.io
+          - h2kvm.io
           resources:
           - hyperconversions/finalizers
           verbs:
           - update
         - apiGroups:
-          - hyper2kvm.io
+          - h2kvm.io
           resources:
           - hyperconversions/status
           verbs:
@@ -390,7 +390,7 @@ spec:
                 - --leader-elect
                 command:
                 - /manager
-                image: ghcr.io/ssahani/hyper2kvm-operator:v1.2.0
+                image: ghcr.io/ssahani/h2kvm-operator:v1.2.0
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -505,11 +505,11 @@ spec:
   - hypervisor
   links:
   - name: Documentation
-    url: https://github.com/ssahani/hyper2kvm
+    url: https://github.com/ssahani/h2kvm
   - name: Source Repository
-    url: https://github.com/ssahani/hyper2kvm
+    url: https://github.com/ssahani/h2kvm
   - name: Issue Tracker
-    url: https://github.com/ssahani/hyper2kvm/issues
+    url: https://github.com/ssahani/h2kvm/issues
   maintainers:
   - email: susant@visioncodex.com
     name: ZyvorAI Labs Private Limited
@@ -517,9 +517,9 @@ spec:
   minKubeVersion: 1.24.0
   provider:
     name: Community
-    url: https://github.com/ssahani/hyper2kvm
+    url: https://github.com/ssahani/h2kvm
   relatedImages:
-  - image: ghcr.io/ssahani/hyper2kvm-operator:v1.2.0
+  - image: ghcr.io/ssahani/h2kvm-operator:v1.2.0
     name: manager
   - image: gcr.io/kubebuilder/kube-rbac-proxy:v0.15.0
     name: kube-rbac-proxy

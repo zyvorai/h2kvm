@@ -1,6 +1,6 @@
 # Migration Checklist
 
-Comprehensive checklists for planning and executing VM migrations with Hyper2KVM.
+Comprehensive checklists for planning and executing VM migrations with H2KVM.
 
 ---
 
@@ -44,9 +44,9 @@ Comprehensive checklists for planning and executing VM migrations with Hyper2KVM
 
 #### 2. Environment Preparation
 
-- [ ] **Install Hyper2KVM**
+- [ ] **Install H2KVM**
   ```bash
-  pip install "hyper2kvm[full]"
+  pip install "h2kvm[full]"
   h2kvmctl --version
   ```
 
@@ -162,7 +162,7 @@ Comprehensive checklists for planning and executing VM migrations with Hyper2KVM
   h2kvmctl --config vm-migration.yaml
 
   # Monitor progress
-  tail -f /var/log/hyper2kvm/migration.log
+  tail -f /var/log/h2kvm/migration.log
   ```
 
 - [ ] **Migration progress tracking**

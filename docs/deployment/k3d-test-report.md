@@ -1,7 +1,7 @@
 # Worker Job Protocol v1 - k3d Integration Test Report
 
 **Date:** 2026-01-30  
-**Cluster:** k3d hyper2kvm-test (1 server, 2 agents)  
+**Cluster:** k3d h2kvm-test (1 server, 2 agents)  
 **Status:** ✅ SUCCESSFUL
 
 ---
@@ -11,18 +11,18 @@
 ### Cluster Details
 
 ```
-k3d cluster: hyper2kvm-test
+k3d cluster: h2kvm-test
 Kubernetes version: v1.31.5-k3s1
 Nodes:
-  - k3d-hyper2kvm-test-server-0 (control-plane)
-  - k3d-hyper2kvm-test-agent-0 (worker, labeled)
-  - k3d-hyper2kvm-test-agent-1 (worker, labeled)
+  - k3d-h2kvm-test-server-0 (control-plane)
+  - k3d-h2kvm-test-agent-0 (worker, labeled)
+  - k3d-h2kvm-test-agent-1 (worker, labeled)
 ```
 
 ### Container Image
 
 ```
-Image: hyper2kvm:worker
+Image: h2kvm:worker
 Base: Fedora 43
 Size: 2.03 GB (505 MB compressed)
 Python: 3.14
@@ -35,10 +35,10 @@ Python: 3.14
 ### 1. Cluster Creation ✅
 
 ```bash
-sudo k3d cluster create hyper2kvm-test \
+sudo k3d cluster create h2kvm-test \
   --servers 1 \
   --agents 2 \
-  --volume /tmp/hyper2kvm-data:/data@all
+  --volume /tmp/h2kvm-data:/data@all
 ```
 
 **Result:** Cluster created successfully with 3 nodes
@@ -47,10 +47,10 @@ sudo k3d cluster create hyper2kvm-test \
 
 ```bash
 # Build worker image
-sudo docker build --target worker -t hyper2kvm:worker .
+sudo docker build --target worker -t h2kvm:worker .
 
 # Import into k3d
-sudo k3d image import hyper2kvm:worker -c hyper2kvm-test
+sudo k3d image import h2kvm:worker -c h2kvm-test
 ```
 
 **Result:** Image imported to all nodes
@@ -59,7 +59,7 @@ sudo k3d image import hyper2kvm:worker -c hyper2kvm-test
 
 ```bash
 # Create namespace
-kubectl create namespace hyper2kvm-workers
+kubectl create namespace h2kvm-workers
 
 # Deploy RBAC
 kubectl apply -f k8s/worker/rbac.yaml
@@ -68,7 +68,7 @@ kubectl apply -f k8s/worker/rbac.yaml
 kubectl apply -f k8s/worker/configmap.yaml
 
 # Label nodes
-kubectl label nodes k3d-hyper2kvm-test-agent-{0,1} hyper2kvm.io/worker-enabled=true
+kubectl label nodes k3d-h2kvm-test-agent-{0,1} h2kvm.io/worker-enabled=true
 
 # Deploy DaemonSet (modified for k3d without init container)
 kubectl apply -f /tmp/daemonset-k3d.yaml
@@ -80,8 +80,8 @@ kubectl apply -f /tmp/daemonset-k3d.yaml
 
 ```
 NAME                     READY   STATUS    RESTARTS   AGE
-hyper2kvm-worker-8cxxt   0/1     Running   0          5m
-hyper2kvm-worker-c9n56   0/1     Running   0          5m
+h2kvm-worker-8cxxt   0/1     Running   0          5m
+h2kvm-worker-c9n56   0/1     Running   0          5m
 ```
 
 **Note:** Pods show 0/1 Ready because readiness probe requires psutil (not critical for test)
@@ -90,13 +90,13 @@ hyper2kvm-worker-c9n56   0/1     Running   0          5m
 
 ```bash
 # Created test qcow2 image
-qemu-img create -f qcow2 /var/lib/hyper2kvm/test.qcow2 1G
+qemu-img create -f qcow2 /var/lib/h2kvm/test.qcow2 1G
 
 # Created job spec (inspect operation)
-cat > /var/lib/hyper2kvm/inspect-job.json
+cat > /var/lib/h2kvm/inspect-job.json
 
 # Executed job via Worker Protocol CLI
-h2kvmctl.worker.cli run /var/lib/hyper2kvm/inspect-job.json
+h2kvmctl.worker.cli run /var/lib/h2kvm/inspect-job.json
 ```
 
 **Result:** Job executed through full Worker Protocol state machine
@@ -109,8 +109,8 @@ h2kvmctl.worker.cli run /var/lib/hyper2kvm/inspect-job.json
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| Namespace | ✅ Created | hyper2kvm-workers |
-| ServiceAccount | ✅ Created | hyper2kvm-worker |
+| Namespace | ✅ Created | h2kvm-workers |
+| ServiceAccount | ✅ Created | h2kvm-worker |
 | Role | ✅ Created | Minimal permissions |
 | RoleBinding | ✅ Created | Bound to service account |
 | ConfigMap | ✅ Created | Worker configuration |
@@ -137,7 +137,7 @@ Job k3d-test-001 lifecycle:
 14:17:26 assigned     → Assigned to worker k3d-test-worker
 14:17:26 running      → Execution started
 14:17:26 progressing  → Starting inspection
-14:17:26 failed       → No module named 'hyper2kvm.inspector'
+14:17:26 failed       → No module named 'h2kvm.inspector'
 ```
 
 **All transitions valid according to state machine specification ✅**
@@ -158,7 +158,7 @@ Job k3d-test-001 lifecycle:
 |---------|--------|-------|
 | docker-entrypoint.sh | ✅ Working | Worker mode functional |
 | Environment variables | ✅ Working | WORKER_ID, STATE_DIR, etc. |
-| Health check PID file | ✅ Working | /var/lib/hyper2kvm/worker.pid |
+| Health check PID file | ✅ Working | /var/lib/h2kvm/worker.pid |
 | Keepalive loop | ✅ Working | Pod stays running indefinitely |
 | Privileged mode | ✅ Working | Capabilities detected |
 
@@ -170,11 +170,11 @@ Job k3d-test-001 lifecycle:
 
 The test job failed with:
 ```
-Error: No module named 'hyper2kvm.inspector'
+Error: No module named 'h2kvm.inspector'
 ```
 
 **This is expected** because:
-1. The worker container is minimal and doesn't include the full hyper2kvm package
+1. The worker container is minimal and doesn't include the full h2kvm package
 2. The test validated the Worker Protocol infrastructure, not the actual inspection logic
 3. The failure occurred AFTER successful state transitions through the protocol
 
@@ -252,7 +252,7 @@ All core components work correctly:
 - ✅ Kubernetes DaemonSet deployment
 - ✅ Container orchestration
 
-The test successfully validated the **infrastructure and protocol**, not the actual VM migration operations (which require the full hyper2kvm package). This separation is intentional and demonstrates the protocol's ability to work independently of specific operations.
+The test successfully validated the **infrastructure and protocol**, not the actual VM migration operations (which require the full h2kvm package). This separation is intentional and demonstrates the protocol's ability to work independently of specific operations.
 
 **Status: PRODUCTION-READY for infrastructure deployment**  
 **Next: Implement operation handlers for actual VM migrations**

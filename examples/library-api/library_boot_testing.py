@@ -4,7 +4,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 """
-Example: Boot testing using hyper2kvm library.
+Example: Boot testing using h2kvm library.
 
 This example demonstrates:
 - Testing boot with QEMU
@@ -19,8 +19,8 @@ import logging
 import sys
 from pathlib import Path
 
-from hyper2kvm import GuestDetector
-from hyper2kvm.quality.testing import LibvirtTest, QemuTest
+from h2kvm import GuestDetector
+from h2kvm.quality.testing import LibvirtTest, QemuTest
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

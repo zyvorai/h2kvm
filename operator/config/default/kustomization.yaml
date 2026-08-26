@@ -1,5 +1,5 @@
 # Adds namespace to all resources.
-namespace: hyper2kvm-system
+namespace: h2kvm-system
 
 # Labels to add to all resources and selectors.
 #commonLabels:

@@ -69,7 +69,7 @@ Technical reference materials including API documentation, architecture, install
 - Validation APIs
 - Rollback APIs
 
-**Audience**: Developers building with Hyper2KVM
+**Audience**: Developers building with H2KVM
 **Complexity**: ⭐⭐⭐ Advanced
 
 ---
@@ -92,10 +92,10 @@ Technical reference materials including API documentation, architecture, install
 
 ### Library API
 
-**[Library API](api/library-api.md)** - Using Hyper2KVM as a Python library:
+**[Library API](api/library-api.md)** - Using H2KVM as a Python library:
 
 ```python
-from hyper2kvm import Migration
+from h2kvm import Migration
 
 # Create migration
 migration = Migration(
@@ -148,7 +148,7 @@ result = migration.run()
 
 ### Integration Contract
 
-**[Integration Contract](Integration-Contract.md)** - Requirements for integrating with Hyper2KVM:
+**[Integration Contract](Integration-Contract.md)** - Requirements for integrating with H2KVM:
 - API contracts
 - Data formats
 - Error handling
@@ -375,7 +375,7 @@ jsonschema -i manifest.json artifact-manifest-v1.0.schema.json
 
 ### API Versions
 
-| API Version | Hyper2KVM Version | Status |
+| API Version | H2KVM Version | Status |
 |-------------|-------------------|--------|
 | **v1.0** | 1.0 - 2.1.0+ | ✅ Current |
 

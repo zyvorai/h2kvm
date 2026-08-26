@@ -20,7 +20,7 @@ The checkpoint/resume feature enables long-running batch conversions to recover 
 When you run a batch conversion with checkpointing enabled (default):
 
 ```bash
-sudo hyper2kvm --config batch-manifest.json batch
+sudo h2kvm --config batch-manifest.json batch
 ```
 
 The orchestrator automatically:
@@ -33,7 +33,7 @@ The orchestrator automatically:
 If the batch is interrupted (Ctrl+C, crash, power loss, etc.), simply re-run the **same command**:
 
 ```bash
-sudo hyper2kvm --config batch-manifest.json batch
+sudo h2kvm --config batch-manifest.json batch
 ```
 
 The orchestrator will:
@@ -82,7 +82,7 @@ Example checkpoint contents:
 Checkpointing is **enabled by default**. To disable:
 
 ```python
-from hyper2kvm.manifest.batch_orchestrator import BatchOrchestrator
+from h2kvm.manifest.batch_orchestrator import BatchOrchestrator
 
 orchestrator = BatchOrchestrator(
     batch_manifest_path="batch.json",
@@ -98,14 +98,14 @@ By default, checkpoints are stored in `{output_directory}/.checkpoints/`. To cus
 {
   "batch_version": "1.0",
   "shared_config": {
-    "output_directory": "/var/lib/hyper2kvm/converted"
+    "output_directory": "/var/lib/h2kvm/converted"
   }
 }
 ```
 
 Checkpoint will be saved to:
 ```
-/var/lib/hyper2kvm/converted/.checkpoints/checkpoint-{batch_id}.json
+/var/lib/h2kvm/converted/.checkpoints/checkpoint-{batch_id}.json
 ```
 
 ### Unique Batch IDs
@@ -127,14 +127,14 @@ Each batch must have a unique `batch_id` to avoid checkpoint conflicts:
 
 Start batch conversion:
 ```bash
-sudo hyper2kvm --config batch.json batch
+sudo h2kvm --config batch.json batch
 ```
 
 After processing 3 out of 10 VMs, press Ctrl+C to interrupt.
 
 Resume from checkpoint:
 ```bash
-sudo hyper2kvm --config batch.json batch
+sudo h2kvm --config batch.json batch
 ```
 
 Output:
@@ -174,19 +174,19 @@ To ignore checkpoint and restart from scratch:
 
 ```bash
 # Remove checkpoint file
-rm -rf /var/lib/hyper2kvm/converted/.checkpoints/checkpoint-migration-2026-01-22.json
+rm -rf /var/lib/h2kvm/converted/.checkpoints/checkpoint-migration-2026-01-22.json
 
 # Re-run batch (will start from VM 1)
-sudo hyper2kvm --config batch.json batch
+sudo h2kvm --config batch.json batch
 ```
 
 Or programmatically:
 
 ```python
-from hyper2kvm.manifest.checkpoint_manager import CheckpointManager
+from h2kvm.manifest.checkpoint_manager import CheckpointManager
 
 manager = CheckpointManager(
-    checkpoint_dir="/var/lib/hyper2kvm/converted/.checkpoints",
+    checkpoint_dir="/var/lib/h2kvm/converted/.checkpoints",
     batch_id="migration-2026-01-22",
 )
 manager.reset()  # Delete checkpoint
@@ -197,10 +197,10 @@ manager.reset()  # Delete checkpoint
 ### Check Progress Percentage
 
 ```python
-from hyper2kvm.manifest.checkpoint_manager import CheckpointManager
+from h2kvm.manifest.checkpoint_manager import CheckpointManager
 
 manager = CheckpointManager(
-    checkpoint_dir="/var/lib/hyper2kvm/converted/.checkpoints",
+    checkpoint_dir="/var/lib/h2kvm/converted/.checkpoints",
     batch_id="migration-2026-01-22",
 )
 
@@ -240,7 +240,7 @@ metadata = {
 ### Manual Checkpoint Management
 
 ```python
-from hyper2kvm.manifest.checkpoint_manager import CheckpointManager
+from h2kvm.manifest.checkpoint_manager import CheckpointManager
 
 manager = CheckpointManager(
     checkpoint_dir="/checkpoints",
@@ -301,7 +301,7 @@ If checkpoint directory cannot be created:
 
 5. **Clean Up Old Checkpoints**: Remove checkpoints from completed batches
    ```bash
-   find /var/lib/hyper2kvm/converted/.checkpoints -mtime +30 -delete
+   find /var/lib/h2kvm/converted/.checkpoints -mtime +30 -delete
    ```
 
 ## Security Considerations
@@ -331,7 +331,7 @@ Verify:
 
 Check checkpoint file:
 ```bash
-cat /var/lib/hyper2kvm/converted/.checkpoints/checkpoint-{batch_id}.json
+cat /var/lib/h2kvm/converted/.checkpoints/checkpoint-{batch_id}.json
 ```
 
 Look for VM ID in `completed_vms` or `failed_vms` arrays.
@@ -406,4 +406,4 @@ class CheckpointManager:
 
 The checkpoint/resume feature makes batch migrations resilient to interruptions, enabling reliable long-running conversions without manual state tracking. Simply re-run the same command to resume from the last completed VM.
 
-For questions or issues, see the [main documentation](../../docs/Batch-Migration-Features-Guide.md) or file an issue at https://github.com/anthropics/hyper2kvm/issues.
+For questions or issues, see the [main documentation](../../docs/Batch-Migration-Features-Guide.md) or file an issue at https://github.com/anthropics/h2kvm/issues.

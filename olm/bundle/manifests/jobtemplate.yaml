@@ -1,9 +1,9 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: jobtemplates.hyper2kvm.io
+  name: jobtemplates.h2kvm.io
 spec:
-  group: hyper2kvm.io
+  group: h2kvm.io
   names:
     kind: JobTemplate
     listKind: JobTemplateList

@@ -108,7 +108,7 @@ This ensures the migrated VM actually boots and runs correctly on KVM.
 After validation, deploy to Kubernetes:
 
 ```yaml
-apiVersion: hyper2kvm.io/v1
+apiVersion: h2kvm.io/v1
 kind: Validation
 metadata:
   name: rhel88-migration

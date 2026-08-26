@@ -10,7 +10,7 @@ from unittest.mock import Mock, call
 
 import pytest
 
-from hyper2kvm.core.guest_identity import (
+from h2kvm.core.guest_identity import (
     GuestDetector,
     GuestIdentity,
     GuestType,

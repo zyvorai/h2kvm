@@ -1,4 +1,4 @@
-# Deployment Quick Reference - Hyper2KVM Operator v2.1.0
+# Deployment Quick Reference - H2KVM Operator v2.1.0
 
 **Status:** ✅ Production Ready | **Test Coverage:** 87.5% | **Date:** 2026-01-30
 
@@ -10,14 +10,14 @@
 
 ```bash
 # OpenShift
-helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-system --create-namespace \
+helm install h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-system --create-namespace \
   --set openshift.enabled=true \
   --set image.tag=2.1.0-operator
 
 # Kubernetes
-helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-system --create-namespace \
+helm install h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-system --create-namespace \
   --set openshift.enabled=false \
   --set image.tag=2.1.0-operator
 ```
@@ -26,8 +26,8 @@ helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
 
 ```bash
 # Via operator-sdk
-operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0 \
-  --namespace hyper2kvm-system
+operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
+  --namespace h2kvm-system
 
 # Via OLM catalog
 oc apply -f olm/catalog/catalog-source.yaml
@@ -38,10 +38,10 @@ oc apply -f olm/catalog/subscription.yaml
 
 ```bash
 # Deploy with automation
-./scripts/deploy-to-openshift.sh 2.1.0 helm hyper2kvm-system
+./scripts/deploy-to-openshift.sh 2.1.0 helm h2kvm-system
 
 # Or manual deployment
-./scripts/deploy-to-openshift.sh 2.1.0 manual hyper2kvm-system
+./scripts/deploy-to-openshift.sh 2.1.0 manual h2kvm-system
 ```
 
 ---
@@ -50,12 +50,12 @@ oc apply -f olm/catalog/subscription.yaml
 
 ```bash
 # Quick validation
-kubectl get crd | grep hyper2kvm
-kubectl get pods -n hyper2kvm-system
-kubectl logs -n hyper2kvm-system deployment/hyper2kvm-operator
+kubectl get crd | grep h2kvm
+kubectl get pods -n h2kvm-system
+kubectl logs -n h2kvm-system deployment/h2kvm-operator
 
 # Full test suite
-./scripts/test-openshift-deployment.sh hyper2kvm-system
+./scripts/test-openshift-deployment.sh h2kvm-system
 
 # Test migration job
 kubectl apply -f k8s/operator/examples/inspect-job.yaml
@@ -67,9 +67,9 @@ kubectl get migrationjobs -w
 ## 📦 Image Registry
 
 **Public Images:**
-- `ghcr.io/ssahani/hyper2kvm:2.1.0-operator`
-- `ghcr.io/ssahani/hyper2kvm:2.1.0-worker`
-- `ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0`
+- `ghcr.io/ssahani/h2kvm:2.1.0-operator`
+- `ghcr.io/ssahani/h2kvm:2.1.0-worker`
+- `ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0`
 
 **Build Local:**
 ```bash
@@ -112,16 +112,16 @@ image:
 
 **Pod not starting:** Check `kubectl describe pod` → Likely SCC (OpenShift) or image pull
 **CRD validation fails:** Use `kubectl apply --dry-run=server`
-**RBAC denied:** Verify `kubectl auth can-i create migrationjobs.hyper2kvm.io`
-**Worker not found:** Check pod labels `hyper2kvm.io/worker: "true"`
+**RBAC denied:** Verify `kubectl auth can-i create migrationjobs.h2kvm.io`
+**Worker not found:** Check pod labels `h2kvm.io/worker: "true"`
 
 ---
 
 ## 📊 Monitoring
 
 **Metrics:** `http://operator-service:8080/metrics`
-**Logs:** `kubectl logs -n hyper2kvm-system deployment/hyper2kvm-operator --follow`
-**Debug:** `kubectl set env deployment/hyper2kvm-operator LOG_LEVEL=DEBUG`
+**Logs:** `kubectl logs -n h2kvm-system deployment/h2kvm-operator --follow`
+**Debug:** `kubectl set env deployment/h2kvm-operator LOG_LEVEL=DEBUG`
 
 ---
 
@@ -129,13 +129,13 @@ image:
 
 ```bash
 # Helm
-helm upgrade hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm upgrade h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-system \
   --set image.tag=2.2.0-operator \
   --reuse-values
 
 # Rollback
-helm rollback hyper2kvm-operator -n hyper2kvm-system
+helm rollback h2kvm-operator -n h2kvm-system
 ```
 
 ---

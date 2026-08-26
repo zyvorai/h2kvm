@@ -16,9 +16,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/hyper2kvm/zkvm/internal/state"
-	"github.com/hyper2kvm/zkvm/internal/theme"
-	"github.com/hyper2kvm/zkvm/internal/widgets"
+	"github.com/h2kvm/zkvm/internal/state"
+	"github.com/h2kvm/zkvm/internal/theme"
+	"github.com/h2kvm/zkvm/internal/widgets"
 )
 
 // ExportResultMsg carries the result of an Export to Libvirt action.
@@ -531,7 +531,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			if m.notifyCfg.OnCompletion {
-				SendNotification(m.notifyCfg, "Migration Complete", "hyper2kvm migration finished successfully")
+				SendNotification(m.notifyCfg, "Migration Complete", "h2kvm migration finished successfully")
 			}
 		} else {
 			m.state = StateFailed

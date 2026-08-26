@@ -529,7 +529,7 @@ ffmpeg -hwaccel qsv -i input.mp4 \
     <tr><td>vGPU licenses (3yr)</td><td>$288,000</td><td>$288,000</td><td>Same NVIDIA vGPU cost (if used)</td></tr>
     <tr><td>vCenter (3yr)</td><td>$33,675</td><td class="check">$0</td><td>Not needed for KVM</td></tr>
     <tr><td>VMware GPU support add-on</td><td>$48,000</td><td class="check">$0</td><td>VMware charges extra for GPU hosts</td></tr>
-    <tr><td>hyper2kvm migration</td><td>—</td><td>Contact for pricing*</td><td>Proprietary (Zyvor AI Labs)</td></tr>
+    <tr><td>h2kvm migration</td><td>—</td><td>Contact for pricing*</td><td>Proprietary (Zyvor AI Labs)</td></tr>
     <tr><td>Migration labor</td><td>—</td><td>$30,000</td><td>One-time (32 GPU VMs)</td></tr>
     <tr><td><strong>3-Year Total</strong></td><td><strong>$1,386,075</strong></td><td><strong>$1,038,000</strong></td><td><strong>Savings: $348,075 (25%)</strong></td></tr>
   </table>
@@ -537,10 +537,10 @@ ffmpeg -hwaccel qsv -i input.mp4 \
 
   <div class="verdict">
     <h3>GPU + KVM = Maximum Performance at Minimum Cost</h3>
-    <p>PCI passthrough on KVM delivers 100% native GPU performance — identical to bare metal, identical to VMware passthrough, but without $378K in hypervisor licensing over 3 years. For AI/ML workloads where GPU hardware is the major cost, eliminating the hypervisor tax is the single most impactful optimization. hyper2kvm migrates GPU VMs with auto-configured passthrough, UEFI, hugepages, and CUDA validation.</p>
+    <p>PCI passthrough on KVM delivers 100% native GPU performance — identical to bare metal, identical to VMware passthrough, but without $378K in hypervisor licensing over 3 years. For AI/ML workloads where GPU hardware is the major cost, eliminating the hypervisor tax is the single most impactful optimization. h2kvm migrates GPU VMs with auto-configured passthrough, UEFI, hugepages, and CUDA validation.</p>
   </div>
 
-  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | GPU Passthrough &amp; vGPU Guide</div>
+  <div class="footer">h2kvm.io | Proprietary (Zyvor AI Labs) | GPU Passthrough &amp; vGPU Guide</div>
 </div>
 
 </body>

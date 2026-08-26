@@ -1,17 +1,17 @@
 #!/bin/bash
 # ============================================================================
-# deploy-local.sh — Build and deploy hyper2kvm on this machine
+# deploy-local.sh — Build and deploy h2kvm on this machine
 # ============================================================================
 # One command to build + install + restart locally:
-#   1. pip install hyper2kvm from source
+#   1. pip install h2kvm from source
 #   2. Build h2kweb web dashboard (Go + React)
 #   3. Install systemd services + config
 #   4. Verify installation
 #
 # Usage:
-#   ./scripts/deploy-local.sh              # full install (system deps + hyper2kvm)
+#   ./scripts/deploy-local.sh              # full install (system deps + h2kvm)
 #   ./scripts/deploy-local.sh --quick      # pip install + services only
-#   ./scripts/deploy-local.sh --uninstall  # remove hyper2kvm
+#   ./scripts/deploy-local.sh --uninstall  # remove h2kvm
 #
 # Requires: sudo privileges, Python >= 3.10
 # ============================================================================
@@ -42,14 +42,14 @@ for arg in "$@"; do
             echo "Usage: $0 [--quick|--uninstall]"
             echo ""
             echo "  --quick      Skip system deps (pip install + services only)"
-            echo "  --uninstall  Remove hyper2kvm from this machine"
+            echo "  --uninstall  Remove h2kvm from this machine"
             exit 0
             ;;
     esac
 done
 
-[ -f "$REPO_DIR/pyproject.toml" ] || error "Not in hyper2kvm repo: $REPO_DIR"
-hyper2kvm_build_metadata "$REPO_DIR"
+[ -f "$REPO_DIR/pyproject.toml" ] || error "Not in h2kvm repo: $REPO_DIR"
+h2kvm_build_metadata "$REPO_DIR"
 
 # ── Find Python >= 3.10 ──
 PYTHON=""
@@ -72,24 +72,24 @@ if $UNINSTALL_MODE; then
     deploy_ui_kv "📂" "Repo" "$REPO_DIR"
     echo ""
 
-    step "Uninstalling hyper2kvm"
-    $SUDO systemctl stop hyper2kvm.service 2>/dev/null || true
+    step "Uninstalling h2kvm"
+    $SUDO systemctl stop h2kvm.service 2>/dev/null || true
     $SUDO systemctl stop h2kweb.service 2>/dev/null || true
-    $SUDO systemctl disable hyper2kvm.service h2kweb.service 2>/dev/null || true
-    $SUDO rm -f /etc/systemd/system/hyper2kvm.service /etc/systemd/system/h2kweb.service
+    $SUDO systemctl disable h2kvm.service h2kweb.service 2>/dev/null || true
+    $SUDO rm -f /etc/systemd/system/h2kvm.service /etc/systemd/system/h2kweb.service
 
-    $SUDO $PYTHON -m pip uninstall hyper2kvm -y 2>/dev/null || true
+    $SUDO $PYTHON -m pip uninstall h2kvm -y 2>/dev/null || true
     $SUDO rm -f /usr/local/bin/h2kvmctl /usr/local/bin/h2kweb 2>/dev/null || true
     $SUDO rm -rf /usr/local/share/h2kweb/dashboard 2>/dev/null || true
-    $SUDO rm -rf /var/lib/hyper2kvm/conversions /var/lib/hyper2kvm/virtio-win-extracted 2>/dev/null || true
-    $SUDO rm -rf /var/cache/hyper2kvm ~/.cache/hyper2kvm 2>/dev/null || true
+    $SUDO rm -rf /var/lib/h2kvm/conversions /var/lib/h2kvm/virtio-win-extracted 2>/dev/null || true
+    $SUDO rm -rf /var/cache/h2kvm ~/.cache/h2kvm 2>/dev/null || true
     $SUDO systemctl daemon-reload
 
-    info "hyper2kvm removed"
+    info "h2kvm removed"
     echo ""
-    echo "  📁 Kept: /etc/hyper2kvm/daemon.yaml"
-    echo "  📁 Kept: /var/lib/hyper2kvm/virtio-win.iso"
-    echo "  📁 Kept: /var/lib/hyper2kvm/output"
+    echo "  📁 Kept: /etc/h2kvm/daemon.yaml"
+    echo "  📁 Kept: /var/lib/h2kvm/virtio-win.iso"
+    echo "  📁 Kept: /var/lib/h2kvm/output"
     echo ""
     exit 0
 fi
@@ -98,7 +98,7 @@ TOTAL_STEPS=6
 $QUICK_MODE && TOTAL_STEPS=4
 CURRENT_STEP=0
 
-deploy_ui_banner "Local Deploy" "${HYPER2KVM_VERSION} (${HYPER2KVM_COMMIT})" "🔄"
+deploy_ui_banner "Local Deploy" "${H2KVM_VERSION} (${H2KVM_COMMIT})" "🔄"
 deploy_ui_kv "📂" "Repo" "$REPO_DIR"
 deploy_ui_kv "🐍" "Python" "$PYTHON ($($PYTHON --version 2>&1))"
 deploy_ui_kv "⚡" "Mode" "$($QUICK_MODE && echo 'quick' || echo 'full')"
@@ -151,7 +151,7 @@ if ! $QUICK_MODE; then
     step "Step ${CURRENT_STEP}/${TOTAL_STEPS}: 🔌 Installing extras (hivex, boto3, virtio-win)"
 
     if [ -f "$REPO_DIR/scripts/install-deps.sh" ]; then
-        $SUDO env HYPER2KVM_PYTHON="$PYTHON" bash "$REPO_DIR/scripts/install-deps.sh" --hivex --boto3 --virtio-win 2>&1 | tail -5
+        $SUDO env H2KVM_PYTHON="$PYTHON" bash "$REPO_DIR/scripts/install-deps.sh" --hivex --boto3 --virtio-win 2>&1 | tail -5
     fi
     $SUDO $PYTHON -m pip install python-augeas 2>&1 | tail -1
     info "Extras installed"
@@ -189,14 +189,14 @@ else
     warn "libvirtd still inactive — check: systemctl status libvirtd; journalctl -u libvirtd -b"
 fi
 
-# ── pip install hyper2kvm ──
+# ── pip install h2kvm ──
 CURRENT_STEP=$((CURRENT_STEP + 1))
-step "Step ${CURRENT_STEP}/${TOTAL_STEPS}: 🐍 Installing hyper2kvm from source"
+step "Step ${CURRENT_STEP}/${TOTAL_STEPS}: 🐍 Installing h2kvm from source"
 
 cd "$REPO_DIR"
 # Uninstall old version (may be RPM-managed, ignore errors)
 set +e
-$SUDO $PYTHON -m pip uninstall hyper2kvm -y &>/dev/null
+$SUDO $PYTHON -m pip uninstall h2kvm -y &>/dev/null
 set -e
 rm -rf build/ dist/ *.egg-info 2>/dev/null || true
 
@@ -215,7 +215,7 @@ if ! PATH="${PATH:+$PATH:}/usr/sbin:/sbin" command -v virt-filesystems &>/dev/nu
     fi
 fi
 
-# Install hyper2kvm
+# Install h2kvm
 set +e
 INSTALL_OUT=$($SUDO $PYTHON -m pip install --no-cache-dir --break-system-packages . 2>&1)
 if [ $? -ne 0 ]; then
@@ -239,15 +239,15 @@ fi
 # python-hivex must match this interpreter (covers --quick when install-deps was skipped).
 if ! $PYTHON -c 'import hivex' 2>/dev/null && [ -f "$REPO_DIR/scripts/install-deps.sh" ]; then
     info "Installing hivex bindings for $PYTHON..."
-    $SUDO env HYPER2KVM_PYTHON="$PYTHON" bash "$REPO_DIR/scripts/install-deps.sh" --hivex 2>&1 | tail -12 || true
+    $SUDO env H2KVM_PYTHON="$PYTHON" bash "$REPO_DIR/scripts/install-deps.sh" --hivex 2>&1 | tail -12 || true
 fi
 $PYTHON -c 'import hivex; print("  ✅ hivex: OK")' 2>/dev/null || warn "hivex: not importable — offline Windows registry steps may fail"
 
 # Runtime dirs
-$SUDO mkdir -p /run/hyper2kvm
-if [ -f "$REPO_DIR/etc/tmpfiles.d/hyper2kvm.conf" ]; then
-    $SUDO cp "$REPO_DIR/etc/tmpfiles.d/hyper2kvm.conf" /etc/tmpfiles.d/hyper2kvm.conf
-    $SUDO systemd-tmpfiles --create /etc/tmpfiles.d/hyper2kvm.conf 2>/dev/null || true
+$SUDO mkdir -p /run/h2kvm
+if [ -f "$REPO_DIR/etc/tmpfiles.d/h2kvm.conf" ]; then
+    $SUDO cp "$REPO_DIR/etc/tmpfiles.d/h2kvm.conf" /etc/tmpfiles.d/h2kvm.conf
+    $SUDO systemd-tmpfiles --create /etc/tmpfiles.d/h2kvm.conf 2>/dev/null || true
 fi
 
 # Libguestfs linking
@@ -303,15 +303,15 @@ fi
 CURRENT_STEP=$((CURRENT_STEP + 1))
 step "Step ${CURRENT_STEP}/${TOTAL_STEPS}: ⚙️  Installing services"
 
-# hyper2kvm daemon
-$SUDO mkdir -p /etc/hyper2kvm /var/lib/hyper2kvm/queue /var/lib/hyper2kvm/output /var/log/hyper2kvm
-$SUDO chmod 755 /var/lib/hyper2kvm /var/lib/hyper2kvm/output
+# h2kvm daemon
+$SUDO mkdir -p /etc/h2kvm /var/lib/h2kvm/queue /var/lib/h2kvm/output /var/log/h2kvm
+$SUDO chmod 755 /var/lib/h2kvm /var/lib/h2kvm/output
 
-if [ ! -f /etc/hyper2kvm/daemon.yaml ]; then
-    $SUDO tee /etc/hyper2kvm/daemon.yaml > /dev/null << 'EOF'
+if [ ! -f /etc/h2kvm/daemon.yaml ]; then
+    $SUDO tee /etc/h2kvm/daemon.yaml > /dev/null << 'EOF'
 cmd: daemon
-watch_dir: /var/lib/hyper2kvm/queue
-output_dir: /var/lib/hyper2kvm/output
+watch_dir: /var/lib/h2kvm/queue
+output_dir: /var/lib/h2kvm/output
 flatten: true
 out_format: qcow2
 compress: true
@@ -321,25 +321,25 @@ remove_vmware_tools: true
 emit_domain_xml: true
 verbose: 1
 EOF
-    info "Created /etc/hyper2kvm/daemon.yaml"
+    info "Created /etc/h2kvm/daemon.yaml"
 else
-    info "/etc/hyper2kvm/daemon.yaml already exists"
+    info "/etc/h2kvm/daemon.yaml already exists"
 fi
 
-$SUDO tee /etc/systemd/system/hyper2kvm.service > /dev/null << 'EOF'
+$SUDO tee /etc/systemd/system/h2kvm.service > /dev/null << 'EOF'
 [Unit]
-Description=hyper2kvm VM Conversion Daemon
-Documentation=https://github.com/ssahani/hyper2kvm
+Description=h2kvm VM Conversion Daemon
+Documentation=https://github.com/ssahani/h2kvm
 After=network.target libvirtd.service
 
 [Service]
 Type=simple
 # virt-filesystems and other host tools are often in /usr/sbin
 Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-WorkingDirectory=/var/lib/hyper2kvm
-RuntimeDirectory=hyper2kvm
+WorkingDirectory=/var/lib/h2kvm
+RuntimeDirectory=h2kvm
 RuntimeDirectoryMode=0755
-ExecStart=/usr/local/bin/h2kvmctl --config /etc/hyper2kvm/daemon.yaml
+ExecStart=/usr/local/bin/h2kvmctl --config /etc/h2kvm/daemon.yaml
 Restart=on-failure
 RestartSec=10s
 TimeoutStartSec=30s
@@ -350,13 +350,13 @@ WantedBy=multi-user.target
 EOF
 
 $SUDO systemctl daemon-reload
-$SUDO systemctl enable --now hyper2kvm.service 2>/dev/null || true
-$SUDO systemctl restart hyper2kvm.service
+$SUDO systemctl enable --now h2kvm.service 2>/dev/null || true
+$SUDO systemctl restart h2kvm.service
 sleep 2
-if $SUDO systemctl is-active hyper2kvm &>/dev/null; then
-    info "hyper2kvm daemon: running"
+if $SUDO systemctl is-active h2kvm &>/dev/null; then
+    info "h2kvm daemon: running"
 else
-    warn "hyper2kvm daemon: not running (check: journalctl -u hyper2kvm -n 10)"
+    warn "h2kvm daemon: not running (check: journalctl -u h2kvm -n 10)"
 fi
 
 # h2kweb dashboard
@@ -425,15 +425,15 @@ done
 
 echo ""
 echo "  ── Modules ──"
-$PYTHON -c 'from hyper2kvm.providers.aws_ec2 import AWSConfig; print("  📍 AWS provider: OK")' 2>/dev/null || echo "  ⚠️  AWS provider: not available"
-$PYTHON -c 'from hyper2kvm.providers.azure import AzureConfig; print("  📍 Azure provider: OK")' 2>/dev/null || echo "  ⚠️  Azure provider: not available"
-$PYTHON -c 'from hyper2kvm.vmcraft.main import VMCraft; print("  📍 VMCraft: OK")' 2>/dev/null || echo "  ⚠️  VMCraft: not available"
+$PYTHON -c 'from h2kvm.providers.aws_ec2 import AWSConfig; print("  📍 AWS provider: OK")' 2>/dev/null || echo "  ⚠️  AWS provider: not available"
+$PYTHON -c 'from h2kvm.providers.azure import AzureConfig; print("  📍 Azure provider: OK")' 2>/dev/null || echo "  ⚠️  Azure provider: not available"
+$PYTHON -c 'from h2kvm.vmcraft.main import VMCraft; print("  📍 VMCraft: OK")' 2>/dev/null || echo "  ⚠️  VMCraft: not available"
 $PYTHON -c 'import hivex; print("  📍 python-hivex: OK")' 2>/dev/null || echo "  ⚠️  python-hivex: not installed"
 $PYTHON -c 'import boto3; print("  📍 boto3: OK")' 2>/dev/null || echo "  ⚠️  boto3: not installed"
 
 echo ""
 echo "  ── Services ──"
-for svc in hyper2kvm h2kweb libvirtd; do
+for svc in h2kvm h2kweb libvirtd; do
     if systemctl is-active "$svc" &>/dev/null; then
         echo "  📍 $svc: running"
     else
@@ -443,9 +443,9 @@ done
 
 echo ""
 echo "  ── Storage ──"
-[ -f /var/lib/hyper2kvm/virtio-win.iso ] && echo "  📍 virtio-win.iso: OK" || echo "  ⚠️  virtio-win.iso: not found"
+[ -f /var/lib/h2kvm/virtio-win.iso ] && echo "  📍 virtio-win.iso: OK" || echo "  ⚠️  virtio-win.iso: not found"
 
-hyper2kvm_print_success "localhost" "0"
+h2kvm_print_success "localhost" "0"
 deploy_ui_note "🚀 h2kvmctl --config migration.yaml"
-deploy_ui_note "📋 journalctl -u hyper2kvm -f"
+deploy_ui_note "📋 journalctl -u h2kvm -f"
 echo ""

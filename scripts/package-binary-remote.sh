@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# package-binary-remote.sh — Build hyper2kvm on a remote Linux host and tarball it
+# package-binary-remote.sh — Build h2kvm on a remote Linux host and tarball it
 # ============================================================================
 # Rsync sources, `pip install` + `web` dashboard build on the server, tarball
 # Python CLI, h2kvmctl, h2kweb + UI for client handoff (no deploy-remote install).
@@ -45,14 +45,14 @@ if [[ -z "${HOST}" ]]; then
     exit 1
 fi
 
-VERSION="${HYPER2KVM_PACKAGE_VERSION:-$(sed -n 's/^version = "\(.*\)"/\1/p' "${REPO_DIR}/pyproject.toml" | head -1)}"
+VERSION="${H2KVM_PACKAGE_VERSION:-$(sed -n 's/^version = "\(.*\)"/\1/p' "${REPO_DIR}/pyproject.toml" | head -1)}"
 VERSION="${VERSION:-0.3.0}"
 ARCH="linux-amd64"
 REMOTE="${USER}@${HOST}"
 REMOTE_HOME=$(ssh -o BatchMode=yes -o ConnectTimeout="${SSH_TIMEOUT}" "${REMOTE}" 'echo "$HOME"')
-BUILD_DIR="${REMOTE_HOME}/.deployment/hyper2kvm-package"
-OUT_DIR="${HYPER2KVM_PACKAGE_DIR:-${REMOTE_HOME}/hyper2kvm-dist}"
-ARTIFACT="hyper2kvm-${VERSION}-${ARCH}"
+BUILD_DIR="${REMOTE_HOME}/.deployment/h2kvm-package"
+OUT_DIR="${H2KVM_PACKAGE_DIR:-${REMOTE_HOME}/h2kvm-dist}"
+ARTIFACT="h2kvm-${VERSION}-${ARCH}"
 LOCAL_DIST="${REPO_DIR}/dist"
 
 RSYNC_EXCLUDES=(
@@ -68,7 +68,7 @@ RSYNC_EXCLUDES=(
 # shellcheck source=lib/package-remote-ui.sh
 source "${SCRIPT_DIR}/lib/package-remote-ui.sh"
 
-pkg_remote_banner "Hyper2KVM" "${VERSION}" "${REMOTE}" "${ARCH}"
+pkg_remote_banner "H2KVM" "${VERSION}" "${REMOTE}" "${ARCH}"
 
 _ensure_h2kweb_local() {
     if [[ -f "${REPO_DIR}/web/h2kweb" && -d "${REPO_DIR}/web/dashboard/dist" ]]; then
@@ -84,7 +84,7 @@ _ensure_h2kweb_local() {
 
 _ensure_h2kweb_local
 
-if [[ "${HYPER2KVM_REMOTE_SKIP_SSH_CHECK:-}" != "1" ]]; then
+if [[ "${H2KVM_REMOTE_SKIP_SSH_CHECK:-}" != "1" ]]; then
     pkg_remote_phase "Preflight"
     ssh -o BatchMode=yes -o ConnectTimeout="${SSH_TIMEOUT}" -o StrictHostKeyChecking=accept-new \
         "${REMOTE}" "true"
@@ -174,18 +174,18 @@ rm -rf "\${STAGE}"
 mkdir -p "\${STAGE}/bin" "\${STAGE}/web/dashboard"
 cp -a "\${BUILD_DIR}/.pkg-venv" "\${STAGE}/venv"
 cp "\${BUILD_DIR}/.pkg-venv/bin/h2kvmctl" "\${STAGE}/bin/"
-cp "\${BUILD_DIR}/.pkg-venv/bin/hyper2kvm-luks" "\${STAGE}/bin/" 2>/dev/null || true
-cp "\${BUILD_DIR}/.pkg-venv/bin/hyper2kvm-encrypt" "\${STAGE}/bin/" 2>/dev/null || true
+cp "\${BUILD_DIR}/.pkg-venv/bin/h2kvm-luks" "\${STAGE}/bin/" 2>/dev/null || true
+cp "\${BUILD_DIR}/.pkg-venv/bin/h2kvm-encrypt" "\${STAGE}/bin/" 2>/dev/null || true
 cp "\${BUILD_DIR}/web/h2kweb" "\${STAGE}/bin/"
 chmod +x "\${STAGE}/bin/"*
-cat > "\${STAGE}/bin/hyper2kvm" <<'WRAP'
+cat > "\${STAGE}/bin/h2kvm" <<'WRAP'
 #!/usr/bin/env bash
 ROOT="\$(cd "\$(dirname "\$0")/.." && pwd)"
-exec "\${ROOT}/venv/bin/python" -m hyper2kvm "\$@"
+exec "\${ROOT}/venv/bin/python" -m h2kvm "\$@"
 WRAP
-chmod +x "\${STAGE}/bin/hyper2kvm"
+chmod +x "\${STAGE}/bin/h2kvm"
 cp -a "\${BUILD_DIR}/web/dashboard/dist/." "\${STAGE}/web/dashboard/"
-cp "\${BUILD_DIR}/examples/hyper2kvm-tools.yaml.example" "\${STAGE}/config.example.yaml" 2>/dev/null || true
+cp "\${BUILD_DIR}/examples/h2kvm-tools.yaml.example" "\${STAGE}/config.example.yaml" 2>/dev/null || true
 cp "\${BUILD_DIR}/web/h2kweb.default" "\${STAGE}/h2kweb.env.example" 2>/dev/null || true
 mkdir -p "\${STAGE}/scripts"
 cp "\${BUILD_DIR}/scripts/install-deps.sh" "\${STAGE}/scripts/" 2>/dev/null || true
@@ -206,30 +206,30 @@ cp "\${LIB}/package-uninstall.sh" "\${STAGE}/uninstall.sh"
 chmod +x "\${STAGE}/install.sh" "\${STAGE}/install-client-deps.sh" "\${STAGE}/test-package.sh" \
   "\${STAGE}/install-everything.sh" "\${STAGE}/uninstall.sh"
 chmod +x "\${LIB}/write-customer-help.sh"
-"\${LIB}/write-customer-help.sh" "\${STAGE}" "Hyper2KVM" platform
+"\${LIB}/write-customer-help.sh" "\${STAGE}" "H2KVM" platform
 cp "\${LIB}/START_HERE.txt" "\${STAGE}/"
 cat > "\${STAGE}/.package-lib/product.meta" <<'META'
-PRODUCT_NAME=Hyper2KVM
+PRODUCT_NAME=H2KVM
 ACCESS_SCHEME=http
 ACCESS_PORT=5070
 ACCESS_PATH=
 AUTO_FULL_INSTALL=0
 FINISH_EXTRA_1='Web: ./bin/h2kweb --addr 0.0.0.0:5070 --static-dir $(pwd)/web/dashboard'
-FINISH_EXTRA_2='CLI: ./bin/hyper2kvm --help'
+FINISH_EXTRA_2='CLI: ./bin/h2kvm --help'
 FINISH_EXTRA_3=
 META
 
 cat > "\${STAGE}/QUICKSTART.txt" <<'QEOF'
-hyper2kvm — 5-minute install
+h2kvm — 5-minute install
 =============================
 
-1. tar xzf hyper2kvm-*-linux-amd64.tar.gz && cd hyper2kvm-*-linux-amd64
+1. tar xzf h2kvm-*-linux-amd64.tar.gz && cd h2kvm-*-linux-amd64
 2. ./install.sh
 3. ./bin/h2kweb --addr 0.0.0.0:5070 --static-dir "$(pwd)/web/dashboard"
 4. Open http://<server-ip>:5070
 5. ./test-package.sh
 
-CLI: ./bin/hyper2kvm --help
+CLI: ./bin/h2kvm --help
 
 More: README.txt
 
@@ -239,13 +239,13 @@ QEOF
 cp "\${BUILD_DIR}/scripts/zyvor-branding/ZYVOR_INSTALL.txt" "\${STAGE}/ZYVOR_INSTALL.txt" 2>/dev/null || true
 
 cat > "\${STAGE}/README.txt" <<README_EOF
-hyper2kvm ${VERSION} — Linux amd64 client bundle
+h2kvm ${VERSION} — Linux amd64 client bundle
 ================================================
 
 START: cat START_HERE.txt  |  full help: cat HELP.txt
 
 WHAT IS IN THIS ARCHIVE (no git clone — not a single static binary)
-  bin/hyper2kvm     wrapper -> venv (Python 3.10+)
+  bin/h2kvm     wrapper -> venv (Python 3.10+)
   bin/h2kvmctl, bin/h2kweb (native Go)
   venv/             pre-built Python env (pip already run on pack host)
   web/dashboard/    static UI
@@ -255,8 +255,8 @@ REQUIREMENTS: Linux x86_64, libvirt/KVM, vSphere or libvirt as migration source
   Python runtime is bundled in venv/ — do not delete venv when moving the folder.
 
 CUSTOMER INSTALL
-  tar xzf hyper2kvm-*-linux-amd64.tar.gz
-  cd hyper2kvm-*-linux-amd64
+  tar xzf h2kvm-*-linux-amd64.tar.gz
+  cd h2kvm-*-linux-amd64
   ./install.sh
   ./bin/h2kweb --addr 0.0.0.0:5070 --static-dir "\$(pwd)/web/dashboard"
 
@@ -266,18 +266,18 @@ TEST: ./test-package.sh
 UNINSTALL: ./uninstall.sh --yes [--remove-dir]
 README_EOF
 
-for req in HELP.txt START_HERE.txt install.sh uninstall.sh README.txt QUICKSTART.txt install-client-deps.sh test-package.sh bin/hyper2kvm bin/h2kweb; do
+for req in HELP.txt START_HERE.txt install.sh uninstall.sh README.txt QUICKSTART.txt install-client-deps.sh test-package.sh bin/h2kvm bin/h2kweb; do
   test -e "\${STAGE}/\${req}" || { echo "bundle missing \${req}" >&2; exit 1; }
 done
 chmod +x "\${LIB}/finalize-customer-bundle.sh"
-"\${LIB}/finalize-customer-bundle.sh" "\${STAGE}" "\${BUILD_DIR}" "Hyper2KVM" "${VERSION}"
+"\${LIB}/finalize-customer-bundle.sh" "\${STAGE}" "\${BUILD_DIR}" "H2KVM" "${VERSION}"
 echo "Customer bundle OK"
 
 cd "\${OUT_DIR}"
 tar czf "\${ARTIFACT}.tar.gz" "\${ARTIFACT}"
 sha256sum "\${ARTIFACT}.tar.gz" | tee "\${ARTIFACT}.tar.gz.sha256"
 ls -lh "\${ARTIFACT}.tar.gz"
-"\${STAGE}/bin/hyper2kvm" --version 2>&1 | head -3 || "\${STAGE}/bin/h2kvmctl" --version 2>&1 | head -3 || true
+"\${STAGE}/bin/h2kvm" --version 2>&1 | head -3 || "\${STAGE}/bin/h2kvmctl" --version 2>&1 | head -3 || true
 REMOTE_PACK
 
 TARBALL="${ARTIFACT}.tar.gz"
@@ -293,4 +293,4 @@ if $FETCH; then
     (cd "${LOCAL_DIST}" && shasum -a 256 -c "${TARBALL}.sha256" 2>/dev/null || sha256sum -c "${TARBALL}.sha256") && pkg_ok "Checksum verified"
 fi
 
-pkg_remote_done "Hyper2KVM" "${REMOTE}:${REMOTE_TARBALL}" "${REMOTE}:${OUT_DIR}/${TARBALL}.sha256"
+pkg_remote_done "H2KVM" "${REMOTE}:${REMOTE_TARBALL}" "${REMOTE}:${OUT_DIR}/${TARBALL}.sha256"

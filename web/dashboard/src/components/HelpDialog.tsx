@@ -117,7 +117,7 @@ export default function HelpDialog({ open, tab, onClose, onTabChange }: HelpDial
           ) : (
             <div role="tabpanel" className="space-y-4 text-sm text-white/75">
               <div>
-                <h3 className="text-lg font-semibold text-white">hyper2kvm</h3>
+                <h3 className="text-lg font-semibold text-white">h2kvm</h3>
                 <p className="text-white/55 mt-1">{t('about.subtitle')}</p>
               </div>
               <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4 space-y-2">
@@ -137,8 +137,8 @@ export default function HelpDialog({ open, tab, onClose, onTabChange }: HelpDial
               </div>
               <ul className="space-y-1.5 text-white/75">
                 <li>
-                  <a href="https://zyvor.dev/hyper2kvm" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">
-                    Zyvor — hyper2kvm product page
+                  <a href="https://zyvor.dev/h2kvm" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">
+                    Zyvor — h2kvm product page
                   </a>
                 </li>
                 <li>

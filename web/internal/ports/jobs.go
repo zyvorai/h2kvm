@@ -6,7 +6,7 @@
 package ports
 
 import (
-	"github.com/hyper2kvm/web/internal/domain"
+	"github.com/h2kvm/web/internal/domain"
 )
 
 // JobManager orchestrates migration job lifecycle.

@@ -8,7 +8,7 @@
 
 ## Overview
 
-Comprehensive OpenShift support added to Hyper2KVM Kubernetes operator, enabling seamless deployment on OpenShift Container Platform 4.10-4.16 with native platform features.
+Comprehensive OpenShift support added to H2KVM Kubernetes operator, enabling seamless deployment on OpenShift Container Platform 4.10-4.16 with native platform features.
 
 ---
 
@@ -17,8 +17,8 @@ Comprehensive OpenShift support added to Hyper2KVM Kubernetes operator, enabling
 ### 1. OpenShift Route Support ✅
 
 **Files Created/Modified:**
-- `helm/hyper2kvm-operator/templates/openshift-route.yaml` - Route templates
-- `helm/hyper2kvm-operator/values.yaml` - Route configuration
+- `helm/h2kvm-operator/templates/openshift-route.yaml` - Route templates
+- `helm/h2kvm-operator/values.yaml` - Route configuration
 
 **Capabilities:**
 - Automatic Route creation for metrics and webhook endpoints
@@ -43,10 +43,10 @@ openshift:
 
 ```bash
 # Get metrics route URL
-oc get route hyper2kvm-operator-metrics -n hyper2kvm-system
+oc get route h2kvm-operator-metrics -n h2kvm-system
 
 # Access metrics
-curl -k https://$(oc get route hyper2kvm-operator-metrics -o jsonpath='{.spec.host}')/metrics
+curl -k https://$(oc get route h2kvm-operator-metrics -o jsonpath='{.spec.host}')/metrics
 ```
 
 ---
@@ -54,9 +54,9 @@ curl -k https://$(oc get route hyper2kvm-operator-metrics -o jsonpath='{.spec.ho
 ### 2. SecurityContextConstraints (SCC) ✅
 
 **Files Created/Modified:**
-- `helm/hyper2kvm-operator/templates/openshift-scc.yaml` - SCC template
-- `helm/hyper2kvm-operator/templates/rbac.yaml` - SCC RBAC permissions
-- `helm/hyper2kvm-operator/values.yaml` - SCC configuration
+- `helm/h2kvm-operator/templates/openshift-scc.yaml` - SCC template
+- `helm/h2kvm-operator/templates/rbac.yaml` - SCC RBAC permissions
+- `helm/h2kvm-operator/values.yaml` - SCC configuration
 
 **Capabilities:**
 - Pre-configured SCC for privileged worker operations
@@ -73,9 +73,9 @@ curl -k https://$(oc get route hyper2kvm-operator-metrics -o jsonpath='{.spec.ho
 **Grant SCC to ServiceAccount:**
 
 ```bash
-oc adm policy add-scc-to-user hyper2kvm-worker-scc \
-  -z hyper2kvm-worker \
-  -n hyper2kvm-workers
+oc adm policy add-scc-to-user h2kvm-worker-scc \
+  -z h2kvm-worker \
+  -n h2kvm-workers
 ```
 
 ---
@@ -83,11 +83,11 @@ oc adm policy add-scc-to-user hyper2kvm-worker-scc \
 ### 3. OLM (Operator Lifecycle Manager) Bundle ✅
 
 **Files Created:**
-- `olm/bundle/manifests/hyper2kvm-operator.clusterserviceversion.yaml` - CSV
+- `olm/bundle/manifests/h2kvm-operator.clusterserviceversion.yaml` - CSV
 - `olm/bundle/metadata/annotations.yaml` - Bundle metadata
 - `olm/bundle/tests/scorecard/config.yaml` - Scorecard tests
 - `olm/bundle.Dockerfile` - Bundle image
-- `olm/hyper2kvm-operator.package.yaml` - Package manifest
+- `olm/h2kvm-operator.package.yaml` - Package manifest
 - `olm/README.md` - OLM deployment guide
 
 **Capabilities:**
@@ -108,11 +108,11 @@ oc adm policy add-scc-to-user hyper2kvm-worker-scc \
 ```bash
 # Via OperatorHub UI
 1. Navigate to OperatorHub
-2. Search "Hyper2KVM"
+2. Search "H2KVM"
 3. Click Install
 
 # Via CLI
-operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.0.0
+operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.0.0
 ```
 
 **CSV Features:**
@@ -128,9 +128,9 @@ operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.0.0
 ### 4. OAuth Proxy Integration ✅
 
 **Files Created/Modified:**
-- `helm/hyper2kvm-operator/templates/openshift-oauth-proxy.yaml` - OAuth resources
-- `helm/hyper2kvm-operator/templates/operator-deployment.yaml` - Sidecar injection
-- `helm/hyper2kvm-operator/values.yaml` - OAuth configuration
+- `helm/h2kvm-operator/templates/openshift-oauth-proxy.yaml` - OAuth resources
+- `helm/h2kvm-operator/templates/operator-deployment.yaml` - Sidecar injection
+- `helm/h2kvm-operator/values.yaml` - OAuth configuration
 
 **Capabilities:**
 - OAuth sidecar container for authenticated metrics access
@@ -159,7 +159,7 @@ TOKEN=$(oc whoami -t)
 
 # Access metrics with authentication
 curl -k -H "Authorization: Bearer $TOKEN" \
-  https://$(oc get route hyper2kvm-operator-metrics -o jsonpath='{.spec.host}')/metrics
+  https://$(oc get route h2kvm-operator-metrics -o jsonpath='{.spec.host}')/metrics
 ```
 
 ---
@@ -167,8 +167,8 @@ curl -k -H "Authorization: Bearer $TOKEN" \
 ### 5. Platform Detection ✅
 
 **Files Modified:**
-- `helm/hyper2kvm-operator/templates/_helpers.tpl` - Detection helpers
-- `helm/hyper2kvm-operator/values.yaml` - Platform configuration
+- `helm/h2kvm-operator/templates/_helpers.tpl` - Detection helpers
+- `helm/h2kvm-operator/values.yaml` - Platform configuration
 
 **Capabilities:**
 - Automatic OpenShift API detection
@@ -179,7 +179,7 @@ curl -k -H "Authorization: Bearer $TOKEN" \
 **Helper Functions:**
 
 ```yaml
-{{- define "hyper2kvm-operator.isOpenShift" -}}
+{{- define "h2kvm-operator.isOpenShift" -}}
 {{- if .Values.openshift.enabled }}
 {{- true }}
 {{- else if and .Values.openshift.autoDetect (.Capabilities.APIVersions.Has "route.openshift.io/v1") }}
@@ -203,7 +203,7 @@ openshift:
 ### 6. Template Metadata for Web Console ✅
 
 **Files Modified:**
-- `helm/hyper2kvm-operator/values.yaml` - Template annotations/labels
+- `helm/h2kvm-operator/values.yaml` - Template annotations/labels
 
 **Capabilities:**
 - Display name in OpenShift Console
@@ -218,14 +218,14 @@ openshift:
 openshift:
   templateMetadata:
     annotations:
-      openshift.io/display-name: "Hyper2KVM Operator"
-      openshift.io/provider-display-name: "Hyper2KVM Project"
-      openshift.io/documentation-url: "https://github.com/ssahani/hyper2kvm"
+      openshift.io/display-name: "H2KVM Operator"
+      openshift.io/provider-display-name: "H2KVM Project"
+      openshift.io/documentation-url: "https://github.com/ssahani/h2kvm"
       description: "Kubernetes operator for automated VM migration"
       iconClass: "icon-openshift"
       tags: "migration,vmware,kvm,virtualization"
     labels:
-      app.kubernetes.io/part-of: "hyper2kvm"
+      app.kubernetes.io/part-of: "h2kvm"
       app.openshift.io/runtime: "python"
 ```
 
@@ -248,8 +248,8 @@ openshift:
 ```bash
 # Mirror operator images
 oc image mirror \
-  ghcr.io/ssahani/hyper2kvm:2.0.0-operator=internal-registry.example.com/hyper2kvm/operator:2.0.0 \
-  ghcr.io/ssahani/hyper2kvm:2.0.0-worker=internal-registry.example.com/hyper2kvm/worker:2.0.0
+  ghcr.io/ssahani/h2kvm:2.0.0-operator=internal-registry.example.com/h2kvm/operator:2.0.0 \
+  ghcr.io/ssahani/h2kvm:2.0.0-worker=internal-registry.example.com/h2kvm/worker:2.0.0
 ```
 
 **ImageContentSourcePolicy:**
@@ -258,11 +258,11 @@ oc image mirror \
 apiVersion: operator.openshift.io/v1alpha1
 kind: ImageContentSourcePolicy
 metadata:
-  name: hyper2kvm-mirror
+  name: h2kvm-mirror
 spec:
   repositoryDigestMirrors:
     - mirrors:
-        - internal-registry.example.com/hyper2kvm
+        - internal-registry.example.com/h2kvm
       source: ghcr.io/ssahani
 ```
 
@@ -280,7 +280,7 @@ spec:
 **Access Metrics in Console:**
 
 1. Navigate to **Observe** → **Metrics**
-2. Query: `hyper2kvm_operator_job_total`
+2. Query: `h2kvm_operator_job_total`
 
 ---
 
@@ -307,8 +307,8 @@ spec:
 
 ```bash
 # Install via OpenShift Console
-1. OperatorHub → Search "Hyper2KVM" → Install
-2. Choose namespace: hyper2kvm-system
+1. OperatorHub → Search "H2KVM" → Install
+2. Choose namespace: h2kvm-system
 3. Update channel: stable
 4. Update approval: Automatic
 ```
@@ -317,11 +317,11 @@ spec:
 
 ```bash
 # Add repo
-helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+helm repo add h2kvm https://ssahani.github.io/h2kvm
 
 # Install with OpenShift features enabled
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --set openshift.enabled=true \
   --set openshift.route.enabled=true \
   --set openshift.oauth.enabled=true
@@ -342,16 +342,16 @@ oc apply -f k8s/operator/
 ### New Files Created
 
 **Helm Templates:**
-1. `helm/hyper2kvm-operator/templates/openshift-route.yaml` - Route resources
-2. `helm/hyper2kvm-operator/templates/openshift-scc.yaml` - SecurityContextConstraints
-3. `helm/hyper2kvm-operator/templates/openshift-oauth-proxy.yaml` - OAuth proxy resources
+1. `helm/h2kvm-operator/templates/openshift-route.yaml` - Route resources
+2. `helm/h2kvm-operator/templates/openshift-scc.yaml` - SecurityContextConstraints
+3. `helm/h2kvm-operator/templates/openshift-oauth-proxy.yaml` - OAuth proxy resources
 
 **OLM Bundle:**
-4. `olm/bundle/manifests/hyper2kvm-operator.clusterserviceversion.yaml` - CSV
+4. `olm/bundle/manifests/h2kvm-operator.clusterserviceversion.yaml` - CSV
 5. `olm/bundle/metadata/annotations.yaml` - Bundle metadata
 6. `olm/bundle/tests/scorecard/config.yaml` - Scorecard config
 7. `olm/bundle.Dockerfile` - Bundle image
-8. `olm/hyper2kvm-operator.package.yaml` - Package manifest
+8. `olm/h2kvm-operator.package.yaml` - Package manifest
 9. `olm/README.md` - OLM guide
 
 **Documentation:**
@@ -361,10 +361,10 @@ oc apply -f k8s/operator/
 ### Files Modified
 
 **Helm Configuration:**
-1. `helm/hyper2kvm-operator/values.yaml` - Added OpenShift section (150+ lines)
-2. `helm/hyper2kvm-operator/templates/_helpers.tpl` - Platform detection helpers
-3. `helm/hyper2kvm-operator/templates/rbac.yaml` - SCC permissions
-4. `helm/hyper2kvm-operator/templates/operator-deployment.yaml` - OAuth sidecar
+1. `helm/h2kvm-operator/values.yaml` - Added OpenShift section (150+ lines)
+2. `helm/h2kvm-operator/templates/_helpers.tpl` - Platform detection helpers
+3. `helm/h2kvm-operator/templates/rbac.yaml` - SCC permissions
+4. `helm/h2kvm-operator/templates/operator-deployment.yaml` - OAuth sidecar
 
 ---
 
@@ -406,10 +406,10 @@ operator-sdk bundle validate olm/bundle --select-optional suite=operatorframewor
 operator-sdk scorecard olm/bundle
 
 # Lint Helm chart
-helm lint helm/hyper2kvm-operator
+helm lint helm/h2kvm-operator
 
 # Template Helm chart
-helm template hyper2kvm-operator helm/hyper2kvm-operator \
+helm template h2kvm-operator helm/h2kvm-operator \
   --set openshift.enabled=true \
   --debug
 ```
@@ -418,17 +418,17 @@ helm template hyper2kvm-operator helm/hyper2kvm-operator \
 
 ```bash
 # Deploy to test cluster
-oc new-project hyper2kvm-test
-helm install test hyper2kvm-operator \
-  --namespace hyper2kvm-test \
+oc new-project h2kvm-test
+helm install test h2kvm-operator \
+  --namespace h2kvm-test \
   --set openshift.enabled=true
 
 # Create test job
 oc apply -f k8s/operator/examples/convert-job.yaml
 
 # Verify
-oc get migrationjobs -n hyper2kvm-test
-oc logs -n hyper2kvm-test -l app.kubernetes.io/name=hyper2kvm-operator
+oc get migrationjobs -n h2kvm-test
+oc logs -n h2kvm-test -l app.kubernetes.io/name=h2kvm-operator
 ```
 
 ---
@@ -439,15 +439,15 @@ oc logs -n hyper2kvm-test -l app.kubernetes.io/name=hyper2kvm-operator
 
 All standard operator metrics are exposed, with OpenShift integration:
 
-- `hyper2kvm_operator_reconciliation_duration_seconds`
-- `hyper2kvm_operator_job_total`
-- `hyper2kvm_operator_job_failures_total`
-- `hyper2kvm_operator_worker_count`
-- `hyper2kvm_operator_is_leader`
+- `h2kvm_operator_reconciliation_duration_seconds`
+- `h2kvm_operator_job_total`
+- `h2kvm_operator_job_failures_total`
+- `h2kvm_operator_worker_count`
+- `h2kvm_operator_is_leader`
 
 **Access via OpenShift Console:**
 1. Observe → Metrics
-2. Query: `hyper2kvm_*`
+2. Query: `h2kvm_*`
 
 ---
 
@@ -477,25 +477,25 @@ Operator requires:
 
 1. **Build bundle image**:
    ```bash
-   docker build -f olm/bundle.Dockerfile -t ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0 olm/
-   docker push ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0
+   docker build -f olm/bundle.Dockerfile -t ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 olm/
+   docker push ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
    ```
 
 2. **Create catalog**:
    ```bash
    opm index add \
-     --bundles ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0 \
-     --tag ghcr.io/ssahani/hyper2kvm-operator-catalog:latest
+     --bundles ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
+     --tag ghcr.io/ssahani/h2kvm-operator-catalog:latest
    ```
 
 3. **Test on OpenShift cluster**:
    ```bash
-   operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0
+   operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
    ```
 
 4. **Submit to OperatorHub**:
    - Fork https://github.com/k8s-operatorhub/community-operators
-   - Add bundle to `operators/hyper2kvm-operator/`
+   - Add bundle to `operators/h2kvm-operator/`
    - Create PR
 
 ---
@@ -505,7 +505,7 @@ Operator requires:
 - [OpenShift Operators Documentation](https://docs.openshift.com/container-platform/latest/operators/index.html)
 - [OLM Documentation](https://olm.operatorframework.io/)
 - [Operator SDK](https://sdk.operatorframework.io/)
-- [Hyper2KVM GitHub](https://github.com/ssahani/hyper2kvm)
+- [H2KVM GitHub](https://github.com/ssahani/h2kvm)
 
 ---
 

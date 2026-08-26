@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: hyper2kvm-daemon
+  name: h2kvm-daemon
   namespace: vm-migration
   labels:
-    app: hyper2kvm-daemon
-    app.kubernetes.io/name: hyper2kvm
+    app: h2kvm-daemon
+    app.kubernetes.io/name: h2kvm
     app.kubernetes.io/component: daemon
-    app.kubernetes.io/part-of: hyper2kvm
+    app.kubernetes.io/part-of: h2kvm
 spec:
   selector:
     matchLabels:
-      app: hyper2kvm-daemon
+      app: h2kvm-daemon
   template:
     metadata:
       labels:
-        app: hyper2kvm-daemon
-        app.kubernetes.io/name: hyper2kvm
+        app: h2kvm-daemon
+        app.kubernetes.io/name: h2kvm
         app.kubernetes.io/component: daemon
-        app.kubernetes.io/part-of: hyper2kvm
+        app.kubernetes.io/part-of: h2kvm
     spec:
-      serviceAccountName: hyper2kvm
+      serviceAccountName: h2kvm
 
       # Init container to load NBD kernel module
       initContainers:
@@ -60,11 +60,11 @@ spec:
 
       containers:
         - name: daemon
-          image: hyper2kvm:v1.2.3-daemon
+          image: h2kvm:v1.2.3-daemon
           imagePullPolicy: IfNotPresent
 
           env:
-            - name: HYPER2KVM_MODE
+            - name: H2KVM_MODE
               value: "daemon"
             - name: PYTHONUNBUFFERED
               value: "1"
@@ -81,14 +81,14 @@ spec:
 
           volumeMounts:
             - name: config
-              mountPath: /etc/hyper2kvm
+              mountPath: /etc/h2kvm
               readOnly: true
             - name: watch-dir
               mountPath: /data/incoming
             - name: output-dir
               mountPath: /data/output
             - name: workdir
-              mountPath: /var/lib/hyper2kvm
+              mountPath: /var/lib/h2kvm
             - name: dev
               mountPath: /dev
               mountPropagation: Bidirectional
@@ -106,7 +106,7 @@ spec:
               command:
                 - pgrep
                 - -f
-                - "hyper2kvm.*daemon"
+                - "h2kvm.*daemon"
             initialDelaySeconds: 30
             periodSeconds: 30
             timeoutSeconds: 5
@@ -117,7 +117,7 @@ spec:
               command:
                 - sh
                 - -c
-                - "[ -f /var/lib/hyper2kvm/daemon.pid ]"
+                - "[ -f /var/lib/h2kvm/daemon.pid ]"
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 3
@@ -125,18 +125,18 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: hyper2kvm-daemon-config
+            name: h2kvm-daemon-config
         - name: watch-dir
           hostPath:
-            path: /mnt/hyper2kvm/incoming
+            path: /mnt/h2kvm/incoming
             type: DirectoryOrCreate
         - name: output-dir
           hostPath:
-            path: /mnt/hyper2kvm/output
+            path: /mnt/h2kvm/output
             type: DirectoryOrCreate
         - name: workdir
           hostPath:
-            path: /var/lib/hyper2kvm
+            path: /var/lib/h2kvm
             type: DirectoryOrCreate
         - name: dev
           hostPath:
@@ -149,7 +149,7 @@ spec:
 
       # Node selection
       nodeSelector:
-        hyper2kvm-daemon: "true"
+        h2kvm-daemon: "true"
 
       # Tolerations for privileged workloads
       tolerations:

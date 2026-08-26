@@ -36,7 +36,7 @@ curl -LO https://github.com/operator-framework/operator-sdk/releases/download/v1
 chmod +x operator-sdk_linux_amd64 && sudo mv operator-sdk_linux_amd64 /usr/local/bin/operator-sdk
 
 # Run bundle
-operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v1.2.0
+operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v1.2.0
 
 # Verify installation
 kubectl get csv -n operators | grep hyperconversion
@@ -47,37 +47,37 @@ kubectl get pods -n operators | grep hyperconversion
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm/operator
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm/operator
 
 # Install CRDs
 make install
 
 # Build operator image
-make docker-build IMG=hyper2kvm-operator:v1.2.0
+make docker-build IMG=h2kvm-operator:v1.2.0
 
 # Load to cluster (for local k3d/kind)
-k3d image import hyper2kvm-operator:v1.2.0
+k3d image import h2kvm-operator:v1.2.0
 # OR
-kind load docker-image hyper2kvm-operator:v1.2.0
+kind load docker-image h2kvm-operator:v1.2.0
 
 # Deploy operator
-make deploy IMG=hyper2kvm-operator:v1.2.0
+make deploy IMG=h2kvm-operator:v1.2.0
 
 # Verify
-kubectl get pods -n hyper2kvm-system
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager -f
+kubectl get pods -n h2kvm-system
+kubectl logs -n h2kvm-system -l control-plane=controller-manager -f
 ```
 
 ### Option 4: Direct YAML Installation
 
 ```bash
 # Install CRDs and operator in one step
-kubectl apply -f https://github.com/ssahani/hyper2kvm/releases/download/operator/v1.2.0/install.yaml
+kubectl apply -f https://github.com/ssahani/h2kvm/releases/download/operator/v1.2.0/install.yaml
 
 # Verify
 kubectl get crds | grep hyperconversions
-kubectl get deployment -n hyper2kvm-system
+kubectl get deployment -n h2kvm-system
 ```
 
 ## Installing h2kctl CLI
@@ -85,7 +85,7 @@ kubectl get deployment -n hyper2kvm-system
 ### From Source
 
 ```bash
-cd hyper2kvm/operator
+cd h2kvm/operator
 
 # Build and install
 make install-h2kctl
@@ -98,7 +98,7 @@ h2kctl version
 
 ```bash
 # Download binary (replace with your architecture)
-curl -LO https://github.com/ssahani/hyper2kvm/releases/download/operator/v1.2.0/h2kctl-linux-amd64
+curl -LO https://github.com/ssahani/h2kvm/releases/download/operator/v1.2.0/h2kctl-linux-amd64
 chmod +x h2kctl-linux-amd64
 sudo mv h2kctl-linux-amd64 /usr/local/bin/h2kctl
 
@@ -112,20 +112,20 @@ h2kctl version
 
 ```bash
 # Check operator pod
-kubectl get pods -n hyper2kvm-system
+kubectl get pods -n h2kvm-system
 
 # Expected output:
 # NAME                                              READY   STATUS    RESTARTS   AGE
 # hyperconversion-operator-controller-manager-xxx   2/2     Running   0          2m
 
 # Check logs
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager -f
+kubectl logs -n h2kvm-system -l control-plane=controller-manager -f
 ```
 
 ### 2. Install Cloud-Init Templates (Optional)
 
 ```bash
-cd hyper2kvm/operator/templates/cloud-init
+cd h2kvm/operator/templates/cloud-init
 
 # Ubuntu template
 kubectl create configmap ubuntu-init \
@@ -148,7 +148,7 @@ kubectl create configmap k8s-init \
 ```bash
 # Create test migration
 cat <<EOF | kubectl apply -f -
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: test-migration
@@ -213,16 +213,16 @@ h2kctl delete ubuntu-vm
 ### Build Multi-Arch Images
 
 ```bash
-cd hyper2kvm/operator
+cd h2kvm/operator
 
 # Build for AMD64 and ARM64 (primary platforms)
-make docker-buildx IMG=myregistry.io/hyper2kvm-operator:v1.2.0
+make docker-buildx IMG=myregistry.io/h2kvm-operator:v1.2.0
 
 # Build for all platforms (AMD64, ARM64, s390x, ppc64le)
-make docker-buildx-extended IMG=myregistry.io/hyper2kvm-operator:v1.2.0
+make docker-buildx-extended IMG=myregistry.io/h2kvm-operator:v1.2.0
 
 # Deploy to ARM cluster (automatic platform detection)
-make deploy IMG=myregistry.io/hyper2kvm-operator:v1.2.0
+make deploy IMG=myregistry.io/h2kvm-operator:v1.2.0
 ```
 
 ## Air-Gapped / Private Registry Installation
@@ -231,16 +231,16 @@ make deploy IMG=myregistry.io/hyper2kvm-operator:v1.2.0
 
 ```bash
 # Tag operator image
-docker tag hyper2kvm-operator:v1.2.0 registry.example.com/hyper2kvm-operator:v1.2.0
-docker push registry.example.com/hyper2kvm-operator:v1.2.0
+docker tag h2kvm-operator:v1.2.0 registry.example.com/h2kvm-operator:v1.2.0
+docker push registry.example.com/h2kvm-operator:v1.2.0
 
 # Build and push bundle
-make bundle-build BUNDLE_IMG=registry.example.com/hyper2kvm-bundle:v1.2.0
-make bundle-push BUNDLE_IMG=registry.example.com/hyper2kvm-bundle:v1.2.0
+make bundle-build BUNDLE_IMG=registry.example.com/h2kvm-bundle:v1.2.0
+make bundle-push BUNDLE_IMG=registry.example.com/h2kvm-bundle:v1.2.0
 
 # Build and push catalog
-make catalog-build CATALOG_IMG=registry.example.com/hyper2kvm-catalog:v1.2.0
-make catalog-push CATALOG_IMG=registry.example.com/hyper2kvm-catalog:v1.2.0
+make catalog-build CATALOG_IMG=registry.example.com/h2kvm-catalog:v1.2.0
+make catalog-push CATALOG_IMG=registry.example.com/h2kvm-catalog:v1.2.0
 ```
 
 ### 2. Create CatalogSource
@@ -253,7 +253,7 @@ metadata:
   namespace: olm
 spec:
   sourceType: grpc
-  image: registry.example.com/hyper2kvm-catalog:v1.2.0
+  image: registry.example.com/h2kvm-catalog:v1.2.0
   displayName: HyperConversion Operator Catalog
   publisher: VisionCodex
   updateStrategy:
@@ -308,8 +308,8 @@ make install
 
 # Update operator image
 kubectl set image deployment/hyperconversion-operator-controller-manager \
-  manager=ghcr.io/ssahani/hyper2kvm-operator:v1.2.0 \
-  -n hyper2kvm-system
+  manager=ghcr.io/ssahani/h2kvm-operator:v1.2.0 \
+  -n h2kvm-system
 ```
 
 ## Uninstalling
@@ -349,16 +349,16 @@ kubectl delete catalogsource hyperconversion-catalog -n olm
 
 ```bash
 # Check pod status
-kubectl get pods -n hyper2kvm-system
+kubectl get pods -n h2kvm-system
 
 # View logs
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager
+kubectl logs -n h2kvm-system -l control-plane=controller-manager
 
 # Check events
-kubectl get events -n hyper2kvm-system --sort-by='.lastTimestamp'
+kubectl get events -n h2kvm-system --sort-by='.lastTimestamp'
 
 # Verify RBAC
-kubectl auth can-i '*' '*' --as=system:serviceaccount:hyper2kvm-system:hyperconversion-operator-controller-manager
+kubectl auth can-i '*' '*' --as=system:serviceaccount:h2kvm-system:hyperconversion-operator-controller-manager
 ```
 
 ### HyperConversion Stuck in Pending
@@ -397,22 +397,22 @@ kubectl logs <virt-launcher-pod> -n <namespace>
 
 ```bash
 # Edit operator deployment
-kubectl edit deployment hyperconversion-operator-controller-manager -n hyper2kvm-system
+kubectl edit deployment hyperconversion-operator-controller-manager -n h2kvm-system
 
 # Add/modify args:
 # - --zap-log-level=debug
 # - --zap-development=true
 
 # Restart operator
-kubectl rollout restart deployment/hyperconversion-operator-controller-manager -n hyper2kvm-system
+kubectl rollout restart deployment/hyperconversion-operator-controller-manager -n h2kvm-system
 ```
 
 ## Support
 
-- **Documentation**: https://github.com/ssahani/hyper2kvm
-- **Issues**: https://github.com/ssahani/hyper2kvm/issues
+- **Documentation**: https://github.com/ssahani/h2kvm
+- **Issues**: https://github.com/ssahani/h2kvm/issues
 - **Email**: susant@visioncodex.com
-- **Slack**: #hyper2kvm (Kubernetes Slack)
+- **Slack**: #h2kvm (Kubernetes Slack)
 
 ## Next Steps
 

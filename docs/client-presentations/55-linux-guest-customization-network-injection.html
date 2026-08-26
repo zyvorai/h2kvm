@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Linux Guest Customization &amp; Network Injection — hyper2kvm Deep Dive</title>
+<title>Linux Guest Customization &amp; Network Injection — h2kvm Deep Dive</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -288,11 +288,11 @@ disable_users:
     <div class="card">
       <h4>How It Works</h4>
       <ul>
-        <li>Scripts staged in <code>/usr/local/lib/hyper2kvm-firstboot/</code></li>
+        <li>Scripts staged in <code>/usr/local/lib/h2kvm-firstboot/</code></li>
         <li>Systemd oneshot service created &amp; enabled</li>
         <li>Runs after <code>network.target</code> by default</li>
         <li>Ordered execution (lower order = earlier)</li>
-        <li>Logged to <code>/var/log/hyper2kvm-firstboot.log</code></li>
+        <li>Logged to <code>/var/log/h2kvm-firstboot.log</code></li>
         <li>Auto-disables after first run (unless keep_enabled)</li>
         <li>Auto-adds shebang if missing</li>
       </ul>
@@ -372,7 +372,7 @@ hosts:
       <h4>initramfs Custom Drivers</h4>
       <ul>
         <li>Add hardware-specific kernel modules to initramfs</li>
-        <li>Written to <code>/etc/dracut.conf.d/hyper2kvm.conf</code></li>
+        <li>Written to <code>/etc/dracut.conf.d/h2kvm.conf</code></li>
         <li>Deduplication (removes duplicates, preserves order)</li>
         <li>Validates modules exist in kernel</li>
         <li>Works with dracut (RHEL/Fedora/SUSE) and update-initramfs (Debian/Ubuntu)</li>
@@ -430,7 +430,7 @@ cloud_config:
     - vim
   runcmd:
     - systemctl enable --now httpd</pre>
-      <p style="font-size:0.78em; margin-top:4px;">Written to <code>/etc/cloud/cloud.cfg.d/99-hyper2kvm.cfg</code></p>
+      <p style="font-size:0.78em; margin-top:4px;">Written to <code>/etc/cloud/cloud.cfg.d/99-h2kvm.cfg</code></p>
     </div>
     <div class="card">
       <h4>NoCloud Seed</h4>
@@ -445,7 +445,7 @@ nocloud_seed:
         ssh_authorized_keys:
           - ssh-ed25519 AAAAC3...
   meta_data: |
-    instance-id: i-hyper2kvm-001
+    instance-id: i-h2kvm-001
     local-hostname: web-prod-01
   network_config: |
     version: 2
@@ -465,7 +465,7 @@ datasource_hint: NoCloud</pre>
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

@@ -46,7 +46,7 @@
     <!-- Your disk on SATA -->
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='none' io='native'/>
-      <source file='/home/ssahani/tt/hyper2kvm/out/windows10-fixed.qcow2'/>
+      <source file='/home/ssahani/tt/h2kvm/out/windows10-fixed.qcow2'/>
       <target dev='sda' bus='sata'/>
     </disk>
 

@@ -1,22 +1,22 @@
 <div align="center">
 
-# hyper2kvm 🚀
+# h2kvm 🚀
 
 **Enterprise-Grade VM Migration Toolkit**
 *Any Hypervisor → KVM with Zero-Downtime & Automated Fixes*
 
-[![PyPI version](https://badge.fury.io/py/hyper2kvm.svg)](https://pypi.org/project/hyper2kvm/)
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/hyper2kvm)](https://pypi.org/project/hyper2kvm/)
+[![PyPI version](https://badge.fury.io/py/h2kvm.svg)](https://pypi.org/project/h2kvm/)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/h2kvm)](https://pypi.org/project/h2kvm/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![GitHub stars](https://img.shields.io/github/stars/ssahani/hyper2kvm.svg?style=social&label=Star&maxAge=2592000)](https://github.com/ssahani/hyper2kvm/stargazers/)
+[![GitHub stars](https://img.shields.io/github/stars/ssahani/h2kvm.svg?style=social&label=Star&maxAge=2592000)](https://github.com/ssahani/h2kvm/stargazers/)
 
-[![Tests](https://github.com/ssahani/hyper2kvm/actions/workflows/tests.yml/badge.svg)](https://github.com/ssahani/hyper2kvm/actions/workflows/tests.yml)
-[![CI](https://github.com/ssahani/hyper2kvm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssahani/hyper2kvm/actions/workflows/ci.yml)
-[![Security](https://github.com/ssahani/hyper2kvm/actions/workflows/security.yml/badge.svg)](https://github.com/ssahani/hyper2kvm/actions/workflows/security.yml)
+[![Tests](https://github.com/ssahani/h2kvm/actions/workflows/tests.yml/badge.svg)](https://github.com/ssahani/h2kvm/actions/workflows/tests.yml)
+[![CI](https://github.com/ssahani/h2kvm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssahani/h2kvm/actions/workflows/ci.yml)
+[![Security](https://github.com/ssahani/h2kvm/actions/workflows/security.yml/badge.svg)](https://github.com/ssahani/h2kvm/actions/workflows/security.yml)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 [Quick Start](#quick-start-) •
-[Features](#why-hyper2kvm) •
+[Features](#why-h2kvm) •
 **[Docs index](docs/README.md)** · **[User stories](docs/USER_STORIES.md)** · [Documentation](#documentation-) •
 [Examples](#your-first-migration-5-minutes) •
 [Kubernetes](#kubernetes--openshift-deployment-️) •
@@ -111,11 +111,11 @@ Production-tested with Windows 10 Pro (20H2) and Windows 11 Pro (22H2).
 
 - **Device models** — auto-detect SPICE/QXL availability, fallback to VNC/virtio
 - **Smoke test auto-fix** — `virsh define` failures auto-repaired (qxl→virtio, spice→vnc)
-- **Runtime dirs** — `/run/hyper2kvm` created by quickstart.sh, deploy-remote.sh, h2kweb
+- **Runtime dirs** — `/run/h2kvm` created by quickstart.sh, deploy-remote.sh, h2kweb
 - **hivex for Python 3.12** — rebuilt from source on RHEL 9 (system package targets 3.9)
 - **virtio-win pre-extraction** — ISO extracted at install time for faster migrations
   - 🐕 **watchdog** added to core dependencies for daemon reliability
-  - 🔧 **hyper2kvm daemon** service deployment (systemd unit, daemon.yaml config)
+  - 🔧 **h2kvm daemon** service deployment (systemd unit, daemon.yaml config)
 - **March 2026**: 🔒 **Security & Robustness Overhaul** - 70+ bug fixes, deep exception handling, command injection fixes ✨
   - 🛡️ Fixed command injection in password handling, dracut args, SSH password exposure
   - 🪟 **Windows VirtIO driver injection** - cached ISO extraction (bsdtar + Rock Ridge), all 4 drivers found
@@ -143,7 +143,7 @@ Production-tested with Windows 10 Pro (20H2) and Windows 11 Pro (22H2).
 
 ## 📑 Table of Contents
 
-- [Why hyper2kvm?](#why-hyper2kvm)
+- [Why h2kvm?](#why-h2kvm)
   - [Feature Comparison](#-vs-traditional-tools)
 - [Quick Start](#quick-start-)
   - [Installation](#one-command-installation)
@@ -163,7 +163,7 @@ Production-tested with Windows 10 Pro (20H2) and Windows 11 Pro (22H2).
 
 ---
 
-## Why hyper2kvm?
+## Why h2kvm?
 
 ### ✨ Production-Ready Features
 
@@ -192,7 +192,7 @@ Production-tested with Windows 10 Pro (20H2) and Windows 11 Pro (22H2).
 <table>
 <tr>
 <th>Traditional Tools</th>
-<th>hyper2kvm</th>
+<th>h2kvm</th>
 </tr>
 <tr>
 <td>
@@ -218,7 +218,7 @@ Production-tested with Windows 10 Pro (20H2) and Windows 11 Pro (22H2).
 </tr>
 </table>
 
-**Unlike traditional migration tools**, hyper2kvm applies **deterministic offline fixes** to ensure **first-boot success** through deep inspection, bootloader repair, driver injection, and network stabilization — eliminating the "boot and hope" approach.
+**Unlike traditional migration tools**, h2kvm applies **deterministic offline fixes** to ensure **first-boot success** through deep inspection, bootloader repair, driver injection, and network stabilization — eliminating the "boot and hope" approach.
 
 ---
 
@@ -228,12 +228,12 @@ Production-tested with Windows 10 Pro (20H2) and Windows 11 Pro (22H2).
 
 ```bash
 # From source (recommended — installs everything on a fresh machine)
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 sudo ./scripts/quickstart.sh
 ```
 
-This installs everything: Python, qemu-img/nbd, libvirt/KVM, OVMF, govc, pyvmomi, kernel modules (nbd, kvm, vhost_net), user permissions, hyper2kvm from source, `/run/hyper2kvm` runtime directory, and pre-extracts virtio-win ISO for Windows migrations.
+This installs everything: Python, qemu-img/nbd, libvirt/KVM, OVMF, govc, pyvmomi, kernel modules (nbd, kvm, vhost_net), user permissions, h2kvm from source, `/run/h2kvm` runtime directory, and pre-extracts virtio-win ISO for Windows migrations.
 
 Optional extras:
 
@@ -249,8 +249,8 @@ sudo ./scripts/run-demo.sh
 Or do everything in one shot (fresh Ubuntu or Fedora machine):
 
 ```bash
-# Zero to running VM — installs all deps, pip packages, hyper2kvm, runs demo
-git clone https://github.com/ssahani/hyper2kvm.git && cd hyper2kvm
+# Zero to running VM — installs all deps, pip packages, h2kvm, runs demo
+git clone https://github.com/ssahani/h2kvm.git && cd h2kvm
 sudo ./scripts/zero-to-demo.sh                # libvirt only
 sudo ./scripts/zero-to-demo.sh --with-k3s     # libvirt + K3s + KubeVirt
 ```
@@ -265,7 +265,7 @@ Or build distro packages:
 
 ```bash
 # RPM (Fedora/RHEL)
-rpmbuild -bb hyper2kvm.spec
+rpmbuild -bb h2kvm.spec
 
 # DEB (Ubuntu/Debian — containerized build)
 ./scripts/build-deb.sh ubuntu:24.04
@@ -274,7 +274,7 @@ rpmbuild -bb hyper2kvm.spec
 Or install via pip:
 
 ```bash
-pip install "hyper2kvm[full]"
+pip install "h2kvm[full]"
 ```
 
 ### 🖥️ Interactive TUI (zkvm)
@@ -282,7 +282,7 @@ pip install "hyper2kvm[full]"
 The **zkvm** terminal UI provides guided migration with no CLI memorization:
 
 ```bash
-cd hyper2kvm/zkvm && go build -o zkvm . && ./zkvm
+cd h2kvm/zkvm && go build -o zkvm . && ./zkvm
 ```
 
 Features: step-by-step form, vSphere VM discovery, file browser with fuzzy search, deploy target toggles, live progress streaming, batch queue processing.
@@ -316,7 +316,7 @@ h2kvmctl --version
 <td>
 
 ```bash
-hyper2kvm --version
+h2kvm --version
 ```
 
 **Recommended for:**
@@ -389,7 +389,7 @@ curl -L https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x8
 ```
 
 > **Note:** `libguestfs` is **recommended** — when LVM or LUKS is detected on the guest disk,
-> hyper2kvm auto-switches to the libguestfs backend (supermin appliance) for full device visibility.
+> h2kvm auto-switches to the libguestfs backend (supermin appliance) for full device visibility.
 > Without it, VMCraft handles LVM via container isolation (works but less robust for complex setups).
 
 ---
@@ -411,7 +411,7 @@ curl -L https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x8
 After conversion, upload to Glance with the OpenStack optional extra:
 
 ```bash
-pip install 'hyper2kvm[openstack]'
+pip install 'h2kvm[openstack]'
 export OS_CLOUD=production
 sudo h2kvmctl --config examples/yaml/20-openstack/openstack-glance-upload.yaml
 ```
@@ -592,7 +592,7 @@ VMCraft:     1.9s   VMCraft:     95MB   VMCraft:     8,500
 #### 💻 Quick Example
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 with VMCraft() as g:
     g.add_disk("/vms/server.qcow2")
@@ -718,7 +718,7 @@ h2kvmctl --config migration-with-test.yaml
 Enterprise-grade rollback with snapshot management:
 
 ```python
-from hyper2kvm.rollback import RollbackOrchestrator
+from h2kvm.rollback import RollbackOrchestrator
 
 orchestrator = RollbackOrchestrator(logger)
 
@@ -894,7 +894,7 @@ h2kvmctl --config batch.yaml
 - **[Enterprise](docs/tutorials/04-enterprise-deployment.md)** - Production deployment
 - **[vSphere Export (govc/OVF Tool/NFC)](docs/tutorials/05-vsphere-export-tools.md)** - vCenter to libvirt end-to-end
 - **[Windows Migration](docs/tutorials/06-windows-migration.md)** - VirtIO injection, two-phase boot
-  - `quickstart.sh` installs `virtio-win.iso` to `/var/lib/hyper2kvm/virtio-win.iso` (auto-discovered, no `--virtio-drivers-dir` needed)
+  - `quickstart.sh` installs `virtio-win.iso` to `/var/lib/h2kvm/virtio-win.iso` (auto-discovered, no `--virtio-drivers-dir` needed)
 
 ### 🍳 Migration Recipes
 
@@ -974,7 +974,7 @@ h2kvmctl --config batch.yaml
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         HYPER2KVM                               │
+│                         H2KVM                               │
 │                   Enterprise Migration Toolkit                  │
 └─────────────────────────────────────────────────────────────────┘
                               │
@@ -1020,11 +1020,11 @@ h2kvmctl --config batch.yaml
 ### Virtual Environment (Recommended — All Distros)
 
 ```bash
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
-sudo ./scripts/install-venv.sh                # /opt/hyper2kvm (Fedora, RHEL, Ubuntu, Debian, SUSE)
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
+sudo ./scripts/install-venv.sh                # /opt/h2kvm (Fedora, RHEL, Ubuntu, Debian, SUSE)
 sudo ./scripts/install-venv.sh /custom/path   # custom location
-./scripts/install-venv.sh --user              # ~/.local/hyper2kvm (no root)
+./scripts/install-venv.sh --user              # ~/.local/h2kvm (no root)
 sudo ./scripts/install-venv.sh --uninstall    # remove
 ```
 
@@ -1035,8 +1035,8 @@ See [docs/development/venv-install.md](docs/development/venv-install.md) for det
 ```bash
 sudo rm -rf dist/ build/ *.egg-info
 python3 -m build --wheel --no-isolation
-rpmbuild -bb hyper2kvm.spec
-sudo rpm -Uvh ~/rpmbuild/RPMS/noarch/hyper2kvm-*.rpm
+rpmbuild -bb h2kvm.spec
+sudo rpm -Uvh ~/rpmbuild/RPMS/noarch/h2kvm-*.rpm
 ```
 
 See [docs/development/rpm-build.md](docs/development/rpm-build.md) for details.
@@ -1045,7 +1045,7 @@ See [docs/development/rpm-build.md](docs/development/rpm-build.md) for details.
 
 ```bash
 ./scripts/build-deb.sh ubuntu:24.04    # or debian:12
-sudo apt install -y ./dist/hyper2kvm_*.deb
+sudo apt install -y ./dist/h2kvm_*.deb
 ```
 
 See [docs/development/deb-build.md](docs/development/deb-build.md) for details.
@@ -1053,15 +1053,15 @@ See [docs/development/deb-build.md](docs/development/deb-build.md) for details.
 ### PyPI
 
 ```bash
-pip install "hyper2kvm[full]"     # full install
-pip install hyper2kvm             # minimal
+pip install "h2kvm[full]"     # full install
+pip install h2kvm             # minimal
 ```
 
 ### From Source (make install)
 
 ```bash
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 sudo make install
 make selftest
 ```
@@ -1090,12 +1090,12 @@ docker run -d --name h2kweb \
 
 The dashboard includes VM screenshots, OS type badges with auto-detected logos (Windows/Linux), disk bus info, guest agent status, migration readiness panel (19 checks), disk images inventory with download buttons, network topology, live migration logs with auto-scroll, dark/light theme toggle, VM resource stats, migration report export, file upload from browser (drag-drop with progress bar and cancel), chunked resumable upload for large files, VM disk image download with range request support, Prometheus metrics (`GET /metrics`, 8 metric families), email notifications (SMTP config in Settings), VM health checks (running/IP/SSH/agent), migration timeline (4-phase visual bar), config backup/restore, login rate limiting (5 attempts/IP/5min), i18n (English + German with language selector), stale upload cleanup (hourly, 24h expiry), VM create/clone/import/resize wizards, disk attach/detach and CD-ROM management, 20+ VM detail sidebar panels (guest info, connectivity test, recommendations, security analysis, storage detail, process list, network stats, lifecycle events), cluster capacity gauges, top consumers widget, activity feed, and KubeVirt live migration visibility.
 
-Remote deployment (includes h2kweb + hyper2kvm daemon automatically):
+Remote deployment (includes h2kweb + h2kvm daemon automatically):
 
 ```bash
 ./scripts/deploy-remote.sh 10.0.0.1 root password
-# → Installs h2kvmctl + h2kweb + hyper2kvm daemon + systemd services
-# → Creates /run/hyper2kvm runtime directory
+# → Installs h2kvmctl + h2kweb + h2kvm daemon + systemd services
+# → Creates /run/h2kvm runtime directory
 # → Dashboard: https://10.0.0.1:5070
 ```
 
@@ -1112,7 +1112,7 @@ See **[docs/PACKAGE_BINARY_REMOTE.md](docs/PACKAGE_BINARY_REMOTE.md)**.
 ```bash
 pip install -e ".[full,dev]"
 pytest tests/
-ruff check hyper2kvm/
+ruff check h2kvm/
 ```
 
 ### Post-Installation Verification
@@ -1125,7 +1125,7 @@ make selftest-quick    # Quick check: skip systemd service checks
 ```
 
 The selftest verifies:
-- All binaries installed to `/usr/bin/` (h2kvmctl, hyper2kvm, zkvm, h2k, hyper2kvm-operator)
+- All binaries installed to `/usr/bin/` (h2kvmctl, h2kvm, zkvm, h2k, h2kvm-operator)
 - Python package importable with all key submodules
 - External tools available (qemu-img, qemu-nbd, virsh, virt-install)
 - hypersdk integration (hypervisord, hyperctl, hyperexport in PATH)
@@ -1186,7 +1186,7 @@ h2kvmctl --cmd live-fix \
     --regen-initramfs
 ```
 
-> **Note:** All examples work identically with `hyper2kvm` command for backwards compatibility.
+> **Note:** All examples work identically with `h2kvm` command for backwards compatibility.
 
 **More Examples:** [Migration Recipes](docs/recipes/01-common-scenarios.md)
 
@@ -1279,16 +1279,16 @@ Native OpenShift support with one-click deployment from OperatorHub.
 **Install from OperatorHub**:
 
 1. Navigate to **OperatorHub** in OpenShift Console
-2. Search for "Hyper2KVM"
+2. Search for "H2KVM"
 3. Click **Install** → Choose namespace → Install
 4. Start migrating VMs with CRD-based jobs!
 
 **Or via Helm**:
 
 ```bash
-helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm repo add h2kvm https://ssahani.github.io/h2kvm
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --set openshift.enabled=true \
   --set openshift.route.enabled=true
 ```
@@ -1411,12 +1411,12 @@ Production-grade job orchestration for VM migrations on Kubernetes/OpenShift wit
 
 ```bash
 # Add Helm repo
-helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+helm repo add h2kvm https://ssahani.github.io/h2kvm
 helm repo update
 
 # Install workers
-helm install hyper2kvm-worker hyper2kvm/hyper2kvm-worker \
-  --namespace hyper2kvm-workers \
+helm install h2kvm-worker h2kvm/h2kvm-worker \
+  --namespace h2kvm-workers \
   --create-namespace \
   --values custom-values.yaml
 ```
@@ -1428,31 +1428,31 @@ helm install hyper2kvm-worker hyper2kvm/hyper2kvm-worker \
 k3d cluster create test-cluster --agents 2
 
 # Deploy with Helm
-helm install hyper2kvm-worker ./helm/hyper2kvm-worker \
-  --namespace hyper2kvm-workers \
+helm install h2kvm-worker ./helm/h2kvm-worker \
+  --namespace h2kvm-workers \
   --create-namespace \
   --set storage.state.enabled=false \
   --set storage.events.enabled=false
 
 # Submit migration job
-POD=$(kubectl get pods -n hyper2kvm-workers -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}')
-kubectl cp job.json hyper2kvm-workers/$POD:/tmp/job.json
-kubectl exec -n hyper2kvm-workers $POD -- \
-  python3 -m hyper2kvm.worker.cli run /tmp/job.json --follow
+POD=$(kubectl get pods -n h2kvm-workers -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}')
+kubectl cp job.json h2kvm-workers/$POD:/tmp/job.json
+kubectl exec -n h2kvm-workers $POD -- \
+  python3 -m h2kvm.worker.cli run /tmp/job.json --follow
 ```
 
 **Docker/Podman:**
 
 ```bash
 # Build worker image
-docker build --target worker -t hyper2kvm:worker .
+docker build --target worker -t h2kvm:worker .
 
 # Run privileged worker
 docker run --privileged \
   -v /data/input:/data/input:ro \
   -v /data/output:/data/output:rw \
   -v /dev:/dev \
-  hyper2kvm:worker
+  h2kvm:worker
 ```
 
 **Monitoring:**
@@ -1466,7 +1466,7 @@ docker run --privileged \
 - [Worker Protocol Specification](docs/worker/PROTOCOL_SPEC.md)
 - [Quick Start Guide](docs/worker/QUICKSTART.md)
 - [Kubernetes Deployment](k8s/README.md)
-- [Helm Chart README](helm/hyper2kvm-worker/README.md)
+- [Helm Chart README](helm/h2kvm-worker/README.md)
 - [Complete Implementation Summary](docs/deployment/WORKER_PROTOCOL_SUMMARY.md)
 
 **Versions:**
@@ -1483,13 +1483,13 @@ docker run --privileged \
 
 ```bash
 # Install operator with Helm (recommended)
-helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace
 
 # Create a migration job (fully automated!)
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: example-conversion
@@ -1546,15 +1546,15 @@ We welcome contributions! See [Contributing Guide](docs/development/contributing
 
 ```bash
 # Setup
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 pip install -e ".[full,dev]"
 
 # Test
 pytest tests/
 
 # Lint
-ruff check hyper2kvm/
+ruff check h2kvm/
 ```
 
 ---
@@ -1576,7 +1576,7 @@ For enterprise support, consulting, or custom development, use the contact infor
 
 Copyright (c) 2024–2026 **Zyvor AI Labs**. All rights reserved.
 
-**hyper2kvm** and **HyperSDK** are proprietary works of Zyvor AI Labs. See [LICENSE](LICENSE) for details.
+**h2kvm** and **HyperSDK** are proprietary works of Zyvor AI Labs. See [LICENSE](LICENSE) for details.
 
 For licensing inquiries: **info@zyvor.dev**
 
@@ -1590,7 +1590,7 @@ Built with:
 - **HyperSDK** - Multi-cloud provider daemon (optional)
 - **libvirt** - Virtualization management
 
-Special thanks to all [contributors](https://github.com/ssahani/hyper2kvm/graphs/contributors).
+Special thanks to all [contributors](https://github.com/ssahani/h2kvm/graphs/contributors).
 
 ---
 
@@ -1606,15 +1606,15 @@ GuestKit provides instant insight into VM disk images without booting:
 - ✅ AI-powered diagnostics - Explain what's inside, what's broken, and how to fix it
 - ✅ Pre-migration validation - Detect issues before migration starts
 - ✅ Rust performance - Fast, safe, memory-efficient
-- ✅ Complementary to hyper2kvm - Use together for comprehensive migration workflows
+- ✅ Complementary to h2kvm - Use together for comprehensive migration workflows
 
-**Use Case:** Run GuestKit inspection before hyper2kvm migration to identify potential issues early.
+**Use Case:** Run GuestKit inspection before h2kvm migration to identify potential issues early.
 
 ```bash
 # Inspect VM before migration
 guestkit inspect /vms/server.vmdk --format json > inspection-report.json
 
-# Review issues, then migrate with hyper2kvm
+# Review issues, then migrate with h2kvm
 h2kvmctl --config migration.yaml
 ```
 

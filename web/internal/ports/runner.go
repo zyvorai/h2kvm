@@ -8,7 +8,7 @@ package ports
 import (
 	"context"
 
-	"github.com/hyper2kvm/web/internal/domain"
+	"github.com/h2kvm/web/internal/domain"
 )
 
 // RunnerEventType classifies events emitted by the h2kvmctl subprocess.

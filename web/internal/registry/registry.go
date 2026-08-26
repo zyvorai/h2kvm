@@ -13,8 +13,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/hyper2kvm/web/internal/domain"
-	"github.com/hyper2kvm/web/internal/ports"
+	"github.com/h2kvm/web/internal/domain"
+	"github.com/h2kvm/web/internal/ports"
 )
 
 // ProviderFactory creates a new ComputeProvider instance.

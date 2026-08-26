@@ -1,6 +1,6 @@
 # Rollback API Reference
 
-**Module**: `hyper2kvm.rollback`
+**Module**: `h2kvm.rollback`
 **Version**: 1.0.0
 **Status**: Production-Ready
 
@@ -23,7 +23,7 @@ The Rollback API provides enterprise-grade rollback capabilities for recovering 
 ## Quick Start
 
 ```python
-from hyper2kvm.rollback import RollbackOrchestrator
+from h2kvm.rollback import RollbackOrchestrator
 from pathlib import Path
 import logging
 
@@ -67,7 +67,7 @@ orchestrator.save_report(report, Path("/reports"), json_report=True, markdown_re
 
 **Import**:
 ```python
-from hyper2kvm.rollback import RollbackOrchestrator
+from h2kvm.rollback import RollbackOrchestrator
 ```
 
 **Constructor**:
@@ -81,8 +81,8 @@ RollbackOrchestrator(
 
 **Parameters**:
 - `logger`: Logger instance for operation logging
-- `snapshot_dir`: Directory for snapshot storage (default: /var/lib/hyper2kvm/snapshots)
-- `state_dir`: Directory for state tracking (default: /var/lib/hyper2kvm/state)
+- `snapshot_dir`: Directory for snapshot storage (default: /var/lib/h2kvm/snapshots)
+- `state_dir`: Directory for state tracking (default: /var/lib/h2kvm/state)
 
 **Attributes**:
 - `snapshot_manager`: SnapshotManager instance
@@ -223,7 +223,7 @@ print(f"Markdown: {reports['markdown']}")
 
 **Import**:
 ```python
-from hyper2kvm.rollback import SnapshotManager
+from h2kvm.rollback import SnapshotManager
 ```
 
 **Constructor**:
@@ -264,7 +264,7 @@ def create_snapshot(
 
 **Example**:
 ```python
-from hyper2kvm.rollback import SnapshotManager, SnapshotType
+from h2kvm.rollback import SnapshotManager, SnapshotType
 
 manager = SnapshotManager(logger, Path("/snapshots"))
 
@@ -379,7 +379,7 @@ print("✓ Snapshot deleted")
 
 **Import**:
 ```python
-from hyper2kvm.rollback import StateTracker, MigrationState
+from h2kvm.rollback import StateTracker, MigrationState
 ```
 
 **Constructor**:
@@ -422,7 +422,7 @@ def checkpoint(
 
 **Example**:
 ```python
-from hyper2kvm.rollback import StateTracker, MigrationState
+from h2kvm.rollback import StateTracker, MigrationState
 
 tracker = StateTracker(logger)
 
@@ -483,7 +483,7 @@ for i, checkpoint in enumerate(plan, 1):
 
 **Import**:
 ```python
-from hyper2kvm.rollback import RollbackExecutor, RollbackAction, RollbackActionType
+from h2kvm.rollback import RollbackExecutor, RollbackAction, RollbackActionType
 ```
 
 **Constructor**:
@@ -510,7 +510,7 @@ def execute_action(self, action: RollbackAction) -> None
 
 **Example**:
 ```python
-from hyper2kvm.rollback import RollbackExecutor, RollbackAction, RollbackActionType
+from h2kvm.rollback import RollbackExecutor, RollbackAction, RollbackActionType
 
 executor = RollbackExecutor(logger)
 
@@ -557,7 +557,7 @@ print(f"Success rate: {summary['success_rate']:.1%}")
 
 **Import**:
 ```python
-from hyper2kvm.rollback import RollbackValidator
+from h2kvm.rollback import RollbackValidator
 ```
 
 **Constructor**:
@@ -588,7 +588,7 @@ def validate_snapshot_restored(
 
 **Example**:
 ```python
-from hyper2kvm.rollback import RollbackValidator
+from h2kvm.rollback import RollbackValidator
 
 validator = RollbackValidator(logger)
 
@@ -682,7 +682,7 @@ class RollbackReport:
 ```python
 import logging
 from pathlib import Path
-from hyper2kvm.rollback import (
+from h2kvm.rollback import (
     RollbackOrchestrator,
     SnapshotType,
     MigrationState
@@ -699,7 +699,7 @@ def safe_migration_with_rollback(vm_path: str, target_path: str):
     orchestrator = RollbackOrchestrator(
         logger,
         snapshot_dir=Path("/snapshots"),
-        state_dir=Path("/var/lib/hyper2kvm/state")
+        state_dir=Path("/var/lib/h2kvm/state")
     )
 
     # Create pre-migration snapshot

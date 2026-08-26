@@ -69,10 +69,10 @@ type AdvancedConfig struct {
 func DefaultConfig() TUIConfig {
 	return TUIConfig{
 		General: GeneralConfig{
-			OutputDir:   "/tmp/hyper2kvm-output",
+			OutputDir:   "/tmp/h2kvm-output",
 			LogLevel:    "info",
 			LogToFile:   true,
-			LogFilePath: "/tmp/hyper2kvm.log",
+			LogFilePath: "/tmp/h2kvm.log",
 		},
 		Migration: MigrationConfig{
 			DefaultFormat:      "qcow2",

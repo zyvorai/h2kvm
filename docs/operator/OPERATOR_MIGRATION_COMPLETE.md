@@ -107,7 +107,7 @@ User → HyperConversion CRD → Go Operator → CDI DataVolume (auto-created)
 
 ### Deployment Status
 ```
-Environment:     k3d cluster (hyper2kvm-test)
+Environment:     k3d cluster (h2kvm-test)
 Operator:        hyperconversion-operator (1/1 Running)
 Migrations:      2/2 Ready (100% success)
 VMs:             2/2 Running with IPs
@@ -143,7 +143,7 @@ KubeVirt:        v1.1.0
 
 ```
 1. User creates HyperConversion CR
-   apiVersion: hyper2kvm.io/v1alpha1
+   apiVersion: h2kvm.io/v1alpha1
    kind: HyperConversion
    spec:
      source:
@@ -268,15 +268,15 @@ a689f79 feat: add Go-based HyperConversion operator for automated VM migration
 ## Cleanup Performed
 
 ### Removed Components
-- ✅ Python operator deployment (hyper2kvm-operator)
+- ✅ Python operator deployment (h2kvm-operator)
 - ✅ Python operator code (27 files, 11,478 lines)
 - ✅ NBD prep daemonset (nbd-prep)
-- ✅ Worker daemonset (hyper2kvm-worker)
+- ✅ Worker daemonset (h2kvm-worker)
 - ✅ Legacy Kubernetes manifests (12 files)
 
 ### Clean Namespace
 ```
-hyper2kvm-system:
+h2kvm-system:
   ✅ hyperconversion-operator: 1/1 Running
   ✅ No legacy components
   ✅ Clean logs
@@ -314,10 +314,10 @@ hyper2kvm-system:
 ## Next Steps
 
 ### Immediate (Production Deployment)
-1. Build production image: `make docker-build IMG=hyper2kvm-operator:v1.0.0`
-2. Push to registry: `docker push <registry>/hyper2kvm-operator:v1.0.0`
-3. Deploy to cluster: `make deploy IMG=<registry>/hyper2kvm-operator:v1.0.0`
-4. Verify deployment: `kubectl get pods -n hyper2kvm-system`
+1. Build production image: `make docker-build IMG=h2kvm-operator:v1.0.0`
+2. Push to registry: `docker push <registry>/h2kvm-operator:v1.0.0`
+3. Deploy to cluster: `make deploy IMG=<registry>/h2kvm-operator:v1.0.0`
+4. Verify deployment: `kubectl get pods -n h2kvm-system`
 5. Test with sample: `kubectl apply -f config/samples/simple-vmdk-to-vm.yaml`
 
 ### Short-Term (1-2 weeks)
@@ -374,7 +374,7 @@ The HyperConversion operator successfully:
 
 ---
 
-**Project**: hyper2kvm
+**Project**: h2kvm
 **Component**: HyperConversion Operator
 **Version**: v1.0.0-alpha1
 **Date**: 2026-02-17

@@ -3,7 +3,7 @@
   "source": {"provider": "vsphere", "vm_name": "photon-os", "export_timestamp": "2026-03-24T10:00:00Z"},
   "vm": {"cpu": 2, "mem_gb": 2, "firmware": "bios", "os_hint": "linux"},
   "disks": [
-    {"id": "disk-0", "source_format": "vmdk", "bytes": 17179869184, "local_path": "/home/ssahani/tt/hyper2kvm/photon.vmdk", "disk_type": "boot"}
+    {"id": "disk-0", "source_format": "vmdk", "bytes": 17179869184, "local_path": "/home/ssahani/tt/h2kvm/photon.vmdk", "disk_type": "boot"}
   ],
   "pipeline": {"inspect": {"enabled": true}, "fix": {"enabled": true, "fstab_mode": "stabilize-all"}, "convert": {"enabled": true, "compress": true}, "validate": {"enabled": true}},
   "output": {"directory": "/output", "format": "qcow2"}

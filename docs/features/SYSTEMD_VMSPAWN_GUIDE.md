@@ -1,4 +1,4 @@
-# systemd-vmspawn Integration Guide for hyper2kvm
+# systemd-vmspawn Integration Guide for h2kvm
 
 ## Overview
 
@@ -16,7 +16,7 @@
 ## Architecture
 
 ```
-hyper2kvm migration pipeline
+h2kvm migration pipeline
            ↓
     systemd-vmspawn
            ↓
@@ -31,19 +31,19 @@ VMs become **first-class systemd objects** managed like services.
 
 ---
 
-## Why systemd-vmspawn for hyper2kvm?
+## Why systemd-vmspawn for h2kvm?
 
 ### 1. Post-Migration Validation
 After converting VMware VMDK → QCOW2, validate boot without complex libvirt setup:
 
 ```python
-from hyper2kvm.systemd import SystemdVmspawn
+from h2kvm.systemd import SystemdVmspawn
 
 vmspawn = SystemdVmspawn()
 
 # Quick smoke test of migrated disk
 vmspawn.spawn(
-    Path("/var/lib/hyper2kvm/migrated-vm.qcow2"),
+    Path("/var/lib/h2kvm/migrated-vm.qcow2"),
     cpus=2,
     memory="4G",
     network_user=True,
@@ -162,7 +162,7 @@ journalctl -M test-vm -b
 ### Python Integration
 
 ```python
-from hyper2kvm.systemd import SystemdCat
+from h2kvm.systemd import SystemdCat
 
 # Log migration events to journal
 cat = SystemdCat()
@@ -213,13 +213,13 @@ cat.log(f"Boot test completed for {vm_name}", priority=6)
 
 ---
 
-## hyper2kvm Integration Examples
+## h2kvm Integration Examples
 
 ### Example 1: Post-Migration Boot Test
 
 ```python
 from pathlib import Path
-from hyper2kvm.systemd import SystemdVmspawn, SystemdCat
+from h2kvm.systemd import SystemdVmspawn, SystemdCat
 import logging
 
 logger = logging.getLogger(__name__)
@@ -340,7 +340,7 @@ CI pipeline: Test all migrated VMs boot successfully.
 
 import sys
 from pathlib import Path
-from hyper2kvm.systemd import SystemdVmspawn
+from h2kvm.systemd import SystemdVmspawn
 
 def ci_boot_test(output_dir: Path) -> int:
     """
@@ -376,7 +376,7 @@ def ci_boot_test(output_dir: Path) -> int:
     return 0
 
 if __name__ == "__main__":
-    sys.exit(ci_boot_test(Path("/var/lib/hyper2kvm/output")))
+    sys.exit(ci_boot_test(Path("/var/lib/h2kvm/output")))
 ```
 
 ---
@@ -427,7 +427,7 @@ def spawn_with_custom_kernel(vm_disk: Path, kernel: Path, initrd: Path):
 ### 3. Resource Monitoring
 
 ```python
-from hyper2kvm.systemd import SystemdCgtop
+from h2kvm.systemd import SystemdCgtop
 import time
 
 def monitor_vm_resources(vm_name: str, duration: int = 60):
@@ -498,7 +498,7 @@ systemd-vmspawn supports multiple disk formats:
 | Format | Support | Notes |
 |--------|---------|-------|
 | **raw** | ✅ Full | Fastest, no overhead |
-| **qcow2** | ✅ Full | Recommended for hyper2kvm |
+| **qcow2** | ✅ Full | Recommended for h2kvm |
 | **vmdk** | ⚠️ Limited | Convert to qcow2 first |
 | **vdi** | ⚠️ Limited | Convert to qcow2 first |
 | **Block devices** | ✅ Full | `/dev/sda`, `/dev/mapper/...` |
@@ -575,7 +575,7 @@ ls -la /dev/net/tun
 
 ---
 
-## Comparison: vmspawn vs libvirt for hyper2kvm
+## Comparison: vmspawn vs libvirt for h2kvm
 
 ### Use vmspawn when:
 - ✅ Quick post-migration validation
@@ -595,7 +595,7 @@ ls -la /dev/net/tun
 
 ---
 
-## Future Enhancements for hyper2kvm
+## Future Enhancements for h2kvm
 
 Potential integrations:
 
@@ -645,5 +645,5 @@ def test_batch(disks: list[Path]) -> list[bool]:
 ---
 
 **Last Updated:** 2026-03-29
-**Author:** hyper2kvm team
+**Author:** h2kvm team
 **Status:** Production-ready (systemd >= 255)

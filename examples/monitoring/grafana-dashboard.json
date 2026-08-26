@@ -1,9 +1,9 @@
 {
   "dashboard": {
     "id": null,
-    "uid": "hyper2kvm-migrations",
-    "title": "hyper2kvm Migration Dashboard",
-    "tags": ["hyper2kvm", "migration", "kvm"],
+    "uid": "h2kvm-migrations",
+    "title": "h2kvm Migration Dashboard",
+    "tags": ["h2kvm", "migration", "kvm"],
     "timezone": "browser",
     "refresh": "30s",
     "panels": [
@@ -13,7 +13,7 @@
         "type": "stat",
         "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
         "targets": [
-          {"expr": "sum(hyper2kvm_migrations_total)", "legendFormat": "Total"}
+          {"expr": "sum(h2kvm_migrations_total)", "legendFormat": "Total"}
         ],
         "fieldConfig": {"defaults": {"thresholds": {"steps": [
           {"color": "green", "value": null},
@@ -27,7 +27,7 @@
         "type": "gauge",
         "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
         "targets": [
-          {"expr": "sum(hyper2kvm_migrations_total{status='success'}) / sum(hyper2kvm_migrations_total) * 100", "legendFormat": "Success %"}
+          {"expr": "sum(h2kvm_migrations_total{status='success'}) / sum(h2kvm_migrations_total) * 100", "legendFormat": "Success %"}
         ],
         "fieldConfig": {"defaults": {"unit": "percent", "min": 0, "max": 100, "thresholds": {"steps": [
           {"color": "red", "value": null},
@@ -41,7 +41,7 @@
         "type": "stat",
         "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
         "targets": [
-          {"expr": "avg(hyper2kvm_migration_speed_mbps)", "legendFormat": "Avg MB/s"}
+          {"expr": "avg(h2kvm_migration_speed_mbps)", "legendFormat": "Avg MB/s"}
         ],
         "fieldConfig": {"defaults": {"unit": "MBs"}}
       },
@@ -51,7 +51,7 @@
         "type": "stat",
         "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
         "targets": [
-          {"expr": "sum(hyper2kvm_migration_size_bytes) / 1024 / 1024 / 1024", "legendFormat": "Total GB"}
+          {"expr": "sum(h2kvm_migration_size_bytes) / 1024 / 1024 / 1024", "legendFormat": "Total GB"}
         ],
         "fieldConfig": {"defaults": {"unit": "decgbytes"}}
       },
@@ -61,7 +61,7 @@
         "type": "timeseries",
         "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
         "targets": [
-          {"expr": "hyper2kvm_migration_duration_seconds", "legendFormat": "{{vm_name}}"}
+          {"expr": "h2kvm_migration_duration_seconds", "legendFormat": "{{vm_name}}"}
         ],
         "fieldConfig": {"defaults": {"unit": "s"}}
       },
@@ -71,8 +71,8 @@
         "type": "timeseries",
         "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
         "targets": [
-          {"expr": "rate(hyper2kvm_migrations_total{status='success'}[5m])", "legendFormat": "Success/min"},
-          {"expr": "rate(hyper2kvm_migrations_total{status='failure'}[5m])", "legendFormat": "Failure/min"}
+          {"expr": "rate(h2kvm_migrations_total{status='success'}[5m])", "legendFormat": "Success/min"},
+          {"expr": "rate(h2kvm_migrations_total{status='failure'}[5m])", "legendFormat": "Failure/min"}
         ]
       },
       {
@@ -81,7 +81,7 @@
         "type": "stat",
         "gridPos": {"h": 4, "w": 8, "x": 0, "y": 12},
         "targets": [
-          {"expr": "hyper2kvm_libvirt_vms_running", "legendFormat": "Running"}
+          {"expr": "h2kvm_libvirt_vms_running", "legendFormat": "Running"}
         ]
       },
       {
@@ -90,7 +90,7 @@
         "type": "bargauge",
         "gridPos": {"h": 4, "w": 8, "x": 8, "y": 12},
         "targets": [
-          {"expr": "hyper2kvm_migration_size_bytes / 1024 / 1024 / 1024", "legendFormat": "{{vm_name}}"}
+          {"expr": "h2kvm_migration_size_bytes / 1024 / 1024 / 1024", "legendFormat": "{{vm_name}}"}
         ],
         "fieldConfig": {"defaults": {"unit": "decgbytes"}}
       },
@@ -100,7 +100,7 @@
         "type": "bargauge",
         "gridPos": {"h": 4, "w": 8, "x": 16, "y": 12},
         "targets": [
-          {"expr": "hyper2kvm_export_duration_seconds", "legendFormat": "{{method}} - {{vm_name}}"}
+          {"expr": "h2kvm_export_duration_seconds", "legendFormat": "{{method}} - {{vm_name}}"}
         ],
         "fieldConfig": {"defaults": {"unit": "s"}}
       }

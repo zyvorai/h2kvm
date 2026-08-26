@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>VMware Exit Strategy with hyper2kvm + hypersdk — Complete Technical Guide</title>
+<title>VMware Exit Strategy with h2kvm + hypersdk — Complete Technical Guide</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -64,7 +64,7 @@
 <!-- COVER -->
 <div class="cover">
   <h1>VMware <span>Exit</span> Strategy</h1>
-  <h2>Complete Technical Guide with hyper2kvm + hypersdk</h2>
+  <h2>Complete Technical Guide with h2kvm + hypersdk</h2>
   <p class="sub">Broadcom's VMware acquisition has made vSphere unsustainable — 2-12x license increases, perpetual licenses eliminated, partners dropped. This guide provides a complete 5-phase exit plan: discovery, pilot, staging, production migration, and decommission. Every technical step covered with the tools, YAML configs, and automation to execute it.</p>
   <div class="badge">5-Phase Plan | $810K Savings/100 VMs | Zero Downtime | Proprietary (Zyvor AI Labs)</div>
 </div>
@@ -99,7 +99,7 @@
   </table>
 
   <div class="highlight">
-    <p style="margin-bottom:0;"><strong>Bottom line:</strong> Every quarter you stay on VMware, Broadcom charges more and delivers less. KVM is free, in the Linux kernel, and isn't going anywhere. The migration tool (hyper2kvm) is also free. The only cost is your time — and the longer you wait, the more that costs too.</p>
+    <p style="margin-bottom:0;"><strong>Bottom line:</strong> Every quarter you stay on VMware, Broadcom charges more and delivers less. KVM is free, in the Linux kernel, and isn't going anywhere. The migration tool (h2kvm) is also free. The only cost is your time — and the longer you wait, the more that costs too.</p>
   </div>
 </div>
 
@@ -148,14 +148,14 @@
 
   <div class="verdict">
     <h3>20 Weeks: From VMware Lock-In to Freedom</h3>
-    <p style="font-size:0.92em;">One engineer with hyper2kvm can migrate 200+ VMs in this timeframe.<br>Larger estates: add engineers linearly (2 engineers = 400 VMs).</p>
+    <p style="font-size:0.92em;">One engineer with h2kvm can migrate 200+ VMs in this timeframe.<br>Larger estates: add engineers linearly (2 engineers = 400 VMs).</p>
   </div>
 </div>
 
 <!-- PAGE 3: Phase 1 — Discovery -->
 <div class="page page-light">
   <h2 class="st"><span class="phase-tag phase-1">Phase 1</span> Discovery <span>&amp; Assessment</span></h2>
-  <p class="sub">Know what you have before you move it. hyper2kvm + hypersdk automates the entire discovery.</p>
+  <p class="sub">Know what you have before you move it. h2kvm + hypersdk automates the entire discovery.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -205,7 +205,7 @@
   <h2 class="st" style="color:#e8e6df;"><span class="phase-tag phase-2">Phase 2-3</span> Pilot <span>&amp; Staging</span></h2>
   <p class="sub">Prove it works. Build confidence. Establish runbooks.</p>
 
-  <h3>Pilot Migration: Step-by-Step with hyper2kvm</h3>
+  <h3>Pilot Migration: Step-by-Step with h2kvm</h3>
   <table>
     <tr><th style="width:5%">#</th><th style="width:15%">Step</th><th style="width:15%">Tool</th><th style="width:35%">Command / Action</th><th style="width:30%">Expected Result</th></tr>
     <tr><td>1</td><td><strong>Pre-flight</strong></td><td>h2kvmctl</td><td><code>h2kvmctl doctor</code></td><td>All 9 checks pass (green)</td></tr>
@@ -269,7 +269,7 @@ uefi: true
 boot_test: true</pre>
     </div>
     <div class="card">
-      <h4>What hyper2kvm Does Automatically</h4>
+      <h4>What h2kvm Does Automatically</h4>
       <ul>
         <li>Exports VMDK from vCenter via govc</li>
         <li>Converts VMDK &rarr; QCOW2 with compression</li>
@@ -304,7 +304,7 @@ boot_test: true</pre>
     <tr><td>1</td><td><strong>Pre-migration snapshot</strong></td><td>Take VMware snapshot (rollback point)</td><td>Snapshot visible in vCenter</td></tr>
     <tr><td>2</td><td><strong>Application drain</strong></td><td>Remove from load balancer, drain connections</td><td>No active sessions/connections</td></tr>
     <tr><td>3</td><td><strong>Database quiesce</strong></td><td>Stop DB or put in maintenance mode</td><td>No writes in progress</td></tr>
-    <tr><td>4</td><td><strong>Export from vSphere</strong></td><td>hyper2kvm exports via govc (streaming progress)</td><td>VMDK downloaded, checksum verified</td></tr>
+    <tr><td>4</td><td><strong>Export from vSphere</strong></td><td>h2kvm exports via govc (streaming progress)</td><td>VMDK downloaded, checksum verified</td></tr>
     <tr><td>5</td><td><strong>Convert + fix</strong></td><td>VMDK &rarr; QCOW2, initramfs/VirtIO/fstab/GRUB</td><td>Conversion completes without errors</td></tr>
     <tr><td>6</td><td><strong>Deploy to KVM</strong></td><td>Generate XML, virsh define</td><td>VM registered in libvirt</td></tr>
     <tr><td>7</td><td><strong>Boot verification</strong></td><td>Automated boot test — VM reaches login</td><td>No BSOD, no kernel panic, services up</td></tr>
@@ -315,7 +315,7 @@ boot_test: true</pre>
   </table>
 
   <div class="highlight">
-    <p style="margin-bottom:0;"><strong>Rollback is always safe:</strong> hyper2kvm creates a <em>copy</em> — it never modifies the source VMware VM. If anything goes wrong, the original VM is untouched. Revert DNS/LB and start the VMware VM. Total rollback time: 5 minutes.</p>
+    <p style="margin-bottom:0;"><strong>Rollback is always safe:</strong> h2kvm creates a <em>copy</em> — it never modifies the source VMware VM. If anything goes wrong, the original VM is untouched. Revert DNS/LB and start the VMware VM. Total rollback time: 5 minutes.</p>
   </div>
 </div>
 
@@ -336,7 +336,7 @@ boot_test: true</pre>
         <li>Live migration between hosts (shared storage)</li>
         <li><strong>Cost:</strong> $0 software</li>
         <li><strong>Complexity:</strong> Lowest</li>
-        <li><strong>hyper2kvm:</strong> <code>emit_domain_xml: true</code></li>
+        <li><strong>h2kvm:</strong> <code>emit_domain_xml: true</code></li>
       </ul>
     </div>
     <div class="card">
@@ -350,7 +350,7 @@ boot_test: true</pre>
         <li>Edge-ready (single-node deployable)</li>
         <li><strong>Cost:</strong> $0 software</li>
         <li><strong>Complexity:</strong> Medium</li>
-        <li><strong>hyper2kvm:</strong> <code>deploy_k8s: true</code></li>
+        <li><strong>h2kvm:</strong> <code>deploy_k8s: true</code></li>
       </ul>
     </div>
     <div class="card">
@@ -359,7 +359,7 @@ boot_test: true</pre>
         <li><strong>Best for:</strong> Red Hat shops wanting vendor support</li>
         <li>OpenShift + OpenShift Virtualization</li>
         <li>Red Hat supported KubeVirt</li>
-        <li>MTV available (but hyper2kvm is more flexible)</li>
+        <li>MTV available (but h2kvm is more flexible)</li>
         <li>Enterprise support contracts + SLAs</li>
         <li>Certified, hardened, tested</li>
         <li><strong>Cost:</strong> $50K+/yr (OpenShift subscription)</li>
@@ -373,7 +373,7 @@ boot_test: true</pre>
         <li>Critical/simple VMs &rarr; KVM/libvirt</li>
         <li>Cloud-native workloads &rarr; K3s + KubeVirt</li>
         <li>Edge sites &rarr; K3s (single-node)</li>
-        <li>hyper2kvm dual-target: same conversion, both outputs</li>
+        <li>h2kvm dual-target: same conversion, both outputs</li>
         <li><code>emit_domain_xml: true</code> + <code>deploy_k8s: true</code></li>
         <li><strong>Cost:</strong> $0 software</li>
         <li><strong>Complexity:</strong> Medium</li>
@@ -384,7 +384,7 @@ boot_test: true</pre>
 
   <h3>Per-Workload Target Recommendation</h3>
   <table>
-    <tr><th style="width:20%">Workload Type</th><th style="width:20%">Recommended Target</th><th style="width:30%">Why</th><th style="width:30%">hyper2kvm Config</th></tr>
+    <tr><th style="width:20%">Workload Type</th><th style="width:20%">Recommended Target</th><th style="width:30%">Why</th><th style="width:30%">h2kvm Config</th></tr>
     <tr><td>Database (PostgreSQL, MySQL, SQL)</td><td>KVM/libvirt</td><td>Simplest, best I/O control, CPU pinning for SQL licensing</td><td><code>emit_domain_xml: true</code></td></tr>
     <tr><td>Web servers (Nginx, Apache)</td><td>KVM or KubeVirt</td><td>Stateless — either target works, KubeVirt enables scaling</td><td>Either or both</td></tr>
     <tr><td>Active Directory DCs</td><td>KVM/libvirt</td><td>AD prefers stable infrastructure, no K8s complexity</td><td><code>emit_domain_xml: true</code></td></tr>
@@ -401,7 +401,7 @@ boot_test: true</pre>
 
   <h3>100-VM Estate — 3-Year TCO Comparison</h3>
   <table>
-    <tr><th style="width:28%">Cost Item</th><th style="width:24%">VMware vSphere (Stay)</th><th style="width:24%">KVM + hyper2kvm (Exit)</th><th style="width:24%">Savings</th></tr>
+    <tr><th style="width:28%">Cost Item</th><th style="width:24%">VMware vSphere (Stay)</th><th style="width:24%">KVM + h2kvm (Exit)</th><th style="width:24%">Savings</th></tr>
     <tr><td><strong>Hypervisor licensing</strong></td><td>$450,000 (3 yr, post-Broadcom)</td><td class="check">$0</td><td class="check">$450,000</td></tr>
     <tr><td><strong>vCenter / management</strong></td><td>$120,000 (3 yr)</td><td class="check">$0 (Cockpit/libvirt)</td><td class="check">$120,000</td></tr>
     <tr><td><strong>vSAN licensing</strong></td><td>$180,000 (3 yr)</td><td class="check">$0 (Ceph/local storage)</td><td class="check">$180,000</td></tr>
@@ -418,7 +418,7 @@ boot_test: true</pre>
     <div class="stat-box card"><div class="num">$900K</div><div class="label">Total savings over 3 years<br>for 100-VM estate</div></div>
     <div class="stat-box card"><div class="num">$300K/yr</div><div class="label">Annual recurring savings<br>after migration complete</div></div>
     <div class="stat-box card"><div class="num">3 months</div><div class="label">Payback period<br>on migration investment</div></div>
-    <div class="stat-box card"><div class="num">Licensed*</div><div class="label">hyper2kvm license cost<br>Proprietary (Zyvor AI Labs)</div></div>
+    <div class="stat-box card"><div class="num">Licensed*</div><div class="label">h2kvm license cost<br>Proprietary (Zyvor AI Labs)</div></div>
   </div>
 
   <h3>SQL Server Additional Savings</h3>
@@ -430,10 +430,10 @@ boot_test: true</pre>
 <!-- PAGE 8: Risk Mitigation & Per-Workload Strategy -->
 <div class="page page-dark">
   <h2 class="st" style="color:#e8e6df;">Risk <span>Mitigation</span></h2>
-  <p class="sub">How hyper2kvm eliminates every common migration failure.</p>
+  <p class="sub">How h2kvm eliminates every common migration failure.</p>
 
   <table>
-    <tr><th style="width:22%">Risk</th><th style="width:25%">Without hyper2kvm</th><th style="width:25%">With hyper2kvm</th><th style="width:28%">How It Works</th></tr>
+    <tr><th style="width:22%">Risk</th><th style="width:25%">Without h2kvm</th><th style="width:25%">With h2kvm</th><th style="width:28%">How It Works</th></tr>
     <tr><td><strong>Linux VM won't boot</strong></td><td class="danger">Common — missing VirtIO in initramfs</td><td class="check">Auto-fixed</td><td>Rebuilds initramfs with virtio_blk/scsi/net in chroot</td></tr>
     <tr><td><strong>Windows BSOD</strong></td><td class="danger">Missing VirtIO storage driver</td><td class="check">Auto-fixed</td><td>Injects viostor + NetKVM from virtio-win ISO</td></tr>
     <tr><td><strong>Wrong root device</strong></td><td class="danger">fstab uses /dev/sda, KVM has /dev/vda</td><td class="check">Auto-fixed</td><td>Converts all fstab entries to UUID-based mounts</td></tr>
@@ -488,11 +488,11 @@ boot_test: true</pre>
     <p style="font-size:0.95em;">
       5 phases. 20 weeks. $900K saved per 100 VMs.<br>
       Every guest fix automated. Every VM boot-verified. Every rollback safe.<br>
-      <strong>hyper2kvm + hypersdk: the complete VMware exit toolkit. Free forever.</strong>
+      <strong>h2kvm + hypersdk: the complete VMware exit toolkit. Free forever.</strong>
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

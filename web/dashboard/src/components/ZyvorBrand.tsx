@@ -11,7 +11,7 @@ export const ZYVOR_URL = 'https://zyvor.dev';
 export const ZYVOR_BRAND = 'Zyvor';
 export const ZYVOR_COPY = '© 2026';
 export const ZYVOR_COPYRIGHT_FULL = '© 2024–2026 Zyvor AI Labs';
-export const ZYVOR_LICENSE = 'Proprietary — HyperSDK & hyper2kvm';
+export const ZYVOR_LICENSE = 'Proprietary — HyperSDK & h2kvm';
 export const ZYVOR_CONTACT_EMAIL = 'info@zyvor.dev';
 export const ZYVOR_LINE = `zyvor.dev · ${ZYVOR_COPY}`;
 

@@ -73,7 +73,7 @@ class TestVCenterExportPipeline(unittest.TestCase):
     """Test full export pipeline via h2kvmctl."""
 
     def setUp(self):
-        self.output_dir = Path("/tmp/hyper2kvm-integration-test")
+        self.output_dir = Path("/tmp/h2kvm-integration-test")
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def tearDown(self):
@@ -151,7 +151,7 @@ class TestLocalConversion(unittest.TestCase):
     @unittest.skipUnless(Path("photon.vmdk").exists(), "photon.vmdk not in cwd")
     def test_photon_conversion(self):
         """Full Photon OS VMDK conversion pipeline."""
-        output_dir = Path("/tmp/hyper2kvm-photon-test")
+        output_dir = Path("/tmp/h2kvm-photon-test")
         output_dir.mkdir(parents=True, exist_ok=True)
         try:
             result = subprocess.run(

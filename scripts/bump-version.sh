@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: Apache-2.0
-# Version bump script for hyper2kvm
+# Version bump script for h2kvm
 
 set -euo pipefail
 
@@ -40,9 +40,9 @@ echo ""
 # Files to update
 FILES=(
     "pyproject.toml"
-    "hyper2kvm/__init__.py"
+    "h2kvm/__init__.py"
     "setup.py"
-    "hyper2kvm.spec"
+    "h2kvm.spec"
 )
 
 # Update each file
@@ -58,13 +58,13 @@ for file in "${FILES[@]}"; do
         pyproject.toml)
             sed -i.bak "s/^version = \".*\"/version = \"$NEW_VERSION\"/" "$file" && rm -f "$file.bak"
             ;;
-        hyper2kvm/__init__.py)
+        h2kvm/__init__.py)
             sed -i.bak "s/__version__ = \".*\"/__version__ = \"$NEW_VERSION\"/" "$file" && rm -f "$file.bak"
             ;;
         setup.py)
             sed -i.bak "s/version=\".*\"/version=\"$NEW_VERSION\"/" "$file" && rm -f "$file.bak"
             ;;
-        hyper2kvm.spec)
+        h2kvm.spec)
             sed -i.bak "s/^Version:.*$/Version:        $NEW_VERSION/" "$file" && rm -f "$file.bak"
             ;;
     esac

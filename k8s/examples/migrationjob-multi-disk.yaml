@@ -1,7 +1,7 @@
 # Multi-Disk MigrationJob Example
 # Migrates a VM with multiple disks (OS + data disks)
 
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: migrate-multi-disk-vm

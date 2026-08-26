@@ -1,12 +1,12 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: hyper2kvm-isolation
+  name: h2kvm-isolation
   namespace: vm-migration
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/part-of: hyper2kvm
+      app.kubernetes.io/part-of: h2kvm
   policyTypes:
     - Ingress
     - Egress

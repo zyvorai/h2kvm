@@ -2,7 +2,7 @@
 
 This page is a **copy-paste cookbook** for running `h2kvmctl` using YAML configs.
 
-It covers the big three you already run in production (**local**, **live-fix**, **fetch-and-fix**) and adds the "missing" ones that show up in real migrations (**ova**, **ovf**, **daemon**, **vsphere/pyvmomi**). It also captures the **design intent** behind the knobs: `hyper2kvm` splits vSphere into **control-plane** (inventory/orchestration) and **data-plane** (moving bytes), because mixing them is how tools become slow and haunted.
+It covers the big three you already run in production (**local**, **live-fix**, **fetch-and-fix**) and adds the "missing" ones that show up in real migrations (**ova**, **ovf**, **daemon**, **vsphere/pyvmomi**). It also captures the **design intent** behind the knobs: `h2kvm` splits vSphere into **control-plane** (inventory/orchestration) and **data-plane** (moving bytes), because mixing them is how tools become slow and haunted.
 
 > Tip: keep one `base.yaml` with defaults, and override per-customer / per-VM in a tiny overlay file.
 
@@ -13,7 +13,7 @@ It covers the big three you already run in production (**local**, **live-fix**, 
 Before following this guide, you should have:
 
 - ✓ Completed the [Installation](02-Installation.md)
-- ✓ Familiarity with basic hyper2kvm concepts
+- ✓ Familiarity with basic h2kvm concepts
 - ✓ Root/sudo access to your system
 - ✓ Source VM files ready for migration
 
@@ -93,7 +93,7 @@ out_format: qcow2
 
 **Rule of thumb**: use the **least invasive** data-plane that solves your goal:
 
-* Need qcow2 + conversion? → hyper2kvm internal converters
+* Need qcow2 + conversion? → h2kvm internal converters
 * Need raw datastore bytes? → HTTP `/folder` download-only
 * Need one disk fast via ESXi? → VDDK pull
 * Need incremental sync? → CBT + HTTP Range reads
@@ -182,7 +182,7 @@ to_output: win-fixed.qcow2
 out_format: qcow2
 compress: true
 
-# optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+# optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 # virtio_drivers_dir: /path/to/virtio-win  # only needed to override the standard path
 # (If you wired these knobs) keep BCD backups + registry safety:
 # windows_bcd_backup: true
@@ -220,7 +220,7 @@ vms:
     remove_vmware_tools: false
   - vmdk: /path/to/win.vmdk
     to_output: win.qcow2
-    # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+    # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
     # virtio_drivers_dir: /path/to/virtio-win  # only needed to override the standard path
 ```yaml
 
@@ -421,7 +421,7 @@ compress_level: 6
 enable_recovery: true
 
 # Logging
-log_file: /var/log/hyper2kvm-daemon.log
+log_file: /var/log/h2kvm-daemon.log
 verbose: 1
 
 # Guest OS fixes (applied to all conversions)
@@ -575,10 +575,10 @@ vc_insecure: true
 # snapshot
 vs_action: create_snapshot
 vm_name: myVM
-name: hyper2kvm-pre-migration
+name: h2kvm-pre-migration
 quiesce: true
 memory: false
-description: "Created by hyper2kvm"
+description: "Created by h2kvm"
 json: true
 ```yaml
 
@@ -605,7 +605,7 @@ vc_insecure: true
 # query CBT ranges
 vs_action: query_changed_disk_areas
 vm_name: myVM
-snapshot_name: hyper2kvm-cbt
+snapshot_name: h2kvm-cbt
 disk: 0
 start_offset: 0
 change_id: "*"
@@ -627,7 +627,7 @@ disk: 0
 local_path: ./downloads/myVM-disk0.vmdk
 
 enable_cbt: true
-snapshot_name: hyper2kvm-cbt
+snapshot_name: h2kvm-cbt
 change_id: "*"
 
 dc_name: ha-datacenter
@@ -695,7 +695,7 @@ Usually storage driver boot-start + CriticalDeviceDatabase.
 Ensure virtio injection is enabled and you keep safety backups:
 
 ```yaml
-# optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+# optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 # virtio_drivers_dir: /path/to/virtio-win  # only needed to override the standard path
 # windows_bcd_backup: true
 # windows_reg_backup: true
@@ -1083,5 +1083,5 @@ Continue your migration journey:
 
 ## Getting Help
 
-Found an issue? [Report it on GitHub](https://github.com/ssahani/hyper2kvm/issues)
+Found an issue? [Report it on GitHub](https://github.com/ssahani/h2kvm/issues)
 

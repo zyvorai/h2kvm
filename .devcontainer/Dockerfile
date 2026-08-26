@@ -1,4 +1,4 @@
-# Development container for hyper2kvm
+# Development container for h2kvm
 # Based on official Python image with development tools
 
 ARG PYTHON_VERSION=3.12

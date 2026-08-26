@@ -33,7 +33,7 @@ assignees: ''
 Example:
 ```bash
 # How you envision using the feature
-hyper2kvm --new-feature ...
+h2kvm --new-feature ...
 ```
 
 ## Benefits

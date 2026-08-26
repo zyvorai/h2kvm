@@ -2,7 +2,7 @@
 set -euo pipefail
 # SPDX-License-Identifier: Apache-2.0
 #
-# hyper2kvm selftest — post-installation verification
+# h2kvm selftest — post-installation verification
 #
 # Verifies that all binaries, Python packages, configs, services,
 # and the Artifact Manifest v1.0 pipeline are correctly installed
@@ -33,7 +33,7 @@ section() { echo ""; echo "━━━ $1 ━━━"; }
 # ── Binaries ──────────────────────────────────────────────────────────────────
 section "Binaries"
 
-for bin in h2kvmctl hyper2kvm; do
+for bin in h2kvmctl h2kvm; do
     if command -v "$bin" &>/dev/null; then
         pass "$bin found: $(command -v "$bin")"
     else
@@ -41,7 +41,7 @@ for bin in h2kvmctl hyper2kvm; do
     fi
 done
 
-for bin in zkvm h2k hyper2kvm-operator; do
+for bin in zkvm h2k h2kvm-operator; do
     if command -v "$bin" &>/dev/null; then
         pass "$bin found: $(command -v "$bin")"
     else
@@ -52,22 +52,22 @@ done
 # ── Python package ────────────────────────────────────────────────────────────
 section "Python Package"
 
-if python3 -c "import hyper2kvm" &>/dev/null; then
-    ver=$(python3 -c "import hyper2kvm; print(hyper2kvm.__version__)" 2>/dev/null || echo "?")
-    pass "hyper2kvm package installed: $ver"
+if python3 -c "import h2kvm" &>/dev/null; then
+    ver=$(python3 -c "import h2kvm; print(h2kvm.__version__)" 2>/dev/null || echo "?")
+    pass "h2kvm package installed: $ver"
 else
-    fail "hyper2kvm package not importable"
+    fail "h2kvm package not importable"
 fi
 
 # Check key submodules
-for mod in hyper2kvm.orchestration.orchestrator \
-           hyper2kvm.orchestration.manifest.orchestrator \
-           hyper2kvm.orchestration.manifest.loader \
-           hyper2kvm.runtime.daemon.manifest_workflow_daemon \
-           hyper2kvm.vmcraft.nbd \
-           hyper2kvm.fixers.offline_fixer \
-           hyper2kvm.providers.aws_ec2 \
-           hyper2kvm.providers.azure; do
+for mod in h2kvm.orchestration.orchestrator \
+           h2kvm.orchestration.manifest.orchestrator \
+           h2kvm.orchestration.manifest.loader \
+           h2kvm.runtime.daemon.manifest_workflow_daemon \
+           h2kvm.vmcraft.nbd \
+           h2kvm.fixers.offline_fixer \
+           h2kvm.providers.aws_ec2 \
+           h2kvm.providers.azure; do
     if python3 -c "import $mod" &>/dev/null; then
         pass "import $mod"
     else
@@ -107,8 +107,8 @@ done
 # ── VirtIO Windows drivers ────────────────────────────────────────────────────
 section "VirtIO Windows Drivers"
 
-if [ -f /var/lib/hyper2kvm/virtio-win.iso ]; then
-    pass "virtio-win.iso: /var/lib/hyper2kvm/virtio-win.iso"
+if [ -f /var/lib/h2kvm/virtio-win.iso ]; then
+    pass "virtio-win.iso: /var/lib/h2kvm/virtio-win.iso"
 else
     warn "virtio-win.iso not found (needed for Windows VirtIO migration)"
 fi
@@ -151,7 +151,7 @@ TESTEOF
 
 # Validate manifest loads without error
 if python3 -c "
-from hyper2kvm.orchestration.manifest.loader import ManifestLoader
+from h2kvm.orchestration.manifest.loader import ManifestLoader
 loader = ManifestLoader()
 m = loader.load('$TEST_TMPDIR/test-manifest.json')
 assert m['manifest_version'] == '1.0'
@@ -179,7 +179,7 @@ fi
 # ── Directories ───────────────────────────────────────────────────────────────
 section "Directories"
 
-for dir in /var/lib/hyper2kvm; do
+for dir in /var/lib/h2kvm; do
     if [[ -d "$dir" ]]; then
         pass "$dir exists"
     else
@@ -191,39 +191,39 @@ done
 if ! $QUICK; then
     section "Systemd Services"
 
-    if systemctl list-unit-files 'hyper2kvm@.service' &>/dev/null; then
-        pass "hyper2kvm@.service template installed"
+    if systemctl list-unit-files 'h2kvm@.service' &>/dev/null; then
+        pass "h2kvm@.service template installed"
     else
-        warn "hyper2kvm@.service not installed"
+        warn "h2kvm@.service not installed"
     fi
 
-    if systemctl list-unit-files 'hyper2kvm.service' &>/dev/null; then
-        pass "hyper2kvm.service installed"
+    if systemctl list-unit-files 'h2kvm.service' &>/dev/null; then
+        pass "h2kvm.service installed"
     else
-        warn "hyper2kvm.service not installed"
+        warn "h2kvm.service not installed"
     fi
 
     # Check if any instance is running
-    running=$(systemctl list-units 'hyper2kvm@*.service' --no-pager --no-legend 2>/dev/null | grep -c active 2>/dev/null || echo 0)
+    running=$(systemctl list-units 'h2kvm@*.service' --no-pager --no-legend 2>/dev/null | grep -c active 2>/dev/null || echo 0)
     if [[ "$running" -gt 0 ]]; then
-        pass "$running hyper2kvm daemon instance(s) active"
+        pass "$running h2kvm daemon instance(s) active"
     else
-        warn "No hyper2kvm daemon instances running"
+        warn "No h2kvm daemon instances running"
     fi
 fi
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 section "Configuration"
 
-if [[ -d /etc/hyper2kvm ]]; then
-    cfgs=$(find /etc/hyper2kvm -maxdepth 1 -name '*.yaml' 2>/dev/null | wc -l)
+if [[ -d /etc/h2kvm ]]; then
+    cfgs=$(find /etc/h2kvm -maxdepth 1 -name '*.yaml' 2>/dev/null | wc -l)
     if [[ "$cfgs" -gt 0 ]]; then
-        pass "/etc/hyper2kvm/ has $cfgs config file(s)"
+        pass "/etc/h2kvm/ has $cfgs config file(s)"
     else
-        warn "/etc/hyper2kvm/ exists but has no .yaml files"
+        warn "/etc/h2kvm/ exists but has no .yaml files"
     fi
 else
-    warn "/etc/hyper2kvm/ does not exist"
+    warn "/etc/h2kvm/ does not exist"
 fi
 
 # ── Go components ─────────────────────────────────────────────────────────────
@@ -239,8 +239,8 @@ if command -v zkvm &>/dev/null; then
     pass "zkvm binary available"
 fi
 
-if command -v hyper2kvm-operator &>/dev/null; then
-    pass "hyper2kvm-operator binary available"
+if command -v h2kvm-operator &>/dev/null; then
+    pass "h2kvm-operator binary available"
 fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────

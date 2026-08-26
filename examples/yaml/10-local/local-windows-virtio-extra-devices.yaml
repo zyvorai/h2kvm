@@ -2,11 +2,11 @@
 #   h2kvmctl --config 10-local/local-windows-virtio-extra-devices.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config 10-local/local-windows-virtio-extra-devices.yaml
+#   h2kvm --config 10-local/local-windows-virtio-extra-devices.yaml
 
 command: local
 vmdk: /path/to/windows.vmdk
-# optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+# optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 virtio_drivers_dir: /path/to/virtio-win
 enable_virtio_gpu: true
 enable_virtio_input: true

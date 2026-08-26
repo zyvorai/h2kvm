@@ -1,5 +1,5 @@
 
-# Windows Boot Cycle (hyper2kvm) ➡➡
+# Windows Boot Cycle (h2kvm) ➡➡
 
 
 ## Table of Contents
@@ -35,12 +35,12 @@
 
 For Windows VM migration, you need:
 
-- ✓ hyper2kvm installed ([Installation Guide](02-Installation.md))
+- ✓ h2kvm installed ([Installation Guide](02-Installation.md))
 - ✓ VirtIO drivers ISO downloaded
 - ✓ Windows source VM disk (VMDK, VHD, etc.)
 - ✓ Understanding of [Windows Boot Cycle](11-Windows-Boot-Cycle.md)
 
-This document explains **how hyper2kvm makes Windows reliably boot on KVM/QEMU** after coming from *any* hypervisor (VMware, Hyper-V, cloud images, raw disks).
+This document explains **how h2kvm makes Windows reliably boot on KVM/QEMU** after coming from *any* hypervisor (VMware, Hyper-V, cloud images, raw disks).
 
 The core idea is simple:
 
@@ -196,7 +196,7 @@ Windows often carries:
 * stale MAC-bound profiles
 * static IPs tied to removed adapters
 
-hyper2kvm applies **safe, explicit policies only**:
+h2kvm applies **safe, explicit policies only**:
 
 * remove stale adapter references
 * preserve static IP if safely discoverable
@@ -251,7 +251,7 @@ This is the **production domain**.
 
 ```mermaid
 sequenceDiagram
-  participant H as hyper2kvm
+  participant H as h2kvm
   participant O as Offline Fix (GuestFS)
   participant B as Bootstrap Domain
   participant W as Windows (1st boot)
@@ -361,5 +361,5 @@ For Windows migrations:
 ## Getting Help
 
 - [Troubleshooting Guide](90-Failure-Modes.md)
-- [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
+- [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
 

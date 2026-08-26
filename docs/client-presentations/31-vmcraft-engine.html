@@ -48,7 +48,7 @@
 <div class="cover">
   <h1>VMCraft <span>Engine</span> Deep Dive</h1>
   <h2>Pure Python Conversion Without libguestfs</h2>
-  <p class="sub">VMCraft is hyper2kvm's default conversion backend. It uses qemu-nbd for block device mounting, direct filesystem access for offline fixes, and chroot for initramfs regeneration. No supermin appliance, no 500MB dependency chain, no appliance boot delay. Just Python + qemu-nbd.</p>
+  <p class="sub">VMCraft is h2kvm's default conversion backend. It uses qemu-nbd for block device mounting, direct filesystem access for offline fixes, and chroot for initramfs regeneration. No supermin appliance, no 500MB dependency chain, no appliance boot delay. Just Python + qemu-nbd.</p>
   <div class="badge">qemu-nbd | chroot | fstab | GRUB | VirtIO | Windows Registry | ~5MB footprint</div>
 </div>
 
@@ -200,7 +200,7 @@ umount /mnt/guest/{sys,proc,dev}</pre>
 
   <h3>VMCraft vs libguestfs: Architecture Comparison</h3>
   <table>
-    <tr><th style="width:22%">Aspect</th><th style="width:39%">VMCraft (hyper2kvm default)</th><th style="width:39%">libguestfs</th></tr>
+    <tr><th style="width:22%">Aspect</th><th style="width:39%">VMCraft (h2kvm default)</th><th style="width:39%">libguestfs</th></tr>
     <tr><td><strong>How it works</strong></td><td>qemu-nbd exposes disk as /dev/nbdN, mount directly on host</td><td>Boots a supermin appliance (mini Linux VM), accesses disk inside appliance</td></tr>
     <tr><td><strong>Disk footprint</strong></td><td class="check">~5 MB (qemu-nbd binary)</td><td class="cross">~500 MB (supermin appliance + kernel + initrd)</td></tr>
     <tr><td><strong>Startup time</strong></td><td class="check">Instant (~100ms for nbd connect)</td><td class="cross">15-45 seconds (appliance boot)</td></tr>
@@ -229,8 +229,8 @@ $ h2kvmctl convert --source disk.vmdk --output /var/lib/libvirt/images/ --format
       Progress: [========================================] 100%  38.2 GB  @ 245 MB/s
 [3/8] Connecting qemu-nbd: /dev/nbd0 -> output.qcow2
 [4/8] Discovering partitions: nbd0p1 (EFI, 600MB), nbd0p2 (xfs, 39.4GB)
-[5/8] Mounting root: /dev/mapper/nbd0p2 -> /tmp/hyper2kvm-abc123/mnt
-      Mounting EFI:  /dev/mapper/nbd0p1 -> /tmp/hyper2kvm-abc123/mnt/boot/efi
+[5/8] Mounting root: /dev/mapper/nbd0p2 -> /tmp/h2kvm-abc123/mnt
+      Mounting EFI:  /dev/mapper/nbd0p1 -> /tmp/h2kvm-abc123/mnt/boot/efi
 [6/8] Applying fixes:
       - fstab: /dev/sda2 -> UUID=a1b2c3d4-e5f6-7890-abcd-ef1234567890
       - fstab: /dev/sda1 -> UUID=ABCD-1234 (vfat)
@@ -293,7 +293,7 @@ Conversion complete: output.qcow2 (14.2 GB on disk, 40 GB virtual)</pre>
 
   <h3>Error Handling &amp; Recovery</h3>
   <div class="highlight">
-    <p style="font-size:0.85em;"><strong>Crash Safety:</strong> VMCraft registers cleanup handlers with Python's <code>atexit</code> module. If the process crashes or is interrupted (Ctrl+C), the cleanup sequence runs: <code>umount -l</code> (lazy unmount), <code>kpartx -dv</code> (remove mappings), <code>qemu-nbd --disconnect</code> (release NBD). LVM volume groups are deactivated with <code>vgchange -an</code>. Temporary directories under <code>/tmp/hyper2kvm-*</code> are removed. This prevents stale mounts and NBD device leaks.</p>
+    <p style="font-size:0.85em;"><strong>Crash Safety:</strong> VMCraft registers cleanup handlers with Python's <code>atexit</code> module. If the process crashes or is interrupted (Ctrl+C), the cleanup sequence runs: <code>umount -l</code> (lazy unmount), <code>kpartx -dv</code> (remove mappings), <code>qemu-nbd --disconnect</code> (release NBD). LVM volume groups are deactivated with <code>vgchange -an</code>. Temporary directories under <code>/tmp/h2kvm-*</code> are removed. This prevents stale mounts and NBD device leaks.</p>
   </div>
 </div>
 
@@ -375,7 +375,7 @@ Conversion complete: output.qcow2 (14.2 GB on disk, 40 GB virtual)</pre>
       <strong>~5MB footprint. 3-5 minute conversions. Works in air-gapped environments.</strong>
     </p>
   </div>
-  <div class="footer"><p>hyper2kvm &mdash; VMCraft Engine Deep Dive | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm &mdash; VMCraft Engine Deep Dive | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

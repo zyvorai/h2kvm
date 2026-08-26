@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
-# record-demo.sh — Record a 3-minute asciinema demo of hyper2kvm
+# record-demo.sh — Record a 3-minute asciinema demo of h2kvm
 #
 # Usage:
 #   ./scripts/record-demo.sh              # interactive (you drive)
@@ -22,7 +22,7 @@ usage() {
     cat <<EOF
 Usage: $0 [options] [output-file]
 
-Record a 3-minute asciinema demo of hyper2kvm.
+Record a 3-minute asciinema demo of h2kvm.
 
 Options:
   --scripted     Automated typing (hands-free demo)
@@ -101,7 +101,7 @@ run_demo() {
     echo -e "${W}"
     echo "  ╔══════════════════════════════════════════════════════╗"
     echo "  ║                                                      ║"
-    echo "  ║   hyper2kvm — VM Migration Demo                      ║"
+    echo "  ║   h2kvm — VM Migration Demo                      ║"
     echo "  ║                                                      ║"
     echo "  ║   VMware / Cloud → KVM / KubeVirt                    ║"
     echo "  ║   Open Source (Apache 2.0)                            ║"
@@ -243,7 +243,7 @@ print(f'  Power: {vm[\"runtime\"][\"powerState\"]}')
     echo -e "${W}"
     echo "  ╔══════════════════════════════════════════════════════╗"
     echo "  ║                                                      ║"
-    echo "  ║   hyper2kvm — Production-Grade VM Migration          ║"
+    echo "  ║   h2kvm — Production-Grade VM Migration          ║"
     echo "  ║                                                      ║"
     echo "  ║   ✓ 10 cloud providers (via hypersdk)                ║"
     echo "  ║   ✓ VMware, Hyper-V, AWS, Azure, GCP                ║"
@@ -252,7 +252,7 @@ print(f'  Power: {vm[\"runtime\"][\"powerState\"]}')
     echo "  ║   ✓ 1,273 tests passing                              ║"
     echo "  ║   ✓ Apache 2.0 — free forever                        ║"
     echo "  ║                                                      ║"
-    echo "  ║   github.com/ssahani/hyper2kvm                       ║"
+    echo "  ║   github.com/ssahani/h2kvm                       ║"
     echo "  ║                                                      ║"
     echo "  ╚══════════════════════════════════════════════════════╝"
     echo -e "${R}"
@@ -263,7 +263,7 @@ print(f'  Power: {vm[\"runtime\"][\"powerState\"]}')
 if [ "$SCRIPTED" = true ]; then
     echo "Recording scripted demo to $CAST_FILE..."
     asciinema rec "$CAST_FILE" \
-        --title "hyper2kvm — VM Migration Demo" \
+        --title "h2kvm — VM Migration Demo" \
         --idle-time-limit 3 \
         --cols 100 \
         --rows 35 \
@@ -287,7 +287,7 @@ else
     echo "  8. ./zkvm/zkvm  (show TUI, press Tab for vSphere, quit)"
     echo
     asciinema rec "$CAST_FILE" \
-        --title "hyper2kvm — VM Migration Demo" \
+        --title "h2kvm — VM Migration Demo" \
         --idle-time-limit 3 \
         --cols 120 \
         --rows 40 \

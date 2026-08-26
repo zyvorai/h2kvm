@@ -41,7 +41,7 @@ fi
 **Systemd:**
 
 ```python
-from hyper2kvm.systemd import SystemdDetectVirt
+from h2kvm.systemd import SystemdDetectVirt
 
 detector = SystemdDetectVirt()
 print(detector.get_hypervisor_name())  # "VMware", "KVM", "Hyper-V", etc.
@@ -72,7 +72,7 @@ losetup -d /dev/loop0
 **Systemd:**
 
 ```python
-from hyper2kvm.systemd import SystemdDissect
+from h2kvm.systemd import SystemdDissect
 
 dissect = SystemdDissect()
 info = dissect.inspect(Path("disk.img"))  # No root required
@@ -107,7 +107,7 @@ gpg --encrypt --recipient admin@example.com \
 **Systemd:**
 
 ```python
-from hyper2kvm.systemd import SystemdCreds
+from h2kvm.systemd import SystemdCreds
 
 creds = SystemdCreds()
 
@@ -144,7 +144,7 @@ nice -n 10 ionice -c2 -n7 \
 **Systemd:**
 
 ```python
-from hyper2kvm.systemd import SystemdRun
+from h2kvm.systemd import SystemdRun
 
 run = SystemdRun()
 run.run(
@@ -178,7 +178,7 @@ systemd-inhibit --what=sleep:shutdown \
 **Systemd:**
 
 ```python
-from hyper2kvm.systemd import SystemdInhibit
+from h2kvm.systemd import SystemdInhibit
 
 inhibit = SystemdInhibit()
 inhibit.run(
@@ -207,7 +207,7 @@ qemu-system-x86_64 -hda disk.qcow2 -m 4G -smp 2
 **Systemd:**
 
 ```python
-from hyper2kvm.systemd import SystemdNspawn, SystemdVmspawn
+from h2kvm.systemd import SystemdNspawn, SystemdVmspawn
 
 # Stage 1: Container test (< 1 min, lightweight)
 nspawn = SystemdNspawn()
@@ -238,7 +238,7 @@ systemd-analyze blame | head -20  # Requires manual interpretation
 **Systemd:**
 
 ```python
-from hyper2kvm.systemd import SystemdAnalyze
+from h2kvm.systemd import SystemdAnalyze
 
 analyze = SystemdAnalyze()
 
@@ -339,7 +339,7 @@ echo "Boot time: $(journalctl -b | grep 'Startup finished' | awk '{print $NF}')"
 
 ```python
 from pathlib import Path
-from hyper2kvm.systemd import (
+from h2kvm.systemd import (
     SystemdDetectVirt, SystemdDissect, SystemdInhibit,
     SystemdNspawn, SystemdAnalyze
 )

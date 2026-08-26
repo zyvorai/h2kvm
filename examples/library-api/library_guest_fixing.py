@@ -4,7 +4,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 """
-Example: Guest OS fixing using hyper2kvm library.
+Example: Guest OS fixing using h2kvm library.
 
 This example demonstrates:
 - Detecting guest OS from disk image
@@ -21,8 +21,8 @@ import logging
 import sys
 from pathlib import Path
 
-from hyper2kvm import GuestDetector
-from hyper2kvm.fixers import OfflineFSFix
+from h2kvm import GuestDetector
+from h2kvm.fixers import OfflineFSFix
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

@@ -73,7 +73,7 @@ if [ "${1:-}" == "--check" ]; then
 
     # Check code quality
     echo "🔍 Checking code quality..."
-    if ruff check . && ruff format --check . && mypy hyper2kvm/; then
+    if ruff check . && ruff format --check . && mypy h2kvm/; then
         echo "✅ Code quality checks pass"
     else
         echo "❌ Code quality checks failed"
@@ -122,7 +122,7 @@ echo
 
 # Run code quality checks
 echo "🔍 Running code quality checks..."
-if ! ruff check . || ! ruff format --check . || ! mypy hyper2kvm/; then
+if ! ruff check . || ! ruff format --check . || ! mypy h2kvm/; then
     echo "❌ Code quality checks failed"
     exit 1
 fi
@@ -150,11 +150,11 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-# Commit version bump (bump-version.sh updates pyproject.toml, __init__.py, setup.py, hyper2kvm.spec)
+# Commit version bump (bump-version.sh updates pyproject.toml, __init__.py, setup.py, h2kvm.spec)
 if [ -n "$(git status --porcelain)" ]; then
-    git add pyproject.toml hyper2kvm/__init__.py
+    git add pyproject.toml h2kvm/__init__.py
     [ -f setup.py ] && git add setup.py
-    [ -f hyper2kvm.spec ] && git add hyper2kvm.spec
+    [ -f h2kvm.spec ] && git add h2kvm.spec
     git commit -m "chore: bump version to $VERSION"
 fi
 

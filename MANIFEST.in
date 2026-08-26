@@ -2,7 +2,7 @@
 include README.md
 include LICENSE
 include requirements.txt
-include hyper2kvm.spec
+include h2kvm.spec
 
 # Include documentation
 recursive-include docs *.md

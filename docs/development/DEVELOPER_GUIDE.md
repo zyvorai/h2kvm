@@ -1,6 +1,6 @@
 # Developer Guide - New Patterns and Best Practices
 
-This guide covers new abstractions and patterns introduced to improve code quality and consistency in hyper2kvm.
+This guide covers new abstractions and patterns introduced to improve code quality and consistency in h2kvm.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ This guide covers new abstractions and patterns introduced to improve code quali
 
 ### Overview
 
-The `CommandRunner` class (`hyper2kvm/core/command_runner.py`) provides a standardized way to execute shell commands with:
+The `CommandRunner` class (`h2kvm/core/command_runner.py`) provides a standardized way to execute shell commands with:
 - Automatic retry with exponential backoff
 - Timeout enforcement
 - Structured logging
@@ -26,7 +26,7 @@ The `CommandRunner` class (`hyper2kvm/core/command_runner.py`) provides a standa
 ### Basic Usage
 
 ```python
-from hyper2kvm.core.command_runner import CommandRunner
+from h2kvm.core.command_runner import CommandRunner
 
 # Create runner (typically in __init__)
 runner = CommandRunner(logger=self.logger, dry_run=False)
@@ -103,7 +103,7 @@ except subprocess.TimeoutExpired:
 **After (new pattern):**
 
 ```python
-from hyper2kvm.core.command_runner import CommandRunner
+from h2kvm.core.command_runner import CommandRunner
 
 runner = CommandRunner(logger=self.logger)
 result = runner.run(
@@ -164,7 +164,7 @@ exit_code, stdout, stderr = runner.run_silent("command")
 
 ### Overview
 
-A comprehensive exception hierarchy (`hyper2kvm/core/exceptions.py`) provides:
+A comprehensive exception hierarchy (`h2kvm/core/exceptions.py`) provides:
 - Subsystem-specific exceptions
 - Consistent error context and redaction
 - User-friendly error messages
@@ -173,7 +173,7 @@ A comprehensive exception hierarchy (`hyper2kvm/core/exceptions.py`) provides:
 ### Exception Tree
 
 ```
-Hyper2KvmError (base)
+H2KvmError (base)
 ├── Fatal (user-facing fatal errors)
 ├── ProviderError
 │   ├── VMwareError
@@ -216,7 +216,7 @@ Hyper2KvmError (base)
 ### Basic Usage
 
 ```python
-from hyper2kvm.core.exceptions import FixerError, BootloaderFixerError
+from h2kvm.core.exceptions import FixerError, BootloaderFixerError
 
 # Raise with code and message
 raise FixerError(
@@ -248,7 +248,7 @@ except Exception as e:
 ### Enhanced Errors with Solutions
 
 ```python
-from hyper2kvm.core.exceptions import create_helpful_error, VMwareError
+from h2kvm.core.exceptions import create_helpful_error, VMwareError
 
 error = create_helpful_error(
     VMwareError,
@@ -291,7 +291,7 @@ error.user_message(include_context=True)
 #   2. Insufficient permissions
 #   3. Incorrect datacenter specified
 #
-# Documentation: https://github.com/ssahani/hyper2kvm/blob/main/docs/30-vSphere-Export.md#troubleshooting
+# Documentation: https://github.com/ssahani/h2kvm/blob/main/docs/30-vSphere-Export.md#troubleshooting
 
 # With cause
 error.user_message(include_cause=True)
@@ -310,7 +310,7 @@ error.to_dict()
 ### Catching Exceptions by Subsystem
 
 ```python
-from hyper2kvm.core.exceptions import FixerError, StorageError
+from h2kvm.core.exceptions import FixerError, StorageError
 
 try:
     perform_migration()
@@ -322,7 +322,7 @@ except StorageError as e:
     # Catch all storage-related errors
     logger.error(f"Storage operation failed: {e.user_message()}")
     cleanup_devices()
-except Hyper2KvmError as e:
+except H2KvmError as e:
     # Catch all project errors
     logger.error(f"Migration failed: {e.user_message()}")
 ```
@@ -381,8 +381,8 @@ class MyFixer:
 **After:**
 
 ```python
-from hyper2kvm.core.command_runner import CommandRunner
-from hyper2kvm.core.exceptions import BootloaderFixerError
+from h2kvm.core.command_runner import CommandRunner
+from h2kvm.core.exceptions import BootloaderFixerError
 
 class MyFixer:
     def __init__(self, logger):
@@ -432,7 +432,7 @@ def download_vm(self, vm_name):
 **After:**
 
 ```python
-from hyper2kvm.core.exceptions import ProviderError, VMwareError
+from h2kvm.core.exceptions import ProviderError, VMwareError
 
 def download_vm(self, vm_name):
     try:
@@ -479,8 +479,8 @@ def mount_partition(self, device, mount_point):
 **After:**
 
 ```python
-from hyper2kvm.core.command_runner import CommandRunner
-from hyper2kvm.core.exceptions import StorageError, MountError
+from h2kvm.core.command_runner import CommandRunner
+from h2kvm.core.exceptions import StorageError, MountError
 
 def mount_partition(self, device, mount_point):
     result = self.runner.run(
@@ -613,7 +613,7 @@ self.logger.error(
 
 ```python
 from unittest.mock import patch, MagicMock
-from hyper2kvm.core.command_runner import CommandRunner
+from h2kvm.core.command_runner import CommandRunner
 
 def test_command_success():
     runner = CommandRunner(logger=mock_logger, dry_run=True)
@@ -639,7 +639,7 @@ def test_command_retry():
 ### Unit Testing Exceptions
 
 ```python
-from hyper2kvm.core.exceptions import FixerError
+from h2kvm.core.exceptions import FixerError
 
 def test_error_context():
     error = FixerError(
@@ -690,7 +690,7 @@ def run_command_old(cmd):
 
 ## Additional Resources
 
-- [CommandRunner API Reference](../hyper2kvm/core/command_runner.py)
-- [Exception Hierarchy](../hyper2kvm/core/exceptions.py)
-- [Configuration README](../hyper2kvm/config/README.md)
-- [Fixer Documentation](../hyper2kvm/fixers/README.md)
+- [CommandRunner API Reference](../h2kvm/core/command_runner.py)
+- [Exception Hierarchy](../h2kvm/core/exceptions.py)
+- [Configuration README](../h2kvm/config/README.md)
+- [Fixer Documentation](../h2kvm/fixers/README.md)

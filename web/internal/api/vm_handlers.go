@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/hyper2kvm/web/internal/domain"
+	"github.com/h2kvm/web/internal/domain"
 )
 
 // --- Libvirt VM Management ---
@@ -1273,7 +1273,7 @@ func (s *Server) handleReadiness(w http.ResponseWriter, r *http.Request) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		path := "/var/lib/hyper2kvm/virtio-win.iso"
+		path := "/var/lib/h2kvm/virtio-win.iso"
 		if fileExists(path) {
 			addCheck("virtio_win_iso", "ok", path)
 		} else {
@@ -1285,7 +1285,7 @@ func (s *Server) handleReadiness(w http.ResponseWriter, r *http.Request) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		path := "/var/lib/hyper2kvm/virtio-win-extracted/viostor"
+		path := "/var/lib/h2kvm/virtio-win-extracted/viostor"
 		if fileExists(path) {
 			addCheck("virtio_win_extracted", "ok", path)
 		} else {
@@ -1497,14 +1497,14 @@ func (s *Server) handleReadiness(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	// /run/hyper2kvm (runtime dir for NBD locks)
+	// /run/h2kvm (runtime dir for NBD locks)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if fileExists("/run/hyper2kvm") {
-			addCheck("runtime_dir", "ok", "/run/hyper2kvm")
+		if fileExists("/run/h2kvm") {
+			addCheck("runtime_dir", "ok", "/run/h2kvm")
 		} else {
-			addCheck("runtime_dir", "error", "/run/hyper2kvm missing (NBD locking will fail)")
+			addCheck("runtime_dir", "error", "/run/h2kvm missing (NBD locking will fail)")
 		}
 	}()
 
@@ -1549,7 +1549,7 @@ func (s *Server) handleDiskImages(w http.ResponseWriter, r *http.Request) {
 	scanDirs := []string{
 		"/var/lib/libvirt/images/",
 		"/data/demo/",
-		"/var/lib/hyper2kvm/demo/",
+		"/var/lib/h2kvm/demo/",
 	}
 
 	var directories []dirInfo
@@ -3964,16 +3964,16 @@ func buildKubeVirtVMYAML(name, ns string, info *MigrationDomainInfo, pvcNames []
 	osLabels := ""
 	if info.IsWindows {
 		osLabels = `
-    hyper2kvm.io/guest-os: windows
+    h2kvm.io/guest-os: windows
     v9s.io/guest-os: windows
     v9s.io/rdp: enabled`
 	} else {
 		osLabels = `
-    hyper2kvm.io/guest-os: linux
+    h2kvm.io/guest-os: linux
     v9s.io/guest-os: linux`
 		if variant := inferKubevirtOSVariant(name); variant != "" {
 			osLabels += fmt.Sprintf("\n    os.template.kubevirt.io/variant: %s", variant)
-			osLabels += fmt.Sprintf("\n    hyper2kvm.io/os-variant: %s", variant)
+			osLabels += fmt.Sprintf("\n    h2kvm.io/os-variant: %s", variant)
 		}
 	}
 
@@ -3983,11 +3983,11 @@ metadata:
   name: %s
   namespace: %s
   labels:
-    hyper2kvm.io/migrated: "true"
-    hyper2kvm.io/source: libvirt
-    hyper2kvm.io/source-vm: %s%s
+    h2kvm.io/migrated: "true"
+    h2kvm.io/source: libvirt
+    h2kvm.io/source-vm: %s%s
   annotations:
-    hyper2kvm.io/guest-os: %s
+    h2kvm.io/guest-os: %s
 spec:
   running: false
   template:

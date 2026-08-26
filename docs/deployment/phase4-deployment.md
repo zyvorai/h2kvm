@@ -91,7 +91,7 @@ kubectl get vmi -A
 ### Option A: Build Locally
 
 ```bash
-cd /path/to/hyper2kvm
+cd /path/to/h2kvm
 
 # Set registry (change to your registry)
 export REGISTRY=quay.io/yourusername
@@ -107,7 +107,7 @@ docker push $REGISTRY/offline-fix-vm:$VERSION
 
 ### Option B: Use Pre-built Images
 
-If using pre-built images from quay.io/hyper2kvm, skip to Step 2.
+If using pre-built images from quay.io/h2kvm, skip to Step 2.
 
 ---
 
@@ -122,7 +122,7 @@ kubectl apply -f k8s/operator/crds/offlinefixjob.yaml
 Verify:
 
 ```bash
-kubectl get crd offlinefixjobs.hyper2kvm.io
+kubectl get crd offlinefixjobs.h2kvm.io
 kubectl api-resources | grep offlinefixjob
 ```
 
@@ -137,11 +137,11 @@ Label nodes that can perform NBD operations:
 kubectl get nodes
 
 # Label nodes (adjust node names)
-kubectl label node worker-1 hyper2kvm.io/nbd-capable=true
-kubectl label node worker-2 hyper2kvm.io/nbd-capable=true
+kubectl label node worker-1 h2kvm.io/nbd-capable=true
+kubectl label node worker-2 h2kvm.io/nbd-capable=true
 
 # Verify
-kubectl get nodes -L hyper2kvm.io/nbd-capable
+kubectl get nodes -L h2kvm.io/nbd-capable
 ```
 
 ---
@@ -168,13 +168,13 @@ kubectl apply -f k8s/daemon/nbd-prep-daemonset.yaml
 
 ```bash
 # Check DaemonSet
-kubectl get ds -n hyper2kvm-system nbd-prep
+kubectl get ds -n h2kvm-system nbd-prep
 
 # Check pods on labeled nodes
-kubectl get pods -n hyper2kvm-system -l app=nbd-prep -o wide
+kubectl get pods -n h2kvm-system -l app=nbd-prep -o wide
 
 # Check logs
-kubectl logs -n hyper2kvm-system -l app=nbd-prep --tail=50
+kubectl logs -n h2kvm-system -l app=nbd-prep --tail=50
 ```
 
 Expected output:
@@ -195,7 +195,7 @@ The OfflineFixJob controller runs as part of the main operator.
 If you're rebuilding the operator to include Phase 4:
 
 ```bash
-cd /path/to/hyper2kvm
+cd /path/to/h2kvm
 
 # Build operator image
 docker build -t quay.io/yourusername/operator:v1.5.0 .
@@ -209,19 +209,19 @@ docker push quay.io/yourusername/operator:v1.5.0
 kubectl apply -f k8s/operator/deployment.yaml
 
 # If updating existing operator
-kubectl set image deployment/hyper2kvm-operator \
+kubectl set image deployment/h2kvm-operator \
   operator=quay.io/yourusername/operator:v1.5.0 \
-  -n hyper2kvm-system
+  -n h2kvm-system
 
 # Restart operator to load new controller
-kubectl rollout restart deployment/hyper2kvm-operator -n hyper2kvm-system
+kubectl rollout restart deployment/h2kvm-operator -n h2kvm-system
 ```
 
 ### Verify
 
 ```bash
 # Check operator logs for OfflineFixJob controller registration
-kubectl logs -n hyper2kvm-system -l app=hyper2kvm-operator --tail=100 | grep -i offline
+kubectl logs -n h2kvm-system -l app=h2kvm-operator --tail=100 | grep -i offline
 ```
 
 ---
@@ -251,11 +251,11 @@ ls -lh /var/lib/imports/
 
 ```yaml
 # test-offlinefixjob.yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: OfflineFixJob
 metadata:
   name: test-centos9-fix
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   source:
     disk:
@@ -270,7 +270,7 @@ spec:
 
   execution:
     mode: kubevirt-vm
-    vmImage: quay.io/hyper2kvm/offline-fix-vm:v1.0.0
+    vmImage: quay.io/h2kvm/offline-fix-vm:v1.0.0
     resources:
       memory: "2Gi"
       cpu: "2"
@@ -280,7 +280,7 @@ spec:
     allowXfsRepair: true
 
   nodeSelector:
-    hyper2kvm.io/nbd-capable: "true"
+    h2kvm.io/nbd-capable: "true"
 
   timeout: "30m"
 ```
@@ -319,14 +319,14 @@ kubectl get offlinefixjob test-centos9-fix -o jsonpath='{.status.conditions}' | 
 
 ```bash
 # NBD prep daemon logs
-kubectl logs -n hyper2kvm-system -l app=nbd-prep --tail=50 -f
+kubectl logs -n h2kvm-system -l app=nbd-prep --tail=50 -f
 
 # Operator logs
-kubectl logs -n hyper2kvm-system -l app=hyper2kvm-operator --tail=50 -f
+kubectl logs -n h2kvm-system -l app=h2kvm-operator --tail=50 -f
 
 # VM logs (when running)
 VM_NAME=$(kubectl get offlinefixjob test-centos9-fix -o jsonpath='{.status.vmName}')
-kubectl logs -n hyper2kvm-system $VM_NAME
+kubectl logs -n h2kvm-system $VM_NAME
 ```
 
 ### Check Node Annotations
@@ -414,7 +414,7 @@ This triggers automatic cleanup:
 
 ```bash
 # Check VM deleted
-kubectl get vmi -n hyper2kvm-system
+kubectl get vmi -n h2kvm-system
 
 # Check node annotations cleared
 kubectl get node $NODE -o jsonpath='{.metadata.annotations}' | jq | grep offlinefix
@@ -431,13 +431,13 @@ ssh $NODE "lsblk | grep nbd"
 
 ```bash
 # Check DaemonSet logs
-kubectl logs -n hyper2kvm-system -l app=nbd-prep
+kubectl logs -n h2kvm-system -l app=nbd-prep
 
 # Check NBD module on node
-kubectl exec -n hyper2kvm-system <nbd-prep-pod> -- lsmod | grep nbd
+kubectl exec -n h2kvm-system <nbd-prep-pod> -- lsmod | grep nbd
 
 # Check NBD devices
-kubectl exec -n hyper2kvm-system <nbd-prep-pod> -- ls -la /dev/nbd*
+kubectl exec -n h2kvm-system <nbd-prep-pod> -- ls -la /dev/nbd*
 ```
 
 ### VM Not Starting
@@ -447,10 +447,10 @@ kubectl exec -n hyper2kvm-system <nbd-prep-pod> -- ls -la /dev/nbd*
 kubectl get kubevirt -n kubevirt
 
 # Check VMI status
-kubectl get vmi -n hyper2kvm-system
+kubectl get vmi -n h2kvm-system
 
 # Check VMI events
-kubectl describe vmi <vm-name> -n hyper2kvm-system
+kubectl describe vmi <vm-name> -n h2kvm-system
 
 # Check virt-handler logs
 kubectl logs -n kubevirt -l kubevirt.io=virt-handler --tail=100
@@ -460,10 +460,10 @@ kubectl logs -n kubevirt -l kubevirt.io=virt-handler --tail=100
 
 ```bash
 # Check VM logs
-kubectl logs -n hyper2kvm-system <vm-name>
+kubectl logs -n h2kvm-system <vm-name>
 
 # Check if /vmroot is mounted correctly
-kubectl exec -n hyper2kvm-system <vm-name> -- ls -la /vmroot/etc/
+kubectl exec -n h2kvm-system <vm-name> -- ls -la /vmroot/etc/
 
 # Check job spec ConfigMap
 kubectl get cm offline-fix-spec-test-centos9-fix -o yaml
@@ -476,10 +476,10 @@ kubectl get cm offline-fix-spec-test-centos9-fix -o yaml
 kubectl get node $NODE -o jsonpath='{.metadata.annotations}' | jq
 
 # Manually trigger cleanup (if needed)
-kubectl annotate node $NODE offlinefix.hyper2kvm.io/cleanup=true
+kubectl annotate node $NODE offlinefix.h2kvm.io/cleanup=true
 
 # Check DaemonSet logs
-kubectl logs -n hyper2kvm-system -l app=nbd-prep --tail=50
+kubectl logs -n h2kvm-system -l app=nbd-prep --tail=50
 ```
 
 ---

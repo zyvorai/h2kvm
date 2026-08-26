@@ -5,14 +5,14 @@ on:
     branches: [ main, develop ]
     paths:
       - 'examples/**'
-      - 'hyper2kvm/core/vmcraft/**'
+      - 'h2kvm/core/vmcraft/**'
       - 'tests/**'
       - '.github/workflows/validate-tools.yml'
   pull_request:
     branches: [ main, develop ]
     paths:
       - 'examples/**'
-      - 'hyper2kvm/core/vmcraft/**'
+      - 'h2kvm/core/vmcraft/**'
       - 'tests/**'
   schedule:
     # Run daily at 2 AM UTC
@@ -84,7 +84,7 @@ jobs:
 
     - name: Verify tool imports
       run: |
-        python -c "import sys; sys.path.insert(0, '.'); from hyper2kvm.core.vmcraft.main import VMCraft; print('✓ VMCraft import successful')"
+        python -c "import sys; sys.path.insert(0, '.'); from h2kvm.core.vmcraft.main import VMCraft; print('✓ VMCraft import successful')"
 
     - name: Run quick validation
       run: |
@@ -124,7 +124,7 @@ jobs:
     - name: Run security scan
       run: |
         bandit -r examples/ -ll -f json -o bandit-report.json || true
-        bandit -r hyper2kvm/ -ll || true
+        bandit -r h2kvm/ -ll || true
 
     - name: Upload security report
       uses: actions/upload-artifact@v7

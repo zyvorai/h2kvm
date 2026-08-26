@@ -1,4 +1,4 @@
-# hyper2kvm Worker Job Protocol v1.0 - Complete Specification
+# h2kvm Worker Job Protocol v1.0 - Complete Specification
 
 **Version:** 1.0
 **Date:** 2026-01-30
@@ -24,7 +24,7 @@
 
 ## Overview
 
-The hyper2kvm Worker Job Protocol provides a production-grade framework for orchestrating disk operations that require privileged access (NBD devices, LVM activation, filesystem surgery).
+The h2kvm Worker Job Protocol provides a production-grade framework for orchestrating disk operations that require privileged access (NBD devices, LVM activation, filesystem surgery).
 
 ### Design Goals
 
@@ -245,7 +245,7 @@ COMPLETED / FAILED / RETRYING / CANCELLED
 Events are stored in JSON Lines format:
 
 ```
-/tmp/hyper2kvm/events/{job_id}.events.jsonl
+/tmp/h2kvm/events/{job_id}.events.jsonl
 ```
 
 Each line is a complete ProgressEvent JSON object.
@@ -290,7 +290,7 @@ Each line is a complete ProgressEvent JSON object.
 Workers automatically detect capabilities on startup:
 
 ```python
-from hyper2kvm.worker.capabilities import get_detector
+from h2kvm.worker.capabilities import get_detector
 
 detector = get_detector()
 
@@ -310,7 +310,7 @@ caps = detector.detect_capabilities()
 ### Worker Engine API
 
 ```python
-from hyper2kvm.worker import WorkerEngine, JobSpec
+from h2kvm.worker import WorkerEngine, JobSpec
 
 # Create engine
 engine = WorkerEngine(
@@ -331,7 +331,7 @@ else:
 ### Scheduler API
 
 ```python
-from hyper2kvm.worker.scheduler import get_scheduler
+from h2kvm.worker.scheduler import get_scheduler
 
 scheduler = get_scheduler()
 
@@ -348,7 +348,7 @@ scheduler.complete_job(job.job_id, success=True)
 ### Event Streaming API
 
 ```python
-from hyper2kvm.worker.events import EventStream, get_event_store
+from h2kvm.worker.events import EventStream, get_event_store
 
 store = get_event_store()
 
@@ -367,24 +367,24 @@ for event in stream:
 
 ## CLI Reference
 
-### hyper2kvm worker run
+### h2kvm worker run
 
 Execute a job immediately:
 
 ```bash
-hyper2kvm worker run job.json [--worker-id worker-01] [--follow]
+h2kvm worker run job.json [--worker-id worker-01] [--follow]
 ```
 
 Options:
 - `--worker-id`: Worker identifier (default: cli-worker)
 - `--follow`: Show progress in real-time
 
-### hyper2kvm worker status
+### h2kvm worker status
 
 Check job status:
 
 ```bash
-hyper2kvm worker status <job-id>
+h2kvm worker status <job-id>
 ```
 
 Shows:
@@ -392,35 +392,35 @@ Shows:
 - Latest phase and progress
 - State history with timestamps
 
-### hyper2kvm worker events
+### h2kvm worker events
 
 Stream job events:
 
 ```bash
-hyper2kvm worker events <job-id> [--follow] [--phase <phase>]
+h2kvm worker events <job-id> [--follow] [--phase <phase>]
 ```
 
 Options:
 - `--follow, -f`: Follow new events in real-time
 - `--phase`: Filter by phase name
 
-### hyper2kvm worker capabilities
+### h2kvm worker capabilities
 
 Show worker capabilities:
 
 ```bash
-hyper2kvm worker capabilities [--json-output]
+h2kvm worker capabilities [--json-output]
 ```
 
 Options:
 - `--json-output`: Output as JSON
 
-### hyper2kvm worker list
+### h2kvm worker list
 
 List jobs:
 
 ```bash
-hyper2kvm worker list [--state <state>]
+h2kvm worker list [--state <state>]
 ```
 
 Options:
@@ -432,19 +432,19 @@ Options:
 
 ### Single Worker (Host)
 
-1. **Install hyper2kvm:**
+1. **Install h2kvm:**
    ```bash
-   pip install -e /path/to/hyper2kvm
+   pip install -e /path/to/h2kvm
    ```
 
 2. **Check capabilities:**
    ```bash
-   hyper2kvm worker capabilities
+   h2kvm worker capabilities
    ```
 
 3. **Run jobs:**
    ```bash
-   hyper2kvm worker run job.json --follow
+   h2kvm worker run job.json --follow
    ```
 
 ### Multi-Worker (Kubernetes)
@@ -455,7 +455,7 @@ See `k8s/worker/` for complete manifests.
 
 ```bash
 # Create namespace
-kubectl create namespace hyper2kvm-workers
+kubectl create namespace h2kvm-workers
 
 # Deploy worker DaemonSet
 kubectl apply -f k8s/worker/daemonset.yaml
@@ -473,7 +473,7 @@ docker run --privileged \
   -v /dev:/dev \
   -v /lib/modules:/lib/modules \
   -v /data:/data \
-  hyper2kvm:worker \
+  h2kvm:worker \
   worker run /data/job.json
 ```
 
@@ -482,7 +482,7 @@ docker run --privileged \
 ```bash
 docker run \
   -v /data:/data \
-  hyper2kvm:cli \
+  h2kvm:cli \
   worker run /data/convert-job.json
 ```
 
@@ -493,8 +493,8 @@ docker run \
 ### Example 1: Simple Inspection
 
 ```python
-from hyper2kvm.worker import JobSpec, OperationType
-from hyper2kvm.worker.engine import create_sample_job_spec
+from h2kvm.worker import JobSpec, OperationType
+from h2kvm.worker.engine import create_sample_job_spec
 
 job = create_sample_job_spec(
     image_path="/images/test.qcow2",
@@ -502,7 +502,7 @@ job = create_sample_job_spec(
     operation=OperationType.INSPECT
 )
 
-from hyper2kvm.worker import WorkerEngine
+from h2kvm.worker import WorkerEngine
 
 engine = WorkerEngine(worker_id="test-worker")
 result = engine.execute_job(job)
@@ -537,8 +537,8 @@ print(f"Inspection report: {result.outputs.report}")
 ### Example 3: Offline Fix with Progress Tracking
 
 ```python
-from hyper2kvm.worker import WorkerEngine
-from hyper2kvm.worker.events import ProgressTracker
+from h2kvm.worker import WorkerEngine
+from h2kvm.worker.events import ProgressTracker
 
 # Create progress tracker
 tracker = ProgressTracker(
@@ -576,8 +576,8 @@ result = engine.execute_job(job)
 
 **Solution:**
 ```bash
-mkdir -p /tmp/hyper2kvm/events
-chmod 777 /tmp/hyper2kvm/events
+mkdir -p /tmp/h2kvm/events
+chmod 777 /tmp/h2kvm/events
 ```
 
 ### Worker Not Matching Jobs
@@ -587,7 +587,7 @@ chmod 777 /tmp/hyper2kvm/events
 **Debug:**
 ```bash
 # Check worker capabilities
-hyper2kvm worker capabilities
+h2kvm worker capabilities
 
 # Check job requirements
 cat job.json | jq .capability_requirements
@@ -599,7 +599,7 @@ cat job.json | jq .capability_requirements
 
 **Solution:** Check state history:
 ```bash
-hyper2kvm worker status <job-id>
+h2kvm worker status <job-id>
 ```
 
 ---
@@ -610,17 +610,17 @@ hyper2kvm worker status <job-id>
 
 | Purpose | Default Path |
 |---------|--------------|
-| Job states | `/tmp/hyper2kvm/jobs/{job_id}.state.json` |
-| Events | `/tmp/hyper2kvm/events/{job_id}.events.jsonl` |
-| Queue | `/tmp/hyper2kvm/queue/{job_id}.job.json` |
+| Job states | `/tmp/h2kvm/jobs/{job_id}.state.json` |
+| Events | `/tmp/h2kvm/events/{job_id}.events.jsonl` |
+| Queue | `/tmp/h2kvm/queue/{job_id}.job.json` |
 
 ### Environment Variables
 
 | Variable | Purpose | Default |
 |----------|---------|---------|
-| `HYPER2KVM_STATE_DIR` | State directory | `/tmp/hyper2kvm/jobs` |
-| `HYPER2KVM_EVENT_DIR` | Event directory | `/tmp/hyper2kvm/events` |
-| `HYPER2KVM_QUEUE_DIR` | Queue directory | `/tmp/hyper2kvm/queue` |
+| `H2KVM_STATE_DIR` | State directory | `/tmp/h2kvm/jobs` |
+| `H2KVM_EVENT_DIR` | Event directory | `/tmp/h2kvm/events` |
+| `H2KVM_QUEUE_DIR` | Queue directory | `/tmp/h2kvm/queue` |
 
 ---
 

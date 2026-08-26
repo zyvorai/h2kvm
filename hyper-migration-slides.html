@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>VMware &amp; Hyper-V to KVM Migration — hypersdk + hyper2kvm</title>
+<title>VMware &amp; Hyper-V to KVM Migration — hypersdk + h2kvm</title>
 <style>
   @page { size: landscape; margin: 0; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -141,7 +141,7 @@
   <div class="tagline">From Traditional Manual Steps to a Fully Automated Two-Tool Solution</div>
   <div class="tool-pills">
     <span class="pill go">hypersdk &mdash; Go</span>
-    <span class="pill py">hyper2kvm &mdash; Python</span>
+    <span class="pill py">h2kvm &mdash; Python</span>
   </div>
   <div class="author">ZyvorAI Labs Private Limited</div>
   <div class="meta">Proprietary (Zyvor AI Labs) &nbsp;|&nbsp; Production Ready</div>
@@ -191,14 +191,14 @@
       </div>
     </div>
   </div>
-  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="logo-footer">hypersdk + h2kvm</div>
   <div class="slide-number">2</div>
 </div>
 
 <!-- ════════════════════════════════════════════ SLIDE 3: Section — Our Solution ════════════════════════════════════════════ -->
 <div class="slide section-slide dark">
   <h2>Our Solution: Two Tools, One Pipeline</h2>
-  <p><strong>hypersdk</strong> (Go) exports &amp; discovers &nbsp;&nbsp;&bull;&nbsp;&nbsp; <strong>hyper2kvm</strong> (Python) fixes &amp; converts</p>
+  <p><strong>hypersdk</strong> (Go) exports &amp; discovers &nbsp;&nbsp;&bull;&nbsp;&nbsp; <strong>h2kvm</strong> (Python) fixes &amp; converts</p>
   <p style="font-size: 13pt; margin-top: 20px; color: rgba(255,255,255,0.6);">Clean separation of concerns via a JSON manifest contract</p>
 </div>
 
@@ -222,12 +222,12 @@
       </div>
       <div class="pipeline-arrow">&rarr;</div>
       <div class="pipeline-step orange" style="min-width: 130px;">
-        <span class="step-num">hyper2kvm</span>
+        <span class="step-num">h2kvm</span>
         Inspect<br>&amp; Fix
       </div>
       <div class="pipeline-arrow">&rarr;</div>
       <div class="pipeline-step orange">
-        <span class="step-num">hyper2kvm</span>
+        <span class="step-num">h2kvm</span>
         Convert<br>&amp; Validate
       </div>
       <div class="pipeline-arrow">&rarr;</div>
@@ -250,7 +250,7 @@
       </div>
       <div class="col">
         <div class="highlight-box" style="font-size: 11pt; padding: 12px 16px;">
-          <strong style="color: #e65100;">hyper2kvm</strong> (Python) handles <em>deterministic operations</em>:<br>
+          <strong style="color: #e65100;">h2kvm</strong> (Python) handles <em>deterministic operations</em>:<br>
           &bull; Consumes manifest, never talks to providers<br>
           &bull; Deep OS inspection via VMCraft engine<br>
           &bull; Bootloader, fstab, initramfs, driver fixes<br>
@@ -263,7 +263,7 @@
       <strong>Contract principle:</strong> Same manifest &rarr; same outcome. Provider-agnostic. Deterministic. Resumable.
     </div>
   </div>
-  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="logo-footer">hypersdk + h2kvm</div>
   <div class="slide-number">4</div>
 </div>
 
@@ -309,13 +309,13 @@
       </div>
     </div>
   </div>
-  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="logo-footer">hypersdk + h2kvm</div>
   <div class="slide-number">5</div>
 </div>
 
-<!-- ════════════════════════════════════════════ SLIDE 6: hyper2kvm Deep Dive ════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════ SLIDE 6: h2kvm Deep Dive ════════════════════════════════════════════ -->
 <div class="slide">
-  <h2>hyper2kvm &mdash; Fix, Convert &amp; Validate Engine</h2>
+  <h2>h2kvm &mdash; Fix, Convert &amp; Validate Engine</h2>
   <div class="content">
     <div class="two-col">
       <div class="col">
@@ -350,7 +350,7 @@
           <tr><td>System Calls</td><td>14,200</td><td><strong>8,500</strong></td></tr>
         </table>
         <h3>Code Example</h3>
-        <pre><code>from hyper2kvm.core.vmcraft import VMCraft
+        <pre><code>from h2kvm.core.vmcraft import VMCraft
 
 with VMCraft() as g:
     g.add_disk("/vms/server.qcow2")
@@ -372,7 +372,7 @@ with VMCraft() as g:
       </div>
     </div>
   </div>
-  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="logo-footer">hypersdk + h2kvm</div>
   <div class="slide-number">6</div>
 </div>
 
@@ -382,10 +382,10 @@ with VMCraft() as g:
   <div class="content">
     <div class="two-col">
       <div class="col">
-        <p style="margin-bottom: 10px;">Communication is <strong>file-based</strong> via a versioned <strong>JSON manifest</strong>. hypersdk produces it, hyper2kvm consumes it.</p>
+        <p style="margin-bottom: 10px;">Communication is <strong>file-based</strong> via a versioned <strong>JSON manifest</strong>. hypersdk produces it, h2kvm consumes it.</p>
         <h3>Design Principles</h3>
         <ul style="font-size: 12pt;">
-          <li><strong>Provider-agnostic</strong> &mdash; hyper2kvm never talks to providers</li>
+          <li><strong>Provider-agnostic</strong> &mdash; h2kvm never talks to providers</li>
           <li><strong>Minimal requirements</strong> &mdash; only <code>disks[]</code> + firmware hint</li>
           <li><strong>Deterministic</strong> &mdash; same manifest &rarr; same outcome</li>
           <li><strong>Resumable</strong> &mdash; checksums enable idempotent ops</li>
@@ -426,7 +426,7 @@ with VMCraft() as g:
       </div>
     </div>
   </div>
-  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="logo-footer">hypersdk + h2kvm</div>
   <div class="slide-number">7</div>
 </div>
 
@@ -456,7 +456,7 @@ hyperctl schedules create \
         </div>
       </div>
       <div class="col">
-        <h3 style="color: #e65100;">Phase 2: Fix &amp; Convert (hyper2kvm)</h3>
+        <h3 style="color: #e65100;">Phase 2: Fix &amp; Convert (h2kvm)</h3>
         <pre><code># YAML config
 cmd: local
 vmdk: /exports/web-01.vhdx
@@ -500,7 +500,7 @@ nc -zv &lt;IP&gt; 22</code></pre>
       </div>
     </div>
   </div>
-  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="logo-footer">hypersdk + h2kvm</div>
   <div class="slide-number">8</div>
 </div>
 
@@ -536,7 +536,7 @@ hyperctl export \
         </div>
       </div>
       <div class="col">
-        <h3 style="color: #e65100;">Phase 2: Fix &amp; Convert (hyper2kvm)</h3>
+        <h3 style="color: #e65100;">Phase 2: Fix &amp; Convert (h2kvm)</h3>
         <pre><code># YAML config
 cmd: local
 vmdk: /exports/web-server.vmdk
@@ -572,7 +572,7 @@ sudo h2kvmctl \
   --k8s-auto-start
 
 # Option C: vSphere Python API
-from hyper2kvm.vmware import \
+from h2kvm.vmware import \
     VMwareClient, ExportOptions
 client = VMwareClient(
     vcenter_host='vcenter',
@@ -587,7 +587,7 @@ await client.async_export_vm(
       </div>
     </div>
   </div>
-  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="logo-footer">hypersdk + h2kvm</div>
   <div class="slide-number">10</div>
 </div>
 
@@ -619,7 +619,7 @@ await client.async_export_vm(
       </div>
       <div class="vs-divider">VS</div>
       <div class="vs-panel right">
-        <h3 style="color: #2e7d32; margin-bottom: 10px;">hypersdk + hyper2kvm (Automated)</h3>
+        <h3 style="color: #2e7d32; margin-bottom: 10px;">hypersdk + h2kvm (Automated)</h3>
         <ol style="font-size: 11.5pt; line-height: 2;">
           <li><code>hyperctl export --provider vsphere --vm web-01</code></li>
           <li><code>h2kvmctl --config migration.yaml</code></li>
@@ -642,7 +642,7 @@ await client.async_export_vm(
       </div>
     </div>
   </div>
-  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="logo-footer">hypersdk + h2kvm</div>
   <div class="slide-number">9</div>
 </div>
 
@@ -650,10 +650,10 @@ await client.async_export_vm(
 <div class="slide">
   <h2>Windows VM Migration: Solving the Hard Problem</h2>
   <div class="content">
-    <p>Windows VMs are the <strong>hardest to migrate</strong> &mdash; missing VirtIO drivers = immediate BSOD. hyper2kvm automates everything.</p>
+    <p>Windows VMs are the <strong>hardest to migrate</strong> &mdash; missing VirtIO drivers = immediate BSOD. h2kvm automates everything.</p>
     <div class="two-col" style="margin-top: 10px;">
       <div class="col">
-        <h3>What hyper2kvm Does Automatically</h3>
+        <h3>What h2kvm Does Automatically</h3>
         <table style="font-size: 10.5pt;">
           <tr><th>Fix</th><th>Details</th></tr>
           <tr><td><strong>VirtIO Drivers</strong></td><td>Injects viostor, netkvm, vioscsi, balloon, serial into DriverStore</td></tr>
@@ -692,7 +692,7 @@ virtio_iso: /path/to/virtio-win.iso
       </div>
     </div>
   </div>
-  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="logo-footer">hypersdk + h2kvm</div>
   <div class="slide-number">11</div>
 </div>
 
@@ -717,7 +717,7 @@ virtio_iso: /path/to/virtio-win.iso
         </ul>
       </div>
       <div class="col">
-        <h3>hyper2kvm Cloud-Native</h3>
+        <h3>h2kvm Cloud-Native</h3>
         <ul style="font-size: 11.5pt;">
           <li><strong>One-command K8s deploy</strong> &mdash; convert + upload + provision</li>
           <li><strong>KubeVirt</strong> &mdash; VirtualMachine resource creation</li>
@@ -737,17 +737,17 @@ sudo h2kvmctl --config migration.yaml \
       </div>
     </div>
   </div>
-  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="logo-footer">hypersdk + h2kvm</div>
   <div class="slide-number">12</div>
 </div>
 
 <!-- ════════════════════════════════════════════ SLIDE 13: Summary ════════════════════════════════════════════ -->
 <div class="slide end-slide">
-  <h2>hypersdk + hyper2kvm</h2>
+  <h2>hypersdk + h2kvm</h2>
   <div class="tagline">"Export Anywhere, Migrate Once, Boot Right."</div>
   <table>
     <tr><td><strong>hypersdk</strong> (Go)</td><td style="color:#aaa;">10 cloud providers, 67+ API endpoints, job scheduling, RBAC, audit</td></tr>
-    <tr><td><strong>hyper2kvm</strong> (Python)</td><td style="color:#aaa;">480+ APIs, 35+ OS versions, deterministic fixes, first-boot success</td></tr>
+    <tr><td><strong>h2kvm</strong> (Python)</td><td style="color:#aaa;">480+ APIs, 35+ OS versions, deterministic fixes, first-boot success</td></tr>
     <tr><td><strong>Contract</strong></td><td style="color:#aaa;">JSON manifest &mdash; provider-agnostic, deterministic, resumable</td></tr>
     <tr><td><strong>Windows</strong></td><td style="color:#aaa;">Full VirtIO injection, registry mods, license &amp; AD support</td></tr>
     <tr><td><strong>Cloud-Native</strong></td><td style="color:#aaa;">KVM, libvirt, KubeVirt, Kubernetes, OpenShift, k3s</td></tr>
@@ -755,8 +755,8 @@ sudo h2kvmctl --config migration.yaml \
   </table>
   <div class="links">
     <strong>hypersdk:</strong> github.com/ssahani/hypersdk &nbsp;&nbsp;|&nbsp;&nbsp;
-    <strong>hyper2kvm:</strong> github.com/ssahani/hyper2kvm &nbsp;&nbsp;|&nbsp;&nbsp;
-    <strong>PyPI:</strong> pypi.org/project/hyper2kvm<br>
+    <strong>h2kvm:</strong> github.com/ssahani/h2kvm &nbsp;&nbsp;|&nbsp;&nbsp;
+    <strong>PyPI:</strong> pypi.org/project/h2kvm<br>
     <strong>License:</strong> Proprietary (Zyvor AI Labs)
   </div>
 </div>

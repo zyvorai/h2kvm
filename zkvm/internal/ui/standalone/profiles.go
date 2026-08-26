@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-const profileDirName = ".config/hyper2kvm/profiles"
+const profileDirName = ".config/h2kvm/profiles"
 
 // ConversionProfile stores a reusable set of form field values.
 type ConversionProfile struct {

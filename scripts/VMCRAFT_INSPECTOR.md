@@ -93,9 +93,9 @@ sudo dnf install mdadm
 
 ### Python Dependencies
 
-VMCraft is included in the hyper2kvm project:
+VMCraft is included in the h2kvm project:
 ```bash
-cd hyper2kvm
+cd h2kvm
 pip install -e .
 ```
 
@@ -359,7 +359,7 @@ The filesystem needs to be mounted for SAM registry access.
 
 To add new features to VMCraft Inspector:
 
-1. Add new methods to VMCraft modules in `hyper2kvm/core/vmcraft/`
+1. Add new methods to VMCraft modules in `h2kvm/core/vmcraft/`
 2. Update `vmcraft_inspect.py` to showcase the new features
 3. Add command-line arguments for selective display
 4. Update this documentation
@@ -373,7 +373,7 @@ SPDX-License-Identifier: Apache-2.0
 - [VMCraft OS Detection](../VMCRAFT_OS_DETECTION.md) - Comprehensive OS detection capabilities
 - [VMCraft Enhancements](../VMCRAFT_ENHANCEMENTS.md) - All 28 new methods with examples
 - [VMCraft Testing Results](../VMCRAFT_TESTING_RESULTS.md) - Test results with Windows 10 VM
-- [VMCraft Module README](../hyper2kvm/core/vmcraft/README.md) - Module architecture
+- [VMCraft Module README](../h2kvm/core/vmcraft/README.md) - Module architecture
 
 ## References
 

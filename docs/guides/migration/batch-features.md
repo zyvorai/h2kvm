@@ -1,6 +1,6 @@
 # Batch Migration Features Guide
 
-**Complete Guide to hyper2kvm's Batch Migration Features**
+**Complete Guide to h2kvm's Batch Migration Features**
 
 ## Table of Contents
 
@@ -18,7 +18,7 @@
 
 ## Overview
 
-hyper2kvm now includes comprehensive batch migration features for enterprise VM migration workflows. These features enable batch processing, configuration reuse, automation hooks, and libvirt integration.
+h2kvm now includes comprehensive batch migration features for enterprise VM migration workflows. These features enable batch processing, configuration reuse, automation hooks, and libvirt integration.
 
 ### Implemented Features
 
@@ -33,7 +33,7 @@ hyper2kvm now includes comprehensive batch migration features for enterprise VM 
 
 ### Architecture Principles
 
-All features follow hyper2kvm's core design:
+All features follow h2kvm's core design:
 - **Security-First**: Path validation, timeout enforcement, process isolation
 - **Configuration-Driven**: YAML/JSON for all features
 - **Composition**: Reuse existing components (ManifestOrchestrator, Config.merge_dicts)
@@ -409,7 +409,7 @@ pipeline:
 ### Creating Custom Profiles
 
 ```yaml
-# /etc/hyper2kvm/profiles/organization.yaml
+# /etc/h2kvm/profiles/organization.yaml
 extends: "production"
 
 pipeline:
@@ -432,7 +432,7 @@ Use custom profile:
 {
   "manifest_version": "1.0",
   "profile": "organization",
-  "custom_profile_path": "/etc/hyper2kvm/profiles",
+  "custom_profile_path": "/etc/h2kvm/profiles",
   "source": {...}
 }
 ```
@@ -447,7 +447,7 @@ production
 Final Configuration
 ```
 
-**See**: `hyper2kvm/profiles/README.md` and `examples/batch/batch-with-profiles.yaml`.
+**See**: `h2kvm/profiles/README.md` and `examples/batch/batch-with-profiles.yaml`.
 
 ---
 
@@ -897,7 +897,7 @@ sudo h2kvmctl --config manifest.yaml
 - Verify hook is in correct stage (e.g., "pre_fix" not "prefix")
 - Check script path exists and is executable
 - For Python hooks, verify module is importable
-- Check hyper2kvm logs for hook execution messages
+- Check h2kvm logs for hook execution messages
 
 **Problem**: Hook timing out
 
@@ -942,7 +942,7 @@ sudo h2kvmctl --config manifest.yaml
 
 ## Summary
 
-hyper2kvm now provides enterprise-grade batch migration capabilities:
+h2kvm now provides enterprise-grade batch migration capabilities:
 
 ✅ **83% Implementation Complete** (5 of 6 phases)
 ✅ **Production Ready**: Batch orchestration, profiles, hooks, libvirt import

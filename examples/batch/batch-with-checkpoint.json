@@ -39,8 +39,8 @@
     }
   ],
   "shared_config": {
-    "output_directory": "/var/lib/hyper2kvm/converted",
-    "checkpoint_directory": "/var/lib/hyper2kvm/checkpoints"
+    "output_directory": "/var/lib/h2kvm/converted",
+    "checkpoint_directory": "/var/lib/h2kvm/checkpoints"
   },
   "__comment": [
     "Checkpoint/Resume Features:",
@@ -53,17 +53,17 @@
     "",
     "Usage:",
     "1. Start batch conversion:",
-    "   sudo hyper2kvm --config batch-with-checkpoint.json batch",
+    "   sudo h2kvm --config batch-with-checkpoint.json batch",
     "",
     "2. If interrupted (Ctrl+C, crash, etc.), resume with same command:",
-    "   sudo hyper2kvm --config batch-with-checkpoint.json batch",
+    "   sudo h2kvm --config batch-with-checkpoint.json batch",
     "",
     "3. Force restart from beginning (clear checkpoint):",
-    "   rm -rf /var/lib/hyper2kvm/converted/.checkpoints/checkpoint-migration-2026-01-22-checkpointed.json",
+    "   rm -rf /var/lib/h2kvm/converted/.checkpoints/checkpoint-migration-2026-01-22-checkpointed.json",
     "",
     "Checkpoint File Location:",
     "- {output_directory}/.checkpoints/checkpoint-{batch_id}.json",
-    "- Example: /var/lib/hyper2kvm/converted/.checkpoints/checkpoint-migration-2026-01-22-checkpointed.json",
+    "- Example: /var/lib/h2kvm/converted/.checkpoints/checkpoint-migration-2026-01-22-checkpointed.json",
     "",
     "Checkpoint Contents:",
     "{",

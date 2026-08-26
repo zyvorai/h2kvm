@@ -324,7 +324,7 @@ class TestFstabParsing:
 
     def test_parse_rhel9_fstab(self):
         """Parse RHEL 9 fstab entries."""
-        from hyper2kvm.fixers.filesystem.fstab_stabilizer import FstabStabilizer
+        from h2kvm.fixers.filesystem.fstab_stabilizer import FstabStabilizer
 
         with open_phony("rhel9.img") as (g, root):
             stabilizer = FstabStabilizer(g)
@@ -343,7 +343,7 @@ class TestFstabParsing:
 
     def test_parse_fedora_fstab_uuid(self):
         """Parse Fedora fstab — should have UUID entries."""
-        from hyper2kvm.fixers.filesystem.fstab_stabilizer import FstabStabilizer
+        from h2kvm.fixers.filesystem.fstab_stabilizer import FstabStabilizer
 
         with open_phony("fedora.img") as (g, root):
             stabilizer = FstabStabilizer(g)
@@ -366,7 +366,7 @@ class TestDomainXMLValidation:
 
     def test_linux_xml_is_valid(self):
         """Generated Linux domain XML should be valid XML."""
-        from hyper2kvm.libvirt.linux_domain import LinuxDomainConfig, emit_linux_domain
+        from h2kvm.libvirt.linux_domain import LinuxDomainConfig, emit_linux_domain
 
         with tempfile.TemporaryDirectory() as tmpdir:
             config = LinuxDomainConfig(
@@ -390,7 +390,7 @@ class TestDomainXMLValidation:
 
     def test_linux_xml_has_disk(self):
         """Linux domain XML should contain a disk device."""
-        from hyper2kvm.libvirt.linux_domain import LinuxDomainConfig, emit_linux_domain
+        from h2kvm.libvirt.linux_domain import LinuxDomainConfig, emit_linux_domain
 
         with tempfile.TemporaryDirectory() as tmpdir:
             config = LinuxDomainConfig(
@@ -410,7 +410,7 @@ class TestDomainXMLValidation:
 
     def test_linux_xml_has_network(self):
         """Linux domain XML should contain a network interface."""
-        from hyper2kvm.libvirt.linux_domain import LinuxDomainConfig, emit_linux_domain
+        from h2kvm.libvirt.linux_domain import LinuxDomainConfig, emit_linux_domain
 
         with tempfile.TemporaryDirectory() as tmpdir:
             config = LinuxDomainConfig(
@@ -426,7 +426,7 @@ class TestDomainXMLValidation:
 
     def test_linux_uefi_has_loader(self):
         """UEFI domain XML should have os/loader element."""
-        from hyper2kvm.libvirt.linux_domain import LinuxDomainConfig, emit_linux_domain
+        from h2kvm.libvirt.linux_domain import LinuxDomainConfig, emit_linux_domain
 
         with tempfile.TemporaryDirectory() as tmpdir:
             config = LinuxDomainConfig(
@@ -457,7 +457,7 @@ class TestMultiFormatConversion:
 
     def test_qcow2_to_vmdk(self):
         """Convert Fedora from qcow2 to VMDK using Convert API."""
-        from hyper2kvm.converters.qemu.converter import Convert
+        from h2kvm.converters.qemu.converter import Convert
 
         img = phony_image("fedora.img")
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -486,7 +486,7 @@ class TestMultiFormatConversion:
 
     def test_qcow2_to_vdi(self):
         """Convert Fedora from qcow2 to VDI using Convert API."""
-        from hyper2kvm.converters.qemu.converter import Convert
+        from h2kvm.converters.qemu.converter import Convert
 
         img = phony_image("fedora.img")
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -515,7 +515,7 @@ class TestMultiFormatConversion:
 
     def test_round_trip_qcow2(self):
         """Convert qcow2 -> raw -> qcow2 and verify content survives."""
-        from hyper2kvm.converters.qemu.converter import Convert
+        from h2kvm.converters.qemu.converter import Convert
 
         img = phony_image("fedora.img")
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -566,7 +566,7 @@ class TestChecksumGeneration:
 
     def test_sha256_consistent_across_conversions(self):
         """Two separate conversions of the same source should produce identical raw output."""
-        from hyper2kvm.converters.qemu.converter import Convert
+        from h2kvm.converters.qemu.converter import Convert
 
         img = phony_image("fedora.img")
         with tempfile.TemporaryDirectory() as tmpdir:

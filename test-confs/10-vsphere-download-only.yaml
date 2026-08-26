@@ -5,7 +5,7 @@
 # Downloads VM files from vSphere/vCenter without conversion
 #
 # Usage:
-#   hyper2kvm --config 10-vsphere-download-only.yaml vsphere
+#   h2kvm --config 10-vsphere-download-only.yaml vsphere
 #
 # Features:
 #   ✅ Concurrent downloads (4 parallel)

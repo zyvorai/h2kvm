@@ -35,7 +35,7 @@ This prevents migration failures by catching issues early.
 ### Library Usage
 
 ```python
-from hyper2kvm.validation import VMDKInspector, RiskLevel
+from h2kvm.validation import VMDKInspector, RiskLevel
 from pathlib import Path
 
 # Create inspector
@@ -101,7 +101,7 @@ print(xml)
 
 **Problem**: Guest expects `lsilogic` but KVM uses `virtio`
 
-**Fix**: hyper2kvm automatically rebuilds initramfs with virtio drivers
+**Fix**: h2kvm automatically rebuilds initramfs with virtio drivers
 
 ### 4. UEFI vs BIOS (HIGH)
 
@@ -295,7 +295,7 @@ if ./scripts/vmdk_inspect.py disk.vmdk 2>&1 | grep -q "Controller.*mismatch"; th
     ./scripts/vmdk_inspect.py --auto-fix --output fixed.qcow2 disk.vmdk
 else
     echo "No fix needed - direct conversion"
-    hyper2kvm --config migration.yaml
+    h2kvm --config migration.yaml
 fi
 
 # Option 3: Inventory mode (never fail)
@@ -336,8 +336,8 @@ fi
 The VMDK Inspector is automatically used during pre-migration validation:
 
 ```python
-from hyper2kvm.validation import VMDKInspector
-from hyper2kvm.orchestrator import Orchestrator
+from h2kvm.validation import VMDKInspector
+from h2kvm.orchestrator import Orchestrator
 
 # Inspector runs before conversion
 inspector = VMDKInspector(logger)

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 # ============================================
-# hyper2kvm Quickstart — Fresh Machine Setup
+# h2kvm Quickstart — Fresh Machine Setup
 # ============================================
 # Production-grade installer: one command installs everything
 # on a fresh Fedora, RHEL, Ubuntu, Debian, or openSUSE machine.
@@ -18,7 +18,7 @@ set -euo pipefail
 #
 # Environment:
 #   VM_NAME, VM_PASS, DRY_RUN, LOG_FILE
-#   HYPER2KVM_INSTALL_BUNDLE_ID, HYPER2KVM_GOVC_DOWNLOAD_PREFIX, HYPER2KVM_VIRTIO_WIN_ISO_URL
+#   H2KVM_INSTALL_BUNDLE_ID, H2KVM_GOVC_DOWNLOAD_PREFIX, H2KVM_VIRTIO_WIN_ISO_URL
 # ============================================
 
 trap 'echo -e "\n[FATAL] quickstart failed at line $LINENO (exit $?)"; echo "Log: $LOG_FILE"; exit 1' ERR
@@ -28,7 +28,7 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/install-versions.inc.sh"
 
 # ── Config ──
 DRY_RUN="${DRY_RUN:-false}"
-LOG_FILE="${LOG_FILE:-/var/log/hyper2kvm-quickstart.log}"
+LOG_FILE="${LOG_FILE:-/var/log/h2kvm-quickstart.log}"
 START_TIME=$(date +%s)
 APT_UPDATED=false
 
@@ -91,11 +91,11 @@ apt_update_once() {
 
 # ── Logging ──
 setup_logging() {
-    mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || LOG_FILE="/tmp/hyper2kvm-quickstart.log"
-    touch "$LOG_FILE" 2>/dev/null || LOG_FILE="/tmp/hyper2kvm-quickstart.log"
-    # deploy-remote.sh sets HYPER2KVM_REMOTE_INSTALL=1: skip exec>(tee) — process substitution
+    mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || LOG_FILE="/tmp/h2kvm-quickstart.log"
+    touch "$LOG_FILE" 2>/dev/null || LOG_FILE="/tmp/h2kvm-quickstart.log"
+    # deploy-remote.sh sets H2KVM_REMOTE_INSTALL=1: skip exec>(tee) — process substitution
     # over SSH can close the session ("Shared connection closed"). Output still streams to SSH.
-    if [ "${HYPER2KVM_REMOTE_INSTALL:-}" = 1 ]; then
+    if [ "${H2KVM_REMOTE_INSTALL:-}" = 1 ]; then
         return 0
     fi
     exec 3>&1
@@ -315,7 +315,7 @@ install_system_packages() {
             _rpm_family_pkg_available hivex && _dnf_pkgs+=(hivex)
             _rpm_family_pkg_available nbd && _dnf_pkgs+=(nbd)
             _rpm_family_pkg_available nbdkit && _dnf_pkgs+=(nbdkit)
-            # hyper2kvm needs Python >= 3.10; EL 8/9 default python3 is often 3.9 — add 3.12 + pip + devel when listed.
+            # h2kvm needs Python >= 3.10; EL 8/9 default python3 is often 3.9 — add 3.12 + pip + devel when listed.
             _rpm_family_pkg_available python3.12 && _dnf_pkgs+=(python3.12)
             _rpm_family_pkg_available python3.12-pip && _dnf_pkgs+=(python3.12-pip)
             _rpm_family_pkg_available python3.12-devel && _dnf_pkgs+=(python3.12-devel)
@@ -414,12 +414,12 @@ setup_services() {
     fi
 
     # Persist modules
-    cat > /etc/modules-load.d/hyper2kvm.conf << 'EOF'
+    cat > /etc/modules-load.d/h2kvm.conf << 'EOF'
 nbd
 kvm
 vhost_net
 EOF
-    cat > /etc/modprobe.d/hyper2kvm-nbd.conf << 'EOF'
+    cat > /etc/modprobe.d/h2kvm-nbd.conf << 'EOF'
 options nbd nbds_max=128 max_part=16
 EOF
 
@@ -465,13 +465,13 @@ EOF
     # Create runtime directories (needed by VMCraft NBD locking)
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-    if [ -f "$REPO_DIR/etc/tmpfiles.d/hyper2kvm.conf" ]; then
-        cp "$REPO_DIR/etc/tmpfiles.d/hyper2kvm.conf" /etc/tmpfiles.d/hyper2kvm.conf
-        systemd-tmpfiles --create /etc/tmpfiles.d/hyper2kvm.conf 2>/dev/null || true
-        info "Runtime dirs: /run/hyper2kvm (via tmpfiles.d)"
+    if [ -f "$REPO_DIR/etc/tmpfiles.d/h2kvm.conf" ]; then
+        cp "$REPO_DIR/etc/tmpfiles.d/h2kvm.conf" /etc/tmpfiles.d/h2kvm.conf
+        systemd-tmpfiles --create /etc/tmpfiles.d/h2kvm.conf 2>/dev/null || true
+        info "Runtime dirs: /run/h2kvm (via tmpfiles.d)"
     else
-        mkdir -p /run/hyper2kvm
-        info "Runtime dirs: /run/hyper2kvm"
+        mkdir -p /run/h2kvm
+        info "Runtime dirs: /run/h2kvm"
     fi
 
     info "Services ready ($(elapsed))"
@@ -499,7 +499,7 @@ install_govc() {
     esac
 
     local url
-    url="$(hyper2kvm_govc_download_url "$arch")"
+    url="$(h2kvm_govc_download_url "$arch")"
     local tmpfile
     tmpfile=$(mktemp)
     # RETURN cleans up on any function exit; EXIT would re-fire at script end with `tmpfile` out of scope (`set -u`).
@@ -527,21 +527,21 @@ install_python_deps() {
     info "Python deps installed ($(elapsed))"
 }
 
-# ── Step 5: hyper2kvm ──
-install_hyper2kvm() {
-    step "Step 5/7: Installing hyper2kvm"
+# ── Step 5: h2kvm ──
+install_h2kvm() {
+    step "Step 5/7: Installing h2kvm"
 
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local repo_dir
     repo_dir="$(cd "$SCRIPT_DIR/.." 2>/dev/null && pwd)"
 
-    if [ -f "$repo_dir/pyproject.toml" ] && grep -q "hyper2kvm" "$repo_dir/pyproject.toml" 2>/dev/null; then
+    if [ -f "$repo_dir/pyproject.toml" ] && grep -q "h2kvm" "$repo_dir/pyproject.toml" 2>/dev/null; then
         info "Installing from source: $repo_dir"
         pip_install -e "$repo_dir" || true
     else
-        pip_install hyper2kvm || true
+        pip_install h2kvm || true
     fi
-    info "hyper2kvm installed: $(h2kvmctl --version 2>/dev/null || echo 'check PATH')"
+    info "h2kvm installed: $(h2kvmctl --version 2>/dev/null || echo 'check PATH')"
 }
 
 # ── Step 6: User permissions ──
@@ -565,14 +565,14 @@ setup_user_perms() {
 install_virtio_win() {
     step "Step 7/8: VirtIO Windows drivers"
 
-    local iso="/var/lib/hyper2kvm/virtio-win.iso"
-    local cache="/var/lib/hyper2kvm/virtio-win-extracted"
-    local url="$HYPER2KVM_VIRTIO_WIN_ISO_URL"
+    local iso="/var/lib/h2kvm/virtio-win.iso"
+    local cache="/var/lib/h2kvm/virtio-win-extracted"
+    local url="$H2KVM_VIRTIO_WIN_ISO_URL"
 
     if [ -f "$iso" ]; then
         info "virtio-win.iso: $iso"
     else
-        mkdir -p /var/lib/hyper2kvm
+        mkdir -p /var/lib/h2kvm
         info "Downloading virtio-win.iso..."
         if retry curl -fSL "$url" -o "$iso"; then
             info "virtio-win.iso installed: $iso"
@@ -596,10 +596,10 @@ install_virtio_win() {
             stat -c %Y "$iso" > "$cache/.iso_mtime"
             info "VirtIO ISO extracted: $cache"
         else
-            warn "bsdtar extraction incomplete — hyper2kvm will extract on first Windows migration"
+            warn "bsdtar extraction incomplete — h2kvm will extract on first Windows migration"
         fi
     elif [ -f "$iso" ]; then
-        warn "bsdtar not found — install bsdtar for pre-extraction, or hyper2kvm will extract on first Windows migration"
+        warn "bsdtar not found — install bsdtar for pre-extraction, or h2kvm will extract on first Windows migration"
     fi
 }
 
@@ -725,8 +725,8 @@ verify_install() {
     fi
 
     # VirtIO Windows drivers
-    if [ -f /var/lib/hyper2kvm/virtio-win.iso ]; then
-        info "virtio-win: /var/lib/hyper2kvm/virtio-win.iso"; ok=$((ok + 1))
+    if [ -f /var/lib/h2kvm/virtio-win.iso ]; then
+        info "virtio-win: /var/lib/h2kvm/virtio-win.iso"; ok=$((ok + 1))
     else
         warn "virtio-win: not found (needed for Windows VirtIO migration)"; opt=$((opt + 1))
     fi
@@ -771,9 +771,9 @@ main() {
     setup_logging
 
     echo ""
-    echo "hyper2kvm Quickstart"
+    echo "h2kvm Quickstart"
     echo "$(date)"
-    dim "Installer bundle: ${HYPER2KVM_INSTALL_BUNDLE_ID}"
+    dim "Installer bundle: ${H2KVM_INSTALL_BUNDLE_ID}"
     echo ""
 
     [ "$DRY_RUN" = "true" ] && warn "DRY RUN — no changes will be made"
@@ -785,13 +785,13 @@ main() {
         install_system_packages
         install_govc
         install_python_deps
-        install_hyper2kvm
+        install_h2kvm
     else
         install_system_packages
         setup_services
         install_govc
         install_python_deps
-        install_hyper2kvm
+        install_h2kvm
         setup_user_perms
         install_virtio_win
         setup_firewall_and_extras

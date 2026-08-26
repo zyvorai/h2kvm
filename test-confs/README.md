@@ -1,6 +1,6 @@
-# 📁 hyper2kvm Configuration Examples
+# 📁 h2kvm Configuration Examples
 
-This directory contains production-ready configuration examples for various migration scenarios, utilizing **hyper2kvm v0.3.0** with **VMCraft v9.0** capabilities.
+This directory contains production-ready configuration examples for various migration scenarios, utilizing **h2kvm v0.3.0** with **VMCraft v9.0** capabilities.
 
 ## 📑 Table of Contents
 
@@ -28,7 +28,7 @@ Convert local VMDK files to QCOW2 format with offline fixes.
 - ✅ Checksum generation
 
 ```bash
-hyper2kvm --config test-confs/01-local-windows-11-vmdk.yaml local
+h2kvm --config test-confs/01-local-windows-11-vmdk.yaml local
 ```
 
 ### 01-local-windows-10-vmdk.yaml
@@ -38,7 +38,7 @@ hyper2kvm --config test-confs/01-local-windows-11-vmdk.yaml local
 - ✅ Registry fixes
 
 ```bash
-hyper2kvm --config test-confs/01-local-windows-10-vmdk.yaml local
+h2kvm --config test-confs/01-local-windows-10-vmdk.yaml local
 ```
 
 ### 02-local-rhel-10-vmdk.yaml
@@ -49,7 +49,7 @@ hyper2kvm --config test-confs/01-local-windows-10-vmdk.yaml local
 - ✅ SELinux compatibility
 
 ```bash
-hyper2kvm --config test-confs/02-local-rhel-10-vmdk.yaml local
+h2kvm --config test-confs/02-local-rhel-10-vmdk.yaml local
 ```
 
 ### 03-local-ubuntu-22-vmdk.yaml
@@ -59,7 +59,7 @@ hyper2kvm --config test-confs/02-local-rhel-10-vmdk.yaml local
 - ✅ Netplan/systemd compatibility
 
 ```bash
-hyper2kvm --config test-confs/03-local-ubuntu-22-vmdk.yaml local
+h2kvm --config test-confs/03-local-ubuntu-22-vmdk.yaml local
 ```
 
 ### 04-local-photon-os-vmdk.yaml
@@ -102,7 +102,7 @@ Download VM files from vCenter without conversion.
 
 ```bash
 export VC_PASSWORD='your-vcenter-password'
-hyper2kvm --config test-confs/10-vsphere-download-only.yaml vsphere
+h2kvm --config test-confs/10-vsphere-download-only.yaml vsphere
 ```
 
 ### 11-vsphere-govc-rhel-10-download.yaml
@@ -112,7 +112,7 @@ hyper2kvm --config test-confs/10-vsphere-download-only.yaml vsphere
 
 ```bash
 export VC_PASSWORD='your-vcenter-password'
-hyper2kvm --config test-confs/11-vsphere-govc-rhel-10-download.yaml vsphere
+h2kvm --config test-confs/11-vsphere-govc-rhel-10-download.yaml vsphere
 ```
 
 ---
@@ -242,12 +242,12 @@ sudo virsh start photon-converted
 
 ## 📚 Complete Examples
 
-### 90-hyper2kvm-full-config.yaml
+### 90-h2kvm-full-config.yaml
 **Comprehensive Configuration Example (YAML)**
 - Shows all available options
 - Detailed comments
 
-### 91-hyper2kvm-full-config.json
+### 91-h2kvm-full-config.json
 **Comprehensive Configuration Example (JSON)**
 - Same as YAML version in JSON format
 
@@ -265,7 +265,7 @@ sudo virsh start photon-converted
 vim test-confs/02-local-rhel-10-vmdk.yaml
 
 # Run conversion
-hyper2kvm --config test-confs/02-local-rhel-10-vmdk.yaml local
+h2kvm --config test-confs/02-local-rhel-10-vmdk.yaml local
 ```
 
 ### 2. vSphere Download
@@ -274,7 +274,7 @@ hyper2kvm --config test-confs/02-local-rhel-10-vmdk.yaml local
 export VC_PASSWORD='your-password'
 
 # Download VM files
-hyper2kvm --config test-confs/10-vsphere-download-only.yaml vsphere
+h2kvm --config test-confs/10-vsphere-download-only.yaml vsphere
 ```
 
 ---
@@ -331,7 +331,7 @@ To customize a configuration:
 
 3. **Run with your config:**
    ```bash
-   hyper2kvm --config my-config.yaml local
+   h2kvm --config my-config.yaml local
    ```
 
 ---
@@ -398,6 +398,6 @@ If you encounter issues:
 ---
 
 **Last Updated:** 2026-02-08
-**hyper2kvm Version:** v0.3.0
+**h2kvm Version:** v0.3.0
 **VMCraft Version:** v9.0
 **Maintained by:** ZyvorAI Labs Private Limited <ssahani@zyvor.dev>

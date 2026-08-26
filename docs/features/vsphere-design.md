@@ -1,6 +1,6 @@
-# hyper2kvm: vSphere Control-Plane + Data-Plane Design
+# h2kvm: vSphere Control-Plane + Data-Plane Design
 
-> **VMware API Integration**: hyper2kvm leverages **hypersdk** (VMware's modern Python SDK, formerly known as pyvmomi/pyVmomi) for enterprise-grade, type-safe vCenter/vSphere API access.
+> **VMware API Integration**: h2kvm leverages **hypersdk** (VMware's modern Python SDK, formerly known as pyvmomi/pyVmomi) for enterprise-grade, type-safe vCenter/vSphere API access.
 
 ## Table of Contents
 
@@ -20,12 +20,12 @@
   - [Export Flow](#export-flow)
 - [Detailed Architecture Breakdown](#detailed-architecture-breakdown)
   - [Where pyvmomi Ends and Data-Plane Begins](#where-pyvmomi-ends-and-data-plane-begins)
-    - [Control-Plane: pyvmomi / pyVim in `hyper2kvm`](#control-plane-pyvmomi-pyvim-in-hyper2kvm)
-    - [Data-Plane Options in `hyper2kvm`](#data-plane-options-in-hyper2kvm)
+    - [Control-Plane: pyvmomi / pyVim in `h2kvm`](#control-plane-pyvmomi-pyvim-in-h2kvm)
+    - [Data-Plane Options in `h2kvm`](#data-plane-options-in-h2kvm)
   - [Why There Are *Two* Download-Only Implementations (Engine + CLI)](#why-there-are-two-download-only-implementations-engine-cli)
-- [CBT Sync in `hyper2kvm` (Control-Plane + Data-Plane Hybrid)](#cbt-sync-in-hyper2kvm-control-plane-data-plane-hybrid)
-- [Encoding + Typing Choices Used Across `hyper2kvm`](#encoding-typing-choices-used-across-hyper2kvm)
-- [Mode Selection Cheatsheet (for `hyper2kvm`)](#mode-selection-cheatsheet-for-hyper2kvm)
+- [CBT Sync in `h2kvm` (Control-Plane + Data-Plane Hybrid)](#cbt-sync-in-h2kvm-control-plane-data-plane-hybrid)
+- [Encoding + Typing Choices Used Across `h2kvm`](#encoding-typing-choices-used-across-h2kvm)
+- [Mode Selection Cheatsheet (for `h2kvm`)](#mode-selection-cheatsheet-for-h2kvm)
 - [Usage Examples](#usage-examples)
   - [Example 1: Basic VM Export](#example-1-basic-vm-export)
   - [Example 2: Download-Only Mode](#example-2-download-only-mode)
@@ -42,16 +42,16 @@
 Before following this guide, you should have:
 
 - ✓ Completed the [Installation](02-Installation.md)
-- ✓ Familiarity with basic hyper2kvm concepts
+- ✓ Familiarity with basic h2kvm concepts
 - ✓ Root/sudo access to your system
 - ✓ Source VM files ready for migration
 
 ## Overview
-`hyper2kvm` is a specialized tool for integrating with VMware vSphere, treating it in a realistic manner: **inventory and orchestration exist in one domain**, while **disk byte movement operates in another**. This intentional separation ensures the vSphere integration remains fast, predictable, and highly debuggable. By avoiding the mixing of control-plane and data-plane operations, the tool prevents common pitfalls like performance bottlenecks in large inventories or hidden failures during exports.
+`h2kvm` is a specialized tool for integrating with VMware vSphere, treating it in a realistic manner: **inventory and orchestration exist in one domain**, while **disk byte movement operates in another**. This intentional separation ensures the vSphere integration remains fast, predictable, and highly debuggable. By avoiding the mixing of control-plane and data-plane operations, the tool prevents common pitfalls like performance bottlenecks in large inventories or hidden failures during exports.
 
 The philosophy is embodied in two key files:
-- **`hyper2kvm/vsphere/vmware_client.py`**: The reusable engine, designed async-first for multi-mode exports (e.g., conversion, downloads).
-- **`hyper2kvm/vsphere/<vsphere_cli_entry>.py` (VsphereMode)**: The action-driven CLI entrypoint, which orchestrates user commands and delegates to the engine.
+- **`h2kvm/vsphere/vmware_client.py`**: The reusable engine, designed async-first for multi-mode exports (e.g., conversion, downloads).
+- **`h2kvm/vsphere/<vsphere_cli_entry>.py` (VsphereMode)**: The action-driven CLI entrypoint, which orchestrates user commands and delegates to the engine.
 
 This structure allows for modular reuse: the engine can be imported independently for scripting, while the CLI provides a user-friendly interface.
 
@@ -61,7 +61,7 @@ The core principles guide the tool's behavior to address real-world vSphere chal
 ### Control-Plane ≠ Data-Plane (Don't Mix Them)
 - **Control-Plane** (powered by **hypersdk**, VMware's modern Python SDK - `pyvmomi` / `pyVim` / `pyVmomi`): Handles resolution of inventory objects, datacenters, hosts, snapshots, Changed Block Tracking (CBT), and datastore browsing with enterprise-grade, type-safe API access.
 - **Data-Plane** (using HTTPS `/folder` / VDDK): Focuses solely on moving bytes, such as exporting/converting disks or downloading VM folders.
-In `hyper2kvm`, **hypersdk** is strictly used to *find and describe* resources (e.g., locating a VM or disk), after which a dedicated data-plane mechanism takes over for efficient byte transfer. This prevents overhead from blending discovery with heavy I/O operations.
+In `h2kvm`, **hypersdk** is strictly used to *find and describe* resources (e.g., locating a VM or disk), after which a dedicated data-plane mechanism takes over for efficient byte transfer. This prevents overhead from blending discovery with heavy I/O operations.
 
 ### Don’t Scan the Universe Unless Asked
 vCenter inventories can be massive, and naive "list everything" approaches lead to sluggish tools. To counter this:
@@ -70,13 +70,13 @@ vCenter inventories can be massive, and naive "list everything" approaches lead 
 - Targeted lookups (e.g., `get_vm_by_name`) are prioritized over repeated `CreateContainerView` traversals, ensuring operations scale well in enterprise environments.
 
 ### Correct Compute Paths for Libvirt ESX (Host-System Path)
-`hyper2kvm` resolves a common failure where libvirt rejects cluster-only paths:
+`h2kvm` resolves a common failure where libvirt rejects cluster-only paths:
 - Avoid: `host/<cluster>`  (frequently rejected).
 - Resolve to: `host/<cluster-or-compute>/<esx-host>` , or fallback to `host/<esx-host>` .
 This fix prevents errors like **"Path … does not specify a host system"** when constructing `vpx://...` URIs.
 
 ### Bytes Should Be Explicit (Download ≠ Convert)
-Operators need control over operations to avoid surprises. `hyper2kvm` exposes distinct data-plane modes:
+Operators need control over operations to avoid surprises. `h2kvm` exposes distinct data-plane modes:
 - **Direct Export**: Converts to local `qcow2/raw` formats, potentially inspecting/modifying the guest.
 - **HTTP Download-Only**: Pulls exact byte-for-byte VM folder files (e.g., VMDKs, VMX).
 - **VDDK Single-Disk Pull**: Raw extraction of one disk via VDDK, without conversion.
@@ -108,7 +108,7 @@ The vSphere integration follows these core principles:
 
 ```mermaid
 graph TB
-    subgraph HV["hyper2kvm vSphere Integration"]
+    subgraph HV["h2kvm vSphere Integration"]
         CLI[VsphereMode.py<br/>CLI Entrypoint<br/>Sync w/ Threads]
         Engine[VMwareClient.py<br/>Reusable Engine<br/>Async-First]
         DataPlane[Data-Plane<br/>Bytes Movement]
@@ -216,7 +216,7 @@ flowchart TD
 
 ## Detailed Architecture Breakdown
 ### Where pyvmomi Ends and Data-Plane Begins
-#### Control-Plane: pyvmomi / pyVim in `hyper2kvm`
+#### Control-Plane: pyvmomi / pyVim in `h2kvm`
 The control-plane leverages `pyvmomi` for non-I/O tasks:
 - **Connection + Session Management**: Utilizes `SmartConnect` for establishing connections and retrieving session cookies.
 - **Datacenter + Host Discovery**: Caches lists via container views.
@@ -231,7 +231,7 @@ Key Patterns:
 - Property collector in CLI for bulk reads in `list_vm_names`.
 - Datastore browser tasks like `SearchDatastore_Task` and `SearchDatastoreSubFolders_Task` for directory listings.
 
-#### Data-Plane Options in `hyper2kvm`
+#### Data-Plane Options in `h2kvm`
 1. **Direct Export Mode (`export_mode="export"`)**:
    - Implemented in `VMwareClient`.
    - Builds correct paths for disk access.
@@ -257,7 +257,7 @@ Key Patterns:
    - This is the "get one disk fast, don’t convert" path.
 
 ### Why There Are *Two* Download-Only Implementations (Engine + CLI)
-Currently, `hyper2kvm` features dual implementations for download-only:
+Currently, `h2kvm` features dual implementations for download-only:
 - `VMwareClient.async_download_only_vm()`: Async, with globs, concurrency, and reuse focus.
 - `VsphereMode` action `download_only_vm`: Sync with thread pool, CLI-oriented.
 This duplication is temporary for behavior stabilization. Long-term plan:
@@ -265,7 +265,7 @@ This duplication is temporary for behavior stabilization. Long-term plan:
 - Delegates to `VMwareClient.export_vm(ExportOptions(export_mode="download_only", ...))`.
 - Engine owns correctness, retries, and async HTTP; CLI handles flag mapping.
 
-## CBT Sync in `hyper2kvm` (Control-Plane + Data-Plane Hybrid)
+## CBT Sync in `h2kvm` (Control-Plane + Data-Plane Hybrid)
 `cbt_sync` exemplifies the split's value for incremental workflows:
 **Control-Plane Steps:**
 1. Optionally enable CBT.
@@ -276,11 +276,11 @@ This duplication is temporary for behavior stabilization. Long-term plan:
 4. For each changed extent, fetch byte ranges using HTTP Range requests (`Range: bytes=<start>-<end>`) and write to local disk at the offset.
 This transforms vSphere into an efficient incremental block source, avoiding full disk re-downloads.
 
-## Encoding + Typing Choices Used Across `hyper2kvm`
+## Encoding + Typing Choices Used Across `h2kvm`
 - `# -*- coding: utf-8 -*-`: Ensures safe handling of logs and VM names in diverse environments.
 - `from __future__ import annotations`: Mitigates runtime type-evaluation issues and simplifies optional imports.
 
-## Mode Selection Cheatsheet (for `hyper2kvm`)
+## Mode Selection Cheatsheet (for `h2kvm`)
 | Need | Mode | Transport/Details |
 |------|------|-------------------|
 | **Converted qcow2/raw** | `export_mode="export"` | `vddk` or `ssh` |
@@ -331,8 +331,8 @@ h2kvmctl vsphere \
 ### Example 4: Programmatic Usage
 
 ```python
-from hyper2kvm.vmware.clients.client import VMwareClient
-from hyper2kvm.vmware.vsphere.mode import ExportOptions
+from h2kvm.vmware.clients.client import VMwareClient
+from h2kvm.vmware.vsphere.mode import ExportOptions
 
 # Initialize client
 client = VMwareClient(
@@ -375,5 +375,5 @@ Continue your migration journey:
 
 ## Getting Help
 
-Found an issue? [Report it on GitHub](https://github.com/ssahani/hyper2kvm/issues)
+Found an issue? [Report it on GitHub](https://github.com/ssahani/h2kvm/issues)
 

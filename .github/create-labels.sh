@@ -16,7 +16,7 @@ if ! command -v gh &> /dev/null; then
     echo "Install it from: https://cli.github.com/"
     echo ""
     echo "Or create labels manually via GitHub web interface:"
-    echo "  https://github.com/ssahani/hyper2kvm/labels"
+    echo "  https://github.com/ssahani/h2kvm/labels"
     exit 1
 fi
 

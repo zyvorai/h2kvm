@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "h2kvm-operator.fullname" . }}-config
+  namespace: {{ include "h2kvm-operator.namespace" . }}
+  labels:
+    {{- include "h2kvm-operator.operatorLabels" . | nindent 4 }}
+data:
+  reconcile_interval: {{ .Values.operator.config.reconcileInterval | quote }}
+  log_level: {{ .Values.operator.config.logLevel | quote }}
+  verbose: {{ .Values.operator.config.verbose | quote }}
+  worker_discovery_interval: {{ .Values.operator.config.workerDiscoveryInterval | quote }}
+  max_concurrent_reconciles: {{ .Values.operator.config.maxConcurrentReconciles | quote }}

@@ -1,6 +1,6 @@
-# Publishing hyper2kvm to PyPI
+# Publishing h2kvm to PyPI
 
-This guide explains how to publish hyper2kvm to PyPI so users can install it with `pip install hyper2kvm`.
+This guide explains how to publish h2kvm to PyPI so users can install it with `pip install h2kvm`.
 
 ## Table of Contents
 
@@ -63,14 +63,14 @@ API tokens are more secure than passwords.
 
 1. Go to https://test.pypi.org/manage/account/token/
 2. Click "Add API token"
-3. Set scope to "Entire account" (or specific to hyper2kvm)
+3. Set scope to "Entire account" (or specific to h2kvm)
 4. Save the token (starts with `pypi-`)
 
 #### For Production PyPI
 
 1. Go to https://pypi.org/manage/account/token/
 2. Click "Add API token"
-3. Set scope to "Entire account" (or specific to hyper2kvm)
+3. Set scope to "Entire account" (or specific to h2kvm)
 4. Save the token
 
 ### 4. Configure Credentials
@@ -118,8 +118,8 @@ Edit version in **3 places**:
 # 1. pyproject.toml
 vim pyproject.toml  # Update version = "0.0.1" to "0.0.2" etc.
 
-# 2. hyper2kvm/__init__.py
-vim hyper2kvm/__init__.py  # Update __version__ = "0.0.1"
+# 2. h2kvm/__init__.py
+vim h2kvm/__init__.py  # Update __version__ = "0.0.1"
 
 # 3. setup.py (if still used)
 vim setup.py  # Update version="0.0.1"
@@ -131,7 +131,7 @@ vim setup.py  # Update version="0.0.1"
 NEW_VERSION="0.0.2"
 
 sed -i "s/^version = \".*\"/version = \"$NEW_VERSION\"/" pyproject.toml
-sed -i "s/__version__ = \".*\"/__version__ = \"$NEW_VERSION\"/" hyper2kvm/__init__.py
+sed -i "s/__version__ = \".*\"/__version__ = \"$NEW_VERSION\"/" h2kvm/__init__.py
 sed -i "s/version=\".*\"/version=\"$NEW_VERSION\"/" setup.py
 
 git diff  # Review changes
@@ -144,8 +144,8 @@ python3 -m build
 ```
 
 This creates:
-- `dist/hyper2kvm-0.0.1.tar.gz` (source distribution)
-- `dist/hyper2kvm-0.0.1-py3-none-any.whl` (wheel)
+- `dist/h2kvm-0.0.1.tar.gz` (source distribution)
+- `dist/h2kvm-0.0.1-py3-none-any.whl` (wheel)
 
 ### 4. Verify Build
 
@@ -154,10 +154,10 @@ This creates:
 ls -lh dist/
 
 # Inspect wheel contents
-unzip -l dist/hyper2kvm-*.whl
+unzip -l dist/h2kvm-*.whl
 
 # Inspect tarball contents
-tar tzf dist/hyper2kvm-*.tar.gz | head -20
+tar tzf dist/h2kvm-*.tar.gz | head -20
 ```
 
 ### 5. Check Package Validity
@@ -185,35 +185,35 @@ twine upload --repository testpypi dist/*
 
 ```bash
 # Create test virtual environment
-python3 -m venv /tmp/test-hyper2kvm
-source /tmp/test-hyper2kvm/bin/activate
+python3 -m venv /tmp/test-h2kvm
+source /tmp/test-h2kvm/bin/activate
 
 # Install from TestPyPI
 pip install --index-url https://test.pypi.org/simple/ \
     --extra-index-url https://pypi.org/simple/ \
-    hyper2kvm
+    h2kvm
 
 # Test the package
-hyper2kvm --version
-hyper2kvm --help
+h2kvm --version
+h2kvm --help
 
 # Test library import
-python3 -c "import hyper2kvm; print(hyper2kvm.__version__)"
+python3 -c "import h2kvm; print(h2kvm.__version__)"
 
 # Test library API
 python3 <<'EOF'
-from hyper2kvm import GuestDetector, DiskProcessor
+from h2kvm import GuestDetector, DiskProcessor
 print("✓ Library imports work!")
 EOF
 
 # Cleanup
 deactivate
-rm -rf /tmp/test-hyper2kvm
+rm -rf /tmp/test-h2kvm
 ```
 
 ### 3. View on TestPyPI
 
-Visit: https://test.pypi.org/project/hyper2kvm/
+Visit: https://test.pypi.org/project/h2kvm/
 
 Verify:
 - Package metadata looks correct
@@ -238,7 +238,7 @@ git status
 
 # Verify version is correct
 grep version pyproject.toml
-grep __version__ hyper2kvm/__init__.py
+grep __version__ h2kvm/__init__.py
 
 # Re-check package
 twine check dist/*
@@ -261,25 +261,25 @@ twine upload dist/*
 
 ### 4. Verify Publication
 
-Visit: https://pypi.org/project/hyper2kvm/
+Visit: https://pypi.org/project/h2kvm/
 
 ### 5. Test Installation from PyPI
 
 ```bash
 # Fresh environment
-python3 -m venv /tmp/test-pypi-hyper2kvm
-source /tmp/test-pypi-hyper2kvm/bin/activate
+python3 -m venv /tmp/test-pypi-h2kvm
+source /tmp/test-pypi-h2kvm/bin/activate
 
 # Install from production PyPI
-pip install hyper2kvm
+pip install h2kvm
 
 # Test
-hyper2kvm --version
-python3 -c "import hyper2kvm; print(hyper2kvm.__version__)"
+h2kvm --version
+python3 -c "import h2kvm; print(h2kvm.__version__)"
 
 # Cleanup
 deactivate
-rm -rf /tmp/test-pypi-hyper2kvm
+rm -rf /tmp/test-pypi-h2kvm
 ```
 
 ---
@@ -288,7 +288,7 @@ rm -rf /tmp/test-pypi-hyper2kvm
 
 ### 1. Create GitHub Release
 
-Go to: https://github.com/ssahani/hyper2kvm/releases/new
+Go to: https://github.com/ssahani/h2kvm/releases/new
 
 - **Tag:** `v0.0.1`
 - **Title:** `v0.0.1 - Initial Release`
@@ -304,13 +304,13 @@ Go to: https://github.com/ssahani/hyper2kvm/releases/new
   ## Installation
 
   ```bash
-  pip install hyper2kvm
+  pip install h2kvm
   ```
 
   ## Documentation
 
-  - [Library API](https://github.com/ssahani/hyper2kvm/blob/main/docs/08-Library-API.md)
-  - [Quick Start](https://github.com/ssahani/hyper2kvm/blob/main/docs/03-Quick-Start.md)
+  - [Library API](https://github.com/ssahani/h2kvm/blob/main/docs/08-Library-API.md)
+  - [Quick Start](https://github.com/ssahani/h2kvm/blob/main/docs/03-Quick-Start.md)
   ```
 
 - **Attach Files:** Upload `dist/` files
@@ -324,7 +324,7 @@ Go to: https://github.com/ssahani/hyper2kvm/releases/new
 ### 3. Monitor
 
 - Watch for issues on GitHub
-- Monitor PyPI download stats: https://pypistats.org/packages/hyper2kvm
+- Monitor PyPI download stats: https://pypistats.org/packages/h2kvm
 
 ---
 
@@ -373,7 +373,7 @@ jobs:
 
 ### Configure Secrets
 
-1. Go to: https://github.com/ssahani/hyper2kvm/settings/secrets/actions
+1. Go to: https://github.com/ssahani/h2kvm/settings/secrets/actions
 2. Click "New repository secret"
 3. Name: `PYPI_API_TOKEN`
 4. Value: Your PyPI API token
@@ -429,9 +429,9 @@ version = "0.1.0rc1"
 Before each release:
 
 - [ ] Update version in `pyproject.toml`
-- [ ] Update version in `hyper2kvm/__init__.py`
+- [ ] Update version in `h2kvm/__init__.py`
 - [ ] Update version in `setup.py`
-- [ ] Update version in `hyper2kvm.spec` (for RPM)
+- [ ] Update version in `h2kvm.spec` (for RPM)
 - [ ] Update `CHANGELOG.md` (if exists)
 - [ ] Update README.md if needed
 - [ ] Run tests
@@ -475,7 +475,7 @@ Wait a few minutes - PyPI indexing takes time. Check:
 
 ```bash
 # Check PyPI project page
-curl -s https://pypi.org/pypi/hyper2kvm/json | jq -r '.info.version'
+curl -s https://pypi.org/pypi/h2kvm/json | jq -r '.info.version'
 ```
 
 ### Import Errors After Installation
@@ -484,9 +484,9 @@ Verify package structure:
 
 ```bash
 # Check wheel contents
-unzip -l dist/hyper2kvm-*.whl | grep -E "\.py$"
+unzip -l dist/h2kvm-*.whl | grep -E "\.py$"
 
-# Should include all hyper2kvm/* files
+# Should include all h2kvm/* files
 ```
 
 ### "Invalid distribution" Error
@@ -521,7 +521,7 @@ python3 -m readme_renderer README.md
 # 1. Update version
 VERSION="0.0.2"
 sed -i "s/^version = \".*\"/version = \"$VERSION\"/" pyproject.toml
-sed -i "s/__version__ = \".*\"/__version__ = \"$VERSION\"/" hyper2kvm/__init__.py
+sed -i "s/__version__ = \".*\"/__version__ = \"$VERSION\"/" h2kvm/__init__.py
 
 # 2. Clean and build
 rm -rf build/ dist/ *.egg-info
@@ -532,7 +532,7 @@ twine check dist/*
 
 # 4. Test with TestPyPI
 twine upload --repository testpypi dist/*
-pip install --index-url https://test.pypi.org/simple/ hyper2kvm
+pip install --index-url https://test.pypi.org/simple/ h2kvm
 
 # 5. Tag and publish
 git tag -a "v${VERSION}" -m "Release v${VERSION}"
@@ -540,8 +540,8 @@ git push origin "v${VERSION}"
 twine upload dist/*
 
 # 6. Verify
-pip install --upgrade hyper2kvm
-hyper2kvm --version
+pip install --upgrade h2kvm
+h2kvm --version
 ```
 
 ---

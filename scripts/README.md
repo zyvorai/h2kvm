@@ -135,27 +135,27 @@ Install runtime dependencies and optional components.
 
 ```bash
 # Install VirtIO Windows drivers ISO to standard path
-# Downloads virtio-win.iso to /var/lib/hyper2kvm/virtio-win.iso
-# This is auto-discovered by hyper2kvm for Windows migrations
+# Downloads virtio-win.iso to /var/lib/h2kvm/virtio-win.iso
+# This is auto-discovered by h2kvm for Windows migrations
 # (no --virtio-drivers-dir flag needed)
 ./scripts/install-deps.sh --virtio-win
 ```
 
 ### `deploy-local.sh` - Local Deployment
 
-Build and deploy hyper2kvm on this machine.
+Build and deploy h2kvm on this machine.
 
 ```bash
 ./scripts/deploy-local.sh              # full install (system deps + pip + h2kweb)
 ./scripts/deploy-local.sh --quick      # pip install + services only
-./scripts/deploy-local.sh --uninstall  # remove hyper2kvm
+./scripts/deploy-local.sh --uninstall  # remove h2kvm
 ```
 
 What it does:
-1. pip install hyper2kvm from source (with `--break-system-packages` for PEP 668)
+1. pip install h2kvm from source (with `--break-system-packages` for PEP 668)
 2. Copy h2kvmctl to `/usr/local/bin/`
 3. Build h2kweb dashboard (Go + React)
-4. Install systemd services (hyper2kvm daemon + h2kweb)
+4. Install systemd services (h2kvm daemon + h2kweb)
 5. Auto-link libguestfs for the active Python version
 6. Verify installation (tools, modules, services)
 
@@ -168,7 +168,7 @@ Full deployment to a remote server via SSH/rsync.
 ./scripts/deploy-remote.sh 185.165.240.5 sus            # SSH key auth
 ./scripts/deploy-remote.sh 185.165.240.5 root mypass     # password auth
 ./scripts/deploy-remote.sh 185.165.240.5 sus --quick     # skip system deps
-./scripts/deploy-remote.sh 185.165.240.5 sus --uninstall # remove hyper2kvm
+./scripts/deploy-remote.sh 185.165.240.5 sus --uninstall # remove h2kvm
 ```
 
 What it does:
@@ -176,8 +176,8 @@ What it does:
 2. Auto-detect container/orchestration runtime (k3s, k8s, docker, podman, libvirt)
 3. Run quickstart.sh (system packages) — full mode only
 4. Run install-deps.sh (hivex, boto3, virtio-win) — full mode only
-5. pip install hyper2kvm + copy h2kvmctl to `/usr/local/bin/`
-6. Install systemd services (hyper2kvm daemon + h2kweb), restart daemon  
+5. pip install h2kvm + copy h2kvmctl to `/usr/local/bin/`
+6. Install systemd services (h2kvm daemon + h2kweb), restart daemon  
    - **h2kweb:** builds automatically on your machine (`cd web && make build`) when `go` and `npm` are available; otherwise build once locally and re-run deploy
 7. Verify installation
 

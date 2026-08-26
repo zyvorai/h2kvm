@@ -1,4 +1,4 @@
-# hyper2kvm Migration Playbooks
+# h2kvm Migration Playbooks
 
 Comprehensive step-by-step playbooks for common VM migration scenarios.
 
@@ -25,7 +25,7 @@ Comprehensive step-by-step playbooks for common VM migration scenarios.
 - vSphere credentials with VM export permissions
 - Target KVM host with sufficient storage
 - Network connectivity between systems
-- hyper2kvm installed and configured
+- h2kvm installed and configured
 
 ### Step 1: Pre-Migration Assessment
 
@@ -36,12 +36,12 @@ export VSPHERE_USERNAME=administrator@vsphere.local
 export VSPHERE_PASSWORD='YourPassword'
 
 # List available VMs
-hyper2kvm --vsphere-list --vsphere-host $VSPHERE_HOST \
+h2kvm --vsphere-list --vsphere-host $VSPHERE_HOST \
   --vsphere-user $VSPHERE_USERNAME \
   --vsphere-password $VSPHERE_PASSWORD
 
 # Get VM details
-hyper2kvm --vsphere-inspect --vm-name web-server-01 \
+h2kvm --vsphere-inspect --vm-name web-server-01 \
   --vsphere-host $VSPHERE_HOST \
   --vsphere-user $VSPHERE_USERNAME \
   --vsphere-password $VSPHERE_PASSWORD
@@ -65,7 +65,7 @@ qemu-img --version
 
 ```bash
 # Export VM from vSphere and convert to QCOW2
-hyper2kvm \
+h2kvm \
   --vsphere-host $VSPHERE_HOST \
   --vsphere-user $VSPHERE_USERNAME \
   --vsphere-password $VSPHERE_PASSWORD \
@@ -76,7 +76,7 @@ hyper2kvm \
   --verbose
 
 # Monitor progress
-tail -f /var/log/hyper2kvm/migration.log
+tail -f /var/log/h2kvm/migration.log
 ```
 
 ### Step 4: Create Libvirt Domain
@@ -189,7 +189,7 @@ EOF
 
 # Verify all VMs exist
 while read vm; do
-  hyper2kvm --vsphere-inspect --vm-name "$vm" \
+  h2kvm --vsphere-inspect --vm-name "$vm" \
     --vsphere-host $VSPHERE_HOST \
     --vsphere-user $VSPHERE_USERNAME \
     --vsphere-password $VSPHERE_PASSWORD
@@ -200,7 +200,7 @@ done < vms-to-migrate.txt
 
 ```bash
 # Generate migration plan
-hyper2kvm --batch vms-to-migrate.txt \
+h2kvm --batch vms-to-migrate.txt \
   --vsphere-host $VSPHERE_HOST \
   --vsphere-user $VSPHERE_USERNAME \
   --vsphere-password $VSPHERE_PASSWORD \
@@ -218,7 +218,7 @@ df -h /var/lib/libvirt/images
 
 ```bash
 # Run batch migration with 4 parallel workers
-hyper2kvm --batch vms-to-migrate.txt \
+h2kvm --batch vms-to-migrate.txt \
   --vsphere-host $VSPHERE_HOST \
   --vsphere-user $VSPHERE_USERNAME \
   --vsphere-password $VSPHERE_PASSWORD \
@@ -226,12 +226,12 @@ hyper2kvm --batch vms-to-migrate.txt \
   --parallel 4 \
   --inject-drivers \
   --compress \
-  --log-file /var/log/hyper2kvm/batch-migration.log \
+  --log-file /var/log/h2kvm/batch-migration.log \
   --webhook-url https://hooks.slack.com/services/YOUR/WEBHOOK/URL \
   --webhook-type slack
 
 # Monitor progress
-watch -n 5 'tail -20 /var/log/hyper2kvm/batch-migration.log'
+watch -n 5 'tail -20 /var/log/h2kvm/batch-migration.log'
 ```
 
 ### Step 4: Automated Post-Migration
@@ -269,8 +269,8 @@ done < $VM_LIST
 
 ```bash
 # Create comprehensive report
-hyper2kvm --report \
-  --log-file /var/log/hyper2kvm/batch-migration.log \
+h2kvm --report \
+  --log-file /var/log/h2kvm/batch-migration.log \
   --output migration-report.html
 
 # Email report
@@ -349,7 +349,7 @@ VMDK_FILE=$(find /tmp/aws-export -name "*.vmdk" | head -1)
 
 ```bash
 # Convert VMDK to QCOW2
-hyper2kvm \
+h2kvm \
   --input $VMDK_FILE \
   --output /var/lib/libvirt/images/aws-instance.qcow2 \
   --os-type linux \
@@ -453,8 +453,8 @@ wget -O /tmp/azure-export/disk.vhd "$DISK_SAS"
 ### Step 4: Convert VHD to QCOW2
 
 ```bash
-# Convert using hyper2kvm
-hyper2kvm \
+# Convert using h2kvm
+h2kvm \
   --input /tmp/azure-export/disk.vhd \
   --output /var/lib/libvirt/images/azure-vm.qcow2 \
   --os-type linux \
@@ -608,7 +608,7 @@ script /var/log/dr-actions-$(date +%Y%m%d).log
 
 ```bash
 # List all dev VMs
-hyper2kvm --vsphere-list --vsphere-host vcenter.dev.local | grep -i dev > dev-vms.txt
+h2kvm --vsphere-list --vsphere-host vcenter.dev.local | grep -i dev > dev-vms.txt
 
 # Get VM owners
 for vm in $(cat dev-vms.txt); do
@@ -641,7 +641,7 @@ mail -s "Dev VM Migration" $(cat dev-vm-owners.csv | cut -d, -f2) < dev-migratio
 
 ```bash
 # Friday 5 PM - start migration
-hyper2kvm --batch dev-vms.txt \
+h2kvm --batch dev-vms.txt \
   --vsphere-host vcenter.dev.local \
   --output-dir /var/lib/libvirt/images/dev \
   --parallel 8 \
@@ -784,7 +784,7 @@ tail -f /var/log/app/errors.log
 curl -X DELETE https://lb.example.com/api/backends/app-01
 
 # Migrate app-01
-hyper2kvm --vm-name app-01 \
+h2kvm --vm-name app-01 \
   --vsphere-host vcenter.local \
   --output /var/lib/libvirt/images/app-01.qcow2 \
   --inject-drivers
@@ -812,7 +812,7 @@ for web in web-01 web-02 web-03; do
   curl -X DELETE https://lb.example.com/api/backends/$web
 
   # Migrate
-  hyper2kvm --vm-name $web --output /var/lib/libvirt/images/${web}.qcow2
+  h2kvm --vm-name $web --output /var/lib/libvirt/images/${web}.qcow2
 
   # Start on KVM
   virsh start $web
@@ -836,7 +836,7 @@ redis-cli BGSAVE
 redis-cli CONFIG SET protected-mode yes
 
 # Migrate
-hyper2kvm --vm-name cache-01 --output /var/lib/libvirt/images/cache-01.qcow2
+h2kvm --vm-name cache-01 --output /var/lib/libvirt/images/cache-01.qcow2
 
 # Start and restore
 virsh start cache-01
@@ -873,7 +873,7 @@ lsyncd /etc/lsyncd/lsyncd.conf.lua
 
 ```bash
 # Migrate all VMs to KVM (kept offline)
-hyper2kvm --batch all-vms.txt \
+h2kvm --batch all-vms.txt \
   --output-dir /var/lib/libvirt/images/shadow \
   --no-start
 
@@ -955,7 +955,7 @@ EOF
 # Migrate latency-sensitive workloads to on-prem KVM
 grep ",on-prem," workload-classification.csv | cut -d, -f1 > migrate-to-kvm.txt
 
-hyper2kvm --batch migrate-to-kvm.txt \
+h2kvm --batch migrate-to-kvm.txt \
   --output-dir /var/lib/libvirt/images \
   --inject-drivers
 ```

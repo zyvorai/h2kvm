@@ -1,13 +1,13 @@
 ---
-title: "hyper2kvm — RHEL 10.2 vCenter Migration Report"
+title: "h2kvm — RHEL 10.2 vCenter Migration Report"
 date: "March 18-19, 2026"
-author: "hyper2kvm Migration Team"
+author: "h2kvm Migration Team"
 ---
 
 # RHEL 10.2 — vCenter to KVM Migration Report
 
 **Date:** March 18-19, 2026
-**Tool:** hyper2kvm v0.3.0
+**Tool:** h2kvm v0.3.0
 **Source:** VMware vCenter 10.73.213.134 (ESXi 8.0)
 **Target:** Fedora 43 (KVM/libvirt)
 
@@ -237,7 +237,7 @@ $ ls -lh output-govc-e2e/libvirt/*.xml
 | Component | Version |
 |-----------|---------|
 | OS | Fedora 43 (kernel 6.18.13) |
-| hyper2kvm | 0.3.0 |
+| h2kvm | 0.3.0 |
 | govc | 0.44.0 |
 | qemu-img | 10.1.4 |
 | libvirt | 11.6.0 |

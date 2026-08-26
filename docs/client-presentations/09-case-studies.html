@@ -45,7 +45,7 @@
 <div class="cover">
   <h1>Case <span>Studies</span></h1>
   <h2>VM Migration Success Stories</h2>
-  <p class="sub">Real-world migration scenarios across industries — from VMware and cloud to KVM/KubeVirt using hyper2kvm + hypersdk.</p>
+  <p class="sub">Real-world migration scenarios across industries — from VMware and cloud to KVM/KubeVirt using h2kvm + hypersdk.</p>
 </div>
 
 <!-- CASE 1 -->
@@ -72,9 +72,9 @@
     </div>
 
     <h3>Migration Approach</h3>
-    <p>Phase 1: 50 dev/test VMs (1 week). Phase 2: 100 staging VMs (2 weeks). Phase 3: 200 production VMs in maintenance windows over 3 weeks. hyper2kvm batch queue processed 30-40 VMs per night. Windows SQL Server VMs required VirtIO injection — 100% automated.</p>
+    <p>Phase 1: 50 dev/test VMs (1 week). Phase 2: 100 staging VMs (2 weeks). Phase 3: 200 production VMs in maintenance windows over 3 weeks. h2kvm batch queue processed 30-40 VMs per night. Windows SQL Server VMs required VirtIO injection — 100% automated.</p>
 
-    <div class="quote">"We expected 2-3 months of migration pain. hyper2kvm's batch automation and auto-boot-verification cut it to 6 weeks. Zero customer-facing downtime."</div>
+    <div class="quote">"We expected 2-3 months of migration pain. h2kvm's batch automation and auto-boot-verification cut it to 6 weeks. Zero customer-facing downtime."</div>
   </div>
 </div>
 
@@ -102,9 +102,9 @@
     </div>
 
     <h3>Key Challenge: HIPAA</h3>
-    <p>Patient data (PHI) couldn't be processed by third-party tools. hyper2kvm runs entirely on-premises with zero cloud dependencies. Audit logs provide the compliance trail required for HIPAA auditors. VHD exports from Azure processed locally with no data leaving the hospital network.</p>
+    <p>Patient data (PHI) couldn't be processed by third-party tools. h2kvm runs entirely on-premises with zero cloud dependencies. Audit logs provide the compliance trail required for HIPAA auditors. VHD exports from Azure processed locally with no data leaving the hospital network.</p>
 
-    <div class="quote">"Our HIPAA auditor was thrilled. All migration processing stays on our network. The audit trail from hyper2kvm's structured logging was exactly what we needed for documentation."</div>
+    <div class="quote">"Our HIPAA auditor was thrilled. All migration processing stays on our network. The audit trail from h2kvm's structured logging was exactly what we needed for documentation."</div>
   </div>
 </div>
 
@@ -132,7 +132,7 @@
     </div>
 
     <h3>Key Innovation: Zero-Touch Rollout</h3>
-    <p>Converted all SCADA/MES VMs at HQ using hyper2kvm. Shipped pre-configured NUCs to each factory. On-site electricians plugged them in. K3s auto-joined the fleet via WireGuard VPN. ArgoCD deployed the VM workloads automatically. No IT travel required for any of the 45 sites.</p>
+    <p>Converted all SCADA/MES VMs at HQ using h2kvm. Shipped pre-configured NUCs to each factory. On-site electricians plugged them in. K3s auto-joined the fleet via WireGuard VPN. ArgoCD deployed the VM workloads automatically. No IT travel required for any of the 45 sites.</p>
 
     <div class="quote">"We shipped a box, the electrician plugged it in, and 20 minutes later we could see the factory floor VMs running in our central dashboard. From 45 VMware licenses to zero."</div>
   </div>
@@ -157,14 +157,14 @@
         <ul><li>vSphere on isolated SCIF network</li><li>VMware licenses $800K/yr</li><li>License renewal = procurement nightmare</li><li>No internet = no cloud migration tools</li><li>Broadcom vendor risk unacceptable</li></ul>
       </div>
       <div class="after"><h5>After (KVM on classified net)</h5>
-        <ul><li>RHEL + KVM on same hardware</li><li>$0 hypervisor licensing</li><li>hyper2kvm installed from RPM via USB</li><li>All processing offline, no external calls</li><li>No vendor dependency for critical infra</li></ul>
+        <ul><li>RHEL + KVM on same hardware</li><li>$0 hypervisor licensing</li><li>h2kvm installed from RPM via USB</li><li>All processing offline, no external calls</li><li>No vendor dependency for critical infra</li></ul>
       </div>
     </div>
 
     <h3>Key Challenge: Complete Air Gap</h3>
-    <p>Classified network has zero internet connectivity. hyper2kvm was installed from RPM packages transferred via approved media. VMDKs exported to encrypted external drives. Conversion performed entirely offline. No telemetry, no phone-home, no cloud APIs called. Full SBOM provided for security review.</p>
+    <p>Classified network has zero internet connectivity. h2kvm was installed from RPM packages transferred via approved media. VMDKs exported to encrypted external drives. Conversion performed entirely offline. No telemetry, no phone-home, no cloud APIs called. Full SBOM provided for security review.</p>
 
-    <div class="quote">"Most migration tools assume internet access. hyper2kvm is the only tool we found that works completely offline with zero external dependencies. Our security team approved it in 2 days after reviewing the open-source code."</div>
+    <div class="quote">"Most migration tools assume internet access. h2kvm is the only tool we found that works completely offline with zero external dependencies. Our security team approved it in 2 days after reviewing the open-source code."</div>
   </div>
 </div>
 
@@ -188,10 +188,10 @@
     <div class="metric"><div class="num">775</div><div class="lbl">Total VMs<br>migrated</div></div>
     <div class="metric"><div class="num">$3.17M</div><div class="lbl">Combined annual<br>savings</div></div>
     <div class="metric"><div class="num">99.8%</div><div class="lbl">Average first-boot<br>success rate</div></div>
-    <div class="metric"><div class="num">Licensed*</div><div class="lbl">hyper2kvm<br>license</div></div>
+    <div class="metric"><div class="num">Licensed*</div><div class="lbl">h2kvm<br>license</div></div>
   </div>
 
-  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs)</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs)</p></div>
 </div>
 </body>
 </html>

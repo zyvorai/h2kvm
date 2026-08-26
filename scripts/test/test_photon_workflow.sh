@@ -28,9 +28,9 @@ NC='\033[0m'
 
 # Configuration
 TEST_NAME="Photon-Workflow-Test"
-PHOTON_VMDK="/home/ssahani/tt/hyper2kvm/photon.vmdk"
-WORKFLOW_DIR="/var/lib/hyper2kvm/photon-test-workflow"
-OUTPUT_DIR="/var/lib/hyper2kvm/photon-test-output"
+PHOTON_VMDK="/home/ssahani/tt/h2kvm/photon.vmdk"
+WORKFLOW_DIR="/var/lib/h2kvm/photon-test-workflow"
+OUTPUT_DIR="/var/lib/h2kvm/photon-test-output"
 DAEMON_CONFIG="/tmp/photon-daemon.yaml"
 DAEMON_LOG="/tmp/photon-daemon.log"
 DAEMON_PID=""
@@ -121,7 +121,7 @@ else
     fi
 fi
 
-print_step "Checking hyper2kvm..."
+print_step "Checking h2kvm..."
 if command -v h2kvmctl &>/dev/null; then
     VERSION=$(h2kvmctl --version 2>&1)
     print_success "h2kvmctl: v$VERSION"

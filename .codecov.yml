@@ -1,4 +1,4 @@
-# Codecov configuration for hyper2kvm
+# Codecov configuration for h2kvm
 # Documentation: https://docs.codecov.com/docs/codecov-yaml
 
 coverage:
@@ -34,7 +34,7 @@ comment:
 flags:
   unittests:
     paths:
-      - hyper2kvm/
+      - h2kvm/
     carryforward: true
 
 github_checks:

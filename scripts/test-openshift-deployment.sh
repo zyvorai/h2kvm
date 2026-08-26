@@ -1,11 +1,11 @@
 #!/bin/bash
-# Test hyper2kvm operator deployment on OpenShift
+# Test h2kvm operator deployment on OpenShift
 # This script validates the deployment and runs basic tests
 # Usage: ./scripts/test-openshift-deployment.sh [NAMESPACE]
 
 set -e
 
-NAMESPACE="${1:-hyper2kvm-system}"
+NAMESPACE="${1:-h2kvm-system}"
 
 # Color output
 
@@ -63,14 +63,14 @@ run_test "Namespace '${NAMESPACE}' exists" "oc get namespace ${NAMESPACE}"
 # Test 4: Check CRDs are installed
 echo ""
 echo_info "=== CRD Tests ==="
-run_test "MigrationJob CRD installed" "oc get crd migrationjobs.hyper2kvm.io"
-run_test "JobTemplate CRD installed" "oc get crd jobtemplates.hyper2kvm.io"
+run_test "MigrationJob CRD installed" "oc get crd migrationjobs.h2kvm.io"
+run_test "JobTemplate CRD installed" "oc get crd jobtemplates.h2kvm.io"
 
 # Test 5: Check operator pod
 echo ""
 echo_info "=== Operator Pod Tests ==="
-run_test "Operator pod exists" "oc get pods -n ${NAMESPACE} -l app.kubernetes.io/name=hyper2kvm-operator"
-run_test "Operator pod is running" "oc get pods -n ${NAMESPACE} -l app.kubernetes.io/name=hyper2kvm-operator -o jsonpath='{.items[0].status.phase}' | grep -q Running"
+run_test "Operator pod exists" "oc get pods -n ${NAMESPACE} -l app.kubernetes.io/name=h2kvm-operator"
+run_test "Operator pod is running" "oc get pods -n ${NAMESPACE} -l app.kubernetes.io/name=h2kvm-operator -o jsonpath='{.items[0].status.phase}' | grep -q Running"
 
 # Test 6: Check webhook pod (if enabled)
 echo ""
@@ -85,7 +85,7 @@ fi
 # Test 7: Check services
 echo ""
 echo_info "=== Service Tests ==="
-run_test "Operator service exists" "oc get svc -n ${NAMESPACE} -l app.kubernetes.io/name=hyper2kvm-operator"
+run_test "Operator service exists" "oc get svc -n ${NAMESPACE} -l app.kubernetes.io/name=h2kvm-operator"
 
 # Test 8: Check routes (OpenShift specific)
 echo ""
@@ -94,8 +94,8 @@ if oc get route -n ${NAMESPACE} &> /dev/null; then
     run_test "Routes exist" "oc get route -n ${NAMESPACE}"
 
     # Test metrics route
-    if oc get route hyper2kvm-operator-metrics -n ${NAMESPACE} &> /dev/null; then
-        METRICS_ROUTE=$(oc get route hyper2kvm-operator-metrics -n ${NAMESPACE} -o jsonpath='{.spec.host}')
+    if oc get route h2kvm-operator-metrics -n ${NAMESPACE} &> /dev/null; then
+        METRICS_ROUTE=$(oc get route h2kvm-operator-metrics -n ${NAMESPACE} -o jsonpath='{.spec.host}')
         echo_info "Metrics route: https://${METRICS_ROUTE}"
         run_test "Metrics route accessible" "curl -k -s -o /dev/null -w '%{http_code}' https://${METRICS_ROUTE}/healthz | grep -q 200"
     fi
@@ -106,8 +106,8 @@ fi
 # Test 9: Check SecurityContextConstraints
 echo ""
 echo_info "=== SecurityContextConstraints Tests ==="
-if oc get scc hyper2kvm-worker-scc &> /dev/null; then
-    run_test "Worker SCC exists" "oc get scc hyper2kvm-worker-scc"
+if oc get scc h2kvm-worker-scc &> /dev/null; then
+    run_test "Worker SCC exists" "oc get scc h2kvm-worker-scc"
 else
     echo_warning "Worker SCC not found (may need manual creation)"
 fi
@@ -115,9 +115,9 @@ fi
 # Test 10: Check RBAC
 echo ""
 echo_info "=== RBAC Tests ==="
-run_test "ServiceAccount exists" "oc get sa -n ${NAMESPACE} hyper2kvm-operator"
-run_test "ClusterRole exists" "oc get clusterrole | grep -q hyper2kvm-operator"
-run_test "ClusterRoleBinding exists" "oc get clusterrolebinding | grep -q hyper2kvm-operator"
+run_test "ServiceAccount exists" "oc get sa -n ${NAMESPACE} h2kvm-operator"
+run_test "ClusterRole exists" "oc get clusterrole | grep -q h2kvm-operator"
+run_test "ClusterRoleBinding exists" "oc get clusterrolebinding | grep -q h2kvm-operator"
 
 # Test 11: Create a test MigrationJob
 echo ""
@@ -125,7 +125,7 @@ echo_info "=== MigrationJob CRD Test ==="
 echo_info "Creating test MigrationJob..."
 
 cat > /tmp/test-migrationjob.yaml <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: test-job-$(date +%s)
@@ -165,7 +165,7 @@ fi
 # Test 12: Check operator logs for errors
 echo ""
 echo_info "=== Operator Logs Test ==="
-OPERATOR_POD=$(oc get pods -n ${NAMESPACE} -l app.kubernetes.io/name=hyper2kvm-operator -o jsonpath='{.items[0].metadata.name}')
+OPERATOR_POD=$(oc get pods -n ${NAMESPACE} -l app.kubernetes.io/name=h2kvm-operator -o jsonpath='{.items[0].metadata.name}')
 
 if [ -n "${OPERATOR_POD}" ]; then
     echo_info "Checking operator logs for errors..."
@@ -185,7 +185,7 @@ fi
 echo ""
 echo_info "=== Resource Usage Test ==="
 echo_info "Operator pod resource usage:"
-oc top pod -n ${NAMESPACE} -l app.kubernetes.io/name=hyper2kvm-operator 2>/dev/null || echo_warning "Metrics server not available"
+oc top pod -n ${NAMESPACE} -l app.kubernetes.io/name=h2kvm-operator 2>/dev/null || echo_warning "Metrics server not available"
 
 # Summary
 echo ""
@@ -216,8 +216,8 @@ else
     echo ""
     echo_error "=== Some Tests Failed ==="
     echo_info "Review the failures above and check:"
-    echo "  - Operator logs: oc logs -n ${NAMESPACE} -l app.kubernetes.io/name=hyper2kvm-operator"
-    echo "  - Pod status: oc describe pod -n ${NAMESPACE} -l app.kubernetes.io/name=hyper2kvm-operator"
+    echo "  - Operator logs: oc logs -n ${NAMESPACE} -l app.kubernetes.io/name=h2kvm-operator"
+    echo "  - Pod status: oc describe pod -n ${NAMESPACE} -l app.kubernetes.io/name=h2kvm-operator"
     echo "  - Events: oc get events -n ${NAMESPACE} --sort-by='.lastTimestamp'"
     exit 1
 fi

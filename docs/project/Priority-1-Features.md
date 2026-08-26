@@ -1,6 +1,6 @@
 # Priority 1 Linux Post-Migration Configuration Features
 
-This document describes the three critical post-migration configuration features added to hyper2kvm.
+This document describes the three critical post-migration configuration features added to h2kvm.
 
 ## Overview
 
@@ -92,7 +92,7 @@ user_config_inject:
 
 ### Implementation
 
-**Module**: `hyper2kvm/fixers/user_config_injector.py` (567 lines)
+**Module**: `h2kvm/fixers/user_config_injector.py` (567 lines)
 **Tests**: `tests/unit/test_fixers/test_user_config_injector.py` (20 tests)
 **Examples**: `test-confs/99-linux-user-ssh-management-examples.yaml` (10 examples)
 
@@ -174,7 +174,7 @@ service_config_inject:
 
 ### Implementation
 
-**Module**: `hyper2kvm/fixers/service_config_injector.py` (93 lines)
+**Module**: `h2kvm/fixers/service_config_injector.py` (93 lines)
 **Tests**: `tests/unit/test_fixers/test_service_config_injector.py` (14 tests)
 **Examples**: `test-confs/99-linux-service-management-examples.yaml` (10 examples)
 
@@ -255,7 +255,7 @@ hostname_config_inject:
 
 ### Implementation
 
-**Module**: `hyper2kvm/fixers/hostname_config_injector.py` (97 lines)
+**Module**: `h2kvm/fixers/hostname_config_injector.py` (97 lines)
 **Tests**: `tests/unit/test_fixers/test_hostname_config_injector.py` (15 tests)
 **Examples**: `test-confs/99-linux-hostname-hosts-examples.yaml` (10 examples)
 
@@ -617,11 +617,11 @@ def _hash_password(password: str) -> str:
 
 ## Report Integration
 
-All features integrate with the hyper2kvm report system:
+All features integrate with the h2kvm report system:
 
 ### Report Output
 
-**Markdown Report**: `hyper2kvm-report.md`
+**Markdown Report**: `h2kvm-report.md`
 ```markdown
 ## Configuration Injections
 
@@ -641,7 +641,7 @@ All features integrate with the hyper2kvm report system:
 - Hosts Entries Added: 3
 ```
 
-**JSON Report**: `hyper2kvm-report.json`
+**JSON Report**: `h2kvm-report.json`
 ```json
 {
   "changes": {
@@ -708,10 +708,10 @@ sudo h2kvmctl --config myconfig.yaml \
 
 ```bash
 # Review detailed logs
-tail -f /path/to/output-dir/hyper2kvm.log
+tail -f /path/to/output-dir/h2kvm.log
 
 # Check report for errors
-cat /path/to/output-dir/hyper2kvm-report.md
+cat /path/to/output-dir/h2kvm-report.md
 ```
 
 ---
@@ -767,6 +767,6 @@ Planned features (Priority 2+):
 ## Support
 
 For issues or questions:
-- GitHub Issues: https://github.com/anthropics/hyper2kvm/issues
+- GitHub Issues: https://github.com/anthropics/h2kvm/issues
 - Documentation: Check docs/ directory
 - Examples: See test-confs/ directory

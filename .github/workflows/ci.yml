@@ -41,16 +41,16 @@ jobs:
       - name: Lint with ruff
         run: |
           pip install ruff
-          ruff check hyper2kvm/
+          ruff check h2kvm/
 
       - name: Type check with mypy
         run: |
           pip install mypy types-PyYAML
-          mypy hyper2kvm/ --ignore-missing-imports
+          mypy h2kvm/ --ignore-missing-imports
 
       - name: Run unit tests
         run: |
-          pytest hyper2kvm/vmspawn/tests/ -v --cov=hyper2kvm.vmspawn --cov-report=xml
+          pytest h2kvm/vmspawn/tests/ -v --cov=h2kvm.vmspawn --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v6
@@ -135,11 +135,11 @@ jobs:
       - name: Build operator image
         working-directory: operator
         run: |
-          docker build -t ghcr.io/hyper2kvm/operator:test .
+          docker build -t ghcr.io/h2kvm/operator:test .
 
       - name: Save image
         run: |
-          docker save ghcr.io/hyper2kvm/operator:test | gzip > operator-image.tar.gz
+          docker save ghcr.io/h2kvm/operator:test | gzip > operator-image.tar.gz
 
       - name: Upload image artifact
         uses: actions/upload-artifact@v7

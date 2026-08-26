@@ -145,7 +145,7 @@ If not specified, additional disks inherit the root disk's StorageClass.
 ## Complete Example
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: database-server

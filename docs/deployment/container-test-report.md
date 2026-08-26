@@ -1,4 +1,4 @@
-# Hyper2kvm Containerization Test Report
+# H2kvm Containerization Test Report
 
 ## Test Date: 2026-01-30
 
@@ -51,21 +51,21 @@ Module-level `import guestfs` and `import hivex` statements failed when librarie
 Made imports conditional using try/except pattern:
 
 **guestfs imports (8 files):**
-- `hyper2kvm/fixers/windows/fixer.py`
-- `hyper2kvm/fixers/windows/virtio/core.py`
-- `hyper2kvm/fixers/windows/virtio/install.py`
-- `hyper2kvm/fixers/windows/virtio/windows_virtio_utils.py`
-- `hyper2kvm/fixers/windows/virtio/windows_virtio_paths.py`
-- `hyper2kvm/fixers/windows/virtio/detection.py`
-- `hyper2kvm/fixers/windows/registry/io.py`
-- `hyper2kvm/fixers/windows/registry/mount.py`
-- `hyper2kvm/fixers/windows/network_fixer.py`
+- `h2kvm/fixers/windows/fixer.py`
+- `h2kvm/fixers/windows/virtio/core.py`
+- `h2kvm/fixers/windows/virtio/install.py`
+- `h2kvm/fixers/windows/virtio/windows_virtio_utils.py`
+- `h2kvm/fixers/windows/virtio/windows_virtio_paths.py`
+- `h2kvm/fixers/windows/virtio/detection.py`
+- `h2kvm/fixers/windows/registry/io.py`
+- `h2kvm/fixers/windows/registry/mount.py`
+- `h2kvm/fixers/windows/network_fixer.py`
 
 **hivex imports (4 files):**
-- `hyper2kvm/fixers/windows/registry/system.py`
-- `hyper2kvm/fixers/windows/registry/firstboot.py`
-- `hyper2kvm/fixers/windows/registry/software.py`
-- `hyper2kvm/fixers/windows/registry/encoding.py`
+- `h2kvm/fixers/windows/registry/system.py`
+- `h2kvm/fixers/windows/registry/firstboot.py`
+- `h2kvm/fixers/windows/registry/software.py`
+- `h2kvm/fixers/windows/registry/encoding.py`
 
 ### Solution Applied
 ```python
@@ -91,11 +91,11 @@ except ImportError:
 
 ### Fixed Issues
 1. ✅ Added `sudo` package to Dockerfile
-2. ✅ Configured passwordless sudo for hyper2kvm user
+2. ✅ Configured passwordless sudo for h2kvm user
 3. ✅ Implemented root detection in `run_sudo()` function
 
 ### Changes Made
-**File:** `hyper2kvm/core/vmcraft/_utils.py`
+**File:** `h2kvm/core/vmcraft/_utils.py`
 ```python
 # Only prepend sudo if we're not already running as root
 if os.geteuid() == 0:
@@ -106,7 +106,7 @@ else:
 
 **File:** `Dockerfile`
 - Added `sudo` to system dependencies (line 25)
-- Created `/etc/sudoers.d/hyper2kvm` with NOPASSWD for hyper2kvm user
+- Created `/etc/sudoers.d/h2kvm` with NOPASSWD for h2kvm user
 
 ### Test Results
 ✅ Root detection works - commands no longer use sudo when running as root
@@ -143,7 +143,7 @@ qemu-nbd: Failed to open /dev/nbd0: Permission denied
 - Run offline fixes on host after extraction
 
 **Option 2:** Run on host (recommended for full functionality)
-- Native hyper2kvm has full NBD access
+- Native h2kvm has full NBD access
 - No container limitations
 
 **Option 3:** Advanced container setup

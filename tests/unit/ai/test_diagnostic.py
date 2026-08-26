@@ -2,14 +2,14 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Unit tests for hyper2kvm.ai.diagnostic.DiagnosticEngine."""
+"""Unit tests for h2kvm.ai.diagnostic.DiagnosticEngine."""
 
 from __future__ import annotations
 
 import pytest
 
-from hyper2kvm.ai.diagnostic import DiagnosticEngine, BUILTIN_PATTERNS
-from hyper2kvm.ai.knowledge_base import KnowledgeBase
+from h2kvm.ai.diagnostic import DiagnosticEngine, BUILTIN_PATTERNS
+from h2kvm.ai.knowledge_base import KnowledgeBase
 
 
 # ---------------------------------------------------------------------------

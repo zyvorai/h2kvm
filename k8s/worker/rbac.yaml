@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker
+  namespace: h2kvm-workers
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker
+  namespace: h2kvm-workers
 rules:
 # Allow workers to read ConfigMaps for job specs
 - apiGroups: [""]
@@ -33,13 +33,13 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker
+  namespace: h2kvm-workers
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: hyper2kvm-worker
+  name: h2kvm-worker
 subjects:
 - kind: ServiceAccount
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker
+  namespace: h2kvm-workers

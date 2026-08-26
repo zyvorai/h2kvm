@@ -100,7 +100,7 @@ main() {
 
 # Help message
 if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-    echo "h2kvmctl-k8s - Kubernetes-aware wrapper for hyper2kvm"
+    echo "h2kvmctl-k8s - Kubernetes-aware wrapper for h2kvm"
     echo ""
     echo "This wrapper automatically:"
     echo "  - Detects and sets KUBECONFIG when using sudo"

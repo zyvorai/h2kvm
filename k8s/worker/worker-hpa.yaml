@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: hyper2kvm-worker-hpa
-  namespace: hyper2kvm-system
+  name: h2kvm-worker-hpa
+  namespace: h2kvm-system
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: hyper2kvm-worker
+    name: h2kvm-worker
   minReplicas: 2
   maxReplicas: 20
   metrics:
@@ -31,7 +31,7 @@ spec:
   - type: Pods
     pods:
       metric:
-        name: hyper2kvm_operator_queue_depth
+        name: h2kvm_operator_queue_depth
       target:
         type: AverageValue
         averageValue: "3"
@@ -63,14 +63,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hyper2kvm-operator-metrics
-  namespace: hyper2kvm-system
+  name: h2kvm-operator-metrics
+  namespace: h2kvm-system
   labels:
-    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/name: h2kvm-operator
     app.kubernetes.io/component: metrics
 spec:
   selector:
-    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/name: h2kvm-operator
     app.kubernetes.io/component: operator
   ports:
   - name: metrics
@@ -82,8 +82,8 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-system
+  name: h2kvm-operator
+  namespace: h2kvm-system
 spec:
   selector:
     matchLabels:

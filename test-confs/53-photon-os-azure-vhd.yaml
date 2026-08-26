@@ -2,7 +2,7 @@
 # test-confs/photon-azure-vhd.yaml
 #
 # Run:
-#   sudo python hyper2kvm.py --config test-confs/photon-azure-vhd.yaml
+#   sudo python h2kvm.py --config test-confs/photon-azure-vhd.yaml
 #
 # What this does:
 # - Opens the Azure Photon OS VHD offline
@@ -50,8 +50,8 @@ no_backup: false
 # --------------------------------------------------------------------
 dry_run: false
 verbose: 2
-log_file: /home/ssahani/by-path/out-photon-azure/hyper2kvm.log
-report: /home/ssahani/by-path/out-photon-azure/hyper2kvm-report.md
+log_file: /home/ssahani/by-path/out-photon-azure/h2kvm.log
+report: /home/ssahani/by-path/out-photon-azure/h2kvm-report.md
 
 # --------------------------------------------------------------------
 # Optional smoke test

@@ -36,7 +36,7 @@ This cookbook provides tested recipes for common VM migration scenarios using VM
 ### Steps
 
 ```python
-from hyper2kvm.core.vmcraft.main import VMCraft
+from h2kvm.core.vmcraft.main import VMCraft
 
 # 1. Quick readiness check
 with VMCraft("/vmware/simple-vm.vmdk") as g:
@@ -104,7 +104,7 @@ print("✓ Migration complete!")
 ### Steps
 
 ```python
-from hyper2kvm.core.vmcraft.main import VMCraft
+from h2kvm.core.vmcraft.main import VMCraft
 import subprocess
 
 # 1. Pre-migration readiness check
@@ -207,7 +207,7 @@ print("✓ Large enterprise VM migration complete!")
 ### Steps
 
 ```python
-from hyper2kvm.core.vmcraft.main import VMCraft
+from h2kvm.core.vmcraft.main import VMCraft
 
 # 1. Pre-migration database health check
 with VMCraft("/vmware/db-server.vmdk") as g:
@@ -310,7 +310,7 @@ print("5. Verify replication if configured")
 ### Batch Migration Script
 
 ```python
-from hyper2kvm.core.vmcraft.main import VMCraft
+from h2kvm.core.vmcraft.main import VMCraft
 from pathlib import Path
 import subprocess
 
@@ -435,7 +435,7 @@ After migration, update load balancer configuration to point to new KVM IPs.
 ### Steps
 
 ```python
-from hyper2kvm.core.vmcraft.main import VMCraft
+from h2kvm.core.vmcraft.main import VMCraft
 
 with VMCraft("/vmware/sensitive-vm.vmdk") as g:
     roots = g.inspect_os()
@@ -539,7 +539,7 @@ print("✓ Security-hardened migration complete!")
 
 ```python
 # Phase 1: Pre-staging (no downtime)
-from hyper2kvm.core.vmcraft.main import VMCraft
+from h2kvm.core.vmcraft.main import VMCraft
 
 # 1. Create initial conversion (read-only)
 with VMCraft("/vmware/production-vm.vmdk") as g:
@@ -617,7 +617,7 @@ print("\n*** CUTOVER COMPLETE - DOWNTIME ENDS ***\n")
 ### Steps
 
 ```python
-from hyper2kvm.core.vmcraft.main import VMCraft
+from h2kvm.core.vmcraft.main import VMCraft
 import subprocess
 from datetime import datetime
 
@@ -709,7 +709,7 @@ print("✓ DR setup complete!")
 ### Parallel Batch Migration
 
 ```python
-from hyper2kvm.core.vmcraft.main import VMCraft
+from h2kvm.core.vmcraft.main import VMCraft
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import subprocess
@@ -885,7 +885,7 @@ with VMCraft("/vmware/vm-no-network.vmdk") as g:
 ### Optimization Checklist
 
 ```python
-from hyper2kvm.core.vmcraft.main import VMCraft
+from h2kvm.core.vmcraft.main import VMCraft
 
 with VMCraft("/kvm/vm-to-optimize.qcow2") as g:
     roots = g.inspect_os()

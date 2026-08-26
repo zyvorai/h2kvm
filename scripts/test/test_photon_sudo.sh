@@ -6,8 +6,8 @@ echo "🚀 Running Photon OS workflow with root permissions..."
 echo ""
 
 # Setup
-WORKFLOW_DIR="/var/lib/hyper2kvm/photon-sudo-test"
-OUTPUT_DIR="/var/lib/hyper2kvm/photon-sudo-output"
+WORKFLOW_DIR="/var/lib/h2kvm/photon-sudo-test"
+OUTPUT_DIR="/var/lib/h2kvm/photon-sudo-output"
 DAEMON_LOG="/tmp/photon-sudo-daemon.log"
 
 # Create directories
@@ -34,7 +34,7 @@ cat > /tmp/photon-sudo-manifest.json <<EOF
   "pipeline": {
     "load": {
       "source_type": "vmdk",
-      "source_path": "/home/ssahani/tt/hyper2kvm/photon.vmdk"
+      "source_path": "/home/ssahani/tt/h2kvm/photon.vmdk"
     },
     "inspect": {
       "enabled": true,

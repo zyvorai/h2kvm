@@ -171,7 +171,7 @@ lvs = lvm.list_lvs()  # Returns guest LVs only
 devices {
     filter = ["a|/dev/nbd0.*|", "r|.*|"]
 }
-LVM_SYSTEM_DIR=/tmp/hyper2kvm-lvm-XXXXX
+LVM_SYSTEM_DIR=/tmp/h2kvm-lvm-XXXXX
 ```
 
 **Safety guarantees:**
@@ -195,7 +195,7 @@ overlay.unmount()  # Original disk unchanged
 
 **Directory structure:**
 ```
-/tmp/hyper2kvm-overlay-XXXXX/
+/tmp/h2kvm-overlay-XXXXX/
 ├── lower/  → (symlink to guest root - read-only)
 ├── upper/  → (modifications - read-write)
 ├── work/   → (OverlayFS internal)
@@ -325,7 +325,7 @@ Typical RHEL 8.8 conversion (16GB disk, LVM root):
 
 ### System-wide:
 
-`/etc/hyper2kvm/config.yaml`:
+`/etc/h2kvm/config.yaml`:
 ```yaml
 offline_fixer:
   backend: namespace_engine
@@ -345,7 +345,7 @@ backend: namespace_engine
 ### Python API:
 
 ```python
-from hyper2kvm.vmcraft.namespace_engine import NamespaceEngine
+from h2kvm.vmcraft.namespace_engine import NamespaceEngine
 
 engine = NamespaceEngine(
     image="guest.qcow2",
@@ -491,6 +491,6 @@ Planned features:
 
 - [BACKENDS.md](BACKENDS.md) - All backend options comparison
 - [LVM_BACKENDS.md](LVM_BACKENDS.md) - LVM-specific backends
-- [namespace_engine.py](../hyper2kvm/vmcraft/namespace_engine.py) - Implementation
+- [namespace_engine.py](../h2kvm/vmcraft/namespace_engine.py) - Implementation
 - [Linux Namespaces](https://man7.org/linux/man-pages/man7/namespaces.7.html) - Kernel documentation
 - [OverlayFS](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html) - Kernel documentation

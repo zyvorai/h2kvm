@@ -128,8 +128,8 @@ for vm in "${PRIORITY_VMS[@]}"; do
 
     log_info "  Converting ${vm} to qcow2..."
 
-    # Use hyper2kvm for recovery conversion
-    sudo python -m hyper2kvm local \
+    # Use h2kvm for recovery conversion
+    sudo python -m h2kvm local \
         --vmdk "${vmdk_path}" \
         --output-dir "${output_dir}" \
         --to-output "${vm}-recovery.qcow2" \

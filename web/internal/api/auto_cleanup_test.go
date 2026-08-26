@@ -18,10 +18,10 @@ func TestIsProtectedFromCleanup(t *testing.T) {
 		mod  time.Time
 		want bool
 	}{
-		{"/var/lib/hyper2kvm/output/job/2025legacy.qcow2.part", recent, true},
-		{"/var/lib/hyper2kvm/output/job/2025legacy.qcow2.tmp", recent, true},
-		{"/var/lib/hyper2kvm/output/job/2025legacy.qcow2", recent, true},
-		{"/var/lib/hyper2kvm/output/job/2025legacy.qcow2", old, false},
+		{"/var/lib/h2kvm/output/job/2025legacy.qcow2.part", recent, true},
+		{"/var/lib/h2kvm/output/job/2025legacy.qcow2.tmp", recent, true},
+		{"/var/lib/h2kvm/output/job/2025legacy.qcow2", recent, true},
+		{"/var/lib/h2kvm/output/job/2025legacy.qcow2", old, false},
 	}
 
 	for _, tc := range cases {

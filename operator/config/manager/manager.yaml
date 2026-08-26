@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: hyper2kvm-system
+  name: h2kvm-system
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hyperconversion-operator
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
   labels:
     control-plane: controller-manager
     app.kubernetes.io/name: hyperconversion-operator
@@ -34,7 +34,7 @@ spec:
         - /manager
         args:
         - --leader-elect
-        image: hyper2kvm-operator:latest
+        image: h2kvm-operator:latest
         name: manager
         securityContext:
           allowPrivilegeEscalation: false

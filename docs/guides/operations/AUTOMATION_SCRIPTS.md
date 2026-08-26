@@ -1,6 +1,6 @@
 # Automation Scripts Collection
 
-Practical automation scripts for streamlining VM migration workflows with Hyper2KVM.
+Practical automation scripts for streamlining VM migration workflows with H2KVM.
 
 ---
 
@@ -182,7 +182,7 @@ libvirt_test: {vm_data.get('libvirt_test', 'true')}
 
 # Logging
 log_level: INFO
-log_file: /var/log/hyper2kvm/{vm_data['name']}.log
+log_file: /var/log/h2kvm/{vm_data['name']}.log
 """
 
     # Write config file
@@ -408,10 +408,10 @@ Monitor migration progress in real-time.
 # Usage: ./monitor-migration.sh
 
 watch -n 2 '
-echo "=== Hyper2KVM Migration Monitor ==="
+echo "=== H2KVM Migration Monitor ==="
 echo ""
 echo "Running Migrations:"
-ps aux | grep -E "h2kvmctl|hyper2kvm" | grep -v grep || echo "  None"
+ps aux | grep -E "h2kvmctl|h2kvm" | grep -v grep || echo "  None"
 echo ""
 echo "System Resources:"
 echo "CPU Usage: $(top -bn1 | grep "Cpu(s)" | awk "{print \$2}" | cut -d"%" -f1)%"
@@ -420,7 +420,7 @@ echo "Disk I/O:"
 iostat -x 1 2 | tail -n +4 | head -n 5
 echo ""
 echo "Recent Log Activity:"
-tail -n 10 /var/log/hyper2kvm/*.log 2>/dev/null | tail -n 5 || echo "  No logs found"
+tail -n 10 /var/log/h2kvm/*.log 2>/dev/null | tail -n 5 || echo "  No logs found"
 '
 ```
 
@@ -681,9 +681,9 @@ echo "Removing files older than $DAYS days"
 echo ""
 
 # Clean old logs
-if [ -d "/var/log/hyper2kvm" ]; then
+if [ -d "/var/log/h2kvm" ]; then
     echo "Cleaning logs..."
-    find /var/log/hyper2kvm -name "*.log" -type f -mtime +$DAYS -delete
+    find /var/log/h2kvm -name "*.log" -type f -mtime +$DAYS -delete
     echo "✅ Logs cleaned"
 fi
 
@@ -716,7 +716,7 @@ Generate statistics from completed migrations.
 #!/usr/bin/env python3
 """
 Generate migration statistics from logs
-Usage: ./generate-stats.py /var/log/hyper2kvm
+Usage: ./generate-stats.py /var/log/h2kvm
 """
 
 import sys
@@ -760,7 +760,7 @@ def parse_log(log_file):
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: ./generate-stats.py /var/log/hyper2kvm")
+        print("Usage: ./generate-stats.py /var/log/h2kvm")
         sys.exit(1)
 
     log_dir = Path(sys.argv[1])
@@ -814,7 +814,7 @@ if __name__ == '__main__':
 **Usage**:
 ```bash
 chmod +x scripts/generate-stats.py
-./scripts/generate-stats.py /var/log/hyper2kvm
+./scripts/generate-stats.py /var/log/h2kvm
 ```
 
 ---
@@ -830,11 +830,11 @@ cd scripts
 2. **Download all scripts**:
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm/scripts
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm/scripts
 
 # Or download individually
-curl -O https://raw.githubusercontent.com/ssahani/hyper2kvm/main/scripts/bulk-vmdk-inspect.sh
+curl -O https://raw.githubusercontent.com/ssahani/h2kvm/main/scripts/bulk-vmdk-inspect.sh
 # ... etc
 ```
 
@@ -867,7 +867,7 @@ pip3 install pyyaml
 | validate-network.sh | Test VM network | `./validate-network.sh vm-name` |
 | health-monitor.sh | Continuous health check | `./health-monitor.sh vm-name 60` |
 | cleanup-old.sh | Clean old artifacts | `./cleanup-old.sh 30` |
-| generate-stats.py | Migration statistics | `./generate-stats.py /var/log/hyper2kvm` |
+| generate-stats.py | Migration statistics | `./generate-stats.py /var/log/h2kvm` |
 
 ---
 
@@ -899,7 +899,7 @@ done
 ./scripts/health-monitor.sh production-db 60 &
 
 # 8. Generate statistics
-./scripts/generate-stats.py /var/log/hyper2kvm
+./scripts/generate-stats.py /var/log/h2kvm
 
 # 9. Cleanup old files
 ./scripts/cleanup-old.sh 30

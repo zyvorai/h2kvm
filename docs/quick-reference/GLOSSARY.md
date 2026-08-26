@@ -1,6 +1,6 @@
 # Glossary
 
-Comprehensive glossary of terms, concepts, and technologies used in Hyper2KVM.
+Comprehensive glossary of terms, concepts, and technologies used in H2KVM.
 
 ---
 
@@ -25,7 +25,7 @@ Comprehensive glossary of terms, concepts, and technologies used in Hyper2KVM.
 A JSON document that describes migration outputs (disk images, configuration files, metadata). Follows the artifact-manifest-v1.0 schema specification.
 
 ### Chroot
-Change root - a Unix operation that changes the apparent root directory. Hyper2KVM uses enhanced chroot with proper isolation and cleanup.
+Change root - a Unix operation that changes the apparent root directory. H2KVM uses enhanced chroot with proper isolation and cleanup.
 
 ### Cold Migration
 Migration performed while the VM is powered off. Allows complete filesystem access and modification.
@@ -34,7 +34,7 @@ Migration performed while the VM is powered off. Allows complete filesystem acce
 The process of transforming a VM disk image from one format to another (e.g., VMDK to QCOW2).
 
 ### Enhanced Chroot
-Hyper2KVM's improved chroot implementation with automatic mount/unmount of /proc, /sys, /dev and safe cleanup.
+H2KVM's improved chroot implementation with automatic mount/unmount of /proc, /sys, /dev and safe cleanup.
 
 ### fstab
 File System Table - Linux configuration file (/etc/fstab) that defines how disk partitions, block devices, or remote filesystems should be mounted.
@@ -46,7 +46,7 @@ The virtual machine being migrated or manipulated. The operating system and appl
 The physical or virtual machine running the hypervisor and hosting guest VMs.
 
 ### Live Migration
-Migration of a running VM with minimal downtime. Hyper2KVM's "live fix" mode uses SSH to apply fixes while the VM is running.
+Migration of a running VM with minimal downtime. H2KVM's "live fix" mode uses SSH to apply fixes while the VM is running.
 
 ### Migration
 The complete process of converting a VM from one platform (VMware/Hyper-V) to another (KVM).
@@ -61,7 +61,7 @@ The original virtualization platform (VMware ESXi, vSphere, Hyper-V) from which 
 The destination virtualization platform (KVM, QEMU, OpenStack, oVirt) to which VMs are being migrated.
 
 ### VMCraft
-Hyper2KVM's native Python VM manipulation engine with 480+ APIs for guest filesystem operations.
+H2KVM's native Python VM manipulation engine with 480+ APIs for guest filesystem operations.
 
 ---
 
@@ -80,7 +80,7 @@ The time required to convert a VMDK to QCOW2, typically 5-60 minutes depending o
 Converting fstab entries from device names (/dev/sda1) to stable identifiers (UUID or LABEL).
 
 ### Fixers
-Modular components in Hyper2KVM that apply specific fixes (e.g., initramfs regeneration, GRUB updates).
+Modular components in H2KVM that apply specific fixes (e.g., initramfs regeneration, GRUB updates).
 
 ### initramfs
 Initial RAM filesystem - a temporary root filesystem loaded during Linux boot before the real root filesystem is mounted.
@@ -95,13 +95,13 @@ The sequence of operations performed during migration: fetch → convert → fix
 Checks performed before migration to identify potential issues (VMDK Inspector, compatibility checks).
 
 ### Rollback
-Reverting migration changes if issues are detected. Hyper2KVM maintains original files for safety.
+Reverting migration changes if issues are detected. H2KVM maintains original files for safety.
 
 ### Stabilization
 Making configurations more robust for the target platform (fstab stabilization, UUID regeneration).
 
 ### Success Rate
-Percentage of migrations that complete successfully and boot on the target platform. Hyper2KVM achieves 96.5% for Linux, 94% for Windows.
+Percentage of migrations that complete successfully and boot on the target platform. H2KVM achieves 96.5% for Linux, 94% for Windows.
 
 ### XFS UUID Regeneration
 Fixing duplicate XFS filesystem UUIDs that occur when VMware VMs are cloned.
@@ -151,22 +151,22 @@ Paravirtualized drivers for optimal performance on KVM. VMCraft can inject these
 VMware's bare-metal hypervisor platform. Common source platform for migrations.
 
 ### Hyper-V
-Microsoft's hypervisor technology. Hyper2KVM can migrate from Hyper-V to KVM.
+Microsoft's hypervisor technology. H2KVM can migrate from Hyper-V to KVM.
 
 ### hyperctl / hypersdk
-Tools for managing hypervisor-native virtualization. Hyper2KVM integrates with these for advanced deployments.
+Tools for managing hypervisor-native virtualization. H2KVM integrates with these for advanced deployments.
 
 ### KVM (Kernel-based Virtual Machine)
-Linux kernel module that turns Linux into a hypervisor. The target platform for Hyper2KVM migrations.
+Linux kernel module that turns Linux into a hypervisor. The target platform for H2KVM migrations.
 
 ### KubeVirt
-Kubernetes extension for running VMs alongside containers. Hyper2KVM can deploy to KubeVirt clusters.
+Kubernetes extension for running VMs alongside containers. H2KVM can deploy to KubeVirt clusters.
 
 ### libvirt
-Virtualization management library. Hyper2KVM can integrate with libvirt for VM management.
+Virtualization management library. H2KVM can integrate with libvirt for VM management.
 
 ### OpenStack
-Cloud computing platform. Hyper2KVM can export VMs in OpenStack-compatible formats.
+Cloud computing platform. H2KVM can export VMs in OpenStack-compatible formats.
 
 ### oVirt
 Open-source virtualization management platform based on KVM.
@@ -181,7 +181,7 @@ Agent running inside VMs for advanced management operations and better integrati
 VMware's centralized management platform for vSphere environments.
 
 ### virt-v2v
-Red Hat's V2V (Virtual-to-Virtual) conversion tool. Hyper2KVM is an alternative with additional features.
+Red Hat's V2V (Virtual-to-Virtual) conversion tool. H2KVM is an alternative with additional features.
 
 ### VMDK (Virtual Machine Disk)
 VMware's disk image format. The typical source format for migrations.
@@ -261,7 +261,7 @@ Media Access Control address - unique identifier for network interfaces.
 Network configuration where VMs share the host's IP address.
 
 ### Network Resilience
-Hyper2KVM's ability to handle network failures during remote operations (retry, exponential backoff).
+H2KVM's ability to handle network failures during remote operations (retry, exponential backoff).
 
 ### Static IP
 Manually configured IP address (as opposed to DHCP). Requires configuration preservation during migration.
@@ -277,41 +277,41 @@ Network segmentation technology. May need reconfiguration after migration.
 Kubernetes object for storing configuration data. Used to provide migration manifests.
 
 ### CRD (Custom Resource Definition)
-Kubernetes extension mechanism. Hyper2KVM defines `MigrationJob`, `OfflineFixJob`, and `InspectionJob` CRDs.
+Kubernetes extension mechanism. H2KVM defines `MigrationJob`, `OfflineFixJob`, and `InspectionJob` CRDs.
 
 ### Helm
-Kubernetes package manager. One deployment method for Hyper2KVM.
+Kubernetes package manager. One deployment method for H2KVM.
 
 ### Job
-Kubernetes resource for running batch tasks. Hyper2KVM migrations run as Kubernetes Jobs.
+Kubernetes resource for running batch tasks. H2KVM migrations run as Kubernetes Jobs.
 
 ### Namespace
-Kubernetes logical cluster division. Hyper2KVM typically runs in dedicated namespaces.
+Kubernetes logical cluster division. H2KVM typically runs in dedicated namespaces.
 
 ### OLM (Operator Lifecycle Manager)
-Framework for managing Kubernetes operators. Alternative deployment method for Hyper2KVM.
+Framework for managing Kubernetes operators. Alternative deployment method for H2KVM.
 
 ### OpenShift
 Red Hat's Kubernetes distribution with additional enterprise features.
 
 ### Operator
-Kubernetes extension for managing complex applications. Hyper2KVM provides operators for automation.
+Kubernetes extension for managing complex applications. H2KVM provides operators for automation.
 
 ### PVC (PersistentVolumeClaim)
 Kubernetes resource for requesting persistent storage for migration artifacts.
 
 ### Worker Node
-Kubernetes node that runs workload pods. Hyper2KVM workers run on worker nodes.
+Kubernetes node that runs workload pods. H2KVM workers run on worker nodes.
 
 ### Worker Protocol
-Hyper2KVM's REST API for job submission and management in Kubernetes environments.
+H2KVM's REST API for job submission and management in Kubernetes environments.
 
 ---
 
 ## Operating Systems
 
 ### CentOS
-Community Enterprise Operating System - free derivative of RHEL. Well-supported by Hyper2KVM.
+Community Enterprise Operating System - free derivative of RHEL. Well-supported by H2KVM.
 
 ### Photon OS
 VMware's minimal Linux distribution optimized for cloud-native applications.
@@ -329,17 +329,17 @@ SUSE Linux Enterprise Server - enterprise Linux distribution with full support.
 Popular Debian-based Linux distribution. Supported including Ubuntu 24.04.
 
 ### Windows
-Microsoft Windows operating systems. Hyper2KVM supports Windows Server and Desktop editions with VirtIO driver injection.
+Microsoft Windows operating systems. H2KVM supports Windows Server and Desktop editions with VirtIO driver injection.
 
 ---
 
 ## Tools & Utilities
 
 ### h2kvmctl
-Hyper2KVM's command-line interface tool for migrations and management.
+H2KVM's command-line interface tool for migrations and management.
 
 ### GRUB (GRand Unified Bootloader)
-Linux bootloader. Hyper2KVM can regenerate GRUB configuration for the new platform.
+Linux bootloader. H2KVM can regenerate GRUB configuration for the new platform.
 
 ### JSON Schema
 Formal specification for JSON document structure. Used for artifact manifest validation.
@@ -351,13 +351,13 @@ Linux utility for listing block devices. Used in migration diagnostics.
 QEMU disk image utility for conversion, compression, and manipulation.
 
 ### systemd
-Modern Linux init system and service manager. Hyper2KVM integrates as a systemd service.
+Modern Linux init system and service manager. H2KVM integrates as a systemd service.
 
 ### TUI (Text User Interface)
-Hyper2KVM's interactive terminal interface for user-friendly migrations.
+H2KVM's interactive terminal interface for user-friendly migrations.
 
 ### VMDK Inspector
-Hyper2KVM tool for analyzing VMDK files before migration to detect potential issues.
+H2KVM tool for analyzing VMDK files before migration to detect potential issues.
 
 ### YAML
 YAML Ain't Markup Language - human-readable data serialization format used for migration manifests.
@@ -455,7 +455,7 @@ Found a missing term? Want to improve a definition?
 ## Version Information
 
 **Last Updated**: March 2026
-**Hyper2KVM Version**: 0.3.0
+**H2KVM Version**: 0.3.0
 **Total Terms**: 150+
 **Categories**: 10
 

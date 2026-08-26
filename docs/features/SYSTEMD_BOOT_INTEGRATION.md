@@ -6,7 +6,7 @@
 
 ## Overview
 
-Comprehensive systemd boot-time integration for hyper2kvm, providing advanced partition management, filesystem optimization, first-boot configuration, and boot performance analysis for migrated VMs.
+Comprehensive systemd boot-time integration for h2kvm, providing advanced partition management, filesystem optimization, first-boot configuration, and boot performance analysis for migrated VMs.
 
 ## Features
 
@@ -213,7 +213,7 @@ class BootEnvironment:
 ### Quick Start
 
 ```python
-from hyper2kvm.systemd import (
+from h2kvm.systemd import (
     SystemdBootIntegration,
     BootEnvironment,
     BootType,
@@ -285,7 +285,7 @@ h2kvmctl.systemd.cli integrate-repair \
 ### Integration with VM Repair
 
 ```python
-from hyper2kvm.systemd import integrate_with_vm_repair
+from h2kvm.systemd import integrate_with_vm_repair
 
 # Simple one-line integration
 success = integrate_with_vm_repair(
@@ -302,11 +302,11 @@ success = integrate_with_vm_repair(
 
 | Unit Type | Location | Example |
 |-----------|----------|---------|
-| Service | `/etc/systemd/system/*.service` | `hyper2kvm-repair.service` |
+| Service | `/etc/systemd/system/*.service` | `h2kvm-repair.service` |
 | Mount | `/etc/systemd/system/*.mount` | `var-lib-data.mount` |
-| Timer | `/etc/systemd/system/*.timer` | `hyper2kvm-repair.timer` |
-| Path | `/etc/systemd/system/*.path` | `hyper2kvm-vmdk.path` |
-| Socket | `/etc/systemd/system/*.socket` | `hyper2kvm-repair.socket` |
+| Timer | `/etc/systemd/system/*.timer` | `h2kvm-repair.timer` |
+| Path | `/etc/systemd/system/*.path` | `h2kvm-vmdk.path` |
+| Socket | `/etc/systemd/system/*.socket` | `h2kvm-repair.socket` |
 
 ### Configuration Directories
 
@@ -321,7 +321,7 @@ success = integrate_with_vm_repair(
 ### Example 1: Standard VM Preparation
 
 ```python
-from hyper2kvm.systemd import (
+from h2kvm.systemd import (
     SystemdBootIntegration,
     BootEnvironment,
     BootType,
@@ -348,7 +348,7 @@ results = integration.apply_all_features(
 ### Example 2: Cloud Image Preparation
 
 ```python
-from hyper2kvm.systemd import (
+from h2kvm.systemd import (
     SystemdRepartManager,
     SystemdGrowfsManager,
     PartitionType,
@@ -376,7 +376,7 @@ growfs.configure_growfs([
 ### Example 3: Performance Analysis
 
 ```python
-from hyper2kvm.systemd import BootPerformanceAnalyzer
+from h2kvm.systemd import BootPerformanceAnalyzer
 
 analyzer = BootPerformanceAnalyzer()
 
@@ -486,7 +486,7 @@ if sum(boot_time.values()) > 60000:  # >60s
 
 ```bash
 # Install systemd Python bindings
-pip install 'hyper2kvm[systemd]'
+pip install 'h2kvm[systemd]'
 ```
 
 #### 2. Permission denied
@@ -537,7 +537,7 @@ systemd-machine-id-setup --root=/mnt/vmroot
 ### After (Automated)
 
 ```python
-from hyper2kvm.systemd import integrate_with_vm_repair
+from h2kvm.systemd import integrate_with_vm_repair
 
 integrate_with_vm_repair(
     vm_name="my-vm",
@@ -548,9 +548,9 @@ integrate_with_vm_repair(
 
 ## Integration Points
 
-### With Hyper2KVM Workflow
+### With H2KVM Workflow
 
-The systemd boot integration is designed to integrate seamlessly with the hyper2kvm VM repair workflow:
+The systemd boot integration is designed to integrate seamlessly with the h2kvm VM repair workflow:
 
 1. **Post-Conversion**: After VMDK→QCOW2 conversion
 2. **Post-Mount**: After root filesystem is mounted
@@ -558,7 +558,7 @@ The systemd boot integration is designed to integrate seamlessly with the hyper2
 
 ```python
 # In VM repair workflow
-from hyper2kvm.systemd import SystemdBootIntegration
+from h2kvm.systemd import SystemdBootIntegration
 
 # After mounting root filesystem
 integration = SystemdBootIntegration(mount_point, vm_name)
@@ -567,7 +567,7 @@ integration.apply_all_features(boot_env, auto_grow_mounts=["/"])
 
 ## Related Documentation
 
-- [Systemd Integration README](../../hyper2kvm/systemd/README.md)
+- [Systemd Integration README](../../h2kvm/systemd/README.md)
 - [Boot Integration Examples](../../examples/systemd_boot_integration_examples.py)
 - [LVM Enterprise Improvements](../LVM_AND_ENTERPRISE_IMPROVEMENTS.md)
 - [Test Results](../test-results/README.md)

@@ -21,18 +21,18 @@ Status:          ⚠️ Disk Pressure (blocking pod scheduling)
 ### Current Deployment Status
 
 **CRDs Installed:**
-- ✅ `migrationjobs.hyper2kvm.io`
-- ✅ `jobtemplates.hyper2kvm.io`
+- ✅ `migrationjobs.h2kvm.io`
+- ✅ `jobtemplates.h2kvm.io`
 
 **RBAC Configured:**
-- ✅ ClusterRole: `hyper2kvm-operator`
-- ✅ ClusterRoleBinding: `hyper2kvm-operator`
-- ✅ ServiceAccount: `hyper2kvm-operator` (namespace: hyper2kvm-test)
+- ✅ ClusterRole: `h2kvm-operator`
+- ✅ ClusterRoleBinding: `h2kvm-operator`
+- ✅ ServiceAccount: `h2kvm-operator` (namespace: h2kvm-test)
 
 **Operator Deployment:**
 - ⚠️ **Status:** Pending (blocked by disk pressure)
-- **Image:** `ghcr.io/ssahani/hyper2kvm:2.1.0-operator`
-- **Namespace:** `hyper2kvm-test`
+- **Image:** `ghcr.io/ssahani/h2kvm:2.1.0-operator`
+- **Namespace:** `h2kvm-test`
 - **Issue:** `0/1 nodes available: 1 node(s) had untolerated taint {node.kubernetes.io/disk-pressure}`
 
 ---
@@ -45,11 +45,11 @@ Status:          ⚠️ Disk Pressure (blocking pod scheduling)
 
 **MigrationJob Manifest:**
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: photon-inspect
-  namespace: hyper2kvm-test
+  namespace: h2kvm-test
 spec:
   operation: inspect
   image:
@@ -88,11 +88,11 @@ spec:
 
 **MigrationJob Manifest:**
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: photon-convert
-  namespace: hyper2kvm-test
+  namespace: h2kvm-test
 spec:
   operation: convert
   image:
@@ -119,11 +119,11 @@ spec:
 
 **MigrationJob Manifest:**
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: photon-offline-fix
-  namespace: hyper2kvm-test
+  namespace: h2kvm-test
 spec:
   operation: offline_fix
   image:
@@ -167,17 +167,17 @@ kubectl apply -f /tmp/simple-operator-deploy.yaml
 
 # Wait for operator to be ready
 kubectl wait --for=condition=ready pod \
-  -l app=hyper2kvm-operator \
-  -n hyper2kvm-test \
+  -l app=h2kvm-operator \
+  -n h2kvm-test \
   --timeout=5m
 
 # Create test migration job
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: photon-inspect
-  namespace: hyper2kvm-test
+  namespace: h2kvm-test
 spec:
   operation: inspect
   image:
@@ -191,8 +191,8 @@ spec:
 EOF
 
 # Monitor job
-kubectl get migrationjob photon-inspect -n hyper2kvm-test -w
-kubectl describe migrationjob photon-inspect -n hyper2kvm-test
+kubectl get migrationjob photon-inspect -n h2kvm-test -w
+kubectl describe migrationjob photon-inspect -n h2kvm-test
 ```
 
 ### Option 2: Helm Deployment (Production)
@@ -201,8 +201,8 @@ kubectl describe migrationjob photon-inspect -n hyper2kvm-test
 export KUBECONFIG=$HOME/.crc/machines/crc/kubeconfig
 
 # Install operator with Helm
-helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-test \
+helm install h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-test \
   --create-namespace \
   --set openshift.enabled=true \
   --set webhook.enabled=false \
@@ -263,7 +263,7 @@ Deploy to a production OpenShift cluster with adequate resources (40GB+ disk per
 
 **Symptom:**
 ```
-Failed to pull image "ghcr.io/ssahani/hyper2kvm:2.1.0-operator"
+Failed to pull image "ghcr.io/ssahani/h2kvm:2.1.0-operator"
 ```
 
 **Solution:**
@@ -272,8 +272,8 @@ Failed to pull image "ghcr.io/ssahani/hyper2kvm:2.1.0-operator"
 # Visit: https://github.com/ssahani?tab=packages
 
 # Or load image locally
-docker pull ghcr.io/ssahani/hyper2kvm:2.1.0-operator
-crc podman load -i <(docker save ghcr.io/ssahani/hyper2kvm:2.1.0-operator)
+docker pull ghcr.io/ssahani/h2kvm:2.1.0-operator
+crc podman load -i <(docker save ghcr.io/ssahani/h2kvm:2.1.0-operator)
 ```
 
 ### Issue 3: SecurityContextConstraints Violations
@@ -290,7 +290,7 @@ kubectl apply -f - <<EOF
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
 metadata:
-  name: hyper2kvm-operator-scc
+  name: h2kvm-operator-scc
 allowPrivilegedContainer: false
 allowHostNetwork: false
 allowHostPorts: false
@@ -311,7 +311,7 @@ volumes:
   - emptyDir
   - secret
 users:
-  - system:serviceaccount:hyper2kvm-test:hyper2kvm-operator
+  - system:serviceaccount:h2kvm-test:h2kvm-operator
 EOF
 ```
 
@@ -323,19 +323,19 @@ While resolving cluster issues, test locally with CLI:
 
 ```bash
 # Inspect photon.vmdk
-h2kvmctl inspect /home/ssahani/tt/hyper2kvm/photon.vmdk \
+h2kvmctl inspect /home/ssahani/tt/h2kvm/photon.vmdk \
   --output-format json > photon-inspection.json
 
 # Convert to QCOW2
 h2kvmctl convert \
-  --vmdk /home/ssahani/tt/hyper2kvm/photon.vmdk \
+  --vmdk /home/ssahani/tt/h2kvm/photon.vmdk \
   --output-dir /tmp/photon-output \
   --to-output photon.qcow2 \
   --out-format qcow2
 
 # Apply offline fixes
 h2kvmctl offline-fix \
-  --vmdk /home/ssahani/tt/hyper2kvm/photon.vmdk \
+  --vmdk /home/ssahani/tt/h2kvm/photon.vmdk \
   --output-dir /tmp/photon-fixed \
   --to-output photon-fixed.qcow2 \
   --fstab-mode stabilize-all \
@@ -399,7 +399,7 @@ h2kvmctl offline-fix \
 
 **Location of photon.vmdk:**
 ```
-/home/ssahani/tt/hyper2kvm/photon.vmdk (974MB)
+/home/ssahani/tt/h2kvm/photon.vmdk (974MB)
 ```
 
 **Expected Output Location:**
@@ -421,8 +421,8 @@ h2kvmctl offline-fix \
 
 **Test Status:** ⚠️ Ready (waiting for cluster disk space)
 **Operator Version:** v0.3.1
-**Images Available:** ✅ ghcr.io/ssahani/hyper2kvm:2.1.0-operator
-**CRDs Installed:** ✅ migrationjobs.hyper2kvm.io, jobtemplates.hyper2kvm.io
+**Images Available:** ✅ ghcr.io/ssahani/h2kvm:2.1.0-operator
+**CRDs Installed:** ✅ migrationjobs.h2kvm.io, jobtemplates.h2kvm.io
 
 When disk space is available, run:
 ```bash

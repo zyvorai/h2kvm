@@ -1,13 +1,13 @@
 # Worker Job Protocol - Quick Start Guide
 
-Get up and running with the hyper2kvm Worker Job Protocol in 5 minutes.
+Get up and running with the h2kvm Worker Job Protocol in 5 minutes.
 
 ---
 
 ## Step 1: Check Your Environment
 
 ```bash
-cd /home/ssahani/tt/hyper2kvm
+cd /home/ssahani/tt/h2kvm
 h2kvmctl.worker.cli capabilities
 ```
 

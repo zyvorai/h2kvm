@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Container isolation for LVM operations enabled by default (`DEFAULT_CONTAINER_ISOLATION = True`)
-- `container_isolation` setting in `/etc/hyper2kvm/config.yaml`
+- `container_isolation` setting in `/etc/h2kvm/config.yaml`
 - 754 new unit tests across core, vmcraft, containers, pipeline, converters, and fixers
 - Debian packaging: install daemon.yaml, modprobe, sysctl, and systemd-limits configs
 - Debian packaging: add podman/docker as Suggests
@@ -62,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Windows always SATA** — removed two-stage (bootstrap/final) deployment; Windows VMs always use SATA disk + e1000e network (no VirtIO without injected drivers)
 - **Default `net_model` for Windows** changed from `virtio` to `e1000e` in `WindowsDomainConfig` and domain emitter
 - **Domain emitter** always uses `stage=bootstrap` for Windows (SATA safe boot)
-- **`/var/lib/hyper2kvm/` permissions** — set 755 so QEMU (uid 107) can access disk images for libvirt VMs
+- **`/var/lib/h2kvm/` permissions** — set 755 so QEMU (uid 107) can access disk images for libvirt VMs
 - **`deploy-remote.sh` sudo** — all privileged operations (pip, systemctl, mkdir, install) now use sudo when USER != root
 - **h2kvmctl at `/usr/local/bin/`** — copy binary to /usr/local/bin instead of symlink so systemd service finds it
 
@@ -88,12 +88,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Netplan fixer: replace hardcoded VMware NIC names with match pattern
 - LUKS migration guide
 - AlmaLinux setup script
-- **Cached VirtIO ISO extraction** — one-time bsdtar extraction to `/var/lib/hyper2kvm/virtio-win-extracted/` with Rock Ridge name support; reused on all subsequent Windows migrations
+- **Cached VirtIO ISO extraction** — one-time bsdtar extraction to `/var/lib/h2kvm/virtio-win-extracted/` with Rock Ridge name support; reused on all subsequent Windows migrations
 - **VMCraft hivex API shim** — `hivex_open/close/root/node_*/value_*` methods on VMCraft class, enabling Windows registry access (RDP check, network snapshot, firewall staging) without guestfs
 - **`deploy-remote.sh`** — one-command remote deployment: rsync repo, run quickstart.sh + install-deps.sh, pip install, verify (supports `--quick` mode for redeploy)
 - **`ami_download_migrate.sh`** — download + migrate + boot demo for Photon/Ubuntu/Fedora AMIs (no AWS credentials needed)
 - **`aws_ec2_migration.py`** — CLI example for EC2 → KVM with argparse, progress bar, multi-instance
-- **AWS EC2 provider** (`hyper2kvm/providers/aws_ec2/`) — production-grade EC2 → KVM migration with boto3 client, retry with exponential backoff, EBS snapshot + ExportImage + S3 download pipeline, resume via state files, multi-disk support, JSON report, cleanup in finally, 51 moto-based tests
+- **AWS EC2 provider** (`h2kvm/providers/aws_ec2/`) — production-grade EC2 → KVM migration with boto3 client, retry with exponential backoff, EBS snapshot + ExportImage + S3 download pipeline, resume via state files, multi-disk support, JSON report, cleanup in finally, 51 moto-based tests
 - **AMI to KVM migration** — download Photon OS / Ubuntu / RHEL AMI tar.gz, extract raw disk, migrate with offline fixes and libvirt deploy
 - **Client presentation #61** — AMI to KVM Migration (8-page landscape PDF with live demo results)
 - **KUBEVIRT_DEPLOY pipeline stage** (Stage 7) — when `pipeline.kubevirt.enabled` is true in a manifest, the daemon generates a KubeVirt `VirtualMachine` CR and applies it via `kubectl`
@@ -201,7 +201,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Package Structure:**
 ```
-hyper2kvm/
+h2kvm/
 ├── core/              # Foundation (utilities, logging, validation)
 ├── vmcraft/           # VM analysis/modification API (promoted)
 ├── providers/         # Source providers (consolidated)
@@ -254,14 +254,14 @@ hyper2kvm/
 **Migration guide:**
 ```python
 # Old imports (no longer work)
-from hyper2kvm.modes.inventory_mode import InventoryMode
-from hyper2kvm.orchestrator import Orchestrator
-from hyper2kvm.vmware import VMwareClient
+from h2kvm.modes.inventory_mode import InventoryMode
+from h2kvm.orchestrator import Orchestrator
+from h2kvm.vmware import VMwareClient
 
 # New imports (required)
-from hyper2kvm.orchestration.modes.inventory import InventoryMode
-from hyper2kvm.orchestration import Orchestrator
-from hyper2kvm.providers.vmware import VMwareClient
+from h2kvm.orchestration.modes.inventory import InventoryMode
+from h2kvm.orchestration import Orchestrator
+from h2kvm.providers.vmware import VMwareClient
 ```
 
 ## [2.2.0] - 2026-01-31
@@ -269,7 +269,7 @@ from hyper2kvm.providers.vmware import VMwareClient
 ### Added - Adaptive Worker System
 
 - **Three-Tier Capability Detection** - Automatic environment capability detection
-  - `hyper2kvm/worker/capabilities.py` - CapabilityLevel enum and detection logic (+340 lines)
+  - `h2kvm/worker/capabilities.py` - CapabilityLevel enum and detection logic (+340 lines)
   - Progressive NBD detection (module → device → partition devices)
   - Three capability levels:
     - **USERSPACE_ONLY** - Basic VMDK → QCOW2 conversion
@@ -279,14 +279,14 @@ from hyper2kvm.providers.vmware import VMwareClient
   - Zero configuration required - automatic detection
 
 - **Adaptive Worker Execution** - Graceful degradation based on environment
-  - `hyper2kvm/worker/engine.py` - Integrated capability detection (+340 lines)
+  - `h2kvm/worker/engine.py` - Integrated capability detection (+340 lines)
   - Automatic adaptation from full offline fixes to inspection-only mode
   - Clear user warnings for skipped operations (not errors)
   - Transparent operation with detailed feedback
   - Progressive enhancement when deployed to better environments
 
 - **OfflineFSFix Integration** - Complete integration with worker engine
-  - `hyper2kvm/worker/engine.py` - OfflineFSFix integration (+154 lines)
+  - `h2kvm/worker/engine.py` - OfflineFSFix integration (+154 lines)
   - Replaced TODO placeholder with full implementation
   - 17 parameters integrated from job spec
   - 5 progress events for user feedback
@@ -367,14 +367,14 @@ Check 3: Partition devices created (/dev/nbd0p1)?
 ### Added - OpenShift Support
 
 - **OpenShift Route Support** - Native Routes for external access
-  - `helm/hyper2kvm-operator/templates/openshift-route.yaml` - Route templates for metrics and webhooks
+  - `helm/h2kvm-operator/templates/openshift-route.yaml` - Route templates for metrics and webhooks
   - TLS termination support (edge, passthrough, reencrypt)
   - Custom hostname configuration
   - Insecure traffic policy options
   - Automatic route creation for operator services
 
 - **SecurityContextConstraints (SCC)** - Privileged worker support
-  - `helm/hyper2kvm-operator/templates/openshift-scc.yaml` - SCC template
+  - `helm/h2kvm-operator/templates/openshift-scc.yaml` - SCC template
   - Pre-configured SCC for worker pods requiring NBD/mount/LVM access
   - Configurable capabilities (SYS_ADMIN, SYS_MODULE, SYS_RAWIO)
   - SELinux context management
@@ -382,11 +382,11 @@ Check 3: Partition devices created (/dev/nbd0p1)?
   - RBAC integration for SCC usage
 
 - **OLM (Operator Lifecycle Manager) Bundle** - OperatorHub deployment
-  - `olm/bundle/manifests/hyper2kvm-operator.clusterserviceversion.yaml` - ClusterServiceVersion (900+ lines)
+  - `olm/bundle/manifests/h2kvm-operator.clusterserviceversion.yaml` - ClusterServiceVersion (900+ lines)
   - `olm/bundle/metadata/annotations.yaml` - Bundle metadata
   - `olm/bundle/tests/scorecard/config.yaml` - Scorecard test configuration
   - `olm/bundle.Dockerfile` - Bundle image Dockerfile
-  - `olm/hyper2kvm-operator.package.yaml` - Package manifest
+  - `olm/h2kvm-operator.package.yaml` - Package manifest
   - OperatorHub integration with install modes (OwnNamespace, SingleNamespace, AllNamespaces)
   - Webhook definitions (validating + mutating)
   - CRD ownership and UI descriptors
@@ -396,7 +396,7 @@ Check 3: Partition devices created (/dev/nbd0p1)?
   - Two channels: stable (default) and preview
 
 - **OAuth Proxy Integration** - Authenticated metrics access
-  - `helm/hyper2kvm-operator/templates/openshift-oauth-proxy.yaml` - OAuth resources
+  - `helm/h2kvm-operator/templates/openshift-oauth-proxy.yaml` - OAuth resources
   - OAuth sidecar container for operator pods
   - Automatic ServiceAccount OAuth integration
   - TLS certificate management via OpenShift annotations
@@ -404,7 +404,7 @@ Check 3: Partition devices created (/dev/nbd0p1)?
   - Session secret management
 
 - **Platform Detection** - Automatic OpenShift detection
-  - `helm/hyper2kvm-operator/templates/_helpers.tpl` - Detection helper functions
+  - `helm/h2kvm-operator/templates/_helpers.tpl` - Detection helper functions
   - Automatic OpenShift API detection via Capabilities
   - Conditional resource rendering (Route vs Ingress)
   - Platform-specific annotations and labels
@@ -480,7 +480,7 @@ Check 3: Partition devices created (/dev/nbd0p1)?
 
 ### Added
 - **Priority Preemption** - Job priority management (IMPLEMENTED)
-  - `hyper2kvm/operator/priority_manager.py` - Priority and preemption logic (350+ lines)
+  - `h2kvm/operator/priority_manager.py` - Priority and preemption logic (350+ lines)
   - Job priority levels (0-100): CRITICAL, HIGH, NORMAL, LOW, BACKGROUND
   - Preemption policies: Never, Lower, SameOrLower, Always
   - Automatic preemption of lower-priority running jobs
@@ -495,7 +495,7 @@ Check 3: Partition devices created (/dev/nbd0p1)?
   - ServiceMonitor for Prometheus integration
 
 - **Advanced Retry Logic** - Sophisticated retry mechanism (IMPLEMENTED)
-  - `hyper2kvm/operator/retry_manager.py` - Retry logic and backoff (280+ lines)
+  - `h2kvm/operator/retry_manager.py` - Retry logic and backoff (280+ lines)
   - Exponential, linear, and fixed backoff strategies
   - Configurable retry budgets
   - Failure threshold tracking (time-windowed)
@@ -504,7 +504,7 @@ Check 3: Partition devices created (/dev/nbd0p1)?
   - Retry history tracking
 
 - **Cost & SLA Tracking** - Resource cost monitoring (IMPLEMENTED)
-  - `hyper2kvm/operator/cost_tracker.py` - Cost calculation and SLA monitoring (350+ lines)
+  - `h2kvm/operator/cost_tracker.py` - Cost calculation and SLA monitoring (350+ lines)
   - Automatic cost calculation (compute, storage, network)
   - Configurable cost rates
   - SLA definition and compliance checking
@@ -514,7 +514,7 @@ Check 3: Partition devices created (/dev/nbd0p1)?
 
 - **Job Templating** - Reusable job templates (IMPLEMENTED)
   - `k8s/operator/crds/jobtemplate.yaml` - JobTemplate CRD
-  - `hyper2kvm/operator/template_manager.py` - Template management (320+ lines)
+  - `h2kvm/operator/template_manager.py` - Template management (320+ lines)
   - Parameterized job templates
   - Parameter validation (type, pattern, range)
   - Template instantiation with parameter substitution
@@ -522,7 +522,7 @@ Check 3: Partition devices created (/dev/nbd0p1)?
   - Template library
 
 - **Backup/Restore** - Operator state backup (IMPLEMENTED)
-  - `hyper2kvm/operator/backup_manager.py` - Backup and restore logic (320+ lines)
+  - `h2kvm/operator/backup_manager.py` - Backup and restore logic (320+ lines)
   - Automated state backups
   - Compressed backup format (gzip)
   - Backup validation
@@ -579,8 +579,8 @@ Check 3: Partition devices created (/dev/nbd0p1)?
 
 ### Added
 - **Job Dependencies** - Advanced job scheduling with dependencies
-  - `hyper2kvm/operator/dag_validator.py` - DAG validation and cycle detection (400+ lines)
-  - `hyper2kvm/operator/dependency_manager.py` - Dependency management (280+ lines)
+  - `h2kvm/operator/dag_validator.py` - DAG validation and cycle detection (400+ lines)
+  - `h2kvm/operator/dependency_manager.py` - Dependency management (280+ lines)
   - Jobs can declare dependencies via `dependsOn` field in CRD
   - Automatic DAG validation (cycle detection, missing references)
   - Smart dependency resolution and execution ordering
@@ -601,15 +601,15 @@ Check 3: Partition devices created (/dev/nbd0p1)?
   - Execution statistics
 
 - **Enhanced Metrics** - Dependency tracking
-  - `hyper2kvm_operator_dag_total_jobs` - Total jobs in DAG
-  - `hyper2kvm_operator_dag_ready_jobs` - Jobs ready to execute
-  - `hyper2kvm_operator_dag_blocked_jobs` - Jobs blocked by dependencies
-  - `hyper2kvm_operator_dag_max_depth` - Maximum DAG depth
-  - `hyper2kvm_operator_dag_parallelism_potential` - Max parallel jobs
-  - `hyper2kvm_operator_dependency_violations_total` - Validation failures
-  - `hyper2kvm_operator_dependency_failures_propagated_total` - Propagated failures
-  - `hyper2kvm_operator_job_dependency_count` - Dependencies per job (histogram)
-  - `hyper2kvm_operator_dependency_wait_time_seconds` - Wait time for dependencies
+  - `h2kvm_operator_dag_total_jobs` - Total jobs in DAG
+  - `h2kvm_operator_dag_ready_jobs` - Jobs ready to execute
+  - `h2kvm_operator_dag_blocked_jobs` - Jobs blocked by dependencies
+  - `h2kvm_operator_dag_max_depth` - Maximum DAG depth
+  - `h2kvm_operator_dag_parallelism_potential` - Max parallel jobs
+  - `h2kvm_operator_dependency_violations_total` - Validation failures
+  - `h2kvm_operator_dependency_failures_propagated_total` - Propagated failures
+  - `h2kvm_operator_job_dependency_count` - Dependencies per job (histogram)
+  - `h2kvm_operator_dependency_wait_time_seconds` - Wait time for dependencies
 
 - **Comprehensive Testing**
   - `tests/test_dag_validator.py` - Unit tests (500+ lines, 30+ tests)
@@ -644,20 +644,20 @@ Check 3: Partition devices created (/dev/nbd0p1)?
 
 ### Added
 - **Leader Election** - Kubernetes-native HA for operator
-  - `hyper2kvm/operator/leader_election.py` - Complete leader election implementation (520 lines)
-  - `hyper2kvm/operator/leader_aware_controller.py` - Controller integration (200 lines)
+  - `h2kvm/operator/leader_election.py` - Complete leader election implementation (520 lines)
+  - `h2kvm/operator/leader_aware_controller.py` - Controller integration (200 lines)
   - Uses Kubernetes Lease API (coordination.k8s.io/v1)
   - Automatic leader failover (<20 seconds)
   - Graceful leadership handoff
   - Configurable lease duration, renew deadline, retry period
 
 - **Enhanced Metrics** - Leader election tracking
-  - `hyper2kvm_operator_leader_election_enabled` - LE status
-  - `hyper2kvm_operator_is_leader` - Leadership status
-  - `hyper2kvm_operator_leader_transitions_total` - Transition count
-  - `hyper2kvm_operator_lease_renewal_total` - Renewal attempts
-  - `hyper2kvm_operator_lease_acquisition_total` - Acquisition attempts
-  - `hyper2kvm_operator_time_since_last_renewal_seconds` - Renewal staleness
+  - `h2kvm_operator_leader_election_enabled` - LE status
+  - `h2kvm_operator_is_leader` - Leadership status
+  - `h2kvm_operator_leader_transitions_total` - Transition count
+  - `h2kvm_operator_lease_renewal_total` - Renewal attempts
+  - `h2kvm_operator_lease_acquisition_total` - Acquisition attempts
+  - `h2kvm_operator_time_since_last_renewal_seconds` - Renewal staleness
 
 - **Multi-Replica Support** - HA operator deployments
   - Run 2+ operator replicas for high availability
@@ -693,7 +693,7 @@ Check 3: Partition devices created (/dev/nbd0p1)?
   - `scripts/bump-chart-version.sh` - Semantic version bumping for charts (350 lines)
   - `.github/workflows/helm-release.yml` - Automated release workflow (150 lines)
   - `docs/deployment/helm-repository.md` - Complete repository usage guide (500+ lines)
-  - GitHub Pages Helm repository at `https://ssahani.github.io/hyper2kvm`
+  - GitHub Pages Helm repository at `https://ssahani.github.io/h2kvm`
 
 - **Release Automation**
   - Automated chart linting in CI/CD
@@ -746,22 +746,22 @@ Check 3: Partition devices created (/dev/nbd0p1)?
 
 - **Documentation**
   - `docs/deployment/v1.6.0-helm-chart.md` - Complete deployment guide (800+ lines)
-  - `helm/hyper2kvm-operator/README.md` - Chart usage guide (500+ lines)
+  - `helm/h2kvm-operator/README.md` - Chart usage guide (500+ lines)
   - Installation, upgrade, troubleshooting, and production considerations
 
 ## [1.5.0] - 2026-01-30
 
 ### Added
 - **Admission Webhooks** - Validation and mutation
-  - `hyper2kvm/operator/webhook.py` - Validation and mutation logic (400 lines)
-  - `hyper2kvm/operator/webhook_server.py` - Flask webhook server (150 lines)
+  - `h2kvm/operator/webhook.py` - Validation and mutation logic (400 lines)
+  - `h2kvm/operator/webhook_server.py` - Flask webhook server (150 lines)
   - Validating webhook with 10+ validation rules
   - Mutating webhook with 6+ default value injections
   - Resource quota enforcement (10 active jobs per namespace, configurable)
   - Worker capacity checking before job creation
 
 - **Enhanced Operator Metrics**
-  - `hyper2kvm/operator/metrics.py` - Operator-specific metrics (300 lines)
+  - `h2kvm/operator/metrics.py` - Operator-specific metrics (300 lines)
   - 20+ Prometheus metrics for operator performance
   - Webhook metrics (validations, mutations, duration)
   - Queue depth and worker utilization tracking
@@ -782,9 +782,9 @@ Check 3: Partition devices created (/dev/nbd0p1)?
 
 ### Added
 - **Kubernetes Operator** - Automated job orchestration
-  - `hyper2kvm/operator/controller.py` - Kopf-based controller (600 lines)
-  - `hyper2kvm/operator/worker_registry.py` - Worker tracking (150 lines)
-  - `hyper2kvm/operator/job_assigner.py` - 100-point scoring algorithm (200 lines)
+  - `h2kvm/operator/controller.py` - Kopf-based controller (600 lines)
+  - `h2kvm/operator/worker_registry.py` - Worker tracking (150 lines)
+  - `h2kvm/operator/job_assigner.py` - 100-point scoring algorithm (200 lines)
   - Job reconciliation loop (30-second interval)
   - Automated worker discovery
   - Intelligent job assignment based on worker load and capabilities
@@ -815,7 +815,7 @@ Check 3: Partition devices created (/dev/nbd0p1)?
 **Solution**:
 - Added `--conversion-dir` CLI argument
 - Added `conversion_dir` config file option
-- Default changed to `~/.cache/hyper2kvm/conversions` (per-user isolation)
+- Default changed to `~/.cache/h2kvm/conversions` (per-user isolation)
 - Full parameter flow: CLI → Orchestrator → OfflineFixer → VMCraft → NBDDeviceManager
 
 **Configuration Examples**:
@@ -830,13 +830,13 @@ conversion_dir: ~/large-disk/vmcraft-temp
 **Dedicated User Setup**:
 ```bash
 # For daemon/service deployments
-sudo useradd -r -m -d /var/lib/hyper2kvm -s /bin/bash hyper2kvm
-sudo mkdir -p /var/lib/hyper2kvm/conversions
-sudo chown hyper2kvm:hyper2kvm /var/lib/hyper2kvm/conversions
-sudo usermod -a -G kvm,qemu,disk,libvirt hyper2kvm
+sudo useradd -r -m -d /var/lib/h2kvm -s /bin/bash h2kvm
+sudo mkdir -p /var/lib/h2kvm/conversions
+sudo chown h2kvm:h2kvm /var/lib/h2kvm/conversions
+sudo usermod -a -G kvm,qemu,disk,libvirt h2kvm
 
 # Configure conversion directory
-echo "conversion_dir: /var/lib/hyper2kvm/conversions" >> config.yaml
+echo "conversion_dir: /var/lib/h2kvm/conversions" >> config.yaml
 ```
 
 **Benefits**:
@@ -850,7 +850,7 @@ echo "conversion_dir: /var/lib/hyper2kvm/conversions" >> config.yaml
 #### h2kvmctl - Primary CLI Command (January 2026)
 
 **New Primary Command for Interactive CLI Usage**:
-- Introduced `h2kvmctl` (Hyper2KVM Control) as the primary command for **interactive CLI workflows**
+- Introduced `h2kvmctl` (H2KVM Control) as the primary command for **interactive CLI workflows**
 - Follows industry-standard `*ctl` naming pattern (kubectl, helmctl, etc.)
 - Shorter: 8 characters vs 12 characters (saves typing for CLI usage)
 - Modern: Aligns with Kubernetes ecosystem conventions
@@ -861,28 +861,28 @@ echo "conversion_dir: /var/lib/hyper2kvm/conversions" >> config.yaml
   - Day-to-day command-line work
   - Follows kubectl-style naming
 
-- **`hyper2kvm`** - Primary for **daemon mode and systemd services**
-  - Background processing (`hyper2kvm daemon`)
+- **`h2kvm`** - Primary for **daemon mode and systemd services**
+  - Background processing (`h2kvm daemon`)
   - Systemd service units
   - Traditional daemon naming convention
 
 **Design Decision: Dual Entry Points (Not a Wrapper)**:
-- Both `h2kvmctl` and `hyper2kvm` call the same Python function
+- Both `h2kvmctl` and `h2kvm` call the same Python function
 - Zero performance overhead - identical functionality
 - No wrapper subprocess - direct entry point
 - Both commands maintained indefinitely - neither is deprecated
 
 **Installation**:
 ```bash
-pip install hyper2kvm
+pip install h2kvm
 # Both commands available:
 h2kvmctl --version      # For CLI usage (recommended)
-hyper2kvm --version     # For daemon mode
+h2kvm --version     # For daemon mode
 ```
 
 **TUI Commands**:
 - `h2kvmctl-tui` - Interactive TUI dashboard
-- `hyper2kvm-tui` - Alternative TUI name (same functionality)
+- `h2kvm-tui` - Alternative TUI name (same functionality)
 
 **Documentation**:
 - Created comprehensive h2kvmctl guide: docs/guides/cli/h2kvmctl-guide.md
@@ -892,8 +892,8 @@ hyper2kvm --version     # For daemon mode
 
 **Usage Recommendations**:
 - **Interactive CLI work**: Use `h2kvmctl` (shorter, modern)
-- **Daemon mode**: Use `hyper2kvm daemon` (traditional daemon naming)
-- **Systemd services**: Use `hyper2kvm` in ExecStart (daemon convention)
+- **Daemon mode**: Use `h2kvm daemon` (traditional daemon naming)
+- **Systemd services**: Use `h2kvm` in ExecStart (daemon convention)
 - **Existing scripts**: No changes needed - both work identically
 - **No deprecation**: Both commands actively maintained for their respective purposes
 
@@ -1088,9 +1088,9 @@ Complete live migration support with minimal downtime (<5s for suitable VMs) usi
 - ✅ Migration cancellation support
 
 **Architecture**:
-- **hyper2kvm**: Orchestration layer (decision engine, workflow management, offline fixes)
+- **h2kvm**: Orchestration layer (decision engine, workflow management, offline fixes)
 - **HyperSDK**: Provider abstraction layer (VMware, Hyper-V, KVM, AWS, Azure, GCP)
-- **Clear separation**: hyper2kvm focuses on analysis and orchestration, HyperSDK handles providers
+- **Clear separation**: h2kvm focuses on analysis and orchestration, HyperSDK handles providers
 
 **Implementation Status**:
 - Phase 1 (Live Migration Decision Engine): ✅ COMPLETE
@@ -1281,11 +1281,11 @@ Comprehensive VMCraft enhancements delivering 2-3x performance improvements, par
 - ✅ Comprehensive partition/LVM APIs
 
 **Files Modified/Created**:
-- **hyper2kvm/core/vmcraft/mount.py**: Added parallel mounts + fallback
-- **hyper2kvm/core/vmcraft/nbd.py**: Added retry logic
-- **hyper2kvm/core/vmcraft/main.py**: Added caching + 30 new API methods
-- **hyper2kvm/core/vmcraft/storage.py**: Added LVMCreator class
-- **hyper2kvm/core/vmcraft/augeas_mgr.py**: NEW - Augeas integration
+- **h2kvm/core/vmcraft/mount.py**: Added parallel mounts + fallback
+- **h2kvm/core/vmcraft/nbd.py**: Added retry logic
+- **h2kvm/core/vmcraft/main.py**: Added caching + 30 new API methods
+- **h2kvm/core/vmcraft/storage.py**: Added LVMCreator class
+- **h2kvm/core/vmcraft/augeas_mgr.py**: NEW - Augeas integration
 - **tests/unit/test_core/**: 105 new tests across 8 test files
 
 **Documentation**:
@@ -1414,7 +1414,7 @@ for source_name, vm_info in plan['restore_order']:
 - Unit tests for all backup sources
 - Commvault and Acronis integrations
 - Restic/Borg native support
-- CLI integration (`hyper2kvm restore-backup`)
+- CLI integration (`h2kvm restore-backup`)
 - Web UI for DR test management
 
 **Business Value**: HIGH - Enables DR testing validation and backup-based migration workflows
@@ -1563,7 +1563,7 @@ Comprehensive database-aware migration with specialized handlers for PostgreSQL,
 
 **8. Migration Workflow Integration**:
 ```python
-from hyper2kvm.database_migration import DatabaseMigrationOrchestrator
+from h2kvm.database_migration import DatabaseMigrationOrchestrator
 
 # Initialize orchestrator
 orchestrator = DatabaseMigrationOrchestrator(logger)
@@ -1729,7 +1729,7 @@ Comprehensive compliance validation framework with CIS Benchmarks and STIG suppo
 
 **8. Integration Example**:
 ```python
-from hyper2kvm.compliance import ComplianceOrchestrator, ComplianceFramework
+from h2kvm.compliance import ComplianceOrchestrator, ComplianceFramework
 
 # Initialize orchestrator with audit logging
 orchestrator = ComplianceOrchestrator(
@@ -1894,7 +1894,7 @@ Comprehensive container extraction from VMs with automatic Kubernetes manifest g
 
 **6. Integration Example**:
 ```python
-from hyper2kvm.containers import ContainerExtractionOrchestrator
+from h2kvm.containers import ContainerExtractionOrchestrator
 
 # Initialize orchestrator
 orchestrator = ContainerExtractionOrchestrator(logger)
@@ -2097,7 +2097,7 @@ Complete rollback framework for recovering from failed migrations with snapshot 
 
 **Integration**:
 ```python
-from hyper2kvm.rollback import RollbackOrchestrator, RollbackStrategy
+from h2kvm.rollback import RollbackOrchestrator, RollbackStrategy
 
 # Create orchestrator
 orchestrator = RollbackOrchestrator(logger, snapshot_dir=Path("/snapshots"))
@@ -2229,7 +2229,7 @@ Complete CLI enhancement providing interactive migration wizard, progress tracki
 **Example Usage**:
 ```python
 # Interactive wizard
-from hyper2kvm.cli import MigrationWizard
+from h2kvm.cli import MigrationWizard
 
 wizard = MigrationWizard(logger)
 result = wizard.run(interactive=True)
@@ -2239,7 +2239,7 @@ if result.completed:
     # Use config for migration...
 
 # Progress tracking
-from hyper2kvm.cli import ProgressBar, Spinner, ProgressTracker
+from h2kvm.cli import ProgressBar, Spinner, ProgressTracker
 
 # Progress bar
 bar = ProgressBar(total=100, prefix="Copying")
@@ -2260,7 +2260,7 @@ tracker.update_stage("Analysis", 50.0)
 # Output: [16.7%] Analysis (ETA: 5m 30s)
 
 # Rich formatting
-from hyper2kvm.cli import OutputFormatter, Table
+from h2kvm.cli import OutputFormatter, Table
 
 formatter = OutputFormatter(enable_colors=True)
 formatter.print_success("Migration completed")
@@ -2272,7 +2272,7 @@ table.add_row(["vm-db-02", "✗ Failed", "2m 15s"])
 formatter.print_table(table)
 
 # Configuration management
-from hyper2kvm.cli import ConfigManager, MigrationConfig
+from h2kvm.cli import ConfigManager, MigrationConfig
 
 manager = ConfigManager(logger)
 
@@ -2285,10 +2285,10 @@ config = MigrationConfig(
 )
 
 # Save to file
-manager.save_config(config, "/etc/hyper2kvm/migration.json")
+manager.save_config(config, "/etc/h2kvm/migration.json")
 
 # Load from file
-loaded = manager.load_config("/etc/hyper2kvm/migration.json")
+loaded = manager.load_config("/etc/h2kvm/migration.json")
 
 # Validate
 errors = manager.validate_config(loaded)
@@ -2308,11 +2308,11 @@ if errors:
 - ✅ Comprehensive validation
 
 **Files Created**:
-- **hyper2kvm/cli/wizard.py**: Interactive migration wizard
-- **hyper2kvm/cli/progress.py**: Progress bars, spinners, trackers
-- **hyper2kvm/cli/formatter.py**: Rich output formatting and tables
-- **hyper2kvm/cli/config.py**: Configuration management
-- **hyper2kvm/cli/__init__.py**: Module exports
+- **h2kvm/cli/wizard.py**: Interactive migration wizard
+- **h2kvm/cli/progress.py**: Progress bars, spinners, trackers
+- **h2kvm/cli/formatter.py**: Rich output formatting and tables
+- **h2kvm/cli/config.py**: Configuration management
+- **h2kvm/cli/__init__.py**: Module exports
 - **tests/unit/test_cli_framework.py**: 31 comprehensive tests
 
 **Integration**:
@@ -2463,7 +2463,7 @@ Complete documentation restructuring with organized learning paths, comprehensiv
 - Clear progression from tutorials to recipes to API reference
 - All new features (Validation, Rollback, CLI) fully documented
 
-**Business Value**: CRITICAL - Dramatically reduces learning curve, improves user success rate, reduces support burden, enables self-service migration, positions Hyper2KVM as professional enterprise tool.
+**Business Value**: CRITICAL - Dramatically reduces learning curve, improves user success rate, reduces support burden, enables self-service migration, positions H2KVM as professional enterprise tool.
 
 
 #### Migration Validation Suite v1.0 (January 2026) - P1 Feature IMPLEMENTED ✅
@@ -2568,7 +2568,7 @@ Complete validation framework for ensuring successful VM migrations with health 
 
 **Integration**:
 ```python
-from hyper2kvm.validation import ValidationOrchestrator
+from h2kvm.validation import ValidationOrchestrator
 
 # Create orchestrator
 orchestrator = ValidationOrchestrator(logger)
@@ -2771,7 +2771,7 @@ Comprehensive Windows-specific migration support with automated license reactiva
 3. **Live Migration Implementation Plan** (live-migration-implementation-plan.md - P0 Priority):
    - **Duration**: 4-6 months (leveraging HyperSDK for provider layer)
    - **Architecture**:
-     - hyper2kvm: Orchestration layer (decision engine, workflow management)
+     - h2kvm: Orchestration layer (decision engine, workflow management)
      - HyperSDK: Provider abstraction (VMware, Hyper-V, KVM, AWS, Azure, GCP)
    - **Components**:
      - Live Migration Decision Engine (feasibility analysis, downtime estimation) - 2 weeks
@@ -3142,13 +3142,13 @@ Comprehensive Windows-specific migration support with automated license reactiva
 ### Fixed
 - **CRITICAL**: Replaced 2 bare except clauses in daemon_watcher.py with proper exception handling
 - **CRITICAL**: Replaced 43 assert statements across 11 files with proper runtime validation
-  - hyper2kvm/vmware/clients/client.py (13 asserts)
-  - hyper2kvm/vmware/utils/v2v.py (10 asserts)
-  - hyper2kvm/vmware/transports/vddk_client.py (6 asserts)
-  - hyper2kvm/converters/flatten.py (4 asserts)
-  - hyper2kvm/converters/qemu/converter.py (2 asserts)
-  - hyper2kvm/vmware/transports/ovftool_client.py (2 asserts)
-  - hyper2kvm/testers/libvirt_tester.py (2 asserts)
+  - h2kvm/vmware/clients/client.py (13 asserts)
+  - h2kvm/vmware/utils/v2v.py (10 asserts)
+  - h2kvm/vmware/transports/vddk_client.py (6 asserts)
+  - h2kvm/converters/flatten.py (4 asserts)
+  - h2kvm/converters/qemu/converter.py (2 asserts)
+  - h2kvm/vmware/transports/ovftool_client.py (2 asserts)
+  - h2kvm/testers/libvirt_tester.py (2 asserts)
   - And 4 other files (1 assert each)
 - **CRITICAL**: Added debug logging to 9 silent error suppressions in offline_fixer.py
 - GitHub Actions workflow optimization
@@ -3195,7 +3195,7 @@ We use [Semantic Versioning](https://semver.org/):
 
 ## Release Process
 
-1. Update version in `pyproject.toml` and `hyper2kvm/__init__.py`
+1. Update version in `pyproject.toml` and `h2kvm/__init__.py`
 2. Update this CHANGELOG.md
 3. Create git tag: `git tag -a v0.1.0 -m "Release 0.1.0"`
 4. Push tag: `git push origin v0.1.0`
@@ -3203,14 +3203,14 @@ We use [Semantic Versioning](https://semver.org/):
 
 ## Links
 
-- [PyPI Releases](https://pypi.org/project/hyper2kvm/#history)
-- [GitHub Releases](https://github.com/ssahani/hyper2kvm/releases)
-- [Unreleased Changes](https://github.com/ssahani/hyper2kvm/compare/v0.1.0...HEAD)
+- [PyPI Releases](https://pypi.org/project/h2kvm/#history)
+- [GitHub Releases](https://github.com/ssahani/h2kvm/releases)
+- [Unreleased Changes](https://github.com/ssahani/h2kvm/compare/v0.1.0...HEAD)
 
-[Unreleased]: https://github.com/ssahani/hyper2kvm/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/ssahani/hyper2kvm/compare/v0.0.2...v0.1.0
-[0.0.2]: https://github.com/ssahani/hyper2kvm/compare/v0.0.1...v0.0.2
-[0.0.1]: https://github.com/ssahani/hyper2kvm/releases/tag/v0.0.1
+[Unreleased]: https://github.com/ssahani/h2kvm/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/ssahani/h2kvm/compare/v0.0.2...v0.1.0
+[0.0.2]: https://github.com/ssahani/h2kvm/compare/v0.0.1...v0.0.2
+[0.0.1]: https://github.com/ssahani/h2kvm/releases/tag/v0.0.1
 
 ## [Unreleased] - 2026-02-05
 
@@ -3247,7 +3247,7 @@ We use [Semantic Versioning](https://semver.org/):
   Fixed to `hatch run pylint`, added `pylint` as a real dependency, and aligned
   `[tool.pylint.format].max-line-length` with the project's actual 120-column style.
 - **Full pylint compliance** - resolved the entire backlog surfaced once the job actually ran
-  (7,176 findings pre-config-fix, 5,724 after): whole-project `pylint hyper2kvm/` now scores a
+  (7,176 findings pre-config-fix, 5,724 after): whole-project `pylint h2kvm/` now scores a
   genuine 10.00/10, including duplicate-code and cyclic-import findings that only appear at
   whole-project scan scope. Real bugs fixed along the way include: several call sites that
   would raise `TypeError`/`ImportError` on every invocation (wrong constructor kwargs,
@@ -3265,7 +3265,7 @@ We use [Semantic Versioning](https://semver.org/):
   `_estimate_downtime`.
 - Fixed two Python `<3.12` f-string `SyntaxError`s from backslashes nested inside an outer
   f-string's substitution expression (`sql_server.py`, `examples/demo_systemd_apis.py`).
-- Synced `hyper2kvm.spec`'s `Version:` field with the package's actual `__version__` (was
+- Synced `h2kvm.spec`'s `Version:` field with the package's actual `__version__` (was
   `0.3.0`, drifted from an unrelated OLM/K8s-manifest versioning change).
 - Pinned `e2e-k8s-test.yml`'s k3s image tags to specific patch releases instead of floating
   minor-version tags that no longer resolved.

@@ -1,4 +1,4 @@
-# hyper2kvm- Documentation
+# h2kvm- Documentation
 
 Enterprise VM migration — any hypervisor to KVM
 
@@ -31,7 +31,7 @@ Part of the [Zyvor / HyperSDK platform stack](https://zyvor.dev):
 | **machina** | Bare-metal hypervisor OS |
 | **zeus-os (v9s)** | Cloud / KubeVirt control plane |
 | **forge** | AI infrastructure on K8s |
-| **hypersdk / hyper2kvm** | VM migration |
+| **hypersdk / h2kvm** | VM migration |
 | **guestkit** | Offline VM assurance |
 | **packetwolf** | Network intelligence |
 | **Aether** | Runtime portability |

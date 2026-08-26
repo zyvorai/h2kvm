@@ -74,7 +74,7 @@ to_output: vm.qcow2
 
 **Kubernetes**:
 ```yaml
-apiVersion: hyper2kvm.io/v1
+apiVersion: h2kvm.io/v1
 kind: MigrationJob
 metadata:
   name: migrate-vm
@@ -196,7 +196,7 @@ compress: false
 
 **Standalone**:
 ```bash
-pip install "hyper2kvm[full]"
+pip install "h2kvm[full]"
 h2kvmctl --version
 ```
 - ✅ Quick setup
@@ -205,8 +205,8 @@ h2kvmctl --version
 
 **Daemon**:
 ```bash
-hyper2kvm daemon start
-hyper2kvm daemon submit job.yaml
+h2kvm daemon start
+h2kvm daemon submit job.yaml
 ```
 - ✅ Queue management
 - ✅ REST API
@@ -214,7 +214,7 @@ hyper2kvm daemon submit job.yaml
 
 **Kubernetes**:
 ```bash
-helm install hyper2kvm hyper2kvm/hyper2kvm
+helm install h2kvm h2kvm/h2kvm
 kubectl apply -f migrationjob.yaml
 ```
 - ✅ Enterprise features
@@ -313,9 +313,9 @@ kubectl apply -f migrationjob.yaml
 
 ## Tool Comparison
 
-### Hyper2KVM vs Alternatives
+### H2KVM vs Alternatives
 
-| Feature | Hyper2KVM | virt-v2v | qemu-img only | Custom Scripts |
+| Feature | H2KVM | virt-v2v | qemu-img only | Custom Scripts |
 |---------|-----------|----------|---------------|----------------|
 | **Ease of Use** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐ |
 | **Automation** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐ | ⭐⭐⭐ |
@@ -331,7 +331,7 @@ kubectl apply -f migrationjob.yaml
 
 ### Detailed Tool Comparison
 
-**Hyper2KVM**:
+**H2KVM**:
 - ✅ 480+ VMCraft APIs
 - ✅ Pure Python (portable)
 - ✅ Kubernetes-native

@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for atomic file operations in hyper2kvm.core.file_ops."""
+"""Tests for atomic file operations in h2kvm.core.file_ops."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from hyper2kvm.core.file_ops import atomic_write, ensure_parent_dir, safe_unlink
+from h2kvm.core.file_ops import atomic_write, ensure_parent_dir, safe_unlink
 
 
 # ---------------------------------------------------------------------------

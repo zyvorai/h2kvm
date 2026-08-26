@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AMI to KVM Migration — Cloud Repatriation with hyper2kvm</title>
+<title>AMI to KVM Migration — Cloud Repatriation with h2kvm</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -55,7 +55,7 @@
 
 <div class="cover">
   <h1>AMI to KVM <span>Migration</span></h1>
-  <h2>Cloud Repatriation with hyper2kvm</h2>
+  <h2>Cloud Repatriation with h2kvm</h2>
   <p class="sub">Migrate Amazon Machine Images (AMI), Azure VHDs, and cloud VM disk images directly to on-premises KVM infrastructure. Automated offline fixes, driver injection, boot repair, and libvirt deployment &mdash; zero manual intervention required.</p>
   <div class="badge">AWS AMI | Azure VHD | Photon OS | Ubuntu | RHEL | Automated Boot Repair | Libvirt Deploy</div>
 </div>
@@ -63,7 +63,7 @@
 <!-- PAGE 1: What is AMI Migration? -->
 <div class="page page-dark">
   <h2 class="st" style="color:#e8e6df;">What is <span>AMI Migration?</span></h2>
-  <p class="sub">Amazon Machine Images are not portable by default. hyper2kvm makes them portable.</p>
+  <p class="sub">Amazon Machine Images are not portable by default. h2kvm makes them portable.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -78,7 +78,7 @@
       </ul>
     </div>
     <div class="card">
-      <h4>The hyper2kvm Solution</h4>
+      <h4>The h2kvm Solution</h4>
       <ul>
         <li>Accept raw/VMDK/VHD/qcow2 from any cloud export</li>
         <li>Auto-detect OS: Linux distro, version, boot mode</li>
@@ -92,7 +92,7 @@
 
   <h3>Supported Cloud Image Formats</h3>
   <table>
-    <tr><th>Cloud Provider</th><th>Export Format</th><th>hyper2kvm Input</th><th>Notes</th></tr>
+    <tr><th>Cloud Provider</th><th>Export Format</th><th>h2kvm Input</th><th>Notes</th></tr>
     <tr><td>AWS EC2</td><td>RAW, VMDK, VHD</td><td><span class="check">&#10003;</span> All formats</td><td>aws ec2 export-image or AMI tar.gz bundles</td></tr>
     <tr><td>Azure</td><td>VHD (fixed)</td><td><span class="check">&#10003;</span> Native VHD</td><td>az vm disk download or managed disk export</td></tr>
     <tr><td>GCP</td><td>RAW (tar.gz)</td><td><span class="check">&#10003;</span> RAW extraction</td><td>gcloud compute images export</td></tr>
@@ -167,7 +167,7 @@ aws ec2 export-image --image-id ami-0123456789 --disk-image-format RAW \
   --s3-export-location S3Bucket=my-exports,S3Prefix=ami-export/
   </pre>
 
-  <h3>Step 2: Migrate with hyper2kvm</h3>
+  <h3>Step 2: Migrate with h2kvm</h3>
   <pre>
 sudo h2kvmctl \
   --cmd local \
@@ -209,24 +209,24 @@ vcpus: 2
 <!-- PAGE 4: What Gets Fixed -->
 <div class="page page-light">
   <h2 class="st">Automated Offline <span>Fixes</span></h2>
-  <p class="sub">What hyper2kvm does to make a cloud image boot on KVM.</p>
+  <p class="sub">What h2kvm does to make a cloud image boot on KVM.</p>
 
   <div class="card-grid">
     <div class="card">
       <h4>1. Initramfs Rebuild</h4>
-      <p>Cloud kernels lack VirtIO modules. hyper2kvm chroots into the guest and runs <code>dracut -f</code> with virtio_blk, virtio_scsi, virtio_net, and nvme drivers. The kernel boots with the right storage and network drivers from the first attempt.</p>
+      <p>Cloud kernels lack VirtIO modules. h2kvm chroots into the guest and runs <code>dracut -f</code> with virtio_blk, virtio_scsi, virtio_net, and nvme drivers. The kernel boots with the right storage and network drivers from the first attempt.</p>
     </div>
     <div class="card">
       <h4>2. GRUB Boot Repair</h4>
-      <p>Cloud images reference <code>/dev/xvda</code> or <code>/dev/nvme0n1p3</code>. hyper2kvm updates <code>root=</code> in grub.cfg to match the new VirtIO disk topology (<code>/dev/vda3</code>). BLS entries and GRUB defaults are both handled.</p>
+      <p>Cloud images reference <code>/dev/xvda</code> or <code>/dev/nvme0n1p3</code>. h2kvm updates <code>root=</code> in grub.cfg to match the new VirtIO disk topology (<code>/dev/vda3</code>). BLS entries and GRUB defaults are both handled.</p>
     </div>
     <div class="card">
       <h4>3. fstab Stabilization</h4>
-      <p>Device names change between cloud and KVM. hyper2kvm converts all fstab entries to UUID or PARTUUID, adds <code>nofail</code> flags, and removes cloud-specific mount points. The system mounts cleanly on any hardware.</p>
+      <p>Device names change between cloud and KVM. h2kvm converts all fstab entries to UUID or PARTUUID, adds <code>nofail</code> flags, and removes cloud-specific mount points. The system mounts cleanly on any hardware.</p>
     </div>
     <div class="card">
       <h4>4. Network Configuration</h4>
-      <p>Cloud network configs reference cloud-specific NIC names. hyper2kvm detects NetworkManager, systemd-networkd, or netplan configs and ensures they work with VirtIO network devices. DHCP continues to work out of the box.</p>
+      <p>Cloud network configs reference cloud-specific NIC names. h2kvm detects NetworkManager, systemd-networkd, or netplan configs and ensures they work with VirtIO network devices. DHCP continues to work out of the box.</p>
     </div>
   </div>
 
@@ -319,14 +319,14 @@ vcpus: 2
 
   <div class="verdict">
     <h3>100 VMs &times; 3 Years: Save $866K &ndash; $1.08M</h3>
-    <p style="font-size:0.85em; opacity:0.8;">On-prem KVM costs include server hardware, power, cooling, and colo fees. No software license costs. Migration with hyper2kvm is a one-time $45K investment.</p>
+    <p style="font-size:0.85em; opacity:0.8;">On-prem KVM costs include server hardware, power, cooling, and colo fees. No software license costs. Migration with h2kvm is a one-time $45K investment.</p>
   </div>
 </div>
 
 <!-- PAGE 7: Architecture -->
 <div class="page page-dark">
   <h2 class="st" style="color:#e8e6df;">Migration <span>Architecture</span></h2>
-  <p class="sub">How hyper2kvm processes cloud images with the VMCraft engine.</p>
+  <p class="sub">How h2kvm processes cloud images with the VMCraft engine.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -377,13 +377,13 @@ vcpus: 2
 
   <div class="highlight">
     <h3>Key Technical Innovation: Cached VirtIO ISO Extraction</h3>
-    <p style="font-size:0.85em;">hyper2kvm extracts virtio-win.iso once using bsdtar (Rock Ridge aware) and caches the result at <code>/var/lib/hyper2kvm/virtio-win-extracted/</code>. Subsequent Windows migrations reuse the cache instantly. The Rock Ridge filesystem extension preserves long directory names (w11, w8.1) that ISO 9660 truncates.</p>
+    <p style="font-size:0.85em;">h2kvm extracts virtio-win.iso once using bsdtar (Rock Ridge aware) and caches the result at <code>/var/lib/h2kvm/virtio-win-extracted/</code>. Subsequent Windows migrations reuse the cache instantly. The Rock Ridge filesystem extension preserves long directory names (w11, w8.1) that ISO 9660 truncates.</p>
   </div>
 </div>
 
 <!-- PAGE 8: Summary -->
 <div class="page page-light">
-  <h2 class="st">Why <span>hyper2kvm</span></h2>
+  <h2 class="st">Why <span>h2kvm</span></h2>
   <p class="sub">The only tool that handles the complete cloud-to-KVM migration pipeline.</p>
 
   <div class="card-grid">
@@ -417,11 +417,11 @@ vcpus: 2
       <strong>Proprietary (Zyvor AI Labs) Licensed</strong> &mdash; Contact for pricing.* No per-VM fees. No subscription required.
     </p>
     <p style="font-size:0.85em; opacity:0.7; margin-top:6px;">
-      github.com/ssahani/hyper2kvm
+      github.com/ssahani/h2kvm
     </p>
   </div>
 
-  <div class="footer">hyper2kvm &mdash; Production-Grade Cloud &amp; Hypervisor to KVM Migration Toolkit &mdash; Proprietary (Zyvor AI Labs)</div>
+  <div class="footer">h2kvm &mdash; Production-Grade Cloud &amp; Hypervisor to KVM Migration Toolkit &mdash; Proprietary (Zyvor AI Labs)</div>
 </div>
 
 </body>

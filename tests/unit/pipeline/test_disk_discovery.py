@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.orchestration.disk_discovery.DiskDiscovery."""
+"""Tests for h2kvm.orchestration.disk_discovery.DiskDiscovery."""
 
 from __future__ import annotations
 
@@ -12,8 +12,8 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from hyper2kvm.core.exceptions import Fatal
-from hyper2kvm.orchestration.disk_discovery import DiskDiscovery
+from h2kvm.core.exceptions import Fatal
+from h2kvm.orchestration.disk_discovery import DiskDiscovery
 
 
 # ---------------------------------------------------------------------------

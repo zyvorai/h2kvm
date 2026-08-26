@@ -9,10 +9,10 @@ from unittest.mock import Mock
 
 import pytest
 
-from hyper2kvm.config.pipeline_config import MigrationConfig
-from hyper2kvm.converters.extractors.ovf import OVF
-from hyper2kvm.core.firmware_resolver import FirmwareResolution
-from hyper2kvm.orchestration.orchestrator import Orchestrator
+from h2kvm.config.pipeline_config import MigrationConfig
+from h2kvm.converters.extractors.ovf import OVF
+from h2kvm.core.firmware_resolver import FirmwareResolution
+from h2kvm.orchestration.orchestrator import Orchestrator
 
 
 def _make_orchestrator(**args_kw):

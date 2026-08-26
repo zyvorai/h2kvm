@@ -1,4 +1,4 @@
-# hyper2kvm: Quick Mode Comparison
+# h2kvm: Quick Mode Comparison
 
 ## One-Page Overview
 
@@ -38,16 +38,16 @@ graph TD
 ### CLI Mode
 ```bash
 # Single VM conversion
-hyper2kvm local --source vm.vmdk --output vm.qcow2
+h2kvm local --source vm.vmdk --output vm.qcow2
 ```
 
 ### Daemon Mode
 ```bash
 # Start daemon
-sudo systemctl start hyper2kvm.service
+sudo systemctl start h2kvm.service
 
 # Drop files → auto-processed
-cp *.vmdk /var/lib/hyper2kvm/queue/
+cp *.vmdk /var/lib/h2kvm/queue/
 ```
 
 ---

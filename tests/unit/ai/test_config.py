@@ -2,15 +2,15 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.ai.config module.
+"""Tests for h2kvm.ai.config module.
 
 Loading AI configuration from the ``ai:`` section of a merged config dict.
 """
 
 from __future__ import annotations
 
-from hyper2kvm.ai.config import load_ai_config
-from hyper2kvm.ai.models import AIConfig
+from h2kvm.ai.config import load_ai_config
+from h2kvm.ai.models import AIConfig
 
 
 # ---------------------------------------------------------------------------
@@ -28,7 +28,7 @@ def test_none_config_returns_defaults():
 def test_empty_dict_returns_defaults():
     cfg = load_ai_config({})
     assert cfg.enabled is True
-    assert cfg.knowledge_base_path == "~/.cache/hyper2kvm/ai/knowledge.db"
+    assert cfg.knowledge_base_path == "~/.cache/h2kvm/ai/knowledge.db"
     assert cfg.anomaly_z_threshold == 2.5
 
 
@@ -57,7 +57,7 @@ def test_partial_config_merges_with_defaults():
     # Non-overridden fields keep defaults.
     assert cfg.max_similar_lookback == 100
     assert cfg.auto_remediate is False
-    assert cfg.knowledge_base_path == "~/.cache/hyper2kvm/ai/knowledge.db"
+    assert cfg.knowledge_base_path == "~/.cache/h2kvm/ai/knowledge.db"
 
 
 # ---------------------------------------------------------------------------

@@ -37,7 +37,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Any
 
-from hyper2kvm.vmcraft.main import VMCraft
+from h2kvm.vmcraft.main import VMCraft
 
 
 def setup_logging():

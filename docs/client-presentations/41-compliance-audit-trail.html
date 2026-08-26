@@ -366,10 +366,10 @@ vms:
       <h4>SIEM Integration</h4>
       <pre>
 # rsyslog forward to SIEM
-# /etc/rsyslog.d/hyper2kvm.conf
+# /etc/rsyslog.d/h2kvm.conf
 module(load="imfile")
 input(type="imfile"
-  File="/var/log/hyper2kvm/migration.log"
+  File="/var/log/h2kvm/migration.log"
   Tag="h2kvmctl"
   Severity="info"
   Facility="local6"
@@ -411,7 +411,7 @@ h2kvmctl convert --config migration.yaml \
     <p>Every h2kvmctl operation produces structured JSON logs with timestamps, operator identity, checksums, and action details. The evidence package template provides auditors with everything they need in one directory. Combine with your ITSM change tickets and CAB approvals for a complete audit trail. Migration from VMware to KVM can be the most well-documented infrastructure change your auditor has ever reviewed.</p>
   </div>
 
-  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Compliance Audit Trail Guide</div>
+  <div class="footer">h2kvm.io | Proprietary (Zyvor AI Labs) | Compliance Audit Trail Guide</div>
 </div>
 
 </body>

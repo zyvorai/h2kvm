@@ -1,11 +1,11 @@
 #!/bin/bash
 set -euo pipefail
-# Simple wrapper to run hyper2kvm from project directory
+# Simple wrapper to run h2kvm from project directory
 
 # Check if no arguments provided or help requested
 if [ $# -eq 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     cat <<'EOF'
-hyper2kvm: Ultimate VMware → KVM/QEMU Converter + Fixer
+h2kvm: Ultimate VMware → KVM/QEMU Converter + Fixer
 
 USAGE:
     sudo ./run.sh --config <yaml-file>
@@ -58,7 +58,7 @@ For detailed help, examples, and all options:
     sudo ./run.sh --help (once with --config specified)
 
 Or view inline documentation:
-    less hyper2kvm/cli/help_texts.py
+    less h2kvm/cli/help_texts.py
 
 Documentation:
     docs/README.md
@@ -70,4 +70,4 @@ EOF
 fi
 
 cd "$(dirname "$0")"
-exec sudo python3 -m hyper2kvm "$@"
+exec sudo python3 -m h2kvm "$@"

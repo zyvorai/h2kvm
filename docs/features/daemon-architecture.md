@@ -1,8 +1,8 @@
-# Integrated Daemon Architecture - hyper2kvm
+# Integrated Daemon Architecture - h2kvm
 
 ## Overview
 
-This document describes the integrated daemon architecture where the Go daemon (hypervisord) and Python daemon (hyper2kvm) work together to provide automated VM migration from vSphere to KVM.
+This document describes the integrated daemon architecture where the Go daemon (hypervisord) and Python daemon (h2kvm) work together to provide automated VM migration from vSphere to KVM.
 
 **Vision:** Single command to migrate a VM from vSphere to KVM, fully automated.
 
@@ -12,7 +12,7 @@ hyperctl convert --vm "production-db" --vcenter vcenter.example.com
 
 # Behind the scenes:
 # 1. hypervisord (Go) fetches VMDK from vSphere
-# 2. hyper2kvm (Python) automatically converts it to KVM
+# 2. h2kvm (Python) automatically converts it to KVM
 # 3. VM is ready in libvirt
 ```
 
@@ -25,7 +25,7 @@ graph TB
     User[User]
     CLI[hyperctl - Control CLI<br/>• Parses user commands<br/>• Orchestrates workflow<br/>• Monitors progress]
     GoDaemon[hypervisord<br/>Go Daemon<br/>• vSphere export<br/>• Disk download<br/>• Queue management<br/>• Status API]
-    PyDaemon[hyper2kvm daemon<br/>Python Daemon<br/>• Watches queue<br/>• Converts VMDKs<br/>• Applies VirtIO drivers<br/>• Control API]
+    PyDaemon[h2kvm daemon<br/>Python Daemon<br/>• Watches queue<br/>• Converts VMDKs<br/>• Applies VirtIO drivers<br/>• Control API]
     vSphere[vSphere Server<br/>• Source VMs<br/>• VMDK export]
     KVM[libvirt KVM<br/>• Converted VMs<br/>• Ready to run]
 
@@ -141,8 +141,8 @@ conversion:
 
   # Python daemon connection
   python_daemon:
-    queue_dir: "/var/lib/hyper2kvm/queue"
-    control_socket: "/var/lib/hyper2kvm/output/.daemon/control.sock"
+    queue_dir: "/var/lib/h2kvm/queue"
+    control_socket: "/var/lib/h2kvm/output/.daemon/control.sock"
 
   # Cleanup after successful conversion
   cleanup_source: true
@@ -150,7 +150,7 @@ conversion:
 
 ---
 
-### 3. Python Daemon (hyper2kvm) - Conversion Engine
+### 3. Python Daemon (h2kvm) - Conversion Engine
 
 **Current Features:**
 - Watch directory for VMDKs
@@ -168,14 +168,14 @@ conversion:
 
 **Configuration:**
 ```yaml
-# /var/lib/hyper2kvm/daemon.yaml
+# /var/lib/h2kvm/daemon.yaml
 command: daemon
 daemon: true
 
 # Directories
-watch_dir: /var/lib/hyper2kvm/queue
-output_dir: /var/lib/hyper2kvm/output
-work_dir: /var/lib/hyper2kvm/work
+watch_dir: /var/lib/h2kvm/queue
+output_dir: /var/lib/h2kvm/output
+work_dir: /var/lib/h2kvm/work
 
 # Conversion options
 max_concurrent_jobs: 3
@@ -219,12 +219,12 @@ set-priority    - Change job priority
 
 #### Python Daemon Service
 
-**File:** `/etc/systemd/system/hyper2kvm-daemon.service`
+**File:** `/etc/systemd/system/h2kvm-daemon.service`
 
 ```ini
 [Unit]
-Description=Hyper2KVM Conversion Daemon
-Documentation=https://github.com/ssahani/hyper2kvm
+Description=H2KVM Conversion Daemon
+Documentation=https://github.com/ssahani/h2kvm
 After=network.target libvirtd.service
 Wants=libvirtd.service
 
@@ -232,14 +232,14 @@ Wants=libvirtd.service
 Type=simple
 User=root
 Group=root
-WorkingDirectory=/var/lib/hyper2kvm
+WorkingDirectory=/var/lib/h2kvm
 
 # Main service
-ExecStart=/usr/local/bin/h2kvmctl --config /etc/hyper2kvm/daemon.yaml
+ExecStart=/usr/local/bin/h2kvmctl --config /etc/h2kvm/daemon.yaml
 
 # Graceful shutdown
 ExecStop=/usr/bin/h2kvmctl.cli.daemon_ctl \
-  --output-dir /var/lib/hyper2kvm/output drain
+  --output-dir /var/lib/h2kvm/output drain
 TimeoutStopSec=300
 
 # Restart policy
@@ -259,7 +259,7 @@ PrivateTmp=true
 # Logging
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=hyper2kvm
+SyslogIdentifier=h2kvm
 
 [Install]
 WantedBy=multi-user.target
@@ -271,10 +271,10 @@ WantedBy=multi-user.target
 
 ```ini
 [Unit]
-Description=Hyper2KVM Export Daemon (Go)
-Documentation=https://github.com/ssahani/hyper2kvm
+Description=H2KVM Export Daemon (Go)
+Documentation=https://github.com/ssahani/h2kvm
 After=network-online.target
-Wants=network-online.target hyper2kvm-daemon.service
+Wants=network-online.target h2kvm-daemon.service
 
 [Service]
 Type=simple
@@ -335,7 +335,7 @@ hyperctl convert --vm "production-db" --vcenter vcenter.example.com
 10. Exports VMDK to /var/lib/hypervisord/work/job-abc123/
 11. Downloads VMDK (progress tracked)
 12. Verifies VMDK integrity (MD5/SHA256)
-13. Copies VMDK to Python daemon queue: /var/lib/hyper2kvm/queue/
+13. Copies VMDK to Python daemon queue: /var/lib/h2kvm/queue/
 14. Sends webhook to Python daemon (optional)
 15. Updates job status: "exported, queued for conversion"
 ```
@@ -424,7 +424,7 @@ Job ID:        job-abc123
 Source VM:     production-db (vSphere)
 Total Size:    250 GB
 Total Time:    12m 57s
-Output:        /var/lib/hyper2kvm/output/2026-01-17/production-db/
+Output:        /var/lib/h2kvm/output/2026-01-17/production-db/
 
 Next steps:
 
@@ -433,9 +433,9 @@ Next steps:
 
 2. Or manually:
    virt-install --name production-db \
-     --disk /var/lib/hyper2kvm/output/2026-01-17/production-db/disk1.vmdk \
-     --disk /var/lib/hyper2kvm/output/2026-01-17/production-db/disk2.vmdk \
-     --disk /var/lib/hyper2kvm/output/2026-01-17/production-db/disk3.vmdk \
+     --disk /var/lib/h2kvm/output/2026-01-17/production-db/disk1.vmdk \
+     --disk /var/lib/h2kvm/output/2026-01-17/production-db/disk2.vmdk \
+     --disk /var/lib/h2kvm/output/2026-01-17/production-db/disk3.vmdk \
      --memory 16384 --vcpus 8 --import
 
 3. View logs:
@@ -530,7 +530,7 @@ GET /api/v1/jobs/job-abc123
 ```bash
 # Go daemon copies VMDK to Python daemon queue
 cp /var/lib/hypervisord/work/job-abc123/disk.vmdk \
-   /var/lib/hyper2kvm/queue/
+   /var/lib/h2kvm/queue/
 
 # Python daemon auto-detects via watchdog
 ```
@@ -544,8 +544,8 @@ Content-Type: application/json
   "job_id": "job-abc123",
   "vm_name": "production-db",
   "files": [
-    "/var/lib/hyper2kvm/queue/production-db.vmdk",
-    "/var/lib/hyper2kvm/queue/production-db_1.vmdk"
+    "/var/lib/h2kvm/queue/production-db.vmdk",
+    "/var/lib/h2kvm/queue/production-db_1.vmdk"
   ],
   "priority": "normal",
   "callback_url": "http://localhost:8080/webhook/conversion-complete"
@@ -563,10 +563,10 @@ Content-Type: application/json
   "job_id": "job-abc123",
   "status": "success",
   "vm_name": "production-db",
-  "output_dir": "/var/lib/hyper2kvm/output/2026-01-17/production-db",
+  "output_dir": "/var/lib/h2kvm/output/2026-01-17/production-db",
   "files": [
-    "/var/lib/hyper2kvm/output/2026-01-17/production-db/disk1.vmdk",
-    "/var/lib/hyper2kvm/output/2026-01-17/production-db/disk2.vmdk"
+    "/var/lib/h2kvm/output/2026-01-17/production-db/disk1.vmdk",
+    "/var/lib/h2kvm/output/2026-01-17/production-db/disk2.vmdk"
   ],
   "duration_seconds": 272,
   "modifications": {
@@ -587,7 +587,7 @@ Content-Type: application/json
   "status": "failed",
   "vm_name": "production-db",
   "error": "Failed to inject VirtIO drivers: missing kernel modules",
-  "error_file": "/var/lib/hyper2kvm/queue/.errors/production-db.vmdk.error.json",
+  "error_file": "/var/lib/h2kvm/queue/.errors/production-db.vmdk.error.json",
   "retry_count": 1,
   "retry_available": true
 }
@@ -601,7 +601,7 @@ Content-Type: application/json
 {
   "command": "queue-job",
   "job_id": "job-abc123",
-  "file": "/var/lib/hyper2kvm/queue/production-db.vmdk",
+  "file": "/var/lib/h2kvm/queue/production-db.vmdk",
   "priority": "high",
   "options": {
     "fix_fstab": true,
@@ -652,7 +652,7 @@ CREATE TABLE jobs (
 
     -- Files
     source_files JSON,                      -- List of VMDKs
-    output_dir TEXT,                        -- /var/lib/hyper2kvm/output/2026-01-17/production-db
+    output_dir TEXT,                        -- /var/lib/h2kvm/output/2026-01-17/production-db
 
     -- Metadata
     created_at TIMESTAMP NOT NULL,
@@ -784,14 +784,14 @@ hypervisord_queue_depth{priority="low"} 1
 **Python Daemon:**
 ```
 # Conversion metrics
-hyper2kvm_conversions_total{status="success"} 142
-hyper2kvm_conversions_total{status="failed"} 3
-hyper2kvm_conversion_duration_seconds{quantile="0.5"} 45
-hyper2kvm_conversion_duration_seconds{quantile="0.99"} 180
+h2kvm_conversions_total{status="success"} 142
+h2kvm_conversions_total{status="failed"} 3
+h2kvm_conversion_duration_seconds{quantile="0.5"} 45
+h2kvm_conversion_duration_seconds{quantile="0.99"} 180
 
 # Queue metrics
-hyper2kvm_queue_depth 3
-hyper2kvm_active_conversions 2
+h2kvm_queue_depth 3
+h2kvm_active_conversions 2
 ```
 
 ### Health Checks
@@ -847,10 +847,10 @@ vsphere:
 **Unix Socket Permissions:**
 ```bash
 # Python daemon control socket
-/var/lib/hyper2kvm/output/.daemon/control.sock
-srwxr-x--- 1 root hyper2kvm 0 Jan 17 10:00 control.sock
+/var/lib/h2kvm/output/.daemon/control.sock
+srwxr-x--- 1 root h2kvm 0 Jan 17 10:00 control.sock
 
-# Only root and hyper2kvm group can access
+# Only root and h2kvm group can access
 ```
 
 **API Authentication (hypervisord):**
@@ -870,12 +870,12 @@ api:
 ```bash
 # Restrict permissions
 chmod 700 /var/lib/hypervisord/work
-chmod 700 /var/lib/hyper2kvm/queue
-chmod 700 /var/lib/hyper2kvm/output
+chmod 700 /var/lib/h2kvm/queue
+chmod 700 /var/lib/h2kvm/output
 
 # SELinux contexts (RHEL/CentOS)
-semanage fcontext -a -t virt_image_t "/var/lib/hyper2kvm/output(/.*)?"
-restorecon -Rv /var/lib/hyper2kvm/
+semanage fcontext -a -t virt_image_t "/var/lib/h2kvm/output(/.*)?"
+restorecon -Rv /var/lib/h2kvm/
 ```
 
 ---
@@ -887,7 +887,7 @@ restorecon -Rv /var/lib/hyper2kvm/
 **1. Install Prerequisites:**
 ```bash
 # Python daemon
-sudo pip3 install hyper2kvm
+sudo pip3 install h2kvm
 
 # Go daemon
 sudo wget https://github.com/ssahani/hypersdk/releases/latest/download/hypervisord
@@ -905,40 +905,40 @@ sudo mkdir -p /var/lib/hypervisord/work
 sudo mkdir -p /etc/hypervisord
 
 # Python daemon
-sudo mkdir -p /var/lib/hyper2kvm/{queue,output,work}
-sudo mkdir -p /etc/hyper2kvm
+sudo mkdir -p /var/lib/h2kvm/{queue,output,work}
+sudo mkdir -p /etc/h2kvm
 
 # Logs
-sudo mkdir -p /var/log/hyper2kvm
+sudo mkdir -p /var/log/h2kvm
 ```
 
 **3. Install Systemd Services:**
 ```bash
 # Copy service files
 sudo cp hypervisord.service /etc/systemd/system/
-sudo cp hyper2kvm-daemon.service /etc/systemd/system/
+sudo cp h2kvm-daemon.service /etc/systemd/system/
 
 # Reload systemd
 sudo systemctl daemon-reload
 
 # Enable services
 sudo systemctl enable hypervisord
-sudo systemctl enable hyper2kvm-daemon
+sudo systemctl enable h2kvm-daemon
 
 # Start services
 sudo systemctl start hypervisord
-sudo systemctl start hyper2kvm-daemon
+sudo systemctl start h2kvm-daemon
 ```
 
 **4. Verify:**
 ```bash
 # Check status
 sudo systemctl status hypervisord
-sudo systemctl status hyper2kvm-daemon
+sudo systemctl status h2kvm-daemon
 
 # Check logs
 sudo journalctl -u hypervisord -f
-sudo journalctl -u hyper2kvm-daemon -f
+sudo journalctl -u h2kvm-daemon -f
 
 # Test CLI
 hyperctl daemon status
@@ -1032,7 +1032,7 @@ hyperctl retry --all-failed
 
 ### hyperctl Configuration
 
-**File:** `~/.config/hyper2kvm/config.yaml`
+**File:** `~/.config/h2kvm/config.yaml`
 
 ```yaml
 # Daemon endpoints
@@ -1041,7 +1041,7 @@ daemons:
     url: "http://localhost:8080"
     timeout: 30
   python:
-    socket: "/var/lib/hyper2kvm/output/.daemon/control.sock"
+    socket: "/var/lib/h2kvm/output/.daemon/control.sock"
     timeout: 10
 
 # Default vCenter
@@ -1056,7 +1056,7 @@ conversion:
   # network is auto-handled
   fstab_mode: stabilize-all
   # grub is auto-handled
-  output_dir: "/var/lib/hyper2kvm/output"
+  output_dir: "/var/lib/h2kvm/output"
 
 # Notifications
 notifications:

@@ -162,7 +162,7 @@ max-complexity = 15
 
 [lint.isort]
 # Import sorting configuration
-known-first-party = ["hyper2kvm"]
+known-first-party = ["h2kvm"]
 combine-as-imports = true
 force-wrap-aliases = true
 split-on-trailing-comma = true

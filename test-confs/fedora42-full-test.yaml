@@ -1,5 +1,5 @@
 # Fedora 42 Server - Complete End-to-End Test Configuration
-# Tests ALL hyper2kvm features comprehensively
+# Tests ALL h2kvm features comprehensively
 
 cmd: local
 
@@ -13,13 +13,13 @@ vmdk: /home/ssahani/Downloads/VMs/extracted/fedora/64bit/fedora42-server.vmdk
 # OUTPUT CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════════════
 
-output_dir: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test
-to_output: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test/fedora42-server.qcow2
+output_dir: /home/ssahani/tt/h2kvm/out/fedora42-full-test
+to_output: /home/ssahani/tt/h2kvm/out/fedora42-full-test/fedora42-server.qcow2
 out_format: qcow2
 compress: true
 
 # Working directory for temporary files
-workdir: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test/work
+workdir: /home/ssahani/tt/h2kvm/out/fedora42-full-test/work
 
 # ═══════════════════════════════════════════════════════════════════════════
 # OFFLINE GUEST FIXES - Linux Features
@@ -70,7 +70,7 @@ cloud_init_user:
   shell: /bin/bash
   sudo: ALL=(ALL) NOPASSWD:ALL
   ssh_authorized_keys:
-    - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... test-key@hyper2kvm"
+    - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... test-key@h2kvm"
 
 # Network configuration (DHCP)
 cloud_init_network:
@@ -95,7 +95,7 @@ cloud_init_packages:
 cloud_init_runcmd:
   - systemctl enable qemu-guest-agent
   - systemctl start qemu-guest-agent
-  - echo "hyper2kvm migration completed at $(date)" >> /var/log/migration.log
+  - echo "h2kvm migration completed at $(date)" >> /var/log/migration.log
 
 # ═══════════════════════════════════════════════════════════════════════════
 # KERNEL & BOOTLOADER CONFIGURATION
@@ -169,11 +169,11 @@ libvirt_graphics: spice
 # ═══════════════════════════════════════════════════════════════════════════
 
 # Generate detailed reports
-report: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test/migration-report.md
-report_json: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test/migration-report.json
+report: /home/ssahani/tt/h2kvm/out/fedora42-full-test/migration-report.md
+report_json: /home/ssahani/tt/h2kvm/out/fedora42-full-test/migration-report.json
 
 # Detailed logging
-log_file: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test/migration.log
+log_file: /home/ssahani/tt/h2kvm/out/fedora42-full-test/migration.log
 verbose: 2
 
 # ═══════════════════════════════════════════════════════════════════════════

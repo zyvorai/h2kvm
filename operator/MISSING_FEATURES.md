@@ -398,7 +398,7 @@ operator/
 **Build**:
 ```bash
 docker buildx build --platform linux/amd64,linux/arm64 \
-  -t hyper2kvm-operator:latest --push .
+  -t h2kvm-operator:latest --push .
 ```
 
 **Effort**: 1-2 hours

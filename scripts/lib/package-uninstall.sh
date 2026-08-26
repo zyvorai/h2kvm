@@ -11,9 +11,9 @@ else
   source "$(dirname "$0")/package-uninstall-lib.sh"
 fi
 
-PRODUCT="hyper2kvm"
+PRODUCT="h2kvm"
 BINARIES=(h2kvmctl)
-BINARIES_SUBPATH=(bin/hyper2kvm bin/h2kweb venv/bin/python)
+BINARIES_SUBPATH=(bin/h2kvm bin/h2kweb venv/bin/python)
 PORTS=(5070)
 LOCAL_CONFIGS=(h2kweb.env)
 

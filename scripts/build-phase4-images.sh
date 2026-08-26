@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-REGISTRY="${REGISTRY:-ghcr.io/hyper2kvm}"
+REGISTRY="${REGISTRY:-ghcr.io/h2kvm}"
 VERSION="${VERSION:-v1.0.0}"
 
 echo "╔═══════════════════════════════════════════════════════════════════╗"
@@ -29,8 +29,8 @@ echo ""
 docker build \
   -t "${REGISTRY}/nbd-prep:${VERSION}" \
   -t "${REGISTRY}/nbd-prep:latest" \
-  -f hyper2kvm/daemon/Dockerfile \
-  hyper2kvm/daemon/
+  -f h2kvm/daemon/Dockerfile \
+  h2kvm/daemon/
 
 echo "✅ NBD prep daemon image built"
 echo ""

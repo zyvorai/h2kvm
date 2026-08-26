@@ -1,0 +1,44 @@
+[Unit]
+Description=H2KVM Scheduled VM Repair
+Documentation=man:h2kvm(1) https://github.com/ssahani/h2kvm
+After=network.target libvirtd.service
+Requires=libvirtd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/h2kvm-repair-all
+User=root
+Group=root
+
+# Resource limits (lower priority for scheduled tasks)
+CPUSchedulingPolicy=batch
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=4
+
+CPUQuota=50%
+MemoryMax=2G
+TasksMax=256
+
+# Security hardening
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/libvirt/images /var/log/h2kvm
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictRealtime=yes
+NoNewPrivileges=yes
+
+# Timeout
+TimeoutStartSec=0
+TimeoutStopSec=30s
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=h2kvm-scheduled
+
+[Install]
+WantedBy=multi-user.target

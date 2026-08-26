@@ -14,7 +14,7 @@ a VMware VMDK to qcow2 and applying offline fixes
 
 Before migrating this platform, ensure:
 
-- ✓ hyper2kvm installed ([Installation Guide](02-Installation.md))
+- ✓ h2kvm installed ([Installation Guide](02-Installation.md))
 - ✓ Familiarity with [Quick Start Guide](03-Quick-Start.md)
 - ✓ Root/sudo access
 - ✓ Source VM accessible
@@ -76,7 +76,7 @@ sudo virsh net-start default 2>/dev/null || true
 
 **Important - Virtio Support:**
 
-Photon OS is a **cloud-native distribution** that ships with virtio drivers pre-installed in the initramfs. After conversion with hyper2kvm:
+Photon OS is a **cloud-native distribution** that ships with virtio drivers pre-installed in the initramfs. After conversion with h2kvm:
 
 * ✅ **Virtio disk works out-of-the-box** (recommended for performance)
 * ✅ The initramfs rebuild warning `"mtime+size unchanged"` is **normal and expected**
@@ -250,7 +250,7 @@ If it reports `multi-user.target`, this is **expected behavior**.
 
 ### Initramfs rebuild warning during conversion
 
-During hyper2kvm conversion, you may see:
+During h2kvm conversion, you may see:
 
 ```
 ⚠️  initramfs rebuild failed: mtime+size unchanged

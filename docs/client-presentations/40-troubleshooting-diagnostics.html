@@ -478,7 +478,7 @@ iperf3 -c 10.0.1.1 -t 30
   <h3>Log Locations</h3>
   <table>
     <tr><th style="width:20%">Component</th><th style="width:35%">Log File</th><th style="width:45%">What It Contains</th></tr>
-    <tr><td>h2kvmctl</td><td><code>/var/log/hyper2kvm/migration.log</code></td><td>Conversion steps, errors, timing, file operations</td></tr>
+    <tr><td>h2kvmctl</td><td><code>/var/log/h2kvm/migration.log</code></td><td>Conversion steps, errors, timing, file operations</td></tr>
     <tr><td>h2kvmctl (verbose)</td><td><code>h2kvmctl convert --verbose 2>&1 | tee debug.log</code></td><td>Full debug output including qemu-img commands</td></tr>
     <tr><td>libvirtd</td><td><code>/var/log/libvirt/qemu/vm-name.log</code></td><td>QEMU startup, device errors, shutdown</td></tr>
     <tr><td>QEMU monitor</td><td><code>virsh qemu-monitor-command vm --hmp info status</code></td><td>Real-time VM state, device info</td></tr>
@@ -521,7 +521,7 @@ iperf3 -c 10.0.1.1 -t 30
     <p>Run <code>h2kvmctl doctor</code> before migration. Use <code>--fix-initramfs --fix-fstab --fix-network</code> for Linux VMs and <code>--virtio-drivers</code> for Windows VMs. These four flags prevent the top 5 failure modes. For everything else, check the decision tree above and the log files. Most issues are diagnosed within 5 minutes.</p>
   </div>
 
-  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Troubleshooting &amp; Diagnostics Guide</div>
+  <div class="footer">h2kvm.io | Proprietary (Zyvor AI Labs) | Troubleshooting &amp; Diagnostics Guide</div>
 </div>
 
 </body>

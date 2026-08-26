@@ -5,7 +5,7 @@ Upload a converted QCOW2 to OpenStack Glance and optionally boot a Nova instance
 ## Prerequisites
 
 ```bash
-pip install 'hyper2kvm[openstack]'
+pip install 'h2kvm[openstack]'
 ```
 
 Authentication (pick one):
@@ -47,7 +47,7 @@ Do not combine `deploy_openstack` with `deploy_k8s` or local libvirt define/star
 
 Multi-disk migrations upload **one** Glance image (the first qcow2 output); additional disks are skipped with a log warning.
 
-## Artifact manifest (hypersdk → hyper2kvm)
+## Artifact manifest (hypersdk → h2kvm)
 
 ```yaml
 pipeline:
@@ -64,7 +64,7 @@ pipeline:
 
 ## Web dashboard
 
-In the migration wizard, open **OpenStack** and enable **Upload to Glance**. Set `OS_CLOUD` or use environment credentials on the hyper2kvm host.
+In the migration wizard, open **OpenStack** and enable **Upload to Glance**. Set `OS_CLOUD` or use environment credentials on the h2kvm host.
 
 When the host has the `openstack` CLI configured, the job monitor polls Glance/Nova status and instance IPs via `/api/v1/deploy/{vmName}/status` and `/ip`.
 

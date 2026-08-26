@@ -6,7 +6,7 @@
 #   ./restore-worker-state.sh <backup-archive> [namespace]
 #
 # Example:
-#   ./restore-worker-state.sh hyper2kvm-worker-backup-2026-01-30_14-30-00.tar.gz hyper2kvm-workers
+#   ./restore-worker-state.sh h2kvm-worker-backup-2026-01-30_14-30-00.tar.gz h2kvm-workers
 #
 
 set -euo pipefail
@@ -15,19 +15,19 @@ if [ $# -lt 1 ]; then
     echo "Usage: $0 <backup-archive> [namespace]"
     echo ""
     echo "Example:"
-    echo "  $0 hyper2kvm-worker-backup-2026-01-30_14-30-00.tar.gz hyper2kvm-workers"
+    echo "  $0 h2kvm-worker-backup-2026-01-30_14-30-00.tar.gz h2kvm-workers"
     exit 1
 fi
 
 BACKUP_ARCHIVE="$1"
-NAMESPACE="${2:-hyper2kvm-workers}"
+NAMESPACE="${2:-h2kvm-workers}"
 
 if [ ! -f "$BACKUP_ARCHIVE" ]; then
     echo "ERROR: Backup archive not found: $BACKUP_ARCHIVE"
     exit 1
 fi
 
-echo "=== Hyper2KVM Worker State Restore ==="
+echo "=== H2KVM Worker State Restore ==="
 echo "Archive: $BACKUP_ARCHIVE"
 echo "Namespace: $NAMESPACE"
 echo ""
@@ -56,12 +56,12 @@ if [ -f "$BACKUP_DIR/backup-metadata.json" ]; then
 fi
 
 # Get current worker pods
-CURRENT_PODS=$(kubectl get pods -n "$NAMESPACE" -l app=hyper2kvm-worker -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || echo "")
+CURRENT_PODS=$(kubectl get pods -n "$NAMESPACE" -l app=h2kvm-worker -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || echo "")
 
 if [ -z "$CURRENT_PODS" ]; then
     echo "WARNING: No worker pods found in namespace $NAMESPACE"
     echo "Please deploy workers first using:"
-    echo "  helm install hyper2kvm-worker ./helm/hyper2kvm-worker -n $NAMESPACE"
+    echo "  helm install h2kvm-worker ./helm/h2kvm-worker -n $NAMESPACE"
     exit 1
 fi
 
@@ -99,7 +99,7 @@ for POD_DIR in "$BACKUP_DIR"/*; do
 
     if [ -z "$TARGET_POD" ]; then
         echo "  WARNING: No more pods available, reusing pods..."
-        TARGET_POD=$(kubectl get pods -n "$NAMESPACE" -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}')
+        TARGET_POD=$(kubectl get pods -n "$NAMESPACE" -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}')
     fi
 
     echo "  Target pod: $TARGET_POD"
@@ -109,7 +109,7 @@ for POD_DIR in "$BACKUP_DIR"/*; do
         echo "  - Restoring job state..."
         tar czf - -C "$POD_DIR" $(ls -A "$POD_DIR" | grep -v -E '(events|capabilities\.json|pod\.yaml)') 2>/dev/null | \
             kubectl exec -n "$NAMESPACE" "$TARGET_POD" -i -- \
-            tar xzf - -C /var/lib/hyper2kvm/jobs || echo "    Failed to restore job state"
+            tar xzf - -C /var/lib/h2kvm/jobs || echo "    Failed to restore job state"
     fi
 
     # Restore events
@@ -117,7 +117,7 @@ for POD_DIR in "$BACKUP_DIR"/*; do
         echo "  - Restoring events..."
         tar czf - -C "$POD_DIR/events" . 2>/dev/null | \
             kubectl exec -n "$NAMESPACE" "$TARGET_POD" -i -- \
-            tar xzf - -C /var/lib/hyper2kvm/events || echo "    Failed to restore events"
+            tar xzf - -C /var/lib/h2kvm/events || echo "    Failed to restore events"
     fi
 
     echo "  Done."
@@ -138,8 +138,8 @@ fi
 echo "=== Restore Complete ==="
 echo ""
 echo "Verify restored state:"
-echo "  kubectl exec -n $NAMESPACE <pod-name> -- ls -la /var/lib/hyper2kvm/jobs"
-echo "  kubectl exec -n $NAMESPACE <pod-name> -- ls -la /var/lib/hyper2kvm/events"
+echo "  kubectl exec -n $NAMESPACE <pod-name> -- ls -la /var/lib/h2kvm/jobs"
+echo "  kubectl exec -n $NAMESPACE <pod-name> -- ls -la /var/lib/h2kvm/events"
 echo ""
 echo "Check worker status:"
-echo "  kubectl logs -n $NAMESPACE -l app=hyper2kvm-worker --tail=50"
+echo "  kubectl logs -n $NAMESPACE -l app=h2kvm-worker --tail=50"

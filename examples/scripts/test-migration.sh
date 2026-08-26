@@ -157,7 +157,7 @@ fi
 if $USE_LIBVIRT; then
     echo -e "${BLUE}Testing with libvirt...${NC}"
 
-    VM_NAME="hyper2kvm-test-$(date +%s)"
+    VM_NAME="h2kvm-test-$(date +%s)"
     DOMAIN_XML=$(mktemp /tmp/${VM_NAME}.XXXXXX.xml)
     trap "rm -f '$DOMAIN_XML'" EXIT
 

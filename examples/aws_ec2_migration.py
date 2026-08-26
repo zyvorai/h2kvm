@@ -82,14 +82,14 @@ Examples:
     args = parser.parse_args()
 
     try:
-        from hyper2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
-        from hyper2kvm.providers.aws_ec2.models import (
+        from h2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
+        from h2kvm.providers.aws_ec2.models import (
             AWSDownloadConfig,
             AWSExportConfig,
             AWSShutdownConfig,
         )
     except ImportError:
-        logger.error("hyper2kvm not installed. Run: pip install hyper2kvm")
+        logger.error("h2kvm not installed. Run: pip install h2kvm")
         logger.error("Also need: pip install boto3")
         sys.exit(1)
 

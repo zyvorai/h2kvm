@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Case Studies — Real-World Migration Success Stories with hyper2kvm</title>
+<title>Case Studies — Real-World Migration Success Stories with h2kvm</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -93,9 +93,9 @@
   <p><strong>Phase 1 (Week 1):</strong> 50 dev/test VMs — validated pipeline, built team confidence. <strong>Phase 2 (Week 2-3):</strong> 100 staging VMs — YAML batch automation, tested Windows VirtIO injection on non-prod SQL. <strong>Phase 3 (Week 4-6):</strong> 200 production VMs in weekend maintenance windows — 30-40 VMs per batch, hypersdk scheduled for Saturday 2AM, webhook notifications to on-call Slack channel. Boot verification on every VM.</p>
 
   <h3>Key Challenge: SQL Server + Active Directory</h3>
-  <p>15 SQL Server instances required VirtIO injection + BCD fix. hyper2kvm's Windows pipeline handled all 15 without manual intervention. AD migration: 6 domain controllers migrated secondary-first with replication verification between each. Zero AD replication failures post-migration.</p>
+  <p>15 SQL Server instances required VirtIO injection + BCD fix. h2kvm's Windows pipeline handled all 15 without manual intervention. AD migration: 6 domain controllers migrated secondary-first with replication verification between each. Zero AD replication failures post-migration.</p>
 
-  <div class="quote">"We expected 2-3 months of pain. hyper2kvm's batch automation and boot verification cut it to 6 weeks. The SQL Server licensing savings alone paid for the entire project in month one."</div>
+  <div class="quote">"We expected 2-3 months of pain. h2kvm's batch automation and boot verification cut it to 6 weeks. The SQL Server licensing savings alone paid for the entire project in month one."</div>
 </div>
 
 <!-- CASE 2: Healthcare — Azure Repatriation -->
@@ -122,12 +122,12 @@
   </div>
 
   <h3>Migration Approach</h3>
-  <p>hypersdk exported VHDs from Azure via managed disk snapshots + SAS URLs. hyper2kvm removed Azure waagent + Hyper-V Integration Components from every VM. Linux VMs: initramfs rebuilt with VirtIO replacing hv_storvsc. Windows VMs (8 PACS workstations): VirtIO injected, BCD updated. All processing on hospital network — zero data left the facility.</p>
+  <p>hypersdk exported VHDs from Azure via managed disk snapshots + SAS URLs. h2kvm removed Azure waagent + Hyper-V Integration Components from every VM. Linux VMs: initramfs rebuilt with VirtIO replacing hv_storvsc. Windows VMs (8 PACS workstations): VirtIO injected, BCD updated. All processing on hospital network — zero data left the facility.</p>
 
   <h3>Key Challenge: HIPAA Compliance</h3>
-  <p>PHI (Protected Health Information) could not be processed by external tools. hyper2kvm's zero-telemetry, zero-cloud-upload architecture was verified by the compliance team via network capture (zero outbound connections during migration). Structured JSON audit logs provided the documentation trail for the HIPAA audit.</p>
+  <p>PHI (Protected Health Information) could not be processed by external tools. h2kvm's zero-telemetry, zero-cloud-upload architecture was verified by the compliance team via network capture (zero outbound connections during migration). Structured JSON audit logs provided the documentation trail for the HIPAA audit.</p>
 
-  <div class="quote">"Our HIPAA auditor was thrilled. Network capture proved zero data exfiltration during migration. The audit log from hyper2kvm was better documentation than our previous cloud vendor provided."</div>
+  <div class="quote">"Our HIPAA auditor was thrilled. Network capture proved zero data exfiltration during migration. The audit log from h2kvm was better documentation than our previous cloud vendor provided."</div>
 </div>
 
 <!-- CASE 3: Manufacturing — Edge -->
@@ -154,10 +154,10 @@
   </div>
 
   <h3>Migration Approach</h3>
-  <p>Converted all 5 SCADA/MES VM templates at HQ using hyper2kvm (VMDK &rarr; QCOW2 with full guest fixes). Uploaded images to container registry. Shipped pre-imaged NUCs to each factory. On-site electricians plugged them in. K3s auto-joined the fleet via WireGuard VPN. ArgoCD deployed KubeVirt VM manifests to all 45 sites within minutes.</p>
+  <p>Converted all 5 SCADA/MES VM templates at HQ using h2kvm (VMDK &rarr; QCOW2 with full guest fixes). Uploaded images to container registry. Shipped pre-imaged NUCs to each factory. On-site electricians plugged them in. K3s auto-joined the fleet via WireGuard VPN. ArgoCD deployed KubeVirt VM manifests to all 45 sites within minutes.</p>
 
   <h3>Key Innovation: Convert Once, Deploy Everywhere</h3>
-  <p>hyper2kvm's dual-target pipeline generated both libvirt XML (for standalone KVM backup) and KubeVirt manifests (for K3s deployment). One conversion at HQ served all 45 sites. No per-site conversion needed.</p>
+  <p>h2kvm's dual-target pipeline generated both libvirt XML (for standalone KVM backup) and KubeVirt manifests (for K3s deployment). One conversion at HQ served all 45 sites. No per-site conversion needed.</p>
 
   <div class="quote">"We shipped a box, the electrician plugged it in, and 20 minutes later factory floor VMs appeared in our central dashboard. From $450K/year in VMware licenses to zero. No IT travel. No on-site expertise needed."</div>
 </div>
@@ -181,17 +181,17 @@
       <ul><li>vSphere 7 on isolated SCIF network — $800K/yr</li><li>License renewal = 6-month procurement cycle</li><li>Broadcom vendor risk rated "unacceptable" by security</li><li>No internet = no cloud migration tools work</li><li>75 Windows Server + 45 RHEL VMs</li></ul>
     </div>
     <div class="after"><h5>After (KVM on classified net)</h5>
-      <ul><li>RHEL 9 STIG-hardened + KVM on same hardware</li><li>$0 hypervisor licensing</li><li>hyper2kvm installed from RPM via approved USB</li><li>All processing offline — zero external calls</li><li>Open-source code reviewed by security team in 2 days</li></ul>
+      <ul><li>RHEL 9 STIG-hardened + KVM on same hardware</li><li>$0 hypervisor licensing</li><li>h2kvm installed from RPM via approved USB</li><li>All processing offline — zero external calls</li><li>Open-source code reviewed by security team in 2 days</li></ul>
     </div>
   </div>
 
   <h3>Migration Approach</h3>
-  <p>hyper2kvm RPMs + Python wheels transferred via approved removable media (FIPS-encrypted USB). VMDKs exported to encrypted external drives. Conversion performed entirely on isolated network. Windows VMs: VirtIO injection from virtio-win ISO (also on USB). Linux VMs: initramfs rebuilt with VirtIO. SHA256 checksums verified for all binaries. Full SBOM provided for security review.</p>
+  <p>h2kvm RPMs + Python wheels transferred via approved removable media (FIPS-encrypted USB). VMDKs exported to encrypted external drives. Conversion performed entirely on isolated network. Windows VMs: VirtIO injection from virtio-win ISO (also on USB). Linux VMs: initramfs rebuilt with VirtIO. SHA256 checksums verified for all binaries. Full SBOM provided for security review.</p>
 
   <h3>Key Challenge: Zero Internet, Zero Exceptions</h3>
-  <p>Not "limited internet" — literally zero network connectivity to outside world. hyper2kvm's zero-dependency architecture (no libguestfs appliance download, no pip install, no API calls) was the only migration tool that passed the security review. Every other tool required network access for something.</p>
+  <p>Not "limited internet" — literally zero network connectivity to outside world. h2kvm's zero-dependency architecture (no libguestfs appliance download, no pip install, no API calls) was the only migration tool that passed the security review. Every other tool required network access for something.</p>
 
-  <div class="quote">"Our security team reviewed the open-source code and approved it in 2 days. Every other migration tool we evaluated failed the air-gap requirement. hyper2kvm was the only option that worked on our classified network."</div>
+  <div class="quote">"Our security team reviewed the open-source code and approved it in 2 days. Every other migration tool we evaluated failed the air-gap requirement. h2kvm was the only option that worked on our classified network."</div>
 </div>
 
 <!-- CASE 5: Retail — Multi-Cloud + Edge -->
@@ -218,7 +218,7 @@
   </div>
 
   <h3>Migration Approach</h3>
-  <p>Two-source migration: hypersdk exported 30 POS backend VMs from AWS (EBS snapshots → S3 → download). hyper2kvm separately exported 200 inventory VMs from VMware vCenter. Both sources converted to QCOW2 with source-specific fixes (AWS: remove SSM/cloud-init, VMware: remove VMware Tools). Generated KubeVirt manifests. GitOps deployed to all 200 stores via ArgoCD.</p>
+  <p>Two-source migration: hypersdk exported 30 POS backend VMs from AWS (EBS snapshots → S3 → download). h2kvm separately exported 200 inventory VMs from VMware vCenter. Both sources converted to QCOW2 with source-specific fixes (AWS: remove SSM/cloud-init, VMware: remove VMware Tools). Generated KubeVirt manifests. GitOps deployed to all 200 stores via ArgoCD.</p>
 
   <h3>Key Result: POS Resilience</h3>
   <p>Before migration, every internet outage meant POS downtime across affected stores. After: POS VMs run locally on K3s at each store. Transactions process in &lt;1ms. Data syncs to HQ when connectivity resumes. Two major ISP outages in the first quarter had zero POS impact.</p>
@@ -250,10 +250,10 @@
   </div>
 
   <h3>Migration Approach</h3>
-  <p>Exported VHDX files via Hyper-V Manager export. hyper2kvm converted VHD/VHDX → QCOW2 with automatic Hyper-V IC removal (hv_kvp, hv_vss, hv_fcopy disabled). Windows VMs (60): VirtIO storage + network drivers injected, BCD updated, VMware/Hyper-V tools removed. Linux VMs (35): initramfs rebuilt replacing hv_storvsc/hv_netvsc with VirtIO. Boot verification on every VM.</p>
+  <p>Exported VHDX files via Hyper-V Manager export. h2kvm converted VHD/VHDX → QCOW2 with automatic Hyper-V IC removal (hv_kvp, hv_vss, hv_fcopy disabled). Windows VMs (60): VirtIO storage + network drivers injected, BCD updated, VMware/Hyper-V tools removed. Linux VMs (35): initramfs rebuilt replacing hv_storvsc/hv_netvsc with VirtIO. Boot verification on every VM.</p>
 
   <h3>Key Challenge: Windows-Heavy Estate</h3>
-  <p>63% Windows VMs — all needed VirtIO injection. 5 SQL Server instances, 3 AD domain controllers, 2 Exchange servers. hyper2kvm's multi-stage Windows pipeline handled all 60 without manual intervention. One VM (legacy Windows 2012 R2 with custom SCSI driver) required manual BCD fix — the only failure out of 95 VMs.</p>
+  <p>63% Windows VMs — all needed VirtIO injection. 5 SQL Server instances, 3 AD domain controllers, 2 Exchange servers. h2kvm's multi-stage Windows pipeline handled all 60 without manual intervention. One VM (legacy Windows 2012 R2 with custom SCSI driver) required manual BCD fix — the only failure out of 95 VMs.</p>
 
   <div class="quote">"We were paying $380K/year mostly for Windows Server Datacenter licenses just to run the hypervisor. Moving to Linux + KVM eliminated that entire cost category. The guest Windows VMs still work perfectly — they just run on a free hypervisor now."</div>
 </div>
@@ -282,7 +282,7 @@
   </div>
 
   <h3>Migration Approach</h3>
-  <p>hypersdk exported VMs from all 3 sources in parallel: AWS EBS snapshots, Azure managed disk exports, VMware govc OVA exports. hyper2kvm applied source-specific fixes for each platform — AWS SSM agent removal, Azure waagent removal, VMware Tools removal. All outputs converted to KubeVirt VirtualMachine manifests. Deployed to a single on-prem K8s cluster with KubeVirt.</p>
+  <p>hypersdk exported VMs from all 3 sources in parallel: AWS EBS snapshots, Azure managed disk exports, VMware govc OVA exports. h2kvm applied source-specific fixes for each platform — AWS SSM agent removal, Azure waagent removal, VMware Tools removal. All outputs converted to KubeVirt VirtualMachine manifests. Deployed to a single on-prem K8s cluster with KubeVirt.</p>
 
   <h3>Key Result: Research Flexibility</h3>
   <p>Research VMs that previously required AWS Reserved Instances (1-year commitment) now run on KubeVirt with instant scale. When a research project ends, the VM is deleted immediately — no wasted cloud spend. When a new project starts, a VM spins up in seconds from a stored image.</p>
@@ -314,12 +314,12 @@
   </div>
 
   <h3>Migration Approach</h3>
-  <p>Phased repatriation over 14 weeks. hypersdk batch-exported EBS snapshots from 220 EC2 instances to S3, then downloaded to co-location facility. hyper2kvm converted all images: removed AWS SSM agent, EC2Config, CloudWatch agent; disabled cloud-init EC2 datasource; rebuilt initramfs with VirtIO replacing xen-blkfront. PostgreSQL RDS: migrated to self-managed PostgreSQL on KVM using pg_dump/restore. 130 stateless VMs deployed to KubeVirt; 90 stateful VMs (databases, legacy apps) deployed to KVM/libvirt.</p>
+  <p>Phased repatriation over 14 weeks. hypersdk batch-exported EBS snapshots from 220 EC2 instances to S3, then downloaded to co-location facility. h2kvm converted all images: removed AWS SSM agent, EC2Config, CloudWatch agent; disabled cloud-init EC2 datasource; rebuilt initramfs with VirtIO replacing xen-blkfront. PostgreSQL RDS: migrated to self-managed PostgreSQL on KVM using pg_dump/restore. 130 stateless VMs deployed to KubeVirt; 90 stateful VMs (databases, legacy apps) deployed to KVM/libvirt.</p>
 
   <h3>Key Metric: Gross Margin Impact</h3>
   <p>As a SaaS company, infrastructure cost directly impacts gross margin. Reducing cloud spend from $2.4M to $720K increased gross margin by <strong>7 percentage points</strong> — from 68% to 75%. This improvement was highlighted in the next investor update and contributed to a successful Series C round.</p>
 
-  <div class="quote">"$1.4M/year in savings improved our gross margin from 68% to 75%. Our investors noticed. Our Series C valuation reflected it. hyper2kvm didn't just save money — it changed our financial story."</div>
+  <div class="quote">"$1.4M/year in savings improved our gross margin from 68% to 75%. Our investors noticed. Our Series C valuation reflected it. h2kvm didn't just save money — it changed our financial story."</div>
 </div>
 
 <!-- SUMMARY -->
@@ -343,7 +343,7 @@
     <div class="metric"><div class="num">1,480</div><div class="lbl">Total VMs<br>migrated</div></div>
     <div class="metric"><div class="num">$6.77M</div><div class="lbl">Combined annual<br>savings</div></div>
     <div class="metric"><div class="num">99.8%</div><div class="lbl">Average first-boot<br>success rate</div></div>
-    <div class="metric"><div class="num">Licensed*</div><div class="lbl">hyper2kvm<br>license cost</div></div>
+    <div class="metric"><div class="num">Licensed*</div><div class="lbl">h2kvm<br>license cost</div></div>
   </div>
 
   <div class="verdict">
@@ -351,11 +351,11 @@
     <p style="font-size:0.9em;">
       VMware exits, Hyper-V exits, AWS/Azure repatriation, edge deployments, KubeVirt modernization.<br>
       99.8% first-boot success. Zero customer-facing downtime. Every compliance framework satisfied.<br>
-      <strong>hyper2kvm + hypersdk: proven across every migration scenario. Free forever.</strong>
+      <strong>h2kvm + hypersdk: proven across every migration scenario. Free forever.</strong>
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

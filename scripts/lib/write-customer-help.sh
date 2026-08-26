@@ -204,7 +204,7 @@ EOF
     platform)
       cat <<'EOF'
 --------------------------------------------------------------------------------
-PLATFORM NOTES (HyperSDK / hyper2kvm)
+PLATFORM NOTES (HyperSDK / h2kvm)
 --------------------------------------------------------------------------------
   Config: ~/.config/hypersdk/config.yaml or *.env in this folder (see README.txt)
   Dashboard: often https://<host>:5080/web/dashboard/  (subpath — use printed URL)

@@ -2,7 +2,7 @@
 # Disk-only conversion (no VM creation)
 # Useful when you just want to convert a disk image to a DataVolume
 # The VM can be created manually later
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: disk-only-conversion

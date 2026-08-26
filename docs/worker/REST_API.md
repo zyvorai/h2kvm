@@ -1,4 +1,4 @@
-# hyper2kvm Worker Job Protocol - REST API Documentation
+# h2kvm Worker Job Protocol - REST API Documentation
 
 **Version:** 1.0
 **Status:** Production-Ready
@@ -8,7 +8,7 @@
 
 ## Overview
 
-The hyper2kvm Worker REST API provides a production-grade HTTP interface for VM migration job orchestration. Built with FastAPI, it offers automatic OpenAPI/Swagger documentation, type-safe request validation, and real-time progress streaming via Server-Sent Events (SSE).
+The h2kvm Worker REST API provides a production-grade HTTP interface for VM migration job orchestration. Built with FastAPI, it offers automatic OpenAPI/Swagger documentation, type-safe request validation, and real-time progress streaming via Server-Sent Events (SSE).
 
 ### Key Features
 
@@ -37,13 +37,13 @@ pip install fastapi uvicorn sse-starlette
 
 ```bash
 # Development mode (auto-reload)
-uvicorn hyper2kvm.worker.api:app --reload --host 0.0.0.0 --port 8000
+uvicorn h2kvm.worker.api:app --reload --host 0.0.0.0 --port 8000
 
 # Production mode (with Gunicorn)
-gunicorn hyper2kvm.worker.api:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+gunicorn h2kvm.worker.api:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 
 # Using Docker
-docker run -p 8000:8000 ghcr.io/ssahani/hyper2kvm-worker-api:latest
+docker run -p 8000:8000 ghcr.io/ssahani/h2kvm-worker-api:latest
 ```
 
 ### Access Documentation
@@ -636,29 +636,29 @@ Prometheus metrics endpoint.
 
 **Response (200 OK):**
 ```
-# HELP hyper2kvm_migration_total Total number of migrations
-# TYPE hyper2kvm_migration_total counter
-hyper2kvm_migration_total{status="completed"} 125
-hyper2kvm_migration_total{status="failed"} 3
+# HELP h2kvm_migration_total Total number of migrations
+# TYPE h2kvm_migration_total counter
+h2kvm_migration_total{status="completed"} 125
+h2kvm_migration_total{status="failed"} 3
 
-# HELP hyper2kvm_migration_duration_seconds Migration duration
-# TYPE hyper2kvm_migration_duration_seconds histogram
-hyper2kvm_migration_duration_seconds_bucket{le="60.0"} 45
-hyper2kvm_migration_duration_seconds_bucket{le="300.0"} 98
-hyper2kvm_migration_duration_seconds_bucket{le="600.0"} 120
-hyper2kvm_migration_duration_seconds_bucket{le="+Inf"} 128
-hyper2kvm_migration_duration_seconds_sum 23456.78
-hyper2kvm_migration_duration_seconds_count 128
+# HELP h2kvm_migration_duration_seconds Migration duration
+# TYPE h2kvm_migration_duration_seconds histogram
+h2kvm_migration_duration_seconds_bucket{le="60.0"} 45
+h2kvm_migration_duration_seconds_bucket{le="300.0"} 98
+h2kvm_migration_duration_seconds_bucket{le="600.0"} 120
+h2kvm_migration_duration_seconds_bucket{le="+Inf"} 128
+h2kvm_migration_duration_seconds_sum 23456.78
+h2kvm_migration_duration_seconds_count 128
 
-# HELP hyper2kvm_worker_jobs_active Current number of active jobs
-# TYPE hyper2kvm_worker_jobs_active gauge
-hyper2kvm_worker_jobs_active 5
+# HELP h2kvm_worker_jobs_active Current number of active jobs
+# TYPE h2kvm_worker_jobs_active gauge
+h2kvm_worker_jobs_active 5
 ```
 
 **Prometheus Configuration:**
 ```yaml
 scrape_configs:
-  - job_name: 'hyper2kvm'
+  - job_name: 'h2kvm'
     static_configs:
       - targets: ['localhost:8000']
     metrics_path: /metrics
@@ -705,14 +705,14 @@ All error responses follow this format:
 pip install -r requirements-api.txt
 
 # Run with auto-reload
-uvicorn hyper2kvm.worker.api:app --reload --host 0.0.0.0 --port 8000
+uvicorn h2kvm.worker.api:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Production
 
 ```bash
 # Using Gunicorn with multiple workers
-gunicorn hyper2kvm.worker.api:app \
+gunicorn h2kvm.worker.api:app \
   -w 4 \
   -k uvicorn.workers.UvicornWorker \
   --bind 0.0.0.0:8000 \
@@ -730,10 +730,10 @@ WORKDIR /app
 COPY requirements.txt requirements-api.txt ./
 RUN pip install --no-cache-dir -r requirements.txt -r requirements-api.txt
 
-COPY hyper2kvm/ ./hyper2kvm/
+COPY h2kvm/ ./h2kvm/
 EXPOSE 8000
 
-CMD ["uvicorn", "hyper2kvm.worker.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "h2kvm.worker.api:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ### Kubernetes
@@ -742,20 +742,20 @@ CMD ["uvicorn", "hyper2kvm.worker.api:app", "--host", "0.0.0.0", "--port", "8000
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hyper2kvm-api
+  name: h2kvm-api
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: hyper2kvm-api
+      app: h2kvm-api
   template:
     metadata:
       labels:
-        app: hyper2kvm-api
+        app: h2kvm-api
     spec:
       containers:
       - name: api
-        image: ghcr.io/ssahani/hyper2kvm-worker-api:latest
+        image: ghcr.io/ssahani/h2kvm-worker-api:latest
         ports:
         - containerPort: 8000
         livenessProbe:
@@ -774,10 +774,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hyper2kvm-api
+  name: h2kvm-api
 spec:
   selector:
-    app: hyper2kvm-api
+    app: h2kvm-api
   ports:
   - port: 80
     targetPort: 8000
@@ -935,7 +935,7 @@ done
 lsof -i :8000
 
 # Use different port
-uvicorn hyper2kvm.worker.api:app --port 8001
+uvicorn h2kvm.worker.api:app --port 8001
 ```
 
 ### Jobs Not Appearing
@@ -945,7 +945,7 @@ uvicorn hyper2kvm.worker.api:app --port 8001
 curl http://localhost:8000/jobs
 
 # Check logs
-uvicorn hyper2kvm.worker.api:app --log-level debug
+uvicorn h2kvm.worker.api:app --log-level debug
 ```
 
 ### Workers Not Registering
@@ -976,7 +976,7 @@ curl -N -H "Accept: text/event-stream" http://localhost:8000/jobs/demo-123/event
 # Calculate optimal workers: (2 × CPU cores) + 1
 NUM_WORKERS=$((2 * $(nproc) + 1))
 
-gunicorn hyper2kvm.worker.api:app -w $NUM_WORKERS -k uvicorn.workers.UvicornWorker
+gunicorn h2kvm.worker.api:app -w $NUM_WORKERS -k uvicorn.workers.UvicornWorker
 ```
 
 ### Database/State Storage
@@ -1010,9 +1010,9 @@ async def list_workers():
 - [Worker Protocol Specification](PROTOCOL_SPEC.md)
 - [Quick Start Guide](QUICKSTART.md)
 - [Kubernetes Deployment](../../k8s/README.md)
-- [CLI Reference](../../hyper2kvm/worker/cli.py)
+- [CLI Reference](../../h2kvm/worker/cli.py)
 
 ---
 
 **Last Updated:** 2026-03-29
-**Maintainer:** hyper2kvm team
+**Maintainer:** h2kvm team

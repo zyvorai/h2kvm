@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Windows Custom PNP Drivers &amp; VirtIO Injection — hyper2kvm Deep Dive</title>
+<title>Windows Custom PNP Drivers &amp; VirtIO Injection — h2kvm Deep Dive</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -62,7 +62,7 @@
 <!-- PAGE 1: Architecture Overview -->
 <div class="page page-dark">
   <h2 class="st">Driver Injection <span>Architecture</span></h2>
-  <p class="sub">How hyper2kvm deterministically prepares Windows for KVM &mdash; entirely offline.</p>
+  <p class="sub">How h2kvm deterministically prepares Windows for KVM &mdash; entirely offline.</p>
 
   <div class="flow">
     <div class="flow-step">Mount QCOW2<br><small>qemu-nbd + ntfs-3g</small></div>
@@ -93,7 +93,7 @@
         <li>Edit SYSTEM hive (services, CriticalDeviceDatabase)</li>
         <li>Edit SOFTWARE hive (RunOnce, OOBE bypass)</li>
         <li>Disable VMware services in registry</li>
-        <li>Stage custom PNP drivers to C:\hyper2kvm-drivers</li>
+        <li>Stage custom PNP drivers to C:\h2kvm-drivers</li>
       </ul>
     </div>
     <div class="card">
@@ -207,7 +207,7 @@ HKLM\SYSTEM\ControlSet001\Control\
       <ul>
         <li>Accepts directories or ISOs as driver sources</li>
         <li>ISOs are auto-mounted and contents copied</li>
-        <li>All driver files staged to <code>C:\hyper2kvm-drivers\</code></li>
+        <li>All driver files staged to <code>C:\h2kvm-drivers\</code></li>
         <li>RunOnce registry key triggers pnputil on first boot</li>
         <li>pnputil recursively discovers and installs all INF files</li>
         <li>Supports multiple driver packages (repeatable flag)</li>
@@ -269,8 +269,8 @@ if exist "%ISO%\guest-agent\qemu-ga-x86_64.msi" (
 )
 
 rem === Custom PNP driver installation ===
-if exist "C:\hyper2kvm-drivers" (
-  pnputil /add-driver "C:\hyper2kvm-drivers\*.inf" /subdirs /install
+if exist "C:\h2kvm-drivers" (
+  pnputil /add-driver "C:\h2kvm-drivers\*.inf" /subdirs /install
 )
   </pre>
 
@@ -369,10 +369,10 @@ win_net:
   <h3>Files Staged in Guest</h3>
   <table>
     <tr><th style="width:40%">Path</th><th style="width:60%">Purpose</th></tr>
-    <tr><td><code>C:\hyper2kvm\net\saved_network.json</code></td><td>Snapshot of VMware TCP/IP config from offline registry</td></tr>
-    <tr><td><code>C:\hyper2kvm\net\network_override.json</code></td><td>User-provided override config (optional)</td></tr>
-    <tr><td><code>C:\hyper2kvm\net\apply-network.ps1</code></td><td>PowerShell script that applies config on first boot</td></tr>
-    <tr><td><code>C:\hyper2kvm\net\apply-network.log</code></td><td>Execution log for troubleshooting</td></tr>
+    <tr><td><code>C:\h2kvm\net\saved_network.json</code></td><td>Snapshot of VMware TCP/IP config from offline registry</td></tr>
+    <tr><td><code>C:\h2kvm\net\network_override.json</code></td><td>User-provided override config (optional)</td></tr>
+    <tr><td><code>C:\h2kvm\net\apply-network.ps1</code></td><td>PowerShell script that applies config on first boot</td></tr>
+    <tr><td><code>C:\h2kvm\net\apply-network.log</code></td><td>Execution log for troubleshooting</td></tr>
   </table>
 </div>
 
@@ -467,7 +467,7 @@ win_net:
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

@@ -36,7 +36,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-echo "🚀 === hyper2kvm Development Setup ==="
+echo "🚀 === h2kvm Development Setup ==="
 echo
 
 # Check Python version
@@ -134,10 +134,10 @@ fi
 echo "🧪 Running initial verification..."
 
 # Import check
-if python3 -c "import hyper2kvm; print(f'hyper2kvm {hyper2kvm.__version__}')" 2>/dev/null; then
-    echo "✅ hyper2kvm import successful"
+if python3 -c "import h2kvm; print(f'h2kvm {h2kvm.__version__}')" 2>/dev/null; then
+    echo "✅ h2kvm import successful"
 else
-    echo "❌ hyper2kvm import failed"
+    echo "❌ h2kvm import failed"
     exit 1
 fi
 

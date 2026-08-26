@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import pytest
 
-from hyper2kvm.cli.args.parser import build_parser
+from h2kvm.cli.args.parser import build_parser
 
 
 @pytest.fixture()

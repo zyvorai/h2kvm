@@ -19,7 +19,7 @@ Successfully migrated a real ESXi RHEL 8.8 VMDK disk image to a running KubeVirt
 ## Test Configuration
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: photon-vmdk-migration
@@ -89,7 +89,7 @@ photon-vmdk-migration   3h37m   Running   True    10.42.1.196
 
 ```
 NAME                    PHASE     IP            NODENAME                      READY
-photon-vmdk-migration   Running   10.42.1.196   k3d-hyper2kvm-test-server-0   True
+photon-vmdk-migration   Running   10.42.1.196   k3d-h2kvm-test-server-0   True
 ```
 
 ## Conditions (All Passed)
@@ -172,8 +172,8 @@ The operator is **production-ready** for VMDK migrations from HTTP/HTTPS sources
 ---
 
 **Test Environment**:
-- Cluster: k3d hyper2kvm-test
+- Cluster: k3d h2kvm-test
 - CDI: v1.58.0
 - KubeVirt: v1.1.0
-- Operator: hyper2kvm-operator:test
+- Operator: h2kvm-operator:test
 - Storage: local-path provisioner

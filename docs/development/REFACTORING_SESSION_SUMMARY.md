@@ -1,7 +1,7 @@
 # Refactoring Session Summary
 
 **Date**: 2026-02-16  
-**Project**: hyper2kvm  
+**Project**: h2kvm  
 **Session Focus**: Comprehensive code quality improvements
 
 ## Overview
@@ -236,10 +236,10 @@ emit_linux_domain(config)
 pip install radon pylint bandit vulture pytest-cov
 
 # Run metrics
-radon cc hyper2kvm -a -nb
-pylint hyper2kvm
-bandit -r hyper2kvm
-pytest --cov=hyper2kvm --cov-report=html
+radon cc h2kvm -a -nb
+pylint h2kvm
+bandit -r h2kvm
+pytest --cov=h2kvm --cov-report=html
 ```
 
 ## Session Statistics

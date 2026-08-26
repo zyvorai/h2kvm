@@ -4,7 +4,7 @@
 
 ## Overview
 
-hyper2kvm provides powerful configuration injection capabilities that allow you to customize VM settings **before first boot**. Unlike traditional cloud-init approaches that run on boot, these injectors work offline using the guestfs backend (VMCraft by default) to modify the VM disk image directly.
+h2kvm provides powerful configuration injection capabilities that allow you to customize VM settings **before first boot**. Unlike traditional cloud-init approaches that run on boot, these injectors work offline using the guestfs backend (VMCraft by default) to modify the VM disk image directly.
 
 **Why Pre-Boot Injection?**
 - ✅ **Deterministic:** Changes applied offline, guaranteed before boot
@@ -15,7 +15,7 @@ hyper2kvm provides powerful configuration injection capabilities that allow you 
 
 ## Available Injectors
 
-hyper2kvm supports five configuration injectors:
+h2kvm supports five configuration injectors:
 
 1. **[Network Configuration](#network-configuration-injection)** - Static IPs, bonds, bridges, VLANs
 2. **[Hostname Configuration](#hostname-configuration-injection)** - Set system hostname
@@ -533,10 +533,10 @@ firstboot_config:
       content: |
         #!/bin/bash
         echo "Final cleanup..."
-        systemctl disable hyper2kvm-firstboot.service
+        systemctl disable h2kvm-firstboot.service
 
   # Service configuration
-  service_name: hyper2kvm-firstboot   # Default
+  service_name: h2kvm-firstboot   # Default
   keep_enabled: false                  # Disable service after first run
 
   # Systemd service customization (optional)
@@ -632,8 +632,8 @@ firstboot_config:
       content: |
         #!/bin/bash
         # Clean up firstboot artifacts
-        rm -rf /var/lib/hyper2kvm-firstboot
-        systemctl disable hyper2kvm-firstboot.service
+        rm -rf /var/lib/h2kvm-firstboot
+        systemctl disable h2kvm-firstboot.service
 
   service:
     Description: "Production First Boot Setup"
@@ -649,14 +649,14 @@ firstboot_config:
 Scripts execute in order (by `order` field, lower first):
 
 1. Scripts run as **root** via systemd oneshot service
-2. Output logged to `/var/log/hyper2kvm-firstboot.log`
+2. Output logged to `/var/log/h2kvm-firstboot.log`
 3. Service auto-disables after completion (unless `keep_enabled: true`)
 4. Failures don't prevent boot (service continues)
 
 ### Runner Script Structure
 
 The injector creates:
-- Individual script files in `/usr/local/lib/hyper2kvm-firstboot/`
+- Individual script files in `/usr/local/lib/h2kvm-firstboot/`
 - Master runner script that executes all in order
 - Systemd service unit at `/etc/systemd/system/{service_name}.service`
 - Symlink in `/etc/systemd/system/multi-user.target.wants/`
@@ -842,18 +842,18 @@ Check logs for:
 
 2. Check service status:
    ```bash
-   systemctl status hyper2kvm-firstboot.service
+   systemctl status h2kvm-firstboot.service
    ```
 
 3. View script logs:
    ```bash
-   cat /var/log/hyper2kvm-firstboot.log
-   journalctl -u hyper2kvm-firstboot.service
+   cat /var/log/h2kvm-firstboot.log
+   journalctl -u h2kvm-firstboot.service
    ```
 
 4. Manually trigger (for testing):
    ```bash
-   systemctl start hyper2kvm-firstboot.service
+   systemctl start h2kvm-firstboot.service
    ```
 
 ---

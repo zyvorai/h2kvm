@@ -1,4 +1,4 @@
-# Hyper2KVM + KubeVirt Integration
+# H2KVM + KubeVirt Integration
 
 **Version:** v0.3.1
 **Date:** 2026-01-31
@@ -12,7 +12,7 @@ This integration enables seamless migration of VMware VMs to KubeVirt-managed vi
 
 **Flow:**
 ```
-VMware VMDK → Hyper2KVM Conversion → KubeVirt VM → Running on K8s
+VMware VMDK → H2KVM Conversion → KubeVirt VM → Running on K8s
 ```
 
 **Benefits:**
@@ -34,7 +34,7 @@ VMware VMDK → Hyper2KVM Conversion → KubeVirt VM → Running on K8s
 ├─────────────────────────────────────────────────────────┤
 │ DataVolume (QCOW2 image in PVC)                         │
 ├─────────────────────────────────────────────────────────┤
-│ Hyper2KVM Conversion (VMDK → QCOW2 + offline fixes)     │
+│ H2KVM Conversion (VMDK → QCOW2 + offline fixes)     │
 ├─────────────────────────────────────────────────────────┤
 │ Source VMDK (VMware export)                             │
 └─────────────────────────────────────────────────────────┘
@@ -42,7 +42,7 @@ VMware VMDK → Hyper2KVM Conversion → KubeVirt VM → Running on K8s
 
 ### Integration Points
 
-1. **Hyper2KVM MigrationJob** → Converts VMDK to KVM-ready QCOW2
+1. **H2KVM MigrationJob** → Converts VMDK to KVM-ready QCOW2
 2. **Kubernetes PVC** → Stores converted image
 3. **KubeVirt DataVolume** → Imports QCOW2 into VM disk
 4. **KubeVirt VirtualMachine** → Runs the converted VM
@@ -93,11 +93,11 @@ kubectl create -f https://github.com/kubevirt/containerized-data-importer/releas
 kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-cr.yaml
 ```
 
-### Install Hyper2KVM
+### Install H2KVM
 
 ```bash
 # Install CRDs
-kubectl apply -f https://raw.githubusercontent.com/ssahani/hyper2kvm/main/k8s/operator/crds/
+kubectl apply -f https://raw.githubusercontent.com/ssahani/h2kvm/main/k8s/operator/crds/
 
 # Deploy operator (see DEPLOYMENT.md)
 kubectl apply -f k8s/operator/manifests/
@@ -107,12 +107,12 @@ kubectl apply -f k8s/operator/manifests/
 
 ## Integration Workflow
 
-### Step 1: Convert VMDK with Hyper2KVM
+### Step 1: Convert VMDK with H2KVM
 
 Create a `MigrationJob` to convert the VMDK:
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: centos9-conversion
@@ -199,7 +199,7 @@ metadata:
   namespace: vms
   labels:
     app: centos9
-    migrated-by: hyper2kvm
+    migrated-by: h2kvm
 spec:
   running: false  # Set to true to auto-start
   template:
@@ -212,7 +212,7 @@ spec:
           disks:
             - name: rootdisk
               disk:
-                bus: virtio  # Hyper2KVM injected virtio drivers
+                bus: virtio  # H2KVM injected virtio drivers
           interfaces:
             - name: default
               masquerade: {}
@@ -286,7 +286,7 @@ spec:
 
 ---
 # Step 4: MigrationJob (converts VMDK → QCOW2)
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: centos9-migration
@@ -343,12 +343,12 @@ metadata:
     app: centos9
     os: centos-stream-9
     migrated-from: vmware
-    migrated-by: hyper2kvm
+    migrated-by: h2kvm
     migration-date: "2026-01-31"
   annotations:
     description: "CentOS Stream 9 migrated from VMware"
-    hyper2kvm/source-vmdk: "centos9.vmdk"
-    hyper2kvm/conversion-job: "centos9-migration"
+    h2kvm/source-vmdk: "centos9.vmdk"
+    h2kvm/conversion-job: "centos9-migration"
 spec:
   running: true
   template:
@@ -523,12 +523,12 @@ spec:
 
 ---
 
-## Integration with Hyper2KVM Operator
+## Integration with H2KVM Operator
 
 ### Enhanced MigrationJob with KubeVirt Output
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: vm-migration-with-kubevirt
@@ -566,7 +566,7 @@ spec:
 ### Check Migration Status
 
 ```bash
-# Hyper2KVM conversion
+# H2KVM conversion
 kubectl get migrationjob -n vm-migrations
 kubectl describe migrationjob centos9-migration -n vm-migrations
 
@@ -582,7 +582,7 @@ virtctl info centos9 -n vm-migrations
 ### Logs
 
 ```bash
-# Hyper2KVM worker logs
+# H2KVM worker logs
 kubectl logs -n vm-migrations <migration-worker-pod>
 
 # KubeVirt virt-launcher logs
@@ -728,9 +728,9 @@ spec:
 
 ---
 
-## Comparison: Traditional vs Hyper2KVM + KubeVirt
+## Comparison: Traditional vs H2KVM + KubeVirt
 
-| Aspect | Traditional Migration | Hyper2KVM + KubeVirt |
+| Aspect | Traditional Migration | H2KVM + KubeVirt |
 |--------|----------------------|----------------------|
 | **Conversion** | Manual qemu-img | Automated with offline fixes |
 | **Driver injection** | Manual | Automatic (virtio drivers) |
@@ -751,7 +751,7 @@ Before production deployment:
 - [ ] Cluster has bare metal or nested virt support
 - [ ] KubeVirt installed and all pods running
 - [ ] CDI installed for DataVolume support
-- [ ] Hyper2KVM operator deployed
+- [ ] H2KVM operator deployed
 - [ ] Storage class configured (fast SSD recommended)
 - [ ] Network policies defined
 - [ ] Backup strategy in place (VM snapshots)
@@ -823,7 +823,7 @@ After activation, all KubeVirt VM management in the dashboard targets the produc
 
 - [KubeVirt Documentation](https://kubevirt.io/user-guide/)
 - [CDI Documentation](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/datavolumes.md)
-- [Hyper2KVM Repository](https://github.com/ssahani/hyper2kvm)
+- [H2KVM Repository](https://github.com/ssahani/h2kvm)
 - [Virtctl CLI Guide](https://kubevirt.io/user-guide/operations/virtctl_client_tool/)
 
 ---

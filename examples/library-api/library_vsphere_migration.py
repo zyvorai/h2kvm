@@ -4,7 +4,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 """
-Example: vSphere VM migration using hyper2kvm library.
+Example: vSphere VM migration using h2kvm library.
 
 This example demonstrates:
 - Connecting to vCenter/ESXi (powered by hypersdk - VMware's modern Python SDK)
@@ -24,7 +24,7 @@ import logging
 import os
 import sys
 
-from hyper2kvm import Orchestrator, VMwareClient
+from h2kvm import Orchestrator, VMwareClient
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

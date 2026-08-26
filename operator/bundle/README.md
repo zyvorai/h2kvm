@@ -15,7 +15,7 @@ kubectl create -f https://operatorhub.io/install/hyperconversion-operator.yaml
 
 ```bash
 # Run the bundle
-operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v1.2.0
+operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v1.2.0
 
 # Cleanup
 operator-sdk cleanup hyperconversion-operator
@@ -27,7 +27,7 @@ operator-sdk cleanup hyperconversion-operator
 bundle/
 ├── manifests/                                   # Operator manifests
 │   ├── hyperconversion-operator.clusterserviceversion.yaml
-│   └── hyper2kvm.io_hyperconversions.yaml
+│   └── h2kvm.io_hyperconversions.yaml
 ├── metadata/                                    # Bundle metadata
 │   └── annotations.yaml
 └── tests/                                       # Scorecard tests
@@ -87,5 +87,5 @@ See [OLM Integration Guide](../docs/OLM_INTEGRATION.md) for detailed documentati
 
 ## Support
 
-- GitHub: https://github.com/ssahani/hyper2kvm
-- Issues: https://github.com/ssahani/hyper2kvm/issues
+- GitHub: https://github.com/ssahani/h2kvm
+- Issues: https://github.com/ssahani/h2kvm/issues

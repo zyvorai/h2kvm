@@ -1,6 +1,6 @@
 # Demo Scripts
 
-Demonstration scripts for showcasing hyper2kvm features and capabilities.
+Demonstration scripts for showcasing h2kvm features and capabilities.
 
 ## Available Demos
 
@@ -40,7 +40,7 @@ python scripts/demos/show_implementations.py
 Some demos may require optional dependencies:
 
 ```bash
-pip install 'hyper2kvm[tui]'
+pip install 'h2kvm[tui]'
 ```
 
 ## See Also

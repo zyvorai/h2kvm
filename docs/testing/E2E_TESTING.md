@@ -1,6 +1,6 @@
 # Kubernetes End-to-End Testing Guide
 
-This guide explains how to run automated end-to-end tests for hyper2kvm in Kubernetes, specifically testing CentOS 9 VM migration.
+This guide explains how to run automated end-to-end tests for h2kvm in Kubernetes, specifically testing CentOS 9 VM migration.
 
 ## Quick Start
 
@@ -86,10 +86,10 @@ bash scripts/test-centos9-e2e-k8s.sh
 
 ```bash
 # Cluster configuration
-CLUSTER_NAME=hyper2kvm-test          # k3d cluster name
-NAMESPACE_OPERATOR=hyper2kvm-system  # Operator namespace
-NAMESPACE_WORKERS=hyper2kvm-workers  # Worker namespace
-NAMESPACE_TEST=hyper2kvm-test        # Test namespace
+CLUSTER_NAME=h2kvm-test          # k3d cluster name
+NAMESPACE_OPERATOR=h2kvm-system  # Operator namespace
+NAMESPACE_WORKERS=h2kvm-workers  # Worker namespace
+NAMESPACE_TEST=h2kvm-test        # Test namespace
 
 # Test data
 CENTOS9_VMDK=/path/to/centos9.vmdk  # CentOS 9 VMDK file
@@ -145,13 +145,13 @@ The E2E test performs these steps:
    - Install JobTemplate CRD
 
 5. **Create Namespaces** 📁
-   - hyper2kvm-system (operator)
-   - hyper2kvm-workers (workers)
-   - hyper2kvm-test (test jobs)
+   - h2kvm-system (operator)
+   - h2kvm-workers (workers)
+   - h2kvm-test (test jobs)
 
 6. **Label Nodes** 🏷️
    - Mark nodes as worker-enabled
-   - `hyper2kvm.io/worker-enabled=true`
+   - `h2kvm.io/worker-enabled=true`
 
 7. **Deploy Workers** ⚙️
    - Create PVCs (local-path for k3d)
@@ -178,12 +178,12 @@ The E2E test performs these steps:
 
 ```bash
 # View all E2E resources
-kubectl get all -n hyper2kvm-test
-kubectl get migrationjobs -n hyper2kvm-test
-kubectl get pods -n hyper2kvm-workers
+kubectl get all -n h2kvm-test
+kubectl get migrationjobs -n h2kvm-test
+kubectl get pods -n h2kvm-workers
 
 # Check CRDs
-kubectl get crds | grep hyper2kvm
+kubectl get crds | grep h2kvm
 ```
 
 ### MigrationJob Specification
@@ -191,7 +191,7 @@ kubectl get crds | grep hyper2kvm
 The test creates a MigrationJob with:
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: centos9-e2e-test
@@ -227,42 +227,42 @@ spec:
 
 ```bash
 # Get job status
-kubectl get migrationjob centos9-e2e-test -n hyper2kvm-test -o wide
+kubectl get migrationjob centos9-e2e-test -n h2kvm-test -o wide
 
 # Describe job
-kubectl describe migrationjob centos9-e2e-test -n hyper2kvm-test
+kubectl describe migrationjob centos9-e2e-test -n h2kvm-test
 
 # Watch for changes
-kubectl get migrationjobs -n hyper2kvm-test -w
+kubectl get migrationjobs -n h2kvm-test -w
 ```
 
 ### View Logs
 
 ```bash
 # Operator logs
-kubectl logs -n hyper2kvm-system -l app=hyper2kvm-operator -f
+kubectl logs -n h2kvm-system -l app=h2kvm-operator -f
 
 # Worker logs
-kubectl logs -n hyper2kvm-workers -l app=hyper2kvm-worker -f
+kubectl logs -n h2kvm-workers -l app=h2kvm-worker -f
 
 # Specific pod logs
-kubectl logs -n hyper2kvm-workers <pod-name> -f
+kubectl logs -n h2kvm-workers <pod-name> -f
 ```
 
 ### Debug Workers
 
 ```bash
 # List worker pods
-kubectl get pods -n hyper2kvm-workers -o wide
+kubectl get pods -n h2kvm-workers -o wide
 
 # Exec into worker
-kubectl exec -it -n hyper2kvm-workers <pod-name> -- /bin/bash
+kubectl exec -it -n h2kvm-workers <pod-name> -- /bin/bash
 
 # Check uploaded data
-kubectl exec -n hyper2kvm-workers <pod-name> -- ls -lh /data/input/
+kubectl exec -n h2kvm-workers <pod-name> -- ls -lh /data/input/
 
 # Check output
-kubectl exec -n hyper2kvm-workers <pod-name> -- ls -lh /data/output/
+kubectl exec -n h2kvm-workers <pod-name> -- ls -lh /data/output/
 ```
 
 ## Cleanup
@@ -280,16 +280,16 @@ AUTO_CLEANUP=true bash scripts/run-e2e-test.sh
 ### Full Cleanup
 
 ```bash
-# Delete all hyper2kvm resources
-kubectl delete namespace hyper2kvm-system hyper2kvm-workers hyper2kvm-test
+# Delete all h2kvm resources
+kubectl delete namespace h2kvm-system h2kvm-workers h2kvm-test
 
 # Delete CRDs
-kubectl delete crd migrationjobs.hyper2kvm.io
-kubectl delete crd offlinefixjobs.hyper2kvm.io
-kubectl delete crd jobtemplates.hyper2kvm.io
+kubectl delete crd migrationjobs.h2kvm.io
+kubectl delete crd offlinefixjobs.h2kvm.io
+kubectl delete crd jobtemplates.h2kvm.io
 
 # Remove node labels
-kubectl label nodes --all hyper2kvm.io/worker-enabled-
+kubectl label nodes --all h2kvm.io/worker-enabled-
 ```
 
 ## Building & Pushing Images
@@ -324,13 +324,13 @@ bash scripts/build-and-push-images.sh
 
 ```bash
 # Update deployment to use GHCR images
-kubectl set image deployment/hyper2kvm-operator \
-  operator=ghcr.io/ssahani/hyper2kvm-operator:latest \
-  -n hyper2kvm-system
+kubectl set image deployment/h2kvm-operator \
+  operator=ghcr.io/ssahani/h2kvm-operator:latest \
+  -n h2kvm-system
 
-kubectl set image daemonset/hyper2kvm-worker \
-  worker=ghcr.io/ssahani/hyper2kvm-worker:latest \
-  -n hyper2kvm-workers
+kubectl set image daemonset/h2kvm-worker \
+  worker=ghcr.io/ssahani/h2kvm-worker:latest \
+  -n h2kvm-workers
 ```
 
 ## CI/CD Integration
@@ -366,7 +366,7 @@ bash scripts/test-centos9-e2e-k8s.sh
 
 ```bash
 # Check pod status
-kubectl describe pod -n hyper2kvm-workers <pod-name>
+kubectl describe pod -n h2kvm-workers <pod-name>
 
 # Common issues:
 # 1. Image not found - run: make build-images
@@ -378,24 +378,24 @@ kubectl describe pod -n hyper2kvm-workers <pod-name>
 
 ```bash
 # Worker pods need to be Running
-kubectl get pods -n hyper2kvm-workers
+kubectl get pods -n h2kvm-workers
 
 # Check if image exists in pod
-kubectl describe pod -n hyper2kvm-workers <pod-name> | grep Image:
+kubectl describe pod -n h2kvm-workers <pod-name> | grep Image:
 ```
 
 ### VMDK Upload Failed
 
 ```bash
 # Check pod is running
-kubectl get pod -n hyper2kvm-workers <pod-name>
+kubectl get pod -n h2kvm-workers <pod-name>
 
 # Check available space
-kubectl exec -n hyper2kvm-workers <pod-name> -- df -h /data/input
+kubectl exec -n h2kvm-workers <pod-name> -- df -h /data/input
 
 # Manual upload
 kubectl cp /path/to/centos9.vmdk \
-  hyper2kvm-workers/<pod-name>:/data/input/centos9.vmdk
+  h2kvm-workers/<pod-name>:/data/input/centos9.vmdk
 ```
 
 ## Advanced Usage
@@ -405,11 +405,11 @@ kubectl cp /path/to/centos9.vmdk \
 Create your own MigrationJob:
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: my-custom-test
-  namespace: hyper2kvm-test
+  namespace: h2kvm-test
 spec:
   operation: convert
   image:
@@ -436,7 +436,7 @@ kubectl get migrationjobs -A -w
 
 ```bash
 # Set resource limits
-kubectl patch daemonset hyper2kvm-worker -n hyper2kvm-workers --type='json' \
+kubectl patch daemonset h2kvm-worker -n h2kvm-workers --type='json' \
   -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/resources/limits/cpu", "value": "8"}]'
 ```
 
@@ -445,10 +445,10 @@ kubectl patch daemonset hyper2kvm-worker -n hyper2kvm-workers --type='json' \
 - 📖 Read [LIVE_MIGRATION.md](LIVE_MIGRATION.md) for live migration features
 - 🔧 Check [UPGRADE_GUIDE.md](UPGRADE_GUIDE.md) for version migration
 - 📋 See [QUICK_REFERENCE.md](QUICK_REFERENCE.md) for command reference
-- 🐛 Report issues at https://github.com/ssahani/hyper2kvm/issues
+- 🐛 Report issues at https://github.com/ssahani/h2kvm/issues
 
 ## Support
 
 For questions and support:
-- GitHub Issues: https://github.com/ssahani/hyper2kvm/issues
-- Documentation: https://github.com/ssahani/hyper2kvm/docs
+- GitHub Issues: https://github.com/ssahani/h2kvm/issues
+- Documentation: https://github.com/ssahani/h2kvm/docs

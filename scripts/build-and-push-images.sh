@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Build and Push hyper2kvm Images to GitHub Container Registry
+# Build and Push h2kvm Images to GitHub Container Registry
 # Builds operator and worker images and pushes them to ghcr.io
 #
 
@@ -9,7 +9,7 @@ set -eo pipefail
 # Configuration
 GHCR_REGISTRY="${GHCR_REGISTRY:-ghcr.io}"
 GITHUB_USER="${GITHUB_USER:-ssahani}"
-IMAGE_NAME="${IMAGE_NAME:-hyper2kvm}"
+IMAGE_NAME="${IMAGE_NAME:-h2kvm}"
 TAG="${TAG:-latest}"
 PUSH="${PUSH:-true}"
 BUILD_OPERATOR="${BUILD_OPERATOR:-true}"
@@ -102,8 +102,8 @@ build_worker() {
 
         # Also tag as latest locally
         docker tag "${image_full}" "${IMAGE_NAME}-worker:latest"
-        docker tag "${image_full}" "hyper2kvm:worker"  # For k3d compatibility
-        log_success "Tagged locally as: ${IMAGE_NAME}-worker:latest, hyper2kvm:worker"
+        docker tag "${image_full}" "h2kvm:worker"  # For k3d compatibility
+        log_success "Tagged locally as: ${IMAGE_NAME}-worker:latest, h2kvm:worker"
     else
         log_error "Failed to build worker image"
         exit 1
@@ -161,12 +161,12 @@ generate_summary() {
         echo ""
         echo "📝 To use in Kubernetes:"
         if [ "${BUILD_OPERATOR}" = "true" ]; then
-            echo "  kubectl set image deployment/hyper2kvm-operator \\"
-            echo "    operator=${OPERATOR_IMAGE} -n hyper2kvm-system"
+            echo "  kubectl set image deployment/h2kvm-operator \\"
+            echo "    operator=${OPERATOR_IMAGE} -n h2kvm-system"
         fi
         if [ "${BUILD_WORKER}" = "true" ]; then
-            echo "  kubectl set image daemonset/hyper2kvm-worker \\"
-            echo "    worker=${WORKER_IMAGE} -n hyper2kvm-workers"
+            echo "  kubectl set image daemonset/h2kvm-worker \\"
+            echo "    worker=${WORKER_IMAGE} -n h2kvm-workers"
         fi
     else
         echo "ℹ️  Images built locally only"
@@ -188,7 +188,7 @@ generate_summary() {
 
 # Main execution
 main() {
-    log_section "Build and Push hyper2kvm Images"
+    log_section "Build and Push h2kvm Images"
     log_info "Registry: ${GHCR_REGISTRY}"
     log_info "User: ${GITHUB_USER}"
     log_info "Tag: ${TAG}"

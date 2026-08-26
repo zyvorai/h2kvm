@@ -12,7 +12,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/hyper2kvm/zkvm/internal/theme"
+	"github.com/h2kvm/zkvm/internal/theme"
 )
 
 // Auto-refresh interval for the VM list.

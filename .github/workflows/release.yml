@@ -153,7 +153,7 @@ jobs:
 
             ### Python Package
             ```bash
-            pip install hyper2kvm==${{ github.ref_name }}
+            pip install h2kvm==${{ github.ref_name }}
             ```
 
             ### Kubernetes Operator
@@ -164,13 +164,13 @@ jobs:
             ### Debian/Ubuntu
             Download the `.deb` file and install:
             ```bash
-            sudo dpkg -i hyper2kvm_${{ github.ref_name }}_all.deb
+            sudo dpkg -i h2kvm_${{ github.ref_name }}_all.deb
             ```
 
             ### RHEL/Fedora
             Download the `.rpm` file and install:
             ```bash
-            sudo rpm -i hyper2kvm-${{ github.ref_name }}.rpm
+            sudo rpm -i h2kvm-${{ github.ref_name }}.rpm
             ```
           draft: false
           prerelease: false

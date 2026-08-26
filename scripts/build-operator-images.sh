@@ -53,8 +53,8 @@ echo_info "Building operator image..."
 if ${CONTAINER_TOOL} build \
     --target operator \
     ${PLATFORM_ARG} \
-    -t ${REGISTRY}/hyper2kvm:${VERSION}-operator \
-    -t ${REGISTRY}/hyper2kvm:latest-operator \
+    -t ${REGISTRY}/h2kvm:${VERSION}-operator \
+    -t ${REGISTRY}/h2kvm:latest-operator \
     -f Dockerfile \
     .; then
     echo_success "Operator image built successfully"
@@ -68,8 +68,8 @@ echo_info "Building worker image..."
 if ${CONTAINER_TOOL} build \
     --target worker \
     ${PLATFORM_ARG} \
-    -t ${REGISTRY}/hyper2kvm:${VERSION}-worker \
-    -t ${REGISTRY}/hyper2kvm:latest-worker \
+    -t ${REGISTRY}/h2kvm:${VERSION}-worker \
+    -t ${REGISTRY}/h2kvm:latest-worker \
     -f Dockerfile \
     .; then
     echo_success "Worker image built successfully"
@@ -83,8 +83,8 @@ echo_info "Building CLI image..."
 if ${CONTAINER_TOOL} build \
     --target cli \
     ${PLATFORM_ARG} \
-    -t ${REGISTRY}/hyper2kvm:${VERSION}-cli \
-    -t ${REGISTRY}/hyper2kvm:latest-cli \
+    -t ${REGISTRY}/h2kvm:${VERSION}-cli \
+    -t ${REGISTRY}/h2kvm:latest-cli \
     -f Dockerfile \
     .; then
     echo_success "CLI image built successfully"
@@ -98,8 +98,8 @@ echo_info "Building daemon image..."
 if ${CONTAINER_TOOL} build \
     --target daemon \
     ${PLATFORM_ARG} \
-    -t ${REGISTRY}/hyper2kvm:${VERSION}-daemon \
-    -t ${REGISTRY}/hyper2kvm:latest-daemon \
+    -t ${REGISTRY}/h2kvm:${VERSION}-daemon \
+    -t ${REGISTRY}/h2kvm:latest-daemon \
     -f Dockerfile \
     .; then
     echo_success "Daemon image built successfully"
@@ -112,10 +112,10 @@ echo ""
 echo_success "All images built successfully!"
 echo ""
 echo_info "Built images:"
-echo "  - ${REGISTRY}/hyper2kvm:${VERSION}-operator"
-echo "  - ${REGISTRY}/hyper2kvm:${VERSION}-worker"
-echo "  - ${REGISTRY}/hyper2kvm:${VERSION}-cli"
-echo "  - ${REGISTRY}/hyper2kvm:${VERSION}-daemon"
+echo "  - ${REGISTRY}/h2kvm:${VERSION}-operator"
+echo "  - ${REGISTRY}/h2kvm:${VERSION}-worker"
+echo "  - ${REGISTRY}/h2kvm:${VERSION}-cli"
+echo "  - ${REGISTRY}/h2kvm:${VERSION}-daemon"
 echo ""
 
 # Ask to push
@@ -124,23 +124,23 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo_info "Pushing images to ${REGISTRY}..."
 
-    ${CONTAINER_TOOL} push ${REGISTRY}/hyper2kvm:${VERSION}-operator
-    ${CONTAINER_TOOL} push ${REGISTRY}/hyper2kvm:latest-operator
+    ${CONTAINER_TOOL} push ${REGISTRY}/h2kvm:${VERSION}-operator
+    ${CONTAINER_TOOL} push ${REGISTRY}/h2kvm:latest-operator
 
-    ${CONTAINER_TOOL} push ${REGISTRY}/hyper2kvm:${VERSION}-worker
-    ${CONTAINER_TOOL} push ${REGISTRY}/hyper2kvm:latest-worker
+    ${CONTAINER_TOOL} push ${REGISTRY}/h2kvm:${VERSION}-worker
+    ${CONTAINER_TOOL} push ${REGISTRY}/h2kvm:latest-worker
 
-    ${CONTAINER_TOOL} push ${REGISTRY}/hyper2kvm:${VERSION}-cli
-    ${CONTAINER_TOOL} push ${REGISTRY}/hyper2kvm:latest-cli
+    ${CONTAINER_TOOL} push ${REGISTRY}/h2kvm:${VERSION}-cli
+    ${CONTAINER_TOOL} push ${REGISTRY}/h2kvm:latest-cli
 
-    ${CONTAINER_TOOL} push ${REGISTRY}/hyper2kvm:${VERSION}-daemon
-    ${CONTAINER_TOOL} push ${REGISTRY}/hyper2kvm:latest-daemon
+    ${CONTAINER_TOOL} push ${REGISTRY}/h2kvm:${VERSION}-daemon
+    ${CONTAINER_TOOL} push ${REGISTRY}/h2kvm:latest-daemon
 
     echo_success "All images pushed successfully!"
 else
     echo_warning "Images not pushed. Push manually with:"
-    echo "  ${CONTAINER_TOOL} push ${REGISTRY}/hyper2kvm:${VERSION}-operator"
-    echo "  ${CONTAINER_TOOL} push ${REGISTRY}/hyper2kvm:${VERSION}-worker"
+    echo "  ${CONTAINER_TOOL} push ${REGISTRY}/h2kvm:${VERSION}-operator"
+    echo "  ${CONTAINER_TOOL} push ${REGISTRY}/h2kvm:${VERSION}-worker"
 fi
 
 echo ""

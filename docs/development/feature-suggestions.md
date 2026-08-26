@@ -1,4 +1,4 @@
-# hyper2kvm Feature Suggestions
+# h2kvm Feature Suggestions
 
 Based on current capabilities and industry trends, here are strategic feature additions organized by category.
 

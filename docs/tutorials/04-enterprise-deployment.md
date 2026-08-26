@@ -9,7 +9,7 @@
 ## What You'll Learn
 
 By the end of this tutorial, you will:
-- ✅ Deploy hyper2kvm in enterprise production environments
+- ✅ Deploy h2kvm in enterprise production environments
 - ✅ Implement automated migration pipelines with CI/CD
 - ✅ Configure centralized logging and monitoring
 - ✅ Set up high-availability migration infrastructure
@@ -103,21 +103,21 @@ all:
   vars:
     ansible_user: ansible
     ansible_python_interpreter: /usr/bin/python3
-    migration_base_dir: /opt/hyper2kvm
+    migration_base_dir: /opt/h2kvm
     migration_data_dir: /data/migrations
 ```
 
-### 1.2: Ansible Playbook - Install hyper2kvm
+### 1.2: Ansible Playbook - Install h2kvm
 
-Create `playbooks/install-hyper2kvm.yml`:
+Create `playbooks/install-h2kvm.yml`:
 
 ```yaml
 ---
-- name: Install and configure hyper2kvm on migration controllers
+- name: Install and configure h2kvm on migration controllers
   hosts: migration_controllers
   become: yes
   vars:
-    hyper2kvm_version: "1.0.0"
+    h2kvm_version: "1.0.0"
     python_version: "3.10"
 
   tasks:
@@ -133,32 +133,32 @@ Create `playbooks/install-hyper2kvm.yml`:
           - libhivex-bin
         state: present
 
-    - name: Create hyper2kvm user
+    - name: Create h2kvm user
       user:
-        name: hyper2kvm
+        name: h2kvm
         system: yes
         create_home: yes
-        home: /opt/hyper2kvm
+        home: /opt/h2kvm
         shell: /bin/bash
 
     - name: Create directory structure
       file:
         path: "{{ item }}"
         state: directory
-        owner: hyper2kvm
-        group: hyper2kvm
+        owner: h2kvm
+        group: h2kvm
         mode: '0755'
       loop:
-        - /opt/hyper2kvm/configs
-        - /opt/hyper2kvm/logs
-        - /opt/hyper2kvm/scripts
+        - /opt/h2kvm/configs
+        - /opt/h2kvm/logs
+        - /opt/h2kvm/scripts
         - /data/migrations/incoming
         - /data/migrations/output
         - /data/migrations/work
 
-    - name: Install hyper2kvm via pip
+    - name: Install h2kvm via pip
       pip:
-        name: "hyper2kvm[full]=={{ hyper2kvm_version }}"
+        name: "h2kvm[full]=={{ h2kvm_version }}"
         state: present
         executable: pip3
 
@@ -175,24 +175,24 @@ Create `playbooks/install-hyper2kvm.yml`:
       copy:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
-        owner: hyper2kvm
-        group: hyper2kvm
+        owner: h2kvm
+        group: h2kvm
         mode: '0600'
       loop:
-        - { src: 'files/esxi_id_rsa', dest: '/opt/hyper2kvm/.ssh/id_rsa' }
-        - { src: 'files/esxi_id_rsa.pub', dest: '/opt/hyper2kvm/.ssh/id_rsa.pub' }
+        - { src: 'files/esxi_id_rsa', dest: '/opt/h2kvm/.ssh/id_rsa' }
+        - { src: 'files/esxi_id_rsa.pub', dest: '/opt/h2kvm/.ssh/id_rsa.pub' }
 
-    - name: Configure sudoers for hyper2kvm user
+    - name: Configure sudoers for h2kvm user
       copy:
-        dest: /etc/sudoers.d/hyper2kvm
+        dest: /etc/sudoers.d/h2kvm
         content: |
-          # Allow hyper2kvm user to run migration commands
-          hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-img
-          hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-nbd
-          hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/mount
-          hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/umount
-          hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/blkid
-          hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/virsh
+          # Allow h2kvm user to run migration commands
+          h2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-img
+          h2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-nbd
+          h2kvm ALL=(ALL) NOPASSWD: /usr/bin/mount
+          h2kvm ALL=(ALL) NOPASSWD: /usr/bin/umount
+          h2kvm ALL=(ALL) NOPASSWD: /usr/bin/blkid
+          h2kvm ALL=(ALL) NOPASSWD: /usr/bin/virsh
         mode: '0440'
         validate: 'visudo -cf %s'
 
@@ -207,13 +207,13 @@ Create `playbooks/execute-migration.yml`:
 
 ```yaml
 ---
-- name: Execute VM migration using hyper2kvm
+- name: Execute VM migration using h2kvm
   hosts: migration_controllers[0]
   become: yes
-  become_user: hyper2kvm
+  become_user: h2kvm
   vars:
     vm_name: "{{ vm_to_migrate }}"
-    migration_config: "/opt/hyper2kvm/configs/{{ vm_name }}.yaml"
+    migration_config: "/opt/h2kvm/configs/{{ vm_name }}.yaml"
 
   tasks:
     - name: Validate migration config exists
@@ -224,7 +224,7 @@ Create `playbooks/execute-migration.yml`:
 
     - name: Create migration log directory
       file:
-        path: "/opt/hyper2kvm/logs/{{ vm_name }}"
+        path: "/opt/h2kvm/logs/{{ vm_name }}"
         state: directory
         mode: '0755'
 
@@ -233,7 +233,7 @@ Create `playbooks/execute-migration.yml`:
         h2kvmctl --config {{ migration_config }}
       register: migration_result
       environment:
-        MIGRATION_LOG: "/opt/hyper2kvm/logs/{{ vm_name }}/migration.log"
+        MIGRATION_LOG: "/opt/h2kvm/logs/{{ vm_name }}/migration.log"
 
     - name: Check migration status
       debug:
@@ -272,8 +272,8 @@ Create `playbooks/execute-migration.yml`:
 ### 1.4: Run Ansible Playbook
 
 ```bash
-# Install hyper2kvm on all migration controllers
-ansible-playbook -i inventory/production.yml playbooks/install-hyper2kvm.yml
+# Install h2kvm on all migration controllers
+ansible-playbook -i inventory/production.yml playbooks/install-h2kvm.yml
 
 # Execute migration for specific VM
 ansible-playbook -i inventory/production.yml playbooks/execute-migration.yml \
@@ -312,7 +312,7 @@ validate:config:
   stage: validate
   image: python:3.10
   script:
-    - pip install hyper2kvm[full]
+    - pip install h2kvm[full]
     - h2kvmctl --config migrations/${VM_NAME}.yaml --dump-config
     - h2kvmctl --config migrations/${VM_NAME}.yaml --dry-run
   only:
@@ -408,9 +408,9 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install hyper2kvm
+      - name: Install h2kvm
         run: |
-          pip install hyper2kvm[full]
+          pip install h2kvm[full]
 
       - name: Validate configuration
         run: |
@@ -486,7 +486,7 @@ Create `scripts/migration-metrics-exporter.py`:
 ```python
 #!/usr/bin/env python3
 """
-Prometheus metrics exporter for hyper2kvm migrations.
+Prometheus metrics exporter for h2kvm migrations.
 Exposes migration statistics as Prometheus metrics.
 """
 
@@ -499,25 +499,25 @@ from watchdog.events import FileSystemEventHandler
 
 # Define metrics
 migration_duration = Histogram(
-    'hyper2kvm_migration_duration_seconds',
+    'h2kvm_migration_duration_seconds',
     'Time spent migrating VM',
     ['vm_name', 'source_format']
 )
 
 migration_size = Gauge(
-    'hyper2kvm_migration_size_bytes',
+    'h2kvm_migration_size_bytes',
     'Size of migrated VM in bytes',
     ['vm_name']
 )
 
 migration_success = Counter(
-    'hyper2kvm_migrations_total',
+    'h2kvm_migrations_total',
     'Total number of migrations',
     ['vm_name', 'status']
 )
 
 migration_speed = Gauge(
-    'hyper2kvm_migration_speed_mbps',
+    'h2kvm_migration_speed_mbps',
     'Average migration speed in MB/s',
     ['vm_name']
 )
@@ -594,7 +594,7 @@ global:
 
 scrape_configs:
   # Migration metrics exporter
-  - job_name: 'hyper2kvm-migrations'
+  - job_name: 'h2kvm-migrations'
     static_configs:
       - targets: ['migration-controller-01:9090', 'migration-controller-02:9090']
 
@@ -620,18 +620,18 @@ alerting:
 
 ### 3.3: Grafana Dashboard
 
-Create `grafana/dashboards/hyper2kvm-migrations.json`:
+Create `grafana/dashboards/h2kvm-migrations.json`:
 
 ```json
 {
   "dashboard": {
-    "title": "Hyper2KVM Migration Dashboard",
+    "title": "H2KVM Migration Dashboard",
     "panels": [
       {
         "title": "Migration Success Rate",
         "targets": [
           {
-            "expr": "rate(hyper2kvm_migrations_total{status=\"success\"}[5m]) / rate(hyper2kvm_migrations_total[5m]) * 100"
+            "expr": "rate(h2kvm_migrations_total{status=\"success\"}[5m]) / rate(h2kvm_migrations_total[5m]) * 100"
           }
         ],
         "type": "graph"
@@ -640,7 +640,7 @@ Create `grafana/dashboards/hyper2kvm-migrations.json`:
         "title": "Average Migration Speed",
         "targets": [
           {
-            "expr": "avg(hyper2kvm_migration_speed_mbps)"
+            "expr": "avg(h2kvm_migration_speed_mbps)"
           }
         ],
         "type": "stat"
@@ -649,7 +649,7 @@ Create `grafana/dashboards/hyper2kvm-migrations.json`:
         "title": "Migration Duration by VM",
         "targets": [
           {
-            "expr": "hyper2kvm_migration_duration_seconds"
+            "expr": "h2kvm_migration_duration_seconds"
           }
         ],
         "type": "heatmap"
@@ -658,7 +658,7 @@ Create `grafana/dashboards/hyper2kvm-migrations.json`:
         "title": "Total Data Migrated",
         "targets": [
           {
-            "expr": "sum(hyper2kvm_migration_size_bytes) / 1024 / 1024 / 1024"
+            "expr": "sum(h2kvm_migration_size_bytes) / 1024 / 1024 / 1024"
           }
         ],
         "type": "stat",
@@ -681,9 +681,9 @@ groups:
       - alert: MigrationFailureRate
         expr: |
           (
-            rate(hyper2kvm_migrations_total{status="failure"}[10m])
+            rate(h2kvm_migrations_total{status="failure"}[10m])
             /
-            rate(hyper2kvm_migrations_total[10m])
+            rate(h2kvm_migrations_total[10m])
           ) > 0.1
         for: 5m
         labels:
@@ -693,7 +693,7 @@ groups:
           description: "Migration failure rate is {{ $value | humanizePercentage }} (threshold: 10%)"
 
       - alert: MigrationSlowSpeed
-        expr: hyper2kvm_migration_speed_mbps < 50
+        expr: h2kvm_migration_speed_mbps < 50
         for: 15m
         labels:
           severity: warning
@@ -702,7 +702,7 @@ groups:
           description: "Migration speed is {{ $value }} MB/s (threshold: 50 MB/s)"
 
       - alert: MigrationControllerDown
-        expr: up{job="hyper2kvm-migrations"} == 0
+        expr: up{job="h2kvm-migrations"} == 0
         for: 2m
         labels:
           severity: critical
@@ -754,7 +754,7 @@ Create `scripts/audit-log.sh`:
 #!/bin/bash
 # Centralized audit logging for migrations
 
-AUDIT_LOG="/var/log/hyper2kvm/audit.log"
+AUDIT_LOG="/var/log/h2kvm/audit.log"
 SYSLOG_SERVER="syslog.corp.local:514"
 
 log_audit_event() {
@@ -768,7 +768,7 @@ log_audit_event() {
     echo "$(date -Iseconds) | $event_type | $vm_name | $user | $result | $details" >> "$AUDIT_LOG"
 
     # Send to syslog server
-    logger -n "$SYSLOG_SERVER" -P 514 -t hyper2kvm-audit \
+    logger -n "$SYSLOG_SERVER" -P 514 -t h2kvm-audit \
       "event=$event_type vm=$vm_name user=$user result=$result details=$details"
 
     # Send to SIEM (example: Splunk HEC)
@@ -875,7 +875,7 @@ def generate_compliance_report(days=30):
         report["compliance_percentage"] = 100.0
 
     # Write report
-    report_path = f"/var/log/hyper2kvm/compliance-report-{datetime.now().strftime('%Y%m%d')}.json"
+    report_path = f"/var/log/h2kvm/compliance-report-{datetime.now().strftime('%Y%m%d')}.json"
     with open(report_path, 'w') as f:
         json.dump(report, f, indent=2)
 
@@ -964,23 +964,23 @@ Create `scripts/backup-infrastructure.sh`:
 #!/bin/bash
 # Backup migration infrastructure configuration
 
-BACKUP_DIR="/backups/hyper2kvm/$(date +%Y%m%d)"
+BACKUP_DIR="/backups/h2kvm/$(date +%Y%m%d)"
 mkdir -p "$BACKUP_DIR"
 
 # Backup configurations
-tar czf "$BACKUP_DIR/configs.tar.gz" /opt/hyper2kvm/configs/
+tar czf "$BACKUP_DIR/configs.tar.gz" /opt/h2kvm/configs/
 
 # Backup scripts
-tar czf "$BACKUP_DIR/scripts.tar.gz" /opt/hyper2kvm/scripts/
+tar czf "$BACKUP_DIR/scripts.tar.gz" /opt/h2kvm/scripts/
 
 # Backup database (migration metadata)
-sqlite3 /opt/hyper2kvm/migration.db ".backup $BACKUP_DIR/migration.db"
+sqlite3 /opt/h2kvm/migration.db ".backup $BACKUP_DIR/migration.db"
 
 # Backup Ansible inventory and playbooks
 tar czf "$BACKUP_DIR/ansible.tar.gz" /etc/ansible/
 
 # Upload to S3
-aws s3 sync "$BACKUP_DIR" s3://corp-backups/hyper2kvm/
+aws s3 sync "$BACKUP_DIR" s3://corp-backups/h2kvm/
 
 echo "✅ Infrastructure backup completed"
 ```
@@ -992,21 +992,21 @@ echo "✅ Infrastructure backup completed"
 # Test DR recovery procedure
 
 # Simulate controller failure
-systemctl stop hyper2kvm-daemon
+systemctl stop h2kvm-daemon
 
 # Restore from backup
-LATEST_BACKUP=$(aws s3 ls s3://corp-backups/hyper2kvm/ | tail -1 | awk '{print $2}')
-aws s3 sync "s3://corp-backups/hyper2kvm/$LATEST_BACKUP" /tmp/restore/
+LATEST_BACKUP=$(aws s3 ls s3://corp-backups/h2kvm/ | tail -1 | awk '{print $2}')
+aws s3 sync "s3://corp-backups/h2kvm/$LATEST_BACKUP" /tmp/restore/
 
 # Restore configurations
 tar xzf /tmp/restore/configs.tar.gz -C /
 tar xzf /tmp/restore/scripts.tar.gz -C /
 
 # Restore database
-sqlite3 /opt/hyper2kvm/migration.db < /tmp/restore/migration.db
+sqlite3 /opt/h2kvm/migration.db < /tmp/restore/migration.db
 
 # Restart services
-systemctl start hyper2kvm-daemon
+systemctl start h2kvm-daemon
 
 # Verify
 h2kvmctl --version
@@ -1017,7 +1017,7 @@ h2kvmctl --version
 ## Summary
 
 You've learned to:
-- ✅ Deploy hyper2kvm at enterprise scale
+- ✅ Deploy h2kvm at enterprise scale
 - ✅ Integrate with CI/CD pipelines (GitLab, GitHub Actions)
 - ✅ Automate with Ansible
 - ✅ Implement comprehensive monitoring
@@ -1075,4 +1075,4 @@ You've learned to:
 - SLA-backed support
 - Professional services for large-scale deployments
 
-Contact: [enterprise@hyper2kvm.example.com](mailto:enterprise@hyper2kvm.example.com)
+Contact: [enterprise@h2kvm.example.com](mailto:enterprise@h2kvm.example.com)

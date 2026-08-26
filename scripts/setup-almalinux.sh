@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# setup-almalinux.sh — Set up hyper2kvm on AlmaLinux 9 / RHEL 9
+# setup-almalinux.sh — Set up h2kvm on AlmaLinux 9 / RHEL 9
 #
 # Installs all required packages for:
 #   - VM conversion (qemu-img, qemu-nbd, libguestfs)
@@ -23,7 +23,7 @@ usage() {
     cat <<EOF
 Usage: $0 [options]
 
-Set up hyper2kvm on AlmaLinux 9 / RHEL 9.
+Set up h2kvm on AlmaLinux 9 / RHEL 9.
 
 Options:
   --with-k3s     Install K3s + KubeVirt + CDI + virtctl
@@ -70,7 +70,7 @@ dnf install -y \
 
 info "Core packages installed"
 
-# ── 3. Python 3.11 (hyper2kvm needs >= 3.10) ─────────────────────────────
+# ── 3. Python 3.11 (h2kvm needs >= 3.10) ─────────────────────────────
 banner "Install Python 3.11"
 dnf install -y python3.11 python3.11-pip python3.11-devel
 info "Python 3.11 installed"
@@ -81,16 +81,16 @@ dnf install -y ntfsprogs ntfs-3g hivex python3-hivex
 info "NTFS + hivex installed"
 
 # Runtime directory (NBD locking, daemon sockets)
-mkdir -p /run/hyper2kvm
-info "Runtime dir: /run/hyper2kvm"
+mkdir -p /run/h2kvm
+info "Runtime dir: /run/h2kvm"
 
 # VirtIO Windows drivers — download + pre-extract
-iso="/var/lib/hyper2kvm/virtio-win.iso"
-cache="/var/lib/hyper2kvm/virtio-win-extracted"
+iso="/var/lib/h2kvm/virtio-win.iso"
+cache="/var/lib/h2kvm/virtio-win-extracted"
 if [ -f "$iso" ]; then
     info "virtio-win.iso: $iso"
 else
-    mkdir -p /var/lib/hyper2kvm
+    mkdir -p /var/lib/h2kvm
     info "Downloading virtio-win.iso..."
     curl -fSL "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" \
         -o "$iso" && info "virtio-win.iso installed" || \
@@ -109,7 +109,7 @@ elif command -v bsdtar &>/dev/null && [ -f "$iso" ]; then
         stat -c %Y "$iso" > "$cache/.iso_mtime"
         info "VirtIO ISO extracted: $cache"
     else
-        warn "bsdtar extraction incomplete — hyper2kvm will extract on first Windows migration"
+        warn "bsdtar extraction incomplete — h2kvm will extract on first Windows migration"
     fi
 fi
 
@@ -120,15 +120,15 @@ virsh net-start default 2>/dev/null || true
 virsh net-autostart default 2>/dev/null || true
 info "Libvirtd running, default network active"
 
-# ── 6. Install hyper2kvm ─────────────────────────────────────────────────
-banner "Install hyper2kvm"
-if [[ -d /opt/hyper2kvm ]]; then
-    info "hyper2kvm already at /opt/hyper2kvm"
-    cd /opt/hyper2kvm && python3.11 -m pip install -e . 2>&1 | tail -3
+# ── 6. Install h2kvm ─────────────────────────────────────────────────
+banner "Install h2kvm"
+if [[ -d /opt/h2kvm ]]; then
+    info "h2kvm already at /opt/h2kvm"
+    cd /opt/h2kvm && python3.11 -m pip install -e . 2>&1 | tail -3
 else
-    warn "/opt/hyper2kvm not found — clone repo first:"
-    echo "  git clone https://github.com/ssahani/hyper2kvm /opt/hyper2kvm"
-    echo "  cd /opt/hyper2kvm && python3.11 -m pip install -e ."
+    warn "/opt/h2kvm not found — clone repo first:"
+    echo "  git clone https://github.com/ssahani/h2kvm /opt/h2kvm"
+    echo "  cd /opt/h2kvm && python3.11 -m pip install -e ."
 fi
 
 # ── 7. K3s + KubeVirt (optional) ─────────────────────────────────────────

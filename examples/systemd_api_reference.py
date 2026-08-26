@@ -11,7 +11,7 @@ The APIs work with offline disk images but return meaningful data
 only when systemd is running in the guest.
 """
 
-from hyper2kvm.vmcraft.main import VMCraft
+from h2kvm.vmcraft.main import VMCraft
 import inspect
 
 
@@ -107,7 +107,7 @@ def print_api_reference():
     print()
     print("EXAMPLE USAGE:")
     print()
-    print("  from hyper2kvm.vmcraft.main import VMCraft")
+    print("  from h2kvm.vmcraft.main import VMCraft")
     print()
     print("  g = VMCraft()")
     print("  g.add_drive_opts('/path/to/vm.vmdk', readonly=True)")

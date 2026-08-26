@@ -1,6 +1,6 @@
 # Testing Documentation
 
-Test plans, procedures, and results for Hyper2KVM across various platforms and deployment scenarios.
+Test plans, procedures, and results for H2KVM across various platforms and deployment scenarios.
 
 ---
 
@@ -114,7 +114,7 @@ STORAGE_CLASS=local-path ./scripts/test-k8s-centos8.sh all
 **Interactive Debug**:
 ```bash
 # Create debug pod
-kubectl run -it debug --image=ghcr.io/ssahani/hyper2kvm:latest \
+kubectl run -it debug --image=ghcr.io/ssahani/h2kvm:latest \
   --rm --restart=Never -- /bin/bash
 
 # Test commands
@@ -214,8 +214,8 @@ pipeline {
 
 **Fix**:
 ```bash
-kubectl get pvc -n hyper2kvm-test
-kubectl describe pvc <pvc-name> -n hyper2kvm-test
+kubectl get pvc -n h2kvm-test
+kubectl describe pvc <pvc-name> -n h2kvm-test
 ```
 
 #### Migration Fails

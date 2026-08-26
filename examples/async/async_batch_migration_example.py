@@ -16,7 +16,7 @@ Features:
 - Real-time statistics
 
 Requirements:
-    pip install 'hyper2kvm[async]'
+    pip install 'h2kvm[async]'
 
 Usage:
     python3 examples/async_batch_migration_example.py
@@ -30,15 +30,15 @@ import asyncio
 import time
 from pathlib import Path
 
-from hyper2kvm.core.optional_imports import HTTPX_AVAILABLE
+from h2kvm.core.optional_imports import HTTPX_AVAILABLE
 
 if not HTTPX_AVAILABLE:
     print("ERROR: httpx library not available!")
-    print("Install with: pip install 'hyper2kvm[async]'")
+    print("Install with: pip install 'h2kvm[async]'")
     exit(1)
 
-from hyper2kvm.providers.vmware.async_client import AsyncVMwareClient, AsyncVMwareOperations
-from hyper2kvm.providers.vmware.async_client.operations import MigrationProgress
+from h2kvm.providers.vmware.async_client import AsyncVMwareClient, AsyncVMwareOperations
+from h2kvm.providers.vmware.async_client.operations import MigrationProgress
 
 
 async def demo_async_batch_migration():
@@ -73,7 +73,7 @@ async def demo_async_batch_migration():
         "monitor-server-01",
     ]
 
-    output_dir = Path("/var/lib/hyper2kvm/output")
+    output_dir = Path("/var/lib/h2kvm/output")
 
     print(f"Configuration:")
     print(f"  vCenter:           {vcenter_config['host']}")
@@ -214,7 +214,7 @@ async def demo_retry_logic():
         print("Exporting VM with automatic retry (max 3 attempts)...")
         result = await ops.export_with_retry(
             "critical-server-01",
-            Path("/var/lib/hyper2kvm/output"),
+            Path("/var/lib/h2kvm/output"),
             max_retries=3,
         )
 

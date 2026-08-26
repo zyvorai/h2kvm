@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker
+  namespace: h2kvm-workers
   labels:
-    app: hyper2kvm-worker
+    app: h2kvm-worker
     component: worker-daemon
 spec:
   selector:
     matchLabels:
-      app: hyper2kvm-worker
+      app: h2kvm-worker
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
@@ -17,20 +17,20 @@ spec:
   template:
     metadata:
       labels:
-        app: hyper2kvm-worker
+        app: h2kvm-worker
         component: worker-daemon
     spec:
       # Node selection for worker-capable nodes
       nodeSelector:
-        hyper2kvm.io/worker-enabled: "true"
+        h2kvm.io/worker-enabled: "true"
       
       tolerations:
-      - key: hyper2kvm.io/privileged
+      - key: h2kvm.io/privileged
         operator: Exists
         effect: NoSchedule
       
       # Service account for worker operations
-      serviceAccountName: hyper2kvm-worker
+      serviceAccountName: h2kvm-worker
       
       # Host networking for NBD device access
       hostNetwork: false
@@ -64,22 +64,22 @@ spec:
       
       containers:
       - name: worker
-        image: hyper2kvm:latest
+        image: h2kvm:latest
         imagePullPolicy: IfNotPresent
         
         env:
-        - name: HYPER2KVM_MODE
+        - name: H2KVM_MODE
           value: "worker"
         - name: WORKER_ID
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        - name: HYPER2KVM_STATE_DIR
-          value: "/var/lib/hyper2kvm/jobs"
-        - name: HYPER2KVM_EVENT_DIR
-          value: "/var/lib/hyper2kvm/events"
-        - name: HYPER2KVM_QUEUE_DIR
-          value: "/var/lib/hyper2kvm/queue"
+        - name: H2KVM_STATE_DIR
+          value: "/var/lib/h2kvm/jobs"
+        - name: H2KVM_EVENT_DIR
+          value: "/var/lib/h2kvm/events"
+        - name: H2KVM_QUEUE_DIR
+          value: "/var/lib/h2kvm/queue"
         - name: PYTHONUNBUFFERED
           value: "1"
         
@@ -106,12 +106,12 @@ spec:
         volumeMounts:
         # Configuration
         - name: config
-          mountPath: /etc/hyper2kvm
+          mountPath: /etc/h2kvm
           readOnly: true
         
         # Worker state and events
         - name: worker-state
-          mountPath: /var/lib/hyper2kvm
+          mountPath: /var/lib/h2kvm
         
         # Device access
         - name: dev
@@ -136,7 +136,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - "kill -TERM $(cat /var/lib/hyper2kvm/worker.pid 2>/dev/null) 2>/dev/null; sleep 30"
+              - "kill -TERM $(cat /var/lib/h2kvm/worker.pid 2>/dev/null) 2>/dev/null; sleep 30"
 
         # Liveness probe: Check worker process
         livenessProbe:
@@ -147,7 +147,7 @@ spec:
             - |
               import sys
               import os
-              pid_file = '/var/lib/hyper2kvm/worker.pid'
+              pid_file = '/var/lib/h2kvm/worker.pid'
               if os.path.exists(pid_file):
                 sys.exit(0)
               sys.exit(1)
@@ -162,7 +162,7 @@ spec:
             command:
             - python3
             - -m
-            - hyper2kvm.worker.cli
+            - h2kvm.worker.cli
             - capabilities
             - --json-output
           initialDelaySeconds: 10
@@ -175,11 +175,11 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: hyper2kvm-worker-config
+          name: h2kvm-worker-config
       
       - name: worker-state
         hostPath:
-          path: /var/lib/hyper2kvm
+          path: /var/lib/h2kvm
           type: DirectoryOrCreate
       
       - name: dev
@@ -199,10 +199,10 @@ spec:
       
       - name: incoming-storage
         hostPath:
-          path: /mnt/hyper2kvm/incoming
+          path: /mnt/h2kvm/incoming
           type: DirectoryOrCreate
       
       - name: output-storage
         hostPath:
-          path: /mnt/hyper2kvm/output
+          path: /mnt/h2kvm/output
           type: DirectoryOrCreate

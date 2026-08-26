@@ -16,7 +16,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/hyper2kvm/zkvm/internal/theme"
+	"github.com/h2kvm/zkvm/internal/theme"
 )
 
 // Refresh interval for KubeVirt VMs.

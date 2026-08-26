@@ -1,4 +1,4 @@
-# Hyper2KVM vmspawn SDK
+# H2KVM vmspawn SDK
 
 Production-grade Python SDK for VM validation using systemd-vmspawn.
 
@@ -34,7 +34,7 @@ systemd-vmspawn --version
 
 ```python
 from pathlib import Path
-from hyper2kvm.vmspawn import VMSpawnManager, VMValidator
+from h2kvm.vmspawn import VMSpawnManager, VMValidator
 
 # Create manager
 manager = VMSpawnManager()
@@ -42,7 +42,7 @@ manager = VMSpawnManager()
 # Create and start VM
 machine = manager.create(
     name="test-vm",
-    image=Path("/var/lib/hyper2kvm/migrated-vm.qcow2"),
+    image=Path("/var/lib/h2kvm/migrated-vm.qcow2"),
     memory_mb=2048,
     cpus=2,
 )
@@ -65,13 +65,13 @@ manager.stop("test-vm")
 ```python
 import asyncio
 from pathlib import Path
-from hyper2kvm.vmspawn.async_machine import AsyncMachine
-from hyper2kvm.vmspawn.async_validator import AsyncValidator
+from h2kvm.vmspawn.async_machine import AsyncMachine
+from h2kvm.vmspawn.async_validator import AsyncValidator
 
 async def validate_vm():
     machine = AsyncMachine(
         name="test-vm",
-        image=Path("/var/lib/hyper2kvm/vm.qcow2"),
+        image=Path("/var/lib/h2kvm/vm.qcow2"),
         memory_mb=2048,
         cpus=2,
     )
@@ -91,9 +91,9 @@ asyncio.run(validate_vm())
 ### Batch Validation (100 VMs)
 
 ```python
-from hyper2kvm.vmspawn.async_machine import AsyncMachine
-from hyper2kvm.vmspawn.async_manager import AsyncVMManager
-from hyper2kvm.vmspawn.async_validator import AsyncValidator
+from h2kvm.vmspawn.async_machine import AsyncMachine
+from h2kvm.vmspawn.async_manager import AsyncVMManager
+from h2kvm.vmspawn.async_validator import AsyncValidator
 
 async def validate_batch():
     # Create 100 VMs
@@ -112,7 +112,7 @@ async def validate_batch():
     results = await manager.validate_batch(machines, AsyncValidator)
 
     # Cleanup
-    from hyper2kvm.vmspawn.cleanup import CleanupEngine
+    from h2kvm.vmspawn.cleanup import CleanupEngine
     cleanup = CleanupEngine(machines)
     await cleanup.cleanup_all()
 
@@ -159,7 +159,7 @@ machine = AsyncMachine(
 ### cloud-init Injection
 
 ```python
-from hyper2kvm.vmspawn.cloudinit import create_cloud_init_config
+from h2kvm.vmspawn.cloudinit import create_cloud_init_config
 
 cloud_init = create_cloud_init_config(
     hostname="web-server",
@@ -180,7 +180,7 @@ machine = AsyncMachine(
 
 Host side:
 ```python
-from hyper2kvm.vmspawn.vsock import VsockClient
+from h2kvm.vmspawn.vsock import VsockClient
 
 client = VsockClient(cid=3, port=9000)
 
@@ -194,7 +194,7 @@ response = client.send(b"GET /status")
 
 Guest side (inside VM):
 ```python
-from hyper2kvm.vmspawn.vsock import VsockServer
+from h2kvm.vmspawn.vsock import VsockServer
 
 server = VsockServer(port=9000)
 
@@ -209,8 +209,8 @@ server.handle(handler)
 ### Kubernetes Node Validation
 
 ```python
-from hyper2kvm.vmspawn.async_machine import AsyncMachine
-from hyper2kvm.vmspawn.validator import KubernetesNodeValidator
+from h2kvm.vmspawn.async_machine import AsyncMachine
+from h2kvm.vmspawn.validator import KubernetesNodeValidator
 
 async def validate_k8s_node():
     machine = AsyncMachine(
@@ -233,12 +233,12 @@ async def validate_k8s_node():
     await machine.stop()
 ```
 
-## Integration with Hyper2KVM Pipeline
+## Integration with H2KVM Pipeline
 
 ```python
 from pathlib import Path
-from hyper2kvm.converters import convert_vmdk_to_qcow2
-from hyper2kvm.vmspawn import VMSpawnManager, VMValidator
+from h2kvm.converters import convert_vmdk_to_qcow2
+from h2kvm.vmspawn import VMSpawnManager, VMValidator
 
 def migrate_and_validate(vmdk_path: Path) -> Path:
     """
@@ -382,4 +382,4 @@ Apache-2.0
 
 **Last Updated:** 2026-03-29
 **Status:** Production-ready
-**Maintainer:** hyper2kvm team
+**Maintainer:** h2kvm team

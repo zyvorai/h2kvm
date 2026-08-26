@@ -12,9 +12,9 @@ export PKG_INSTALL_ROOT="${ROOT}"
 }
 
 pkg_counters_reset
-pkg_banner "Hyper2KVM package test" "hyper2kvm · h2kweb · optional UI"
+pkg_banner "H2KVM package test" "h2kvm · h2kweb · optional UI"
 
-[[ -x ./bin/hyper2kvm ]] && pkg_ok "bin/hyper2kvm" || pkg_fail "bin/hyper2kvm"
+[[ -x ./bin/h2kvm ]] && pkg_ok "bin/h2kvm" || pkg_fail "bin/h2kvm"
 [[ -x ./bin/h2kweb ]] && pkg_ok "bin/h2kweb" || pkg_fail "bin/h2kweb"
 [[ -d ./web/dashboard ]] && pkg_ok "web/dashboard" || pkg_warn "web/dashboard missing"
 

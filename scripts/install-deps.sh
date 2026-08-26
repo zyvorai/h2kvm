@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 # ============================================
-# hyper2kvm — Install all dependencies
+# h2kvm — Install all dependencies
 # ============================================
 # Production-grade installer for govc, OVF Tool, pyvmomi,
-# qemu-img, libguestfs, libvirt, OVMF, and hyper2kvm.
+# qemu-img, libguestfs, libvirt, OVMF, and h2kvm.
 #
 # Supports: Fedora, RHEL/CentOS, Ubuntu/Debian, openSUSE
 #
@@ -17,13 +17,13 @@ set -euo pipefail
 # Individual components:
 #   --python   --govc    --ovftool  --pyvmomi
 #   --qemu     --guestfs --libvirt  --ovmf
-#   --hyper2kvm --verify
+#   --h2kvm --verify
 #
 # Environment:
 #   DRY_RUN=true    Preview without installing
 #   LOG_FILE=path   Custom log path
-#   HYPER2KVM_INSTALL_BUNDLE_ID, HYPER2KVM_GOVC_DOWNLOAD_PREFIX, HYPER2KVM_VIRTIO_WIN_ISO_URL
-#   HYPER2KVM_PYTHON=/usr/bin/python3.12  Force hivex bindings for the same interpreter as h2kvmctl/pip
+#   H2KVM_INSTALL_BUNDLE_ID, H2KVM_GOVC_DOWNLOAD_PREFIX, H2KVM_VIRTIO_WIN_ISO_URL
+#   H2KVM_PYTHON=/usr/bin/python3.12  Force hivex bindings for the same interpreter as h2kvmctl/pip
 # ============================================
 
 trap 'echo -e "\n[FATAL] install-deps failed at line $LINENO"; exit 1' ERR
@@ -33,7 +33,7 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/install-versions.inc.sh"
 
 # ── Config ──
 DRY_RUN="${DRY_RUN:-false}"
-LOG_FILE="${LOG_FILE:-/var/log/hyper2kvm-install.log}"
+LOG_FILE="${LOG_FILE:-/var/log/h2kvm-install.log}"
 START_TIME=$(date +%s)
 
 # ── Helpers ──
@@ -84,9 +84,9 @@ pip_install() {
 
 # ── Logging ──
 setup_logging() {
-    mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || LOG_FILE="/tmp/hyper2kvm-install.log"
-    touch "$LOG_FILE" 2>/dev/null || LOG_FILE="/tmp/hyper2kvm-install.log"
-    if [ "${HYPER2KVM_REMOTE_INSTALL:-}" = 1 ]; then
+    mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || LOG_FILE="/tmp/h2kvm-install.log"
+    touch "$LOG_FILE" 2>/dev/null || LOG_FILE="/tmp/h2kvm-install.log"
+    if [ "${H2KVM_REMOTE_INSTALL:-}" = 1 ]; then
         return 0
     fi
     exec > >(tee -a "$LOG_FILE") 2>&1
@@ -157,7 +157,7 @@ install_govc() {
     esac
 
     local url
-    url="$(hyper2kvm_govc_download_url "$arch")"
+    url="$(h2kvm_govc_download_url "$arch")"
     local tmpfile
     tmpfile=$(mktemp)
     retry curl -fsSL "$url" -o "$tmpfile"
@@ -315,12 +315,12 @@ install_libvirt() {
     fi
 
     # Persist modules across reboots
-    cat > /etc/modules-load.d/hyper2kvm.conf << 'MODEOF'
+    cat > /etc/modules-load.d/h2kvm.conf << 'MODEOF'
 nbd
 kvm
 vhost_net
 MODEOF
-    cat > /etc/modprobe.d/hyper2kvm-nbd.conf << 'MODEOF'
+    cat > /etc/modprobe.d/h2kvm-nbd.conf << 'MODEOF'
 options nbd nbds_max=128 max_part=16
 MODEOF
 
@@ -366,34 +366,34 @@ install_mkosi() {
     info "mkosi installed: $(mkosi --version 2>/dev/null || echo 'check PATH')"
 }
 
-# ── hyper2kvm itself ──
-install_hyper2kvm() {
+# ── h2kvm itself ──
+install_h2kvm() {
     if command -v h2kvmctl &>/dev/null; then
-        info "hyper2kvm already installed: $(h2kvmctl --version 2>/dev/null | head -1)"
+        info "h2kvm already installed: $(h2kvmctl --version 2>/dev/null | head -1)"
         return
     fi
 
-    step "Installing hyper2kvm"
+    step "Installing h2kvm"
 
     # If we're inside the repo, install from source
     local script_dir
     script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-    if [ -f "$script_dir/pyproject.toml" ] && grep -q "hyper2kvm" "$script_dir/pyproject.toml" 2>/dev/null; then
+    if [ -f "$script_dir/pyproject.toml" ] && grep -q "h2kvm" "$script_dir/pyproject.toml" 2>/dev/null; then
         info "Installing from source: $script_dir"
         pip_install -e "$script_dir"
     else
-        pip_install hyper2kvm
+        pip_install h2kvm
     fi
     # KubeVirt/k3s deploy (--deploy-k8s) requires the kubernetes Python package
     pip_install kubernetes || warn "kubernetes pip package failed — KubeVirt deploy will not work until: pip install kubernetes"
-    info "hyper2kvm installed: $(h2kvmctl --version 2>/dev/null | head -1)"
+    info "h2kvm installed: $(h2kvmctl --version 2>/dev/null | head -1)"
 }
 
 # ── hivex + bsdtar (Windows registry access + ISO extraction) ──
 # Bindings must match the interpreter that runs h2kvmctl (often pip → Python 3.12 on EL9).
 resolve_hivex_target_python() {
-    if [ -n "${HYPER2KVM_PYTHON:-}" ] && [ -x "${HYPER2KVM_PYTHON}" ]; then
-        echo "${HYPER2KVM_PYTHON}"
+    if [ -n "${H2KVM_PYTHON:-}" ] && [ -x "${H2KVM_PYTHON}" ]; then
+        echo "${H2KVM_PYTHON}"
         return 0
     fi
     local h2 line1 she
@@ -600,7 +600,7 @@ install_hivex() {
         fi
     fi
 
-    warn "hivex: still not importable for $active_py — set HYPER2KVM_PYTHON to match pip/h2kvmctl, or install python\$(X).\$(Y)-hivex for that interpreter"
+    warn "hivex: still not importable for $active_py — set H2KVM_PYTHON to match pip/h2kvmctl, or install python\$(X).\$(Y)-hivex for that interpreter"
 }
 
 # ── boto3 (AWS EC2 provider) ──
@@ -619,14 +619,14 @@ install_boto3() {
 install_virtio_win() {
     step "Installing VirtIO Windows drivers"
 
-    local iso="/var/lib/hyper2kvm/virtio-win.iso"
-    local cache="/var/lib/hyper2kvm/virtio-win-extracted"
-    local url="$HYPER2KVM_VIRTIO_WIN_ISO_URL"
+    local iso="/var/lib/h2kvm/virtio-win.iso"
+    local cache="/var/lib/h2kvm/virtio-win-extracted"
+    local url="$H2KVM_VIRTIO_WIN_ISO_URL"
 
     if [ -f "$iso" ]; then
         info "virtio-win.iso: $iso"
     else
-        mkdir -p /var/lib/hyper2kvm
+        mkdir -p /var/lib/h2kvm
         info "Downloading virtio-win.iso..."
         if retry curl -fSL "$url" -o "$iso"; then
             info "virtio-win.iso installed: $iso"
@@ -650,7 +650,7 @@ install_virtio_win() {
             stat -c %Y "$iso" > "$cache/.iso_mtime"
             info "VirtIO ISO extracted: $cache"
         else
-            warn "bsdtar extraction incomplete — hyper2kvm will extract on first Windows migration"
+            warn "bsdtar extraction incomplete — h2kvm will extract on first Windows migration"
         fi
     fi
 }
@@ -708,8 +708,8 @@ verify_all() {
     fi
 
     # VirtIO Windows drivers
-    if [ -f /var/lib/hyper2kvm/virtio-win.iso ]; then
-        info "virtio-win: /var/lib/hyper2kvm/virtio-win.iso"; ok=$((ok + 1))
+    if [ -f /var/lib/h2kvm/virtio-win.iso ]; then
+        info "virtio-win: /var/lib/h2kvm/virtio-win.iso"; ok=$((ok + 1))
     else
         warn "virtio-win: not found (install with --virtio-win)"; opt=$((opt + 1))
     fi
@@ -756,8 +756,8 @@ main() {
 
     if [ $# -eq 0 ] || [ "${1:-}" = "--all" ]; then
         echo ""
-        echo "hyper2kvm Dependency Installer"
-        info "Installer bundle: ${HYPER2KVM_INSTALL_BUNDLE_ID}"
+        echo "h2kvm Dependency Installer"
+        info "Installer bundle: ${H2KVM_INSTALL_BUNDLE_ID}"
         echo ""
         install_python
         install_qemu
@@ -769,7 +769,7 @@ main() {
         install_ovftool
         install_hivex
         install_boto3
-        install_hyper2kvm
+        install_h2kvm
         install_virtio_win
         verify_all
         return
@@ -788,7 +788,7 @@ main() {
             --mkosi)     install_mkosi ;;
             --hivex)     install_hivex ;;
             --boto3)     install_boto3 ;;
-            --hyper2kvm)   install_hyper2kvm ;;
+            --h2kvm)   install_h2kvm ;;
             --virtio-win)  install_virtio_win ;;
             --verify)      verify_all ;;
             --all)         ;; # handled above
@@ -796,11 +796,11 @@ main() {
                 echo "Usage: sudo $0 [--all|--verify|--govc|--qemu|--libvirt|...]"
                 echo ""
                 echo "Flags: --python --govc --ovftool --pyvmomi --qemu --hivex --boto3"
-                echo "       --guestfs --libvirt --ovmf --mkosi --hyper2kvm --virtio-win --verify"
+                echo "       --guestfs --libvirt --ovmf --mkosi --h2kvm --virtio-win --verify"
                 echo ""
                 echo "Env:   DRY_RUN=true  LOG_FILE=/path/to/log"
-                echo "       HYPER2KVM_INSTALL_BUNDLE_ID  HYPER2KVM_GOVC_DOWNLOAD_PREFIX  HYPER2KVM_VIRTIO_WIN_ISO_URL"
-                echo "       HYPER2KVM_PYTHON=/usr/bin/python3.12  (hivex bindings must match h2kvmctl interpreter)"
+                echo "       H2KVM_INSTALL_BUNDLE_ID  H2KVM_GOVC_DOWNLOAD_PREFIX  H2KVM_VIRTIO_WIN_ISO_URL"
+                echo "       H2KVM_PYTHON=/usr/bin/python3.12  (hivex bindings must match h2kvmctl interpreter)"
                 exit 0
                 ;;
             *)           error "Unknown option: $arg (try --help)"; exit 1 ;;

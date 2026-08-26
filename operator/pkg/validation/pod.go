@@ -11,14 +11,14 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	hyper2kvmv1 "github.com/hyper2kvm/operator/api/v1"
+	h2kvmv1 "github.com/h2kvm/operator/api/v1"
 )
 
 // BuildValidationPodSpec builds the pod specification for running validation
-func BuildValidationPodSpec(validation *hyper2kvmv1.Validation) *corev1.PodSpec {
+func BuildValidationPodSpec(validation *h2kvmv1.Validation) *corev1.PodSpec {
 	// Build command arguments
 	args := []string{
-		"python3", "-m", "hyper2kvm.vmspawn.validator",
+		"python3", "-m", "h2kvm.vmspawn.validator",
 		"--image", validation.Spec.Image,
 		"--memory", fmt.Sprintf("%d", validation.Spec.Memory),
 		"--cpus", fmt.Sprintf("%d", validation.Spec.CPUs),
@@ -55,7 +55,7 @@ func BuildValidationPodSpec(validation *hyper2kvmv1.Validation) *corev1.PodSpec 
 		Containers: []corev1.Container{
 			{
 				Name:  "validator",
-				Image: "ghcr.io/ssahani/hyper2kvm-validator:0.3.0",
+				Image: "ghcr.io/ssahani/h2kvm-validator:0.3.0",
 				Args:  args,
 				SecurityContext: &corev1.SecurityContext{
 					Privileged: &privileged,

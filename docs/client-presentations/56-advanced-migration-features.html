@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Advanced Migration Features — hyper2kvm Deep Dive</title>
+<title>Advanced Migration Features — h2kvm Deep Dive</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -87,7 +87,7 @@ luks_passphrase: "encryption-key"
 luks_passphrase_env: LUKS_KEY
 # Or use keyfile:
 luks_keyfile: /path/to/keyfile
-luks_mapper_prefix: "hyper2kvm"
+luks_mapper_prefix: "h2kvm"
 
 # initramfs auto-includes:
 #   dm_crypt, xts, dm_mod</pre>
@@ -228,9 +228,9 @@ h2kvmctl --batch-manifest batch.yaml
     <div class="card">
       <h4>Systemd Service</h4>
       <pre style="font-size:0.7em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
-# hyper2kvm@.service
+# h2kvm@.service
 [Unit]
-Description=hyper2kvm daemon
+Description=h2kvm daemon
 
 [Service]
 ExecStart=/usr/local/sbin/h2kvmctl \
@@ -243,7 +243,7 @@ WantedBy=multi-user.target
 
 # Enable:
 systemctl enable --now \
-  hyper2kvm@/data/migrations</pre>
+  h2kvm@/data/migrations</pre>
     </div>
   </div>
 </div>
@@ -325,7 +325,7 @@ systemctl enable --now \
 {
   "ts": "2026-03-24T09:45:14.260+00:00",
   "level": "info",
-  "service": "hyper2kvm",
+  "service": "h2kvm",
   "component": "disk_processor",
   "host": "kvm-host-01",
   "pid": 12345,
@@ -409,14 +409,14 @@ systemctl enable --now \
     <tr><td class="check">Stable</td><td>initramfs_regen</td><td>VirtIO initramfs rebuild</td><td>Default: ON</td></tr>
     <tr><td class="check">Stable</td><td>serial_console</td><td>Serial console injection</td><td>Default: ON</td></tr>
     <tr><td class="check">Stable</td><td>buslogic_autofix</td><td>BusLogic driver auto-remediation</td><td>Default: ON</td></tr>
-    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>ai_diagnostics</td><td>AI-powered error diagnosis and remediation</td><td>HYPER2KVM_FF_AI_DIAGNOSTICS=1</td></tr>
-    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>multi_drive</td><td>Multi-disk VM support</td><td>HYPER2KVM_FF_MULTI_DRIVE=1</td></tr>
-    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>parallel_conversion</td><td>Parallel qemu-img conversions</td><td>HYPER2KVM_FF_PARALLEL_CONVERSION=1</td></tr>
-    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>container_isolation</td><td>Container-isolated LVM operations</td><td>HYPER2KVM_FF_CONTAINER_ISOLATION=1</td></tr>
-    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>incremental_sync</td><td>Incremental disk sync (CBT)</td><td>HYPER2KVM_FF_INCREMENTAL_SYNC=1</td></tr>
-    <tr><td style="color:#ef4444; font-weight:700;">Exp</td><td>luks_auto_unlock</td><td>LUKS2 + TPM auto-unlock enrollment</td><td>HYPER2KVM_FF_LUKS_AUTO_UNLOCK=1</td></tr>
-    <tr><td style="color:#ef4444; font-weight:700;">Exp</td><td>tpm_enrollment</td><td>TPM2 measured boot enrollment</td><td>HYPER2KVM_FF_TPM_ENROLLMENT=1</td></tr>
-    <tr><td style="color:#ef4444; font-weight:700;">Exp</td><td>network_topology_map</td><td>Network topology discovery and mapping</td><td>HYPER2KVM_FF_NETWORK_TOPOLOGY_MAP=1</td></tr>
+    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>ai_diagnostics</td><td>AI-powered error diagnosis and remediation</td><td>H2KVM_FF_AI_DIAGNOSTICS=1</td></tr>
+    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>multi_drive</td><td>Multi-disk VM support</td><td>H2KVM_FF_MULTI_DRIVE=1</td></tr>
+    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>parallel_conversion</td><td>Parallel qemu-img conversions</td><td>H2KVM_FF_PARALLEL_CONVERSION=1</td></tr>
+    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>container_isolation</td><td>Container-isolated LVM operations</td><td>H2KVM_FF_CONTAINER_ISOLATION=1</td></tr>
+    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>incremental_sync</td><td>Incremental disk sync (CBT)</td><td>H2KVM_FF_INCREMENTAL_SYNC=1</td></tr>
+    <tr><td style="color:#ef4444; font-weight:700;">Exp</td><td>luks_auto_unlock</td><td>LUKS2 + TPM auto-unlock enrollment</td><td>H2KVM_FF_LUKS_AUTO_UNLOCK=1</td></tr>
+    <tr><td style="color:#ef4444; font-weight:700;">Exp</td><td>tpm_enrollment</td><td>TPM2 measured boot enrollment</td><td>H2KVM_FF_TPM_ENROLLMENT=1</td></tr>
+    <tr><td style="color:#ef4444; font-weight:700;">Exp</td><td>network_topology_map</td><td>Network topology discovery and mapping</td><td>H2KVM_FF_NETWORK_TOPOLOGY_MAP=1</td></tr>
   </table>
 
   <div class="verdict">
@@ -428,7 +428,7 @@ systemctl enable --now \
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

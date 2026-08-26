@@ -18,11 +18,11 @@
 
 ### One-Command Quickstart
 
-Install hyper2kvm and **all** dependencies on a fresh Fedora, RHEL, Ubuntu, Debian, or openSUSE machine:
+Install h2kvm and **all** dependencies on a fresh Fedora, RHEL, Ubuntu, Debian, or openSUSE machine:
 
 ```bash
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 sudo ./scripts/quickstart.sh
 ```
 
@@ -38,7 +38,7 @@ This single command installs:
 | govc | vSphere VM export (NFC) |
 | pyvmomi | vSphere Python SDK |
 | nbd, kvm, vhost_net | Kernel modules (loaded + persisted) |
-| hyper2kvm | Installed from source |
+| h2kvm | Installed from source |
 | User permissions | libvirt, kvm, qemu, disk groups |
 
 Optional flags:
@@ -60,7 +60,7 @@ sudo ./scripts/run-demo.sh --local vm.vmdk   # your own VMDK
 sudo ./scripts/run-demo.sh --cleanup         # remove demo VMs
 ```
 
-The demo script downloads a sample image, converts it with hyper2kvm,
+The demo script downloads a sample image, converts it with h2kvm,
 applies guest fixes, boots on libvirt, and shows the result. It includes
 pre-flight checks for RAM, disk space, tools, KVM, and SELinux.
 
@@ -89,7 +89,7 @@ sudo ./scripts/install-deps.sh --ovmf         # UEFI firmware
 sudo ./scripts/install-deps.sh --govc         # govc (vSphere export)
 sudo ./scripts/install-deps.sh --ovftool      # VMware OVF Tool
 sudo ./scripts/install-deps.sh --pyvmomi      # vSphere Python SDK
-sudo ./scripts/install-deps.sh --hyper2kvm    # hyper2kvm itself
+sudo ./scripts/install-deps.sh --h2kvm    # h2kvm itself
 sudo ./scripts/install-deps.sh --verify       # check all tools
 sudo ./scripts/install-deps.sh --all          # install everything
 ```
@@ -131,7 +131,7 @@ sudo ufw allow 6443/tcp      # optional (K3s)
 
 ### Kernel Modules
 
-hyper2kvm requires these kernel modules:
+h2kvm requires these kernel modules:
 
 | Module | Purpose | Required |
 |--------|---------|----------|
@@ -143,8 +143,8 @@ hyper2kvm requires these kernel modules:
 The install scripts automatically:
 
 1. **Load modules** immediately via `modprobe`
-2. **Persist across reboots** via `/etc/modules-load.d/hyper2kvm.conf`
-3. **Set NBD options** via `/etc/modprobe.d/hyper2kvm-nbd.conf`:
+2. **Persist across reboots** via `/etc/modules-load.d/h2kvm.conf`
+3. **Set NBD options** via `/etc/modprobe.d/h2kvm-nbd.conf`:
    - `nbds_max=128` — supports 128 concurrent conversions
    - `max_part=16` — supports GPT disks with up to 16 partitions
 
@@ -159,8 +159,8 @@ sudo modprobe kvm_intel    # Intel CPUs
 sudo modprobe vhost_net
 
 # Persist across reboots
-echo -e "nbd\nkvm\nvhost_net" | sudo tee /etc/modules-load.d/hyper2kvm.conf
-echo "options nbd nbds_max=128 max_part=16" | sudo tee /etc/modprobe.d/hyper2kvm-nbd.conf
+echo -e "nbd\nkvm\nvhost_net" | sudo tee /etc/modules-load.d/h2kvm.conf
+echo "options nbd nbds_max=128 max_part=16" | sudo tee /etc/modprobe.d/h2kvm-nbd.conf
 
 # Verify
 lsmod | grep -E "nbd|kvm|vhost"
@@ -171,8 +171,8 @@ ls /dev/kvm     # Should exist if KVM is available
 ### Quick start (recommended: editable install)
 
 ```bash
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -224,16 +224,16 @@ brew install argcomplete              # macOS
 After installation, you can use tab completion:
 
 ```bash
-hyper2kvm --<TAB>              # Shows all available options
-hyper2kvm --vm<TAB>            # Completes to --vmdk, --vm-name, etc.
-hyper2kvm --vmdk /path/<TAB>   # Path completion
+h2kvm --<TAB>              # Shows all available options
+h2kvm --vm<TAB>            # Completes to --vmdk, --vm-name, etc.
+h2kvm --vmdk /path/<TAB>   # Path completion
 ```
 
 For detailed installation instructions and troubleshooting, see [completions/README.md](../completions/README.md).
 
 ### Automated Installation (Recommended)
 
-The fastest way to install hyper2kvm and all dependencies:
+The fastest way to install h2kvm and all dependencies:
 
 ```bash
 # Install everything (govc, ovftool, pyvmomi, qemu-img, libguestfs, libvirt, OVMF)
@@ -259,7 +259,7 @@ Available flags:
 | `--govc` | govc (govmomi) | vSphere VM export via API |
 | `--ovftool` | VMware OVF Tool | vSphere VM export (VMware official) |
 | `--pyvmomi` | pyvmomi | vSphere Python SDK |
-| `--hyper2kvm` | hyper2kvm | The tool itself |
+| `--h2kvm` | h2kvm | The tool itself |
 | `--verify` | — | Check all tools |
 | `--all` | Everything | Full install |
 
@@ -267,7 +267,7 @@ Available flags:
 
 ### System dependencies by OS
 
-`hyper2kvm` is Python with a pure Python VMCraft engine for VM manipulation.
+`h2kvm` is Python with a pure Python VMCraft engine for VM manipulation.
 
 **Core dependencies** (required):
 
@@ -508,18 +508,18 @@ pip install -e .
 
 ### Option 2: Using Docker (Recommended for macOS)
 
-Run hyper2kvm in a Linux container:
+Run h2kvm in a Linux container:
 
 ```bash
 # Build container
-docker build -t hyper2kvm .
+docker build -t h2kvm .
 
 # Run with volume mounts
 docker run -it --rm \
   --privileged \
   -v $(pwd)/input:/input \
   -v $(pwd)/output:/output \
-  hyper2kvm local --vmdk /input/disk.vmdk --to-output /output/disk.qcow2
+  h2kvm local --vmdk /input/disk.vmdk --to-output /output/disk.qcow2
 ```bash
 
 ### Option 3: Use a Linux VM
@@ -533,7 +533,7 @@ The most reliable option for macOS users:
 
 ## Windows (WSL)
 
-hyper2kvm works in **Windows Subsystem for Linux (WSL2)** with some caveats.
+h2kvm works in **Windows Subsystem for Linux (WSL2)** with some caveats.
 
 ### Prerequisites
 
@@ -564,9 +564,9 @@ sudo apt-get install -y \
   openssh-client rsync \
   libvirt-clients libvirt-daemon-system
 
-# Clone and install hyper2kvm
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+# Clone and install h2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -587,7 +587,7 @@ pip install -e .
 docker run -it --rm --privileged `
   -v C:\VMs\input:/input `
   -v C:\VMs\output:/output `
-  hyper2kvm local --vmdk /input/disk.vmdk --to-output /output/disk.qcow2
+  h2kvm local --vmdk /input/disk.vmdk --to-output /output/disk.qcow2
 ```bash
 
 ---
@@ -615,17 +615,17 @@ COPY . /app
 RUN python3 -m pip install --no-cache-dir -r requirements.txt && \
     python3 -m pip install -e .
 
-ENTRYPOINT ["python3", "-m", "hyper2kvm"]
+ENTRYPOINT ["python3", "-m", "h2kvm"]
 ```bash
 
 Build and run:
 
 ```bash
-docker build -t hyper2kvm .
+docker build -t h2kvm .
 docker run -it --rm --privileged \
   -v /path/to/input:/input \
   -v /path/to/output:/output \
-  hyper2kvm local --vmdk /input/disk.vmdk --to-output /output/disk.qcow2
+  h2kvm local --vmdk /input/disk.vmdk --to-output /output/disk.qcow2
 ```bash
 
 ### Using Podman
@@ -633,25 +633,25 @@ docker run -it --rm --privileged \
 Podman works the same as Docker:
 
 ```bash
-podman build -t hyper2kvm .
+podman build -t h2kvm .
 podman run -it --rm --privileged \
   -v /path/to/input:/input:Z \
   -v /path/to/output:/output:Z \
-  hyper2kvm local --vmdk /input/disk.vmdk --to-output /output/disk.qcow2
+  h2kvm local --vmdk /input/disk.vmdk --to-output /output/disk.qcow2
 ```bash
 
 **Note:** The `:Z` suffix is required for SELinux systems (Fedora/RHEL).
 
 ### Using a Virtual Environment (Recommended for development)
 
-This isolates hyper2kvm's dependencies from system Python:
+This isolates h2kvm's dependencies from system Python:
 
 ```bash
 # Create virtual environment
-python3 -m venv ~/.venvs/hyper2kvm
+python3 -m venv ~/.venvs/h2kvm
 
 # Activate it
-source ~/.venvs/hyper2kvm/bin/activate
+source ~/.venvs/h2kvm/bin/activate
 
 # Install
 pip install -r requirements.txt
@@ -690,7 +690,7 @@ qemu-img --version
 
 ### Python version too old
 
-**Problem:** hyper2kvm requires Python 3.10+.
+**Problem:** h2kvm requires Python 3.10+.
 
 **Solution:**
 ```bash
@@ -719,7 +719,7 @@ Or run in a container with `--privileged`.
 
 ### System Configuration
 
-After installation, the system-wide configuration file is at `/etc/hyper2kvm/config.yaml`.
+After installation, the system-wide configuration file is at `/etc/h2kvm/config.yaml`.
 
 Key settings:
 - `container_isolation: true` (default) -- runs LVM activation inside Podman/Docker for isolation
@@ -772,19 +772,19 @@ pip install pytest pytest-cov pytest-xdist ruff mypy bandit
 python -m pytest tests/unit/ -v
 
 # Run with coverage
-python -m pytest tests/unit/ --cov=hyper2kvm --cov-report=term-missing
+python -m pytest tests/unit/ --cov=h2kvm --cov-report=term-missing
 
 # Run specific test file
 python -m pytest tests/unit/test_core/test_utils.py -v
 
 # Run linting
-ruff check hyper2kvm/
+ruff check h2kvm/
 
 # Run type checking
-mypy hyper2kvm/ --ignore-missing-imports
+mypy h2kvm/ --ignore-missing-imports
 
 # Run security scan
-bandit -r hyper2kvm/
+bandit -r h2kvm/
 ```bash
 
 ### Continuous Integration

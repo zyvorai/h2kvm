@@ -12,7 +12,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/hyper2kvm/web/internal/domain"
+	"github.com/h2kvm/web/internal/domain"
 )
 
 // Provider implements ports.ComputeProvider for AWS EC2.

@@ -1,10 +1,10 @@
-# hyper2kvm Kubernetes Operator
+# h2kvm Kubernetes Operator
 
 Kubernetes operator for converting VM images from various formats (VMDK, VHD, VDI, OVA) to KubeVirt-compatible qcow2 and deploying them as VirtualMachines.
 
 ## Overview
 
-The hyper2kvm operator automates the process of:
+The h2kvm operator automates the process of:
 1. Downloading VM images from HTTP/HTTPS/S3 sources into DataVolumes
 2. Converting disk formats using qemu-img (optional)
 3. Applying offline fixes (fstab, grub, initramfs, LVM, network configuration) to migrated Linux VMs
@@ -31,7 +31,7 @@ When `spec.conversion.offlineFixes: true` is set, the operator launches a fixer 
 - **Network configuration**: Updates netplan/NetworkManager for virtio NICs
 - **GRUB updates**: Ensures bootloader can boot on KVM
 
-The fixer runs as a Kubernetes Job with the converted DataVolume mounted. It uses the `h2kvmctl` CLI from the `FIXER_IMAGE` container (default: `quay.io/hyper2kvm/fixer:latest`).
+The fixer runs as a Kubernetes Job with the converted DataVolume mounted. It uses the `h2kvmctl` CLI from the `FIXER_IMAGE` container (default: `quay.io/h2kvm/fixer:latest`).
 
 ## Architecture
 
@@ -87,7 +87,7 @@ kubectl apply -f config/manager/
 ### Basic VM Migration (HTTP source)
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: ubuntu-migration
@@ -107,7 +107,7 @@ spec:
 ### VMware VMDK Migration with Offline Fixes
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: vmware-rhel-migration
@@ -134,7 +134,7 @@ spec:
 ### Disk-Only Conversion (No VM)
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: disk-only
@@ -242,10 +242,10 @@ make build
 make test
 
 # Build container image
-make docker-build IMG=myregistry/hyper2kvm-operator:latest
+make docker-build IMG=myregistry/h2kvm-operator:latest
 
 # Push container image
-make docker-push IMG=myregistry/hyper2kvm-operator:latest
+make docker-push IMG=myregistry/h2kvm-operator:latest
 ```
 
 ### Run locally
@@ -255,7 +255,7 @@ make docker-push IMG=myregistry/hyper2kvm-operator:latest
 make install
 
 # Set environment variables for local development
-export FIXER_IMAGE=quay.io/hyper2kvm/fixer:latest
+export FIXER_IMAGE=quay.io/h2kvm/fixer:latest
 
 # Run controller locally
 make run
@@ -267,7 +267,7 @@ The operator supports these environment variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `FIXER_IMAGE` | `quay.io/hyper2kvm/fixer:latest` | Container image for offline fixer Job |
+| `FIXER_IMAGE` | `quay.io/h2kvm/fixer:latest` | Container image for offline fixer Job |
 | `FIXER_PULL_POLICY` | `IfNotPresent` | Image pull policy for fixer |
 
 These can be set in the operator deployment or via Helm values.
@@ -319,7 +319,7 @@ kubectl get job <name>-fixer
 kubectl logs job/<name>-fixer
 
 # Verify FIXER_IMAGE is set
-kubectl get deployment -n hyper2kvm-system -o yaml | grep FIXER_IMAGE
+kubectl get deployment -n h2kvm-system -o yaml | grep FIXER_IMAGE
 ```
 
 ### VirtualMachine not created

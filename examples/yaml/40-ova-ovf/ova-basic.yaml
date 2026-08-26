@@ -2,7 +2,7 @@
 #   h2kvmctl --config 40-ova-ovf/ova-basic.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config 40-ova-ovf/ova-basic.yaml
+#   h2kvm --config 40-ova-ovf/ova-basic.yaml
 
 command: ova
 ova: /path/to/appliance.ova

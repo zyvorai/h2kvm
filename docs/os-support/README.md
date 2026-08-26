@@ -1,6 +1,6 @@
 # Operating System Support
 
-Comprehensive guides for migrating specific operating systems to KVM with Hyper2KVM.
+Comprehensive guides for migrating specific operating systems to KVM with H2KVM.
 
 ## Quick Navigation
 
@@ -326,8 +326,8 @@ EOF
 - **[FAQ](../FAQ.md)** - Frequently asked questions
 
 ### Support
-- **GitHub Issues**: [Report OS-specific bugs](https://github.com/ssahani/hyper2kvm/issues)
-- **GitHub Discussions**: [Ask questions](https://github.com/ssahani/hyper2kvm/discussions)
+- **GitHub Issues**: [Report OS-specific bugs](https://github.com/ssahani/h2kvm/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/ssahani/h2kvm/discussions)
 
 ### Testing
 - **[Test Results](../test-results/)** - Detailed test results by OS

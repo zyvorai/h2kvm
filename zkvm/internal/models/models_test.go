@@ -11,8 +11,8 @@ import (
 
 func TestDefaultConfig(t *testing.T) {
 	cfg := DefaultConfig()
-	if cfg.General.OutputDir != "/tmp/hyper2kvm-output" {
-		t.Errorf("expected output dir /tmp/hyper2kvm-output, got %s", cfg.General.OutputDir)
+	if cfg.General.OutputDir != "/tmp/h2kvm-output" {
+		t.Errorf("expected output dir /tmp/h2kvm-output, got %s", cfg.General.OutputDir)
 	}
 	if cfg.Migration.DefaultFormat != "qcow2" {
 		t.Errorf("expected default format qcow2, got %s", cfg.Migration.DefaultFormat)

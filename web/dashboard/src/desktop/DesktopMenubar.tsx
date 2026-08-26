@@ -80,7 +80,7 @@ export function DesktopMenubar({
             }`}
           >
             {menu.label}
-            {menu.label !== 'hyper2kvm' && <ChevronDown className="w-3 h-3 opacity-60" />}
+            {menu.label !== 'h2kvm' && <ChevronDown className="w-3 h-3 opacity-60" />}
           </button>
           {openMenu === menu.label && (
             <div className="absolute top-full left-0 mt-1 min-w-[11rem] max-h-[min(24rem,70vh)] overflow-y-auto rounded-xl border border-white/10 glass-strong p-1 shadow-2xl z-[500]">

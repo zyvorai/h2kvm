@@ -6,7 +6,7 @@
 #
 # Usage:
 #   export VC_PASSWORD='your-password'
-#   hyper2kvm --config 95-vsphere-connection-retry-example.yaml vsphere
+#   h2kvm --config 95-vsphere-connection-retry-example.yaml vsphere
 #
 # Features:
 #   ✅ Automatic connection retry with exponential backoff
@@ -16,7 +16,7 @@
 #
 # Requirements:
 #   - vCenter/ESXi access credentials
-#   - hyper2kvm with VMwareConnectionOptions support
+#   - h2kvm with VMwareConnectionOptions support
 # ==============================================================================
 
 cmd: vsphere
@@ -32,7 +32,7 @@ vc_port: 443
 # Connection Retry Configuration (NEW)
 # ==============================================================================
 #
-# These settings control how hyper2kvm handles transient connection failures
+# These settings control how h2kvm handles transient connection failures
 # when connecting to vSphere/vCenter using pyvmomi (SmartConnect).
 #
 # All settings are optional - defaults shown below.

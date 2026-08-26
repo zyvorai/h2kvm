@@ -48,7 +48,7 @@ def _create_ec2_instance(ec2, *, name: str = "prod-web-01", instance_type: str =
     return resp["Instances"][0]["InstanceId"]
 
 
-def _create_s3_bucket(s3, bucket: str = "hyper2kvm-exports"):
+def _create_s3_bucket(s3, bucket: str = "h2kvm-exports"):
     """Helper: create an S3 bucket."""
     s3.create_bucket(Bucket=bucket)
 
@@ -69,15 +69,15 @@ class TestE2EFullPipeline:
         The export and convert steps are mocked since moto doesn't support
         export_image API. Everything else is real moto EC2/S3.
         """
-        from hyper2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
-        from hyper2kvm.providers.aws_ec2.models import AWSShutdownConfig
+        from h2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
+        from h2kvm.providers.aws_ec2.models import AWSShutdownConfig
 
         ec2 = boto3.client("ec2", region_name="us-east-1")
         s3 = boto3.client("s3", region_name="us-east-1")
 
         # Setup: create instance + S3 bucket
         instance_id = _create_ec2_instance(ec2, name="prod-web-01")
-        _create_s3_bucket(s3, "hyper2kvm-exports")
+        _create_s3_bucket(s3, "h2kvm-exports")
 
         # Verify instance is running
         resp = ec2.describe_instances(InstanceIds=[instance_id])
@@ -88,7 +88,7 @@ class TestE2EFullPipeline:
 
         config = AWSConfig(
             region="us-east-1",
-            bucket="hyper2kvm-exports",
+            bucket="h2kvm-exports",
             instance_ids=[instance_id],
             shutdown=AWSShutdownConfig(stop_instance=True),
             output_dir=output_dir,
@@ -104,7 +104,7 @@ class TestE2EFullPipeline:
         # Test the real components individually:
 
         # 1. Client: describe + stop
-        from hyper2kvm.providers.aws_ec2.client import AWSClient
+        from h2kvm.providers.aws_ec2.client import AWSClient
 
         client = AWSClient(region="us-east-1")
         info = client.describe_instance(instance_id)
@@ -131,11 +131,11 @@ class TestE2EFullPipeline:
         assert snap_resp["Snapshots"][0]["State"] == "completed"
 
         # 3. S3 download (simulate export result)
-        fake_disk_key = f"hyper2kvm/{snap_id}/disk.vmdk"
+        fake_disk_key = f"h2kvm/{snap_id}/disk.vmdk"
         fake_disk_size = 2 * 1024 * 1024  # 2MB
-        _upload_fake_disk(s3, "hyper2kvm-exports", fake_disk_key, fake_disk_size)
+        _upload_fake_disk(s3, "h2kvm-exports", fake_disk_key, fake_disk_size)
 
-        from hyper2kvm.providers.aws_ec2.downloader import Downloader
+        from h2kvm.providers.aws_ec2.downloader import Downloader
 
         downloader = Downloader(s3)
         progress_log = []
@@ -143,7 +143,7 @@ class TestE2EFullPipeline:
         workdir.mkdir(parents=True, exist_ok=True)
 
         result = downloader.download(
-            "hyper2kvm-exports",
+            "h2kvm-exports",
             fake_disk_key,
             local_path,
             progress_cb=lambda dl, total: progress_log.append((dl, total)),
@@ -156,7 +156,7 @@ class TestE2EFullPipeline:
         assert progress_log[-1][0] == progress_log[-1][1]  # final: dl == total
 
         # 4. Converter (mock h2kvmctl)
-        from hyper2kvm.providers.aws_ec2.converter import Converter
+        from h2kvm.providers.aws_ec2.converter import Converter
 
         converter = Converter()
         with patch("subprocess.run") as mock_run:
@@ -178,11 +178,11 @@ class TestE2EFullPipeline:
 
         # 5. Cleanup
         client.delete_snapshot(snap_id)
-        downloader.delete_s3_object("hyper2kvm-exports", fake_disk_key)
+        downloader.delete_s3_object("h2kvm-exports", fake_disk_key)
 
         # Verify cleanup
         with pytest.raises(Exception):
-            s3.head_object(Bucket="hyper2kvm-exports", Key=fake_disk_key)
+            s3.head_object(Bucket="h2kvm-exports", Key=fake_disk_key)
 
     @mock_aws
     def test_full_provider_orchestrator(self, tmp_path):
@@ -192,8 +192,8 @@ class TestE2EFullPipeline:
         This tests the orchestrator logic: state management, phase ordering,
         cleanup, report generation.
         """
-        from hyper2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
-        from hyper2kvm.providers.aws_ec2.models import ExportTask
+        from h2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
+        from h2kvm.providers.aws_ec2.models import ExportTask
 
         ec2_client = boto3.client("ec2", region_name="us-east-1")
         s3_client = boto3.client("s3", region_name="us-east-1")
@@ -224,7 +224,7 @@ class TestE2EFullPipeline:
         def mock_process_volume(volume_id, inst_id, disk, state, state_path, **kwargs):
             disk.snapshot_id = "snap-mock123"
             disk.s3_bucket = "export-bucket"
-            disk.s3_key = "hyper2kvm/snap-mock123/disk.vmdk"
+            disk.s3_key = "h2kvm/snap-mock123/disk.vmdk"
             disk.local_path = str(fake_disk)
             disk.ok = True
 
@@ -267,8 +267,8 @@ class TestE2EFullPipeline:
     @mock_aws
     def test_provider_skip_stop_if_configured(self, tmp_path):
         """Test that stop_instance=False skips the stop phase."""
-        from hyper2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
-        from hyper2kvm.providers.aws_ec2.models import AWSShutdownConfig
+        from h2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
+        from h2kvm.providers.aws_ec2.models import AWSShutdownConfig
 
         ec2_client = boto3.client("ec2", region_name="us-east-1")
         s3_client = boto3.client("s3", region_name="us-east-1")
@@ -306,7 +306,7 @@ class TestE2EFullPipeline:
     @mock_aws
     def test_provider_handles_process_volume_failure(self, tmp_path):
         """Test that a failed volume doesn't crash the pipeline."""
-        from hyper2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
+        from h2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
 
         ec2_client = boto3.client("ec2", region_name="us-east-1")
         s3_client = boto3.client("s3", region_name="us-east-1")
@@ -341,7 +341,7 @@ class TestE2EFullPipeline:
     @mock_aws
     def test_provider_pull_all(self, tmp_path):
         """Test pull_all() processes multiple instances."""
-        from hyper2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
+        from h2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
 
         ec2_client = boto3.client("ec2", region_name="us-east-1")
         s3_client = boto3.client("s3", region_name="us-east-1")
@@ -381,7 +381,7 @@ class TestE2EFullPipeline:
     @mock_aws
     def test_state_file_resumability(self, tmp_path):
         """Test that state file enables resuming after interruption."""
-        from hyper2kvm.providers.aws_ec2.utils import load_state, save_state
+        from h2kvm.providers.aws_ec2.utils import load_state, save_state
 
         state_path = tmp_path / "i-abc123.state.json"
 
@@ -401,7 +401,7 @@ class TestE2EFullPipeline:
         # Simulate phase 3: export completed
         loaded["vol-123"]["export_task_id"] = "export-789"
         loaded["vol-123"]["s3_bucket"] = "bucket"
-        loaded["vol-123"]["s3_key"] = "hyper2kvm/snap-resume456/disk.vmdk"
+        loaded["vol-123"]["s3_key"] = "h2kvm/snap-resume456/disk.vmdk"
         save_state(state_path, loaded)
 
         # Simulate phase 4: download completed
@@ -419,8 +419,8 @@ class TestE2EFullPipeline:
     @mock_aws
     def test_multi_disk_instance(self, tmp_path):
         """Test instance with multiple EBS volumes (root + data)."""
-        from hyper2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
-        from hyper2kvm.providers.aws_ec2.models import AWSExportConfig
+        from h2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
+        from h2kvm.providers.aws_ec2.models import AWSExportConfig
 
         ec2_client = boto3.client("ec2", region_name="us-east-1")
         s3_client = boto3.client("s3", region_name="us-east-1")
@@ -474,8 +474,8 @@ class TestE2EFullPipeline:
     @mock_aws
     def test_root_only_export(self, tmp_path):
         """Test that disks='root' only exports the root volume."""
-        from hyper2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
-        from hyper2kvm.providers.aws_ec2.models import AWSExportConfig
+        from h2kvm.providers.aws_ec2 import AWSConfig, AWSProvider
+        from h2kvm.providers.aws_ec2.models import AWSExportConfig
 
         ec2_client = boto3.client("ec2", region_name="us-east-1")
         s3_client = boto3.client("s3", region_name="us-east-1")

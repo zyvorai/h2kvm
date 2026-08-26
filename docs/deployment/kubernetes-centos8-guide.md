@@ -1,6 +1,6 @@
-# Hyper2KVM Kubernetes Deployment on CentOS 8
+# H2KVM Kubernetes Deployment on CentOS 8
 
-Complete guide for deploying Hyper2KVM on Kubernetes with CentOS 8 nodes.
+Complete guide for deploying H2KVM on Kubernetes with CentOS 8 nodes.
 
 ---
 
@@ -16,7 +16,7 @@ Complete guide for deploying Hyper2KVM on Kubernetes with CentOS 8 nodes.
 
 ## Overview
 
-This guide covers deploying Hyper2KVM on Kubernetes running on CentOS 8 (or CentOS Stream 8) nodes. The deployment supports:
+This guide covers deploying H2KVM on Kubernetes running on CentOS 8 (or CentOS Stream 8) nodes. The deployment supports:
 
 - **Worker-based architecture** - Kubernetes-native job execution
 - **Batch migrations** - Parallel VM processing
@@ -88,27 +88,27 @@ sudo dnf install -y ntfs-3g
 ### 1. Create Namespace
 
 ```bash
-kubectl create namespace hyper2kvm-system
+kubectl create namespace h2kvm-system
 ```
 
 ### 2. Deploy Basic Setup
 
-Create `hyper2kvm-basic.yaml`:
+Create `h2kvm-basic.yaml`:
 
 ```yaml
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-system
+  name: h2kvm-worker
+  namespace: h2kvm-system
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: hyper2kvm-worker-role
-  namespace: hyper2kvm-system
+  name: h2kvm-worker-role
+  namespace: h2kvm-system
 rules:
 - apiGroups: [""]
   resources: ["pods", "pods/log"]
@@ -121,23 +121,23 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: hyper2kvm-worker-binding
-  namespace: hyper2kvm-system
+  name: h2kvm-worker-binding
+  namespace: h2kvm-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: hyper2kvm-worker-role
+  name: h2kvm-worker-role
 subjects:
 - kind: ServiceAccount
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-system
+  name: h2kvm-worker
+  namespace: h2kvm-system
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: vmware-storage
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   accessModes:
     - ReadWriteMany
@@ -151,7 +151,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: kvm-storage
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   accessModes:
     - ReadWriteMany
@@ -165,18 +165,18 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: test-migration
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   template:
     metadata:
       labels:
-        app: hyper2kvm
+        app: h2kvm
     spec:
-      serviceAccountName: hyper2kvm-worker
+      serviceAccountName: h2kvm-worker
       restartPolicy: Never
       containers:
-      - name: hyper2kvm
-        image: ghcr.io/ssahani/hyper2kvm:latest
+      - name: h2kvm
+        image: ghcr.io/ssahani/h2kvm:latest
         imagePullPolicy: Always
         command:
           - h2kvmctl
@@ -224,13 +224,13 @@ spec:
 ### 3. Deploy
 
 ```bash
-kubectl apply -f hyper2kvm-basic.yaml
+kubectl apply -f h2kvm-basic.yaml
 
 # Watch progress
-kubectl get jobs -n hyper2kvm-system -w
+kubectl get jobs -n h2kvm-system -w
 
 # Check logs
-kubectl logs -n hyper2kvm-system job/test-migration -f
+kubectl logs -n h2kvm-system job/test-migration -f
 ```
 
 ---
@@ -247,7 +247,7 @@ On **each worker node**:
 
 set -e
 
-echo "=== Preparing CentOS 8 Node for Hyper2KVM ==="
+echo "=== Preparing CentOS 8 Node for H2KVM ==="
 
 # Update system
 echo "Updating system..."
@@ -322,9 +322,9 @@ echo ""
 echo "✅ Node preparation complete!"
 echo ""
 echo "Next steps:"
-echo "1. Label this node for hyper2kvm workloads:"
-echo "   kubectl label node $(hostname) hyper2kvm=enabled"
-echo "2. Deploy hyper2kvm manifests"
+echo "1. Label this node for h2kvm workloads:"
+echo "   kubectl label node $(hostname) h2kvm=enabled"
+echo "2. Deploy h2kvm manifests"
 ```
 
 Run the script:
@@ -334,7 +334,7 @@ chmod +x prepare-centos8-node.sh
 ./prepare-centos8-node.sh
 
 # Label the node
-kubectl label node <node-name> hyper2kvm=enabled
+kubectl label node <node-name> h2kvm=enabled
 ```
 
 ---
@@ -343,10 +343,10 @@ kubectl label node <node-name> hyper2kvm=enabled
 
 ```bash
 # Create namespace
-kubectl create namespace hyper2kvm-system
+kubectl create namespace h2kvm-system
 
 # Set as default for convenience
-kubectl config set-context --current --namespace=hyper2kvm-system
+kubectl config set-context --current --namespace=h2kvm-system
 ```
 
 Create `01-rbac.yaml`:
@@ -356,15 +356,15 @@ Create `01-rbac.yaml`:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-system
+  name: h2kvm-worker
+  namespace: h2kvm-system
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: hyper2kvm-worker-role
-  namespace: hyper2kvm-system
+  name: h2kvm-worker-role
+  namespace: h2kvm-system
 rules:
 - apiGroups: [""]
   resources: ["pods", "pods/log", "configmaps", "secrets"]
@@ -380,16 +380,16 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: hyper2kvm-worker-binding
-  namespace: hyper2kvm-system
+  name: h2kvm-worker-binding
+  namespace: h2kvm-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: hyper2kvm-worker-role
+  name: h2kvm-worker-role
 subjects:
 - kind: ServiceAccount
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-system
+  name: h2kvm-worker
+  namespace: h2kvm-system
 ```
 
 Apply:
@@ -411,9 +411,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: vmware-storage
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
   labels:
-    app: hyper2kvm
+    app: h2kvm
     storage-type: source
 spec:
   accessModes:
@@ -429,9 +429,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: kvm-storage
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
   labels:
-    app: hyper2kvm
+    app: h2kvm
     storage-type: destination
 spec:
   accessModes:
@@ -447,9 +447,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: conversion-temp
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
   labels:
-    app: hyper2kvm
+    app: h2kvm
     storage-type: temp
 spec:
   accessModes:
@@ -469,14 +469,14 @@ sudo dnf install -y nfs-utils
 sudo systemctl enable --now nfs-server
 
 # Create export directory
-sudo mkdir -p /exports/hyper2kvm/{vmware,kvm}
-sudo chown -R nobody:nobody /exports/hyper2kvm
-sudo chmod -R 777 /exports/hyper2kvm
+sudo mkdir -p /exports/h2kvm/{vmware,kvm}
+sudo chown -R nobody:nobody /exports/h2kvm
+sudo chmod -R 777 /exports/h2kvm
 
 # Configure exports
 cat <<EOF | sudo tee -a /etc/exports
-/exports/hyper2kvm/vmware *(rw,sync,no_root_squash,no_subtree_check)
-/exports/hyper2kvm/kvm *(rw,sync,no_root_squash,no_subtree_check)
+/exports/h2kvm/vmware *(rw,sync,no_root_squash,no_subtree_check)
+/exports/h2kvm/kvm *(rw,sync,no_root_squash,no_subtree_check)
 EOF
 
 # Apply changes
@@ -502,8 +502,8 @@ Create `03-configmap.yaml`:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: hyper2kvm-config
-  namespace: hyper2kvm-system
+  name: h2kvm-config
+  namespace: h2kvm-system
 data:
   # Default migration settings
   default-fstab-mode: "stabilize-all"
@@ -537,9 +537,9 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: migrate-VMNAME  # Replace VMNAME
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
   labels:
-    app: hyper2kvm
+    app: h2kvm
     migration-type: single
 spec:
   backoffLimit: 2  # Retry twice on failure
@@ -547,15 +547,15 @@ spec:
   template:
     metadata:
       labels:
-        app: hyper2kvm
+        app: h2kvm
         job-name: migrate-VMNAME
     spec:
-      serviceAccountName: hyper2kvm-worker
+      serviceAccountName: h2kvm-worker
       restartPolicy: Never
 
       # Schedule on labeled nodes only
       nodeSelector:
-        hyper2kvm: enabled
+        h2kvm: enabled
 
       # Prefer nodes with more resources
       affinity:
@@ -568,8 +568,8 @@ spec:
                 operator: Exists
 
       containers:
-      - name: hyper2kvm
-        image: ghcr.io/ssahani/hyper2kvm:latest
+      - name: h2kvm
+        image: ghcr.io/ssahani/h2kvm:latest
         imagePullPolicy: Always
 
         command:
@@ -671,7 +671,7 @@ kubectl run -it --rm copy-vmdk \
     }]
   }
 }' \
-  --namespace=hyper2kvm-system
+  --namespace=h2kvm-system
 
 # Inside the pod, copy your VMDK files
 # Exit when done
@@ -698,34 +698,34 @@ Create `05-production-deployment.yaml`:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hyper2kvm-api
-  namespace: hyper2kvm-system
+  name: h2kvm-api
+  namespace: h2kvm-system
   labels:
-    app: hyper2kvm
+    app: h2kvm
     component: api
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: hyper2kvm
+      app: h2kvm
       component: api
   template:
     metadata:
       labels:
-        app: hyper2kvm
+        app: h2kvm
         component: api
     spec:
-      serviceAccountName: hyper2kvm-worker
+      serviceAccountName: h2kvm-worker
       nodeSelector:
-        hyper2kvm: enabled
+        h2kvm: enabled
 
       containers:
       - name: api
-        image: ghcr.io/ssahani/hyper2kvm:latest
+        image: ghcr.io/ssahani/h2kvm:latest
         imagePullPolicy: Always
 
         command:
-          - hyper2kvm
+          - h2kvm
           - daemon
           - --mode
           - api
@@ -770,10 +770,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hyper2kvm-api
-  namespace: hyper2kvm-system
+  name: h2kvm-api
+  namespace: h2kvm-system
   labels:
-    app: hyper2kvm
+    app: h2kvm
     component: api
 spec:
   type: ClusterIP
@@ -783,7 +783,7 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: hyper2kvm
+    app: h2kvm
     component: api
 
 ---
@@ -791,21 +791,21 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: hyper2kvm-api
-  namespace: hyper2kvm-system
+  name: h2kvm-api
+  namespace: h2kvm-system
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
-  - host: hyper2kvm.example.com  # CHANGE THIS
+  - host: h2kvm.example.com  # CHANGE THIS
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: hyper2kvm-api
+            name: h2kvm-api
             port:
               number: 80
 ```
@@ -817,7 +817,7 @@ kubectl apply -f 05-production-deployment.yaml
 
 # Verify
 kubectl get pods -l component=api
-kubectl get svc hyper2kvm-api
+kubectl get svc h2kvm-api
 ```
 
 ---
@@ -831,7 +831,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: batch-migration-manifest
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 data:
   manifest.json: |
     {
@@ -858,24 +858,24 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: batch-migration
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   parallelism: 3
   completions: 3
   template:
     metadata:
       labels:
-        app: hyper2kvm
+        app: h2kvm
         job-type: batch
     spec:
-      serviceAccountName: hyper2kvm-worker
+      serviceAccountName: h2kvm-worker
       restartPolicy: Never
       nodeSelector:
-        hyper2kvm: enabled
+        h2kvm: enabled
 
       containers:
-      - name: hyper2kvm
-        image: ghcr.io/ssahani/hyper2kvm:latest
+      - name: h2kvm
+        image: ghcr.io/ssahani/h2kvm:latest
 
         command:
           - h2kvmctl
@@ -936,17 +936,17 @@ spec:
 # Install Prometheus Operator (if not already installed)
 kubectl create -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml
 
-# Create ServiceMonitor for hyper2kvm
+# Create ServiceMonitor for h2kvm
 cat <<EOF | kubectl apply -f -
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: hyper2kvm-metrics
-  namespace: hyper2kvm-system
+  name: h2kvm-metrics
+  namespace: h2kvm-system
 spec:
   selector:
     matchLabels:
-      app: hyper2kvm
+      app: h2kvm
   endpoints:
   - port: http
     path: /metrics
@@ -958,16 +958,16 @@ EOF
 
 ```bash
 # View job logs
-kubectl logs -n hyper2kvm-system job/migrate-test-vm
+kubectl logs -n h2kvm-system job/migrate-test-vm
 
 # Follow logs in real-time
-kubectl logs -n hyper2kvm-system -f job/migrate-test-vm
+kubectl logs -n h2kvm-system -f job/migrate-test-vm
 
 # View API logs
-kubectl logs -n hyper2kvm-system -l component=api
+kubectl logs -n h2kvm-system -l component=api
 
 # View all migration logs
-kubectl logs -n hyper2kvm-system -l app=hyper2kvm --tail=100
+kubectl logs -n h2kvm-system -l app=h2kvm --tail=100
 ```
 
 ---
@@ -1039,7 +1039,7 @@ sudo sed -i 's/^SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
 **Check**:
 ```bash
 # Describe PVC
-kubectl describe pvc vmware-storage -n hyper2kvm-system
+kubectl describe pvc vmware-storage -n h2kvm-system
 
 # Check PV
 kubectl get pv
@@ -1059,10 +1059,10 @@ sudo mount -t nfs <nfs-server>:/export/path /mnt/test
 **Debug**:
 ```bash
 # Check pod events
-kubectl describe pod -n hyper2kvm-system <pod-name>
+kubectl describe pod -n h2kvm-system <pod-name>
 
 # Check node labels
-kubectl get nodes --show-labels | grep hyper2kvm
+kubectl get nodes --show-labels | grep h2kvm
 
 # Check node resources
 kubectl top nodes
@@ -1095,20 +1095,20 @@ free -h  # on worker nodes
 
 ```bash
 # Shell into a running job pod
-kubectl exec -it -n hyper2kvm-system <pod-name> -- /bin/bash
+kubectl exec -it -n h2kvm-system <pod-name> -- /bin/bash
 
-# Check hyper2kvm version
-kubectl exec -n hyper2kvm-system <pod-name> -- h2kvmctl --version
+# Check h2kvm version
+kubectl exec -n h2kvm-system <pod-name> -- h2kvmctl --version
 
 # Test VMDK access
-kubectl exec -n hyper2kvm-system <pod-name> -- ls -lh /mnt/vmware/
+kubectl exec -n h2kvm-system <pod-name> -- ls -lh /mnt/vmware/
 
 # Check available tools
-kubectl exec -n hyper2kvm-system <pod-name> -- which qemu-img
-kubectl exec -n hyper2kvm-system <pod-name> -- qemu-img --version
+kubectl exec -n h2kvm-system <pod-name> -- which qemu-img
+kubectl exec -n h2kvm-system <pod-name> -- qemu-img --version
 
 # View pod resource usage
-kubectl top pod -n hyper2kvm-system
+kubectl top pod -n h2kvm-system
 ```
 
 ---
@@ -1167,7 +1167,7 @@ spec:
           - key: app
             operator: In
             values:
-            - hyper2kvm
+            - h2kvm
         topologyKey: kubernetes.io/hostname
 ```
 
@@ -1177,16 +1177,16 @@ spec:
 
 ```bash
 # Delete all jobs
-kubectl delete jobs -n hyper2kvm-system --all
+kubectl delete jobs -n h2kvm-system --all
 
 # Delete deployment
-kubectl delete deployment hyper2kvm-api -n hyper2kvm-system
+kubectl delete deployment h2kvm-api -n h2kvm-system
 
 # Delete PVCs (WARNING: This deletes data!)
-kubectl delete pvc -n hyper2kvm-system --all
+kubectl delete pvc -n h2kvm-system --all
 
 # Delete namespace
-kubectl delete namespace hyper2kvm-system
+kubectl delete namespace h2kvm-system
 ```
 
 ---
@@ -1205,7 +1205,7 @@ kubectl delete namespace hyper2kvm-system
 
 - [Kubernetes Documentation](https://kubernetes.io/docs/)
 - [CentOS 8 Documentation](https://docs.centos.org/en-US/8-stream/)
-- [Hyper2KVM Migration Guide](../MIGRATION_CHECKLIST.md)
+- [H2KVM Migration Guide](../MIGRATION_CHECKLIST.md)
 - [Best Practices](../BEST_PRACTICES.md)
 - [Troubleshooting Guide](../TROUBLESHOOTING_FLOWCHART.md)
 

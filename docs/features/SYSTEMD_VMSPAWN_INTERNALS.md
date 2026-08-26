@@ -1,6 +1,6 @@
 # systemd-vmspawn Internals and Architecture
 
-Deep technical analysis of systemd-vmspawn for hyper2kvm integration.
+Deep technical analysis of systemd-vmspawn for h2kvm integration.
 
 ---
 
@@ -142,14 +142,14 @@ Managed by systemd.
 
 ---
 
-## 2. hyper2kvm Integration Architecture
+## 2. h2kvm Integration Architecture
 
 ### Recommended Pipeline
 
 ```
 VMware VM (VMDK)
    ↓
-Hyper2KVM Conversion Engine
+H2KVM Conversion Engine
    ↓
 QCOW2/Raw Image
    ↓
@@ -163,7 +163,7 @@ Production Deployment
 ### Integration Architecture
 
 ```
-Hyper2KVM Controller
+H2KVM Controller
    ↓
 Conversion Engine
    ↓
@@ -232,8 +232,8 @@ def validate_vm_boot(image: Path, name: str) -> bool:
         print(f"Boot validation failed: {e}")
         return False
 
-# Usage in Hyper2KVM pipeline
-converted_qcow2 = Path("/var/lib/hyper2kvm/converted.qcow2")
+# Usage in H2KVM pipeline
+converted_qcow2 = Path("/var/lib/h2kvm/converted.qcow2")
 
 if validate_vm_boot(converted_qcow2, "test-vm"):
     print("✅ Conversion validated - VM boots successfully")
@@ -260,7 +260,7 @@ def check_vm_health(vm_name: str) -> bool:
 ### Production-Grade Integration Architecture
 
 ```
-hyper2kvm-controller
+h2kvm-controller
  ├── Conversion Engine
  │   └── VMware → QCOW2
  ├── vmspawn Manager
@@ -392,14 +392,14 @@ KVM
 | **Cloud native** | ❌ No | ❌ No | ✅ Yes |
 | **Best for CI/testing** | ✅ Yes | Medium | Medium |
 | **Best for enterprise** | ❌ No | ✅ Yes | ✅ Yes |
-| **Best for Hyper2KVM validation** | ✅ **Yes** | ✅ Yes | ❌ No |
+| **Best for H2KVM validation** | ✅ **Yes** | ✅ Yes | ❌ No |
 | **Setup time** | ✅ Instant | Medium | ❌ Hours |
 | **Resource overhead** | ✅ Minimal | Medium | ❌ High |
 | **API complexity** | ✅ Simple | Medium | ❌ Complex |
 
 ---
 
-## Recommended hyper2kvm Strategy
+## Recommended h2kvm Strategy
 
 ### Multi-Tier Approach
 
@@ -427,7 +427,7 @@ Production deployment target?
 ### Recommended Integration
 
 ```
-Hyper2KVM
+H2KVM
  ├── Conversion Validation → vmspawn (lightweight, fast)
  ├── Production Deployment → KubeVirt (cloud-native)
  └── Standalone Deployment → libvirt (traditional)
@@ -438,7 +438,7 @@ Hyper2KVM
 ```
 VMware VMDK
    ↓
-Hyper2KVM Conversion
+H2KVM Conversion
    ↓
 Boot Validation (vmspawn) ← Fast smoke test
    ↓
@@ -447,7 +447,7 @@ Production (KubeVirt/libvirt) ← Full deployment
 
 ---
 
-## Why vmspawn is Perfect for Hyper2KVM Validation
+## Why vmspawn is Perfect for H2KVM Validation
 
 ### Key Benefits
 
@@ -479,7 +479,7 @@ Production (KubeVirt/libvirt) ← Full deployment
 ### Validation Workflow
 
 ```python
-# Hyper2KVM validation pipeline
+# H2KVM validation pipeline
 def validate_migration(source_vmdk: Path) -> bool:
     """
     Complete validation workflow.
@@ -525,7 +525,7 @@ def validate_migration(source_vmdk: Path) -> bool:
 
 ---
 
-## Next Steps for hyper2kvm
+## Next Steps for h2kvm
 
 ### Immediate Implementation
 
@@ -557,5 +557,5 @@ def validate_migration(source_vmdk: Path) -> bool:
 ---
 
 **Last Updated:** 2026-03-29
-**Author:** hyper2kvm team + systemd analysis
+**Author:** h2kvm team + systemd analysis
 **Status:** Technical deep-dive

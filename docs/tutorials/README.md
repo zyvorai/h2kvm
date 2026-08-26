@@ -1,6 +1,6 @@
-# Hyper2KVM Tutorials
+# H2KVM Tutorials
 
-Step-by-step tutorials for learning Hyper2KVM, from beginner to enterprise deployment.
+Step-by-step tutorials for learning H2KVM, from beginner to enterprise deployment.
 
 ## Learning Path
 
@@ -14,7 +14,7 @@ Your first VM migration with detailed explanations.
 **Prerequisites**: None - start here!
 
 **What you'll learn:**
-- Installing Hyper2KVM
+- Installing H2KVM
 - Understanding YAML configuration
 - Running your first migration
 - Importing to libvirt
@@ -200,8 +200,8 @@ Each tutorial follows this structure:
 ### Option 1: Local Practice
 
 ```bash
-# Install Hyper2KVM
-pip install "hyper2kvm[full]"
+# Install H2KVM
+pip install "h2kvm[full]"
 
 # Install libvirt for testing
 sudo dnf install -y libvirt qemu-kvm virt-manager  # Fedora/RHEL
@@ -239,7 +239,7 @@ If you get stuck:
 2. **Review error messages** carefully
 3. **Consult the troubleshooting guide**: [Troubleshooting Guide](../guides/troubleshooting.md)
 4. **Check migration recipes**: [Migration Recipes](../recipes/01-common-scenarios.md)
-5. **Ask for help**: [GitHub Discussions](https://github.com/ssahani/hyper2kvm/discussions)
+5. **Ask for help**: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
 
 ### Additional Resources
 
@@ -302,7 +302,7 @@ If you get stuck:
 
 ### Before Tutorials
 - **[Getting Started](../getting-started/)** - Installation and setup
-- **[Installation Guide](../getting-started/01-Installation.md)** - Install Hyper2KVM
+- **[Installation Guide](../getting-started/01-Installation.md)** - Install H2KVM
 
 ### During Tutorials
 - **[Migration Recipes](../recipes/)** - Quick reference patterns
@@ -318,15 +318,15 @@ If you get stuck:
 
 Help us improve these tutorials:
 
-- **Found an error?** [Open an issue](https://github.com/ssahani/hyper2kvm/issues)
-- **Have a suggestion?** [Start a discussion](https://github.com/ssahani/hyper2kvm/discussions)
+- **Found an error?** [Open an issue](https://github.com/ssahani/h2kvm/issues)
+- **Have a suggestion?** [Start a discussion](https://github.com/ssahani/h2kvm/discussions)
 - **Want to contribute?** [See contributing guide](../development/contributing.md)
 
 ## What's Next?
 
 Choose your starting point:
 
-### 🎯 I'm brand new to Hyper2KVM
+### 🎯 I'm brand new to H2KVM
 → Start with [Tutorial 01 - Beginner](01-beginner-migration.md)
 
 ### 🚀 I've done a basic migration before
@@ -346,7 +346,7 @@ Choose your starting point:
 ## Quick Links
 
 ### Before You Start
-- **[Installation Guide](../getting-started/01-Installation.md)** - Set up hyper2kvm
+- **[Installation Guide](../getting-started/01-Installation.md)** - Set up h2kvm
 - **[System Requirements](../getting-started/02-System-Requirements.md)** - Prerequisites check
 - **[LVM Performance Guide](../LVM_AND_ENTERPRISE_IMPROVEMENTS.md)** - Understand 7x faster LVM improvements
 

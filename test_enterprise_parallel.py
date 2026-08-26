@@ -17,7 +17,7 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from hyper2kvm.vmcraft.enterprise_parallel_manager import (
+from h2kvm.vmcraft.enterprise_parallel_manager import (
     EnterpriseParallelManager,
     ConversionJob,
     ConversionResult,

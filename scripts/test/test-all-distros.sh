@@ -69,11 +69,11 @@ test_distribution() {
 
     # Run conversion
     local log_file
-    log_file="/tmp/hyper2kvm-test-${name}.log"
+    log_file="/tmp/h2kvm-test-${name}.log"
 
     echo "Running conversion (this may take a few minutes)..."
 
-    if sudo timeout 300 python3 -m hyper2kvm --config "$config" > "$log_file" 2>&1; then
+    if sudo timeout 300 python3 -m h2kvm --config "$config" > "$log_file" 2>&1; then
         log_info "Conversion completed successfully"
 
         # Extract stats from log
@@ -115,7 +115,7 @@ test_distribution() {
 # Main test sequence
 log_header "Universal Filesystem Support - Multi-Distribution Test Suite"
 
-echo "Testing hyper2kvm with multiple Linux distributions"
+echo "Testing h2kvm with multiple Linux distributions"
 echo "This validates:"
 echo "  - Different filesystems (ext4, XFS, Btrfs, etc.)"
 echo "  - Different storage layouts (partitions, LVM, etc.)"
@@ -167,7 +167,7 @@ if [[ $FAILED_TESTS -eq 0 ]]; then
     exit 0
 else
     echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${RED}Some tests failed. Check logs in /tmp/hyper2kvm-test-*.log${NC}"
+    echo -e "${RED}Some tests failed. Check logs in /tmp/h2kvm-test-*.log${NC}"
     echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     exit 1
 fi

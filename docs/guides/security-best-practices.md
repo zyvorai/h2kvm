@@ -1,6 +1,6 @@
-# Security Best Practices for hyper2kvm
+# Security Best Practices for h2kvm
 
-Comprehensive security guide for deploying and using hyper2kvm in production environments.
+Comprehensive security guide for deploying and using h2kvm in production environments.
 
 ## Table of Contents
 
@@ -20,7 +20,7 @@ Comprehensive security guide for deploying and using hyper2kvm in production env
 
 ### Threat Model
 
-hyper2kvm processes privileged operations on VM disk images. Key security concerns:
+h2kvm processes privileged operations on VM disk images. Key security concerns:
 
 1. **Image Tampering**: Malicious modification of VM images
 2. **Credential Exposure**: vSphere/cloud credentials in configurations
@@ -46,37 +46,37 @@ Always verify package signatures before installation:
 
 ```bash
 # For RPM installations
-rpm --checksig hyper2kvm-*.rpm
+rpm --checksig h2kvm-*.rpm
 
 # Verify GPG signature
-rpm --import https://download.hyper2kvm.io/GPG-KEY
-rpm -K hyper2kvm-*.rpm
+rpm --import https://download.h2kvm.io/GPG-KEY
+rpm -K h2kvm-*.rpm
 
 # For pip installations
-pip install hyper2kvm --require-hashes
+pip install h2kvm --require-hashes
 ```
 
 ### Use Official Sources Only
 
 ```bash
 # ✅ GOOD: Official PyPI
-pip install hyper2kvm
+pip install h2kvm
 
 # ✅ GOOD: Official GitHub releases
-wget https://github.com/yourorg/hyper2kvm/releases/download/v1.0.0/hyper2kvm.rpm
+wget https://github.com/yourorg/h2kvm/releases/download/v1.0.0/h2kvm.rpm
 
 # ❌ BAD: Unknown third-party mirrors
-pip install -i http://unknown-mirror.com/simple hyper2kvm
+pip install -i http://unknown-mirror.com/simple h2kvm
 ```
 
 ### Verify Binary Checksums
 
 ```bash
 # Download checksum file
-wget https://download.hyper2kvm.io/hyper2kvm-1.0.0.tar.gz.sha256
+wget https://download.h2kvm.io/h2kvm-1.0.0.tar.gz.sha256
 
 # Verify checksum
-sha256sum -c hyper2kvm-1.0.0.tar.gz.sha256
+sha256sum -c h2kvm-1.0.0.tar.gz.sha256
 ```
 
 ### Container Security
@@ -85,10 +85,10 @@ When using Docker:
 
 ```dockerfile
 # Use specific version tags (not 'latest')
-FROM hyper2kvm/hyper2kvm:1.0.0
+FROM h2kvm/h2kvm:1.0.0
 
 # Run as non-root user
-USER hyper2kvm
+USER h2kvm
 
 # Read-only root filesystem
 RUN chmod -R a-w /app
@@ -107,20 +107,20 @@ Set restrictive permissions on configuration files:
 
 ```bash
 # Configuration files - owner read/write only
-chmod 600 /etc/hyper2kvm/config.yaml
-chown hyper2kvm:hyper2kvm /etc/hyper2kvm/config.yaml
+chmod 600 /etc/h2kvm/config.yaml
+chown h2kvm:h2kvm /etc/h2kvm/config.yaml
 
 # Credentials file - owner read only
-chmod 400 /etc/hyper2kvm/credentials
-chown hyper2kvm:hyper2kvm /etc/hyper2kvm/credentials
+chmod 400 /etc/h2kvm/credentials
+chown h2kvm:h2kvm /etc/h2kvm/credentials
 
 # Log directory - owner read/write/execute
-chmod 700 /var/log/hyper2kvm
-chown hyper2kvm:hyper2kvm /var/log/hyper2kvm
+chmod 700 /var/log/h2kvm
+chown h2kvm:h2kvm /var/log/h2kvm
 
 # Output directory - owner read/write/execute
 chmod 700 /var/lib/libvirt/images
-chown hyper2kvm:qemu /var/lib/libvirt/images
+chown h2kvm:qemu /var/lib/libvirt/images
 ```
 
 ### Run as Dedicated User
@@ -128,20 +128,20 @@ chown hyper2kvm:qemu /var/lib/libvirt/images
 Create a dedicated service account:
 
 ```bash
-# Create hyper2kvm user
-useradd -r -s /sbin/nologin -d /var/lib/hyper2kvm hyper2kvm
+# Create h2kvm user
+useradd -r -s /sbin/nologin -d /var/lib/h2kvm h2kvm
 
 # Add to necessary groups
-usermod -aG qemu hyper2kvm
-usermod -aG libvirt hyper2kvm
+usermod -aG qemu h2kvm
+usermod -aG libvirt h2kvm
 
 # Configure sudo for specific commands only
-cat > /etc/sudoers.d/hyper2kvm << 'EOF'
-hyper2kvm ALL=(root) NOPASSWD: /usr/bin/guestfish
-hyper2kvm ALL=(root) NOPASSWD: /usr/bin/virt-inspector
-hyper2kvm ALL=(root) NOPASSWD: /usr/bin/qemu-img
+cat > /etc/sudoers.d/h2kvm << 'EOF'
+h2kvm ALL=(root) NOPASSWD: /usr/bin/guestfish
+h2kvm ALL=(root) NOPASSWD: /usr/bin/virt-inspector
+h2kvm ALL=(root) NOPASSWD: /usr/bin/qemu-img
 EOF
-chmod 440 /etc/sudoers.d/hyper2kvm
+chmod 440 /etc/sudoers.d/h2kvm
 ```
 
 ### SELinux / AppArmor
@@ -155,8 +155,8 @@ Enable mandatory access control:
 getenforce
 
 # Create custom policy
-cat > hyper2kvm.te << 'EOF'
-module hyper2kvm 1.0;
+cat > h2kvm.te << 'EOF'
+module h2kvm 1.0;
 
 require {
     type unconfined_t;
@@ -169,9 +169,9 @@ allow unconfined_t virt_image_t:file { read write open };
 EOF
 
 # Compile and load policy
-checkmodule -M -m -o hyper2kvm.mod hyper2kvm.te
-semodule_package -o hyper2kvm.pp -m hyper2kvm.mod
-semodule -i hyper2kvm.pp
+checkmodule -M -m -o h2kvm.mod h2kvm.te
+semodule_package -o h2kvm.pp -m h2kvm.mod
+semodule -i h2kvm.pp
 
 # Set correct contexts
 semanage fcontext -a -t virt_image_t "/var/lib/libvirt/images(/.*)?"
@@ -182,7 +182,7 @@ restorecon -Rv /var/lib/libvirt/images
 
 ```bash
 # Create AppArmor profile
-cat > /etc/apparmor.d/usr.bin.hyper2kvm << 'EOF'
+cat > /etc/apparmor.d/usr.bin.h2kvm << 'EOF'
 #include <tunables/global>
 
 /usr/bin/h2kvmctl {
@@ -208,7 +208,7 @@ cat > /etc/apparmor.d/usr.bin.hyper2kvm << 'EOF'
 EOF
 
 # Load profile
-apparmor_parser -r /etc/apparmor.d/usr.bin.hyper2kvm
+apparmor_parser -r /etc/apparmor.d/usr.bin.h2kvm
 ```
 
 ---
@@ -382,13 +382,13 @@ vsphere:
 
 ```bash
 # Store credentials in Vault
-vault kv put secret/hyper2kvm/vsphere \
+vault kv put secret/h2kvm/vsphere \
   username=administrator@vsphere.local \
   password=MySecretPassword123
 
 # Retrieve in script
-export VSPHERE_USERNAME=$(vault kv get -field=username secret/hyper2kvm/vsphere)
-export VSPHERE_PASSWORD=$(vault kv get -field=password secret/hyper2kvm/vsphere)
+export VSPHERE_USERNAME=$(vault kv get -field=username secret/h2kvm/vsphere)
+export VSPHERE_PASSWORD=$(vault kv get -field=password secret/h2kvm/vsphere)
 
 h2kvmctl vsphere --vc-user "$VSPHERE_USERNAME" --vc-password "$VSPHERE_PASSWORD" ...
 ```
@@ -408,11 +408,11 @@ stringData:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: hyper2kvm
+  name: h2kvm
 spec:
   containers:
-  - name: hyper2kvm
-    image: hyper2kvm/hyper2kvm:1.0.0
+  - name: h2kvm
+    image: h2kvm/h2kvm:1.0.0
     env:
     - name: VSPHERE_USERNAME
       valueFrom:
@@ -441,7 +441,7 @@ NEW_PASSWORD=$(openssl rand -base64 32)
 govc user.update -password "$NEW_PASSWORD" administrator@vsphere.local
 
 # Update in Vault
-vault kv put secret/hyper2kvm/vsphere \
+vault kv put secret/h2kvm/vsphere \
   username=administrator@vsphere.local \
   password="$NEW_PASSWORD"
 
@@ -458,7 +458,7 @@ echo "✓ Credentials rotated successfully"
 # config.yaml
 logging:
   level: INFO
-  audit_log: /var/log/hyper2kvm/audit.log
+  audit_log: /var/log/h2kvm/audit.log
   security_events: true
   include_checksums: true
   log_all_api_calls: true
@@ -491,9 +491,9 @@ Forward logs to SIEM:
 
 ```bash
 # Configure rsyslog
-cat > /etc/rsyslog.d/hyper2kvm.conf << 'EOF'
-# Forward hyper2kvm logs to SIEM
-if $programname == 'hyper2kvm' then @@siem.example.com:514
+cat > /etc/rsyslog.d/h2kvm.conf << 'EOF'
+# Forward h2kvm logs to SIEM
+if $programname == 'h2kvm' then @@siem.example.com:514
 & stop
 EOF
 
@@ -504,16 +504,16 @@ systemctl restart rsyslog
 
 ```bash
 # Configure logrotate
-cat > /etc/logrotate.d/hyper2kvm << 'EOF'
-/var/log/hyper2kvm/*.log {
+cat > /etc/logrotate.d/h2kvm << 'EOF'
+/var/log/h2kvm/*.log {
     daily
     rotate 365
     compress
     delaycompress
     notifempty
-    create 0600 hyper2kvm hyper2kvm
+    create 0600 h2kvm h2kvm
     postrotate
-        systemctl reload hyper2kvm-daemon
+        systemctl reload h2kvm-daemon
     endscript
 }
 EOF
@@ -540,7 +540,7 @@ Data protection considerations:
 VM_IMAGE=$1
 
 # Verify it's a temporary file
-if [[ "$VM_IMAGE" != /tmp/hyper2kvm/* ]]; then
+if [[ "$VM_IMAGE" != /tmp/h2kvm/* ]]; then
     echo "Can only delete temporary files"
     exit 1
 fi
@@ -549,7 +549,7 @@ fi
 shred -vfz -n 7 "$VM_IMAGE"
 
 # Log deletion
-logger -t hyper2kvm "GDPR deletion: $VM_IMAGE by $USER"
+logger -t h2kvm "GDPR deletion: $VM_IMAGE by $USER"
 ```
 
 ### PCI-DSS Compliance
@@ -601,21 +601,21 @@ auditctl -w /var/lib/libvirt/images -p wa -k vm_image_access
 auditctl -w /etc/sudoers -p wa -k sudoers_changes
 
 # Detect credential access
-auditctl -w /etc/hyper2kvm/credentials -p r -k credential_access
+auditctl -w /etc/h2kvm/credentials -p r -k credential_access
 ```
 
 #### 2. Containment
 
 ```bash
-# Immediately stop hyper2kvm service
-systemctl stop hyper2kvm-daemon
+# Immediately stop h2kvm service
+systemctl stop h2kvm-daemon
 
 # Block network access
 iptables -A OUTPUT -j REJECT
 
 # Preserve evidence
-cp -a /var/log/hyper2kvm /evidence/hyper2kvm-logs-$(date +%Y%m%d-%H%M%S)
-cp -a /var/lib/hyper2kvm /evidence/hyper2kvm-data-$(date +%Y%m%d-%H%M%S)
+cp -a /var/log/h2kvm /evidence/h2kvm-logs-$(date +%Y%m%d-%H%M%S)
+cp -a /var/lib/h2kvm /evidence/h2kvm-data-$(date +%Y%m%d-%H%M%S)
 ```
 
 #### 3. Investigation
@@ -625,26 +625,26 @@ cp -a /var/lib/hyper2kvm /evidence/hyper2kvm-data-$(date +%Y%m%d-%H%M%S)
 ausearch -k vm_image_access -ts recent
 
 # Check for unauthorized changes
-rpm -Va hyper2kvm
+rpm -Va h2kvm
 
 # Review access logs
-grep -E "(FAILED|ERROR|DENIED)" /var/log/hyper2kvm/audit.log
+grep -E "(FAILED|ERROR|DENIED)" /var/log/h2kvm/audit.log
 ```
 
 #### 4. Recovery
 
 ```bash
 # Reinstall from trusted source
-dnf reinstall hyper2kvm
+dnf reinstall h2kvm
 
 # Restore configuration from backup
-cp /backup/config.yaml /etc/hyper2kvm/config.yaml
+cp /backup/config.yaml /etc/h2kvm/config.yaml
 
 # Rotate credentials
 ./rotate-credentials.sh
 
 # Restart service
-systemctl start hyper2kvm-daemon
+systemctl start h2kvm-daemon
 ```
 
 ### Forensic Collection
@@ -657,10 +657,10 @@ EVIDENCE_DIR="/evidence/$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$EVIDENCE_DIR"
 
 # Collect logs
-cp -a /var/log/hyper2kvm "$EVIDENCE_DIR/logs"
+cp -a /var/log/h2kvm "$EVIDENCE_DIR/logs"
 
 # Collect configuration
-cp -a /etc/hyper2kvm "$EVIDENCE_DIR/config"
+cp -a /etc/h2kvm "$EVIDENCE_DIR/config"
 
 # Collect system state
 ps aux > "$EVIDENCE_DIR/processes.txt"
@@ -730,9 +730,9 @@ Use this checklist before production deployment:
 ## Security Contacts
 
 Report security vulnerabilities to:
-- Email: security@hyper2kvm.io
-- PGP Key: https://hyper2kvm.io/security.pgp
-- Bug Bounty: https://hackerone.com/hyper2kvm
+- Email: security@h2kvm.io
+- PGP Key: https://h2kvm.io/security.pgp
+- Bug Bounty: https://hackerone.com/h2kvm
 
 ---
 

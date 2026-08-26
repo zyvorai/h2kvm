@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Cloud Repatriation with hyper2kvm + hypersdk — Bring Your VMs Home</title>
+<title>Cloud Repatriation with h2kvm + hypersdk — Bring Your VMs Home</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -65,7 +65,7 @@
 <!-- COVER -->
 <div class="cover">
   <h1>Cloud <span>Repatriation</span></h1>
-  <h2>Bring Your VMs Home with hyper2kvm + hypersdk</h2>
+  <h2>Bring Your VMs Home with h2kvm + hypersdk</h2>
   <p class="sub">Export VMs from AWS, Azure, GCP, Oracle Cloud, Alibaba Cloud, and OpenStack. Convert to QCOW2 with full guest fixes. Deploy to on-premises KVM or KubeVirt. 10 cloud providers, one tool, zero cloud lock-in. Save 70-90% on compute costs by running workloads on infrastructure you own.</p>
   <div class="badge">10 Cloud Providers | $0 Migration Tool | 70-90% Cost Savings | Proprietary (Zyvor AI Labs)</div>
 </div>
@@ -164,7 +164,7 @@
   </table>
 
   <div class="highlight">
-    <p style="margin-bottom:0;"><strong>No other migration tool supports all 10.</strong> AWS MGN only exports from AWS. Azure Migrate only from Azure. virt-v2v handles zero cloud sources. Red Hat MTV handles VMware only. hyper2kvm + hypersdk is the <em>only</em> unified cloud repatriation platform.</p>
+    <p style="margin-bottom:0;"><strong>No other migration tool supports all 10.</strong> AWS MGN only exports from AWS. Azure Migrate only from Azure. virt-v2v handles zero cloud sources. Red Hat MTV handles VMware only. h2kvm + hypersdk is the <em>only</em> unified cloud repatriation platform.</p>
   </div>
 </div>
 
@@ -179,7 +179,7 @@
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-tool">hypersdk: EBS snapshot &rarr; S3 export</div>
     <div class="flow-arrow">&rarr;</div>
-    <div class="flow-step flow-tool">hyper2kvm: convert + guest fix</div>
+    <div class="flow-step flow-tool">h2kvm: convert + guest fix</div>
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-onprem">On-Prem KVM / KubeVirt</div>
   </div>
@@ -190,7 +190,7 @@
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-tool">hypersdk: disk snapshot &rarr; SAS download</div>
     <div class="flow-arrow">&rarr;</div>
-    <div class="flow-step flow-tool">hyper2kvm: VHD &rarr; QCOW2 + fix</div>
+    <div class="flow-step flow-tool">h2kvm: VHD &rarr; QCOW2 + fix</div>
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-onprem">On-Prem KVM / KubeVirt</div>
   </div>
@@ -201,7 +201,7 @@
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-tool">hypersdk: disk &rarr; GCS image export</div>
     <div class="flow-arrow">&rarr;</div>
-    <div class="flow-step flow-tool">hyper2kvm: RAW &rarr; QCOW2 + fix</div>
+    <div class="flow-step flow-tool">h2kvm: RAW &rarr; QCOW2 + fix</div>
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-onprem">On-Prem KVM / KubeVirt</div>
   </div>
@@ -213,10 +213,10 @@
     <tr><td>2</td><td><strong>Discover VMs</strong></td><td>hypersdk</td><td>List VMs with CPU, RAM, disk, OS, tags — filter by name, tag, region</td><td>VM inventory with metadata</td></tr>
     <tr><td>3</td><td><strong>Snapshot</strong></td><td>hypersdk</td><td>Create consistent disk snapshot (optional: stop VM first for DBs)</td><td>Point-in-time disk snapshot</td></tr>
     <tr><td>4</td><td><strong>Export</strong></td><td>hypersdk</td><td>Export disk image to object storage (S3/Blob/GCS), download locally</td><td>VMDK, VHD, or RAW image file</td></tr>
-    <tr><td>5</td><td><strong>Convert</strong></td><td>hyper2kvm</td><td>Convert to QCOW2, flatten, optional compression</td><td>Optimized QCOW2 image</td></tr>
-    <tr><td>6</td><td><strong>Guest Fix</strong></td><td>hyper2kvm</td><td>fstab UUID repair, initramfs rebuild (VirtIO), GRUB fix, remove cloud agents, SELinux relabel, Windows VirtIO injection</td><td>Boot-ready for KVM</td></tr>
-    <tr><td>7</td><td><strong>Deploy</strong></td><td>hyper2kvm</td><td>Generate libvirt XML or KubeVirt manifest, virsh define or kubectl apply</td><td>VM running on-prem</td></tr>
-    <tr><td>8</td><td><strong>Verify</strong></td><td>hyper2kvm</td><td>Automated boot test, service health check, network validation</td><td>Confirmed working</td></tr>
+    <tr><td>5</td><td><strong>Convert</strong></td><td>h2kvm</td><td>Convert to QCOW2, flatten, optional compression</td><td>Optimized QCOW2 image</td></tr>
+    <tr><td>6</td><td><strong>Guest Fix</strong></td><td>h2kvm</td><td>fstab UUID repair, initramfs rebuild (VirtIO), GRUB fix, remove cloud agents, SELinux relabel, Windows VirtIO injection</td><td>Boot-ready for KVM</td></tr>
+    <tr><td>7</td><td><strong>Deploy</strong></td><td>h2kvm</td><td>Generate libvirt XML or KubeVirt manifest, virsh define or kubectl apply</td><td>VM running on-prem</td></tr>
+    <tr><td>8</td><td><strong>Verify</strong></td><td>h2kvm</td><td>Automated boot test, service health check, network validation</td><td>Confirmed working</td></tr>
     <tr><td>9</td><td><strong>Notify</strong></td><td>hypersdk</td><td>Webhook to Slack/Teams/PagerDuty with pass/fail per VM</td><td>Team informed</td></tr>
     <tr><td>10</td><td><strong>Decommission</strong></td><td>Manual</td><td>Terminate cloud VM after validation period (keep snapshot as backup)</td><td>Cloud bill drops to $0</td></tr>
   </table>
@@ -280,7 +280,7 @@
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-tool" style="padding:9px 20px;">hypersdk<br>(unified export)</div>
     <div class="flow-arrow">&rarr;</div>
-    <div class="flow-step flow-tool" style="padding:9px 20px;">hyper2kvm<br>(convert + fix)</div>
+    <div class="flow-step flow-tool" style="padding:9px 20px;">h2kvm<br>(convert + fix)</div>
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-onprem" style="padding:9px 20px;">On-Prem<br>KVM Cluster</div>
   </div>
@@ -289,7 +289,7 @@
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-tool" style="visibility:hidden; padding:9px 20px;">hypersdk</div>
     <div class="flow-arrow" style="visibility:hidden;">&rarr;</div>
-    <div class="flow-step flow-tool" style="visibility:hidden; padding:9px 20px;">hyper2kvm</div>
+    <div class="flow-step flow-tool" style="visibility:hidden; padding:9px 20px;">h2kvm</div>
     <div class="flow-arrow" style="visibility:hidden;">&rarr;</div>
     <div class="flow-step flow-onprem" style="visibility:hidden; padding:9px 20px;">target</div>
   </div>
@@ -348,7 +348,7 @@ h2kvmctl --config consolidate.yaml   # Processes all exports, applies per-source
 <!-- PAGE 6: Cloud-Specific Technical Details -->
 <div class="page page-light">
   <h2 class="st">Cloud-Specific <span>Technical Details</span></h2>
-  <p class="sub">What hyper2kvm fixes for each cloud provider — Linux and Windows.</p>
+  <p class="sub">What h2kvm fixes for each cloud provider — Linux and Windows.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -393,14 +393,14 @@ h2kvmctl --config consolidate.yaml   # Processes all exports, applies per-source
   </div>
 
   <div class="highlight">
-    <p style="margin-bottom:0;"><strong>hyper2kvm auto-detects the source cloud</strong> based on installed agents, driver stack, and fstab patterns. It applies the correct set of fixes for each source — no manual configuration needed. Just point it at the exported disk image.</p>
+    <p style="margin-bottom:0;"><strong>h2kvm auto-detects the source cloud</strong> based on installed agents, driver stack, and fstab patterns. It applies the correct set of fixes for each source — no manual configuration needed. Just point it at the exported disk image.</p>
   </div>
 </div>
 
 <!-- PAGE 7: Repatriation Scenarios -->
 <div class="page page-dark">
   <h2 class="st">Repatriation <span>Scenarios</span></h2>
-  <p class="sub">Real-world cloud exit projects powered by hyper2kvm + hypersdk.</p>
+  <p class="sub">Real-world cloud exit projects powered by h2kvm + hypersdk.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -478,7 +478,7 @@ h2kvmctl --config consolidate.yaml   # Processes all exports, applies per-source
   <p class="sub">Cloud repatriation is the one migration direction that cloud vendors don't help with.</p>
 
   <table>
-    <tr><th style="width:22%">Capability</th><th style="width:16%">hyper2kvm + hypersdk</th><th style="width:12%">virt-v2v</th><th style="width:12%">MTV</th><th style="width:12%">AWS MGN</th><th style="width:13%">Azure Migrate</th><th style="width:13%">Manual</th></tr>
+    <tr><th style="width:22%">Capability</th><th style="width:16%">h2kvm + hypersdk</th><th style="width:12%">virt-v2v</th><th style="width:12%">MTV</th><th style="width:12%">AWS MGN</th><th style="width:13%">Azure Migrate</th><th style="width:13%">Manual</th></tr>
     <tr><td><strong>Export from AWS</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td>Inbound only</td><td class="cross">&#10007;</td><td class="partial">Complex</td></tr>
     <tr><td><strong>Export from Azure</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td>Inbound only</td><td class="partial">Complex</td></tr>
     <tr><td><strong>Export from GCP</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Complex</td></tr>
@@ -496,7 +496,7 @@ h2kvmctl --config consolidate.yaml   # Processes all exports, applies per-source
   <div class="highlight">
     <h3 style="margin-top:0;">The Critical Insight</h3>
     <p><strong>Cloud vendors build tools to migrate INTO their cloud, not OUT.</strong> AWS MGN migrates to AWS. Azure Migrate migrates to Azure. Neither helps you leave. virt-v2v doesn't support any cloud source. MTV only handles VMware.</p>
-    <p style="margin-bottom:0;">hyper2kvm + hypersdk is <strong>the only tool purpose-built for cloud repatriation</strong> — exporting FROM clouds TO on-premises infrastructure. It's the tool cloud vendors don't want to exist.</p>
+    <p style="margin-bottom:0;">h2kvm + hypersdk is <strong>the only tool purpose-built for cloud repatriation</strong> — exporting FROM clouds TO on-premises infrastructure. It's the tool cloud vendors don't want to exist.</p>
   </div>
 
   <div class="verdict">
@@ -504,11 +504,11 @@ h2kvmctl --config consolidate.yaml   # Processes all exports, applies per-source
     <p style="font-size:0.95em;">
       10 cloud providers. Automated export + conversion + guest fixes + deployment.<br>
       $600K-$1.8M saved per project. One tool. Zero lock-in. Free forever.<br>
-      <strong>hyper2kvm + hypersdk: the cloud exit platform.</strong>
+      <strong>h2kvm + hypersdk: the cloud exit platform.</strong>
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

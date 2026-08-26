@@ -2,7 +2,7 @@
 #   h2kvmctl --config 30-fetch-and-fix/fetch-basic.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config 30-fetch-and-fix/fetch-basic.yaml
+#   h2kvm --config 30-fetch-and-fix/fetch-basic.yaml
 
 command: fetch-and-fix
 host: esxi.example.com

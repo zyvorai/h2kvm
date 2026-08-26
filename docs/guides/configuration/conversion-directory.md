@@ -2,7 +2,7 @@
 
 ## Overview
 
-hyper2kvm converts sparse VMDK files to QCOW2 format during migration for reliability and performance. This guide explains how to configure the temporary conversion directory for optimal disk space management.
+h2kvm converts sparse VMDK files to QCOW2 format during migration for reliability and performance. This guide explains how to configure the temporary conversion directory for optimal disk space management.
 
 ## Default Behavior
 
@@ -11,7 +11,7 @@ hyper2kvm converts sparse VMDK files to QCOW2 format during migration for reliab
 - Issues: System-wide location, permission conflicts, disk space constraints
 
 **After (configurable)**:
-- Default: `~/.cache/hyper2kvm/conversions`
+- Default: `~/.cache/h2kvm/conversions`
 - Per-user isolation
 - Respects XDG Base Directory specification
 - Better disk space management
@@ -48,7 +48,7 @@ libvirt_import: true
 
 ```bash
 # Set via environment (future enhancement)
-export HYPER2KVM_CONVERSION_DIR=/mnt/large-disk/conversions
+export H2KVM_CONVERSION_DIR=/mnt/large-disk/conversions
 h2kvmctl --config migration.yaml
 ```
 
@@ -62,7 +62,7 @@ h2kvmctl --config migration.yaml
 # Use default per-user cache directory
 h2kvmctl --config migration.yaml
 
-# Conversion files stored in: ~/.cache/hyper2kvm/conversions
+# Conversion files stored in: ~/.cache/h2kvm/conversions
 ```
 
 **Benefits**:
@@ -93,27 +93,27 @@ h2kvmctl --conversion-dir ~/conversions --config user2-vm.yaml
 
 ```bash
 # Create dedicated user
-sudo useradd -r -m -d /var/lib/hyper2kvm -s /bin/bash hyper2kvm
-sudo mkdir -p /var/lib/hyper2kvm/conversions
-sudo chown hyper2kvm:hyper2kvm /var/lib/hyper2kvm/conversions
+sudo useradd -r -m -d /var/lib/h2kvm -s /bin/bash h2kvm
+sudo mkdir -p /var/lib/h2kvm/conversions
+sudo chown h2kvm:h2kvm /var/lib/h2kvm/conversions
 
 # Add to required groups
-sudo usermod -a -G kvm,qemu,disk,libvirt hyper2kvm
+sudo usermod -a -G kvm,qemu,disk,libvirt h2kvm
 
 # Configure sudoers for NBD operations
-sudo tee /etc/sudoers.d/hyper2kvm << 'EOF'
-hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-nbd
-hyper2kvm ALL=(ALL) NOPASSWD: /usr/sbin/modprobe
-hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-img
-hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/mount
-hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/umount
-hyper2kvm ALL=(ALL) NOPASSWD: /usr/sbin/vgchange
-hyper2kvm ALL=(ALL) NOPASSWD: /usr/sbin/lvscan
-hyper2kvm ALL=(ALL) NOPASSWD: /usr/sbin/blkid
+sudo tee /etc/sudoers.d/h2kvm << 'EOF'
+h2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-nbd
+h2kvm ALL=(ALL) NOPASSWD: /usr/sbin/modprobe
+h2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-img
+h2kvm ALL=(ALL) NOPASSWD: /usr/bin/mount
+h2kvm ALL=(ALL) NOPASSWD: /usr/bin/umount
+h2kvm ALL=(ALL) NOPASSWD: /usr/sbin/vgchange
+h2kvm ALL=(ALL) NOPASSWD: /usr/sbin/lvscan
+h2kvm ALL=(ALL) NOPASSWD: /usr/sbin/blkid
 EOF
 
 # Run migration as service user
-sudo -u hyper2kvm h2kvmctl --conversion-dir /var/lib/hyper2kvm/conversions --config migration.yaml
+sudo -u h2kvm h2kvmctl --conversion-dir /var/lib/h2kvm/conversions --config migration.yaml
 ```
 
 **Benefits**:
@@ -132,10 +132,10 @@ sudo mkdir -p /mnt/large-disk
 sudo mount /dev/sdb1 /mnt/large-disk
 
 # Create conversion directory
-mkdir -p /mnt/large-disk/hyper2kvm-conversions
+mkdir -p /mnt/large-disk/h2kvm-conversions
 
 # Run migration
-h2kvmctl --conversion-dir /mnt/large-disk/hyper2kvm-conversions --config migration.yaml
+h2kvmctl --conversion-dir /mnt/large-disk/h2kvm-conversions --config migration.yaml
 ```
 
 **Benefits**:
@@ -145,18 +145,18 @@ h2kvmctl --conversion-dir /mnt/large-disk/hyper2kvm-conversions --config migrati
 
 ### Container/Kubernetes Deployment
 
-**Scenario**: Running hyper2kvm in container with volume mounts
+**Scenario**: Running h2kvm in container with volume mounts
 
 ```yaml
 # Kubernetes Pod
 apiVersion: v1
 kind: Pod
 metadata:
-  name: hyper2kvm-migration
+  name: h2kvm-migration
 spec:
   containers:
-  - name: hyper2kvm
-    image: hyper2kvm:latest
+  - name: h2kvm
+    image: h2kvm:latest
     volumeMounts:
     - name: conversions
       mountPath: /var/conversions
@@ -214,7 +214,7 @@ h2kvmctl --conversion-dir ~/conversions --config vm.yaml
 h2kvmctl --conversion-dir /mnt/large-disk/conversions --config vm.yaml
 ```
 
-**Warning**: hyper2kvm automatically disables sparse conversion for:
+**Warning**: h2kvm automatically disables sparse conversion for:
 - LVM volumes
 - mdraid arrays
 - LUKS encrypted volumes
@@ -228,7 +228,7 @@ h2kvmctl --conversion-dir /mnt/large-disk/conversions --config vm.yaml
 df -h ~
 
 # Check conversion directory space
-df -h ~/.cache/hyper2kvm/conversions
+df -h ~/.cache/h2kvm/conversions
 
 # Check large disk space
 df -h /mnt/large-disk
@@ -240,10 +240,10 @@ df -h /mnt/large-disk
 
 ```bash
 # Remove all conversion temporary files
-rm -rf ~/.cache/hyper2kvm/conversions/*
+rm -rf ~/.cache/h2kvm/conversions/*
 
 # Remove specific conversion
-rm -rf ~/.cache/hyper2kvm/conversions/vm-name.*
+rm -rf ~/.cache/h2kvm/conversions/vm-name.*
 ```
 
 ### Automatic Cleanup
@@ -256,9 +256,9 @@ Conversion files are automatically cleaned up:
 ### Systemd Timer for Cleanup
 
 ```ini
-# /etc/systemd/system/hyper2kvm-cleanup.timer
+# /etc/systemd/system/h2kvm-cleanup.timer
 [Unit]
-Description=Cleanup hyper2kvm conversion directory daily
+Description=Cleanup h2kvm conversion directory daily
 
 [Timer]
 OnCalendar=daily
@@ -269,20 +269,20 @@ WantedBy=timers.target
 ```
 
 ```ini
-# /etc/systemd/system/hyper2kvm-cleanup.service
+# /etc/systemd/system/h2kvm-cleanup.service
 [Unit]
-Description=Cleanup old hyper2kvm conversions
+Description=Cleanup old h2kvm conversions
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/find /var/lib/hyper2kvm/conversions -type f -mtime +1 -delete
-User=hyper2kvm
-Group=hyper2kvm
+ExecStart=/usr/bin/find /var/lib/h2kvm/conversions -type f -mtime +1 -delete
+User=h2kvm
+Group=h2kvm
 ```
 
 Enable:
 ```bash
-sudo systemctl enable --now hyper2kvm-cleanup.timer
+sudo systemctl enable --now h2kvm-cleanup.timer
 ```
 
 ## Troubleshooting
@@ -304,13 +304,13 @@ h2kvmctl --conversion-dir ~/conversions --config migration.yaml
 **Solution**:
 ```bash
 # Check available space
-df -h ~/.cache/hyper2kvm/conversions
+df -h ~/.cache/h2kvm/conversions
 
 # Use larger disk
 h2kvmctl --conversion-dir /mnt/large-disk/conversions --config migration.yaml
 
 # Or clean up old conversions
-rm -rf ~/.cache/hyper2kvm/conversions/*
+rm -rf ~/.cache/h2kvm/conversions/*
 ```
 
 ### Conversion Directory Not Created
@@ -331,16 +331,16 @@ h2kvmctl --conversion-dir ~/custom-conversions --config migration.yaml
 **Default behavior**:
 ```bash
 # Created with mode 0700 (owner read/write/execute only)
-ls -ld ~/.cache/hyper2kvm/conversions
-# drwx------ user user ~/.cache/hyper2kvm/conversions
+ls -ld ~/.cache/h2kvm/conversions
+# drwx------ user user ~/.cache/h2kvm/conversions
 ```
 
 **Custom directory**:
 ```bash
 # Ensure proper permissions
-mkdir -p /var/lib/hyper2kvm/conversions
-chmod 700 /var/lib/hyper2kvm/conversions
-chown hyper2kvm:hyper2kvm /var/lib/hyper2kvm/conversions
+mkdir -p /var/lib/h2kvm/conversions
+chmod 700 /var/lib/h2kvm/conversions
+chown h2kvm:h2kvm /var/lib/h2kvm/conversions
 ```
 
 ### Sensitive Data
@@ -358,14 +358,14 @@ chown hyper2kvm:hyper2kvm /var/lib/hyper2kvm/conversions
 **SELinux context** (RHEL/CentOS/Fedora):
 ```bash
 # Set proper context for conversion directory
-sudo semanage fcontext -a -t virt_image_t "/var/lib/hyper2kvm/conversions(/.*)?"
-sudo restorecon -Rv /var/lib/hyper2kvm/conversions
+sudo semanage fcontext -a -t virt_image_t "/var/lib/h2kvm/conversions(/.*)?"
+sudo restorecon -Rv /var/lib/h2kvm/conversions
 ```
 
 **AppArmor profile** (Ubuntu/Debian):
 ```bash
 # Add to /etc/apparmor.d/local/usr.bin.qemu-system-x86_64
-/var/lib/hyper2kvm/conversions/** rw,
+/var/lib/h2kvm/conversions/** rw,
 ```
 
 ## Performance Tips
@@ -392,18 +392,18 @@ h2kvmctl --conversion-dir /mnt/ssd/conversions \
 
 ### From Hardcoded `/var/tmp`
 
-**No action required** - defaults changed automatically to `~/.cache/hyper2kvm/conversions`
+**No action required** - defaults changed automatically to `~/.cache/h2kvm/conversions`
 
 ### Existing Scripts
 
 **Option 1: Use default**
 ```bash
 # Old (still works)
-hyper2kvm --config migration.yaml
+h2kvm --config migration.yaml
 
 # New (same behavior)
 h2kvmctl --config migration.yaml
-# Uses ~/.cache/hyper2kvm/conversions
+# Uses ~/.cache/h2kvm/conversions
 ```
 
 **Option 2: Explicit configuration**
@@ -416,9 +416,9 @@ h2kvmctl --conversion-dir /var/tmp/vmcraft-conversions --config migration.yaml
 
 | Scenario | Recommended Configuration |
 |----------|--------------------------|
-| Developer workstation | Default (`~/.cache/hyper2kvm/conversions`) |
+| Developer workstation | Default (`~/.cache/h2kvm/conversions`) |
 | Multi-user server | Per-user (`~/conversions`) |
-| Dedicated service | `/var/lib/hyper2kvm/conversions` |
+| Dedicated service | `/var/lib/h2kvm/conversions` |
 | Limited disk space | External disk (`/mnt/large-disk/conversions`) |
 | Container deployment | Volume mount (`/var/conversions`) |
 | CI/CD pipeline | Workspace directory (`$WORKSPACE/conversions`) |

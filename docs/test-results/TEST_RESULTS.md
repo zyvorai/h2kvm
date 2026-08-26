@@ -1,4 +1,4 @@
-# Test Results - Hyper2KVM OpenShift Operator
+# Test Results - H2KVM OpenShift Operator
 
 **Date:** 2026-01-30
 **Version:** 0.3.0
@@ -96,7 +96,7 @@ Result: Server-side validation successful
 #### ✅ Test 2: JobTemplate CRD Installation
 ```yaml
 Status: ✅ PASSED
-CRD: jobtemplates.hyper2kvm.io
+CRD: jobtemplates.h2kvm.io
 Result: Installed successfully on OpenShift
 ```
 
@@ -108,7 +108,7 @@ Result: Installed successfully on OpenShift
 
 #### ✅ Test 1: Helm Lint
 ```bash
-Command: helm lint helm/hyper2kvm-operator
+Command: helm lint helm/h2kvm-operator
 Result: ✅ PASSED - 0 errors, 0 warnings
 Status: Chart syntax valid
 ```
@@ -146,7 +146,7 @@ Result: ✅ PASSED - OpenShift resources render correctly
 
 **OpenShift Resources:**
 - ✅ 2x Route (metrics, webhook)
-- ✅ 1x SecurityContextConstraints (hyper2kvm-operator-scc)
+- ✅ 1x SecurityContextConstraints (h2kvm-operator-scc)
 - ✅ 1x Job (OAuth session secret generation)
 
 **Validated:**
@@ -164,7 +164,7 @@ Result: ✅ PASSED - OpenShift resources render correctly
 #### ✅ Test 1: Operator Image Build
 ```bash
 Target: operator
-Image: hyper2kvm-operator:test
+Image: h2kvm-operator:test
 Size: ~500MB
 Build Time: ~60 seconds
 Result: ✅ PASSED
@@ -178,7 +178,7 @@ Result: ✅ PASSED
 
 #### ✅ Test 2: OLM Bundle Image Build
 ```bash
-Image: ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0
+Image: ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
 Size: 54.8kB
 Result: ✅ PASSED
 ```
@@ -211,7 +211,7 @@ Result: ✅ PASSED
 
 #### ✅ Test 2: SecurityContextConstraints Validation
 ```bash
-SCC Name: hyper2kvm-operator-scc
+SCC Name: h2kvm-operator-scc
 UID Range: MustRunAsRange (1000650000-1000659999)
 Result: ✅ PASSED - SCC enforcement working correctly
 ```
@@ -225,7 +225,7 @@ Result: ✅ PASSED - SCC enforcement working correctly
 
 #### ✅ Test 3: RBAC Permissions
 ```bash
-ClusterRole: hyper2kvm-operator-test
+ClusterRole: h2kvm-operator-test
 Result: ✅ PASSED - All permissions granted
 ```
 
@@ -263,7 +263,7 @@ Validation: Script structure correct, all functions defined
 ```bash
 Test: Bundle build execution
 Result: ✅ PASSED
-Output: ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0 (54.8kB)
+Output: ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 (54.8kB)
 ```
 
 #### ✅ Test 3: deploy-to-openshift.sh
@@ -363,7 +363,7 @@ No cluster-admin: ✅ Confirmed
 #### ✅ Test 3: Image Security
 ```yaml
 Base Image: python:3.13-slim
-User: non-root (hyper2kvm, UID varies by platform)
+User: non-root (h2kvm, UID varies by platform)
 Vulnerabilities: None in base dependencies
 ```
 
@@ -445,7 +445,7 @@ Documentation:     100% (complete coverage)
 
 **Status:** ✅ **APPROVED FOR PRODUCTION DEPLOYMENT**
 
-The hyper2kvm operator is ready for production deployment on OpenShift 4.10-4.16. All critical functionality tested and validated. Minor DAG algorithm issues do not affect core operation.
+The h2kvm operator is ready for production deployment on OpenShift 4.10-4.16. All critical functionality tested and validated. Minor DAG algorithm issues do not affect core operation.
 
 **Next Steps:**
 1. Push images to registry

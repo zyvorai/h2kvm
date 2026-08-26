@@ -1,6 +1,6 @@
 ---
 # Ubuntu VM with cloud-init configuration
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: ubuntu-with-cloudinit

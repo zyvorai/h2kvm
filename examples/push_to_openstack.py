@@ -4,9 +4,9 @@
 # https://zyvor.dev · info@zyvor.dev
 
 """
-Push a QCOW2 VM image to OpenStack using hyper2kvm (convert + fix + Glance upload).
+Push a QCOW2 VM image to OpenStack using h2kvm (convert + fix + Glance upload).
 
-Requires: pip install 'hyper2kvm[openstack]'
+Requires: pip install 'h2kvm[openstack]'
 Auth: clouds.yaml (--os-cloud), sourced openrc, or OS_* environment variables.
 """
 
@@ -19,9 +19,9 @@ from pathlib import Path
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Migrate QCOW2/VMDK to OpenStack via hyper2kvm")
+    parser = argparse.ArgumentParser(description="Migrate QCOW2/VMDK to OpenStack via h2kvm")
     parser.add_argument("image_path", help="Source disk (VMDK, QCOW2, OVA path, etc.) or existing QCOW2")
-    parser.add_argument("--config", "-c", help="hyper2kvm YAML config (cmd: local, flatten, etc.)")
+    parser.add_argument("--config", "-c", help="h2kvm YAML config (cmd: local, flatten, etc.)")
     parser.add_argument("--glance-name", required=True, help="Name for the Glance image")
     parser.add_argument("--os-cloud", help="Cloud entry in clouds.yaml")
     parser.add_argument("--openstack-boot-instance", action="store_true")

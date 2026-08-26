@@ -2,7 +2,7 @@
 
 ## Current Implementation
 
-hyper2kvm implements connection retry with exponential backoff for VMware vSphere/vCenter connections:
+h2kvm implements connection retry with exponential backoff for VMware vSphere/vCenter connections:
 
 ### Retry Strategy
 - **Max retries**: 3 (configurable via `vc_connection_max_retries`)
@@ -38,7 +38,7 @@ For production deployments that need to handle extended network outages, you can
 ```python
 #!/usr/bin/env python3
 """
-Network-aware hyper2kvm wrapper with netlink monitoring.
+Network-aware h2kvm wrapper with netlink monitoring.
 Pauses operations during network outages and resumes when connectivity returns.
 """
 import sys
@@ -215,7 +215,7 @@ if __name__ == "__main__":
     monitor.start()
 
     # Create VMware client (example)
-    from hyper2kvm.vmware.clients.client import VMwareClient
+    from h2kvm.vmware.clients.client import VMwareClient
     vmware_client = VMwareClient(
         logger=logger,
         host="vcenter.example.com",

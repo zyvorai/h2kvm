@@ -69,7 +69,7 @@ date
 # Check running processes
 echo ""
 echo "Running Migrations:"
-ps aux | grep -E "h2kvmctl|hyper2kvm" | grep -v grep | awk '{print $11, $12, $13}'
+ps aux | grep -E "h2kvmctl|h2kvm" | grep -v grep | awk '{print $11, $12, $13}'
 
 # System resources
 echo ""
@@ -86,7 +86,7 @@ iostat -x 1 2 | tail -n +4 | head -n 3
 # Recent logs
 echo ""
 echo "Recent Activity:"
-tail -n 5 /var/log/hyper2kvm/*.log 2>/dev/null | grep -E "INFO|ERROR|WARNING" | tail -3
+tail -n 5 /var/log/h2kvm/*.log 2>/dev/null | grep -E "INFO|ERROR|WARNING" | tail -3
 ```
 
 **Dashboard**: Set up continuous monitoring
@@ -511,10 +511,10 @@ check_and_alert() {
         echo "$message" | mail -s "VM Alert: $vm" "$ALERT_EMAIL"
 
         # Send to syslog
-        logger -t hyper2kvm-alert "$message"
+        logger -t h2kvm-alert "$message"
 
         # Send to monitoring system (example: Prometheus Pushgateway)
-        # curl -X POST http://pushgateway:9091/metrics/job/hyper2kvm ...
+        # curl -X POST http://pushgateway:9091/metrics/job/h2kvm ...
     fi
 }
 
@@ -583,7 +583,7 @@ rate(libvirt_domain_block_stats_write_bytes_total[5m])
 ```json
 {
   "dashboard": {
-    "title": "Hyper2KVM Migrated VMs",
+    "title": "H2KVM Migrated VMs",
     "panels": [
       {
         "title": "CPU Usage",

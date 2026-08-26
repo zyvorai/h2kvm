@@ -413,7 +413,7 @@ g.dd_copy(src, dest, blocksize=512, count=None)
 ### 1. Basic VM Inspection
 
 ```python
-from hyper2kvm.core.vmcraft.main import VMCraft
+from h2kvm.core.vmcraft.main import VMCraft
 
 with VMCraft("/path/to/vm.qcow2") as g:
     # Detect OS

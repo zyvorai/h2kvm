@@ -99,7 +99,7 @@ except RuntimeError as e:
 ### 1. Basic Augeas Workflow
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 g = VMCraft("ubuntu-server.vmdk")
 g.launch()

@@ -1,6 +1,6 @@
 command: local
 vmdk: /home/ssahani/Downloads/centos/CentOS_Stream_9_VMM_LinuxVMImages.COM.vmdk
-output_dir: /home/hyper2kvm-test
+output_dir: /home/h2kvm-test
 to_output: centos9.qcow2
 out_format: qcow2
 fstab_mode: stabilize-all

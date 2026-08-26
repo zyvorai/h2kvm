@@ -1,10 +1,10 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: hyper2kvm-pvc-cleanup
-  namespace: hyper2kvm-workers
+  name: h2kvm-pvc-cleanup
+  namespace: h2kvm-workers
   labels:
-    app: hyper2kvm-pvc-cleanup
+    app: h2kvm-pvc-cleanup
     component: maintenance
 spec:
   schedule: "0 2 * * *"  # Daily at 2am
@@ -18,10 +18,10 @@ spec:
       template:
         metadata:
           labels:
-            app: hyper2kvm-pvc-cleanup
+            app: h2kvm-pvc-cleanup
             component: maintenance
         spec:
-          serviceAccountName: hyper2kvm-pvc-cleanup
+          serviceAccountName: h2kvm-pvc-cleanup
           restartPolicy: OnFailure
           containers:
           - name: pvc-cleanup
@@ -32,13 +32,13 @@ spec:
             - name: DRY_RUN
               value: "true"
             - name: NAMESPACES
-              value: "hyper2kvm-workers,hyper2kvm-system"
+              value: "h2kvm-workers,h2kvm-system"
             command:
             - /bin/sh
             - -c
             - |
               set -e
-              echo "=== Hyper2KVM PVC Cleanup ==="
+              echo "=== H2KVM PVC Cleanup ==="
               echo "Mode: $([ \"$DRY_RUN\" = 'true' ] && echo 'DRY RUN (no deletions)' || echo 'LIVE (will delete)')"
               echo "Max age: ${MAX_AGE_DAYS} days"
               echo "Namespaces: ${NAMESPACES}"
@@ -116,18 +116,18 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: hyper2kvm-pvc-cleanup
-  namespace: hyper2kvm-workers
+  name: h2kvm-pvc-cleanup
+  namespace: h2kvm-workers
   labels:
-    app: hyper2kvm-pvc-cleanup
+    app: h2kvm-pvc-cleanup
     component: maintenance
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: hyper2kvm-pvc-cleanup
+  name: h2kvm-pvc-cleanup
   labels:
-    app: hyper2kvm-pvc-cleanup
+    app: h2kvm-pvc-cleanup
     component: maintenance
 rules:
 - apiGroups: [""]
@@ -140,15 +140,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: hyper2kvm-pvc-cleanup
+  name: h2kvm-pvc-cleanup
   labels:
-    app: hyper2kvm-pvc-cleanup
+    app: h2kvm-pvc-cleanup
     component: maintenance
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: hyper2kvm-pvc-cleanup
+  name: h2kvm-pvc-cleanup
 subjects:
 - kind: ServiceAccount
-  name: hyper2kvm-pvc-cleanup
-  namespace: hyper2kvm-workers
+  name: h2kvm-pvc-cleanup
+  namespace: h2kvm-workers

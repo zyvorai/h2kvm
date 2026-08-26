@@ -1,6 +1,6 @@
 # Contributing to Documentation
 
-Guide for contributing to Hyper2KVM documentation.
+Guide for contributing to H2KVM documentation.
 
 ---
 
@@ -511,7 +511,7 @@ EOF
 ### Python Examples
 
 ```python
-from hyper2kvm import Migration
+from h2kvm import Migration
 
 # Create a migration instance
 migration = Migration(
@@ -704,7 +704,7 @@ Include at the bottom of major documents:
 ---
 
 **Last Updated**: March 2026
-**Hyper2KVM Version**: 0.3.0
+**H2KVM Version**: 0.3.0
 **Documentation Version**: 0.3.0
 ```
 
@@ -725,11 +725,11 @@ For deprecated features:
 
 - Check [Documentation Index](index.md)
 - Review [Existing Examples](tutorials/)
-- Ask in [GitHub Discussions](https://github.com/ssahani/hyper2kvm/discussions)
+- Ask in [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
 
 ### Suggesting Improvements
 
-- Open an issue: [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
+- Open an issue: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
 - Describe what's unclear
 - Suggest improvements
 - Submit a PR if you can

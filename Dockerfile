@@ -1,12 +1,12 @@
-# Multi-stage Dockerfile for hyper2kvm
+# Multi-stage Dockerfile for h2kvm
 # Supports both development and production builds
 
 # Stage 1: Base image with system dependencies
 FROM fedora:43 AS base
 
 LABEL maintainer="ZyvorAI Labs Private Limited <ssahani@zyvor.dev>"
-LABEL description="hyper2kvm - Hypervisor to KVM/QEMU Migration Toolkit"
-LABEL org.opencontainers.image.source="https://github.com/ssahani/hyper2kvm"
+LABEL description="h2kvm - Hypervisor to KVM/QEMU Migration Toolkit"
+LABEL org.opencontainers.image.source="https://github.com/ssahani/h2kvm"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 # Install system dependencies
@@ -45,7 +45,7 @@ RUN pip install --no-cache-dir \
 # Copy project files
 COPY . /app/
 
-# Install hyper2kvm in development mode
+# Install h2kvm in development mode
 RUN pip install -e .[dev,full]
 
 # Install pre-commit hooks
@@ -59,7 +59,7 @@ FROM base AS builder
 
 # Copy only necessary files for building
 COPY pyproject.toml README.md LICENSE ./
-COPY hyper2kvm/ ./hyper2kvm/
+COPY h2kvm/ ./h2kvm/
 
 # Install build dependencies and build wheel
 RUN pip install --no-cache-dir build && \
@@ -76,9 +76,9 @@ RUN pip install --no-cache-dir /tmp/*.whl && \
     rm -rf /tmp/*.whl
 
 # Create non-root user and directories
-RUN useradd -m -u 1000 -s /bin/bash hyper2kvm && \
-    mkdir -p /data /output /var/lib/hyper2kvm /var/log/hyper2kvm /etc/hyper2kvm && \
-    chown -R hyper2kvm:hyper2kvm /data /output /var/lib/hyper2kvm /var/log/hyper2kvm
+RUN useradd -m -u 1000 -s /bin/bash h2kvm && \
+    mkdir -p /data /output /var/lib/h2kvm /var/log/h2kvm /etc/h2kvm && \
+    chown -R h2kvm:h2kvm /data /output /var/lib/h2kvm /var/log/h2kvm
 
 # Copy entrypoint wrapper
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
@@ -97,13 +97,13 @@ RUN pip install --no-cache-dir \
     rich \
     pydantic
 
-USER hyper2kvm
+USER h2kvm
 
 # Health check for CLI
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD python3 -c "import hyper2kvm; print(hyper2kvm.__version__)" || exit 1
+    CMD python3 -c "import h2kvm; print(h2kvm.__version__)" || exit 1
 
-ENV HYPER2KVM_MODE=cli
+ENV H2KVM_MODE=cli
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["--help"]
 
@@ -116,16 +116,16 @@ RUN dnf install -y inotify-tools && dnf clean all && \
     watchdog \
     tenacity
 
-USER hyper2kvm
+USER h2kvm
 
 # Create daemon PID file directory
-RUN mkdir -p /var/lib/hyper2kvm/queue
+RUN mkdir -p /var/lib/h2kvm/queue
 
 # Health check for daemon (checks if daemon process is running)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD pgrep -f "hyper2kvm.*daemon" > /dev/null || exit 1
+    CMD pgrep -f "h2kvm.*daemon" > /dev/null || exit 1
 
-ENV HYPER2KVM_MODE=daemon
+ENV H2KVM_MODE=daemon
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 # Stage 7: Batch Container (optimized for parallel processing)
@@ -136,13 +136,13 @@ RUN pip install --no-cache-dir \
     httpx \
     tenacity
 
-USER hyper2kvm
+USER h2kvm
 
 # Health check for batch
 HEALTHCHECK --interval=60s --timeout=5s --start-period=30s --retries=3 \
-    CMD python3 -c "import hyper2kvm; print('Ready')" || exit 1
+    CMD python3 -c "import h2kvm; print('Ready')" || exit 1
 
-ENV HYPER2KVM_MODE=batch
+ENV H2KVM_MODE=batch
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 # Stage 8: TUI Container (interactive terminal UI)
@@ -152,10 +152,10 @@ FROM base-runtime AS tui
 RUN pip install --no-cache-dir \
     textual[dev]
 
-USER hyper2kvm
+USER h2kvm
 
 # No health check for TUI (interactive mode)
-ENV HYPER2KVM_MODE=tui
+ENV H2KVM_MODE=tui
 ENV TERM=xterm-256color
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
@@ -171,7 +171,7 @@ RUN dnf install -y \
     && dnf clean all
 
 # Install worker-specific dependencies
-# Note: Adding minimal dependencies to avoid importing full hyper2kvm with Azure/vSphere
+# Note: Adding minimal dependencies to avoid importing full h2kvm with Azure/vSphere
 RUN pip install --no-cache-dir \
     click \
     rich \
@@ -184,25 +184,25 @@ RUN pip install --no-cache-dir \
     prometheus-client
 
 # Worker requires some privileged operations via sudo (restricted to specific commands)
-RUN echo "hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-nbd, /usr/sbin/modprobe, /usr/bin/qemu-system-x86_64, /usr/libexec/qemu-kvm, /usr/local/sbin/h2kvmctl, /usr/bin/virsh, /usr/sbin/kpartx, /usr/bin/mount, /usr/bin/umount, /usr/sbin/blkid, /usr/sbin/losetup" > /etc/sudoers.d/hyper2kvm && \
-    chmod 0440 /etc/sudoers.d/hyper2kvm
+RUN echo "h2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-nbd, /usr/sbin/modprobe, /usr/bin/qemu-system-x86_64, /usr/libexec/qemu-kvm, /usr/local/sbin/h2kvmctl, /usr/bin/virsh, /usr/sbin/kpartx, /usr/bin/mount, /usr/bin/umount, /usr/sbin/blkid, /usr/sbin/losetup" > /etc/sudoers.d/h2kvm && \
+    chmod 0440 /etc/sudoers.d/h2kvm
 
-USER hyper2kvm
+USER h2kvm
 
 # Create worker directories
 RUN mkdir -p \
-    /var/lib/hyper2kvm/jobs \
-    /var/lib/hyper2kvm/events \
-    /var/lib/hyper2kvm/queue
+    /var/lib/h2kvm/jobs \
+    /var/lib/h2kvm/events \
+    /var/lib/h2kvm/queue
 
 # Health check for worker (checks if worker daemon is running)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-    CMD python3 -m hyper2kvm.worker.cli capabilities --json-output > /dev/null || exit 1
+    CMD python3 -m h2kvm.worker.cli capabilities --json-output > /dev/null || exit 1
 
-ENV HYPER2KVM_MODE=worker
-ENV HYPER2KVM_STATE_DIR=/var/lib/hyper2kvm/jobs
-ENV HYPER2KVM_EVENT_DIR=/var/lib/hyper2kvm/events
-ENV HYPER2KVM_QUEUE_DIR=/var/lib/hyper2kvm/queue
+ENV H2KVM_MODE=worker
+ENV H2KVM_STATE_DIR=/var/lib/h2kvm/jobs
+ENV H2KVM_EVENT_DIR=/var/lib/h2kvm/events
+ENV H2KVM_QUEUE_DIR=/var/lib/h2kvm/queue
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD []
@@ -219,19 +219,19 @@ RUN pip install --no-cache-dir \
     pydantic \
     requests
 
-USER hyper2kvm
+USER h2kvm
 
 # Create operator directories
-RUN mkdir -p /var/lib/hyper2kvm/operator
+RUN mkdir -p /var/lib/h2kvm/operator
 
 # Health check for operator
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
     CMD curl -f http://localhost:8080/healthz || exit 1
 
-ENV HYPER2KVM_MODE=operator
+ENV H2KVM_MODE=operator
 ENV PYTHONUNBUFFERED=1
 
-ENTRYPOINT ["python3", "-m", "hyper2kvm.operator.cli"]
+ENTRYPOINT ["python3", "-m", "h2kvm.operator.cli"]
 
 # Stage 11: Production image (full-featured, backwards compatible)
 FROM base AS production
@@ -245,18 +245,18 @@ RUN WHEEL=$(ls /tmp/*.whl) && \
     rm -rf /tmp/*.whl
 
 # Create non-root user for security
-RUN useradd -m -u 1000 -s /bin/bash hyper2kvm && \
+RUN useradd -m -u 1000 -s /bin/bash h2kvm && \
     mkdir -p /data /output && \
-    chown -R hyper2kvm:hyper2kvm /data /output && \
-    echo "hyper2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-nbd, /usr/sbin/modprobe, /usr/bin/qemu-system-x86_64, /usr/libexec/qemu-kvm, /usr/local/sbin/h2kvmctl, /usr/bin/virsh, /usr/sbin/kpartx, /usr/bin/mount, /usr/bin/umount, /usr/sbin/blkid, /usr/sbin/losetup" > /etc/sudoers.d/hyper2kvm && \
-    chmod 0440 /etc/sudoers.d/hyper2kvm
+    chown -R h2kvm:h2kvm /data /output && \
+    echo "h2kvm ALL=(ALL) NOPASSWD: /usr/bin/qemu-nbd, /usr/sbin/modprobe, /usr/bin/qemu-system-x86_64, /usr/libexec/qemu-kvm, /usr/local/sbin/h2kvmctl, /usr/bin/virsh, /usr/sbin/kpartx, /usr/bin/mount, /usr/bin/umount, /usr/sbin/blkid, /usr/sbin/losetup" > /etc/sudoers.d/h2kvm && \
+    chmod 0440 /etc/sudoers.d/h2kvm
 
-USER hyper2kvm
+USER h2kvm
 WORKDIR /data
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD python3 -c "import hyper2kvm; print(hyper2kvm.__version__)" || exit 1
+    CMD python3 -c "import h2kvm; print(h2kvm.__version__)" || exit 1
 
 # Default command shows help
 ENTRYPOINT ["h2kvmctl"]

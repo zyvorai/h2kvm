@@ -21,31 +21,31 @@ The Windows firstboot integration provides **automatic post-conversion initializ
 
 ### Windows Service-Based Execution
 
-Unlike RunOnce registry entries (fragile across logon/autologon scenarios), hyper2kvm uses a **Windows Service** for reliable first-boot execution:
+Unlike RunOnce registry entries (fragile across logon/autologon scenarios), h2kvm uses a **Windows Service** for reliable first-boot execution:
 
 ```
 Boot Sequence:
 1. Windows kernel loads
 2. Service Control Manager (SCM) starts
-3. hyper2kvm-firstboot service executes (LocalSystem)
+3. h2kvm-firstboot service executes (LocalSystem)
 4. 8-step enterprise initialization
 5. Detailed logging to:
-   - C:\Windows\Temp\hyper2kvm-firstboot.log
-   - Windows Event Log (Application → hyper2kvm → Event ID 1000)
+   - C:\Windows\Temp\h2kvm-firstboot.log
+   - Windows Event Log (Application → h2kvm → Event ID 1000)
 6. Service self-deletes
-7. Completion marker written (C:\hyper2kvm\firstboot.done)
+7. Completion marker written (C:\h2kvm\firstboot.done)
 ```
 
 ### Service Configuration
 
 ```
-Service Name:    hyper2kvm-firstboot
-Display Name:    hyper2kvm First Boot Driver Installer
+Service Name:    h2kvm-firstboot
+Display Name:    h2kvm First Boot Driver Installer
 Service Type:    Win32 Own Process
 Start Type:      Automatic (2)
 Account:         LocalSystem
-ImagePath:       %SystemRoot%\System32\cmd.exe /c "C:\hyper2kvm\firstboot.cmd"
-Description:     One-shot first boot installer for hyper2kvm staged drivers
+ImagePath:       %SystemRoot%\System32\cmd.exe /c "C:\h2kvm\firstboot.cmd"
+Description:     One-shot first boot installer for h2kvm staged drivers
 ```
 
 ## Enterprise Initialization (8 Steps)
@@ -53,7 +53,7 @@ Description:     One-shot first boot installer for hyper2kvm staged drivers
 ### 1. QEMU Guest Agent Installation
 
 ```powershell
-Location: C:\hyper2kvm\drivers\virtio\guest-agent\qemu-ga-x86_64.msi
+Location: C:\h2kvm\drivers\virtio\guest-agent\qemu-ga-x86_64.msi
 Method:   Silent MSI installation (msiexec /i /qn /norestart)
 Service:  QEMU-GA (Automatic start)
 Purpose:  - VM state monitoring
@@ -72,7 +72,7 @@ Get-Service QEMU-GA | Select Name, Status, StartType
 
 **Method 1: Staged INF Files**
 ```cmd
-pnputil /add-driver C:\hyper2kvm\drivers\virtio\*.inf /install
+pnputil /add-driver C:\h2kvm\drivers\virtio\*.inf /install
 ```
 
 **Method 2: DriverStore Search**
@@ -157,22 +157,22 @@ netsh advfirewall firewall show rule name="Remote Desktop - User Mode (TCP-In)"
 
 **Event Source Registration:**
 ```powershell
-[System.Diagnostics.EventLog]::CreateEventSource('hyper2kvm', 'Application')
+[System.Diagnostics.EventLog]::CreateEventSource('h2kvm', 'Application')
 ```
 
 **Completion Event:**
 ```
 Log:        Application
-Source:     hyper2kvm
+Source:     h2kvm
 Event ID:   1000
 Type:       Information
-Message:    Hyper2KVM first boot initialization completed successfully.
+Message:    H2KVM first boot initialization completed successfully.
             VMware to KVM conversion finalized.
 ```
 
 **View Events:**
 ```powershell
-Get-EventLog -LogName Application -Source hyper2kvm -Newest 10
+Get-EventLog -LogName Application -Source h2kvm -Newest 10
 ```
 
 ### 7. Health Verification
@@ -198,12 +198,12 @@ Health check: PASS
 
 ### 8. Conversion Metadata
 
-**File:** `C:\hyper2kvm\metadata.json`
+**File:** `C:\h2kvm\metadata.json`
 
 **Content:**
 ```json
 {
-  "conversion_tool": "hyper2kvm",
+  "conversion_tool": "h2kvm",
   "conversion_version": "enterprise-1.0",
   "conversion_date": "2026-02-14T20:15:30Z",
   "source_platform": "VMware",
@@ -298,7 +298,7 @@ rmdir /s /q "C:\Program Files\VMware\VMware Tools"
 
 ### Staging Directory
 ```
-C:\hyper2kvm\drivers\virtio\     (guestfs: /hyper2kvm/drivers/virtio/)
+C:\h2kvm\drivers\virtio\     (guestfs: /h2kvm/drivers/virtio/)
 ├── viostor\              - SCSI controller drivers
 ├── vioscsi\              - SCSI pass-through drivers
 ├── netkvm\               - Network drivers
@@ -311,14 +311,14 @@ C:\hyper2kvm\drivers\virtio\     (guestfs: /hyper2kvm/drivers/virtio/)
 
 ### Logs and Markers
 ```
-C:\Windows\Temp\hyper2kvm-firstboot.log   (guestfs: /Windows/Temp/hyper2kvm-firstboot.log)
-C:\hyper2kvm\firstboot.done               (guestfs: /hyper2kvm/firstboot.done)
-C:\hyper2kvm\metadata.json                (guestfs: /hyper2kvm/metadata.json)
+C:\Windows\Temp\h2kvm-firstboot.log   (guestfs: /Windows/Temp/h2kvm-firstboot.log)
+C:\h2kvm\firstboot.done               (guestfs: /h2kvm/firstboot.done)
+C:\h2kvm\metadata.json                (guestfs: /h2kvm/metadata.json)
 ```
 
 ### Script Location
 ```
-C:\hyper2kvm\firstboot.cmd                (guestfs: /hyper2kvm/firstboot.cmd)
+C:\h2kvm\firstboot.cmd                (guestfs: /h2kvm/firstboot.cmd)
 ```
 
 ## Verification After First Boot
@@ -327,25 +327,25 @@ C:\hyper2kvm\firstboot.cmd                (guestfs: /hyper2kvm/firstboot.cmd)
 
 **View log file:**
 ```cmd
-type C:\Windows\Temp\hyper2kvm-firstboot.log
+type C:\Windows\Temp\h2kvm-firstboot.log
 ```
 
 **Check completion marker:**
 ```cmd
-dir C:\hyper2kvm\firstboot.done
+dir C:\h2kvm\firstboot.done
 ```
 
 ### 2. Verify Windows Event Log
 
 ```powershell
-Get-EventLog -LogName Application -Source hyper2kvm -Newest 1
+Get-EventLog -LogName Application -Source h2kvm -Newest 1
 ```
 
 **Expected output:**
 ```
 Index Time          EntryType   Source    InstanceID Message
 ----- ----          ---------   ------    ---------- -------
-12345 Feb 14 20:17  Information hyper2kvm       1000 Hyper2KVM first boot initialization...
+12345 Feb 14 20:17  Information h2kvm       1000 H2KVM first boot initialization...
 ```
 
 ### 3. Check QEMU Guest Agent
@@ -388,7 +388,7 @@ Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } |
 ### 6. Verify Conversion Metadata
 
 ```powershell
-Get-Content C:\hyper2kvm\metadata.json | ConvertFrom-Json | Format-List
+Get-Content C:\h2kvm\metadata.json | ConvertFrom-Json | Format-List
 ```
 
 ### 7. Check for Failed Services
@@ -416,14 +416,14 @@ wmic product where "name like '%VMware%'" get name
 
 **Expected:** All commands should return empty (no VMware components found)
 
-## Integration with hyper2kvm Pipeline
+## Integration with h2kvm Pipeline
 
 ### Automatic Provisioning
 
 The Windows enterprise firstboot is **automatically provisioned** during VM conversion when using `inject_virtio_drivers()`:
 
 ```python
-from hyper2kvm.fixers.windows import inject_virtio_drivers
+from h2kvm.fixers.windows import inject_virtio_drivers
 
 result = inject_virtio_drivers(g)
 # Firstboot service automatically created with:
@@ -442,13 +442,13 @@ result = inject_virtio_drivers(g)
 For custom scenarios, use the provisioning function directly:
 
 ```python
-from hyper2kvm.fixers.windows.registry.firstboot import provision_firstboot_payload_and_service
+from h2kvm.fixers.windows.registry.firstboot import provision_firstboot_payload_and_service
 
 fb_result = provision_firstboot_payload_and_service(
     fixer_instance,
     guestfs_instance,
     system_hive_path="/Windows/System32/config/SYSTEM",
-    service_name="hyper2kvm-firstboot",
+    service_name="h2kvm-firstboot",
     remove_vmware_tools=True,
     install_qemu_guest_agent=True,
     enhanced_virtio_install=True,
@@ -489,9 +489,9 @@ fb_result = provision_firstboot_payload_and_service(
 | **Driver Installation** | dracut virtio injection | pnputil + DriverStore |
 | **Guest Agent** | qemu-guest-agent (yum/apt) | QEMU-GA MSI installer |
 | **Network Reset** | NetworkManager + udev | Disable VMware, reset VirtIO |
-| **Idempotency** | `/etc/hyper2kvm/converted` flag | `C:\hyper2kvm\firstboot.done` |
+| **Idempotency** | `/etc/h2kvm/converted` flag | `C:\h2kvm\firstboot.done` |
 | **Self-Cleanup** | Service disables itself | Service deletes itself |
-| **Metadata** | `/etc/hyper2kvm/metadata.json` | `C:\hyper2kvm\metadata.json` |
+| **Metadata** | `/etc/h2kvm/metadata.json` | `C:\h2kvm\metadata.json` |
 | **Observability** | Structured journal logs | Event Log (ID 1000) |
 
 ## Troubleshooting
@@ -500,21 +500,21 @@ fb_result = provision_firstboot_payload_and_service(
 
 **Check service status:**
 ```cmd
-sc query hyper2kvm-firstboot
+sc query h2kvm-firstboot
 ```
 
 **If service exists but didn't run:**
 ```cmd
 # Check service configuration
-sc qc hyper2kvm-firstboot
+sc qc h2kvm-firstboot
 
 # Check service start type (should be 2 = AUTO_START)
-reg query "HKLM\SYSTEM\CurrentControlSet\Services\hyper2kvm-firstboot" /v Start
+reg query "HKLM\SYSTEM\CurrentControlSet\Services\h2kvm-firstboot" /v Start
 ```
 
 **Manual trigger (if needed):**
 ```cmd
-sc start hyper2kvm-firstboot
+sc start h2kvm-firstboot
 ```
 
 ### QEMU Guest Agent Not Running
@@ -526,20 +526,20 @@ type C:\Windows\Temp\qemu-ga-install.log
 
 **Manual installation:**
 ```cmd
-msiexec /i C:\hyper2kvm\drivers\virtio\guest-agent\qemu-ga-x86_64.msi /qn /norestart /l*v C:\qemu-ga-manual.log
+msiexec /i C:\h2kvm\drivers\virtio\guest-agent\qemu-ga-x86_64.msi /qn /norestart /l*v C:\qemu-ga-manual.log
 ```
 
 ### VirtIO Drivers Not Installed
 
 **Check driver staging:**
 ```cmd
-dir /s /b C:\hyper2kvm\drivers\virtio\*.inf
+dir /s /b C:\h2kvm\drivers\virtio\*.inf
 ```
 
 **Manual driver installation:**
 ```cmd
-pnputil /add-driver C:\hyper2kvm\drivers\virtio\viostor\*.inf /install
-pnputil /add-driver C:\hyper2kvm\drivers\virtio\netkvm\*.inf /install
+pnputil /add-driver C:\h2kvm\drivers\virtio\viostor\*.inf /install
+pnputil /add-driver C:\h2kvm\drivers\virtio\netkvm\*.inf /install
 pnputil /scan-devices
 ```
 
@@ -579,7 +579,7 @@ wmic product where "name like '%VMware Tools%'" call uninstall
 
 ## Best Practices
 
-1. **Always stage QEMU Guest Agent MSI** in `C:\hyper2kvm\drivers\virtio\guest-agent\qemu-ga-x86_64.msi`
+1. **Always stage QEMU Guest Agent MSI** in `C:\h2kvm\drivers\virtio\guest-agent\qemu-ga-x86_64.msi`
 
 2. **Enable all enterprise features** for production migrations:
    ```python
@@ -593,11 +593,11 @@ wmic product where "name like '%VMware Tools%'" call uninstall
    create_metadata=True
    ```
 
-3. **Review logs after first boot** - Check `C:\Windows\Temp\hyper2kvm-firstboot.log` and Windows Event Log
+3. **Review logs after first boot** - Check `C:\Windows\Temp\h2kvm-firstboot.log` and Windows Event Log
 
 4. **Verify health status** - Run health verification commands to ensure all components are working
 
-5. **Document metadata** - Save `C:\hyper2kvm\metadata.json` for audit trails
+5. **Document metadata** - Save `C:\h2kvm\metadata.json` for audit trails
 
 ## Production Readiness
 

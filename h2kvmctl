@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
-# h2kvmctl - Primary CLI command for Hyper2KVM
+# h2kvmctl - Primary CLI command for H2KVM
 #
 # This is a development wrapper. After pip install, the real
 # h2kvmctl command is installed as an entry point.
@@ -11,7 +11,7 @@ import os
 # Add parent directory to path for development
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from hyper2kvm.__main__ import main
+from h2kvm.__main__ import main
 
 if __name__ == "__main__":
     main()

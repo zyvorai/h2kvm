@@ -13,7 +13,7 @@ var (
 	// ValidationTotal tracks total number of validations
 	ValidationTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "hyper2kvm_validation_total",
+			Name: "h2kvm_validation_total",
 			Help: "Total number of VM validations",
 		},
 		[]string{"status"},
@@ -22,7 +22,7 @@ var (
 	// ValidationDuration tracks validation duration
 	ValidationDuration = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "hyper2kvm_validation_duration_seconds",
+			Name:    "h2kvm_validation_duration_seconds",
 			Help:    "Duration of VM validations in seconds",
 			Buckets: []float64{10, 30, 60, 120, 300, 600, 1200},
 		},
@@ -32,7 +32,7 @@ var (
 	// ValidationChecks tracks individual check results
 	ValidationChecks = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "hyper2kvm_validation_checks_total",
+			Name: "h2kvm_validation_checks_total",
 			Help: "Total number of validation checks by type",
 		},
 		[]string{"check", "result"},
@@ -41,7 +41,7 @@ var (
 	// ActiveValidations tracks currently running validations
 	ActiveValidations = prometheus.NewGauge(
 		prometheus.GaugeOpts{
-			Name: "hyper2kvm_active_validations",
+			Name: "h2kvm_active_validations",
 			Help: "Number of currently active validations",
 		},
 	)
@@ -49,7 +49,7 @@ var (
 	// ValidationPodCreationDuration tracks pod creation time
 	ValidationPodCreationDuration = prometheus.NewHistogram(
 		prometheus.HistogramOpts{
-			Name:    "hyper2kvm_validation_pod_creation_duration_seconds",
+			Name:    "h2kvm_validation_pod_creation_duration_seconds",
 			Help:    "Duration of validation pod creation in seconds",
 			Buckets: prometheus.DefBuckets,
 		},
@@ -58,7 +58,7 @@ var (
 	// KubeVirtVMCreationTotal tracks KubeVirt VM creation
 	KubeVirtVMCreationTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "hyper2kvm_kubevirt_vm_creation_total",
+			Name: "h2kvm_kubevirt_vm_creation_total",
 			Help: "Total number of KubeVirt VM creations",
 		},
 		[]string{"status"},
@@ -67,7 +67,7 @@ var (
 	// KubeVirtVMCreationDuration tracks KubeVirt VM creation time
 	KubeVirtVMCreationDuration = prometheus.NewHistogram(
 		prometheus.HistogramOpts{
-			Name:    "hyper2kvm_kubevirt_vm_creation_duration_seconds",
+			Name:    "h2kvm_kubevirt_vm_creation_duration_seconds",
 			Help:    "Duration of KubeVirt VM creation in seconds",
 			Buckets: prometheus.DefBuckets,
 		},
@@ -76,7 +76,7 @@ var (
 	// ReconcileErrorsTotal tracks reconciliation errors
 	ReconcileErrorsTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "hyper2kvm_reconcile_errors_total",
+			Name: "h2kvm_reconcile_errors_total",
 			Help: "Total number of reconciliation errors",
 		},
 		[]string{"phase"},
@@ -85,7 +85,7 @@ var (
 	// ReconcileDuration tracks reconciliation duration
 	ReconcileDuration = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "hyper2kvm_reconcile_duration_seconds",
+			Name:    "h2kvm_reconcile_duration_seconds",
 			Help:    "Duration of reconciliation loops in seconds",
 			Buckets: prometheus.DefBuckets,
 		},
@@ -95,7 +95,7 @@ var (
 	// ValidationTimeouts tracks validation timeouts
 	ValidationTimeouts = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name: "hyper2kvm_validation_timeouts_total",
+			Name: "h2kvm_validation_timeouts_total",
 			Help: "Total number of validation timeouts",
 		},
 	)
@@ -103,7 +103,7 @@ var (
 	// ValidationQueueSize tracks validation queue size
 	ValidationQueueSize = prometheus.NewGauge(
 		prometheus.GaugeOpts{
-			Name: "hyper2kvm_validation_queue_size",
+			Name: "h2kvm_validation_queue_size",
 			Help: "Current size of the validation queue",
 		},
 	)

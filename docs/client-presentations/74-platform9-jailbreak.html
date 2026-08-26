@@ -71,7 +71,7 @@
 <div class="cover">
   <h1>Platform9 <span>Jailbreak</span></h1>
   <h2>Escape the Managed KVM Trap</h2>
-  <p style="font-size: 1.05em; opacity: 0.85; max-width: 780px; margin-top: 0.8em;">Migrate from Platform9 Managed OpenStack/KVM to Self-Managed KVM with hyper2kvm + hypersdk</p>
+  <p style="font-size: 1.05em; opacity: 0.85; max-width: 780px; margin-top: 0.8em;">Migrate from Platform9 Managed OpenStack/KVM to Self-Managed KVM with h2kvm + hypersdk</p>
   <p class="sub">"Your VMs. Your infrastructure. Your freedom."</p>
 </div>
 
@@ -104,7 +104,7 @@
 
 <!-- Page 3: The Escape Path -->
 <div class="page page-dark">
-  <h2 class="st">The Escape Path — <span>hyper2kvm + hypersdk</span></h2>
+  <h2 class="st">The Escape Path — <span>h2kvm + hypersdk</span></h2>
   <p class="sub">A four-step jailbreak from Platform9 to self-managed KVM freedom.</p>
   <div class="workflow">
     <div class="wf-step">
@@ -115,7 +115,7 @@
     <div class="wf-step">
       <div class="wf-num">2</div>
       <h4>Convert &amp; Fix</h4>
-      <p>hyper2kvm's VMCraft engine performs offline disk manipulation: driver injection, initramfs regeneration, fstab UUID stabilization, GRUB repair. No libguestfs appliance needed.</p>
+      <p>h2kvm's VMCraft engine performs offline disk manipulation: driver injection, initramfs regeneration, fstab UUID stabilization, GRUB repair. No libguestfs appliance needed.</p>
     </div>
     <div class="wf-step">
       <div class="wf-num">3</div>
@@ -125,12 +125,12 @@
     <div class="wf-step">
       <div class="wf-num">4</div>
       <h4>Monitor</h4>
-      <p>Use the hyper2kvm web dashboard with 20+ VM panels for full visibility. No Platform9 dependency. No cloud control plane. Everything runs on your infrastructure.</p>
+      <p>Use the h2kvm web dashboard with 20+ VM panels for full visibility. No Platform9 dependency. No cloud control plane. Everything runs on your infrastructure.</p>
     </div>
   </div>
   <div class="highlight">
     <h3 style="margin-top: 0;">Why This Works</h3>
-    <p style="font-size: 0.88em;">Platform9 is built on OpenStack + KVM. Under the hood, your VMs are already KVM guests managed by libvirt. The Platform9 layer adds an abstraction you don't need. hyper2kvm + hypersdk peel off that layer, give you direct libvirt access, and provide a web dashboard that replaces Platform9's management UI — without the monthly bill.</p>
+    <p style="font-size: 0.88em;">Platform9 is built on OpenStack + KVM. Under the hood, your VMs are already KVM guests managed by libvirt. The Platform9 layer adds an abstraction you don't need. h2kvm + hypersdk peel off that layer, give you direct libvirt access, and provide a web dashboard that replaces Platform9's management UI — without the monthly bill.</p>
   </div>
 </div>
 
@@ -139,7 +139,7 @@
   <h2 class="st">Feature <span>Comparison</span></h2>
   <p class="sub">Side-by-side capabilities: what you get with Platform9 vs. what you get after the jailbreak.</p>
   <table>
-    <tr><th style="width:28%">Capability</th><th style="width:36%">Platform9</th><th style="width:36%">hyper2kvm + hypersdk</th></tr>
+    <tr><th style="width:28%">Capability</th><th style="width:36%">Platform9</th><th style="width:36%">h2kvm + hypersdk</th></tr>
     <tr><td><strong>VM management</strong></td><td class="check">&#10003; (their dashboard)</td><td class="check">&#10003; (web dashboard, 20+ panels)</td></tr>
     <tr><td><strong>KVM/libvirt control</strong></td><td class="partial">Abstracted (limited)</td><td class="check">&#10003; Full access (virsh, XML, API)</td></tr>
     <tr><td><strong>Cost</strong></td><td class="cross">~$250/node/month</td><td class="check">Contact for pricing*</td></tr>
@@ -162,7 +162,7 @@
   <h2 class="st">Cost Savings <span>Analysis</span></h2>
   <p class="sub">Three-year total cost of ownership for a 50-node deployment.</p>
   <table>
-    <tr><th style="width:35%">Item</th><th style="width:32%">Platform9 (50 nodes)</th><th style="width:33%">hyper2kvm + hypersdk</th></tr>
+    <tr><th style="width:35%">Item</th><th style="width:32%">Platform9 (50 nodes)</th><th style="width:33%">h2kvm + hypersdk</th></tr>
     <tr><td><strong>License Year 1</strong></td><td class="cross">$150,000</td><td class="check">$0</td></tr>
     <tr><td><strong>License Year 2</strong></td><td class="cross">$150,000</td><td class="check">$0</td></tr>
     <tr><td><strong>License Year 3</strong></td><td class="cross">$150,000</td><td class="check">$0</td></tr>
@@ -204,7 +204,7 @@
       </ul>
     </div>
     <div class="col col-after">
-      <h4>After (hyper2kvm + hypersdk)</h4>
+      <h4>After (h2kvm + hypersdk)</h4>
       <ul>
         <li>Self-managed KVM — nothing phones home</li>
         <li>Licensed* (Zyvor AI Labs)</li>
@@ -254,13 +254,13 @@
     </div>
   </div>
   <div class="highlight">
-    <p style="margin: 0; font-size: 0.88em;"><strong>Platform9 escape strategy:</strong> hypersdk connects to the OpenStack API layer that Platform9 runs on top of. It exports VMs using standard OpenStack calls — no Platform9-specific API needed. Your VMs come out as standard disk images ready for hyper2kvm conversion.</p>
+    <p style="margin: 0; font-size: 0.88em;"><strong>Platform9 escape strategy:</strong> hypersdk connects to the OpenStack API layer that Platform9 runs on top of. It exports VMs using standard OpenStack calls — no Platform9-specific API needed. Your VMs come out as standard disk images ready for h2kvm conversion.</p>
   </div>
 </div>
 
-<!-- Page 8: hyper2kvm — The Conversion Engine -->
+<!-- Page 8: h2kvm — The Conversion Engine -->
 <div class="page page-light">
-  <h2 class="st">hyper2kvm — <span>The Conversion Engine</span></h2>
+  <h2 class="st">h2kvm — <span>The Conversion Engine</span></h2>
   <p class="sub">The Python toolkit that converts exported VMs into production-ready KVM guests.</p>
   <div class="card-grid">
     <div class="card">
@@ -302,7 +302,7 @@
       <div class="step-num">1</div>
       <div class="step-body">
         <h4>Install the Tools</h4>
-        <p><code>pip install hyper2kvm</code> for the conversion engine. <code>go install hypersdk</code> for the export daemon. Both install in under a minute with zero external dependencies beyond Python 3.10+ and Go 1.22+.</p>
+        <p><code>pip install h2kvm</code> for the conversion engine. <code>go install hypersdk</code> for the export daemon. Both install in under a minute with zero external dependencies beyond Python 3.10+ and Go 1.22+.</p>
       </div>
     </div>
     <div class="step">
@@ -323,14 +323,14 @@
       <div class="step-num">4</div>
       <div class="step-body">
         <h4>Verify</h4>
-        <p>Open <code>https://host:5070</code> in your browser to see the VM running in the hyper2kvm web dashboard. All 20+ panels are live: CPU, memory, disk I/O, network, guest agent info, security analysis.</p>
+        <p>Open <code>https://host:5070</code> in your browser to see the VM running in the h2kvm web dashboard. All 20+ panels are live: CPU, memory, disk I/O, network, guest agent info, security analysis.</p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">5</div>
       <div class="step-body">
         <h4>Repeat for Remaining VMs</h4>
-        <p>Use batch mode for fleet migrations: define all VMs in a YAML file and let hyper2kvm process them in parallel. The zkvm TUI provides a guided wizard for operators who prefer interactive workflows.</p>
+        <p>Use batch mode for fleet migrations: define all VMs in a YAML file and let h2kvm process them in parallel. The zkvm TUI provides a guided wizard for operators who prefer interactive workflows.</p>
       </div>
     </div>
     <div class="step">
@@ -376,14 +376,14 @@
   <div class="highlight" style="text-align: center; padding: 24px;">
     <h3 style="margin-top: 0; font-size: 1.2em;">Get Started Today</h3>
     <p style="font-size: 1em; margin-bottom: 0.8em;">
-      <strong>hyper2kvm:</strong> <code>github.com/ssahani/hyper2kvm</code><br>
+      <strong>h2kvm:</strong> <code>github.com/ssahani/h2kvm</code><br>
       <strong>hypersdk:</strong> <code>github.com/ssahani/hypersdk</code>
     </p>
     <p style="font-size: 0.95em; margin-bottom: 0;">Schedule a migration assessment — we'll analyze your Platform9 deployment and provide a step-by-step jailbreak plan tailored to your environment.</p>
   </div>
 
   <div class="footer">
-    <p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit — Break free from vendor lock-in</p>
+    <p>h2kvm + hypersdk — Production-Grade VM Migration Toolkit — Break free from vendor lock-in</p>
   </div>
 </div>
 

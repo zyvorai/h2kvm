@@ -6,7 +6,7 @@
 #
 # Usage:
 #   export VC_PASSWORD='your-password'
-#   sudo -E hyper2kvm --config 40-vsphere-vddk-download-disk.yaml vsphere
+#   sudo -E h2kvm --config 40-vsphere-vddk-download-disk.yaml vsphere
 #
 # Features:
 #   - VDDK raw disk download

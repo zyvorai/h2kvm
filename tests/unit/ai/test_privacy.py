@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.ai.privacy module.
+"""Tests for h2kvm.ai.privacy module.
 
 DataAnonymizer: salt creation, hashing, and field-level anonymization.
 """
@@ -12,7 +12,7 @@ from __future__ import annotations
 import os
 import stat
 
-from hyper2kvm.ai.privacy import DataAnonymizer
+from h2kvm.ai.privacy import DataAnonymizer
 
 
 # ---------------------------------------------------------------------------

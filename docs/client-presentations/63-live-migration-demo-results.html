@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>hyper2kvm — Live Migration Demo Results</title>
+<title>h2kvm — Live Migration Demo Results</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -120,7 +120,7 @@
     <div class="card">
       <div class="icon">🔧</div>
       <h4>Migration Tool</h4>
-      <p>hyper2kvm v0.3.0<br>VMCraft backend (Python + qemu-nbd)<br>Offline guest fixes: fstab, network, initramfs<br>Auto libvirt domain XML + virsh define</p>
+      <p>h2kvm v0.3.0<br>VMCraft backend (Python + qemu-nbd)<br>Offline guest fixes: fstab, network, initramfs<br>Auto libvirt domain XML + virsh define</p>
     </div>
     <div class="card">
       <div class="icon">📦</div>
@@ -245,23 +245,23 @@
 <!-- PAGE 4: WHAT WAS FIXED AUTOMATICALLY -->
 <div class="page page-accent">
   <h2 class="section-title">Automated Guest <span>Fixes</span></h2>
-  <p class="subtitle">hyper2kvm applied these fixes automatically during migration &mdash; no manual guest access required.</p>
+  <p class="subtitle">h2kvm applied these fixes automatically during migration &mdash; no manual guest access required.</p>
 
   <div class="card-grid">
     <div class="card">
       <div class="icon">🌐</div>
       <h4>NetworkManager Connection Fix</h4>
-      <p>VMware images use <code>interface-name=ens33</code> (VMware PCI topology). On KVM with virtio, the NIC becomes <code>enp1s0</code>. hyper2kvm removes the VMware-specific interface name and sets <code>autoconnect=true</code> so NetworkManager activates on any available NIC.</p>
+      <p>VMware images use <code>interface-name=ens33</code> (VMware PCI topology). On KVM with virtio, the NIC becomes <code>enp1s0</code>. h2kvm removes the VMware-specific interface name and sets <code>autoconnect=true</code> so NetworkManager activates on any available NIC.</p>
     </div>
     <div class="card">
       <div class="icon">🔑</div>
       <h4>MAC Address Pinning Removal</h4>
-      <p>VMware images hardcode the guest NIC MAC address in NetworkManager profiles. hyper2kvm strips <code>mac-address</code>, <code>cloned-mac-address</code>, and <code>mac-address-blacklist</code> entries so the guest accepts the new KVM-assigned MAC.</p>
+      <p>VMware images hardcode the guest NIC MAC address in NetworkManager profiles. h2kvm strips <code>mac-address</code>, <code>cloned-mac-address</code>, and <code>mac-address-blacklist</code> entries so the guest accepts the new KVM-assigned MAC.</p>
     </div>
     <div class="card">
       <div class="icon">💾</div>
       <h4>Initramfs Rebuild with virtio</h4>
-      <p>VMware disks use <code>lsilogic</code> SCSI controller. KVM uses virtio. hyper2kvm injects virtio modules (<code>virtio_blk</code>, <code>virtio_scsi</code>, <code>virtio_net</code>, <code>virtio_pci</code>) and rebuilds initramfs via <code>dracut -f</code> or <code>update-initramfs -u</code> inside a chroot with proper bind mounts.</p>
+      <p>VMware disks use <code>lsilogic</code> SCSI controller. KVM uses virtio. h2kvm injects virtio modules (<code>virtio_blk</code>, <code>virtio_scsi</code>, <code>virtio_net</code>, <code>virtio_pci</code>) and rebuilds initramfs via <code>dracut -f</code> or <code>update-initramfs -u</code> inside a chroot with proper bind mounts.</p>
     </div>
     <div class="card">
       <div class="icon">📋</div>
@@ -356,7 +356,7 @@
     <div class="vm-icon">🟡</div>
     <div class="vm-info">
       <h4>openSUSE Leap 15.6</h4>
-      <p>btrfs root &bull; Same host kernel limitation &bull; Not a hyper2kvm bug</p>
+      <p>btrfs root &bull; Same host kernel limitation &bull; Not a h2kvm bug</p>
     </div>
     <div class="vm-status fail">btrfs unsupported</div>
   </div>
@@ -419,7 +419,7 @@
 <!-- PAGE 7: DISTRO COVERAGE -->
 <div class="page page-dark">
   <h2 class="section-title">Cross-Distro <span>Coverage</span></h2>
-  <p class="subtitle">hyper2kvm handles the full spectrum of Linux network and boot configurations.</p>
+  <p class="subtitle">h2kvm handles the full spectrum of Linux network and boot configurations.</p>
 
   <div class="card-grid card-grid-3">
     <div class="card">
@@ -524,11 +524,11 @@
     <div class="card">
       <div class="icon">📖</div>
       <h4>Open Source</h4>
-      <p>Proprietary (Zyvor AI Labs) licensed<br>github.com/ssahani/hyper2kvm<br>Production-ready for enterprise deployment.</p>
+      <p>Proprietary (Zyvor AI Labs) licensed<br>github.com/ssahani/h2kvm<br>Production-ready for enterprise deployment.</p>
     </div>
   </div>
 
-  <div class="footer">hyper2kvm &mdash; Enterprise VM Migration Platform &mdash; Proprietary (Zyvor AI Labs) &mdash; March 2026</div>
+  <div class="footer">h2kvm &mdash; Enterprise VM Migration Platform &mdash; Proprietary (Zyvor AI Labs) &mdash; March 2026</div>
 </div>
 
 </body>

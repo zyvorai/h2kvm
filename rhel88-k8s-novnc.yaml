@@ -22,7 +22,7 @@ network_fixes_enable: true
 
 # Kubernetes deployment
 deploy_k8s: true
-k8s_namespace: hyper2kvm-vms
+k8s_namespace: h2kvm-vms
 k8s_vm_name: rhel88-migrated
 k8s_storage_class: local-path
 k8s_pvc_size: 40Gi

@@ -1,4 +1,4 @@
-module github.com/hyper2kvm/operator
+module github.com/h2kvm/operator
 
 go 1.25.0
 

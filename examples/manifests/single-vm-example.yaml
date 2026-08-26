@@ -11,7 +11,7 @@ vmware:
   dc_name: DC1
   datastore: datastore1
 
-output_dir: /var/lib/hyper2kvm/output
+output_dir: /var/lib/h2kvm/output
 output_format: qcow2
 
 # Optional: network fixes

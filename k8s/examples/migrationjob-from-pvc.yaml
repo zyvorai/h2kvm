@@ -1,7 +1,7 @@
 # MigrationJob from existing PVC
 # Use this when you've already uploaded VMDK to a PVC
 
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: migrate-photon

@@ -1,11 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 #
-# Hyper2KVM Systemd Integration Installation Script
+# H2KVM Systemd Integration Installation Script
 # ==================================================
 #
 # This script installs systemd units, creates necessary directories,
-# and sets up the systemd integration for hyper2kvm.
+# and sets up the systemd integration for h2kvm.
 #
 # Usage: sudo ./install-systemd-integration.sh [options]
 #
@@ -30,10 +30,10 @@ NC='\033[0m' # No Color
 
 # Configuration
 SYSTEMD_UNIT_DIR="/etc/systemd/system"
-RUNTIME_DIR="/run/hyper2kvm"
-STATE_DIR="/var/lib/hyper2kvm"
-LOG_DIR="/var/log/hyper2kvm"
-CONFIG_DIR="/etc/hyper2kvm"
+RUNTIME_DIR="/run/h2kvm"
+STATE_DIR="/var/lib/h2kvm"
+LOG_DIR="/var/log/h2kvm"
+CONFIG_DIR="/etc/h2kvm"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 UNITS_DIR="${PROJECT_ROOT}/systemd/units"
@@ -157,14 +157,14 @@ install_units() {
     fi
 
     local units=(
-        "hyper2kvm.service"
-        "hyper2kvm.socket"
-        "hyper2kvm.timer"
-        "hyper2kvm-scheduled.service"
-        "hyper2kvm.path"
-        "hyper2kvm-path-trigger.service"
-        "hyper2kvm.target"
-        "hyper2kvm@.service"
+        "h2kvm.service"
+        "h2kvm.socket"
+        "h2kvm.timer"
+        "h2kvm-scheduled.service"
+        "h2kvm.path"
+        "h2kvm-path-trigger.service"
+        "h2kvm.target"
+        "h2kvm@.service"
     )
 
     for unit in "${units[@]}"; do
@@ -190,7 +190,7 @@ install_units() {
 create_config() {
     log_info "Creating default configuration..."
 
-    local config_file="${CONFIG_DIR}/hyper2kvm.conf"
+    local config_file="${CONFIG_DIR}/h2kvm.conf"
 
     if [[ -f "$config_file" ]]; then
         log_warning "Configuration file already exists: $config_file"
@@ -203,7 +203,7 @@ create_config() {
     fi
 
     cat > "$config_file" << 'EOF'
-# Hyper2KVM Systemd Integration Configuration
+# H2KVM Systemd Integration Configuration
 # ============================================
 
 # VM image directories to monitor (comma-separated)
@@ -226,7 +226,7 @@ LOG_LEVEL=INFO
 JOURNAL_LOGGING=true
 
 # Socket settings
-SOCKET_PATH=/run/hyper2kvm/repair.sock
+SOCKET_PATH=/run/h2kvm/repair.sock
 SOCKET_TIMEOUT=30
 
 # Timer settings
@@ -260,19 +260,19 @@ enable_services() {
     log_info "Enabling services..."
 
     if [[ $ENABLE_ALL == true || $ENABLE_SOCKET == true ]]; then
-        enable_unit "hyper2kvm.socket"
+        enable_unit "h2kvm.socket"
     fi
 
     if [[ $ENABLE_ALL == true || $ENABLE_TIMER == true ]]; then
-        enable_unit "hyper2kvm.timer"
+        enable_unit "h2kvm.timer"
     fi
 
     if [[ $ENABLE_ALL == true || $ENABLE_PATH == true ]]; then
-        enable_unit "hyper2kvm.path"
+        enable_unit "h2kvm.path"
     fi
 
     if [[ $ENABLE_ALL == true ]]; then
-        enable_unit "hyper2kvm.target"
+        enable_unit "h2kvm.target"
     fi
 }
 
@@ -304,13 +304,13 @@ uninstall() {
 
     # Stop and disable services
     local units=(
-        "hyper2kvm.socket"
-        "hyper2kvm.service"
-        "hyper2kvm.timer"
-        "hyper2kvm-scheduled.service"
-        "hyper2kvm.path"
-        "hyper2kvm-path-trigger.service"
-        "hyper2kvm.target"
+        "h2kvm.socket"
+        "h2kvm.service"
+        "h2kvm.timer"
+        "h2kvm-scheduled.service"
+        "h2kvm.path"
+        "h2kvm-path-trigger.service"
+        "h2kvm.target"
     )
 
     for unit in "${units[@]}"; do
@@ -324,7 +324,7 @@ uninstall() {
     done
 
     # Remove unit files
-    for unit in "${units[@]}" "hyper2kvm@.service"; do
+    for unit in "${units[@]}" "h2kvm@.service"; do
         local unit_file="${SYSTEMD_UNIT_DIR}/${unit}"
         if [[ -f "$unit_file" ]]; then
             if [[ $DRY_RUN == true ]]; then
@@ -353,11 +353,11 @@ show_status() {
     echo ""
 
     local units=(
-        "hyper2kvm.socket"
-        "hyper2kvm.service"
-        "hyper2kvm.timer"
-        "hyper2kvm.path"
-        "hyper2kvm.target"
+        "h2kvm.socket"
+        "h2kvm.service"
+        "h2kvm.timer"
+        "h2kvm.path"
+        "h2kvm.target"
     )
 
     for unit in "${units[@]}"; do
@@ -375,7 +375,7 @@ show_status() {
 # Show help
 show_help() {
     cat << EOF
-Hyper2KVM Systemd Integration Installation Script
+H2KVM Systemd Integration Installation Script
 
 Usage: sudo $0 [options]
 
@@ -467,7 +467,7 @@ main() {
 
     echo ""
     echo "╔════════════════════════════════════════════════════════╗"
-    echo "║  Hyper2KVM Systemd Integration Installation Script    ║"
+    echo "║  H2KVM Systemd Integration Installation Script    ║"
     echo "╚════════════════════════════════════════════════════════╝"
     echo ""
 
@@ -501,10 +501,10 @@ main() {
     # Show next steps
     echo ""
     log_info "Next steps:"
-    echo "  1. Review configuration: $CONFIG_DIR/hyper2kvm.conf"
-    echo "  2. Check service status: systemctl status hyper2kvm.target"
-    echo "  3. View logs: journalctl -u hyper2kvm.service -f"
-    echo "  4. Test socket: hyper2kvm-client health-check"
+    echo "  1. Review configuration: $CONFIG_DIR/h2kvm.conf"
+    echo "  2. Check service status: systemctl status h2kvm.target"
+    echo "  3. View logs: journalctl -u h2kvm.service -f"
+    echo "  4. Test socket: h2kvm-client health-check"
     echo ""
 }
 

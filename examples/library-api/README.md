@@ -1,6 +1,6 @@
 # Library API Examples
 
-This directory contains Python scripts demonstrating programmatic usage of hyper2kvm as a library.
+This directory contains Python scripts demonstrating programmatic usage of h2kvm as a library.
 
 ## Available Examples
 
@@ -44,8 +44,8 @@ pip install -e .
 
 For specific features:
 ```bash
-pip install 'hyper2kvm[vsphere]'  # For vSphere examples
-pip install 'hyper2kvm[azure]'    # For Azure examples
+pip install 'h2kvm[vsphere]'  # For vSphere examples
+pip install 'h2kvm[azure]'    # For Azure examples
 ```
 
 ## Documentation

@@ -1,12 +1,12 @@
 # Documentation Navigation Map
 
-Visual guide to navigating Hyper2KVM documentation.
+Visual guide to navigating H2KVM documentation.
 
 ---
 
 ## Quick Navigation by User Type
 
-### 🆕 New Users (Never used Hyper2KVM)
+### 🆕 New Users (Never used H2KVM)
 
 **Start Here** → **Learn Basics** → **Practice**
 
@@ -189,7 +189,7 @@ Troubleshooting Path:
     └─→ [FAQ](FAQ.md) - Search for your error
         └─→ [Troubleshooting Guide](guides/troubleshooting.md)
             └─→ [Failure Modes](reference/failure-modes.md)
-                └─→ Still stuck? [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
+                └─→ Still stuck? [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
 ```
 
 ---

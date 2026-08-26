@@ -11,7 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/hyper2kvm/zkvm/internal/theme"
+	"github.com/h2kvm/zkvm/internal/theme"
 )
 
 // ProgressBar is a Bubble Tea model that renders a progress bar with percentage.

@@ -181,7 +181,7 @@ comparison = g.compare_vms(profile1, profile2)
 ### Example 1: Windows Service Analysis
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 with VMCraft() as g:
     g.add_drive_opts("windows.vmdk", readonly=True, format="vmdk")

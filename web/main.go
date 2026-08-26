@@ -3,7 +3,7 @@
 // https://zyvor.dev · info@zyvor.dev
 
 
-// h2kweb is the hyper2kvm web dashboard server.
+// h2kweb is the h2kvm web dashboard server.
 // It provides a browser-based UI for VM migration with provider browsing
 // (VMware vSphere, Azure, EC2) and real-time job monitoring via WebSocket.
 package main
@@ -28,15 +28,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hyper2kvm/web/internal/adapters/azure"
-	"github.com/hyper2kvm/web/internal/adapters/ec2"
-	"github.com/hyper2kvm/web/internal/adapters/vsphere"
-	"github.com/hyper2kvm/web/internal/api"
-	"github.com/hyper2kvm/web/internal/domain"
-	"github.com/hyper2kvm/web/internal/jobs"
-	"github.com/hyper2kvm/web/internal/ports"
-	"github.com/hyper2kvm/web/internal/registry"
-	"github.com/hyper2kvm/web/internal/runner"
+	"github.com/h2kvm/web/internal/adapters/azure"
+	"github.com/h2kvm/web/internal/adapters/ec2"
+	"github.com/h2kvm/web/internal/adapters/vsphere"
+	"github.com/h2kvm/web/internal/api"
+	"github.com/h2kvm/web/internal/domain"
+	"github.com/h2kvm/web/internal/jobs"
+	"github.com/h2kvm/web/internal/ports"
+	"github.com/h2kvm/web/internal/registry"
+	"github.com/h2kvm/web/internal/runner"
 )
 
 var (
@@ -62,7 +62,7 @@ func main() {
 	log.Printf("h2kweb %s starting", version)
 
 	// Ensure runtime directories exist (NBD locking, workflow).
-	for _, dir := range []string{"/run/hyper2kvm", "/run/hyper2kvm/workflow"} {
+	for _, dir := range []string{"/run/h2kvm", "/run/h2kvm/workflow"} {
 		if err := os.MkdirAll(dir, 0o755); err != nil {
 			log.Printf("warning: cannot create %s: %v", dir, err)
 		}
@@ -166,7 +166,7 @@ func main() {
 // older than 24 hours. It reads meta.json from each session directory to
 // determine the creation time.
 func cleanupStaleUploads(ctx context.Context) {
-	const uploadsDir = "/var/lib/hyper2kvm/input/.uploads"
+	const uploadsDir = "/var/lib/h2kvm/input/.uploads"
 	const maxAge = 24 * time.Hour
 
 	ticker := time.NewTicker(1 * time.Hour)
@@ -223,9 +223,9 @@ func cleanupStaleUploads(ctx context.Context) {
 }
 
 // generateSelfSignedCert creates a self-signed TLS certificate and key
-// in /var/lib/hyper2kvm/tls/ and returns the file paths.
+// in /var/lib/h2kvm/tls/ and returns the file paths.
 func generateSelfSignedCert() (certFile, keyFile string) {
-	dir := "/var/lib/hyper2kvm/tls"
+	dir := "/var/lib/h2kvm/tls"
 	certFile = filepath.Join(dir, "server.crt")
 	keyFile = filepath.Join(dir, "server.key")
 
@@ -248,7 +248,7 @@ func generateSelfSignedCert() (certFile, keyFile string) {
 	hostname, _ := os.Hostname()
 	template := x509.Certificate{
 		SerialNumber: big.NewInt(1),
-		Subject:      pkix.Name{Organization: []string{"hyper2kvm"}, CommonName: hostname},
+		Subject:      pkix.Name{Organization: []string{"h2kvm"}, CommonName: hostname},
 		NotBefore:    time.Now(),
 		NotAfter:     time.Now().Add(365 * 24 * time.Hour), // 1 year
 		KeyUsage:     x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,

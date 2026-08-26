@@ -8,10 +8,10 @@ set -euo pipefail
 
 # Configuration
 AUTO_CONFIRM="${AUTO_CONFIRM:-false}"
-CLUSTER_NAME="${CLUSTER_NAME:-hyper2kvm-test}"
-NAMESPACE_OPERATOR="${NAMESPACE_OPERATOR:-hyper2kvm-system}"
-NAMESPACE_WORKERS="${NAMESPACE_WORKERS:-hyper2kvm-workers}"
-NAMESPACE_TEST="${NAMESPACE_TEST:-hyper2kvm-test}"
+CLUSTER_NAME="${CLUSTER_NAME:-h2kvm-test}"
+NAMESPACE_OPERATOR="${NAMESPACE_OPERATOR:-h2kvm-system}"
+NAMESPACE_WORKERS="${NAMESPACE_WORKERS:-h2kvm-workers}"
+NAMESPACE_TEST="${NAMESPACE_TEST:-h2kvm-test}"
 UBUNTU_VMDK="${UBUNTU_VMDK:-${VM_IMAGE:-/home/ssahani/Downloads/VM-Images/ubuntu/ubuntu.vmdk}}"
 TIMEOUT="${TIMEOUT:-600}"
 SKIP_BUILD="${SKIP_BUILD:-false}"
@@ -84,7 +84,7 @@ upload_test_data() {
     fi
 
     log_info "Finding a running worker pod..."
-    WORKER_POD=$(kubectl get pods -n "${NAMESPACE_WORKERS}" -l app=hyper2kvm-worker --field-selector status.phase=Running -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
+    WORKER_POD=$(kubectl get pods -n "${NAMESPACE_WORKERS}" -l app=h2kvm-worker --field-selector status.phase=Running -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
 
     if [ -z "${WORKER_POD}" ]; then
         log_warning "No worker pod found, skipping data upload"
@@ -113,16 +113,16 @@ monitor_job() {
 
     echo ""
     log_info "Operator Logs (last 20 lines):"
-    kubectl logs -n "${NAMESPACE_OPERATOR}" -l app=hyper2kvm-operator --tail=20 | grep -i ubuntu || true
+    kubectl logs -n "${NAMESPACE_OPERATOR}" -l app=h2kvm-operator --tail=20 | grep -i ubuntu || true
 
     echo ""
     log_info "Worker Pods Status:"
     kubectl get pods -n "${NAMESPACE_WORKERS}" -o wide
 
-    if kubectl get pods -n "${NAMESPACE_WORKERS}" -l app=hyper2kvm-worker &> /dev/null; then
+    if kubectl get pods -n "${NAMESPACE_WORKERS}" -l app=h2kvm-worker &> /dev/null; then
         echo ""
         log_info "Worker Logs (last 20 lines):"
-        kubectl logs -n "${NAMESPACE_WORKERS}" -l app=hyper2kvm-worker --tail=20 || true
+        kubectl logs -n "${NAMESPACE_WORKERS}" -l app=h2kvm-worker --tail=20 || true
     fi
 }
 
@@ -137,9 +137,9 @@ generate_report() {
     echo ""
 
     echo "📦 Infrastructure Status:"
-    echo "  • Operator: $(kubectl get pods -n "${NAMESPACE_OPERATOR}" -l app=hyper2kvm-operator -o jsonpath='{.items[0].status.phase}' 2>/dev/null || echo 'Not Found')"
-    echo "  • Workers:  $(kubectl get pods -n "${NAMESPACE_WORKERS}" -l app=hyper2kvm-worker --no-headers 2>/dev/null | wc -l) pod(s)"
-    echo "  • CRDs:     $(kubectl get crd | grep hyper2kvm.io | wc -l) installed"
+    echo "  • Operator: $(kubectl get pods -n "${NAMESPACE_OPERATOR}" -l app=h2kvm-operator -o jsonpath='{.items[0].status.phase}' 2>/dev/null || echo 'Not Found')"
+    echo "  • Workers:  $(kubectl get pods -n "${NAMESPACE_WORKERS}" -l app=h2kvm-worker --no-headers 2>/dev/null | wc -l) pod(s)"
+    echo "  • CRDs:     $(kubectl get crd | grep h2kvm.io | wc -l) installed"
 
     echo ""
     echo "🔄 MigrationJob Status:"
@@ -156,7 +156,7 @@ generate_report() {
         echo "     3. Monitor: kubectl get migrationjobs -n ${NAMESPACE_TEST} -w"
     elif [ "${JOB_STATE}" = "Running" ]; then
         echo "  🔄 Migration in progress..."
-        echo "  📌 Monitor logs: kubectl logs -n ${NAMESPACE_WORKERS} -l app=hyper2kvm-worker -f"
+        echo "  📌 Monitor logs: kubectl logs -n ${NAMESPACE_WORKERS} -l app=h2kvm-worker -f"
     elif [ "${JOB_STATE}" = "Completed" ]; then
         echo "  🎉 Migration completed successfully!"
     else

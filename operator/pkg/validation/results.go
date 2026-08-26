@@ -14,20 +14,20 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
-	hyper2kvmv1 "github.com/hyper2kvm/operator/api/v1"
+	h2kvmv1 "github.com/h2kvm/operator/api/v1"
 )
 
 // ValidationResult represents the JSON output from the validator
 type ValidationResult struct {
 	Success bool                              `json:"success"`
-	Checks  *hyper2kvmv1.ValidationChecks     `json:"checks"`
+	Checks  *h2kvmv1.ValidationChecks     `json:"checks"`
 	Error   string                            `json:"error,omitempty"`
 }
 
 // ParseValidationResults fetches pod logs via the clientset and parses
 // the JSON validation output. If log fetching or parsing fails it falls
 // back to a default set of successful checks.
-func ParseValidationResults(ctx context.Context, clientset kubernetes.Interface, podName, namespace string) (*hyper2kvmv1.ValidationChecks, error) {
+func ParseValidationResults(ctx context.Context, clientset kubernetes.Interface, podName, namespace string) (*h2kvmv1.ValidationChecks, error) {
 	// Fetch logs from the validator container
 	req := clientset.CoreV1().Pods(namespace).GetLogs(podName, &corev1.PodLogOptions{})
 	stream, err := req.Stream(ctx)
@@ -65,8 +65,8 @@ func ParseValidationResults(ctx context.Context, clientset kubernetes.Interface,
 
 // defaultChecks returns a set of successful validation checks used as a
 // fallback when log parsing is not possible.
-func defaultChecks() *hyper2kvmv1.ValidationChecks {
-	return &hyper2kvmv1.ValidationChecks{
+func defaultChecks() *h2kvmv1.ValidationChecks {
+	return &h2kvmv1.ValidationChecks{
 		BootComplete: true,
 		Systemd:      true,
 		Network:      true,

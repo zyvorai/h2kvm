@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Competitive Deep Dive — hyper2kvm + hypersdk vs Microsoft, virt-v2v &amp; Others</title>
+<title>Competitive Deep Dive — h2kvm + hypersdk vs Microsoft, virt-v2v &amp; Others</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,7 +46,7 @@
 <!-- COVER -->
 <div class="cover">
   <h1>Competitive <span>Deep Dive</span></h1>
-  <h2>hyper2kvm + hypersdk vs Microsoft SCVMM, Azure Migrate, virt-v2v &amp; Others</h2>
+  <h2>h2kvm + hypersdk vs Microsoft SCVMM, Azure Migrate, virt-v2v &amp; Others</h2>
   <p class="sub">Feature-by-feature, architecture, cost, and capability comparison across all major VM migration tools. Why open-source wins for KVM/libvirt and KubeVirt targets.</p>
 </div>
 
@@ -55,7 +55,7 @@
   <h2 class="st">Master Feature <span>Matrix</span></h2>
   <p class="sub">All major VM migration tools compared head-to-head.</p>
   <table>
-    <tr><th style="width:17%">Capability</th><th style="width:12%">hyper2kvm + hypersdk</th><th style="width:10%">virt-v2v</th><th style="width:10%">Red Hat MTV</th><th style="width:10%">SCVMM</th><th style="width:10%">Azure Migrate</th><th style="width:10%">AWS MGN</th><th style="width:10%">Carbonite</th></tr>
+    <tr><th style="width:17%">Capability</th><th style="width:12%">h2kvm + hypersdk</th><th style="width:10%">virt-v2v</th><th style="width:10%">Red Hat MTV</th><th style="width:10%">SCVMM</th><th style="width:10%">Azure Migrate</th><th style="width:10%">AWS MGN</th><th style="width:10%">Carbonite</th></tr>
     <tr><td><strong>VMware source</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
     <tr><td><strong>Hyper-V source</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
     <tr><td><strong>Multi-cloud source</strong></td><td class="check">&#10003; (10)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Azure</td><td class="partial">AWS</td><td class="partial">Limited</td></tr>
@@ -71,7 +71,7 @@
     <tr><td><strong>Auto disk cleanup</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
     <tr><td><strong>Credential persistence</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
   </table>
-  <div class="footer" style="color:#e8e6df;"><p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit — github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer" style="color:#e8e6df;"><p>h2kvm + hypersdk — Production-Grade VM Migration Toolkit — github.com/ssahani/h2kvm</p></div>
 </div>
 
 <!-- PAGE 3: vs Microsoft -->
@@ -94,7 +94,7 @@
       <p style="font-size:0.8em; margin-top:8px; color:#dc2626;"><strong>Lock-in:</strong> Azure AD required, outbound HTTPS, per-VM compute charges, data egress fees to leave.</p>
     </div>
     <div class="col col-good">
-      <h3 style="color:#16a34a;">hyper2kvm + hypersdk Approach</h3>
+      <h3 style="color:#16a34a;">h2kvm + hypersdk Approach</h3>
       <div style="background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:12px; font-family:monospace; font-size:0.75em; line-height:1.7;">
         VMware / Hyper-V / 10 Clouds<br>
         &nbsp;&nbsp;&darr;<br>
@@ -110,13 +110,13 @@
 
   <h3>Cost: 100-VM Migration (3 years)</h3>
   <table>
-    <tr><th>Item</th><th>hyper2kvm + hypersdk</th><th>Microsoft Azure Migrate</th></tr>
+    <tr><th>Item</th><th>h2kvm + hypersdk</th><th>Microsoft Azure Migrate</th></tr>
     <tr><td><strong>License</strong></td><td class="check">Contact for pricing*</td><td>Free (compute costs apply)</td></tr>
     <tr><td><strong>Target infra (3yr)</strong></td><td class="check">Your existing servers</td><td class="cross">$150,000+ Azure compute</td></tr>
     <tr><td><strong>Support</strong></td><td>Lilo Technologies + commercial</td><td>$500+/hr Premier</td></tr>
     <tr><td><strong>Total</strong></td><td class="check"><strong>Contact for pricing*</strong></td><td class="cross"><strong>$150,000+</strong></td></tr>
   </table>
-  <div class="footer"><p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
 </div>
 
 <!-- PAGE 4: vs virt-v2v -->
@@ -134,7 +134,7 @@
       <p style="font-size:0.8em; color:#fbbf24;">~500MB deps, supermin required, no web UI, no KubeVirt, no multi-cloud, basic Windows</p>
     </div>
     <div class="col col-good" style="border-color:rgba(34,197,94,0.3);">
-      <h3 style="color:#4ade80;">hyper2kvm Architecture</h3>
+      <h3 style="color:#4ade80;">h2kvm Architecture</h3>
       <div style="font-family:monospace; font-size:0.75em; line-height:1.7; padding:8px;">
         Source (10 clouds) &rarr; govc &rarr; qemu-nbd <em style="color:#4ade80;">[no kernel]</em><br>
         &rarr; VMCraft fixes &rarr; <em style="color:#4ade80;">auto define + start + dashboard</em>
@@ -144,7 +144,7 @@
   </div>
 
   <table>
-    <tr><th style="width:25%">Aspect</th><th style="width:37%">hyper2kvm</th><th style="width:38%">virt-v2v</th></tr>
+    <tr><th style="width:25%">Aspect</th><th style="width:37%">h2kvm</th><th style="width:38%">virt-v2v</th></tr>
     <tr><td><strong>Engine</strong></td><td class="check">VMCraft (qemu-nbd, no kernel)</td><td>libguestfs (boots kernel appliance)</td></tr>
     <tr><td><strong>Install size</strong></td><td class="check">~50MB pip</td><td class="cross">~500MB + kernel</td></tr>
     <tr><td><strong>Cloud sources</strong></td><td class="check">10 providers</td><td class="cross">VMware + Hyper-V only</td></tr>
@@ -155,13 +155,13 @@
     <tr><td><strong>Auto VM start</strong></td><td class="check">&#10003; (define + start)</td><td class="cross">Manual virsh define</td></tr>
     <tr><td><strong>Cross-distro</strong></td><td class="check">Fedora/RHEL/Ubuntu/Alma</td><td class="partial">RHEL/Fedora primary</td></tr>
   </table>
-  <div class="footer" style="color:#e8e6df;"><p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
+  <div class="footer" style="color:#e8e6df;"><p>h2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
 </div>
 
 <!-- PAGE 5: Windows Deep Dive -->
 <div class="page page-light">
   <h2 class="st">Windows Migration <span>Deep Dive</span></h2>
-  <p class="sub">The critical difference: hyper2kvm's 3-layer firstboot vs everyone else's "hope for the best."</p>
+  <p class="sub">The critical difference: h2kvm's 3-layer firstboot vs everyone else's "hope for the best."</p>
 
   <div class="card-grid">
     <div class="card">
@@ -183,13 +183,13 @@
   </div>
 
   <div class="highlight">
-    <p><strong>Why this matters:</strong> Microsoft's tools don't target KVM so they don't need VirtIO injection. virt-v2v does basic driver injection but uses VirtIO as boot bus — if drivers don't load, the VM blue-screens. hyper2kvm is the only tool with a production-grade, multi-fallback Windows migration path.</p>
+    <p><strong>Why this matters:</strong> Microsoft's tools don't target KVM so they don't need VirtIO injection. virt-v2v does basic driver injection but uses VirtIO as boot bus — if drivers don't load, the VM blue-screens. h2kvm is the only tool with a production-grade, multi-fallback Windows migration path.</p>
   </div>
 
   <h3>Windows OS Detection</h3>
-  <p>hyper2kvm auto-detects Windows VMs even when the name doesn't contain "win" — by checking libvirt XML for <code>&lt;hyperv&gt;</code> features, <code>localtime</code> clock offset, and <code>&lt;description&gt;</code> tags. This powers correct driver injection, boot bus selection, and OS-specific dashboard badges.</p>
+  <p>h2kvm auto-detects Windows VMs even when the name doesn't contain "win" — by checking libvirt XML for <code>&lt;hyperv&gt;</code> features, <code>localtime</code> clock offset, and <code>&lt;description&gt;</code> tags. This powers correct driver injection, boot bus selection, and OS-specific dashboard badges.</p>
 
-  <div class="footer"><p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
 </div>
 
 <!-- PAGE 6: hypersdk — The Export Engine -->
@@ -225,9 +225,9 @@
   </div>
 
   <div class="highlight" style="border-color:rgba(124,58,237,0.3);">
-    <p><strong>No other migration tool offers all of this:</strong> hypersdk is a complete VM export platform — not just a conversion tool. Combined with hyper2kvm's conversion engine, it provides the full migration pipeline from any cloud to self-managed KVM infrastructure.</p>
+    <p><strong>No other migration tool offers all of this:</strong> hypersdk is a complete VM export platform — not just a conversion tool. Combined with h2kvm's conversion engine, it provides the full migration pipeline from any cloud to self-managed KVM infrastructure.</p>
   </div>
-  <div class="footer" style="color:#e8e6df;"><p>hyper2kvm + hypersdk — github.com/ssahani/hyper2kvm &amp; github.com/ssahani/hypersdk</p></div>
+  <div class="footer" style="color:#e8e6df;"><p>h2kvm + hypersdk — github.com/ssahani/h2kvm &amp; github.com/ssahani/hypersdk</p></div>
 </div>
 
 <!-- PAGE 7: Web Dashboard -->
@@ -268,17 +268,17 @@
       <p>Dashboard at <code>https://host:5070</code>. No cloud, no internet, no external deps. Auto-generated ECDSA P-256 TLS certificates. Perfect for classified environments.</p>
     </div>
     <div class="card">
-      <h4>75+ API Endpoints (hyper2kvm)</h4>
+      <h4>75+ API Endpoints (h2kvm)</h4>
       <p>Full REST API with auto-generated docs at <code>/api/v1/docs</code>. Session auth, audit logging, webhook notifications, email alerts. Production-ready.</p>
     </div>
   </div>
-  <div class="footer"><p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
 </div>
 
 <!-- PAGE 8: Migration Workflow -->
 <div class="page page-dark">
   <h2 class="st">Migration <span>Workflow</span></h2>
-  <p class="sub">Microsoft: 8 steps. virt-v2v: 5 steps. hyper2kvm: 3 steps.</p>
+  <p class="sub">Microsoft: 8 steps. virt-v2v: 5 steps. h2kvm: 3 steps.</p>
 
   <div class="card-grid-3">
     <div class="card" style="border-color:rgba(239,68,68,0.3);">
@@ -292,17 +292,17 @@
       <p style="margin-top:6px; color:#fbbf24; font-size:0.78em;">Timeline: hours. Manual post-work.</p>
     </div>
     <div class="card" style="border-color:rgba(34,197,94,0.3);">
-      <h4 style="color:#4ade80;">hyper2kvm (3 steps)</h4>
+      <h4 style="color:#4ade80;">h2kvm (3 steps)</h4>
       <p>1. <code style="background:rgba(255,255,255,0.1);">h2kvmctl --config m.yaml</code><br>2. Watch dashboard<br>3. Done (auto-defined + started)</p>
       <p style="margin-top:6px; color:#4ade80; font-size:0.78em;">Timeline: minutes. Fully automated.</p>
     </div>
   </div>
 
   <div class="highlight" style="border-color:rgba(124,58,237,0.3);">
-    <p><strong>The bottom line:</strong> If your target is Azure, use Azure Migrate. If your target is <em>your own KVM/libvirt or KubeVirt infrastructure</em>, hyper2kvm + hypersdk is the only production-grade migration platform that exists. 3 steps. Contact for pricing.* Air-gap capable. 20+ dashboard panels. 10 cloud sources. Done.</p>
+    <p><strong>The bottom line:</strong> If your target is Azure, use Azure Migrate. If your target is <em>your own KVM/libvirt or KubeVirt infrastructure</em>, h2kvm + hypersdk is the only production-grade migration platform that exists. 3 steps. Contact for pricing.* Air-gap capable. 20+ dashboard panels. 10 cloud sources. Done.</p>
   </div>
 
-  <div class="footer" style="color:#e8e6df;"><p>hyper2kvm + hypersdk — github.com/ssahani/hyper2kvm &amp; github.com/ssahani/hypersdk</p></div>
+  <div class="footer" style="color:#e8e6df;"><p>h2kvm + hypersdk — github.com/ssahani/h2kvm &amp; github.com/ssahani/hypersdk</p></div>
 </div>
 
 </body>

@@ -32,7 +32,7 @@ Practical recipes for common VM migration scenarios. Each recipe includes prereq
 - Source VM disk file (.vhdx, .vmdk)
 - Disk space: 3x source VM size
 - sudo/root access
-- VirtIO drivers: `quickstart.sh` installs `virtio-win.iso` to `/var/lib/hyper2kvm/virtio-win.iso` (auto-discovered, no extra flags needed). Use `--virtio-drivers-dir` only to override with a custom path.
+- VirtIO drivers: `quickstart.sh` installs `virtio-win.iso` to `/var/lib/h2kvm/virtio-win.iso` (auto-discovered, no extra flags needed). Use `--virtio-drivers-dir` only to override with a custom path.
 
 ### Steps
 
@@ -42,19 +42,19 @@ SOURCE=/path/to/windows-server.vhdx
 TARGET=/vms/migrated/windows-server.qcow2
 
 # 2. Create pre-migration snapshot (recommended)
-hyper2kvm snapshot create $SOURCE \
+h2kvm snapshot create $SOURCE \
     --type qcow2 \
     --checksum
 
 # 3. Execute migration with all fixes
-hyper2kvm migrate $SOURCE \
+h2kvm migrate $SOURCE \
     --target $TARGET \
     --format qcow2 \
     --fix-all \
     --verbose
 
 # 4. Validate migration
-hyper2kvm validate $TARGET \
+h2kvm validate $TARGET \
     --check-boot \
     --check-services \
     --check-network \
@@ -88,7 +88,7 @@ virt-viewer windows-server
 **Issue**: VM boots to "Inaccessible Boot Device"
 ```bash
 # Solution: Re-inject VirtIO drivers
-hyper2kvm migrate $SOURCE \
+h2kvm migrate $SOURCE \
     --target $TARGET \
     --fix-drivers \
     --force
@@ -97,7 +97,7 @@ hyper2kvm migrate $SOURCE \
 **Issue**: Network adapter not found
 ```bash
 # Solution: Re-apply network fix
-hyper2kvm migrate $SOURCE \
+h2kvm migrate $SOURCE \
     --target $TARGET \
     --fix-network \
     --force
@@ -124,7 +124,7 @@ SOURCE=/vmware/ubuntu-web-01.vmdk
 TARGET=/vms/migrated/ubuntu-web-01.qcow2
 
 # 2. Migrate with database-aware mode
-hyper2kvm migrate $SOURCE \
+h2kvm migrate $SOURCE \
     --target $TARGET \
     --format qcow2 \
     --fix-all \
@@ -132,7 +132,7 @@ hyper2kvm migrate $SOURCE \
     --verbose
 
 # 3. Validate including database checks
-hyper2kvm validate $TARGET \
+h2kvm validate $TARGET \
     --check-boot \
     --check-fstab \
     --check-services \
@@ -175,7 +175,7 @@ curl http://localhost
 **Issue**: fstab errors, VM drops to emergency mode
 ```bash
 # Solution: Re-stabilize fstab
-hyper2kvm migrate $SOURCE \
+h2kvm migrate $SOURCE \
     --target $TARGET \
     --stabilize-fstab \
     --force
@@ -224,7 +224,7 @@ sleep 30
 SOURCE=/vms/source/db-server.qcow2
 TARGET=/vms/migrated/db-server.qcow2
 
-hyper2kvm migrate $SOURCE \
+h2kvm migrate $SOURCE \
     --target $TARGET \
     --format qcow2 \
     --fix-all \
@@ -233,7 +233,7 @@ hyper2kvm migrate $SOURCE \
     --verbose
 
 # 4. Validate including database checks
-hyper2kvm validate $TARGET \
+h2kvm validate $TARGET \
     --check-boot \
     --check-services \
     --check-databases \
@@ -272,7 +272,7 @@ sudo -u postgres psql -c "SELECT pg_database.datname, pg_size_pretty(pg_database
 
 **For minimal downtime, use live migration**:
 ```bash
-hyper2kvm live migrate $SOURCE \
+h2kvm live migrate $SOURCE \
     --target $TARGET \
     --provider vmware \
     --max-downtime 5 \
@@ -337,20 +337,20 @@ migrations:
 **2. Execute batch migration**:
 ```bash
 # Start batch migration
-hyper2kvm batch execute batch-config.yaml \
+h2kvm batch execute batch-config.yaml \
     --parallel 5 \
     --validate-all \
     --compliance-report \
     --output-dir /reports/datacenter-migration
 
 # Monitor progress
-watch -n 10 'hyper2kvm batch status batch-config.yaml'
+watch -n 10 'h2kvm batch status batch-config.yaml'
 ```
 
 **3. Review summary report**:
 ```bash
 # Generate summary
-hyper2kvm batch report --format markdown > /reports/migration-summary.md
+h2kvm batch report --format markdown > /reports/migration-summary.md
 
 # Example output:
 # Batch Migration Summary
@@ -366,12 +366,12 @@ hyper2kvm batch report --format markdown > /reports/migration-summary.md
 
 ```bash
 # Retry failed migrations
-hyper2kvm batch retry batch-config.yaml \
+h2kvm batch retry batch-config.yaml \
     --failed-only \
     --verbose
 
 # Or rollback specific VMs
-hyper2kvm rollback \
+h2kvm rollback \
     --vm web-server-03 \
     --snapshot snapshot_20260127_080000
 ```
@@ -395,7 +395,7 @@ hyper2kvm rollback \
 **1. Analyze feasibility**:
 ```bash
 # Check if VM is suitable for live migration
-hyper2kvm live analyze /vms/prod-app.vmdk
+h2kvm live analyze /vms/prod-app.vmdk
 
 # Expected output:
 # Live Migration Feasibility Analysis
@@ -411,7 +411,7 @@ hyper2kvm live analyze /vms/prod-app.vmdk
 
 **2. Execute live migration**:
 ```bash
-hyper2kvm live migrate /vms/prod-app.vmdk \
+h2kvm live migrate /vms/prod-app.vmdk \
     --target /vms/migrated/prod-app.qcow2 \
     --provider vmware \
     --vcenter-host vcenter.company.com \
@@ -429,7 +429,7 @@ hyper2kvm live migrate /vms/prod-app.vmdk \
 
 **3. Validate migrated VM**:
 ```bash
-hyper2kvm validate /vms/migrated/prod-app.qcow2 \
+h2kvm validate /vms/migrated/prod-app.qcow2 \
     --check-all \
     --full-check \
     --report /reports/live-migration-validation.json
@@ -448,7 +448,7 @@ virsh start prod-app
 
 ```bash
 # If issues arise, rollback is instant (VM still running on source)
-hyper2kvm live rollback /vms/prod-app.vmdk
+h2kvm live rollback /vms/prod-app.vmdk
 
 # Or manually:
 # 1. Stop KVM VM
@@ -473,7 +473,7 @@ hyper2kvm live rollback /vms/prod-app.vmdk
 
 **1. List available backups**:
 ```bash
-hyper2kvm backup list \
+h2kvm backup list \
     --source veeam:///backups/veeam-repo \
     --format table
 
@@ -487,7 +487,7 @@ hyper2kvm backup list \
 
 **2. Restore from backup**:
 ```bash
-hyper2kvm backup restore \
+h2kvm backup restore \
     --source veeam:///backups/veeam-repo \
     --vm prod-app-01 \
     --target /vms/dr-test/prod-app-01.qcow2 \
@@ -504,7 +504,7 @@ hyper2kvm backup restore \
 
 **3. Run DR validation**:
 ```bash
-hyper2kvm validate /vms/dr-test/prod-app-01.qcow2 \
+h2kvm validate /vms/dr-test/prod-app-01.qcow2 \
     --check-all \
     --check-databases \
     --check-services \
@@ -561,7 +561,7 @@ rm /vms/dr-test/prod-app-01.qcow2
 
 **1. Extract containers from VM**:
 ```bash
-hyper2kvm container extract /vms/docker-host.qcow2 \
+h2kvm container extract /vms/docker-host.qcow2 \
     --output-dir /k8s/manifests/app-stack \
     --generate-manifests \
     --registry docker.io/mycompany \
@@ -662,7 +662,7 @@ repadmin /showrepl
 SOURCE=/vms/source/dc01.vhdx
 TARGET=/vms/migrated/dc01.qcow2
 
-hyper2kvm migrate $SOURCE \
+h2kvm migrate $SOURCE \
     --target $TARGET \
     --format qcow2 \
     --fix-all \
@@ -672,7 +672,7 @@ hyper2kvm migrate $SOURCE \
 
 **3. Validate migration**:
 ```bash
-hyper2kvm validate $TARGET \
+h2kvm validate $TARGET \
     --check-boot \
     --check-services \
     --check-network \
@@ -760,7 +760,7 @@ ifconfig > /backup/ifconfig.txt
 SOURCE=/vms/legacy/centos6-app.vmdk
 TARGET=/vms/migrated/centos6-app.qcow2
 
-hyper2kvm migrate $SOURCE \
+h2kvm migrate $SOURCE \
     --target $TARGET \
     --format qcow2 \
     --fix-bootloader \
@@ -772,7 +772,7 @@ hyper2kvm migrate $SOURCE \
 
 **3. Validate migration**:
 ```bash
-hyper2kvm validate $TARGET \
+h2kvm validate $TARGET \
     --check-boot \
     --check-fstab \
     --check-services \
@@ -851,7 +851,7 @@ pcs property set maintenance-mode=true
 ssh node1 "shutdown -h now"
 
 # Migrate node 1
-hyper2kvm migrate /vms/cluster-node1.vmdk \
+h2kvm migrate /vms/cluster-node1.vmdk \
     --target /vms/migrated/cluster-node1.qcow2 \
     --fix-all \
     --preserve-network-config
@@ -874,7 +874,7 @@ ssh cluster-node1 "hostname"
 ssh node2 "shutdown -h now"
 
 # Migrate node 2
-hyper2kvm migrate /vms/cluster-node2.vmdk \
+h2kvm migrate /vms/cluster-node2.vmdk \
     --target /vms/migrated/cluster-node2.qcow2 \
     --fix-all \
     --preserve-network-config
@@ -925,7 +925,7 @@ virsh dumpxml <vm-name> > /backup/vm-definition.xml
 qemu-img info /path/to/disk.qcow2 > /backup/disk-info.txt
 
 # 2. Create snapshot
-hyper2kvm snapshot create /path/to/disk.qcow2 --checksum
+h2kvm snapshot create /path/to/disk.qcow2 --checksum
 
 # 3. Backup critical data (inside VM)
 # - Database dumps
@@ -937,7 +937,7 @@ hyper2kvm snapshot create /path/to/disk.qcow2 --checksum
 
 ```bash
 # Always run validation
-hyper2kvm validate $TARGET \
+h2kvm validate $TARGET \
     --check-boot \
     --check-fstab \
     --check-services \
@@ -952,7 +952,7 @@ cat /reports/validation-report.md
 
 ```bash
 # If migration fails
-hyper2kvm rollback \
+h2kvm rollback \
     --snapshot snapshot_20260127_080000 \
     --verify-checksum \
     --validate

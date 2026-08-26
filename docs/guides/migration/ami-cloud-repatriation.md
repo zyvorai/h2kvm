@@ -4,7 +4,7 @@ Migrate Amazon Machine Images (AMI), Azure VHDs, and cloud VM disk images to on-
 
 ## Supported Cloud Formats
 
-| Cloud | Export Format | hyper2kvm Input | How to Get |
+| Cloud | Export Format | h2kvm Input | How to Get |
 |-------|-------------|----------------|-----------|
 | AWS EC2 | RAW, VMDK, VHD | All formats | `aws ec2 export-image` or AMI tar.gz |
 | Azure | VHD (fixed) | Native VHD | `az disk download` or managed disk export |
@@ -140,7 +140,7 @@ sudo h2kvmctl --cmd local --vmdk ./disk.raw \
 
 ## What Gets Fixed Automatically
 
-When migrating cloud images to KVM, hyper2kvm performs these offline fixes:
+When migrating cloud images to KVM, h2kvm performs these offline fixes:
 
 ### Linux
 
@@ -172,7 +172,7 @@ Cloud images expect a metadata service at 169.254.169.254. On KVM without cloud-
 # Disable cloud-init before migration (in the guest)
 sudo touch /etc/cloud/cloud-init.disabled
 
-# Or set a root password via hyper2kvm
+# Or set a root password via h2kvm
 sudo h2kvmctl --cmd local --vmdk cloud-image.raw \
   --root-password "changeme" \
   --fstab-mode stabilize-all --regen-initramfs

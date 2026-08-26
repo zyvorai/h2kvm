@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>hyper2kvm — Enterprise Storage: LVM + LUKS Auto-Detection</title>
+<title>h2kvm — Enterprise Storage: LVM + LUKS Auto-Detection</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,7 +46,7 @@
 
 <!-- SLIDE 1: Cover -->
 <div class="cover">
-  <h1><span>hyper2kvm</span></h1>
+  <h1><span>h2kvm</span></h1>
   <h2>Enterprise Storage: LVM &amp; LUKS Auto-Detection</h2>
   <p class="sub">Automatic detection and handling of LVM, LUKS encryption, and complex storage stacks. Supermin appliance boots for full device visibility. Zero configuration needed.</p>
   <div class="badge">Verified: RHEL 8.8 + CentOS 9 + Ubuntu 22.04 LUKS</div>
@@ -86,7 +86,7 @@
       </ul>
     </div>
     <div class="card">
-      <h4>hyper2kvm Solution</h4>
+      <h4>h2kvm Solution</h4>
       <ul>
         <li>Auto-detect LVM/LUKS before opening disk</li>
         <li>Boot supermin appliance for full isolation</li>
@@ -134,7 +134,7 @@ $ sudo h2kvmctl --cmd local \
 
 Quick probe: detected LUKS on disk
 Auto-switched to supermin appliance backend
-LUKS: opened /dev/sda3 -> /dev/mapper/hyper2kvm-crypt1
+LUKS: opened /dev/sda3 -> /dev/mapper/h2kvm-crypt1
 LVM after LUKS open: ['/dev/ubuntu-vg/ubuntu-lv']
 Detected guest: Ubuntu 22.04.5 LTS
 LUKS detected (crypttab exists) -- preserving existing boot config
@@ -271,7 +271,7 @@ sudo h2kvmctl --cmd local --vmdk disk.vmdk \
   --emit-domain-xml --virsh-define -o /output
 
 # Passphrase from environment
-export HYPER2KVM_LUKS_PASSPHRASE="password"
+export H2KVM_LUKS_PASSPHRASE="password"
 sudo h2kvmctl --cmd local --vmdk disk.vmdk --luks-enable ...
 
 # Keyfile
@@ -333,7 +333,7 @@ sudo h2kvmctl --config migration.yaml
       </ul>
     </div>
   </div>
-  <div class="footer">hyper2kvm &bull; Proprietary (Zyvor AI Labs) &bull; github.com/ssahani/hyper2kvm &bull; March 2026</div>
+  <div class="footer">h2kvm &bull; Proprietary (Zyvor AI Labs) &bull; github.com/ssahani/h2kvm &bull; March 2026</div>
 </div>
 
 </body>

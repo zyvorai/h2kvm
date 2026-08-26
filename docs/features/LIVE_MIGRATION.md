@@ -2,7 +2,7 @@
 
 ## Overview
 
-hyper2kvm now supports comprehensive VM migration capabilities:
+h2kvm now supports comprehensive VM migration capabilities:
 
 1. **Cold Migration** (Hypervisor → KubeVirt): Convert VMware/Hyper-V VMs to KubeVirt
 2. **Live Migration** (KubeVirt → KubeVirt): Zero-downtime VM migration between nodes
@@ -33,7 +33,7 @@ Eviction strategies control what happens when a node needs to be drained or goes
 ### Example: VM with LiveMigrate
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: production-vm
@@ -63,7 +63,7 @@ MigrationPolicy CRDs define cluster-wide or VM-specific migration behavior.
 ### Creating a Migration Policy
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationPolicy
 metadata:
   name: production-policy
@@ -97,7 +97,7 @@ spec:
 
 Policies are applied in order:
 1. MigrationJob specifies `migrationPolicyRef`
-2. VM has annotation `hyper2kvm.io/migration-policy`
+2. VM has annotation `h2kvm.io/migration-policy`
 3. VM labels match policy `vmSelector`
 4. Default policy (no selector)
 
@@ -289,40 +289,40 @@ The VM remains on the source node.
 ### Prometheus Metrics
 
 **Migration Counts:**
-- `hyper2kvm_live_migrations_total` - Total migrations (by namespace, nodes)
-- `hyper2kvm_live_migrations_succeeded_total` - Successful migrations
-- `hyper2kvm_live_migrations_failed_total` - Failed migrations (by reason)
+- `h2kvm_live_migrations_total` - Total migrations (by namespace, nodes)
+- `h2kvm_live_migrations_succeeded_total` - Successful migrations
+- `h2kvm_live_migrations_failed_total` - Failed migrations (by reason)
 
 **Migration Performance:**
-- `hyper2kvm_live_migration_duration_seconds` - Migration duration histogram
-- `hyper2kvm_live_migration_data_transferred_bytes` - Data transferred histogram
-- `hyper2kvm_live_migration_downtime_ms` - VM downtime histogram
+- `h2kvm_live_migration_duration_seconds` - Migration duration histogram
+- `h2kvm_live_migration_data_transferred_bytes` - Data transferred histogram
+- `h2kvm_live_migration_downtime_ms` - VM downtime histogram
 
 **Active Migrations:**
-- `hyper2kvm_live_migrations_active` - Currently active migrations (by phase)
-- `hyper2kvm_migration_bandwidth_bytes_per_second` - Current bandwidth
-- `hyper2kvm_migration_dirty_rate_bytes_per_second` - Memory dirty rate
+- `h2kvm_live_migrations_active` - Currently active migrations (by phase)
+- `h2kvm_migration_bandwidth_bytes_per_second` - Current bandwidth
+- `h2kvm_migration_dirty_rate_bytes_per_second` - Memory dirty rate
 
 **Policy Enforcement:**
-- `hyper2kvm_migration_policy_violations_total` - Policy violations
-- `hyper2kvm_post_copy_activations_total` - Post-copy activations
-- `hyper2kvm_auto_converge_activations_total` - Auto-converge activations
+- `h2kvm_migration_policy_violations_total` - Policy violations
+- `h2kvm_post_copy_activations_total` - Post-copy activations
+- `h2kvm_auto_converge_activations_total` - Auto-converge activations
 
 ### Example Queries
 
 ```promql
 # Average migration duration
-avg(hyper2kvm_live_migration_duration_seconds)
+avg(h2kvm_live_migration_duration_seconds)
 
 # Migration success rate
-sum(rate(hyper2kvm_live_migrations_succeeded_total[5m])) /
-sum(rate(hyper2kvm_live_migrations_total[5m]))
+sum(rate(h2kvm_live_migrations_succeeded_total[5m])) /
+sum(rate(h2kvm_live_migrations_total[5m]))
 
 # Active migrations by phase
-sum by (phase) (hyper2kvm_live_migrations_active)
+sum by (phase) (h2kvm_live_migrations_active)
 
 # Policy violations
-rate(hyper2kvm_migration_policy_violations_total[5m])
+rate(h2kvm_migration_policy_violations_total[5m])
 ```
 
 ### Kubernetes Events
@@ -457,7 +457,7 @@ createVM:
 Create dedicated policy:
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationPolicy
 metadata:
   name: critical-workload-policy

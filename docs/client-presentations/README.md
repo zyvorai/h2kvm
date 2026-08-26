@@ -1,4 +1,4 @@
-# hyper2kvm Client Presentations
+# h2kvm Client Presentations
 
 57 slide decks + 4 templates covering business value, architecture, migration guides, competitive analysis, and live demos.
 
@@ -81,8 +81,8 @@ All presentations available as HTML (viewable in browser) and PDF (printable).
 | # | Title | Pages | Compared To |
 |---|-------|-------|-------------|
 | 07 | Competitive Analysis | 8 | Overview |
-| 13 | hyper2kvm vs virt-v2v | 6 | Red Hat virt-v2v |
-| 14 | hyper2kvm vs MTV | 6 | Red Hat Migration Toolkit |
+| 13 | h2kvm vs virt-v2v | 6 | Red Hat virt-v2v |
+| 14 | h2kvm vs MTV | 6 | Red Hat Migration Toolkit |
 
 ### Operations & Day 2
 

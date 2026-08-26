@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-export PYBUILD_NAME=hyper2kvm
+export PYBUILD_NAME=h2kvm
 
 %:
 	dh $@ --with python3 --buildsystem=pybuild
@@ -18,38 +18,38 @@ override_dh_auto_clean:
 override_dh_auto_install:
 	dh_auto_install
 	# Install man pages
-	install -d debian/hyper2kvm/usr/share/man/man1
-	install -d debian/hyper2kvm/usr/share/man/man5
-	install -m 644 man/build/man/hyper2kvm.1 debian/hyper2kvm/usr/share/man/man1/
-	install -m 644 man/build/man/hyper2kvm-local.1 debian/hyper2kvm/usr/share/man/man1/
-	install -m 644 man/build/man/hyper2kvm-vsphere.1 debian/hyper2kvm/usr/share/man/man1/
-	install -m 644 man/build/man/hyper2kvm-hyperv.1 debian/hyper2kvm/usr/share/man/man1/
-	install -m 644 man/build/man/hyper2kvm-azure.1 debian/hyper2kvm/usr/share/man/man1/
-	install -m 644 man/build/man/hyper2kvm.conf.5 debian/hyper2kvm/usr/share/man/man5/
+	install -d debian/h2kvm/usr/share/man/man1
+	install -d debian/h2kvm/usr/share/man/man5
+	install -m 644 man/build/man/h2kvm.1 debian/h2kvm/usr/share/man/man1/
+	install -m 644 man/build/man/h2kvm-local.1 debian/h2kvm/usr/share/man/man1/
+	install -m 644 man/build/man/h2kvm-vsphere.1 debian/h2kvm/usr/share/man/man1/
+	install -m 644 man/build/man/h2kvm-hyperv.1 debian/h2kvm/usr/share/man/man1/
+	install -m 644 man/build/man/h2kvm-azure.1 debian/h2kvm/usr/share/man/man1/
+	install -m 644 man/build/man/h2kvm.conf.5 debian/h2kvm/usr/share/man/man5/
 	# Install example configurations
-	install -d debian/hyper2kvm/usr/share/doc/hyper2kvm/examples
-	install -m 644 test-confs/*.yaml debian/hyper2kvm/usr/share/doc/hyper2kvm/examples/
-	install -m 644 test-confs/*.json debian/hyper2kvm/usr/share/doc/hyper2kvm/examples/
+	install -d debian/h2kvm/usr/share/doc/h2kvm/examples
+	install -m 644 test-confs/*.yaml debian/h2kvm/usr/share/doc/h2kvm/examples/
+	install -m 644 test-confs/*.json debian/h2kvm/usr/share/doc/h2kvm/examples/
 	# Install system configuration
-	install -d debian/hyper2kvm/etc/hyper2kvm/migrations
-	install -m 644 etc/hyper2kvm/config.yaml.sample debian/hyper2kvm/etc/hyper2kvm/config.yaml
-	install -m 644 etc/hyper2kvm/README.md debian/hyper2kvm/etc/hyper2kvm/
-	install -m 644 etc/hyper2kvm/migrations/*.yaml debian/hyper2kvm/etc/hyper2kvm/migrations/
+	install -d debian/h2kvm/etc/h2kvm/migrations
+	install -m 644 etc/h2kvm/config.yaml.sample debian/h2kvm/etc/h2kvm/config.yaml
+	install -m 644 etc/h2kvm/README.md debian/h2kvm/etc/h2kvm/
+	install -m 644 etc/h2kvm/migrations/*.yaml debian/h2kvm/etc/h2kvm/migrations/
 	# Install daemon configuration
-	install -m 644 etc/hyper2kvm/daemon.yaml.sample debian/hyper2kvm/etc/hyper2kvm/daemon.yaml
+	install -m 644 etc/h2kvm/daemon.yaml.sample debian/h2kvm/etc/h2kvm/daemon.yaml
 	# Install modprobe configuration for NBD module
-	install -d debian/hyper2kvm/etc/modprobe.d
-	install -m 644 etc/modprobe.d/nbd.conf debian/hyper2kvm/etc/modprobe.d/hyper2kvm-nbd.conf
+	install -d debian/h2kvm/etc/modprobe.d
+	install -m 644 etc/modprobe.d/nbd.conf debian/h2kvm/etc/modprobe.d/h2kvm-nbd.conf
 	# Install sysctl configuration for file descriptor and inotify limits
-	install -d debian/hyper2kvm/etc/sysctl.d
-	install -m 644 etc/sysctl.d/99-hyper2kvm-nbd.conf debian/hyper2kvm/etc/sysctl.d/99-hyper2kvm-nbd.conf
+	install -d debian/h2kvm/etc/sysctl.d
+	install -m 644 etc/sysctl.d/99-h2kvm-nbd.conf debian/h2kvm/etc/sysctl.d/99-h2kvm-nbd.conf
 	# Install systemd default limits for parallel conversions
-	install -d debian/hyper2kvm/etc/systemd/system.conf.d
-	install -m 644 etc/systemd/system.conf.d/hyper2kvm-limits.conf debian/hyper2kvm/etc/systemd/system.conf.d/hyper2kvm-limits.conf
+	install -d debian/h2kvm/etc/systemd/system.conf.d
+	install -m 644 etc/systemd/system.conf.d/h2kvm-limits.conf debian/h2kvm/etc/systemd/system.conf.d/h2kvm-limits.conf
 	# Create directories for daemon mode
-	install -d debian/hyper2kvm/var/lib/hyper2kvm/conversions
-	install -d debian/hyper2kvm/var/log/hyper2kvm
+	install -d debian/h2kvm/var/lib/h2kvm/conversions
+	install -d debian/h2kvm/var/log/h2kvm
 
 override_dh_installsystemd:
-	dh_installsystemd --name=hyper2kvm
-	dh_installsystemd --name=hyper2kvm@
+	dh_installsystemd --name=h2kvm
+	dh_installsystemd --name=h2kvm@

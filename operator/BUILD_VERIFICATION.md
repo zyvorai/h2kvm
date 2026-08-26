@@ -14,7 +14,7 @@
 - ✅ **Lint Warnings**: None
 
 ### Generated Code
-- ✅ **CRD Manifest**: `config/crd/bases/hyper2kvm.io_hyperconversions.yaml` (422 lines)
+- ✅ **CRD Manifest**: `config/crd/bases/h2kvm.io_hyperconversions.yaml` (422 lines)
 - ✅ **DeepCopy Code**: `api/v1alpha1/zz_generated.deepcopy.go` (8.9 KB)
 - ✅ **RBAC Manifest**: `config/rbac/role.yaml` (87 lines)
 - ✅ **Controller-gen**: v0.16.5
@@ -80,7 +80,7 @@ All 5 sample CRs validated:
 - ✅ `disk-only-conversion.yaml` - Disk-only workflow
 - ✅ `advanced-multi-network.yaml` - Multi-network + UEFI
 - ✅ `ubuntu-with-cloudinit.yaml` - Cloud-init example
-- ✅ `hyper2kvm_v1alpha1_hyperconversion.yaml` - Default
+- ✅ `h2kvm_v1alpha1_hyperconversion.yaml` - Default
 
 ## Documentation
 
@@ -228,13 +228,13 @@ make build
 ls -lh bin/manager
 
 # CRD verification
-kubectl apply --dry-run=client -f config/crd/bases/hyper2kvm.io_hyperconversions.yaml
+kubectl apply --dry-run=client -f config/crd/bases/h2kvm.io_hyperconversions.yaml
 
 # Sample CR verification
 kubectl apply --dry-run=client -f config/samples/simple-vmdk-to-vm.yaml
 
 # Container build (when ready)
-make docker-build IMG=hyper2kvm-operator:v1.0.0-alpha1
+make docker-build IMG=h2kvm-operator:v1.0.0-alpha1
 ```
 
 ## Conclusion

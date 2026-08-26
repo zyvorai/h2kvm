@@ -146,20 +146,20 @@ $ sudo dmsetup ls | wc -l
 
 ### Files Modified
 
-1. **`hyper2kvm/daemon/nbd_prep.py`**
+1. **`h2kvm/daemon/nbd_prep.py`**
    - Added `activate_lvm(nbd_device)` with device filtering
    - Added `deactivate_lvm()` with tracked VG cleanup
    - Added retry logic with `retry_on_failure()`
    - Added NBD locking with `acquire_nbd_lock()`
    - Enhanced mount_root_partition to prioritize LVM
 
-2. **`hyper2kvm/core/vmcraft/storage.py`**
+2. **`h2kvm/core/vmcraft/storage.py`**
    - Added NBD device filtering to `LVMActivator.activate()`
    - Added dmsetup fallback for busy LV cleanup
    - Added warning logs when falling back to unsafe activation
    - Enhanced deactivation with better error handling
 
-3. **`hyper2kvm/fixers/offline_vm/fix_initramfs.py`**
+3. **`h2kvm/fixers/offline_vm/fix_initramfs.py`**
    - Added parallel initramfs regeneration
    - Added `ThreadPoolExecutor` for multi-kernel rebuilds
    - Added `parallel_workers` parameter (default: 4)
@@ -290,9 +290,9 @@ $ sudo dmsetup ls | wc -l
 
 ### Integration Guides
 
-- LVM activation API: See `hyper2kvm/daemon/nbd_prep.py:activate_lvm()`
-- VMCraft storage: See `hyper2kvm/core/vmcraft/storage.py:LVMActivator`
-- Parallel initramfs: See `hyper2kvm/fixers/offline_vm/fix_initramfs.py`
+- LVM activation API: See `h2kvm/daemon/nbd_prep.py:activate_lvm()`
+- VMCraft storage: See `h2kvm/core/vmcraft/storage.py:LVMActivator`
+- Parallel initramfs: See `h2kvm/fixers/offline_vm/fix_initramfs.py`
 
 ---
 
@@ -337,5 +337,5 @@ Separate bug preventing full conversion:
 
 ---
 
-*For detailed logs, see `/tmp/hyper2kvm-test.log` (133 lines)*
+*For detailed logs, see `/tmp/h2kvm-test.log` (133 lines)*
 *Working files in `output/work/working-flattened-20260214-170333.qcow2` (8.22 GB)*

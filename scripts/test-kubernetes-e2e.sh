@@ -1,17 +1,17 @@
 #!/bin/bash
 #
 # End-to-End Kubernetes Test Suite
-# Comprehensive testing of Hyper2KVM Kubernetes deployment
+# Comprehensive testing of H2KVM Kubernetes deployment
 #
 
 set -e
 
 # Test configuration
-NAMESPACE="${NAMESPACE:-hyper2kvm-system}"
-WORKER_NAMESPACE="${WORKER_NAMESPACE:-hyper2kvm-workers}"
-TEST_NAMESPACE="${TEST_NAMESPACE:-hyper2kvm-test}"
-RELEASE_NAME="${RELEASE_NAME:-hyper2kvm-operator}"
-HELM_CHART="${HELM_CHART:-./helm/hyper2kvm-operator}"
+NAMESPACE="${NAMESPACE:-h2kvm-system}"
+WORKER_NAMESPACE="${WORKER_NAMESPACE:-h2kvm-workers}"
+TEST_NAMESPACE="${TEST_NAMESPACE:-h2kvm-test}"
+RELEASE_NAME="${RELEASE_NAME:-h2kvm-operator}"
+HELM_CHART="${HELM_CHART:-./helm/h2kvm-operator}"
 TIMEOUT="${TIMEOUT:-300}"
 CLEANUP="${CLEANUP:-true}"
 
@@ -160,7 +160,7 @@ test_crd_installation() {
     fi
 
     run_test "Verify MigrationJob CRD"
-    if kubectl get crd migrationjobs.hyper2kvm.io &> /dev/null; then
+    if kubectl get crd migrationjobs.h2kvm.io &> /dev/null; then
         log_success "MigrationJob CRD verified"
     else
         log_error "MigrationJob CRD not found"
@@ -168,7 +168,7 @@ test_crd_installation() {
     fi
 
     run_test "Verify OfflineFixJob CRD"
-    if kubectl get crd offlinefixjobs.hyper2kvm.io &> /dev/null; then
+    if kubectl get crd offlinefixjobs.h2kvm.io &> /dev/null; then
         log_success "OfflineFixJob CRD verified"
     else
         log_error "OfflineFixJob CRD not found"
@@ -192,17 +192,17 @@ test_operator_deployment() {
     fi
 
     run_test "Wait for operator pod"
-    if wait_for_pod "${NAMESPACE}" "app=hyper2kvm-operator" "${TIMEOUT}"; then
+    if wait_for_pod "${NAMESPACE}" "app=h2kvm-operator" "${TIMEOUT}"; then
         log_success "Operator pod is ready"
     else
         log_error "Operator pod failed to become ready"
         kubectl get pods -n "${NAMESPACE}"
-        kubectl describe pod -l app=hyper2kvm-operator -n "${NAMESPACE}"
+        kubectl describe pod -l app=h2kvm-operator -n "${NAMESPACE}"
         return 1
     fi
 
     run_test "Verify operator deployment"
-    if wait_for_deployment "${NAMESPACE}" "hyper2kvm-operator" "${TIMEOUT}"; then
+    if wait_for_deployment "${NAMESPACE}" "h2kvm-operator" "${TIMEOUT}"; then
         log_success "Operator deployment is available"
     else
         log_error "Operator deployment not available"
@@ -210,7 +210,7 @@ test_operator_deployment() {
     fi
 
     run_test "Check operator logs"
-    pod_name=$(kubectl get pod -n "${NAMESPACE}" -l app=hyper2kvm-operator -o jsonpath='{.items[0].metadata.name}')
+    pod_name=$(kubectl get pod -n "${NAMESPACE}" -l app=h2kvm-operator -o jsonpath='{.items[0].metadata.name}')
     if kubectl logs -n "${NAMESPACE}" "${pod_name}" --tail=10 | grep -q "Starting operator"; then
         log_success "Operator started successfully"
     else
@@ -222,7 +222,7 @@ test_webhook_configuration() {
     log_section "Phase 5: Webhook Configuration"
 
     run_test "Verify webhook service"
-    if kubectl get service -n "${NAMESPACE}" hyper2kvm-webhook &> /dev/null; then
+    if kubectl get service -n "${NAMESPACE}" h2kvm-webhook &> /dev/null; then
         log_success "Webhook service exists"
     else
         log_error "Webhook service not found"
@@ -230,7 +230,7 @@ test_webhook_configuration() {
     fi
 
     run_test "Verify validating webhook configuration"
-    if kubectl get validatingwebhookconfiguration hyper2kvm-validating-webhook &> /dev/null; then
+    if kubectl get validatingwebhookconfiguration h2kvm-validating-webhook &> /dev/null; then
         log_success "Validating webhook configuration exists"
     else
         log_error "Validating webhook configuration not found"
@@ -238,7 +238,7 @@ test_webhook_configuration() {
     fi
 
     run_test "Verify mutating webhook configuration"
-    if kubectl get mutatingwebhookconfiguration hyper2kvm-mutating-webhook &> /dev/null; then
+    if kubectl get mutatingwebhookconfiguration h2kvm-mutating-webhook &> /dev/null; then
         log_success "Mutating webhook configuration exists"
     else
         log_error "Mutating webhook configuration not found"
@@ -251,7 +251,7 @@ test_migrationjob_creation() {
 
     run_test "Create test MigrationJob"
     cat <<EOF | kubectl apply -f - -n "${TEST_NAMESPACE}"
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: test-migration
@@ -301,7 +301,7 @@ test_offlinefixjob_creation() {
 
     run_test "Create test OfflineFixJob"
     cat <<EOF | kubectl apply -f - -n "${TEST_NAMESPACE}"
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: OfflineFixJob
 metadata:
   name: test-fix
@@ -337,7 +337,7 @@ test_batch_migrationjobs() {
     run_test "Create multiple MigrationJobs"
     for i in {1..3}; do
         cat <<EOF | kubectl apply -f - -n "${TEST_NAMESPACE}"
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: test-batch-${i}
@@ -375,7 +375,7 @@ test_job_dependencies() {
 
     run_test "Create job with dependency"
     cat <<EOF | kubectl apply -f - -n "${TEST_NAMESPACE}"
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: test-dep-1
@@ -387,7 +387,7 @@ spec:
     format: qcow2
     path: /output/dep-1.qcow2
 ---
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: test-dep-2
@@ -414,7 +414,7 @@ test_metrics_collection() {
     log_section "Phase 10: Metrics Testing"
 
     run_test "Check metrics endpoint"
-    pod_name=$(kubectl get pod -n "${NAMESPACE}" -l app=hyper2kvm-operator -o jsonpath='{.items[0].metadata.name}')
+    pod_name=$(kubectl get pod -n "${NAMESPACE}" -l app=h2kvm-operator -o jsonpath='{.items[0].metadata.name}')
 
     if kubectl exec -n "${NAMESPACE}" "${pod_name}" -- curl -s http://localhost:8080/metrics > /dev/null 2>&1; then
         log_success "Metrics endpoint accessible"
@@ -424,7 +424,7 @@ test_metrics_collection() {
 
     run_test "Check ServiceMonitor CRD"
     if kubectl get crd servicemonitors.monitoring.coreos.com &> /dev/null; then
-        if kubectl get servicemonitor -n "${NAMESPACE}" hyper2kvm-operator &> /dev/null; then
+        if kubectl get servicemonitor -n "${NAMESPACE}" h2kvm-operator &> /dev/null; then
             log_success "ServiceMonitor exists"
         else
             log_warning "ServiceMonitor not found (Prometheus operator may not be installed)"
@@ -438,7 +438,7 @@ test_rbac_permissions() {
     log_section "Phase 11: RBAC Testing"
 
     run_test "Verify ServiceAccount"
-    if kubectl get serviceaccount -n "${NAMESPACE}" hyper2kvm-operator &> /dev/null; then
+    if kubectl get serviceaccount -n "${NAMESPACE}" h2kvm-operator &> /dev/null; then
         log_success "ServiceAccount exists"
     else
         log_error "ServiceAccount not found"
@@ -446,7 +446,7 @@ test_rbac_permissions() {
     fi
 
     run_test "Verify ClusterRole"
-    if kubectl get clusterrole hyper2kvm-operator &> /dev/null; then
+    if kubectl get clusterrole h2kvm-operator &> /dev/null; then
         log_success "ClusterRole exists"
     else
         log_error "ClusterRole not found"
@@ -454,7 +454,7 @@ test_rbac_permissions() {
     fi
 
     run_test "Verify ClusterRoleBinding"
-    if kubectl get clusterrolebinding hyper2kvm-operator &> /dev/null; then
+    if kubectl get clusterrolebinding h2kvm-operator &> /dev/null; then
         log_success "ClusterRoleBinding exists"
     else
         log_error "ClusterRoleBinding not found"
@@ -506,7 +506,7 @@ test_summary() {
 
 # Main execution
 main() {
-    log_section "Hyper2KVM Kubernetes E2E Test Suite"
+    log_section "H2KVM Kubernetes E2E Test Suite"
     log_info "🚀 Starting comprehensive Kubernetes tests..."
     echo ""
 

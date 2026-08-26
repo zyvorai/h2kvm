@@ -4,10 +4,10 @@
 cmd: local
 
 # Source VMDK (inspected successfully)
-vmdk: /home/ssahani/tt/hyper2kvm/esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+vmdk: /home/ssahani/tt/h2kvm/esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
 
 # Conversion directory (use local dir with more space)
-conversion_dir: /home/ssahani/tt/hyper2kvm/tmp-conversions
+conversion_dir: /home/ssahani/tt/h2kvm/tmp-conversions
 
 # Output Configuration
 output_dir: out/rhel88-test

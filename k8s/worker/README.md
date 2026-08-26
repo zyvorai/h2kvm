@@ -1,6 +1,6 @@
-# hyper2kvm Worker Kubernetes Deployment
+# h2kvm Worker Kubernetes Deployment
 
-Production-ready Kubernetes manifests for deploying hyper2kvm workers using the Worker Job Protocol v1.
+Production-ready Kubernetes manifests for deploying h2kvm workers using the Worker Job Protocol v1.
 
 ## Architecture
 
@@ -41,8 +41,8 @@ Production-ready Kubernetes manifests for deploying hyper2kvm workers using the 
 Label nodes that should run workers:
 
 ```bash
-kubectl label nodes worker-node1 hyper2kvm.io/worker-enabled=true
-kubectl label nodes worker-node2 hyper2kvm.io/worker-enabled=true
+kubectl label nodes worker-node1 h2kvm.io/worker-enabled=true
+kubectl label nodes worker-node2 h2kvm.io/worker-enabled=true
 ```
 
 ### NBD Kernel Module
@@ -65,7 +65,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: conversion-temp
-  namespace: hyper2kvm-workers
+  namespace: h2kvm-workers
 spec:
   accessModes:
   - ReadWriteOnce
@@ -108,14 +108,14 @@ kubectl apply -f daemonset.yaml
 
 ```bash
 # Check pods are running
-kubectl get pods -n hyper2kvm-workers -l app=hyper2kvm-worker
+kubectl get pods -n h2kvm-workers -l app=h2kvm-worker
 
 # Check worker capabilities
-kubectl exec -n hyper2kvm-workers -it hyper2kvm-worker-xxxxx -- \
-  python3 -m hyper2kvm.worker.cli capabilities
+kubectl exec -n h2kvm-workers -it h2kvm-worker-xxxxx -- \
+  python3 -m h2kvm.worker.cli capabilities
 
 # Check NBD module loaded
-kubectl exec -n hyper2kvm-workers hyper2kvm-worker-xxxxx -- lsmod | grep nbd
+kubectl exec -n h2kvm-workers h2kvm-worker-xxxxx -- lsmod | grep nbd
 ```
 
 ## Usage
@@ -129,8 +129,8 @@ cat > job-spec-configmap.yaml << 'EOFCM'
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: hyper2kvm-job-migration-001
-  namespace: hyper2kvm-workers
+  name: h2kvm-job-migration-001
+  namespace: h2kvm-workers
 data:
   job-spec.json: |
     {
@@ -166,10 +166,10 @@ sed 's/JOBID/migration-001/g' job-template.yaml > migration-001-job.yaml
 kubectl apply -f migration-001-job.yaml
 
 # Follow job progress
-kubectl logs -n hyper2kvm-workers -f job/hyper2kvm-migration-migration-001
+kubectl logs -n h2kvm-workers -f job/h2kvm-migration-migration-001
 
 # Check job status
-kubectl get job -n hyper2kvm-workers
+kubectl get job -n h2kvm-workers
 ```
 
 ### Long-Running Worker (DaemonSet)
@@ -183,9 +183,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: queued-job-002
-  namespace: hyper2kvm-workers
+  namespace: h2kvm-workers
   labels:
-    hyper2kvm.io/job-type: queued
+    h2kvm.io/job-type: queued
 data:
   job-spec.json: |
     {
@@ -216,22 +216,22 @@ kubectl apply -f queue-job.yaml
 
 ```bash
 # View worker logs
-kubectl logs -n hyper2kvm-workers -l app=hyper2kvm-worker --tail=100 -f
+kubectl logs -n h2kvm-workers -l app=h2kvm-worker --tail=100 -f
 
 # View job events (stored in worker pod)
-kubectl exec -n hyper2kvm-workers hyper2kvm-worker-xxxxx -- \
-  python3 -m hyper2kvm.worker.cli events migration-001
+kubectl exec -n h2kvm-workers h2kvm-worker-xxxxx -- \
+  python3 -m h2kvm.worker.cli events migration-001
 
 # Check job status
-kubectl exec -n hyper2kvm-workers hyper2kvm-worker-xxxxx -- \
-  python3 -m hyper2kvm.worker.cli status migration-001
+kubectl exec -n h2kvm-workers h2kvm-worker-xxxxx -- \
+  python3 -m h2kvm.worker.cli status migration-001
 ```
 
 ### List All Jobs
 
 ```bash
-kubectl exec -n hyper2kvm-workers hyper2kvm-worker-xxxxx -- \
-  python3 -m hyper2kvm.worker.cli list
+kubectl exec -n h2kvm-workers h2kvm-worker-xxxxx -- \
+  python3 -m h2kvm.worker.cli list
 ```
 
 ## Resource Limits
@@ -266,7 +266,7 @@ Workers run with `privileged: true` because they require:
 Apply Pod Security Standards:
 
 ```bash
-kubectl label namespace hyper2kvm-workers \
+kubectl label namespace h2kvm-workers \
   pod-security.kubernetes.io/enforce=privileged \
   pod-security.kubernetes.io/audit=restricted \
   pod-security.kubernetes.io/warn=restricted
@@ -278,7 +278,7 @@ kubectl label namespace hyper2kvm-workers \
 
 ```bash
 # Check events
-kubectl describe pod -n hyper2kvm-workers hyper2kvm-worker-xxxxx
+kubectl describe pod -n h2kvm-workers h2kvm-worker-xxxxx
 
 # Common issues:
 # 1. NBD module not available on node
@@ -290,7 +290,7 @@ kubectl describe pod -n hyper2kvm-workers hyper2kvm-worker-xxxxx
 
 ```bash
 # Check kernel module availability
-kubectl exec -n hyper2kvm-workers hyper2kvm-worker-xxxxx -- \
+kubectl exec -n h2kvm-workers h2kvm-worker-xxxxx -- \
   ls /lib/modules/$(uname -r)/kernel/drivers/block/nbd.ko
 
 # Load manually on node
@@ -303,10 +303,10 @@ Worker doesn't have NBD access. Check:
 
 ```bash
 # Verify privileged mode enabled
-kubectl get pod -n hyper2kvm-workers hyper2kvm-worker-xxxxx -o yaml | grep privileged
+kubectl get pod -n h2kvm-workers h2kvm-worker-xxxxx -o yaml | grep privileged
 
 # Verify /dev mounted
-kubectl exec -n hyper2kvm-workers hyper2kvm-worker-xxxxx -- ls -la /dev/nbd0
+kubectl exec -n h2kvm-workers h2kvm-worker-xxxxx -- ls -la /dev/nbd0
 ```
 
 ### Migration Interrupted by Pod Restart
@@ -324,10 +324,10 @@ Jobs in progress are lost on pod restart. To prevent:
 Add more worker nodes:
 
 ```bash
-kubectl label nodes worker-node3 hyper2kvm.io/worker-enabled=true
+kubectl label nodes worker-node3 h2kvm.io/worker-enabled=true
 
 # DaemonSet automatically schedules pod on new node
-kubectl get pods -n hyper2kvm-workers -o wide
+kubectl get pods -n h2kvm-workers -o wide
 ```
 
 ### Vertical Scaling
@@ -352,15 +352,15 @@ kubectl apply -f configmap.yaml
 kubectl apply -f daemonset.yaml
 
 # 2. Wait for workers ready
-kubectl wait --for=condition=Ready pods -n hyper2kvm-workers -l app=hyper2kvm-worker --timeout=300s
+kubectl wait --for=condition=Ready pods -n h2kvm-workers -l app=h2kvm-worker --timeout=300s
 
 # 3. Submit migration job
 cat > migration-job-spec.yaml << 'EOFJOB'
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: hyper2kvm-job-prod-001
-  namespace: hyper2kvm-workers
+  name: h2kvm-job-prod-001
+  namespace: h2kvm-workers
 data:
   job-spec.json: |
     {
@@ -392,10 +392,10 @@ kubectl apply -f migration-job-spec.yaml
 sed 's/JOBID/prod-migration-001/g' job-template.yaml | kubectl apply -f -
 
 # 5. Monitor progress
-kubectl logs -n hyper2kvm-workers -f job/hyper2kvm-migration-prod-migration-001
+kubectl logs -n h2kvm-workers -f job/h2kvm-migration-prod-migration-001
 
 # 6. Retrieve results
-kubectl exec -n hyper2kvm-workers job/hyper2kvm-migration-prod-migration-001 -- \
+kubectl exec -n h2kvm-workers job/h2kvm-migration-prod-migration-001 -- \
   ls -lh /output/
 ```
 

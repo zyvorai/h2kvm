@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>hyper2kvm - Enterprise VM Migration Toolkit</title>
+<title>h2kvm - Enterprise VM Migration Toolkit</title>
 <style>
   @page {
     size: landscape;
@@ -376,11 +376,11 @@
 
 <!-- SLIDE 1: Title -->
 <div class="slide title-slide">
-  <h1>hyper2kvm</h1>
+  <h1>h2kvm</h1>
   <div class="subtitle">Enterprise-Grade VM Migration Toolkit</div>
   <div class="tagline">Any Hypervisor &rarr; KVM with Zero-Downtime &amp; Automated Fixes</div>
   <div class="author">ZyvorAI Labs Private Limited</div>
-  <div class="meta">Python 3.10+ &nbsp;|&nbsp; Proprietary (Zyvor AI Labs) &nbsp;|&nbsp; PyPI: hyper2kvm</div>
+  <div class="meta">Python 3.10+ &nbsp;|&nbsp; Proprietary (Zyvor AI Labs) &nbsp;|&nbsp; PyPI: h2kvm</div>
 </div>
 
 <!-- SLIDE 2: The Problem -->
@@ -407,19 +407,19 @@
       </div>
     </div>
   </div>
-  <div class="logo-footer">hyper2kvm</div>
+  <div class="logo-footer">h2kvm</div>
   <div class="slide-number">2</div>
 </div>
 
 <!-- SLIDE 3: The Solution -->
 <div class="slide">
-  <h2>The Solution: hyper2kvm</h2>
+  <h2>The Solution: h2kvm</h2>
   <div class="content">
     <div class="highlight-box" style="font-size: 16pt; text-align: center; margin-bottom: 20px;">
       <strong>Deterministic offline fixes</strong> ensure <strong>first-boot success</strong> &mdash; every time.
     </div>
     <table>
-      <tr><th style="width:50%">Traditional Tools</th><th>hyper2kvm</th></tr>
+      <tr><th style="width:50%">Traditional Tools</th><th>h2kvm</th></tr>
       <tr><td>&#10060; Convert disk format only</td><td>&#9989; Convert + deep inspection + repair</td></tr>
       <tr><td>&#10060; "Boot and hope"</td><td>&#9989; Deterministic first-boot success</td></tr>
       <tr><td>&#10060; Manual fixes required</td><td>&#9989; Automated bootloader, fstab, driver fixes</td></tr>
@@ -428,7 +428,7 @@
       <tr><td>&#10060; Single VM at a time</td><td>&#9989; Batch processing + K8s deployment</td></tr>
     </table>
   </div>
-  <div class="logo-footer">hyper2kvm</div>
+  <div class="logo-footer">h2kvm</div>
   <div class="slide-number">3</div>
 </div>
 
@@ -487,7 +487,7 @@
       <span class="badge green">k3s</span>
     </div>
   </div>
-  <div class="logo-footer">hyper2kvm</div>
+  <div class="logo-footer">h2kvm</div>
   <div class="slide-number">4</div>
 </div>
 
@@ -555,7 +555,7 @@
       </div>
     </div>
   </div>
-  <div class="logo-footer">hyper2kvm</div>
+  <div class="logo-footer">h2kvm</div>
   <div class="slide-number">5</div>
 </div>
 
@@ -593,7 +593,7 @@
       </div>
       <div class="col">
         <h3>Code Example</h3>
-        <pre><code>from hyper2kvm.core.vmcraft import VMCraft
+        <pre><code>from h2kvm.core.vmcraft import VMCraft
 
 with VMCraft() as g:
     g.add_disk("/vms/server.qcow2")
@@ -613,7 +613,7 @@ with VMCraft() as g:
       </div>
     </div>
   </div>
-  <div class="logo-footer">hyper2kvm</div>
+  <div class="logo-footer">h2kvm</div>
   <div class="slide-number">6</div>
 </div>
 
@@ -673,7 +673,7 @@ with VMCraft() as g:
       </div>
     </div>
   </div>
-  <div class="logo-footer">hyper2kvm</div>
+  <div class="logo-footer">h2kvm</div>
   <div class="slide-number">7</div>
 </div>
 
@@ -717,7 +717,7 @@ with VMCraft() as g:
       </div>
     </div>
   </div>
-  <div class="logo-footer">hyper2kvm</div>
+  <div class="logo-footer">h2kvm</div>
   <div class="slide-number">8</div>
 </div>
 
@@ -770,7 +770,7 @@ sudo h2kvmctl \
       </div>
     </div>
   </div>
-  <div class="logo-footer">hyper2kvm</div>
+  <div class="logo-footer">h2kvm</div>
   <div class="slide-number">9</div>
 </div>
 
@@ -831,7 +831,7 @@ sudo h2kvmctl \
       </div>
     </div>
   </div>
-  <div class="logo-footer">hyper2kvm</div>
+  <div class="logo-footer">h2kvm</div>
   <div class="slide-number">10</div>
 </div>
 
@@ -843,10 +843,10 @@ sudo h2kvmctl \
       <div class="col">
         <h3>Installation</h3>
         <pre><code># Install with all features
-pip install "hyper2kvm[full]"
+pip install "h2kvm[full]"
 
 # Or minimal install
-pip install hyper2kvm</code></pre>
+pip install h2kvm</code></pre>
 
         <h3 style="margin-top: 15px;">System Dependencies (Optional)</h3>
         <pre><code># Fedora / RHEL
@@ -867,12 +867,12 @@ sudo dnf install -y \
 h2kvmctl --version
 
 # Daemon / systemd mode
-hyper2kvm --version
+h2kvm --version
 
 # Both are identical</code></pre>
 
         <h3 style="margin-top: 15px;">Project Structure</h3>
-        <pre><code>hyper2kvm/
+        <pre><code>h2kvm/
   cli/           # Click-based CLI
   core/          # VMCraft engine
   converters/    # qemu-img wrappers
@@ -888,13 +888,13 @@ hyper2kvm --version
       </div>
     </div>
   </div>
-  <div class="logo-footer">hyper2kvm</div>
+  <div class="logo-footer">h2kvm</div>
   <div class="slide-number">11</div>
 </div>
 
 <!-- SLIDE 12: Summary / End -->
 <div class="slide end-slide">
-  <h2>hyper2kvm</h2>
+  <h2>h2kvm</h2>
   <div class="tagline">"Migrate Once, Boot Right."</div>
   <table style="width: 70%; margin: 0 auto; font-size: 14pt; margin-bottom: 40px;">
     <tr><td style="border-bottom: 1px solid #334; color: #ccc; padding: 10px;"><strong style="color: #ff8a65;">Deterministic</strong></td><td style="border-bottom: 1px solid #334; color: #aaa;">No more "boot and hope"</td></tr>
@@ -906,8 +906,8 @@ hyper2kvm --version
     <tr><td style="color: #ccc;"><strong style="color: #ff8a65;">Pure Python</strong></td><td style="color: #aaa;">Zero C dependencies, runs anywhere</td></tr>
   </table>
   <div class="links">
-    <strong>PyPI:</strong> pypi.org/project/hyper2kvm &nbsp;&nbsp;|&nbsp;&nbsp;
-    <strong>GitHub:</strong> github.com/ssahani/hyper2kvm &nbsp;&nbsp;|&nbsp;&nbsp;
+    <strong>PyPI:</strong> pypi.org/project/h2kvm &nbsp;&nbsp;|&nbsp;&nbsp;
+    <strong>GitHub:</strong> github.com/ssahani/h2kvm &nbsp;&nbsp;|&nbsp;&nbsp;
     <strong>License:</strong> Proprietary (Zyvor AI Labs)
   </div>
 </div>

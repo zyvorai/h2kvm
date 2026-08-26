@@ -3,7 +3,7 @@
 
 command: local
 vmdk: /home/ssahani/vmware/win10/win10.vmdk
-output_dir: /home/ssahani/tt/hyper2kvm/output-win10
+output_dir: /home/ssahani/tt/h2kvm/output-win10
 to_output: win10-converted.qcow2
 out_format: qcow2
 compress: true

@@ -84,7 +84,7 @@ Before executing, validate your batch configuration.
 
 ```bash
 # Validate configuration syntax
-hyper2kvm batch validate batch-web-servers.yaml
+h2kvm batch validate batch-web-servers.yaml
 
 # Expected output:
 # ✓ Configuration valid
@@ -105,7 +105,7 @@ hyper2kvm batch validate batch-web-servers.yaml
 Execute a dry run to see what would happen without actually migrating.
 
 ```bash
-hyper2kvm batch execute batch-web-servers.yaml \
+h2kvm batch execute batch-web-servers.yaml \
     --dry-run \
     --verbose
 
@@ -120,8 +120,8 @@ hyper2kvm batch execute batch-web-servers.yaml \
 # Queue:
 #   web-04, web-05, web-06, web-07, web-08, web-09, web-10
 #
-# Snapshots would be created in: /var/lib/hyper2kvm/snapshots
-# Reports would be generated in: /var/lib/hyper2kvm/reports
+# Snapshots would be created in: /var/lib/h2kvm/snapshots
+# Reports would be generated in: /var/lib/h2kvm/reports
 ```
 
 ---
@@ -132,7 +132,7 @@ Start the batch migration.
 
 ```bash
 # Execute batch migration
-hyper2kvm batch execute batch-web-servers.yaml \
+h2kvm batch execute batch-web-servers.yaml \
     --parallel 3 \
     --validate-all \
     --compliance-report \
@@ -146,7 +146,7 @@ hyper2kvm batch execute batch-web-servers.yaml \
 
 ```bash
 # In another terminal, monitor progress
-watch -n 10 'hyper2kvm batch status batch-web-servers.yaml'
+watch -n 10 'h2kvm batch status batch-web-servers.yaml'
 
 # Output:
 # Batch Migration Status
@@ -189,7 +189,7 @@ Suppose web-08 fails during migration.
 
 ```bash
 # Check detailed error for web-08
-hyper2kvm batch logs --vm web-08 --tail 100
+h2kvm batch logs --vm web-08 --tail 100
 
 # Output:
 # [ERROR] Migration failed for web-08
@@ -217,12 +217,12 @@ df -h /kvm/vms
 
 ```bash
 # Retry only failed VMs
-hyper2kvm batch retry batch-web-servers.yaml \
+h2kvm batch retry batch-web-servers.yaml \
     --failed-only \
     --verbose
 
 # Or retry specific VM
-hyper2kvm batch retry batch-web-servers.yaml \
+h2kvm batch retry batch-web-servers.yaml \
     --vm web-08
 ```
 
@@ -235,7 +235,7 @@ After batch completion, review the summary report.
 ### Generate Summary
 
 ```bash
-hyper2kvm batch report \
+h2kvm batch report \
     --config batch-web-servers.yaml \
     --format markdown \
     --output /reports/web-migration/summary.md
@@ -302,7 +302,7 @@ Migrate VMs during off-peak hours automatically.
 #!/bin/bash
 # /scripts/automated-migration.sh
 
-LOG_DIR=/var/log/hyper2kvm
+LOG_DIR=/var/log/h2kvm
 REPORT_DIR=/reports/automated-migrations
 DATE=$(date +%Y%m%d_%H%M%S)
 
@@ -312,7 +312,7 @@ exec 1>>"$LOG_DIR/migration-$DATE.log" 2>&1
 echo "Starting automated migration: $DATE"
 
 # Execute batch migration
-hyper2kvm batch execute /etc/hyper2kvm/nightly-migrations.yaml \
+h2kvm batch execute /etc/h2kvm/nightly-migrations.yaml \
     --parallel 2 \
     --validate-all \
     --output-dir "$REPORT_DIR/$DATE"
@@ -356,14 +356,14 @@ stages:
 validate_config:
   stage: validate
   script:
-    - hyper2kvm batch validate migrations/batch-config.yaml
+    - h2kvm batch validate migrations/batch-config.yaml
   only:
     - main
 
 execute_migration:
   stage: migrate
   script:
-    - hyper2kvm batch execute migrations/batch-config.yaml --parallel 5
+    - h2kvm batch execute migrations/batch-config.yaml --parallel 5
   artifacts:
     paths:
       - reports/
@@ -375,7 +375,7 @@ execute_migration:
 verify_migration:
   stage: verify
   script:
-    - hyper2kvm batch report --format json > report.json
+    - h2kvm batch report --format json > report.json
     - python3 scripts/check-success-rate.py report.json
   dependencies:
     - execute_migration
@@ -396,9 +396,9 @@ Use Ansible for orchestrated migrations.
   hosts: kvm-host
   become: yes
   tasks:
-    - name: Install Hyper2KVM
+    - name: Install H2KVM
       pip:
-        name: hyper2kvm
+        name: h2kvm
         state: latest
 
     - name: Copy batch configuration
@@ -408,7 +408,7 @@ Use Ansible for orchestrated migrations.
 
     - name: Execute batch migration
       command: >
-        hyper2kvm batch execute /tmp/batch-config.yaml
+        h2kvm batch execute /tmp/batch-config.yaml
         --parallel 3
         --validate-all
         --output-dir /reports/ansible-migration
@@ -419,7 +419,7 @@ Use Ansible for orchestrated migrations.
         msg: "{{ migration_result.stdout }}"
 
     - name: Generate compliance report
-      command: hyper2kvm batch report --format pdf --output /reports/compliance.pdf
+      command: h2kvm batch report --format pdf --output /reports/compliance.pdf
       when: migration_result.rc == 0
 
     - name: Send notification
@@ -502,22 +502,22 @@ web-03,/vmware/web-03.vmdk,/kvm/web-03.qcow2
 
 ```bash
 # Export metrics for Prometheus
-hyper2kvm batch metrics \
+h2kvm batch metrics \
     --config batch-config.yaml \
     --format prometheus \
-    --output /metrics/hyper2kvm.prom
+    --output /metrics/h2kvm.prom
 
 # Example metrics:
-# hyper2kvm_migrations_total 10
-# hyper2kvm_migrations_successful 10
-# hyper2kvm_migrations_failed 0
-# hyper2kvm_migration_duration_seconds{vm="web-01"} 754
-# hyper2kvm_migration_data_gb{vm="web-01"} 45
+# h2kvm_migrations_total 10
+# h2kvm_migrations_successful 10
+# h2kvm_migrations_failed 0
+# h2kvm_migration_duration_seconds{vm="web-01"} 754
+# h2kvm_migration_data_gb{vm="web-01"} 45
 ```
 
 ### Grafana Dashboard
 
-Import the Hyper2KVM Grafana dashboard for visualization:
+Import the H2KVM Grafana dashboard for visualization:
 - Migration success rate over time
 - Average migration duration
 - Data throughput
@@ -532,10 +532,10 @@ Import the Hyper2KVM Grafana dashboard for visualization:
 
 ```bash
 # Always validate before executing
-hyper2kvm batch validate batch-config.yaml
+h2kvm batch validate batch-config.yaml
 
 # Run dry-run to preview
-hyper2kvm batch execute batch-config.yaml --dry-run
+h2kvm batch execute batch-config.yaml --dry-run
 ```
 
 ### 2. Use Appropriate Parallelism
@@ -589,13 +589,13 @@ batch:
 **Solution**:
 ```bash
 # Check active workers
-hyper2kvm batch status batch-config.yaml
+h2kvm batch status batch-config.yaml
 
 # Cancel stuck migration
-hyper2kvm batch cancel --vm web-05
+h2kvm batch cancel --vm web-05
 
 # Resume batch
-hyper2kvm batch resume batch-config.yaml
+h2kvm batch resume batch-config.yaml
 ```
 
 ### Issue: Out of disk space
@@ -606,7 +606,7 @@ hyper2kvm batch resume batch-config.yaml
 df -h /kvm/vms
 
 # Clean old snapshots
-hyper2kvm snapshot cleanup --older-than 7d
+h2kvm snapshot cleanup --older-than 7d
 
 # Adjust target compression
 # In config: format: qcow2 with compression

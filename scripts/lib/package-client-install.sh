@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Client-side runtime dependencies for hyper2kvm bundle.
+# Client-side runtime dependencies for h2kvm bundle.
 # Uses install-deps.sh from the same directory when present.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 if [ -x "${ROOT}/scripts/install-deps.sh" ]; then
-  echo "== hyper2kvm: running scripts/install-deps.sh (qemu, guestfs, libvirt) =="
-  sudo env HYPER2KVM_REMOTE_INSTALL=1 bash "${ROOT}/scripts/install-deps.sh" --qemu --guestfs --libvirt --ovmf
+  echo "== h2kvm: running scripts/install-deps.sh (qemu, guestfs, libvirt) =="
+  sudo env H2KVM_REMOTE_INSTALL=1 bash "${ROOT}/scripts/install-deps.sh" --qemu --guestfs --libvirt --ovmf
 else
-  echo "== hyper2kvm: minimal libvirt/qemu install =="
+  echo "== h2kvm: minimal libvirt/qemu install =="
   SUDO=""
   [ "$(id -u)" -ne 0 ] && command -v sudo &>/dev/null && SUDO=sudo
   if command -v dnf &>/dev/null; then

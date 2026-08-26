@@ -9,7 +9,7 @@ type Props = {
   compact?: boolean;
 };
 
-/** hyper2kvm pipeline identity — use above migration forms. */
+/** h2kvm pipeline identity — use above migration forms. */
 export function MigrationPipelineBanner({ className = '', compact = false }: Props) {
   return (
     <div

@@ -1,6 +1,6 @@
 # User Guides
 
-Task-oriented guides for using Hyper2KVM effectively. Learn how to accomplish specific tasks and use various features.
+Task-oriented guides for using H2KVM effectively. Learn how to accomplish specific tasks and use various features.
 
 ## Performance Highlights (v2.2.0+)
 
@@ -150,11 +150,11 @@ Solutions for:
 ### Command Categories
 
 **Migration Commands:**
-- `hyper2kvm --cmd local` - Local VMDK migration
-- `hyper2kvm --cmd fetch-and-fix` - Remote ESXi fetch
-- `hyper2kvm --cmd ova` - OVA file import
-- `hyper2kvm --cmd vhd` - VHD file import
-- `hyper2kvm --cmd live-fix` - Live SSH-based fixing
+- `h2kvm --cmd local` - Local VMDK migration
+- `h2kvm --cmd fetch-and-fix` - Remote ESXi fetch
+- `h2kvm --cmd ova` - OVA file import
+- `h2kvm --cmd vhd` - VHD file import
+- `h2kvm --cmd live-fix` - Live SSH-based fixing
 
 **Worker Commands:**
 - `h2kvmctl submit` - Submit migration job to worker
@@ -365,7 +365,7 @@ sudo h2kvmctl --config fetch.yaml
 
 Help improve the guides:
 
-1. **Found an issue?** [Open an issue](https://github.com/ssahani/hyper2kvm/issues)
+1. **Found an issue?** [Open an issue](https://github.com/ssahani/h2kvm/issues)
 2. **Have a recipe?** Share it in the [Cookbook](cookbook.md)
 3. **Found a workaround?** Add to [Troubleshooting](troubleshooting.md)
 

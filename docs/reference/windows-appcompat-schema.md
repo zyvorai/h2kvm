@@ -232,7 +232,7 @@ windows:
       generate_script: true
 ```
 
-**Output**: `C:\hyper2kvm\appcompat\sql-reconfiguration.sql` (in guest filesystem)
+**Output**: `C:\h2kvm\appcompat\sql-reconfiguration.sql` (in guest filesystem)
 
 ---
 

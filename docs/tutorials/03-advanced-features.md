@@ -56,7 +56,7 @@ First, set up passwordless SSH access:
 
 ```bash
 # Generate SSH key if you don't have one
-ssh-keygen -t ed25519 -C "hyper2kvm-migration"
+ssh-keygen -t ed25519 -C "h2kvm-migration"
 
 # Copy key to production VM
 ssh-copy-id root@prod-db-01.example.com
@@ -118,7 +118,7 @@ Planned Changes:
   ✓ initramfs: Will add virtio_blk, virtio_scsi, virtio_net
   ✓ VMware Tools: Will remove vmware-tools package
 
-Backups will be created at: /root/.hyper2kvm-backup/
+Backups will be created at: /root/.h2kvm-backup/
 ```
 
 ### 1.4: Execute Live Fix
@@ -328,10 +328,10 @@ mkdir -p "$SNAPSHOT_DIR"
 
 echo "Creating pre-migration snapshot for $VM_NAME..."
 
-# Using hyper2kvm's rollback API
+# Using h2kvm's rollback API
 python3 <<EOF
 import logging
-from hyper2kvm.rollback import RollbackOrchestrator
+from h2kvm.rollback import RollbackOrchestrator
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("snapshot")
@@ -393,7 +393,7 @@ else
     # Execute rollback
     python3 <<EOF
 import logging
-from hyper2kvm.rollback import RollbackOrchestrator
+from h2kvm.rollback import RollbackOrchestrator
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("rollback")
@@ -826,5 +826,5 @@ You've learned:
 ---
 
 **Need Help?**
-- GitHub Issues: [Report problems](https://github.com/ssahani/hyper2kvm/issues)
+- GitHub Issues: [Report problems](https://github.com/ssahani/h2kvm/issues)
 - Documentation: [Full documentation](../index.md)

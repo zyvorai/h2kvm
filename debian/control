@@ -1,4 +1,4 @@
-Source: hyper2kvm
+Source: h2kvm
 Section: admin
 Priority: optional
 Maintainer: ZyvorAI Labs Private Limited <ssahani@zyvor.dev>
@@ -11,12 +11,12 @@ Build-Depends: debhelper-compat (= 13),
                python3-sphinx,
                python3-sphinx-rtd-theme
 Standards-Version: 4.6.2
-Homepage: https://github.com/ssahani/hyper2kvm
-Vcs-Browser: https://github.com/ssahani/hyper2kvm
-Vcs-Git: https://github.com/ssahani/hyper2kvm.git
+Homepage: https://github.com/ssahani/h2kvm
+Vcs-Browser: https://github.com/ssahani/h2kvm
+Vcs-Git: https://github.com/ssahani/h2kvm.git
 Rules-Requires-Root: no
 
-Package: hyper2kvm
+Package: h2kvm
 Architecture: all
 Depends: ${python3:Depends},
          ${misc:Depends},
@@ -36,7 +36,7 @@ Recommends: libguestfs-tools,
             systemd
 Suggests: podman | docker.io
 Description: Production-grade hypervisor to KVM/QEMU migration toolkit
- hyper2kvm is a comprehensive toolkit for migrating virtual machines from
+ h2kvm is a comprehensive toolkit for migrating virtual machines from
  multiple hypervisors and disk ecosystems (VMware vSphere, Hyper-V, Azure,
  AWS, local disks) into reliable, bootable KVM/QEMU systems.
  .

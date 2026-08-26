@@ -24,11 +24,11 @@ Features:
   ✅ Async/await support for background tasks
   ✅ Rich widget library (DataTable, ProgressBar, Log)
 
-Installation: pip install 'hyper2kvm[tui]'
+Installation: pip install 'h2kvm[tui]'
 
 Visual:
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ [BRIGHT ORANGE HEADER #ff6600]  hyper2kvm Dashboard | 14:23:45              ║
+║ [BRIGHT ORANGE HEADER #ff6600]  h2kvm Dashboard | 14:23:45              ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                              ║
 ║  📦 Active Migrations [GOLD-ORANGE #ffaa44]                                  ║
@@ -71,7 +71,7 @@ Installation: Built-in on Linux/macOS/Unix
 
 Visual (using terminal colors):
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ [YELLOW BG] hyper2kvm Migration Dashboard | 14:23:45 [/YELLOW]              ║
+║ [YELLOW BG] h2kvm Migration Dashboard | 14:23:45 [/YELLOW]              ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                              ║
 ║ === METRICS ===                                                              ║
@@ -117,7 +117,7 @@ Installation: Always available!
 
 Visual:
 ================================================================================
-                   hyper2kvm Migration Dashboard - 14:23:45
+                   h2kvm Migration Dashboard - 14:23:45
 ================================================================================
 
 [METRICS]

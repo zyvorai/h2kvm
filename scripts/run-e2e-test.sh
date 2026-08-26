@@ -7,10 +7,10 @@
 set -e
 
 # Configuration
-CLUSTER_NAME="${CLUSTER_NAME:-hyper2kvm-test}"
-NAMESPACE_OPERATOR="${NAMESPACE_OPERATOR:-hyper2kvm-system}"
-NAMESPACE_WORKERS="${NAMESPACE_WORKERS:-hyper2kvm-workers}"
-NAMESPACE_TEST="${NAMESPACE_TEST:-hyper2kvm-test}"
+CLUSTER_NAME="${CLUSTER_NAME:-h2kvm-test}"
+NAMESPACE_OPERATOR="${NAMESPACE_OPERATOR:-h2kvm-system}"
+NAMESPACE_WORKERS="${NAMESPACE_WORKERS:-h2kvm-workers}"
+NAMESPACE_TEST="${NAMESPACE_TEST:-h2kvm-test}"
 CENTOS9_VMDK="${CENTOS9_VMDK:-/home/ssahani/Downloads/VM-Images/centos/centos9.vmdk}"
 PUSH_TO_GHCR="${PUSH_TO_GHCR:-false}"
 FORCE_REBUILD="${FORCE_REBUILD:-false}"
@@ -33,11 +33,11 @@ smart_build_images() {
     fi
 
     # Check if image exists locally
-    if docker image inspect hyper2kvm:worker &> /dev/null; then
+    if docker image inspect h2kvm:worker &> /dev/null; then
         log_success "Worker image already exists locally"
 
         # Check age of image
-        IMAGE_AGE=$(docker image inspect hyper2kvm:worker --format '{{.Created}}')
+        IMAGE_AGE=$(docker image inspect h2kvm:worker --format '{{.Created}}')
         log_info "Image created: ${IMAGE_AGE}"
 
         read -p "Rebuild image? [y/N] " -n 1 -r
@@ -58,7 +58,7 @@ smart_deploy() {
     log_section "Smart Deployment Check"
 
     # Check CRDs
-    if ! kubectl get crd migrationjobs.hyper2kvm.io &> /dev/null; then
+    if ! kubectl get crd migrationjobs.h2kvm.io &> /dev/null; then
         log_info "CRDs not found, deploying..."
         deploy_crds
     else
@@ -81,7 +81,7 @@ smart_deploy() {
     fi
 
     # Check node labels
-    local unlabeled=$(kubectl get nodes -o json | jq -r '.items[] | select(.metadata.labels["hyper2kvm.io/worker-enabled"] != "true") | .metadata.name' | wc -l)
+    local unlabeled=$(kubectl get nodes -o json | jq -r '.items[] | select(.metadata.labels["h2kvm.io/worker-enabled"] != "true") | .metadata.name' | wc -l)
     if [ "${unlabeled}" -gt 0 ]; then
         log_info "${unlabeled} nodes need labeling"
         label_nodes
@@ -90,17 +90,17 @@ smart_deploy() {
     fi
 
     # Check worker deployment
-    if ! kubectl get daemonset hyper2kvm-worker -n "${NAMESPACE_WORKERS}" &> /dev/null; then
+    if ! kubectl get daemonset h2kvm-worker -n "${NAMESPACE_WORKERS}" &> /dev/null; then
         log_info "Worker DaemonSet not found, deploying..."
         deploy_workers
     else
         log_success "Worker DaemonSet already exists"
 
         # Check if pods are running
-        RUNNING_WORKERS=$(kubectl get pods -n "${NAMESPACE_WORKERS}" -l app=hyper2kvm-worker --field-selector status.phase=Running --no-headers 2>/dev/null | wc -l)
+        RUNNING_WORKERS=$(kubectl get pods -n "${NAMESPACE_WORKERS}" -l app=h2kvm-worker --field-selector status.phase=Running --no-headers 2>/dev/null | wc -l)
         if [ "${RUNNING_WORKERS}" -eq 0 ]; then
             log_warning "Worker pods exist but not running, redeploying..."
-            kubectl delete daemonset hyper2kvm-worker -n "${NAMESPACE_WORKERS}" --ignore-not-found=true
+            kubectl delete daemonset h2kvm-worker -n "${NAMESPACE_WORKERS}" --ignore-not-found=true
             deploy_workers
         else
             log_success "${RUNNING_WORKERS} worker pod(s) running"
@@ -141,7 +141,7 @@ smart_upload_data() {
         return 0
     fi
 
-    WORKER_POD=$(kubectl get pods -n "${NAMESPACE_WORKERS}" -l app=hyper2kvm-worker --field-selector status.phase=Running -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
+    WORKER_POD=$(kubectl get pods -n "${NAMESPACE_WORKERS}" -l app=h2kvm-worker --field-selector status.phase=Running -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
 
     if [ -z "${WORKER_POD}" ]; then
         log_warning "No running worker pod found, skipping data upload"

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>hyper2kvm TCO Calculator — VMware vs KVM Cost Comparison</title>
+<title>h2kvm TCO Calculator — VMware vs KVM Cost Comparison</title>
 <style>
   :root {
     --bg: #0f172a; --bg2: #1e293b; --bg3: #334155;
@@ -128,7 +128,7 @@
 <div class="header">
   <h1>VMware vs KVM <span>TCO Calculator</span></h1>
   <p>Enter your infrastructure details to see real-time cost comparison and savings</p>
-  <div class="badge">hyper2kvm.io &bull; Interactive &bull; No Data Sent &bull; 100% Client-Side</div>
+  <div class="badge">h2kvm.io &bull; Interactive &bull; No Data Sent &bull; 100% Client-Side</div>
 </div>
 
 <div class="container">
@@ -331,7 +331,7 @@
 </div>
 
 <div class="footer">
-  <p><a href="https://hyper2kvm.io">hyper2kvm.io</a> &bull; Proprietary (Zyvor AI Labs) &bull; All calculations run locally in your browser &bull; No data is sent anywhere</p>
+  <p><a href="https://h2kvm.io">h2kvm.io</a> &bull; Proprietary (Zyvor AI Labs) &bull; All calculations run locally in your browser &bull; No data is sent anywhere</p>
   <p style="margin-top:4px;">Pricing based on publicly available Broadcom/VMware list prices as of 2025. Actual pricing may vary by agreement.</p>
 </div>
 
@@ -381,7 +381,7 @@ function calculate() {
   const kvmDistroCost = distroPrice * hostCount * years;
   const kvmMigrationLabor = vmCount * hoursPerVm * engRate;
   const kvmTraining = trainingBudget;
-  const kvmSoftware = 0; // hyper2kvm is free
+  const kvmSoftware = 0; // h2kvm is free
   const kvmTotalOnetime = kvmMigrationLabor + kvmTraining;
   const kvmTotalRecurring = kvmDistroCost;
   const kvmTotal = kvmTotalOnetime + kvmTotalRecurring;
@@ -427,12 +427,12 @@ function calculate() {
     ['Linux OS subscription', 0, kvmDistroCost, -kvmDistroCost],
     ['Migration labor (one-time)', 0, kvmMigrationLabor, -kvmMigrationLabor],
     ['Training (one-time)', 0, kvmTraining, -kvmTraining],
-    ['hyper2kvm software', 0, 0, 0],
+    ['h2kvm software', 0, 0, 0],
   ];
 
   let tbody = '';
   rows.forEach(r => {
-    if (r[1] === 0 && r[2] === 0 && r[3] === 0 && r[0] === 'hyper2kvm software') {
+    if (r[1] === 0 && r[2] === 0 && r[3] === 0 && r[0] === 'h2kvm software') {
       tbody += `<tr><td>${r[0]}</td><td class="cost-vmware">—</td><td class="cost-kvm" style="color:var(--green)">$0 (free)</td><td class="savings">$0</td></tr>`;
     } else if (r[1] === 0 && r[2] === 0) {
       return;

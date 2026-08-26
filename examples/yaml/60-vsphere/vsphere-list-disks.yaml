@@ -2,7 +2,7 @@
 #   h2kvmctl --config 60-vsphere/vsphere-list-disks.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config 60-vsphere/vsphere-list-disks.yaml
+#   h2kvm --config 60-vsphere/vsphere-list-disks.yaml
 
 command: vsphere
 vcenter: vcenter.example.com

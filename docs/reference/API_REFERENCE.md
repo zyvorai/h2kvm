@@ -1,6 +1,6 @@
 # API Reference
 
-Complete API documentation for hyper2kvm vmspawn SDK.
+Complete API documentation for h2kvm vmspawn SDK.
 
 ## Core Classes
 
@@ -9,7 +9,7 @@ Complete API documentation for hyper2kvm vmspawn SDK.
 Configuration for a VM instance.
 
 ```python
-from hyper2kvm.vmspawn import MachineConfig
+from h2kvm.vmspawn import MachineConfig
 
 config = MachineConfig(
     name="my-vm",
@@ -37,7 +37,7 @@ config = MachineConfig(
 Synchronous VM management.
 
 ```python
-from hyper2kvm.vmspawn import Machine, MachineConfig
+from h2kvm.vmspawn import Machine, MachineConfig
 
 config = MachineConfig(name="test-vm", image="/path/to/image.qcow2")
 machine = Machine(config)
@@ -136,7 +136,7 @@ logs = machine.get_journal(lines=50)
 Asynchronous VM management for parallel operations.
 
 ```python
-from hyper2kvm.vmspawn import AsyncMachine, MachineConfig
+from h2kvm.vmspawn import AsyncMachine, MachineConfig
 import asyncio
 
 async def main():
@@ -169,7 +169,7 @@ All methods are async versions of `Machine` methods:
 Manage multiple VMs with rate limiting.
 
 ```python
-from hyper2kvm.vmspawn import AsyncVMManager, MachineConfig
+from h2kvm.vmspawn import AsyncVMManager, MachineConfig
 import asyncio
 
 async def main():
@@ -237,7 +237,7 @@ results = await manager.validate_batch(configs, timeout=300)
 Basic VM validation.
 
 ```python
-from hyper2kvm.vmspawn import VMValidator, MachineConfig
+from h2kvm.vmspawn import VMValidator, MachineConfig
 
 config = MachineConfig(name="test", image="/path/to/image.qcow2")
 validator = VMValidator(config)
@@ -278,7 +278,7 @@ Run validation.
 Kubernetes node validation.
 
 ```python
-from hyper2kvm.vmspawn import KubernetesNodeValidator, MachineConfig
+from h2kvm.vmspawn import KubernetesNodeValidator, MachineConfig
 
 config = MachineConfig(name="k8s-node", image="/path/to/k8s-node.qcow2")
 validator = KubernetesNodeValidator(config)
@@ -309,7 +309,7 @@ Same as `VMValidator.validate()`, with additional checks:
 Raised when VM fails to start.
 
 ```python
-from hyper2kvm.vmspawn.exceptions import VMStartError
+from h2kvm.vmspawn.exceptions import VMStartError
 
 try:
     machine.start()
@@ -340,7 +340,7 @@ Raised for systemd-related errors.
 Automatic resource cleanup.
 
 ```python
-from hyper2kvm.vmspawn.cleanup import CleanupEngine
+from h2kvm.vmspawn.cleanup import CleanupEngine
 
 cleanup = CleanupEngine()
 
@@ -359,7 +359,7 @@ with CleanupEngine() as cleanup:
 Host-guest communication via vsock.
 
 ```python
-from hyper2kvm.vmspawn.vsock import VsockClient, VsockServer
+from h2kvm.vmspawn.vsock import VsockClient, VsockServer
 
 # In host
 client = VsockClient(cid=3, port=9000)
@@ -377,7 +377,7 @@ server.send(b"Hello Host")
 ### Cloud-init Support
 
 ```python
-from hyper2kvm.vmspawn.cloudinit import create_cloud_init_config
+from h2kvm.vmspawn.cloudinit import create_cloud_init_config
 
 cloud_init = create_cloud_init_config(
     hostname="my-vm",

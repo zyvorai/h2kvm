@@ -28,8 +28,8 @@ virsh domiflist fedora43-cloud | head -3
 echo ""
 
 echo "5. Verifying XML files exist:"
-ls -lh /home/ssahani/tt/hyper2kvm/out/opensuse-leap-test/opensuse-leap-15.4.xml
-ls -lh /home/ssahani/tt/hyper2kvm/out/fedora43-cloud-test/fedora43-cloud.xml
+ls -lh /home/ssahani/tt/h2kvm/out/opensuse-leap-test/opensuse-leap-15.4.xml
+ls -lh /home/ssahani/tt/h2kvm/out/fedora43-cloud-test/fedora43-cloud.xml
 echo ""
 
 echo "✅ Verification complete!"

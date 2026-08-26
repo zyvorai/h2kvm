@@ -1,6 +1,6 @@
 # OpenShift Quick Start Guide
 
-**Get hyper2kvm operator running on OpenShift in 5 minutes!**
+**Get h2kvm operator running on OpenShift in 5 minutes!**
 
 ---
 
@@ -18,16 +18,16 @@
 
 1. Log in to OpenShift Console
 2. Navigate to **Operators** → **OperatorHub**
-3. Search for **"Hyper2KVM"**
+3. Search for **"H2KVM"**
 
 ### Step 2: Install
 
-1. Click **Hyper2KVM Operator**
+1. Click **H2KVM Operator**
 2. Click **Install**
 3. Configure:
    - **Update Channel**: `stable`
    - **Installation Mode**: `A specific namespace`
-   - **Installed Namespace**: `hyper2kvm-system`
+   - **Installed Namespace**: `h2kvm-system`
    - **Update Approval**: `Automatic`
 4. Click **Install**
 
@@ -35,21 +35,21 @@
 
 ```bash
 # Check installation
-oc get csv -n hyper2kvm-system
+oc get csv -n h2kvm-system
 
 # Check operator pod
-oc get pods -n hyper2kvm-system
+oc get pods -n h2kvm-system
 ```
 
 ### Step 4: Create Your First Job
 
 ```bash
 oc apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: my-first-migration
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   operation: inspect
   image:
@@ -73,12 +73,12 @@ EOF
 oc login <cluster-url>
 
 # Add Helm repo
-helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+helm repo add h2kvm https://ssahani.github.io/h2kvm
 helm repo update
 
 # Install operator
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace \
   --set openshift.enabled=true \
   --set openshift.route.enabled=true \
@@ -89,10 +89,10 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 
 ```bash
 # Check all resources
-oc get all -n hyper2kvm-system
+oc get all -n h2kvm-system
 
 # Check routes
-oc get routes -n hyper2kvm-system
+oc get routes -n h2kvm-system
 ```
 
 ---
@@ -102,8 +102,8 @@ oc get routes -n hyper2kvm-system
 ### Step 1: Clone Repository
 
 ```bash
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 ```
 
 ### Step 2: Build Images
@@ -132,7 +132,7 @@ oc login <cluster-url>
 ### Step 4: Test Deployment
 
 ```bash
-./scripts/test-openshift-deployment.sh hyper2kvm-system
+./scripts/test-openshift-deployment.sh h2kvm-system
 ```
 
 ---
@@ -143,7 +143,7 @@ oc login <cluster-url>
 
 ```bash
 # Get metrics route
-METRICS_ROUTE=$(oc get route hyper2kvm-operator-metrics -n hyper2kvm-system -o jsonpath='{.spec.host}')
+METRICS_ROUTE=$(oc get route h2kvm-operator-metrics -n h2kvm-system -o jsonpath='{.spec.host}')
 
 # Access with OpenShift OAuth token
 curl -k -H "Authorization: Bearer $(oc whoami -t)" https://$METRICS_ROUTE/metrics
@@ -152,7 +152,7 @@ curl -k -H "Authorization: Bearer $(oc whoami -t)" https://$METRICS_ROUTE/metric
 ### Operator Logs
 
 ```bash
-oc logs -n hyper2kvm-system -l app.kubernetes.io/name=hyper2kvm-operator -f
+oc logs -n h2kvm-system -l app.kubernetes.io/name=h2kvm-operator -f
 ```
 
 ### Web Console
@@ -167,7 +167,7 @@ Navigate to: **Workloads** → **MigrationJobs**
 
 ```bash
 oc apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: inspect-vmdk
@@ -185,7 +185,7 @@ EOF
 
 ```bash
 oc apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: convert-vmdk
@@ -209,7 +209,7 @@ EOF
 
 ```bash
 oc apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: fix-windows-vm
@@ -239,7 +239,7 @@ oc get migrationjobs --watch
 oc describe migrationjob <job-name>
 
 # Check job logs
-oc logs -n hyper2kvm-workers -l job-name=<job-name>
+oc logs -n h2kvm-workers -l job-name=<job-name>
 ```
 
 ---
@@ -249,8 +249,8 @@ oc logs -n hyper2kvm-workers -l job-name=<job-name>
 ### Enable HA (High Availability)
 
 ```bash
-helm upgrade hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm upgrade h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --set operator.replicaCount=3 \
   --set operator.leaderElection.enabled=true \
   --set webhook.replicaCount=2
@@ -259,9 +259,9 @@ helm upgrade hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 ### Custom Routes
 
 ```bash
-helm upgrade hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
-  --set openshift.route.host=hyper2kvm.apps.example.com \
+helm upgrade h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
+  --set openshift.route.host=h2kvm.apps.example.com \
   --set openshift.route.tls.termination=edge
 ```
 
@@ -270,27 +270,27 @@ helm upgrade hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 ```bash
 # Mirror images to internal registry
 oc image mirror \
-  ghcr.io/ssahani/hyper2kvm:2.1.0-operator=internal-registry.example.com/hyper2kvm/operator:2.1.0 \
-  ghcr.io/ssahani/hyper2kvm:2.1.0-worker=internal-registry.example.com/hyper2kvm/worker:2.1.0
+  ghcr.io/ssahani/h2kvm:2.1.0-operator=internal-registry.example.com/h2kvm/operator:2.1.0 \
+  ghcr.io/ssahani/h2kvm:2.1.0-worker=internal-registry.example.com/h2kvm/worker:2.1.0
 
 # Create ImageContentSourcePolicy
 oc apply -f - <<EOF
 apiVersion: operator.openshift.io/v1alpha1
 kind: ImageContentSourcePolicy
 metadata:
-  name: hyper2kvm-mirror
+  name: h2kvm-mirror
 spec:
   repositoryDigestMirrors:
     - mirrors:
-        - internal-registry.example.com/hyper2kvm
+        - internal-registry.example.com/h2kvm
       source: ghcr.io/ssahani
 EOF
 
 # Deploy with custom registry
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
-  --set operator.image.repository=internal-registry.example.com/hyper2kvm/operator \
-  --set worker.image.repository=internal-registry.example.com/hyper2kvm/worker
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
+  --set operator.image.repository=internal-registry.example.com/h2kvm/operator \
+  --set worker.image.repository=internal-registry.example.com/h2kvm/worker
 ```
 
 ---
@@ -301,13 +301,13 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 
 ```bash
 # Check pod status
-oc describe pod -n hyper2kvm-system -l app.kubernetes.io/name=hyper2kvm-operator
+oc describe pod -n h2kvm-system -l app.kubernetes.io/name=h2kvm-operator
 
 # Check logs
-oc logs -n hyper2kvm-system -l app.kubernetes.io/name=hyper2kvm-operator
+oc logs -n h2kvm-system -l app.kubernetes.io/name=h2kvm-operator
 
 # Check events
-oc get events -n hyper2kvm-system --sort-by='.lastTimestamp'
+oc get events -n h2kvm-system --sort-by='.lastTimestamp'
 ```
 
 ### Worker Pods Failing
@@ -317,23 +317,23 @@ oc get events -n hyper2kvm-system --sort-by='.lastTimestamp'
 oc get pod <worker-pod> -o yaml | grep openshift.io/scc
 
 # Grant SCC manually
-oc adm policy add-scc-to-user hyper2kvm-worker-scc \
-  -z hyper2kvm-worker \
-  -n hyper2kvm-workers
+oc adm policy add-scc-to-user h2kvm-worker-scc \
+  -z h2kvm-worker \
+  -n h2kvm-workers
 ```
 
 ### Route Not Accessible
 
 ```bash
 # Check route
-oc get route -n hyper2kvm-system
+oc get route -n h2kvm-system
 
 # Check route status
-oc describe route hyper2kvm-operator-metrics -n hyper2kvm-system
+oc describe route h2kvm-operator-metrics -n h2kvm-system
 
 # Recreate route
-oc delete route hyper2kvm-operator-metrics -n hyper2kvm-system
-oc apply -f helm/hyper2kvm-operator/templates/openshift-route.yaml
+oc delete route h2kvm-operator-metrics -n h2kvm-system
+oc apply -f helm/h2kvm-operator/templates/openshift-route.yaml
 ```
 
 ---
@@ -343,22 +343,22 @@ oc apply -f helm/hyper2kvm-operator/templates/openshift-route.yaml
 ### Via OperatorHub
 
 1. Navigate to **Operators** → **Installed Operators**
-2. Find **Hyper2KVM Operator**
+2. Find **H2KVM Operator**
 3. Click **Actions** → **Uninstall Operator**
 
 ### Via Helm
 
 ```bash
-helm uninstall hyper2kvm-operator -n hyper2kvm-system
-oc delete project hyper2kvm-system
+helm uninstall h2kvm-operator -n h2kvm-system
+oc delete project h2kvm-system
 ```
 
 ### Cleanup CRDs (Optional)
 
 ```bash
 # WARNING: This deletes all MigrationJobs!
-oc delete crd migrationjobs.hyper2kvm.io
-oc delete crd jobtemplates.hyper2kvm.io
+oc delete crd migrationjobs.h2kvm.io
+oc delete crd jobtemplates.h2kvm.io
 ```
 
 ---
@@ -368,11 +368,11 @@ oc delete crd jobtemplates.hyper2kvm.io
 - **[Full Documentation](docs/deployment/openshift-deployment-guide.md)** - Complete deployment guide
 - **[OLM Bundle Guide](olm/README.md)** - OperatorHub publishing
 - **[Feature Summary](docs/deployment/OPENSHIFT_FEATURES_SUMMARY.md)** - All OpenShift features
-- **[GitHub Repository](https://github.com/ssahani/hyper2kvm)** - Source code and issues
+- **[GitHub Repository](https://github.com/ssahani/h2kvm)** - Source code and issues
 
 ---
 
 **Need Help?**
 
-- GitHub Issues: https://github.com/ssahani/hyper2kvm/issues
-- Documentation: https://github.com/ssahani/hyper2kvm/tree/main/docs
+- GitHub Issues: https://github.com/ssahani/h2kvm/issues
+- Documentation: https://github.com/ssahani/h2kvm/tree/main/docs

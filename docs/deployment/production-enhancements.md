@@ -44,11 +44,11 @@ RUN pip install --no-cache-dir \
 **Solution:** Created PVC templates (`k8s/worker/pvc-templates.yaml`)
 
 **New PVCs:**
-1. `hyper2kvm-worker-state` (10 Gi, ReadWriteMany)
+1. `h2kvm-worker-state` (10 Gi, ReadWriteMany)
    - Job state persistence
    - State machine history
    
-2. `hyper2kvm-worker-events` (5 Gi, ReadWriteMany)
+2. `h2kvm-worker-events` (5 Gi, ReadWriteMany)
    - Progress events
    - Audit logs
 
@@ -85,8 +85,8 @@ RUN pip install --no-cache-dir \
 
 **Volume Mounts:**
 ```yaml
-/var/lib/hyper2kvm/jobs    → PVC (persistent state)
-/var/lib/hyper2kvm/events  → PVC (persistent events)
+/var/lib/h2kvm/jobs    → PVC (persistent state)
+/var/lib/h2kvm/events  → PVC (persistent events)
 /data/input                → PVC (VMDK input, ReadOnly)
 /data/output               → PVC (qcow2 output, ReadWrite)
 /tmp/conversion            → PVC (conversion temp, fast NVMe)
@@ -96,36 +96,36 @@ RUN pip install --no-cache-dir \
 
 ### 4. Prometheus Metrics ✅
 
-**Created:** `hyper2kvm/worker/metrics.py`
+**Created:** `h2kvm/worker/metrics.py`
 
 **Metrics Exposed:**
-- `hyper2kvm_migration_total{worker_id, operation, status}`
+- `h2kvm_migration_total{worker_id, operation, status}`
   - Total migrations by status (success/failed)
   
-- `hyper2kvm_migration_duration_seconds{worker_id, operation}`
+- `h2kvm_migration_duration_seconds{worker_id, operation}`
   - Migration duration histogram (buckets: 1m, 5m, 10m, 30m, 1h, 2h)
   
-- `hyper2kvm_migration_failures_total{worker_id, operation, error_type}`
+- `h2kvm_migration_failures_total{worker_id, operation, error_type}`
   - Failure count by error type
   
-- `hyper2kvm_worker_info{worker_id, ...}`
+- `h2kvm_worker_info{worker_id, ...}`
   - Static worker information
   
-- `hyper2kvm_worker_jobs_active{worker_id}`
+- `h2kvm_worker_jobs_active{worker_id}`
   - Current active jobs count
   
-- `hyper2kvm_vmdk_size_bytes{worker_id}`
+- `h2kvm_vmdk_size_bytes{worker_id}`
   - VMDK size distribution histogram
   
-- `hyper2kvm_conversion_temp_usage_bytes{worker_id}`
+- `h2kvm_conversion_temp_usage_bytes{worker_id}`
   - Temporary storage usage
   
-- `hyper2kvm_conversion_temp_capacity_bytes{worker_id}`
+- `h2kvm_conversion_temp_capacity_bytes{worker_id}`
   - Temporary storage capacity
 
 **Usage:**
 ```python
-from hyper2kvm.worker.metrics import get_metrics, start_metrics_server
+from h2kvm.worker.metrics import get_metrics, start_metrics_server
 
 # Initialize metrics
 metrics = get_metrics(worker_id="worker-01")
@@ -149,10 +149,10 @@ metrics.record_migration_complete("convert", duration=1234.5, success=True)
 3. **PrometheusRule** - Alert rules
 
 **Alerts Defined:**
-- `Hyper2KVMWorkerDown` - Worker pod down for >5 minutes
-- `Hyper2KVMJobFailed` - Job failure rate detected
-- `Hyper2KVMMigrationSlow` - Migration >2 hours
-- `Hyper2KVMTempStorageFull` - Temp storage >90% full
+- `H2KVMWorkerDown` - Worker pod down for >5 minutes
+- `H2KVMJobFailed` - Job failure rate detected
+- `H2KVMMigrationSlow` - Migration >2 hours
+- `H2KVMTempStorageFull` - Temp storage >90% full
 
 **Deployment:**
 ```bash
@@ -222,7 +222,7 @@ cd k8s/worker
 ./submit-job.sh --follow examples/convert-job.json
 
 # Submit to specific worker
-./submit-job.sh --worker hyper2kvm-worker-abc123 examples/inspect-job.json
+./submit-job.sh --worker h2kvm-worker-abc123 examples/inspect-job.json
 
 # Use custom namespace
 ./submit-job.sh --namespace my-workers job.json
@@ -266,7 +266,7 @@ k8s/
 k8s/monitoring/
 ├── servicemonitor.yaml ✨ NEW             # Prometheus integration
 
-hyper2kvm/worker/
+h2kvm/worker/
 └── metrics.py ✨ NEW                       # Prometheus metrics
 
 docs/deployment/
@@ -371,14 +371,14 @@ make label-nodes NODE_NAMES="worker-01 worker-02 worker-03"
 make status
 
 # Verify PVCs are bound
-kubectl get pvc -n hyper2kvm-workers
+kubectl get pvc -n h2kvm-workers
 
 # Check worker capabilities
 make capabilities
 
 # View metrics endpoint
-POD=$(kubectl get pods -n hyper2kvm-workers -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}')
-kubectl port-forward -n hyper2kvm-workers $POD 9090:9090
+POD=$(kubectl get pods -n h2kvm-workers -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}')
+kubectl port-forward -n h2kvm-workers $POD 9090:9090
 # Open: http://localhost:9090/metrics
 ```
 

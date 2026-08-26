@@ -207,7 +207,7 @@
   <table>
     <tr><th>Issue</th><th>Where to Look</th><th>Resolution</th></tr>
     <tr><td>VM won't start</td><td>Events tab</td><td>Check for scheduling failures, resource limits, PVC issues</td></tr>
-    <tr><td>VM boots to GRUB</td><td>Serial console</td><td>Bootloader misconfigured &mdash; re-run hyper2kvm with --regen-initramfs</td></tr>
+    <tr><td>VM boots to GRUB</td><td>Serial console</td><td>Bootloader misconfigured &mdash; re-run h2kvm with --regen-initramfs</td></tr>
     <tr><td>No network after migration</td><td>Network tab + console</td><td>Check interface binding, cloud-init network config</td></tr>
     <tr><td>High CPU usage</td><td>Metrics tab</td><td>Identify the process via SSH/serial console, adjust CPU limits</td></tr>
     <tr><td>Disk full on host</td><td>Host &rarr; Partitions</td><td>Clean up old images, PVCs, or snapshots</td></tr>
@@ -228,8 +228,8 @@
 
   <div class="footer">
     <p>v9s Operations Guide &mdash; Day-2 KubeVirt VM Management<br>
-    Part of the hyper2kvm ecosystem<br>
-    github.com/ssahani/hyper2kvm</p>
+    Part of the h2kvm ecosystem<br>
+    github.com/ssahani/h2kvm</p>
   </div>
 </div>
 

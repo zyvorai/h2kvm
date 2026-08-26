@@ -10,8 +10,8 @@ import logging
 
 import pytest
 
-from hyper2kvm.config.pipeline_config import resolve_enable_rdp
-from hyper2kvm.fixers.windows.registry.firstboot import log_firstboot_provision_summary
+from h2kvm.config.pipeline_config import resolve_enable_rdp
+from h2kvm.fixers.windows.registry.firstboot import log_firstboot_provision_summary
 
 
 class TestResolveEnableRdp:

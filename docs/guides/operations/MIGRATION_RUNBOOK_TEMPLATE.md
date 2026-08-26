@@ -93,7 +93,7 @@ Network: [BANDWIDTH] Mbps
 
 ### 3. Software Installation
 
-- [ ] Hyper2KVM installed: Version `[VERSION]`
+- [ ] H2KVM installed: Version `[VERSION]`
 - [ ] Dependencies verified: qemu-img `[VERSION]`
 - [ ] Pre-flight validation passed
 - [ ] Test migration successful
@@ -563,7 +563,7 @@ Next steps: [NEXT-STEPS]
 
 | Vendor | Support Number | Support Email | Account Number |
 |--------|----------------|---------------|----------------|
-| **Hyper2KVM** | [SUPPORT-INFO] | support@hyper2kvm.io | [ACCOUNT] |
+| **H2KVM** | [SUPPORT-INFO] | support@h2kvm.io | [ACCOUNT] |
 | **VMware** | [SUPPORT-INFO] | [EMAIL] | [ACCOUNT] |
 | **[OTHER]** | [SUPPORT-INFO] | [EMAIL] | [ACCOUNT] |
 

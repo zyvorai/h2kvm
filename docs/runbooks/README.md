@@ -1,6 +1,6 @@
 # Operational Runbooks
 
-Procedures for handling common operational scenarios in hyper2kvm migrations.
+Procedures for handling common operational scenarios in h2kvm migrations.
 
 ## Quick Reference
 
@@ -24,7 +24,7 @@ Validates KVM, QEMU, libvirt, disk space, and all dependencies.
 ```bash
 ./scripts/collect-debug-bundle.sh
 ```
-Gathers logs, events, resource states, and metrics into `/tmp/hyper2kvm-debug-<timestamp>.tar.gz`.
+Gathers logs, events, resource states, and metrics into `/tmp/h2kvm-debug-<timestamp>.tar.gz`.
 
 ### Health Check
 ```bash
@@ -35,19 +35,19 @@ Validates operator, workers, KubeVirt, CDI, and all cluster components.
 ### Log Locations
 
 **CLI migrations:**
-- Migration logs: `/tmp/hyper2kvm-<random>/migration.log`
+- Migration logs: `/tmp/h2kvm-<random>/migration.log`
 - Output directory: Specified via `--output-dir` (default varies)
 - Checkpoints: `<output-dir>/checkpoints/`
 
 **Kubernetes migrations:**
-- Operator logs: `kubectl logs -n hyper2kvm-system -l control-plane=controller-manager`
-- Worker logs: `kubectl logs -n hyper2kvm-workers <pod-name>`
-- Migration job logs: `kubectl logs -n hyper2kvm-migration <job-pod>`
-- Events: `kubectl get events -n hyper2kvm-migration --sort-by=.lastTimestamp`
+- Operator logs: `kubectl logs -n h2kvm-system -l control-plane=controller-manager`
+- Worker logs: `kubectl logs -n h2kvm-workers <pod-name>`
+- Migration job logs: `kubectl logs -n h2kvm-migration <job-pod>`
+- Events: `kubectl get events -n h2kvm-migration --sort-by=.lastTimestamp`
 
 **System paths:**
-- State directory: `/var/lib/hyper2kvm/`
-- Temporary workspace: `/tmp/hyper2kvm-*/`
+- State directory: `/var/lib/h2kvm/`
+- Temporary workspace: `/tmp/h2kvm-*/`
 - NBD devices: `/dev/nbd*`
 - Device mapper: `/dev/mapper/`
 
@@ -56,7 +56,7 @@ Validates operator, workers, KubeVirt, CDI, and all cluster components.
 | Role | Contact Method | Response Time |
 |------|---------------|---------------|
 | On-call Engineer | PagerDuty/Slack | 15 minutes |
-| Platform Team | Slack #hyper2kvm-ops | 1 hour |
+| Platform Team | Slack #h2kvm-ops | 1 hour |
 | Vendor Support | support@example.com | 4 hours |
 
 ## Escalation Criteria

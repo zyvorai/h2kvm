@@ -1,0 +1,233 @@
+# SPDX-License-Identifier: Apache-2.0
+# Built-in migration profiles for h2kvm
+#
+# These profiles provide pre-configured settings for common migration scenarios.
+# Profiles support inheritance via the 'extends' field.
+
+# =============================================================================
+# PRODUCTION PROFILE
+# =============================================================================
+# Full-featured conversion with all safety measures enabled.
+# Best for production migrations where data integrity and boot success are critical.
+
+production:
+  description: "Production migration profile with full fixes, compression, and validation"
+
+  pipeline:
+    # Inspection stage
+    inspect:
+      enabled: true
+      collect_guest_info: true
+
+    # Offline fixes stage
+    fix:
+      enabled: true
+      backup: true
+      update_grub: true
+      regen_initramfs: true
+      fstab_mode: "stabilize-all"
+      remove_vmware_tools: false
+      print_fstab: false
+
+    # Conversion stage
+    convert:
+      enabled: true
+      compress: true
+      compress_level: 6
+      check_image_integrity: true
+
+    # Validation stage
+    validate:
+      enabled: true
+      check_image_integrity: true
+
+  output:
+    format: "qcow2"
+
+  options:
+    report:
+      enabled: true
+      path: "report.json"
+
+# =============================================================================
+# TESTING PROFILE
+# =============================================================================
+# Faster conversion for test/development environments.
+# Extends production but disables time-consuming operations.
+
+testing:
+  description: "Testing profile with faster conversion, minimal validation"
+  extends: "production"
+
+  pipeline:
+    # Disable guest inspection for speed
+    inspect:
+      enabled: false
+      collect_guest_info: false
+
+    # Minimal fixes
+    fix:
+      enabled: true
+      backup: false  # Skip backups in testing
+      regen_initramfs: false  # Skip initramfs regeneration
+
+    # No compression for faster conversion
+    convert:
+      enabled: true
+      compress: false
+      check_image_integrity: false
+
+    # Skip validation in testing
+    validate:
+      enabled: false
+
+  output:
+    format: "qcow2"  # Still use qcow2 for testing
+
+# =============================================================================
+# MINIMAL PROFILE
+# =============================================================================
+# Bare minimum processing for already-prepared VMs or raw conversions.
+# Only performs critical fixes, no compression, no validation.
+
+minimal:
+  description: "Minimal profile with only critical fixes, no conversion or validation"
+
+  pipeline:
+    # No inspection
+    inspect:
+      enabled: false
+
+    # Critical fixes only
+    fix:
+      enabled: true
+      backup: false
+      update_grub: true  # Still fix GRUB
+      regen_initramfs: false
+      fstab_mode: "stabilize-all"  # Fix fstab
+      remove_vmware_tools: false
+      print_fstab: false
+
+    # No format conversion
+    convert:
+      enabled: false
+
+    # No validation
+    validate:
+      enabled: false
+
+  output:
+    format: "raw"  # Keep as raw when no conversion
+
+  options:
+    report:
+      enabled: false
+
+# =============================================================================
+# FAST PROFILE
+# =============================================================================
+# Speed-optimized conversion with minimal safety checks.
+# Use for bulk migrations of non-critical VMs.
+
+fast:
+  description: "Fast profile optimized for bulk migrations with minimal overhead"
+  extends: "minimal"
+
+  pipeline:
+    fix:
+      enabled: true
+      backup: false
+      update_grub: false  # Skip GRUB update
+      regen_initramfs: false
+      fstab_mode: "noop"  # Don't modify fstab
+
+    convert:
+      enabled: true
+      compress: false
+      check_image_integrity: false
+
+  output:
+    format: "qcow2"
+
+# =============================================================================
+# WINDOWS PROFILE
+# =============================================================================
+# Profile optimized for Windows guest migrations.
+
+windows:
+  description: "Windows-optimized profile with driver injection"
+  extends: "production"
+
+  pipeline:
+    inspect:
+      enabled: true
+      collect_guest_info: true
+
+    fix:
+      enabled: true
+      backup: true
+      update_grub: false  # Windows doesn't use GRUB
+      regen_initramfs: false  # Windows doesn't use initramfs
+      fstab_mode: "noop"  # Windows doesn't use fstab
+
+    convert:
+      enabled: true
+      compress: true
+      compress_level: 6
+
+    validate:
+      enabled: true
+
+  output:
+    format: "qcow2"
+
+# =============================================================================
+# ARCHIVE PROFILE
+# =============================================================================
+# Maximum compression for archival/backup purposes.
+
+archive:
+  description: "Archive profile with maximum compression for long-term storage"
+  extends: "production"
+
+  pipeline:
+    convert:
+      enabled: true
+      compress: true
+      compress_level: 9  # Maximum compression
+
+  output:
+    format: "qcow2"
+
+# =============================================================================
+# DEBUG PROFILE
+# =============================================================================
+# Verbose profile for troubleshooting migration issues.
+
+debug:
+  description: "Debug profile with maximum verbosity and detailed reporting"
+  extends: "production"
+
+  pipeline:
+    inspect:
+      enabled: true
+      collect_guest_info: true
+
+    fix:
+      enabled: true
+      backup: true
+      update_grub: true
+      regen_initramfs: true
+      print_fstab: true  # Print fstab for debugging
+
+    convert:
+      enabled: true
+      compress: false  # Faster conversion for debugging
+
+    validate:
+      enabled: true
+
+  options:
+    report:
+      enabled: true
+      path: "debug_report.json"

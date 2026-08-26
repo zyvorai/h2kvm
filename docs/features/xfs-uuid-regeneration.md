@@ -8,7 +8,7 @@
 
 When VMware VMs are cloned from templates or snapshots, all XFS filesystems retain identical UUIDs. This causes critical mount failures in Linux systems because XFS refuses to mount filesystems with duplicate UUIDs (the kernel blocks it for data integrity).
 
-Hyper2KVM automatically detects and fixes this issue through:
+H2KVM automatically detects and fixes this issue through:
 1. **XFS UUID Regeneration** - Generate new unique UUIDs for all XFS filesystems
 2. **Automatic fstab Rebuild** - Reconstruct `/etc/fstab` when UUIDs don't match actual disks
 3. **Initramfs Regeneration** - Rebuild boot images with new UUIDs for successful boot
@@ -48,7 +48,7 @@ dmesg | tail
 
 ### Automatic XFS UUID Regeneration
 
-Hyper2KVM performs these steps **automatically** during offline migration:
+H2KVM performs these steps **automatically** during offline migration:
 
 ```
 1. Detect all XFS filesystems on the source disk
@@ -95,7 +95,7 @@ UUID=f1154fa7-a4ab-43c4-84e5-0933c84b4f4f /boot xfs defaults 0 0
 
 ### Automatic Detection and Rebuild
 
-Hyper2KVM detects UUID mismatches and **rebuilds fstab from scratch**:
+H2KVM detects UUID mismatches and **rebuilds fstab from scratch**:
 
 ```python
 # Detection logic
@@ -147,7 +147,7 @@ def _rebuild_fstab_from_disk_layout(g, uuid_changes):
     write_fstab("""
     #
     # /etc/fstab
-    # Rebuilt by hyper2kvm based on actual disk UUIDs
+    # Rebuilt by h2kvm based on actual disk UUIDs
     #
     UUID=2b004342... /     xfs defaults              0 0
     UUID=5ffdf052... /boot xfs defaults,nofail,...   0 0
@@ -490,10 +490,10 @@ INFO: ✓ Mount succeeded with nouuid: /dev/nbd4p2
 
 ### Implementation Files
 
-- `hyper2kvm/fixers/offline_fixer.py::_regenerate_xfs_uuids()` - UUID regeneration logic
-- `hyper2kvm/fixers/offline_fixer.py::_rebuild_fstab_from_disk_layout()` - fstab rebuild
-- `hyper2kvm/fixers/offline_fixer.py::_update_fstab_with_new_uuids()` - fstab update with fallback
-- `hyper2kvm/core/vmcraft/mount.py` - XFS duplicate UUID detection and nouuid retry
+- `h2kvm/fixers/offline_fixer.py::_regenerate_xfs_uuids()` - UUID regeneration logic
+- `h2kvm/fixers/offline_fixer.py::_rebuild_fstab_from_disk_layout()` - fstab rebuild
+- `h2kvm/fixers/offline_fixer.py::_update_fstab_with_new_uuids()` - fstab update with fallback
+- `h2kvm/core/vmcraft/mount.py` - XFS duplicate UUID detection and nouuid retry
 
 ---
 

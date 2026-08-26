@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker
+  namespace: h2kvm-workers
   labels:
-    app: hyper2kvm-worker
+    app: h2kvm-worker
     component: worker-daemon
 spec:
   selector:
     matchLabels:
-      app: hyper2kvm-worker
+      app: h2kvm-worker
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
@@ -17,40 +17,40 @@ spec:
   template:
     metadata:
       labels:
-        app: hyper2kvm-worker
+        app: h2kvm-worker
         component: worker-daemon
     spec:
       # Node selection for worker-capable nodes
       nodeSelector:
-        hyper2kvm.io/worker-enabled: "true"
+        h2kvm.io/worker-enabled: "true"
 
       tolerations:
-      - key: hyper2kvm.io/privileged
+      - key: h2kvm.io/privileged
         operator: Exists
         effect: NoSchedule
 
       # Service account for worker operations
-      serviceAccountName: hyper2kvm-worker
+      serviceAccountName: h2kvm-worker
 
       # Main worker container (no init containers for k3d)
       containers:
       - name: worker
-        image: hyper2kvm:worker
+        image: h2kvm:worker
         imagePullPolicy: IfNotPresent  # Use local image in k3d
 
         env:
-        - name: HYPER2KVM_MODE
+        - name: H2KVM_MODE
           value: "worker"
         - name: WORKER_ID
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        - name: HYPER2KVM_STATE_DIR
-          value: "/var/lib/hyper2kvm/jobs"
-        - name: HYPER2KVM_EVENT_DIR
-          value: "/var/lib/hyper2kvm/events"
-        - name: HYPER2KVM_QUEUE_DIR
-          value: "/var/lib/hyper2kvm/queue"
+        - name: H2KVM_STATE_DIR
+          value: "/var/lib/h2kvm/jobs"
+        - name: H2KVM_EVENT_DIR
+          value: "/var/lib/h2kvm/events"
+        - name: H2KVM_QUEUE_DIR
+          value: "/var/lib/h2kvm/queue"
         - name: PYTHONUNBUFFERED
           value: "1"
 
@@ -76,11 +76,11 @@ spec:
         volumeMounts:
         # Persistent worker state
         - name: worker-state
-          mountPath: /var/lib/hyper2kvm/jobs
+          mountPath: /var/lib/h2kvm/jobs
 
         # Persistent events
         - name: worker-events
-          mountPath: /var/lib/hyper2kvm/events
+          mountPath: /var/lib/h2kvm/events
 
         # Device access
         - name: dev
@@ -101,7 +101,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - "kill -TERM $(cat /var/lib/hyper2kvm/worker.pid 2>/dev/null) 2>/dev/null; sleep 30"
+              - "kill -TERM $(cat /var/lib/h2kvm/worker.pid 2>/dev/null) 2>/dev/null; sleep 30"
 
         ports:
         - name: metrics
@@ -114,12 +114,12 @@ spec:
       # Persistent storage for worker state
       - name: worker-state
         persistentVolumeClaim:
-          claimName: hyper2kvm-worker-state
+          claimName: h2kvm-worker-state
 
       # Persistent storage for events
       - name: worker-events
         persistentVolumeClaim:
-          claimName: hyper2kvm-worker-events
+          claimName: h2kvm-worker-events
 
       # Device access
       - name: dev
@@ -130,10 +130,10 @@ spec:
       # Host paths for testing (replace with PVCs in production)
       - name: input-storage
         hostPath:
-          path: /tmp/hyper2kvm/input
+          path: /tmp/h2kvm/input
           type: DirectoryOrCreate
 
       - name: output-storage
         hostPath:
-          path: /tmp/hyper2kvm/output
+          path: /tmp/h2kvm/output
           type: DirectoryOrCreate

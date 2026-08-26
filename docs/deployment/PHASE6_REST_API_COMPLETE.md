@@ -8,7 +8,7 @@
 
 ## 🎉 What We Built
 
-Successfully implemented a production-grade REST API for the hyper2kvm Worker Job Protocol with **FastAPI**, providing:
+Successfully implemented a production-grade REST API for the h2kvm Worker Job Protocol with **FastAPI**, providing:
 
 - **Complete HTTP Interface** - All job, worker, and queue operations via REST
 - **Real-Time Streaming** - Server-Sent Events (SSE) for live progress updates
@@ -167,7 +167,7 @@ FROM python:3.11-slim
 ```
 
 **Features:**
-- Non-root user (hyper2kvm, UID 1000)
+- Non-root user (h2kvm, UID 1000)
 - Health check on `/health`
 - Minimal base (Python 3.11 slim)
 - Multi-architecture (amd64, arm64)
@@ -177,8 +177,8 @@ FROM python:3.11-slim
 
 ```bash
 # Pull and run
-docker pull ghcr.io/ssahani/hyper2kvm-worker-api:latest
-docker run -p 8000:8000 ghcr.io/ssahani/hyper2kvm-worker-api:latest
+docker pull ghcr.io/ssahani/h2kvm-worker-api:latest
+docker run -p 8000:8000 ghcr.io/ssahani/h2kvm-worker-api:latest
 
 # Access API
 curl http://localhost:8000/docs
@@ -188,14 +188,14 @@ curl http://localhost:8000/docs
 
 ```bash
 docker run -p 8000:8000 \
-  -v /var/lib/hyper2kvm:/var/lib/hyper2kvm \
-  ghcr.io/ssahani/hyper2kvm-worker-api:latest
+  -v /var/lib/h2kvm:/var/lib/h2kvm \
+  ghcr.io/ssahani/h2kvm-worker-api:latest
 ```
 
 Mounted directories:
-- `/var/lib/hyper2kvm/jobs` - Job state machines
-- `/var/lib/hyper2kvm/events` - Progress events
-- `/var/lib/hyper2kvm/queue` - Job queue
+- `/var/lib/h2kvm/jobs` - Job state machines
+- `/var/lib/h2kvm/events` - Progress events
+- `/var/lib/h2kvm/queue` - Job queue
 
 ---
 
@@ -208,13 +208,13 @@ Mounted directories:
 pip install -r requirements-api.txt
 
 # Start with auto-reload
-uvicorn hyper2kvm.worker.api:app --reload
+uvicorn h2kvm.worker.api:app --reload
 ```
 
 ### Production (Gunicorn)
 
 ```bash
-gunicorn hyper2kvm.worker.api:app \
+gunicorn h2kvm.worker.api:app \
   -w 4 \
   -k uvicorn.workers.UvicornWorker \
   --bind 0.0.0.0:8000
@@ -226,11 +226,11 @@ gunicorn hyper2kvm.worker.api:app \
 version: '3.8'
 services:
   api:
-    image: ghcr.io/ssahani/hyper2kvm-worker-api:latest
+    image: ghcr.io/ssahani/h2kvm-worker-api:latest
     ports:
       - "8000:8000"
     volumes:
-      - hyper2kvm-data:/var/lib/hyper2kvm
+      - h2kvm-data:/var/lib/h2kvm
     restart: unless-stopped
 ```
 
@@ -240,14 +240,14 @@ services:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hyper2kvm-api
+  name: h2kvm-api
 spec:
   replicas: 3
   template:
     spec:
       containers:
       - name: api
-        image: ghcr.io/ssahani/hyper2kvm-worker-api:latest
+        image: ghcr.io/ssahani/h2kvm-worker-api:latest
         ports:
         - containerPort: 8000
         livenessProbe:
@@ -392,7 +392,7 @@ async def lifespan(app: FastAPI):
 
 ### Non-Root Containers
 
-Docker image runs as UID 1000 (hyper2kvm user).
+Docker image runs as UID 1000 (h2kvm user).
 
 ### Health Checks
 
@@ -424,16 +424,16 @@ Documented patterns for:
 **Metrics endpoint:** `/metrics`
 
 Exposed metrics:
-- `hyper2kvm_migration_total` - Total migrations
-- `hyper2kvm_migration_duration_seconds` - Duration histogram
-- `hyper2kvm_worker_jobs_active` - Active job count
-- `hyper2kvm_worker_info` - Worker information
+- `h2kvm_migration_total` - Total migrations
+- `h2kvm_migration_duration_seconds` - Duration histogram
+- `h2kvm_worker_jobs_active` - Active job count
+- `h2kvm_worker_info` - Worker information
 
 **Prometheus scrape config:**
 
 ```yaml
 scrape_configs:
-  - job_name: 'hyper2kvm'
+  - job_name: 'h2kvm'
     static_configs:
       - targets: ['localhost:8000']
     metrics_path: /metrics
@@ -545,8 +545,8 @@ API server can be scaled independently:
 ## 📝 Files Created
 
 ```
-hyper2kvm/
-├── hyper2kvm/worker/
+h2kvm/
+├── h2kvm/worker/
 │   └── api.py                           # 850 lines - FastAPI application
 ├── requirements-api.txt                 # 15 lines - API dependencies
 ├── examples/

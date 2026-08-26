@@ -2,13 +2,13 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.core.exceptions."""
+"""Tests for h2kvm.core.exceptions."""
 
 from __future__ import annotations
 
 import pytest
 
-from hyper2kvm.core.exceptions import (
+from h2kvm.core.exceptions import (
     AzureError,
     BootloaderFixerError,
     ConfigurationError,
@@ -16,7 +16,7 @@ from hyper2kvm.core.exceptions import (
     DiskConversionError,
     Fatal,
     FixerError,
-    Hyper2KvmError,
+    H2KvmError,
     InfrastructureError,
     LVMError,
     ManifestError,
@@ -238,13 +238,13 @@ class TestRedactSecrets:
 
 
 # ============================================================================
-# Hyper2KvmError - construction and __post_init__
+# H2KvmError - construction and __post_init__
 # ============================================================================
 
 
-class TestHyper2KvmErrorConstruction:
+class TestH2KvmErrorConstruction:
     def test_defaults(self):
-        err = Hyper2KvmError()
+        err = H2KvmError()
         assert err.code == 1
         assert err.msg == "error"
         assert err.cause is None
@@ -252,50 +252,50 @@ class TestHyper2KvmErrorConstruction:
 
     def test_custom_fields(self):
         cause = ValueError("boom")
-        err = Hyper2KvmError(code=42, msg="disk failed", cause=cause, context={"disk": "/dev/sda"})
+        err = H2KvmError(code=42, msg="disk failed", cause=cause, context={"disk": "/dev/sda"})
         assert err.code == 42
         assert err.msg == "disk failed"
         assert err.cause is cause
         assert err.context == {"disk": "/dev/sda"}
 
     def test_code_clamped_via_safe_int(self):
-        err = Hyper2KvmError(code="not_a_number")  # type: ignore[arg-type]
+        err = H2KvmError(code="not_a_number")  # type: ignore[arg-type]
         # _safe_int("not_a_number") -> 1, _clamp_exit_code(1) -> 1
         assert err.code == 1
 
     def test_code_out_of_range_raises(self):
         with pytest.raises(ValueError, match="range 0-255"):
-            Hyper2KvmError(code=999)
+            H2KvmError(code=999)
 
     def test_msg_normalized_to_one_line(self):
-        err = Hyper2KvmError(msg="line1\nline2\nline3")
+        err = H2KvmError(msg="line1\nline2\nline3")
         assert "\n" not in err.msg
         assert err.msg == "line1 line2 line3"
 
     def test_empty_msg_uses_class_name(self):
-        err = Hyper2KvmError(msg="")
-        assert err.msg == "Hyper2KvmError"
+        err = H2KvmError(msg="")
+        assert err.msg == "H2KvmError"
 
     def test_none_context_defaults_to_empty_dict(self):
-        err = Hyper2KvmError(context=None)
+        err = H2KvmError(context=None)
         assert err.context == {}
 
     def test_is_exception(self):
-        err = Hyper2KvmError()
+        err = H2KvmError()
         assert isinstance(err, Exception)
 
     def test_args_tuple(self):
-        err = Hyper2KvmError(msg="test message")
+        err = H2KvmError(msg="test message")
         assert err.args == ("test message",)
 
     def test_super_init_called_with_msg(self):
-        err = Hyper2KvmError(msg="hello")
+        err = H2KvmError(msg="hello")
         # Exception.__init__ sets args
         assert str(Exception.__str__(err)) == "hello"
 
     def test_eq_false_means_identity_equality(self):
-        a = Hyper2KvmError(code=1, msg="same")
-        b = Hyper2KvmError(code=1, msg="same")
+        a = H2KvmError(code=1, msg="same")
+        b = H2KvmError(code=1, msg="same")
         assert a != b
         assert a == a
 
@@ -307,23 +307,23 @@ class TestHyper2KvmErrorConstruction:
 
 class TestWithContext:
     def test_adds_context(self):
-        err = Hyper2KvmError()
+        err = H2KvmError()
         result = err.with_context(vm="test-vm", disk="/dev/sda")
         assert result is err  # returns self
         assert err.context == {"vm": "test-vm", "disk": "/dev/sda"}
 
     def test_updates_existing_context(self):
-        err = Hyper2KvmError(context={"a": 1})
+        err = H2KvmError(context={"a": 1})
         err.with_context(b=2)
         assert err.context == {"a": 1, "b": 2}
 
     def test_overwrites_existing_key(self):
-        err = Hyper2KvmError(context={"a": 1})
+        err = H2KvmError(context={"a": 1})
         err.with_context(a=99)
         assert err.context["a"] == 99
 
     def test_chaining(self):
-        err = Hyper2KvmError()
+        err = H2KvmError()
         result = err.with_context(a=1).with_context(b=2)
         assert result is err
         assert err.context == {"a": 1, "b": 2}
@@ -336,22 +336,22 @@ class TestWithContext:
 
 class TestUserMessage:
     def test_basic_message(self):
-        err = Hyper2KvmError(msg="something broke")
+        err = H2KvmError(msg="something broke")
         assert err.user_message() == "something broke"
 
     def test_include_context_false_ignores_context(self):
-        err = Hyper2KvmError(msg="fail", context={"vm": "test"})
+        err = H2KvmError(msg="fail", context={"vm": "test"})
         result = err.user_message(include_context=False)
         assert "vm" not in result
 
     def test_include_context_true_shows_context(self):
-        err = Hyper2KvmError(msg="fail", context={"vm": "test"})
+        err = H2KvmError(msg="fail", context={"vm": "test"})
         result = err.user_message(include_context=True)
         assert "vm=" in result
         assert "'test'" in result
 
     def test_solutions_formatted(self):
-        err = Hyper2KvmError(
+        err = H2KvmError(
             msg="disk error",
             context={"solutions": ["Check disk space", "Run fsck"]},
         )
@@ -361,7 +361,7 @@ class TestUserMessage:
         assert "2. Run fsck" in result
 
     def test_causes_formatted(self):
-        err = Hyper2KvmError(
+        err = H2KvmError(
             msg="boot failed",
             context={"causes": ["Missing GRUB", "Wrong partition"]},
         )
@@ -371,7 +371,7 @@ class TestUserMessage:
         assert "2. Wrong partition" in result
 
     def test_doc_link_formatted(self):
-        err = Hyper2KvmError(
+        err = H2KvmError(
             msg="error",
             context={"doc_link": "https://example.com/docs"},
         )
@@ -379,7 +379,7 @@ class TestUserMessage:
         assert "Documentation: https://example.com/docs" in result
 
     def test_remaining_context_after_special_fields(self):
-        err = Hyper2KvmError(
+        err = H2KvmError(
             msg="error",
             context={"solutions": ["fix it"], "vm": "my-vm"},
         )
@@ -389,28 +389,28 @@ class TestUserMessage:
 
     def test_include_cause_true(self):
         cause = OSError("disk full")
-        err = Hyper2KvmError(msg="write failed", cause=cause)
+        err = H2KvmError(msg="write failed", cause=cause)
         result = err.user_message(include_cause=True)
         assert "cause: OSError: disk full" in result
 
     def test_include_cause_false_ignores_cause(self):
         cause = OSError("disk full")
-        err = Hyper2KvmError(msg="write failed", cause=cause)
+        err = H2KvmError(msg="write failed", cause=cause)
         result = err.user_message(include_cause=False)
         assert "cause" not in result
 
     def test_include_cause_when_none(self):
-        err = Hyper2KvmError(msg="oops")
+        err = H2KvmError(msg="oops")
         result = err.user_message(include_cause=True)
         assert "cause" not in result
 
     def test_empty_context_no_brackets(self):
-        err = Hyper2KvmError(msg="fail", context={})
+        err = H2KvmError(msg="fail", context={})
         result = err.user_message(include_context=True)
         assert result == "fail"
 
     def test_all_special_fields_together(self):
-        err = Hyper2KvmError(
+        err = H2KvmError(
             msg="migration failed",
             context={
                 "solutions": ["Retry"],
@@ -435,15 +435,15 @@ class TestUserMessage:
 
 class TestStr:
     def test_str_returns_user_message(self):
-        err = Hyper2KvmError(msg="broken")
+        err = H2KvmError(msg="broken")
         assert str(err) == "broken"
 
     def test_str_does_not_include_context(self):
-        err = Hyper2KvmError(msg="fail", context={"vm": "test"})
+        err = H2KvmError(msg="fail", context={"vm": "test"})
         assert "vm" not in str(err)
 
     def test_str_does_not_include_cause(self):
-        err = Hyper2KvmError(msg="fail", cause=ValueError("inner"))
+        err = H2KvmError(msg="fail", cause=ValueError("inner"))
         assert "cause" not in str(err)
 
 
@@ -454,39 +454,39 @@ class TestStr:
 
 class TestToDict:
     def test_basic_dict(self):
-        err = Hyper2KvmError(code=2, msg="disk error")
+        err = H2KvmError(code=2, msg="disk error")
         d = err.to_dict()
-        assert d["type"] == "Hyper2KvmError"
+        assert d["type"] == "H2KvmError"
         assert d["code"] == 2
         assert d["message"] == "disk error"
         assert d["context"] == {}
 
     def test_context_included(self):
-        err = Hyper2KvmError(msg="err", context={"disk": "/dev/sda"})
+        err = H2KvmError(msg="err", context={"disk": "/dev/sda"})
         d = err.to_dict()
         assert d["context"]["disk"] == "/dev/sda"
 
     def test_secrets_redacted_in_context(self):
-        err = Hyper2KvmError(msg="err", context={"password": "hunter2", "host": "vm1"})
+        err = H2KvmError(msg="err", context={"password": "hunter2", "host": "vm1"})
         d = err.to_dict()
         assert d["context"]["password"] == "***REDACTED***"
         assert d["context"]["host"] == "vm1"
 
     def test_include_cause_true(self):
         cause = IOError("read error")
-        err = Hyper2KvmError(msg="fail", cause=cause)
+        err = H2KvmError(msg="fail", cause=cause)
         d = err.to_dict(include_cause=True)
         assert "cause" in d
         assert d["cause"]["type"] == "OSError"  # IOError is alias for OSError
         assert "read error" in d["cause"]["message"]
 
     def test_include_cause_false(self):
-        err = Hyper2KvmError(msg="fail", cause=ValueError("x"))
+        err = H2KvmError(msg="fail", cause=ValueError("x"))
         d = err.to_dict(include_cause=False)
         assert "cause" not in d
 
     def test_include_cause_true_but_no_cause(self):
-        err = Hyper2KvmError(msg="fail")
+        err = H2KvmError(msg="fail")
         d = err.to_dict(include_cause=True)
         assert "cause" not in d
 
@@ -502,26 +502,26 @@ class TestToDict:
 
 
 class TestSubclassHierarchy:
-    def test_fatal_is_hyper2kvm_error(self):
-        assert issubclass(Fatal, Hyper2KvmError)
+    def test_fatal_is_h2kvm_error(self):
+        assert issubclass(Fatal, H2KvmError)
 
-    def test_vmware_error_is_hyper2kvm_error(self):
-        assert issubclass(VMwareError, Hyper2KvmError)
+    def test_vmware_error_is_h2kvm_error(self):
+        assert issubclass(VMwareError, H2KvmError)
 
-    def test_provider_error_is_hyper2kvm_error(self):
-        assert issubclass(ProviderError, Hyper2KvmError)
+    def test_provider_error_is_h2kvm_error(self):
+        assert issubclass(ProviderError, H2KvmError)
 
     def test_azure_error_is_provider_error(self):
         assert issubclass(AzureError, ProviderError)
 
-    def test_fixer_error_is_hyper2kvm_error(self):
-        assert issubclass(FixerError, Hyper2KvmError)
+    def test_fixer_error_is_h2kvm_error(self):
+        assert issubclass(FixerError, H2KvmError)
 
     def test_bootloader_fixer_is_fixer_error(self):
         assert issubclass(BootloaderFixerError, FixerError)
 
-    def test_storage_error_is_hyper2kvm_error(self):
-        assert issubclass(StorageError, Hyper2KvmError)
+    def test_storage_error_is_h2kvm_error(self):
+        assert issubclass(StorageError, H2KvmError)
 
     def test_disk_conversion_is_storage_error(self):
         assert issubclass(DiskConversionError, StorageError)
@@ -529,14 +529,14 @@ class TestSubclassHierarchy:
     def test_lvm_error_is_storage_error(self):
         assert issubclass(LVMError, StorageError)
 
-    def test_configuration_error_is_hyper2kvm_error(self):
-        assert issubclass(ConfigurationError, Hyper2KvmError)
+    def test_configuration_error_is_h2kvm_error(self):
+        assert issubclass(ConfigurationError, H2KvmError)
 
     def test_manifest_error_is_configuration_error(self):
         assert issubclass(ManifestError, ConfigurationError)
 
-    def test_command_error_is_hyper2kvm_error(self):
-        assert issubclass(CommandError, Hyper2KvmError)
+    def test_command_error_is_h2kvm_error(self):
+        assert issubclass(CommandError, H2KvmError)
 
     def test_all_subclasses_are_exceptions(self):
         for cls in (
@@ -622,23 +622,23 @@ class TestWrapVmware:
 
 class TestFormatExceptionForCli:
     def test_verbose_0_just_message(self):
-        err = Hyper2KvmError(msg="disk error", context={"vm": "test"})
+        err = H2KvmError(msg="disk error", context={"vm": "test"})
         result = format_exception_for_cli(err, verbose=0)
         assert result == "disk error"
         assert "vm" not in result
 
     def test_verbose_1_includes_context(self):
-        err = Hyper2KvmError(msg="disk error", context={"vm": "test"})
+        err = H2KvmError(msg="disk error", context={"vm": "test"})
         result = format_exception_for_cli(err, verbose=1)
         assert "vm=" in result
 
     def test_verbose_1_no_cause(self):
-        err = Hyper2KvmError(msg="fail", cause=ValueError("inner"))
+        err = H2KvmError(msg="fail", cause=ValueError("inner"))
         result = format_exception_for_cli(err, verbose=1)
         assert "cause" not in result
 
     def test_verbose_2_includes_context_and_cause(self):
-        err = Hyper2KvmError(msg="fail", context={"vm": "x"}, cause=ValueError("inner"))
+        err = H2KvmError(msg="fail", context={"vm": "x"}, cause=ValueError("inner"))
         result = format_exception_for_cli(err, verbose=2)
         assert "vm=" in result
         assert "cause: ValueError: inner" in result
@@ -689,7 +689,7 @@ class TestCreateHelpfulError:
     def test_doc_link_formatted(self):
         err = create_helpful_error(Fatal, "fail", doc_link="troubleshooting.md")
         assert "troubleshooting.md" in err.context["doc_link"]
-        assert err.context["doc_link"].startswith("https://github.com/ssahani/hyper2kvm/blob/main/docs/")
+        assert err.context["doc_link"].startswith("https://github.com/ssahani/h2kvm/blob/main/docs/")
 
     def test_extra_context_kwargs(self):
         err = create_helpful_error(Fatal, "fail", vm="test-vm")

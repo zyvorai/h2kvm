@@ -1,5 +1,5 @@
 #!/bin/bash
-# Extended Multi-Distribution Test Suite for hyper2kvm
+# Extended Multi-Distribution Test Suite for h2kvm
 # Tests additional distributions beyond the core 4
 
 set -euo pipefail
@@ -40,7 +40,7 @@ cleanup_env() {
     done
 
     # Clean up any stale mount points
-    sudo umount /tmp/hyper2kvm-guestfs-* 2>/dev/null || true
+    sudo umount /tmp/h2kvm-guestfs-* 2>/dev/null || true
 
     # Wait for devices to settle
     sleep 2
@@ -67,8 +67,8 @@ test_distribution() {
     cleanup_env
 
     # Run the conversion
-    local log_file="/tmp/hyper2kvm-test-$name.log"
-    if sudo timeout 600 python3 -m hyper2kvm --config "$config" > "$log_file" 2>&1; then
+    local log_file="/tmp/h2kvm-test-$name.log"
+    if sudo timeout 600 python3 -m h2kvm --config "$config" > "$log_file" 2>&1; then
         echo -e "${GREEN}✓ PASSED: $name${NC}"
         PASSED=$((PASSED + 1))
         TEST_RESULTS["$name"]="PASSED"
@@ -135,7 +135,7 @@ print_summary() {
 
 # Main test execution
 main() {
-    print_header "hyper2kvm Extended Distribution Test Suite"
+    print_header "h2kvm Extended Distribution Test Suite"
     echo "Testing additional distributions beyond core validation"
     echo ""
 

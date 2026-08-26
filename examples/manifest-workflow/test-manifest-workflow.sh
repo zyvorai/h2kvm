@@ -15,7 +15,7 @@ echo -e "${BLUE}========================================${NC}"
 echo ""
 
 # Setup test directories
-TEST_BASE="/tmp/hyper2kvm-manifest-test"
+TEST_BASE="/tmp/h2kvm-manifest-test"
 echo -e "${GREEN}Setting up test environment...${NC}"
 rm -rf "$TEST_BASE"
 mkdir -p "$TEST_BASE"/{manifest-workflow,output}
@@ -28,8 +28,8 @@ cat > "$TEST_BASE/manifest-daemon.yaml" <<'EOF'
 command: daemon
 daemon: true
 manifest_workflow_mode: true
-manifest_workflow_dir: /tmp/hyper2kvm-manifest-test/manifest-workflow
-output_dir: /tmp/hyper2kvm-manifest-test/output
+manifest_workflow_dir: /tmp/h2kvm-manifest-test/manifest-workflow
+output_dir: /tmp/h2kvm-manifest-test/output
 max_concurrent_jobs: 1
 verbose: 2
 EOF
@@ -43,7 +43,7 @@ cat > "$TEST_BASE/manifest-workflow/to_be_processed/photon-test.json" <<'EOF'
   "pipeline": {
     "load": {
       "source_type": "vmdk",
-      "source_path": "/home/ssahani/tt/hyper2kvm/photon.vmdk"
+      "source_path": "/home/ssahani/tt/h2kvm/photon.vmdk"
     },
     "inspect": {
       "enabled": true,
@@ -91,7 +91,7 @@ cat "$TEST_BASE/manifest-workflow/to_be_processed/photon-test.json" | head -20
 
 echo ""
 echo -e "${GREEN}To start the manifest workflow daemon:${NC}"
-echo -e "  sudo python -m hyper2kvm --config $TEST_BASE/manifest-daemon.yaml"
+echo -e "  sudo python -m h2kvm --config $TEST_BASE/manifest-daemon.yaml"
 echo ""
 echo -e "${GREEN}To monitor:${NC}"
 echo -e "  watch -n 1 'ls -lR $TEST_BASE/manifest-workflow/'"

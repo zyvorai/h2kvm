@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Linux VM Migration with hyper2kvm — Complete Guide</title>
+<title>Linux VM Migration with h2kvm — Complete Guide</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -61,7 +61,7 @@
 <!-- COVER -->
 <div class="cover">
   <h1><span>Linux</span> VM Migration</h1>
-  <h2>How hyper2kvm Migrates Linux from VMware, Hyper-V, AWS, Azure &amp; GCP to KVM</h2>
+  <h2>How h2kvm Migrates Linux from VMware, Hyper-V, AWS, Azure &amp; GCP to KVM</h2>
   <p class="sub">Automated initramfs rebuild with VirtIO drivers, fstab UUID repair, GRUB reconfiguration, SELinux relabeling, network cleanup, and boot verification. Supports RHEL, Ubuntu, Debian, SUSE, Fedora, CentOS, Rocky, Alma, Oracle Linux, Photon OS, and more — across BIOS, UEFI, LVM, XFS, ext4, and Btrfs.</p>
   <div class="badge">Auto initramfs | fstab Fix | GRUB Repair | SELinux Safe | 15+ Distros | Proprietary (Zyvor AI Labs)</div>
 </div>
@@ -69,7 +69,7 @@
 <!-- PAGE 1: The Linux Boot Problem -->
 <div class="page page-dark">
   <h2 class="st">The Linux <span>Boot Problem</span></h2>
-  <p class="sub">Why Linux VMs fail to boot after migration — and how hyper2kvm prevents every failure.</p>
+  <p class="sub">Why Linux VMs fail to boot after migration — and how h2kvm prevents every failure.</p>
 
   <div class="alert">
     <h4>Without initramfs rebuild and fstab repair, most Linux VMs fail to boot on KVM</h4>
@@ -78,7 +78,7 @@
 
   <h3>Every Failure Mode — Automatically Fixed</h3>
   <table>
-    <tr><th style="width:20%">Failure</th><th style="width:18%">Symptom</th><th style="width:24%">Root Cause</th><th style="width:38%">hyper2kvm Automatic Fix</th></tr>
+    <tr><th style="width:20%">Failure</th><th style="width:18%">Symptom</th><th style="width:24%">Root Cause</th><th style="width:38%">h2kvm Automatic Fix</th></tr>
     <tr><td><strong>Kernel panic</strong></td><td>VFS: Unable to mount root fs</td><td>Missing virtio_blk/virtio_scsi in initramfs</td><td class="check">Rebuilds initramfs with all VirtIO modules injected</td></tr>
     <tr><td><strong>Root mount failure</strong></td><td>Dropped to emergency shell</td><td>fstab uses /dev/sda1 — KVM has /dev/vda1</td><td class="check">Converts all fstab entries to UUID-based mounts</td></tr>
     <tr><td><strong>GRUB boot failure</strong></td><td>grub rescue> prompt</td><td>root= parameter points to wrong device</td><td class="check">Updates GRUB config with correct root= device/UUID</td></tr>
@@ -92,7 +92,7 @@
   </table>
 
   <div class="highlight">
-    <p style="margin-bottom:0;"><strong>All fixes applied offline</strong> — hyper2kvm mounts the disk via qemu-nbd, modifies the filesystem directly (fstab, GRUB, initramfs, network configs), then unmounts. The VM boots clean on KVM the first time.</p>
+    <p style="margin-bottom:0;"><strong>All fixes applied offline</strong> — h2kvm mounts the disk via qemu-nbd, modifies the filesystem directly (fstab, GRUB, initramfs, network configs), then unmounts. The VM boots clean on KVM the first time.</p>
   </div>
 </div>
 
@@ -153,7 +153,7 @@
 <!-- PAGE 3: The Fix Pipeline -->
 <div class="page page-dark">
   <h2 class="st">The Fix <span>Pipeline</span></h2>
-  <p class="sub">What hyper2kvm does to every Linux VM — automatically, offline, before first boot.</p>
+  <p class="sub">What h2kvm does to every Linux VM — automatically, offline, before first boot.</p>
 
   <div class="flow">
     <div class="flow-step flow-src">Source Disk (VMDK/VHD/RAW)</div>
@@ -194,14 +194,14 @@ chroot /mnt/guest dracut --force --add-drivers "virtio_blk virtio_scsi virtio_ne
 echo -e "virtio_blk\nvirtio_scsi\nvirtio_net\nvirtio_pci" >> /mnt/guest/etc/initramfs-tools/modules
 chroot /mnt/guest update-initramfs -u -k all
 
-# hyper2kvm handles all of this automatically — detects distro, selects correct method, runs in chroot
+# h2kvm handles all of this automatically — detects distro, selects correct method, runs in chroot
   </pre>
 </div>
 
 <!-- PAGE 4: Multi-Source Migration Paths -->
 <div class="page page-light">
   <h2 class="st">Every Source <span>Platform</span></h2>
-  <p class="sub">hyper2kvm migrates Linux VMs from any hypervisor or cloud with source-specific fixes.</p>
+  <p class="sub">h2kvm migrates Linux VMs from any hypervisor or cloud with source-specific fixes.</p>
 
   <h3>VMware vSphere &rarr; KVM</h3>
   <div class="flow">
@@ -258,7 +258,7 @@ chroot /mnt/guest update-initramfs -u -k all
 <!-- PAGE 5: Enterprise Linux Workloads -->
 <div class="page page-dark">
   <h2 class="st">Enterprise Linux <span>Workloads</span></h2>
-  <p class="sub">Critical applications migrated safely with hyper2kvm.</p>
+  <p class="sub">Critical applications migrated safely with h2kvm.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -438,7 +438,7 @@ boot_test: true
 
   <h3>Batch Migration — 100 Linux VMs</h3>
   <table>
-    <tr><th style="width:5%">#</th><th style="width:18%">Step</th><th style="width:40%">What hyper2kvm Does</th><th style="width:37%">Result</th></tr>
+    <tr><th style="width:5%">#</th><th style="width:18%">Step</th><th style="width:40%">What h2kvm Does</th><th style="width:37%">Result</th></tr>
     <tr><td>1</td><td><strong>Pre-flight</strong></td><td><code>h2kvmctl doctor</code> — checks disk space, qemu-nbd, libvirt, KubeVirt</td><td>Green light before starting</td></tr>
     <tr><td>2</td><td><strong>Discover</strong></td><td>zkvm TUI: browse vCenter, see OS, CPU, RAM, disk per VM</td><td>Select VMs, batch queue</td></tr>
     <tr><td>3</td><td><strong>Export</strong></td><td>govc export with streaming progress + ETA</td><td>VMDK/OVA files downloaded</td></tr>
@@ -453,10 +453,10 @@ boot_test: true
 <!-- PAGE 7: Tool Comparison -->
 <div class="page page-dark">
   <h2 class="st">Linux Migration <span>Tool Comparison</span></h2>
-  <p class="sub">How hyper2kvm compares to other tools for Linux VM migration.</p>
+  <p class="sub">How h2kvm compares to other tools for Linux VM migration.</p>
 
   <table>
-    <tr><th style="width:24%">Capability</th><th style="width:15%">hyper2kvm</th><th style="width:15%">virt-v2v</th><th style="width:15%">Red Hat MTV</th><th style="width:15%">AWS MGN</th><th style="width:16%">Manual</th></tr>
+    <tr><th style="width:24%">Capability</th><th style="width:15%">h2kvm</th><th style="width:15%">virt-v2v</th><th style="width:15%">Red Hat MTV</th><th style="width:15%">AWS MGN</th><th style="width:16%">Manual</th></tr>
     <tr><td><strong>initramfs rebuild + VirtIO</strong></td><td class="check">&#10003; Auto (all distros)</td><td class="check">&#10003; Auto</td><td class="partial">Limited</td><td class="cross">N/A</td><td class="partial">Manual chroot</td></tr>
     <tr><td><strong>fstab UUID repair</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="partial">Basic</td><td class="cross">N/A</td><td class="partial">Manual edit</td></tr>
     <tr><td><strong>GRUB config fix</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="partial">Basic</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
@@ -477,14 +477,14 @@ boot_test: true
   </table>
 
   <div class="highlight">
-    <p style="margin-bottom:0;"><strong>hyper2kvm advantage:</strong> The only tool that migrates Linux from VMware + Hyper-V + 10 clouds, supports 15+ distros, deploys to both KVM and KubeVirt, includes automated boot verification, needs no libguestfs, and is licensed*.</p>
+    <p style="margin-bottom:0;"><strong>h2kvm advantage:</strong> The only tool that migrates Linux from VMware + Hyper-V + 10 clouds, supports 15+ distros, deploys to both KVM and KubeVirt, includes automated boot verification, needs no libguestfs, and is licensed*.</p>
   </div>
 </div>
 
 <!-- PAGE 8: Real-World Scenarios & Summary -->
 <div class="page page-light">
   <h2 class="st">Real-World <span>Scenarios</span></h2>
-  <p class="sub">Enterprise Linux migration projects powered by hyper2kvm.</p>
+  <p class="sub">Enterprise Linux migration projects powered by h2kvm.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -504,7 +504,7 @@ boot_test: true
         <li><strong>Source:</strong> AWS EC2 (Amazon Linux 2, Ubuntu, RHEL)</li>
         <li><strong>Workloads:</strong> PostgreSQL, Django apps, Elasticsearch</li>
         <li><strong>Target:</strong> On-prem KVM (data sovereignty)</li>
-        <li><strong>Process:</strong> hypersdk exports EBS snapshots, hyper2kvm converts RAW &rarr; QCOW2, removes cloud-init/SSM, rebuilds initramfs, deploys to libvirt</li>
+        <li><strong>Process:</strong> hypersdk exports EBS snapshots, h2kvm converts RAW &rarr; QCOW2, removes cloud-init/SSM, rebuilds initramfs, deploys to libvirt</li>
         <li><strong>Timeline:</strong> 3 weeks</li>
         <li><strong>Savings:</strong> $600K/yr in AWS compute + egress</li>
       </ul>
@@ -526,7 +526,7 @@ boot_test: true
         <li><strong>Source:</strong> 30 on AWS, 20 on Azure, 15 on GCP, 15 on VMware</li>
         <li><strong>Workloads:</strong> RHEL, Ubuntu, SUSE, Photon OS — everything</li>
         <li><strong>Target:</strong> Centralized KVM cluster + edge K3s sites</li>
-        <li><strong>Process:</strong> hypersdk exports from all 4 sources, hyper2kvm applies source-specific fixes per distro, dual-target deploy</li>
+        <li><strong>Process:</strong> hypersdk exports from all 4 sources, h2kvm applies source-specific fixes per distro, dual-target deploy</li>
         <li><strong>Timeline:</strong> 5 weeks</li>
         <li><strong>Savings:</strong> $1.2M/yr consolidated infrastructure</li>
       </ul>
@@ -538,11 +538,11 @@ boot_test: true
     <p style="font-size:0.95em;">
       15+ distributions. 10 source platforms. Every guest fix automated.<br>
       initramfs rebuilt. fstab repaired. GRUB fixed. SELinux relabeled. Boot verified.<br>
-      <strong>hyper2kvm: every Linux VM boots clean on KVM, first time, every time.</strong>
+      <strong>h2kvm: every Linux VM boots clean on KVM, first time, every time.</strong>
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

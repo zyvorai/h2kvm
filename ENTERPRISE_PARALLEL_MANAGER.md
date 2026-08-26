@@ -16,7 +16,7 @@ Implemented enterprise-grade parallel VM conversion manager using persistent nam
 
 ### 1. Enterprise Parallel Manager Core
 
-**File:** `hyper2kvm/vmcraft/enterprise_parallel_manager.py` (1,000+ lines)
+**File:** `h2kvm/vmcraft/enterprise_parallel_manager.py` (1,000+ lines)
 
 **Key Components:**
 
@@ -147,7 +147,7 @@ modprobe nbd max_part=16 nbds_max=128
 ### Basic Parallel Conversion
 
 ```python
-from hyper2kvm.vmcraft.enterprise_parallel_manager import (
+from h2kvm.vmcraft.enterprise_parallel_manager import (
     EnterpriseParallelManager,
     ConversionJob,
     ConversionResult,
@@ -330,7 +330,7 @@ sysctl -w net.core.wmem_max=134217728
 ### New Documentation Created
 
 1. **Enterprise Parallel Manager Implementation**
-   - File: `hyper2kvm/vmcraft/enterprise_parallel_manager.py`
+   - File: `h2kvm/vmcraft/enterprise_parallel_manager.py`
    - Comprehensive inline documentation
    - Architecture diagrams in docstrings
 
@@ -378,11 +378,11 @@ def convert(job, nbd_device, namespace):
 
 ```python
 # BEFORE
-from hyper2kvm.vmcraft.parallel_converter import ParallelConversionManager
+from h2kvm.vmcraft.parallel_converter import ParallelConversionManager
 manager = ParallelConversionManager(max_workers=8)
 
 # AFTER
-from hyper2kvm.vmcraft.enterprise_parallel_manager import EnterpriseParallelManager
+from h2kvm.vmcraft.enterprise_parallel_manager import EnterpriseParallelManager
 manager = EnterpriseParallelManager(max_workers=16)
 ```
 
@@ -470,7 +470,7 @@ Throughput:     1,600+ VMs/hour peak
 
 ## 🔗 Related Files
 
-- **Implementation**: [enterprise_parallel_manager.py](hyper2kvm/vmcraft/enterprise_parallel_manager.py)
+- **Implementation**: [enterprise_parallel_manager.py](h2kvm/vmcraft/enterprise_parallel_manager.py)
 - **Examples**: [enterprise_parallel_example.py](examples/enterprise_parallel_example.py)
 - **Comparison**: [PARALLEL_CONVERSION_COMPARISON.md](docs/architecture/PARALLEL_CONVERSION_COMPARISON.md)
 - **Architecture**: [SAFE_NAMESPACE_ARCHITECTURE.md](docs/architecture/SAFE_NAMESPACE_ARCHITECTURE.md)

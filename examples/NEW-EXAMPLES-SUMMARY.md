@@ -1,6 +1,6 @@
 # New Examples Summary - 2026-01-19
 
-This document summarizes the new comprehensive examples added to hyper2kvm to demonstrate real-world migration scenarios, best practices, and CI/CD integration.
+This document summarizes the new comprehensive examples added to h2kvm to demonstrate real-world migration scenarios, best practices, and CI/CD integration.
 
 ---
 
@@ -190,7 +190,7 @@ Automated migration pipelines for major CI/CD platforms.
 1. Preparation - Create workspace, check resources
 2. Pre-Migration Checks - Validate environment
 3. Backup VMware VMs - Create snapshots
-4. Migrate VMs - Parallel processing with hyper2kvm
+4. Migrate VMs - Parallel processing with h2kvm
 5. Post-Migration Tests - Boot validation + smoke tests
 6. Generate Reports - Aggregate results
 
@@ -287,7 +287,7 @@ Automated migration pipelines for major CI/CD platforms.
 
 4. **Execute migration:**
    ```bash
-   sudo python -m hyper2kvm --config configs/my-ehr-migration.yaml
+   sudo python -m h2kvm --config configs/my-ehr-migration.yaml
    ```
 
 ---
@@ -338,7 +338,7 @@ Automated migration pipelines for major CI/CD platforms.
 
 4. **Execute DR activation:**
    ```bash
-   sudo python -m hyper2kvm --config configs/my-dr-failover.yaml
+   sudo python -m h2kvm --config configs/my-dr-failover.yaml
    ```
 
 ---
@@ -417,8 +417,8 @@ Automated migration pipelines for major CI/CD platforms.
 
 3. **Configure GitLab Runner:**
    ```bash
-   # Install hyper2kvm on runner
-   pip install hyper2kvm
+   # Install h2kvm on runner
+   pip install h2kvm
 
    # Tag runner
    gitlab-runner register --tag-list kvm-migration
@@ -472,10 +472,10 @@ vim configs/ehr-migration.yaml
 # Update: vcenter, vs_vm_name, output_dir
 
 # 3. Dry-run validation
-sudo python -m hyper2kvm --config configs/ehr-migration.yaml --dry-run
+sudo python -m h2kvm --config configs/ehr-migration.yaml --dry-run
 
 # 4. Execute migration (after approval)
-sudo python -m hyper2kvm --config configs/ehr-migration.yaml
+sudo python -m h2kvm --config configs/ehr-migration.yaml
 
 # 5. Post-migration: Enable LUKS encryption
 sudo cryptsetup luksFormat --type luks2 --cipher aes-xts-plain64 \
@@ -492,7 +492,7 @@ cp examples/industry-specific/ecommerce-high-availability.yaml \
    configs/webshop-migration.yaml
 
 # 2. Phase 1: Migrate first web server
-sudo python -m hyper2kvm --config configs/webshop-migration.yaml
+sudo python -m h2kvm --config configs/webshop-migration.yaml
 
 # 3. Phase 2: Run in parallel with production (24 hours)
 # Monitor metrics, compare performance
@@ -542,17 +542,17 @@ cat /recovery/ransomware-*/reports/incident-summary.md
 Found these examples helpful? Have a new industry-specific scenario? Encountered an anti-pattern not documented?
 
 **Submit a PR or open an issue:**
-- GitHub: https://github.com/ssahani/hyper2kvm/issues
-- GitLab: https://gitlab.com/ssahani/hyper2kvm/issues
+- GitHub: https://github.com/ssahani/h2kvm/issues
+- GitLab: https://gitlab.com/ssahani/h2kvm/issues
 
 ---
 
 ## 📝 License
 
-These examples are part of hyper2kvm and are licensed under the Apache-2.0 License.
+These examples are part of h2kvm and are licensed under the Apache-2.0 License.
 
 ---
 
 **Last Updated:** 2026-01-19
-**Author:** hyper2kvm contributors
+**Author:** h2kvm contributors
 **Maintained by:** ZyvorAI Labs Private Limited <ssahani@zyvor.dev>

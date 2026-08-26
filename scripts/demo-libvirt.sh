@@ -16,15 +16,15 @@ error() { echo "  ❌ $*"; }
 step()  { echo "  🔧 $*"; }
 die()   { error "$@"; exit 1; }
 
-OUTPUT_BASE="/var/lib/hyper2kvm/demo"
-LOGDIR="/var/log/hyper2kvm"
+OUTPUT_BASE="/var/lib/h2kvm/demo"
+LOGDIR="/var/log/h2kvm"
 # Use the login user's home directory (works under sudo)
 if [[ -n "${SUDO_USER:-}" ]]; then
     _USER_HOME="$(eval echo ~"$SUDO_USER")"
 else
     _USER_HOME="${HOME:-$(eval echo ~"$(whoami)")}"
 fi
-DEMO_DIR="${HYPER2KVM_DEMO_DIR:-${_USER_HOME}/demo}"
+DEMO_DIR="${H2KVM_DEMO_DIR:-${_USER_HOME}/demo}"
 
 # Defaults (overridable via flags)
 OPT_MEMORY=2048
@@ -151,7 +151,7 @@ show_status() {
     host_ip=$(hostname -I 2>/dev/null | awk '{print $1}')
 
     echo ""
-    echo "  📋 hyper2kvm Demo — Libvirt VM Status"
+    echo "  📋 h2kvm Demo — Libvirt VM Status"
     echo "  ════════════════════════════════════════"
     echo ""
 
@@ -172,7 +172,7 @@ do_cleanup_one() {
     virsh undefine "$vm_name" --nvram 2>/dev/null || true
     virsh undefine "$vm_name" 2>/dev/null || true
     rm -rf "${OUTPUT_BASE}/${vm_name}"
-    rm -f /var/lib/hyper2kvm/input/${vm_name}.*
+    rm -f /var/lib/h2kvm/input/${vm_name}.*
     info "Removed: $vm_name"
 }
 
@@ -328,7 +328,7 @@ migrate_one() {
     info "Pre-flight passed"
 
     # ── Copy source ──
-    local workdir="/var/lib/hyper2kvm/input"
+    local workdir="/var/lib/h2kvm/input"
     mkdir -p "$workdir"
     local safe_src="$workdir/${vm_name}.${ext_lower}"
     if [ ! -f "$safe_src" ] || [ "$src" -nt "$safe_src" ]; then
@@ -587,7 +587,7 @@ find_source() {
         echo "$src"
         return
     fi
-    for search_dir in ${DEMO_DIR} ${DEMO_DIR}/archives /var/lib/hyper2kvm/input; do
+    for search_dir in ${DEMO_DIR} ${DEMO_DIR}/archives /var/lib/h2kvm/input; do
         if [[ -f "$search_dir/$src" ]]; then
             echo "$search_dir/$src"
             return
@@ -606,7 +606,7 @@ banner() {
     echo ""
     echo "  ╔══════════════════════════════════════════════════╗"
     echo "  ║                                                  ║"
-    echo "  ║     hyper2kvm — VM Migration Demo                ║"
+    echo "  ║     h2kvm — VM Migration Demo                ║"
     echo "  ║     VMware VMDK → KVM/Libvirt in one command     ║"
     echo "  ║                                                  ║"
     echo "  ╚══════════════════════════════════════════════════╝"

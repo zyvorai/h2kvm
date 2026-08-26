@@ -1,6 +1,6 @@
 # Worker Job Protocol - Documentation Index
 
-Complete guide to the hyper2kvm Worker Job Protocol v1 for production Kubernetes deployments.
+Complete guide to the h2kvm Worker Job Protocol v1 for production Kubernetes deployments.
 
 ---
 
@@ -37,7 +37,7 @@ Complete guide to the hyper2kvm Worker Job Protocol v1 for production Kubernetes
    - Job submission
    - Troubleshooting
 
-5. **[../../helm/hyper2kvm-worker/README.md](../../helm/hyper2kvm-worker/README.md)** - Helm Chart
+5. **[../../helm/h2kvm-worker/README.md](../../helm/h2kvm-worker/README.md)** - Helm Chart
    - Installation guide
    - Configuration parameters
    - Storage setup
@@ -97,7 +97,7 @@ Complete guide to the hyper2kvm Worker Job Protocol v1 for production Kubernetes
 
 **DevOps Engineers**
 1. [k8s/README.md](../../k8s/README.md) - kubectl deployment
-2. [helm/README.md](../../helm/hyper2kvm-worker/README.md) - Helm installation
+2. [helm/README.md](../../helm/h2kvm-worker/README.md) - Helm installation
 3. [v1.3.0-cicd-ops.md](../deployment/v1.3.0-cicd-ops.md) - CI/CD setup
 
 **SRE / Operations**
@@ -113,7 +113,7 @@ Complete guide to the hyper2kvm Worker Job Protocol v1 for production Kubernetes
 ### By Task
 
 **Deploy Workers**
-- [Helm Chart README](../../helm/hyper2kvm-worker/README.md) - Helm installation
+- [Helm Chart README](../../helm/h2kvm-worker/README.md) - Helm installation
 - [k8s README](../../k8s/README.md) - kubectl deployment
 - [k3d Test Report](../deployment/k3d-test-report.md) - Local testing
 
@@ -129,7 +129,7 @@ Complete guide to the hyper2kvm Worker Job Protocol v1 for production Kubernetes
 
 **Operate Workers**
 - [v1.3.0-cicd-ops.md](../deployment/v1.3.0-cicd-ops.md) - Backup/restore
-- [helm/README.md](../../helm/hyper2kvm-worker/README.md) - Helm operations
+- [helm/README.md](../../helm/h2kvm-worker/README.md) - Helm operations
 - [k8s/README.md](../../k8s/README.md) - Troubleshooting
 
 **Set Up CI/CD**
@@ -150,7 +150,7 @@ Complete guide to the hyper2kvm Worker Job Protocol v1 for production Kubernetes
 ### Path 2: Production Deployment (4 hours)
 
 1. Read [WORKER_PROTOCOL_SUMMARY.md](../deployment/WORKER_PROTOCOL_SUMMARY.md) (30 min)
-2. Review [Helm Chart README](../../helm/hyper2kvm-worker/README.md) (30 min)
+2. Review [Helm Chart README](../../helm/h2kvm-worker/README.md) (30 min)
 3. Set up storage classes (1 hour)
 4. Deploy with Helm + monitoring (1 hour)
 5. Configure backups and CI/CD (1 hour)
@@ -158,7 +158,7 @@ Complete guide to the hyper2kvm Worker Job Protocol v1 for production Kubernetes
 ### Path 3: Development (8 hours)
 
 1. Read [PROTOCOL_SPEC.md](PROTOCOL_SPEC.md) (1 hour)
-2. Study code in `hyper2kvm/worker/*.py` (2 hours)
+2. Study code in `h2kvm/worker/*.py` (2 hours)
 3. Run tests: `pytest tests/test_worker_protocol.py` (1 hour)
 4. Build Docker images (1 hour)
 5. Test in k3d (2 hours)
@@ -243,7 +243,7 @@ k8s/
 │   └── README.md                Operator roadmap
 └── worker/examples/             Job examples
 
-helm/hyper2kvm-worker/
+helm/h2kvm-worker/
 └── README.md                    Helm chart guide
 
 RELEASE_NOTES_v1.3.0.md         Latest release notes
@@ -338,9 +338,9 @@ RELEASE_NOTES_v1.3.0.md         Latest release notes
 
 Found a documentation issue?
 
-1. Check if it's already reported: [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
-2. Submit improvement: [GitHub Pull Request](https://github.com/ssahani/hyper2kvm/pulls)
-3. Discuss ideas: [GitHub Discussions](https://github.com/ssahani/hyper2kvm/discussions)
+1. Check if it's already reported: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+2. Submit improvement: [GitHub Pull Request](https://github.com/ssahani/h2kvm/pulls)
+3. Discuss ideas: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
 
 **Documentation Standards:**
 - Use markdown (.md files)
@@ -362,8 +362,8 @@ Found a documentation issue?
 
 ### Community Support
 
-- **GitHub Issues:** [Report bugs](https://github.com/ssahani/hyper2kvm/issues)
-- **Discussions:** [Ask questions](https://github.com/ssahani/hyper2kvm/discussions)
+- **GitHub Issues:** [Report bugs](https://github.com/ssahani/h2kvm/issues)
+- **Discussions:** [Ask questions](https://github.com/ssahani/h2kvm/discussions)
 - **Examples:** [k8s/worker/examples/](../../k8s/worker/examples/)
 
 ### Enterprise Support
@@ -379,7 +379,7 @@ Based on your role:
 **I'm a Developer** → [QUICKSTART.md](QUICKSTART.md)
 **I'm deploying to k3d** → [k8s/README.md](../../k8s/README.md)
 **I'm deploying to production** → [WORKER_PROTOCOL_SUMMARY.md](../deployment/WORKER_PROTOCOL_SUMMARY.md)
-**I want to use Helm** → [helm/README.md](../../helm/hyper2kvm-worker/README.md)
+**I want to use Helm** → [helm/README.md](../../helm/h2kvm-worker/README.md)
 **I need to set up CI/CD** → [v1.3.0-cicd-ops.md](../deployment/v1.3.0-cicd-ops.md)
 **I want to contribute** → [PROTOCOL_SPEC.md](PROTOCOL_SPEC.md)
 

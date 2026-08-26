@@ -1,0 +1,13 @@
+{{- if and .Values.global.namespace (ne .Values.global.namespace "default") }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "h2kvm-operator.namespace" . }}
+  labels:
+    {{- include "h2kvm-operator.labels" . | nindent 4 }}
+    {{- if .Values.podSecurityStandards.enabled }}
+    pod-security.kubernetes.io/enforce: {{ .Values.podSecurityStandards.enforce }}
+    pod-security.kubernetes.io/audit: {{ .Values.podSecurityStandards.audit }}
+    pod-security.kubernetes.io/warn: {{ .Values.podSecurityStandards.warn }}
+    {{- end }}
+{{- end }}

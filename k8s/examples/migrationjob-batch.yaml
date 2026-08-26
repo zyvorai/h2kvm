@@ -2,7 +2,7 @@
 # Migrate multiple VMs at once (GitOps-friendly)
 
 ---
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: migrate-web-01
@@ -30,7 +30,7 @@ spec:
   cleanupPolicy: OnSuccess
 
 ---
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: migrate-web-02
@@ -58,7 +58,7 @@ spec:
   cleanupPolicy: OnSuccess
 
 ---
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: migrate-db-01

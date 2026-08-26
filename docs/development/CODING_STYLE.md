@@ -519,12 +519,12 @@ All custom exceptions inherit from base exception:
 from dataclasses import dataclass
 
 @dataclass
-class Hyper2KvmError(Exception):
-    """Base exception for hyper2kvm."""
+class H2KvmError(Exception):
+    """Base exception for h2kvm."""
     msg: str
 
 @dataclass
-class LVMError(Hyper2KvmError):
+class LVMError(H2KvmError):
     """LVM operation failed."""
     device: str
     vg_name: str
@@ -586,8 +586,8 @@ import libvirt
 from guestfs import GuestFS
 
 # Local
-from hyper2kvm.core import exceptions
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.core import exceptions
+from h2kvm.vmcraft import VMCraft
 ```
 
 ### Import Style
@@ -702,7 +702,7 @@ class TestLVMActivation:
 ```python
 from unittest.mock import Mock, patch
 
-@patch("hyper2kvm.vmcraft.storage.run_sudo")
+@patch("h2kvm.vmcraft.storage.run_sudo")
 def test_activate_lvm_success(mock_run_sudo):
     """Should activate VG successfully."""
     # Arrange
@@ -773,7 +773,7 @@ from typing import TYPE_CHECKING
 
 import libvirt
 
-from hyper2kvm.core import exceptions
+from h2kvm.core import exceptions
 
 # TYPE_CHECKING imports
 if TYPE_CHECKING:
@@ -819,7 +819,7 @@ pre-commit install
 # Run before committing
 ruff format .
 ruff check .
-mypy hyper2kvm/
+mypy h2kvm/
 pytest tests/unit/
 ```
 
@@ -861,7 +861,7 @@ pytest tests/unit/
 ```bash
 ruff format .           # Format code
 ruff check .            # Check linting
-mypy hyper2kvm/         # Type check
+mypy h2kvm/         # Type check
 pytest tests/unit/      # Run tests
 git commit              # Pre-commit hooks run automatically
 ```

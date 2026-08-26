@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================
-# hyper2kvm Auto Demo — Zero to Running VM
+# h2kvm Auto Demo — Zero to Running VM
 # ============================================
 # Production-grade installer: installs everything on a fresh machine,
 # converts a VM, boots it, validates it, and logs in via SSH.
@@ -22,13 +22,13 @@ trap 'echo -e "\n[FATAL] Failed at line $LINENO (exit $?)"; echo "Log: $LOG_FILE
 
 # ── Colors ──
 # ── Logging ──
-LOG_FILE="${LOG_FILE:-/var/log/hyper2kvm-demo.log}"
-mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || LOG_FILE="/tmp/hyper2kvm-demo.log"
+LOG_FILE="${LOG_FILE:-/var/log/h2kvm-demo.log}"
+mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || LOG_FILE="/tmp/h2kvm-demo.log"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
 # ── Config (overridable via env) ──
 VM_NAME="${VM_NAME:-demo-photon}"
-VM_PASS="${VM_PASS:-hyper2kvm}"
+VM_PASS="${VM_PASS:-h2kvm}"
 AUTO_YES="${AUTO_YES:-false}"
 DRY_RUN="${DRY_RUN:-false}"
 VM_IP=""
@@ -80,7 +80,7 @@ for arg in "$@"; do
             echo ""
             echo "Environment:"
             echo "  VM_NAME=name     VM name (default: demo-photon)"
-            echo "  VM_PASS=pass     Root password (default: hyper2kvm)"
+            echo "  VM_PASS=pass     Root password (default: h2kvm)"
             echo "  AUTO_YES=true    Non-interactive mode"
             echo "  DRY_RUN=true     Preview without executing"
             echo "  LOG_FILE=path    Log file path"
@@ -178,9 +178,9 @@ preflight() {
 # ── Clone repo if needed ──
 ensure_repo() {
     if [ ! -f "$REPO_DIR/pyproject.toml" ]; then
-        step "Cloning hyper2kvm"
-        retry git clone https://github.com/ssahani/hyper2kvm.git /tmp/hyper2kvm
-        REPO_DIR="/tmp/hyper2kvm"
+        step "Cloning h2kvm"
+        retry git clone https://github.com/ssahani/h2kvm.git /tmp/h2kvm
+        REPO_DIR="/tmp/h2kvm"
         SCRIPT_DIR="$REPO_DIR/scripts"
     fi
     cd "$REPO_DIR"
@@ -188,7 +188,7 @@ ensure_repo() {
 
 # ── Install ──
 install_all() {
-    step "Installing hyper2kvm + dependencies"
+    step "Installing h2kvm + dependencies"
     if [ "$DRY_RUN" = "false" ]; then
         "$SCRIPT_DIR/quickstart.sh" "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}"
     else
@@ -346,7 +346,7 @@ show_results() {
 
     echo ""
     echo "╔══════════════════════════════════════════════════════╗"
-    echo "║  hyper2kvm Demo Complete                             ║"
+    echo "║  h2kvm Demo Complete                             ║"
     echo "╠══════════════════════════════════════════════════════╣"
     printf "  ║  ✔ %-10s %-40s ║\n" "VM:" "$VM_NAME"
 
@@ -422,7 +422,7 @@ auto_cockpit() {
 # ── Main ──
 main() {
     echo ""
-    echo "hyper2kvm Auto Demo"
+    echo "h2kvm Auto Demo"
     echo "Zero to Running VM in one command"
     echo ""
 

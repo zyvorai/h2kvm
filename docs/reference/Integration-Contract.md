@@ -1,12 +1,12 @@
-# Integration Contract: hypersdk ↔ hyper2kvm
+# Integration Contract: hypersdk ↔ h2kvm
 
 ## Overview
 
-This document defines the **integration contract** between **hypersdk** (daemon/API/control-plane) and **hyper2kvm** (fix/convert/validate engine).
+This document defines the **integration contract** between **hypersdk** (daemon/API/control-plane) and **h2kvm** (fix/convert/validate engine).
 
 **Architecture:**
 - **hypersdk** produces artifacts + manifest (handles the messy outside world)
-- **hyper2kvm** consumes manifest and performs deterministic offline operations
+- **h2kvm** consumes manifest and performs deterministic offline operations
 - **Communication:** File-based via versioned JSON manifest
 
 ---
@@ -15,7 +15,7 @@ This document defines the **integration contract** between **hypersdk** (daemon/
 
 ### Design Principles
 
-1. **Provider-agnostic**: hyper2kvm never talks to providers directly
+1. **Provider-agnostic**: h2kvm never talks to providers directly
 2. **Minimal requirements**: Only `disks[]` + optional firmware hint required
 3. **Backward compatible**: Version changes within major version must be compatible
 4. **Deterministic**: Same manifest → same outcome
@@ -27,7 +27,7 @@ This document defines the **integration contract** between **hypersdk** (daemon/
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
   "title": "Artifact Manifest",
-  "description": "Contract between hypersdk and hyper2kvm for VM migration artifacts",
+  "description": "Contract between hypersdk and h2kvm for VM migration artifacts",
   "type": "object",
   "required": ["manifest_version", "disks"],
   "properties": {
@@ -38,7 +38,7 @@ This document defines the **integration contract** between **hypersdk** (daemon/
     },
     "source": {
       "type": "object",
-      "description": "Source system metadata (informational, not required by hyper2kvm)",
+      "description": "Source system metadata (informational, not required by h2kvm)",
       "properties": {
         "provider": {
           "type": "string",
@@ -85,7 +85,7 @@ This document defines the **integration contract** between **hypersdk** (daemon/
         },
         "firmware": {
           "type": "string",
-          "description": "Firmware type (helps hyper2kvm make boot decisions)",
+          "description": "Firmware type (helps h2kvm make boot decisions)",
           "enum": ["bios", "uefi", "unknown"],
           "default": "bios"
         },
@@ -239,7 +239,7 @@ This document defines the **integration contract** between **hypersdk** (daemon/
 
 ### Minimal Valid Manifest
 
-The **absolute minimum** hyper2kvm requires:
+The **absolute minimum** h2kvm requires:
 
 ```json
 {
@@ -321,9 +321,9 @@ What hypersdk **should** provide for optimal results:
 
 ---
 
-## hyper2kvm Manifest Processing
+## h2kvm Manifest Processing
 
-### What hyper2kvm Uses
+### What h2kvm Uses
 
 | Field | Usage | Impact if Missing |
 |-------|-------|-------------------|
@@ -337,7 +337,7 @@ What hypersdk **should** provide for optimal results:
 | `vm.firmware` | Boot config decisions | Assumes BIOS |
 | `vm.os_hint` | Fix strategy selection | Uses auto-detection |
 
-### What hyper2kvm Ignores (but preserves in report)
+### What h2kvm Ignores (but preserves in report)
 
 - `source.*` - All fields (informational only)
 - `vm.cpu`, `vm.mem_gb` - Not needed for offline fixes
@@ -348,7 +348,7 @@ What hypersdk **should** provide for optimal results:
 ### Processing Logic
 
 ```python
-# Pseudo-code for hyper2kvm manifest processing
+# Pseudo-code for h2kvm manifest processing
 
 def load_manifest(path):
     manifest = json.load(path)
@@ -390,16 +390,16 @@ def load_manifest(path):
 
 ---
 
-## hyper2kvm Output Report
+## h2kvm Output Report
 
 ### Report Format
 
-hyper2kvm generates `report.json` that hypersdk can consume:
+h2kvm generates `report.json` that hypersdk can consume:
 
 ```json
 {
   "version": "1.0",
-  "hyper2kvm_version": "1.0.0",
+  "h2kvm_version": "1.0.0",
   "timestamp": "2026-01-21T18:45:00Z",
   "input_manifest": {
     "path": "/work/job123/manifest.json",
@@ -537,7 +537,7 @@ hyper2kvm generates `report.json` that hypersdk can consume:
 
 ### Version Support
 
-| hyper2kvm Version | Supported Manifest Versions |
+| h2kvm Version | Supported Manifest Versions |
 |-------------------|----------------------------|
 | 1.0.x | 1.0 |
 | 1.1.x | 1.0, 1.1 |
@@ -549,7 +549,7 @@ hyper2kvm generates `report.json` that hypersdk can consume:
 ```json
 {
   "error": "UnsupportedManifestVersion",
-  "message": "Manifest version '2.0' not supported. This hyper2kvm version supports: ['1.0']",
+  "message": "Manifest version '2.0' not supported. This h2kvm version supports: ['1.0']",
   "manifest_version": "2.0",
   "supported_versions": ["1.0"]
 }
@@ -573,16 +573,16 @@ hyper2kvm generates `report.json` that hypersdk can consume:
 [hypersdk] Job status: "export_complete"
 ```
 
-### Phase 2: hyper2kvm Convert
+### Phase 2: h2kvm Convert
 
 ```
 [hypersdk] POST /v1/conversions (input: job_id)
     ↓
-[hypersdk] Spawn: hyper2kvm --manifest /work/{job_id}/manifest.json
+[hypersdk] Spawn: h2kvm --manifest /work/{job_id}/manifest.json
     ↓
-[hyper2kvm] LOAD_MANIFEST → INSPECT → FIX → CONVERT → VALIDATE
+[h2kvm] LOAD_MANIFEST → INSPECT → FIX → CONVERT → VALIDATE
     ↓
-[hyper2kvm] Write: report.json
+[h2kvm] Write: report.json
     ↓
 [hypersdk] Parse report.json
     ↓
@@ -611,7 +611,7 @@ hyper2kvm generates `report.json` that hypersdk can consume:
 2. **Stable paths**: Artifacts at `/work/{job_id}/` don't move during job lifetime
 3. **Checksum verification**: Always verify checksums before reuse
 
-### hyper2kvm Guarantees
+### h2kvm Guarantees
 
 1. **Read-only input**: Never modifies input disks
 2. **Idempotent operations**: Same manifest → same output (deterministic)
@@ -627,7 +627,7 @@ hyper2kvm generates `report.json` that hypersdk can consume:
 Both repos must maintain:
 
 1. **Golden manifests**: `tests/fixtures/manifests/*.json`
-2. **Round-trip tests**: hypersdk export → hyper2kvm convert → validate report
+2. **Round-trip tests**: hypersdk export → h2kvm convert → validate report
 3. **Schema validation**: Automated schema validation in CI
 
 ### Test Matrix
@@ -646,7 +646,7 @@ Both repos must maintain:
 ## Definition of Done (Phase 0)
 
 ✅ JSON schema documented and validated
-✅ hyper2kvm accepts Artifact Manifest v1
+✅ h2kvm accepts Artifact Manifest v1
 ✅ Backward compatibility with legacy format
 ✅ Multi-disk pipeline support
 ✅ Reference examples committed
@@ -683,7 +683,7 @@ Both repos must maintain:
 
 ### OpenStack deploy (manifest pipeline)
 
-After conversion, upload the boot disk to Glance via hyper2kvm `deploy_openstack` (requires `openstacksdk` on the worker).
+After conversion, upload the boot disk to Glance via h2kvm `deploy_openstack` (requires `openstacksdk` on the worker).
 
 ```json
 {
@@ -703,7 +703,7 @@ After conversion, upload the boot disk to Glance via hyper2kvm `deploy_openstack
 }
 ```
 
-Mutually exclusive with `pipeline.kubevirt.enabled` and local libvirt define/start in the same hyper2kvm run.
+Mutually exclusive with `pipeline.kubevirt.enabled` and local libvirt define/start in the same h2kvm run.
 
 ### Validation Tiers (Phase 4)
 

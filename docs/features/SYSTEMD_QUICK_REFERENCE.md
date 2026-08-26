@@ -7,7 +7,7 @@ Quick reference guide for using systemd tools in VM migration workflows.
 ### Detect Source Platform
 
 ```python
-from hyper2kvm.systemd import SystemdDetectVirt
+from h2kvm.systemd import SystemdDetectVirt
 
 detector = SystemdDetectVirt()
 if detector.is_virtualized():
@@ -18,7 +18,7 @@ if detector.is_virtualized():
 ### Inspect Disk Image
 
 ```python
-from hyper2kvm.systemd import SystemdDissect
+from h2kvm.systemd import SystemdDissect
 
 dissect = SystemdDissect()
 info = dissect.inspect(Path("vm.qcow2"))
@@ -31,7 +31,7 @@ print(f"Partitions: {len(info.partitions)}")
 ### Prevent Sleep During Migration
 
 ```python
-from hyper2kvm.systemd import SystemdInhibit
+from h2kvm.systemd import SystemdInhibit
 
 inhibit = SystemdInhibit()
 inhibit.run(
@@ -43,7 +43,7 @@ inhibit.run(
 ### Convert with Resource Limits
 
 ```python
-from hyper2kvm.systemd import SystemdRun
+from h2kvm.systemd import SystemdRun
 
 run = SystemdRun()
 run.run(
@@ -56,7 +56,7 @@ run.run(
 ### Test in Container (Fast)
 
 ```python
-from hyper2kvm.systemd import SystemdNspawn
+from h2kvm.systemd import SystemdNspawn
 
 nspawn = SystemdNspawn()
 nspawn.spawn_image(
@@ -69,7 +69,7 @@ nspawn.spawn_image(
 ### Test in Full VM (Comprehensive)
 
 ```python
-from hyper2kvm.systemd import SystemdVmspawn
+from h2kvm.systemd import SystemdVmspawn
 
 vmspawn = SystemdVmspawn()
 vmspawn.spawn(
@@ -83,7 +83,7 @@ vmspawn.spawn(
 ### Secure Credential Storage
 
 ```python
-from hyper2kvm.systemd import SystemdCreds
+from h2kvm.systemd import SystemdCreds
 
 creds = SystemdCreds()
 
@@ -91,17 +91,17 @@ creds = SystemdCreds()
 creds.encrypt(
     vcenter_password,
     "vcenter-password",
-    output=Path("/var/lib/hyper2kvm/vcenter.cred")
+    output=Path("/var/lib/h2kvm/vcenter.cred")
 )
 
 # Decrypt
-password = creds.decrypt(Path("/var/lib/hyper2kvm/vcenter.cred"))
+password = creds.decrypt(Path("/var/lib/h2kvm/vcenter.cred"))
 ```
 
 ### Setup LUKS Auto-Unlock
 
 ```python
-from hyper2kvm.systemd import SystemdCryptenroll
+from h2kvm.systemd import SystemdCryptenroll
 
 enroll = SystemdCryptenroll()
 
@@ -115,7 +115,7 @@ recovery_key = enroll.enroll_recovery(Path("/dev/sda1"))
 ### Ensure Unique Machine ID
 
 ```python
-from hyper2kvm.systemd import SystemdMachineId
+from h2kvm.systemd import SystemdMachineId
 
 machine_id = SystemdMachineId()
 
@@ -129,7 +129,7 @@ new_id = machine_id.setup(root=Path("/mnt/migrated-vm"))
 ### Monitor Resource Usage
 
 ```python
-from hyper2kvm.systemd import SystemdCgtop
+from h2kvm.systemd import SystemdCgtop
 
 cgtop = SystemdCgtop()
 stats = cgtop.snapshot()
@@ -142,7 +142,7 @@ for cg in stats[:5]:  # Top 5 cgroups
 ### Analyze Boot Performance
 
 ```python
-from hyper2kvm.systemd import SystemdAnalyze
+from h2kvm.systemd import SystemdAnalyze
 
 analyze = SystemdAnalyze()
 
@@ -161,7 +161,7 @@ for unit in slow_units:
 
 ```python
 from pathlib import Path
-from hyper2kvm.systemd import (
+from h2kvm.systemd import (
     SystemdDetectVirt,
     SystemdDissect,
     SystemdInhibit,
@@ -324,7 +324,7 @@ for vm in vm_list:
 
 - **Full Documentation**: [SYSTEMD_INTEGRATION_SUMMARY.md](SYSTEMD_INTEGRATION_SUMMARY.md)
 - **Complete Example**: [systemd_complete_migration.py](../examples/systemd_complete_migration.py)
-- **Tool README**: [systemd/README.md](../hyper2kvm/systemd/README.md)
+- **Tool README**: [systemd/README.md](../h2kvm/systemd/README.md)
 
 ## 💡 Tips
 
@@ -340,4 +340,4 @@ for vm in vm_list:
 ## 🔗 References
 
 - [systemd Tools Documentation](https://www.freedesktop.org/software/systemd/man/)
-- [hyper2kvm Documentation](../README.md)
+- [h2kvm Documentation](../README.md)

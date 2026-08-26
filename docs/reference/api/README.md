@@ -1,6 +1,6 @@
 # API Reference Documentation
 
-Complete API reference for using Hyper2KVM programmatically as a Python library.
+Complete API reference for using H2KVM programmatically as a Python library.
 
 ---
 
@@ -119,7 +119,7 @@ Complete API reference for using Hyper2KVM programmatically as a Python library.
 ---
 
 ### Path 2: Build an Application (1-2 hours)
-**Goal**: Integrate Hyper2KVM into your application
+**Goal**: Integrate H2KVM into your application
 
 1. Read **[Library API](library-api.md)** introduction
 2. Choose API level (high/mid/low)
@@ -146,7 +146,7 @@ Complete API reference for using Hyper2KVM programmatically as a Python library.
 **Recommended**: [Library API](library-api.md) - Level 1 (High-Level API)
 
 ```python
-from hyper2kvm.core import convert_vm
+from h2kvm.core import convert_vm
 
 result = convert_vm(
     input_path="/path/to/vm.vmdk",
@@ -163,7 +163,7 @@ result = convert_vm(
 **Recommended**: [Library API](library-api.md) - Batch Migration APIs
 
 ```python
-from hyper2kvm.orchestrator import BatchOrchestrator
+from h2kvm.orchestrator import BatchOrchestrator
 
 orchestrator = BatchOrchestrator(
     manifest="migrations.json",
@@ -180,7 +180,7 @@ orchestrator.execute()
 **Recommended**: [VMCraft API](vmcraft.md) - OS Detection
 
 ```python
-from hyper2kvm.vmcraft.main import VMCraft
+from h2kvm.vmcraft.main import VMCraft
 
 g = VMCraft()
 g.add_drive_opts('/path/to/disk.vmdk', readonly=True)
@@ -203,7 +203,7 @@ g.shutdown()
 **Recommended**: [VMCraft API](vmcraft.md) - File Operations + Boot Management
 
 ```python
-from hyper2kvm.vmcraft.main import VMCraft
+from h2kvm.vmcraft.main import VMCraft
 
 g = VMCraft()
 g.add_drive_opts('/path/to/disk.vmdk', readonly=False)
@@ -245,7 +245,7 @@ g.shutdown()
 
 ### By User Experience Level
 
-**Beginner** (First time using Hyper2KVM as library):
+**Beginner** (First time using H2KVM as library):
 1. Start with [Library API](library-api.md) - Overview and Quick Start
 2. Review Level 1 High-Level API examples
 3. Use [Quick Reference](quick-reference.md) for syntax
@@ -285,7 +285,7 @@ g.shutdown()
 ## Related Documentation
 
 ### Getting Started
-- **[Installation Guide](../../getting-started/01-Installation.md)** - Install Hyper2KVM
+- **[Installation Guide](../../getting-started/01-Installation.md)** - Install H2KVM
 - **[Quick Start](../../getting-started/02-Quick-Start.md)** - First migration
 - **[Beginner Tutorial](../../tutorials/01-beginner-migration.md)** - Step-by-step walkthrough
 
@@ -326,7 +326,7 @@ g.shutdown()
 
 **API Version**: v1.0
 **VMCraft Version**: v9.2
-**Hyper2KVM Version**: v0.3.1
+**H2KVM Version**: v0.3.1
 **Last Updated**: March 2026
 
 ---

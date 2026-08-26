@@ -19,7 +19,7 @@ Some security features require manual setup in the GitHub repository settings.
 
 1. Go to your repository settings:
    ```
-   https://github.com/ssahani/hyper2kvm/settings/security_analysis
+   https://github.com/ssahani/h2kvm/settings/security_analysis
    ```
 
 2. Under "Data services":
@@ -39,7 +39,7 @@ Some security features require manual setup in the GitHub repository settings.
 
 1. Go to Security > Code scanning
    ```
-   https://github.com/ssahani/hyper2kvm/security/code-scanning
+   https://github.com/ssahani/h2kvm/security/code-scanning
    ```
 
 2. Click "Set up code scanning"
@@ -69,7 +69,7 @@ Some security features require manual setup in the GitHub repository settings.
 Periodically check for security advisories:
 
 ```
-https://github.com/ssahani/hyper2kvm/security/advisories
+https://github.com/ssahani/h2kvm/security/advisories
 ```
 
 ---

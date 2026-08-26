@@ -1,5 +1,5 @@
 {
-  "image": "/home/ssahani/tt/hyper2kvm/esx8.0-rhel8.8-with-thin-provision-disk1.vmdk",
+  "image": "/home/ssahani/tt/h2kvm/esx8.0-rhel8.8-with-thin-provision-disk1.vmdk",
   "format": "vmdk",
   "virtual_size_gb": 16.0,
   "actual_size_gb": 3.8777809143066406,

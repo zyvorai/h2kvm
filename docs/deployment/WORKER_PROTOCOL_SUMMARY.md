@@ -1,6 +1,6 @@
-# Hyper2KVM Worker Job Protocol - Complete Implementation Summary
+# H2KVM Worker Job Protocol - Complete Implementation Summary
 
-**Project:** hyper2kvm - Hypervisor to KVM Migration Toolkit
+**Project:** h2kvm - Hypervisor to KVM Migration Toolkit
 **Component:** Worker Job Protocol v1
 **Timeline:** 2026-01-30
 **Status:** Production-Ready with Full Automation
@@ -213,7 +213,7 @@ PROGRESSING
 
 ### Test Coverage
 
-- Unit tests: hyper2kvm/worker/*.py
+- Unit tests: h2kvm/worker/*.py
 - Integration tests: k3d deployment (test-worker-protocol)
 - CI tests: 3 Python versions (3.10, 3.11, 3.12)
 - Security tests: Trivy scanning
@@ -226,14 +226,14 @@ PROGRESSING
 
 ```bash
 # Build worker image
-docker build --target worker -t hyper2kvm:worker .
+docker build --target worker -t h2kvm:worker .
 
 # Run worker
 docker run --privileged \
   -v /data/input:/data/input:ro \
   -v /data/output:/data/output:rw \
   -v /dev:/dev \
-  hyper2kvm:worker
+  h2kvm:worker
 ```
 
 ### 2. Kubernetes (kubectl)
@@ -251,13 +251,13 @@ make submit-job JOB_FILE=examples/convert-job.json
 
 ```bash
 # Install Helm chart
-helm install hyper2kvm-worker ./helm/hyper2kvm-worker \
-  --namespace hyper2kvm-workers \
+helm install h2kvm-worker ./helm/h2kvm-worker \
+  --namespace h2kvm-workers \
   --create-namespace \
   --values custom-values.yaml
 
 # Upgrade
-helm upgrade hyper2kvm-worker ./helm/hyper2kvm-worker \
+helm upgrade h2kvm-worker ./helm/h2kvm-worker \
   --values custom-values.yaml
 ```
 
@@ -334,14 +334,14 @@ make -C k8s k3d-full-test
 
 #### Infrastructure
 
-- [ ] Label worker nodes: `hyper2kvm.io/worker-enabled: "true"`
+- [ ] Label worker nodes: `h2kvm.io/worker-enabled: "true"`
 - [ ] Load NBD kernel module on nodes: `modprobe nbd max_part=16`
 - [ ] Configure storage classes (NFS, Ceph, local-nvme)
 - [ ] Set up persistent volumes
 
 #### Deployment
 
-- [ ] Review and customize `helm/hyper2kvm-worker/values.yaml`
+- [ ] Review and customize `helm/h2kvm-worker/values.yaml`
 - [ ] Configure resource limits (CPU, memory)
 - [ ] Set appropriate PVC sizes
 - [ ] Enable Prometheus ServiceMonitor
@@ -377,7 +377,7 @@ worker:
       cpu: "16"
       memory: "32Gi"
   nodeSelector:
-    hyper2kvm.io/worker-enabled: "true"
+    h2kvm.io/worker-enabled: "true"
   tolerations:
   - key: "privileged"
     operator: "Exists"
@@ -462,7 +462,7 @@ alerting:
 
 ### Deployment Documentation
 - **k8s/README.md** - Kubernetes deployment guide
-- **helm/hyper2kvm-worker/README.md** - Helm chart documentation
+- **helm/h2kvm-worker/README.md** - Helm chart documentation
 - **production-enhancements.md** - v1.1.0 features
 - **v1.2.0-enhancements.md** - v1.2.0 features
 - **v1.3.0-cicd-ops.md** - v1.3.0 features
@@ -481,7 +481,7 @@ alerting:
 
 - **Documentation:** Start with `docs/worker/QUICKSTART.md`
 - **Examples:** See `k8s/worker/examples/`
-- **Issues:** https://github.com/ssahani/hyper2kvm/issues
+- **Issues:** https://github.com/ssahani/h2kvm/issues
 - **Discussions:** GitHub Discussions
 
 ### Contributing
@@ -499,12 +499,12 @@ alerting:
 pytest tests/test_worker_protocol.py -v
 
 # Build Docker image
-docker build --target worker -t hyper2kvm:test .
+docker build --target worker -t h2kvm:test .
 
 # Test in k3d
 k3d cluster create test
-k3d image import hyper2kvm:test
-helm install test ./helm/hyper2kvm-worker --set worker.image.tag=test
+k3d image import h2kvm:test
+helm install test ./helm/h2kvm-worker --set worker.image.tag=test
 ```
 
 ---

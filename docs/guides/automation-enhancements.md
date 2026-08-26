@@ -1,6 +1,6 @@
 # Automation Enhancements
 
-Summary of all automation improvements implemented across the hyper2kvm project.
+Summary of all automation improvements implemented across the h2kvm project.
 
 ## KubeVirt TUI Enhancements (7 features)
 
@@ -52,11 +52,11 @@ Files: `kubernetes.go`, `kubevirt.go`, `kube_client.go`, `standalone.go`, `help.
 | 17 | PodDisruptionBudget | `k8s/worker/pdb.yaml` — minAvailable=1 |
 | 18 | Health probes | `/healthz` + `/readyz` HTTP endpoints in worker engine (port 8081) |
 | 19 | HPA | Already existed in `worker-hpa.yaml` |
-| 20 | Circuit breaker | `hyper2kvm/core/circuit_breaker.py` — thread-safe, decorator pattern, global registry |
+| 20 | Circuit breaker | `h2kvm/core/circuit_breaker.py` — thread-safe, decorator pattern, global registry |
 | 21 | Batch resume | Checkpoint-aware `_process_disks()` + `load_checkpoint()` in orchestrator |
 | 22 | TPM flag | `--no-tpm` wired through encryption pipeline |
 | 23 | OVMF auto-detect | Searches 5 common paths across Fedora/RHEL/Debian/Ubuntu/Arch |
-| 24 | User config | `~/.config/hyper2kvm/config.yaml` via XDG_CONFIG_HOME |
+| 24 | User config | `~/.config/h2kvm/config.yaml` via XDG_CONFIG_HOME |
 | 25 | Operator tests | 3 HyperConversion tests: pending, ready, deletion |
 | 26 | Changelog | `make changelog` from git commits |
 | 27 | RBAC expansion | Added hyperconversions, datavolumes, configmaps, secrets |
@@ -68,7 +68,7 @@ Files: `kubernetes.go`, `kubevirt.go`, `kube_client.go`, `standalone.go`, `help.
 | 28 | SBOM | `make sbom` — CycloneDX generation |
 | 29-30 | Image signing | Documented for CI integration |
 | 31 | Ingress example | `k8s/examples/ingress.yaml` — nginx ingress for worker API |
-| 32-33 | Config backup | `hyper2kvm/core/config_backup.py` — backup/restore/list |
+| 32-33 | Config backup | `h2kvm/core/config_backup.py` — backup/restore/list |
 | 34 | Daemon health | HTTP `/healthz` + `/readyz` on configurable port |
 | 35 | CLI docs | `make docs` generates from argparse |
 | 36 | License compliance | `make license-check` — REUSE lint |
@@ -98,11 +98,11 @@ make health            # Full-stack health check (all components)
 make debug-bundle      # Collect debug bundle for troubleshooting
 
 # Uninstall
-make uninstall            # Remove all hyper2kvm components
+make uninstall            # Remove all h2kvm components
 make uninstall-operator   # Remove operator only
 make uninstall-workers    # Remove workers only
 make uninstall-migrations # Remove migration resources only
-make uninstall-all        # Remove hyper2kvm + KubeVirt + CDI
+make uninstall-all        # Remove h2kvm + KubeVirt + CDI
 make uninstall-k3d        # Delete entire k3d cluster
 
 # Backup
@@ -132,8 +132,8 @@ make lint-all                # ruff + mypy + go vet + shellcheck
 
 | File | Purpose |
 |------|---------|
-| `hyper2kvm/core/circuit_breaker.py` | Thread-safe circuit breaker with decorator |
-| `hyper2kvm/core/config_backup.py` | Config backup/restore utility |
+| `h2kvm/core/circuit_breaker.py` | Thread-safe circuit breaker with decorator |
+| `h2kvm/core/config_backup.py` | Config backup/restore utility |
 
 ### Kubernetes manifests
 
@@ -165,17 +165,17 @@ make lint-all                # ruff + mypy + go vet + shellcheck
 
 | File | Change |
 |------|--------|
-| `hyper2kvm/cli/args/groups.py` | OVF retry 0→3, OVMF auto-detect |
-| `hyper2kvm/cli/system_config.py` | User-level config path support |
-| `hyper2kvm/infrastructure/deployers/kubernetes.py` | Remove hardcoded KubeVirt version |
-| `hyper2kvm/libvirt/domain_emitter.py` | OVMF auto-detection across distros |
-| `hyper2kvm/orchestration/orchestrator.py` | Batch checkpoint/resume |
-| `hyper2kvm/pipeline/cli.py` | Wire --no-tpm flag |
-| `hyper2kvm/pipeline/vmware_to_luks_tpm.py` | Skip TPM enrollment when --no-tpm |
-| `hyper2kvm/runtime/worker/engine.py` | HTTP health server |
-| `hyper2kvm/database_migration/mongodb.py` | Real fsyncLock/Unlock implementation |
-| `hyper2kvm/database_migration/postgresql.py` | Real CHECKPOINT implementation |
-| `hyper2kvm/database_migration/redis.py` | Real BGSAVE with polling |
+| `h2kvm/cli/args/groups.py` | OVF retry 0→3, OVMF auto-detect |
+| `h2kvm/cli/system_config.py` | User-level config path support |
+| `h2kvm/infrastructure/deployers/kubernetes.py` | Remove hardcoded KubeVirt version |
+| `h2kvm/libvirt/domain_emitter.py` | OVMF auto-detection across distros |
+| `h2kvm/orchestration/orchestrator.py` | Batch checkpoint/resume |
+| `h2kvm/pipeline/cli.py` | Wire --no-tpm flag |
+| `h2kvm/pipeline/vmware_to_luks_tpm.py` | Skip TPM enrollment when --no-tpm |
+| `h2kvm/runtime/worker/engine.py` | HTTP health server |
+| `h2kvm/database_migration/mongodb.py` | Real fsyncLock/Unlock implementation |
+| `h2kvm/database_migration/postgresql.py` | Real CHECKPOINT implementation |
+| `h2kvm/database_migration/redis.py` | Real BGSAVE with polling |
 
 ### Go fixes
 

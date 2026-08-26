@@ -32,7 +32,7 @@ Custom Resource Definition for declarative offline VM repair.
 
 **Example:**
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: OfflineFixJob
 metadata:
   name: centos9-fix
@@ -47,7 +47,7 @@ spec:
   - grub
   - selinux
   nodeSelector:
-    hyper2kvm.io/nbd-capable: "true"
+    h2kvm.io/nbd-capable: "true"
 ```
 
 **Status Phases:**
@@ -62,7 +62,7 @@ spec:
 
 Python controller using kopf framework.
 
-**Location:** `hyper2kvm/operator/offlinefixjob_controller.py` (400 lines)
+**Location:** `h2kvm/operator/offlinefixjob_controller.py` (400 lines)
 
 **Responsibilities:**
 - Watch OfflineFixJob resources
@@ -75,13 +75,13 @@ Python controller using kopf framework.
 
 **Key Functions:**
 ```python
-@kopf.on.create('hyper2kvm.io', 'v1alpha1', 'offlinefixjobs')
+@kopf.on.create('h2kvm.io', 'v1alpha1', 'offlinefixjobs')
 async def create_offline_fix_job(...)
 
 @kopf.on.field(..., field='status.phase', new='Pending')
 async def handle_pending(...)
 
-@kopf.on.delete('hyper2kvm.io', 'v1alpha1', 'offlinefixjobs')
+@kopf.on.delete('h2kvm.io', 'v1alpha1', 'offlinefixjobs')
 async def delete_offline_fix_job(...)
 ```
 
@@ -89,7 +89,7 @@ async def delete_offline_fix_job(...)
 
 DaemonSet that manages NBD on host nodes.
 
-**Location:** `hyper2kvm/daemon/nbd_prep.py` (450 lines)
+**Location:** `h2kvm/daemon/nbd_prep.py` (450 lines)
 
 **Responsibilities:**
 - Watch node annotations for job assignments
@@ -102,7 +102,7 @@ DaemonSet that manages NBD on host nodes.
 
 **Workflow:**
 ```python
-1. Controller annotates node: offlinefix.hyper2kvm.io/job=namespace/name
+1. Controller annotates node: offlinefix.h2kvm.io/job=namespace/name
 2. Daemon sees annotation → Executes NBD setup
 3. Daemon updates annotation: nbd-ready=true
 4. Controller creates VM
@@ -163,7 +163,7 @@ Kubernetes manifest for NBD prep daemon.
 **Location:** `k8s/daemon/nbd-prep-daemonset.yaml`
 
 **Key Features:**
-- Runs on nodes with label `hyper2kvm.io/nbd-capable=true`
+- Runs on nodes with label `h2kvm.io/nbd-capable=true`
 - ServiceAccount + RBAC for node access
 - **Scoped capabilities** (SYS_ADMIN, SYS_MODULE) - NOT privileged
 - Volume mounts: `/dev`, `/var/lib/kubevirt-offline`, `/var/lib/imports`
@@ -181,8 +181,8 @@ Kubernetes manifest for NBD prep daemon.
 ┌─────────────────────────────────────────────────────────────┐
 │ 2. Controller (kopf)                                        │
 │    • Phase: Pending                                         │
-│    • Selects node with hyper2kvm.io/nbd-capable=true        │
-│    • Annotates node: offlinefix.hyper2kvm.io/job=ns/name   │
+│    • Selects node with h2kvm.io/nbd-capable=true        │
+│    • Annotates node: offlinefix.h2kvm.io/job=ns/name   │
 └──────────────────┬──────────────────────────────────────────┘
                    ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -202,7 +202,7 @@ Kubernetes manifest for NBD prep daemon.
 │    • Creates KubeVirt VirtualMachineInstance:               │
 │      - Volume: HostDisk (path: /var/lib/kubevirt-offline/)  │
 │      - Volume: ConfigMap (job spec)                         │
-│      - Image: quay.io/hyper2kvm/offline-fix-vm:v1.0.0      │
+│      - Image: quay.io/h2kvm/offline-fix-vm:v1.0.0      │
 │    • Phase: VMRunning                                       │
 └──────────────────┬──────────────────────────────────────────┘
                    ↓
@@ -310,13 +310,13 @@ OfflineFixJob can be created automatically by Migration controller:
 
 ```python
 # In Migration controller
-@kopf.on.field('hyper2kvm.io', 'v1alpha1', 'migrations',
+@kopf.on.field('h2kvm.io', 'v1alpha1', 'migrations',
                field='status.phase', new='ConversionComplete')
 async def trigger_offline_fixes(spec, status, namespace, name, **kwargs):
     """Create OfflineFixJob after disk conversion."""
 
     ofj = {
-        'apiVersion': 'hyper2kvm.io/v1alpha1',
+        'apiVersion': 'h2kvm.io/v1alpha1',
         'kind': 'OfflineFixJob',
         'metadata': {
             'name': f'fix-{name}',
@@ -345,11 +345,11 @@ async def trigger_offline_fixes(spec, status, namespace, name, **kwargs):
 
 ```bash
 # Test controller logic
-cd hyper2kvm/operator
+cd h2kvm/operator
 python -m pytest test_offlinefixjob_controller.py
 
 # Test NBD daemon
-cd hyper2kvm/daemon
+cd h2kvm/daemon
 python -m pytest test_nbd_prep.py
 ```
 
@@ -381,13 +381,13 @@ See: `docs/deployment/phase4-deployment.md`
 ./scripts/build-phase4-images.sh
 
 # 2. Push to registry
-docker push quay.io/hyper2kvm/nbd-prep:v1.0.0
-docker push quay.io/hyper2kvm/offline-fix-vm:v1.0.0
+docker push quay.io/h2kvm/nbd-prep:v1.0.0
+docker push quay.io/h2kvm/offline-fix-vm:v1.0.0
 
 # 3. Deploy
 kubectl apply -f k8s/operator/crds/offlinefixjob.yaml
 kubectl apply -f k8s/daemon/nbd-prep-daemonset.yaml
-kubectl label node worker-1 hyper2kvm.io/nbd-capable=true
+kubectl label node worker-1 h2kvm.io/nbd-capable=true
 
 # 4. Test
 kubectl apply -f k8s/operator/examples/offlinefixjob-example.yaml
@@ -405,10 +405,10 @@ kubectl get offlinefixjob -w
 **NBD not attaching:**
 ```bash
 # Check DaemonSet logs
-kubectl logs -n hyper2kvm-system -l app=nbd-prep
+kubectl logs -n h2kvm-system -l app=nbd-prep
 
 # Check NBD module
-kubectl exec -n hyper2kvm-system <pod> -- lsmod | grep nbd
+kubectl exec -n h2kvm-system <pod> -- lsmod | grep nbd
 ```
 
 **VM not starting:**
@@ -417,17 +417,17 @@ kubectl exec -n hyper2kvm-system <pod> -- lsmod | grep nbd
 kubectl get kubevirt -n kubevirt
 
 # Check VMI
-kubectl get vmi -n hyper2kvm-system
+kubectl get vmi -n h2kvm-system
 kubectl describe vmi <vm-name>
 ```
 
 **Fixers failing:**
 ```bash
 # Check VM logs
-kubectl logs -n hyper2kvm-system <vm-pod>
+kubectl logs -n h2kvm-system <vm-pod>
 
 # Check guest filesystem mount
-kubectl exec -n hyper2kvm-system <vm-pod> -- ls /vmroot/etc
+kubectl exec -n h2kvm-system <vm-pod> -- ls /vmroot/etc
 ```
 
 ---

@@ -1,12 +1,12 @@
 # Copyright (c) 2026 ZyvorAI Labs Private Limited. All rights reserved.
 
-"""Comprehensive tests for hyper2kvm.core.firmware_resolver."""
+"""Comprehensive tests for h2kvm.core.firmware_resolver."""
 
 from __future__ import annotations
 
 import pytest
 
-from hyper2kvm.core.firmware_resolver import (
+from h2kvm.core.firmware_resolver import (
     BIOS_BOOT_FAILURE_PATTERNS,
     UEFI_BOOT_FAILURE_PATTERNS,
     FirmwareResolution,

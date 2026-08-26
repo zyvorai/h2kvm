@@ -1,6 +1,6 @@
 # GitHub Actions Workflows
 
-This directory contains CI/CD workflows for hyper2kvm.
+This directory contains CI/CD workflows for h2kvm.
 
 ## Workflows
 
@@ -92,9 +92,9 @@ Jobs:
 Add these to README.md:
 
 ```markdown
-[![Tests](https://github.com/ssahani/hyper2kvm/workflows/tests/badge.svg)](https://github.com/ssahani/hyper2kvm/actions)
-[![Security](https://github.com/ssahani/hyper2kvm/workflows/security/badge.svg)](https://github.com/ssahani/hyper2kvm/actions)
-[![codecov](https://codecov.io/gh/ssahani/hyper2kvm/branch/main/graph/badge.svg)](https://codecov.io/gh/ssahani/hyper2kvm)
+[![Tests](https://github.com/ssahani/h2kvm/workflows/tests/badge.svg)](https://github.com/ssahani/h2kvm/actions)
+[![Security](https://github.com/ssahani/h2kvm/workflows/security/badge.svg)](https://github.com/ssahani/h2kvm/actions)
+[![codecov](https://codecov.io/gh/ssahani/h2kvm/branch/main/graph/badge.svg)](https://codecov.io/gh/ssahani/h2kvm)
 ```
 
 ## Secrets Required
@@ -107,7 +107,7 @@ For full automation, configure these secrets in GitHub Settings:
    - Add to GitHub: Settings → Secrets → Actions → New repository secret
 
 2. **CODECOV_TOKEN** (optional)
-   - Go to https://codecov.io/gh/ssahani/hyper2kvm
+   - Go to https://codecov.io/gh/ssahani/h2kvm
    - Copy token
    - Add to GitHub secrets
 
@@ -140,7 +140,7 @@ gh run list
 gh run view <run-id> --log
 
 # Or in browser
-https://github.com/ssahani/hyper2kvm/actions
+https://github.com/ssahani/h2kvm/actions
 ```
 
 ### Common issues

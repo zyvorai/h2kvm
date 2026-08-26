@@ -1,4 +1,4 @@
-module github.com/hyper2kvm/web
+module github.com/h2kvm/web
 
 go 1.23.0
 

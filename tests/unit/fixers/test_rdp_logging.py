@@ -6,7 +6,7 @@
 
 import logging
 
-from hyper2kvm.fixers.windows.rdp import log_rdp_precheck_summary, service_start_label
+from h2kvm.fixers.windows.rdp import log_rdp_precheck_summary, service_start_label
 
 
 def test_service_start_label():

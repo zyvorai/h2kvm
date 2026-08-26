@@ -5,7 +5,7 @@
 # Converts a local Red Hat Enterprise Linux 10 VMDK to QCOW2 format
 #
 # Usage:
-#   hyper2kvm --config 02-local-rhel-10-vmdk.yaml local
+#   h2kvm --config 02-local-rhel-10-vmdk.yaml local
 #
 # Features:
 #   ✅ UUID-based fstab stabilization
@@ -22,7 +22,7 @@
 cmd: local
 
 # Source VMDK
-vmdk: /home/ssahani/tt/hyper2kvm/downloads/esx8.0-rhel10.1-x86_64-efi/esx8.0-rhel10.1-x86_64-efi/esx8.0-rhel10.1-x86_64-efi.vmdk
+vmdk: /home/ssahani/tt/h2kvm/downloads/esx8.0-rhel10.1-x86_64-efi/esx8.0-rhel10.1-x86_64-efi/esx8.0-rhel10.1-x86_64-efi.vmdk
 
 # Output Configuration
 output_dir: /home/ssahani/by-path/out
@@ -76,10 +76,10 @@ dry_run: false
 verbose: 2
 
 # Optional logfile
-log_file: /home/ssahani/by-path/out/hyper2kvm.log
+log_file: /home/ssahani/by-path/out/h2kvm.log
 
 # Optional Markdown report
-report: /home/ssahani/by-path/out/hyper2kvm-report.md
+report: /home/ssahani/by-path/out/h2kvm-report.md
 
 # Optional Smoke Tests (disabled by default)
 # libvirt_test: true

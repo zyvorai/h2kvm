@@ -20,7 +20,7 @@ Complete documentation for migrating Windows VMs from VMware/Hyper-V to KVM.
 The VirtIO Windows drivers ISO is **automatically discovered** at the standard path:
 
 ```
-/var/lib/hyper2kvm/virtio-win.iso
+/var/lib/h2kvm/virtio-win.iso
 ```
 
 **Easiest setup** -- run once and forget:
@@ -29,7 +29,7 @@ The VirtIO Windows drivers ISO is **automatically discovered** at the standard p
 sudo ./scripts/install-deps.sh --virtio-win
 ```
 
-This downloads the ISO to the standard location. After that, hyper2kvm finds it automatically -- no `--virtio-drivers-dir` flag or `virtio_drivers_dir` YAML key needed.
+This downloads the ISO to the standard location. After that, h2kvm finds it automatically -- no `--virtio-drivers-dir` flag or `virtio_drivers_dir` YAML key needed.
 
 To use a different ISO location, pass `--virtio-drivers-dir /your/path/to/virtio-win.iso` as an override.
 
@@ -204,7 +204,7 @@ To use a different ISO location, pass `--virtio-drivers-dir /your/path/to/virtio
 docs/os-support/windows/guide.md
 
 # 2. Convert VM with driver injection
-hyper2kvm local \
+h2kvm local \
   --vmdk /vms/windows.vmdk \
   --output-dir /vms/converted \
   --to-output windows.qcow2 \
@@ -387,8 +387,8 @@ docs/guides/operations/MIGRATION_RUNBOOK_TEMPLATE.md
 
 ### Convert with VirtIO Injection
 ```bash
-# If virtio-win.iso is at /var/lib/hyper2kvm/virtio-win.iso (auto-discovered):
-hyper2kvm local \
+# If virtio-win.iso is at /var/lib/h2kvm/virtio-win.iso (auto-discovered):
+h2kvm local \
   --vmdk /vms/windows.vmdk \
   --output-dir /vms/output \
   --to-output windows.qcow2 \
@@ -396,7 +396,7 @@ hyper2kvm local \
   --out-format qcow2
 
 # To override with a custom ISO path:
-hyper2kvm local \
+h2kvm local \
   --vmdk /vms/windows.vmdk \
   --output-dir /vms/output \
   --to-output windows.qcow2 \
@@ -476,7 +476,7 @@ hyper2kvm local \
 ## Windows Migration Best Practices
 
 ### Before Migration
-1. ✅ Install VirtIO drivers ISO: `sudo ./scripts/install-deps.sh --virtio-win` (auto-downloads to `/var/lib/hyper2kvm/virtio-win.iso`)
+1. ✅ Install VirtIO drivers ISO: `sudo ./scripts/install-deps.sh --virtio-win` (auto-downloads to `/var/lib/h2kvm/virtio-win.iso`)
 2. ✅ Document source VM configuration (boot mode, disk layout)
 3. ✅ Verify Windows license (volume vs retail)
 4. ✅ Check for third-party drivers that may need reinstallation

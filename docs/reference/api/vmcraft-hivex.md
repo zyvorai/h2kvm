@@ -152,7 +152,7 @@ Some guestfs hivex methods require a handle parameter, others use an implicit "c
 ## Usage Example
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 with VMCraft() as g:
     g.add_disk("/vms/windows10.qcow2")
@@ -178,11 +178,11 @@ with VMCraft() as g:
 
 These modules use the hivex API (works on both guestfs and VMCraft):
 
-- `hyper2kvm/fixers/windows/rdp.py` — RDP verification (fDenyTSConnections)
-- `hyper2kvm/fixers/windows/firewall.py` — Firewall service status check
-- `hyper2kvm/fixers/windows/network_fixer.py` — TCP/IP config snapshot
-- `hyper2kvm/fixers/windows/virtio/detection.py` — Windows build number from SOFTWARE hive
-- `hyper2kvm/fixers/windows/virtio/install.py` — SYSTEM hive registry edits
+- `h2kvm/fixers/windows/rdp.py` — RDP verification (fDenyTSConnections)
+- `h2kvm/fixers/windows/firewall.py` — Firewall service status check
+- `h2kvm/fixers/windows/network_fixer.py` — TCP/IP config snapshot
+- `h2kvm/fixers/windows/virtio/detection.py` — Windows build number from SOFTWARE hive
+- `h2kvm/fixers/windows/virtio/install.py` — SYSTEM hive registry edits
 
 ## See Also
 

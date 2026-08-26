@@ -9,6 +9,6 @@
   "disk": 0,
   "local_path": "./downloads/myVM-disk0.vmdk",
   "enable_cbt": true,
-  "snapshot_name": "hyper2kvm-cbt",
+  "snapshot_name": "h2kvm-cbt",
   "json": true
 }

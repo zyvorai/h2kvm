@@ -1,4 +1,4 @@
-# REST API Dependencies for hyper2kvm Worker Protocol
+# REST API Dependencies for h2kvm Worker Protocol
 # Install with: pip install -r requirements-api.txt
 
 # FastAPI framework

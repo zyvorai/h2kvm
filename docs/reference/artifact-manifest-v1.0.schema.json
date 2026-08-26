@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/ssahani/hyper2kvm/schemas/artifact-manifest-v1.0.json",
+  "$id": "https://github.com/ssahani/h2kvm/schemas/artifact-manifest-v1.0.json",
   "title": "Artifact Manifest v1.0",
-  "description": "Schema for hypersdk-to-hyper2kvm integration contract. Defines VM disk artifacts and conversion pipeline configuration.",
+  "description": "Schema for hypersdk-to-h2kvm integration contract. Defines VM disk artifacts and conversion pipeline configuration.",
   "type": "object",
   "required": ["manifest_version", "disks"],
   "additionalProperties": true,
@@ -14,7 +14,7 @@
     },
     "source": {
       "type": "object",
-      "description": "Source system metadata (informational, not required by hyper2kvm)",
+      "description": "Source system metadata (informational, not required by h2kvm)",
       "additionalProperties": true,
       "properties": {
         "provider": {
@@ -65,7 +65,7 @@
           "type": "string",
           "enum": ["bios", "uefi", "unknown"],
           "default": "bios",
-          "description": "Firmware type (helps hyper2kvm make boot decisions)"
+          "description": "Firmware type (helps h2kvm make boot decisions)"
         },
         "secureboot": {
           "type": "boolean",
@@ -280,7 +280,7 @@
             },
             "enable_rdp": {
               "type": "boolean",
-              "description": "Enable Windows RDP via hyper2kvm firstboot (TermService + firewall). Default when omitted: true if vm.os_hint is windows"
+              "description": "Enable Windows RDP via h2kvm firstboot (TermService + firewall). Default when omitted: true if vm.os_hint is windows"
             }
           }
         },

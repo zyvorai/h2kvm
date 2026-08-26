@@ -16,7 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
-	hyper2kvmv1alpha1 "github.com/hyper2kvm/operator/api/v1alpha1"
+	h2kvmv1alpha1 "github.com/h2kvm/operator/api/v1alpha1"
 )
 
 var _ = Describe("HyperConversion Controller", func() {
@@ -32,17 +32,17 @@ var _ = Describe("HyperConversion Controller", func() {
 			ns := "default"
 			storageSize := resource.MustParse("20Gi")
 
-			hc := &hyper2kvmv1alpha1.HyperConversion{
+			hc := &h2kvmv1alpha1.HyperConversion{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      hcName,
 					Namespace: ns,
 				},
-				Spec: hyper2kvmv1alpha1.HyperConversionSpec{
-					Source: hyper2kvmv1alpha1.SourceSpec{
+				Spec: h2kvmv1alpha1.HyperConversionSpec{
+					Source: h2kvmv1alpha1.SourceSpec{
 						URL:    "https://example.com/disk.qcow2",
 						Format: "qcow2",
 					},
-					Storage: hyper2kvmv1alpha1.StorageSpec{
+					Storage: h2kvmv1alpha1.StorageSpec{
 						Size:       &storageSize,
 						AccessMode: "ReadWriteOnce",
 					},
@@ -54,10 +54,10 @@ var _ = Describe("HyperConversion Controller", func() {
 			// The controller should transition to Uploading and create a DataVolume.
 			// Verify that the status reports the DataVolume name.
 			Eventually(func(g Gomega) {
-				fetched := &hyper2kvmv1alpha1.HyperConversion{}
+				fetched := &h2kvmv1alpha1.HyperConversion{}
 				g.Expect(k8sClient.Get(ctx, types.NamespacedName{Name: hcName, Namespace: ns}, fetched)).To(Succeed())
 				g.Expect(fetched.Status.DataVolumeName).ToNot(BeEmpty())
-				g.Expect(fetched.Status.Phase).To(Equal(hyper2kvmv1alpha1.PhaseUploading))
+				g.Expect(fetched.Status.Phase).To(Equal(h2kvmv1alpha1.PhaseUploading))
 			}, timeout, interval).Should(Succeed())
 
 			// Verify the DataVolume object was created in the API server.
@@ -74,7 +74,7 @@ var _ = Describe("HyperConversion Controller", func() {
 
 			// Verify DataVolume labels
 			labels := dv.GetLabels()
-			Expect(labels).To(HaveKeyWithValue("hyper2kvm.io/hyperconversion", hcName))
+			Expect(labels).To(HaveKeyWithValue("h2kvm.io/hyperconversion", hcName))
 
 			// Cleanup
 			Expect(k8sClient.Delete(ctx, hc)).Should(Succeed())
@@ -89,22 +89,22 @@ var _ = Describe("HyperConversion Controller", func() {
 			storageSize := resource.MustParse("20Gi")
 			vmMemory := resource.MustParse("4Gi")
 
-			hc := &hyper2kvmv1alpha1.HyperConversion{
+			hc := &h2kvmv1alpha1.HyperConversion{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      hcName,
 					Namespace: ns,
 				},
-				Spec: hyper2kvmv1alpha1.HyperConversionSpec{
-					Source: hyper2kvmv1alpha1.SourceSpec{
+				Spec: h2kvmv1alpha1.HyperConversionSpec{
+					Source: h2kvmv1alpha1.SourceSpec{
 						URL:    "https://example.com/disk.qcow2",
 						Format: "qcow2",
 					},
-					Storage: hyper2kvmv1alpha1.StorageSpec{
+					Storage: h2kvmv1alpha1.StorageSpec{
 						Size:       &storageSize,
 						AccessMode: "ReadWriteOnce",
 					},
-					VM: &hyper2kvmv1alpha1.VMSpec{
-						CPU: hyper2kvmv1alpha1.CPUSpec{
+					VM: &h2kvmv1alpha1.VMSpec{
+						CPU: h2kvmv1alpha1.CPUSpec{
 							Cores:   2,
 							Sockets: 1,
 							Threads: 1,
@@ -121,7 +121,7 @@ var _ = Describe("HyperConversion Controller", func() {
 			// Wait for the DataVolume to be created and the status to be Uploading.
 			dvName := hcName + "-dv"
 			Eventually(func(g Gomega) {
-				fetched := &hyper2kvmv1alpha1.HyperConversion{}
+				fetched := &h2kvmv1alpha1.HyperConversion{}
 				g.Expect(k8sClient.Get(ctx, types.NamespacedName{Name: hcName, Namespace: ns}, fetched)).To(Succeed())
 				g.Expect(fetched.Status.DataVolumeName).To(Equal(dvName))
 			}, timeout, interval).Should(Succeed())
@@ -146,9 +146,9 @@ var _ = Describe("HyperConversion Controller", func() {
 			// The controller should detect Succeeded, transition through Converting
 			// and CreatingVM, and eventually reach Ready with a VirtualMachine created.
 			Eventually(func(g Gomega) {
-				fetched := &hyper2kvmv1alpha1.HyperConversion{}
+				fetched := &h2kvmv1alpha1.HyperConversion{}
 				g.Expect(k8sClient.Get(ctx, types.NamespacedName{Name: hcName, Namespace: ns}, fetched)).To(Succeed())
-				g.Expect(fetched.Status.Phase).To(Equal(hyper2kvmv1alpha1.PhaseReady))
+				g.Expect(fetched.Status.Phase).To(Equal(h2kvmv1alpha1.PhaseReady))
 				g.Expect(fetched.Status.VirtualMachineName).ToNot(BeEmpty())
 				g.Expect(fetched.Status.Progress).To(Equal(int32(100)))
 			}, timeout, interval).Should(Succeed())
@@ -165,7 +165,7 @@ var _ = Describe("HyperConversion Controller", func() {
 			}, timeout, interval).Should(Succeed())
 
 			vmLabels := vm.GetLabels()
-			Expect(vmLabels).To(HaveKeyWithValue("hyper2kvm.io/hyperconversion", hcName))
+			Expect(vmLabels).To(HaveKeyWithValue("h2kvm.io/hyperconversion", hcName))
 
 			// Cleanup
 			Expect(k8sClient.Delete(ctx, hc)).Should(Succeed())
@@ -180,22 +180,22 @@ var _ = Describe("HyperConversion Controller", func() {
 			storageSize := resource.MustParse("20Gi")
 			vmMemory := resource.MustParse("4Gi")
 
-			hc := &hyper2kvmv1alpha1.HyperConversion{
+			hc := &h2kvmv1alpha1.HyperConversion{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      hcName,
 					Namespace: ns,
 				},
-				Spec: hyper2kvmv1alpha1.HyperConversionSpec{
-					Source: hyper2kvmv1alpha1.SourceSpec{
+				Spec: h2kvmv1alpha1.HyperConversionSpec{
+					Source: h2kvmv1alpha1.SourceSpec{
 						URL:    "https://example.com/disk.qcow2",
 						Format: "qcow2",
 					},
-					Storage: hyper2kvmv1alpha1.StorageSpec{
+					Storage: h2kvmv1alpha1.StorageSpec{
 						Size:       &storageSize,
 						AccessMode: "ReadWriteOnce",
 					},
-					VM: &hyper2kvmv1alpha1.VMSpec{
-						CPU: hyper2kvmv1alpha1.CPUSpec{
+					VM: &h2kvmv1alpha1.VMSpec{
+						CPU: h2kvmv1alpha1.CPUSpec{
 							Cores:   2,
 							Sockets: 1,
 							Threads: 1,
@@ -212,7 +212,7 @@ var _ = Describe("HyperConversion Controller", func() {
 			// Wait for DataVolume creation.
 			dvName := hcName + "-dv"
 			Eventually(func(g Gomega) {
-				fetched := &hyper2kvmv1alpha1.HyperConversion{}
+				fetched := &h2kvmv1alpha1.HyperConversion{}
 				g.Expect(k8sClient.Get(ctx, types.NamespacedName{Name: hcName, Namespace: ns}, fetched)).To(Succeed())
 				g.Expect(fetched.Status.DataVolumeName).To(Equal(dvName))
 			}, timeout, interval).Should(Succeed())
@@ -235,9 +235,9 @@ var _ = Describe("HyperConversion Controller", func() {
 
 			// Wait until Ready with VM created.
 			Eventually(func(g Gomega) {
-				fetched := &hyper2kvmv1alpha1.HyperConversion{}
+				fetched := &h2kvmv1alpha1.HyperConversion{}
 				g.Expect(k8sClient.Get(ctx, types.NamespacedName{Name: hcName, Namespace: ns}, fetched)).To(Succeed())
-				g.Expect(fetched.Status.Phase).To(Equal(hyper2kvmv1alpha1.PhaseReady))
+				g.Expect(fetched.Status.Phase).To(Equal(h2kvmv1alpha1.PhaseReady))
 				g.Expect(fetched.Status.VirtualMachineName).ToNot(BeEmpty())
 			}, timeout, interval).Should(Succeed())
 
@@ -247,7 +247,7 @@ var _ = Describe("HyperConversion Controller", func() {
 			// The finalizer should clean up the DataVolume and VirtualMachine,
 			// then remove the finalizer so the HyperConversion is fully deleted.
 			Eventually(func() bool {
-				err := k8sClient.Get(ctx, types.NamespacedName{Name: hcName, Namespace: ns}, &hyper2kvmv1alpha1.HyperConversion{})
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: hcName, Namespace: ns}, &h2kvmv1alpha1.HyperConversion{})
 				return err != nil // Should be NotFound
 			}, timeout, interval).Should(BeTrue())
 

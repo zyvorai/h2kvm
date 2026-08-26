@@ -1,13 +1,13 @@
 #!/bin/bash
 # ============================================
-# hyper2kvm: Zero to Demo in One Command
+# h2kvm: Zero to Demo in One Command
 # ============================================
 # Fresh Fedora or Ubuntu machine → running KVM + KubeVirt VM
 #
 # Installs everything:
 #   1. System deps (qemu, libvirt, nbd, pip)
 #   2. Python deps via pip (pyvmomi, pyyaml, click, etc.)
-#   3. hyper2kvm from source
+#   3. h2kvm from source
 #   4. K3s + KubeVirt + CDI (optional: --with-k3s)
 #   5. Downloads test VMDK
 #   6. Runs migration → libvirt VM booting
@@ -52,7 +52,7 @@ VERIFY_ONLY=false
 DRY_RUN=false
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DEMO_VMDK="${DEMO_VMDK:-}"
-OUTPUT_DIR="/tmp/hyper2kvm-demo"
+OUTPUT_DIR="/tmp/h2kvm-demo"
 KUBECONFIG_PATH="/etc/rancher/k3s/k3s.yaml"
 
 for arg in "$@"; do
@@ -96,7 +96,7 @@ if $VERIFY_ONLY; then
     exit 0
 fi
 
-banner "hyper2kvm: Zero to Demo"
+banner "h2kvm: Zero to Demo"
 echo "Distro:  $ID ($PRETTY_NAME)"
 echo "K3s:     $WITH_K3S"
 echo ""
@@ -126,11 +126,11 @@ if $DRY_RUN; then
     echo "Python packages (pip):"
     echo "  pyyaml click argcomplete pyvmomi requests watchdog"
     echo ""
-    echo "hyper2kvm:"
+    echo "h2kvm:"
     if [ -f "$REPO_DIR/pyproject.toml" ]; then
         echo "  pip install -e $REPO_DIR (from source)"
     else
-        echo "  pip install hyper2kvm (from PyPI)"
+        echo "  pip install h2kvm (from PyPI)"
     fi
     if $WITH_K3S; then
         echo ""
@@ -208,9 +208,9 @@ pip3 install --quiet --upgrade \
 info "Python deps installed"
 
 # ════════════════════════════════════════════
-# PHASE 3: Install hyper2kvm
+# PHASE 3: Install h2kvm
 # ════════════════════════════════════════════
-banner "Phase 3: Install hyper2kvm"
+banner "Phase 3: Install h2kvm"
 
 if [ -f "$REPO_DIR/pyproject.toml" ]; then
     step "Installing from source: $REPO_DIR"
@@ -218,11 +218,11 @@ if [ -f "$REPO_DIR/pyproject.toml" ]; then
     pip3 install --quiet -e "$REPO_DIR" 2>/dev/null || true
 else
     step "Installing from PyPI..."
-    pip3 install $PIP_FLAGS --quiet hyper2kvm 2>/dev/null || true
+    pip3 install $PIP_FLAGS --quiet h2kvm 2>/dev/null || true
 fi
 
 h2kvmctl --version
-info "hyper2kvm $(h2kvmctl --version) installed"
+info "h2kvm $(h2kvmctl --version) installed"
 
 # ════════════════════════════════════════════
 # PHASE 4: K3s + KubeVirt (optional)
@@ -327,7 +327,7 @@ k8s_namespace: default"
     export KUBECONFIG="$KUBECONFIG_PATH"
 fi
 
-cat > /tmp/hyper2kvm-demo.yaml <<YAML
+cat > /tmp/h2kvm-demo.yaml <<YAML
 cmd: local
 vmdk: $DEMO_VMDK
 output_dir: $OUTPUT_DIR
@@ -339,7 +339,7 @@ compress: false
 fstab_mode: stabilize-all
 regen_initramfs: true
 emit_domain_xml: true
-vm_name: hyper2kvm-demo
+vm_name: h2kvm-demo
 memory: 2048
 vcpus: 2
 machine: q35
@@ -349,8 +349,8 @@ keep_domain: true
 $K8S_FLAGS
 YAML
 
-step "Running: h2kvmctl --config /tmp/hyper2kvm-demo.yaml"
-h2kvmctl --config /tmp/hyper2kvm-demo.yaml 2>&1 | \
+step "Running: h2kvmctl --config /tmp/h2kvm-demo.yaml"
+h2kvmctl --config /tmp/h2kvm-demo.yaml 2>&1 | \
     grep -E "Sanity|Flatten|progress|Convert|initramfs|emit_domain|deploy_k8s|RUNNING|Done|Generated|k8s|kubevirt|PVC|uploaded" || true
 
 # ════════════════════════════════════════════
@@ -364,7 +364,7 @@ ls -lh "$OUTPUT_DIR/libvirt/"*.xml 2>/dev/null
 
 echo ""
 echo "=== Libvirt VM ==="
-virsh list --all 2>/dev/null | grep hyper2kvm-demo || echo "(not found)"
+virsh list --all 2>/dev/null | grep h2kvm-demo || echo "(not found)"
 
 if $WITH_K3S; then
     echo ""
@@ -376,24 +376,24 @@ echo ""
 echo "=== Network ==="
 # Wait a few seconds for DHCP lease
 sleep 5
-VM_IP=$(virsh domifaddr hyper2kvm-demo 2>/dev/null | grep ipv4 | awk '{print $4}' | cut -d/ -f1 || true)
+VM_IP=$(virsh domifaddr h2kvm-demo 2>/dev/null | grep ipv4 | awk '{print $4}' | cut -d/ -f1 || true)
 if [ -n "$VM_IP" ]; then
     echo "VM IP: $VM_IP"
     nc -zv -w3 "$VM_IP" 22 2>&1 || true
 else
     echo "VM has not received an IP yet (DHCP pending)."
-    echo "Check later: virsh domifaddr hyper2kvm-demo"
+    echo "Check later: virsh domifaddr h2kvm-demo"
 fi
 
 banner "Done!"
 echo "VM is running. Connect via:"
-echo "  virsh console hyper2kvm-demo"
+echo "  virsh console h2kvm-demo"
 [ -n "$VM_IP" ] && echo "  ssh root@$VM_IP"
 if $WITH_K3S; then
     echo "  KUBECONFIG=$KUBECONFIG_PATH kubectl get vmi"
 fi
 echo ""
 echo "Cleanup:"
-echo "  virsh destroy hyper2kvm-demo && virsh undefine hyper2kvm-demo --nvram"
-$WITH_K3S && echo "  KUBECONFIG=$KUBECONFIG_PATH kubectl delete vm hyper2kvm-demo"
+echo "  virsh destroy h2kvm-demo && virsh undefine h2kvm-demo --nvram"
+$WITH_K3S && echo "  KUBECONFIG=$KUBECONFIG_PATH kubectl delete vm h2kvm-demo"
 echo "  rm -rf $OUTPUT_DIR"

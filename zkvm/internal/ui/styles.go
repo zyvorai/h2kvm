@@ -7,7 +7,7 @@ package ui
 import (
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/hyper2kvm/zkvm/internal/theme"
+	"github.com/h2kvm/zkvm/internal/theme"
 )
 
 // Legacy aliases.

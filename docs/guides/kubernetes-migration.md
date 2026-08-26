@@ -1,6 +1,6 @@
 # Kubernetes Migration Guide
 
-Complete guide for migrating VMware VMs to KubeVirt on k3s/k3d using hyper2kvm.
+Complete guide for migrating VMware VMs to KubeVirt on k3s/k3d using h2kvm.
 
 Three deployment methods are covered:
 
@@ -16,7 +16,7 @@ k3d version        # k3d v5.8+
 kubectl version    # v1.31+
 virtctl version    # KubeVirt CLI
 docker version     # or podman
-h2kvmctl --version # hyper2kvm CLI
+h2kvmctl --version # h2kvm CLI
 
 # Cluster with KubeVirt + CDI
 kubectl get kubevirts -n kubevirt   # Phase: Deployed
@@ -86,19 +86,19 @@ Run the entire h2kvmctl pipeline inside a Kubernetes Job pod.
 
 ```bash
 # Build worker image (has qemu-img, lvm2, kpartx)
-docker build --target worker -t hyper2kvm:worker -f Dockerfile .
+docker build --target worker -t h2kvm:worker -f Dockerfile .
 
 # Load into k3d
-k3d image import hyper2kvm:worker -c hyper2kvm-test
+k3d image import h2kvm:worker -c h2kvm-test
 ```
 
 ### Step 2: Copy VMDK into k3d node
 
 ```bash
 # k3d nodes are Docker containers — host paths aren't directly accessible
-docker exec k3d-hyper2kvm-test-agent-0 mkdir -p /tmp/hyper2kvm-input
+docker exec k3d-h2kvm-test-agent-0 mkdir -p /tmp/h2kvm-input
 docker cp esx8.0-rhel8.8-with-thin-provision-disk1.vmdk \
-  k3d-hyper2kvm-test-agent-0:/tmp/hyper2kvm-input/
+  k3d-h2kvm-test-agent-0:/tmp/h2kvm-input/
 ```
 
 ### Step 3: Deploy all resources
@@ -108,7 +108,7 @@ kubectl apply -f k8s/migration/rhel88-k3s-migration.yaml
 ```
 
 This single YAML creates:
-- `hyper2kvm-migration` namespace
+- `h2kvm-migration` namespace
 - ConfigMap with migration.yaml config
 - PVCs for input (10Gi) and output (25Gi)
 - Job: copy VMDK from node hostPath into input PVC
@@ -120,10 +120,10 @@ This single YAML creates:
 
 ```bash
 # Watch jobs
-kubectl get jobs -n hyper2kvm-migration -w
+kubectl get jobs -n h2kvm-migration -w
 
 # Follow migration logs
-kubectl logs -n hyper2kvm-migration -l step=migrate -f
+kubectl logs -n h2kvm-migration -l step=migrate -f
 
 # Expected output:
 #   rhel88-copy-vmdk    Complete  (14s)
@@ -133,11 +133,11 @@ kubectl logs -n hyper2kvm-migration -l step=migrate -f
 ### Step 5: Start the VM
 
 ```bash
-kubectl patch vm rhel88-migrated -n hyper2kvm-migration \
+kubectl patch vm rhel88-migrated -n h2kvm-migration \
   --type merge -p '{"spec":{"runStrategy":"Always"}}'
 
 # Verify
-kubectl get vmi -n hyper2kvm-migration
+kubectl get vmi -n h2kvm-migration
 # rhel88-migrated   Running   10.42.0.78   Ready
 ```
 
@@ -145,7 +145,7 @@ kubectl get vmi -n hyper2kvm-migration
 
 ```bash
 # Extract XML from output PVC
-kubectl run extract-xml -n hyper2kvm-migration --rm -i \
+kubectl run extract-xml -n h2kvm-migration --rm -i \
   --restart=Never --image=fedora:43 \
   --overrides='{"spec":{"containers":[{"name":"x","image":"fedora:43",
     "command":["cat","/output/libvirt/rhel88-migrated.xml"],
@@ -181,20 +181,20 @@ The HyperConversion operator watches CRDs and orchestrates: DataVolume creation 
 
 ```bash
 # Build Go operator (distroless runtime)
-docker build -t hyper2kvm-operator:latest -f operator/Dockerfile operator/
+docker build -t h2kvm-operator:latest -f operator/Dockerfile operator/
 
 # Load into k3d
-k3d image import hyper2kvm-operator:latest -c hyper2kvm-test
+k3d image import h2kvm-operator:latest -c h2kvm-test
 ```
 
 ### Step 2: Install CRDs
 
 ```bash
-kubectl apply -f operator/config/crd/bases/hyper2kvm.io_hyperconversions.yaml
-kubectl apply -f operator/config/crd/hyper2kvm.io_validations.yaml
+kubectl apply -f operator/config/crd/bases/h2kvm.io_hyperconversions.yaml
+kubectl apply -f operator/config/crd/h2kvm.io_validations.yaml
 
 # Verify
-kubectl get crd hyperconversions.hyper2kvm.io
+kubectl get crd hyperconversions.h2kvm.io
 ```
 
 ### Step 3: Deploy operator + HyperConversion CR
@@ -204,7 +204,7 @@ kubectl apply -f k8s/operator-deploy/deploy-operator-migrate.yaml
 ```
 
 This deploys:
-- `hyper2kvm-system` namespace with ServiceAccount + ClusterRole + ClusterRoleBinding
+- `h2kvm-system` namespace with ServiceAccount + ClusterRole + ClusterRoleBinding
 - Operator Deployment (Go binary, distroless image, non-root)
 - HTTP file server (busybox httpd) serving the converted QCOW2
 - HyperConversion CR pointing to the HTTP source URL
@@ -213,10 +213,10 @@ This deploys:
 
 ```bash
 # Operator logs
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager -f
+kubectl logs -n h2kvm-system -l control-plane=controller-manager -f
 
 # HyperConversion status
-kubectl get hc -n hyper2kvm-migration -w
+kubectl get hc -n h2kvm-migration -w
 
 # Expected progression:
 #   PHASE       PROGRESS  DATAVOLUME                    VM
@@ -230,16 +230,16 @@ kubectl get hc -n hyper2kvm-migration -w
 ### Step 5: Verify VM
 
 ```bash
-kubectl get vm,vmi -n hyper2kvm-migration
+kubectl get vm,vmi -n h2kvm-migration
 # rhel88-operator-vm   Running   True   10.42.0.93
 
-virtctl console rhel88-operator-vm -n hyper2kvm-migration
+virtctl console rhel88-operator-vm -n h2kvm-migration
 ```
 
 ### HyperConversion CR Reference
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: my-migration
@@ -343,8 +343,8 @@ Do NOT mount `/dev` as a hostPath volume in k3d — it causes `termination-log` 
 
 ```bash
 # Load images into k3d (required since k3d can't pull from local Docker)
-k3d image import hyper2kvm:worker -c <cluster-name>
-k3d image import hyper2kvm-operator:latest -c <cluster-name>
+k3d image import h2kvm:worker -c <cluster-name>
+k3d image import h2kvm-operator:latest -c <cluster-name>
 ```
 
 ### Copying files into k3d nodes
@@ -361,7 +361,7 @@ docker cp local-file.vmdk k3d-<cluster>-agent-0:/tmp/data/
 
 ### Migration job fails with "requires root"
 
-The worker image runs as user `hyper2kvm` by default. Add `runAsUser: 0` to the pod's security context.
+The worker image runs as user `h2kvm` by default. Add `runAsUser: 0` to the pod's security context.
 
 ### CDI DataVolume stuck in WaitForFirstConsumer
 
@@ -383,7 +383,7 @@ Check that:
 3. The operator has RBAC for `hyperconversions`, `datavolumes`, `virtualmachines`
 
 ```bash
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager
+kubectl logs -n h2kvm-system -l control-plane=controller-manager
 ```
 
 ### dracut fails with "Invalid tmpdir"
@@ -401,7 +401,7 @@ Inside containers, `/var/tmp` may not exist. The migration continues with the ex
 | `k8s/migration/rhel88-k3s-migration.yaml` | In-cluster Job migration (all-in-one) |
 | `k8s/operator-deploy/deploy-operator-migrate.yaml` | Operator deployment + HyperConversion CR |
 | `scripts/run-k8s-migration.sh` | Automation script for Method 2 |
-| `operator/config/crd/bases/hyper2kvm.io_hyperconversions.yaml` | HyperConversion CRD |
+| `operator/config/crd/bases/h2kvm.io_hyperconversions.yaml` | HyperConversion CRD |
 | `operator/controllers/hyperconversion_controller.go` | Operator reconciliation logic |
 
 ## Verified Results

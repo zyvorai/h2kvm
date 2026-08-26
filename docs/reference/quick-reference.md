@@ -4,13 +4,13 @@
 
 ### Run TUI Dashboard
 ```python
-from hyper2kvm.tui import run_dashboard
+from h2kvm.tui import run_dashboard
 run_dashboard()  # Auto-detects best implementation
 ```
 
 ### Use Progress Bar
 ```python
-from hyper2kvm.core.progress import create_progress_bar
+from h2kvm.core.progress import create_progress_bar
 
 with create_progress_bar("Task name", total=100) as progress:
     for i in range(100):
@@ -31,7 +31,7 @@ with create_progress_bar("Task name", total=100) as progress:
 
 ### Import
 ```python
-from hyper2kvm.tui import run_dashboard, get_dashboard_type, MigrationStatus
+from h2kvm.tui import run_dashboard, get_dashboard_type, MigrationStatus
 ```
 
 ### Check Type
@@ -56,15 +56,15 @@ migration = MigrationStatus(
 ### Control Dashboard
 ```python
 # Textual
-from hyper2kvm.tui.dashboard import MigrationDashboard
+from h2kvm.tui.dashboard import MigrationDashboard
 dashboard = MigrationDashboard(refresh_interval=1.0)
 
 # Curses
-from hyper2kvm.tui.fallback_dashboard import CursesDashboard
+from h2kvm.tui.fallback_dashboard import CursesDashboard
 dashboard = CursesDashboard(refresh_interval=1.0)
 
 # CLI
-from hyper2kvm.tui.cli_dashboard import CLIDashboard
+from h2kvm.tui.cli_dashboard import CLIDashboard
 dashboard = CLIDashboard(refresh_interval=2.0)
 
 # Operations (same for all)
@@ -90,7 +90,7 @@ dashboard.remove_migration(vm_name)
 
 ### Simple Usage
 ```python
-from hyper2kvm.core.progress import create_progress_bar
+from h2kvm.core.progress import create_progress_bar
 
 with create_progress_bar("Description", total=100) as progress:
     progress.update(50)           # Set to 50%
@@ -100,7 +100,7 @@ with create_progress_bar("Description", total=100) as progress:
 
 ### Custom Configuration
 ```python
-from hyper2kvm.core.progress import SimpleProgressBar, ProgressBarConfig
+from h2kvm.core.progress import SimpleProgressBar, ProgressBarConfig
 
 config = ProgressBarConfig(
     width=40,           # Bar width in characters
@@ -128,7 +128,7 @@ progress.finish("Done!")
 
 ### Progress Manager (Auto-fallback)
 ```python
-from hyper2kvm.core.progress import ProgressManager
+from h2kvm.core.progress import ProgressManager
 
 # Uses Rich if available, otherwise SimpleProgressBar
 with ProgressManager("Task", total=100) as progress:
@@ -140,13 +140,13 @@ with ProgressManager("Task", total=100) as progress:
 
 ```bash
 # Minimal (CLI only)
-pip install hyper2kvm
+pip install h2kvm
 
 # Recommended (with Textual)
-pip install 'hyper2kvm[tui]'
+pip install 'h2kvm[tui]'
 
 # Full (all features)
-pip install 'hyper2kvm[full]'
+pip install 'h2kvm[full]'
 ```
 
 ## 🔧 Optional Dependencies
@@ -176,7 +176,7 @@ class MigrationStatus:
 ## 🎨 ANSI Color Codes
 
 ```python
-from hyper2kvm.core.progress import Colors
+from h2kvm.core.progress import Colors
 
 # Orange theme
 Colors.BRIGHT_ORANGE  # \033[38;5;208m
@@ -245,7 +245,7 @@ pytest tests/unit/ -v
 
 ### Textual not found
 ```bash
-pip install 'hyper2kvm[tui]'
+pip install 'h2kvm[tui]'
 ```
 
 ### Curses not found (Windows)
@@ -262,7 +262,7 @@ config = ProgressBarConfig(color_enabled=False)
 ### Dashboard not starting
 ```python
 # Check available type
-from hyper2kvm.tui import get_dashboard_type
+from h2kvm.tui import get_dashboard_type
 print(get_dashboard_type())  # Should show: textual, curses, or cli
 ```
 
@@ -270,8 +270,8 @@ print(get_dashboard_type())  # Should show: textual, curses, or cli
 
 ### VM Migration with Progress
 ```python
-from hyper2kvm.core.progress import create_progress_bar
-from hyper2kvm.tui import MigrationDashboard
+from h2kvm.core.progress import create_progress_bar
+from h2kvm.tui import MigrationDashboard
 
 # Create dashboard
 dashboard = MigrationDashboard()

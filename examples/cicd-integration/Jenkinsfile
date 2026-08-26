@@ -1,4 +1,4 @@
-// Jenkinsfile for automated VM migration with hyper2kvm
+// Jenkinsfile for automated VM migration with h2kvm
 //
 // Pipeline: Migrate VMs from VMware to KVM in a CI/CD workflow
 //
@@ -11,7 +11,7 @@
 //
 // Prerequisites:
 // - Jenkins with Pipeline plugin
-// - hyper2kvm installed on Jenkins agent
+// - h2kvm installed on Jenkins agent
 // - Credentials stored in Jenkins (vCenter, SSH keys)
 // - Shared storage accessible to Jenkins agents
 
@@ -19,7 +19,7 @@
 
 pipeline {
     agent {
-        label 'kvm-migration-agent'  // Jenkins agent with hyper2kvm + libvirt
+        label 'kvm-migration-agent'  // Jenkins agent with h2kvm + libvirt
     }
 
     parameters {
@@ -96,9 +96,9 @@ pipeline {
                 script {
                     echo "=== Pre-Migration Validation ==="
 
-                    // Check hyper2kvm version
+                    // Check h2kvm version
                     sh """
-                        python -m hyper2kvm --version | tee ${MIGRATION_BASE}/logs/version.log
+                        python -m h2kvm --version | tee ${MIGRATION_BASE}/logs/version.log
                     """
 
                     // Check KVM host resources
@@ -165,7 +165,7 @@ pipeline {
                             stage("Migrate ${vm.name}") {
                                 try {
                                     sh """
-                                        python -m hyper2kvm vsphere \
+                                        python -m h2kvm vsphere \
                                             --vcenter ${VCENTER_HOST} \
                                             --username ${VCENTER_USER} \
                                             --password-file /secure/vcenter.pass \

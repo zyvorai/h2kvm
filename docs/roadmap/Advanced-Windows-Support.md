@@ -2,9 +2,9 @@
 
 ## Executive Summary
 
-This document outlines the implementation roadmap for advanced Windows migration features in hyper2kvm. Based on comprehensive analysis of the current codebase, this plan extends existing production-ready Windows capabilities with enterprise-focused enhancements.
+This document outlines the implementation roadmap for advanced Windows migration features in h2kvm. Based on comprehensive analysis of the current codebase, this plan extends existing production-ready Windows capabilities with enterprise-focused enhancements.
 
-**Current State**: hyper2kvm v0.3.0 has excellent Windows migration fundamentals:
+**Current State**: h2kvm v0.3.0 has excellent Windows migration fundamentals:
 - ✅ VirtIO driver injection (8 driver types, full architecture support)
 - ✅ Registry manipulation (SYSTEM/SOFTWARE hives)
 - ✅ First-boot service provisioning
@@ -21,7 +21,7 @@ This document outlines the implementation roadmap for advanced Windows migration
 ### Production-Ready Features ✅
 
 #### 1. VirtIO Driver Injection
-**Files**: `hyper2kvm/fixers/windows/virtio/`
+**Files**: `h2kvm/fixers/windows/virtio/`
 **Status**: Fully implemented (2,500+ lines)
 
 **Capabilities**:
@@ -47,7 +47,7 @@ windows:
 ```
 
 #### 2. Registry Operations
-**Files**: `hyper2kvm/fixers/windows/registry/`
+**Files**: `h2kvm/fixers/windows/registry/`
 **Status**: Fully implemented (1,800+ lines)
 
 **Capabilities**:
@@ -58,18 +58,18 @@ windows:
 - Safe modification pipeline with verification
 
 #### 3. First-Boot Service Provisioning
-**Files**: `hyper2kvm/fixers/windows/registry/firstboot.py`
+**Files**: `h2kvm/fixers/windows/registry/firstboot.py`
 **Status**: Fully implemented (200+ lines)
 
 **Capabilities**:
 - One-shot Windows service creation (runs as LocalSystem)
 - VMware Tools uninstallation (7 removal methods)
 - Custom command/script execution
-- Idempotency markers (`C:\hyper2kvm\firstboot.done`)
-- Comprehensive logging to `C:\Windows\Temp\hyper2kvm-firstboot.log`
+- Idempotency markers (`C:\h2kvm\firstboot.done`)
+- Comprehensive logging to `C:\Windows\Temp\h2kvm-firstboot.log`
 
 #### 4. Network Configuration Retention
-**Files**: `hyper2kvm/fixers/windows/network_fixer.py`
+**Files**: `h2kvm/fixers/windows/network_fixer.py`
 **Status**: Fully implemented (600+ lines)
 
 **Capabilities**:
@@ -100,7 +100,7 @@ windows:
 
 1. **Offline License Key Extraction**:
 ```python
-# File: hyper2kvm/fixers/windows/license/extractor.py
+# File: h2kvm/fixers/windows/license/extractor.py
 
 def extract_license_info(guestfs, root):
     """Extract Windows license/activation state from offline registry."""
@@ -172,7 +172,7 @@ def decode_product_key(license_data):
 ```powershell
 # File: templates/windows/reactivate-license.ps1
 
-$LogFile = "C:\hyper2kvm\license-reactivation.log"
+$LogFile = "C:\h2kvm\license-reactivation.log"
 
 function Write-Log {
     param($Message)
@@ -182,8 +182,8 @@ function Write-Log {
 
 Write-Log "=== Windows License Reactivation Started ==="
 
-# Read license metadata injected by hyper2kvm
-$LicenseInfo = Get-Content "C:\hyper2kvm\license\license-info.json" | ConvertFrom-Json
+# Read license metadata injected by h2kvm
+$LicenseInfo = Get-Content "C:\h2kvm\license\license-info.json" | ConvertFrom-Json
 
 switch ($LicenseInfo.Type) {
     "MAK" {
@@ -216,7 +216,7 @@ Write-Log "=== License Reactivation Complete ==="
 
 **Integration Point**:
 ```python
-# In hyper2kvm/fixers/windows/fixer.py
+# In h2kvm/fixers/windows/fixer.py
 
 def fix_windows(self, guestfs, root):
     # ... existing driver injection ...
@@ -236,7 +236,7 @@ def fix_windows(self, guestfs, root):
 
         # Add reactivation to first-boot service
         self.firstboot.add_command(
-            r"powershell.exe -ExecutionPolicy Bypass -File C:\hyper2kvm\license\reactivate-license.ps1"
+            r"powershell.exe -ExecutionPolicy Bypass -File C:\h2kvm\license\reactivate-license.ps1"
         )
 ```
 
@@ -331,7 +331,7 @@ def update_kms_configuration(guestfs, root, kms_server, kms_port=1688):
 
 1. **Offline Domain Metadata Extraction**:
 ```python
-# File: hyper2kvm/fixers/windows/activedirectory/extractor.py
+# File: h2kvm/fixers/windows/activedirectory/extractor.py
 
 def extract_domain_info(guestfs, root):
     """Extract Active Directory membership info from offline registry."""
@@ -365,8 +365,8 @@ def extract_domain_info(guestfs, root):
 ```powershell
 # File: templates/windows/rejoin-domain.ps1
 
-$LogFile = "C:\hyper2kvm\ad\rejoin-domain.log"
-$ConfigFile = "C:\hyper2kvm\ad\domain-info.json"
+$LogFile = "C:\h2kvm\ad\rejoin-domain.log"
+$ConfigFile = "C:\h2kvm\ad\domain-info.json"
 
 function Write-Log {
     param($Message)
@@ -386,7 +386,7 @@ $DomainInfo = Get-Content $ConfigFile | ConvertFrom-Json
 
 # Option 1: Use stored credentials (encrypted with DPAPI for LocalSystem)
 if ($DomainInfo.CredentialFile) {
-    $CredPath = "C:\hyper2kvm\ad\credentials.xml"
+    $CredPath = "C:\h2kvm\ad\credentials.xml"
     $Credential = Import-Clixml -Path $CredPath
 
     Write-Log "Rejoining domain: $($DomainInfo.Domain)"
@@ -417,7 +417,7 @@ if ($DomainInfo.CredentialFile) {
 elseif ($DomainInfo.UnattendedJoinFile) {
     Write-Log "Using unattended join file (djoin.exe)"
 
-    $JoinFile = "C:\hyper2kvm\ad\unattended-join.txt"
+    $JoinFile = "C:\h2kvm\ad\unattended-join.txt"
 
     # Execute offline domain join
     djoin.exe /RequestODJ /LoadFile $JoinFile /WindowsPath C:\Windows /LocalOS
@@ -477,14 +477,14 @@ def stage_unattended_domain_join(guestfs, root, unattended_join_file):
 
     # Upload pre-provisioned join file
     join_content = read_file(unattended_join_file)
-    guestfs.write(f"{root}/hyper2kvm/ad/unattended-join.txt", join_content)
+    guestfs.write(f"{root}/h2kvm/ad/unattended-join.txt", join_content)
 
     domain_info = {
         "UnattendedJoinFile": True,
         "Method": "djoin.exe"
     }
 
-    write_json(guestfs, f"{root}/hyper2kvm/ad/domain-info.json", domain_info)
+    write_json(guestfs, f"{root}/h2kvm/ad/domain-info.json", domain_info)
 ```
 
 **Configuration**:
@@ -587,7 +587,7 @@ switch ($Action) {
 
 **Implementation**:
 ```python
-# File: hyper2kvm/fixers/windows/appcompat/detector.py
+# File: h2kvm/fixers/windows/appcompat/detector.py
 
 def detect_hardware_dependent_apps(guestfs, root):
     """Scan for applications with hardware dependencies."""
@@ -728,7 +728,7 @@ def is_hardware_dependent(app_info):
 
 **Implementation**:
 ```python
-# File: hyper2kvm/fixers/windows/appcompat/sqlserver.py
+# File: h2kvm/fixers/windows/appcompat/sqlserver.py
 
 def detect_sql_server_instances(guestfs, root):
     """Detect SQL Server installations and configurations."""
@@ -806,8 +806,8 @@ def generate_sql_reconfiguration_script(instances):
 ```powershell
 # File: templates/windows/reconfigure-sqlserver.ps1
 
-$LogFile = "C:\hyper2kvm\sql\reconfiguration.log"
-$ScriptFile = "C:\hyper2kvm\sql\reconfigure-instance.sql"
+$LogFile = "C:\h2kvm\sql\reconfiguration.log"
+$ScriptFile = "C:\h2kvm\sql\reconfigure-instance.sql"
 
 function Write-Log {
     param($Message)
@@ -818,7 +818,7 @@ function Write-Log {
 Write-Log "=== SQL Server Reconfiguration Started ==="
 
 # Read instance metadata
-$InstanceInfo = Get-Content "C:\hyper2kvm\sql\instances.json" | ConvertFrom-Json
+$InstanceInfo = Get-Content "C:\h2kvm\sql\instances.json" | ConvertFrom-Json
 
 foreach ($Instance in $InstanceInfo.Instances) {
     Write-Log "Processing instance: $($Instance.Name)"
@@ -941,7 +941,7 @@ def configure_balloon_driver(hive_system, controlset):
 ```powershell
 # File: templates/windows/enable-trim.ps1
 
-$LogFile = "C:\hyper2kvm\storage\trim-enablement.log"
+$LogFile = "C:\h2kvm\storage\trim-enablement.log"
 
 function Write-Log {
     param($Message)

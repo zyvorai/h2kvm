@@ -2,14 +2,14 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Unit tests for hyper2kvm.ai.remediation.RemediationEngine."""
+"""Unit tests for h2kvm.ai.remediation.RemediationEngine."""
 
 from __future__ import annotations
 
 import pytest
 
-from hyper2kvm.ai.models import AIConfig, Diagnosis, Remediation, RiskLevel
-from hyper2kvm.ai.remediation import RemediationEngine, FIX_REGISTRY
+from h2kvm.ai.models import AIConfig, Diagnosis, Remediation, RiskLevel
+from h2kvm.ai.remediation import RemediationEngine, FIX_REGISTRY
 
 
 # ---------------------------------------------------------------------------

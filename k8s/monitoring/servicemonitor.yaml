@@ -3,16 +3,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: hyper2kvm-worker-metrics
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker-metrics
+  namespace: h2kvm-workers
   labels:
-    app: hyper2kvm-worker
+    app: h2kvm-worker
     component: metrics
 spec:
   type: ClusterIP
   clusterIP: None  # Headless service
   selector:
-    app: hyper2kvm-worker
+    app: h2kvm-worker
   ports:
   - name: metrics
     port: 9090
@@ -23,15 +23,15 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker
+  namespace: h2kvm-workers
   labels:
-    app: hyper2kvm-worker
+    app: h2kvm-worker
     prometheus: kube-prometheus
 spec:
   selector:
     matchLabels:
-      app: hyper2kvm-worker
+      app: h2kvm-worker
       component: metrics
   endpoints:
   - port: metrics
@@ -43,52 +43,52 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: hyper2kvm-worker-alerts
-  namespace: hyper2kvm-workers
+  name: h2kvm-worker-alerts
+  namespace: h2kvm-workers
   labels:
-    app: hyper2kvm-worker
+    app: h2kvm-worker
     prometheus: kube-prometheus
 spec:
   groups:
-  - name: hyper2kvm-worker
+  - name: h2kvm-worker
     interval: 30s
     rules:
     # Alert when worker pod is down
-    - alert: Hyper2KVMWorkerDown
-      expr: up{job="hyper2kvm-worker-metrics"} == 0
+    - alert: H2KVMWorkerDown
+      expr: up{job="h2kvm-worker-metrics"} == 0
       for: 5m
       labels:
         severity: critical
       annotations:
-        summary: "Hyper2KVM worker is down"
+        summary: "H2KVM worker is down"
         description: "Worker {{ $labels.pod }} in namespace {{ $labels.namespace }} has been down for more than 5 minutes."
     
     # Alert when job fails
-    - alert: Hyper2KVMJobFailed
-      expr: rate(hyper2kvm_migration_failures_total[5m]) > 0
+    - alert: H2KVMJobFailed
+      expr: rate(h2kvm_migration_failures_total[5m]) > 0
       for: 1m
       labels:
         severity: warning
       annotations:
-        summary: "Hyper2KVM job failures detected"
+        summary: "H2KVM job failures detected"
         description: "Worker {{ $labels.worker_id }} has {{ $value }} failed jobs per second."
     
     # Alert when migration takes too long
-    - alert: Hyper2KVMMigrationSlow
-      expr: hyper2kvm_migration_duration_seconds > 7200
+    - alert: H2KVMMigrationSlow
+      expr: h2kvm_migration_duration_seconds > 7200
       for: 5m
       labels:
         severity: warning
       annotations:
-        summary: "Hyper2KVM migration taking too long"
+        summary: "H2KVM migration taking too long"
         description: "Job {{ $labels.job_id }} has been running for {{ $value }} seconds (>2 hours)."
     
     # Alert when conversion temp storage is full
-    - alert: Hyper2KVMTempStorageFull
-      expr: hyper2kvm_conversion_temp_usage_bytes / hyper2kvm_conversion_temp_capacity_bytes > 0.9
+    - alert: H2KVMTempStorageFull
+      expr: h2kvm_conversion_temp_usage_bytes / h2kvm_conversion_temp_capacity_bytes > 0.9
       for: 5m
       labels:
         severity: warning
       annotations:
-        summary: "Hyper2KVM temp storage nearly full"
+        summary: "H2KVM temp storage nearly full"
         description: "Worker {{ $labels.worker_id }} temp storage is {{ $value | humanizePercentage }} full."

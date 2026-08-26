@@ -52,9 +52,9 @@
   <div class="alert"><h4>Without proper driver injection, Windows VMs BSOD on first boot</h4>
   <p>Windows kernel loads storage drivers at boot time based on registry entries. VMware uses LSI Logic or PVSCSI controllers. KVM uses VirtIO. If VirtIO drivers aren't injected before migration, Windows can't see the boot disk and blue-screens with INACCESSIBLE_BOOT_DEVICE (0x7B).</p></div>
 
-  <h3>What hyper2kvm Fixes Automatically</h3>
+  <h3>What h2kvm Fixes Automatically</h3>
   <table>
-    <tr><th>Problem</th><th>Cause</th><th>hyper2kvm Fix</th></tr>
+    <tr><th>Problem</th><th>Cause</th><th>h2kvm Fix</th></tr>
     <tr><td>BSOD: INACCESSIBLE_BOOT_DEVICE</td><td>Missing VirtIO storage driver</td><td class="check">Inject viostor/vioscsi from virtio-win ISO</td></tr>
     <tr><td>No network after boot</td><td>VMware VMXNET3 driver, no VirtIO net</td><td class="check">Inject NetKVM (VirtIO network driver)</td></tr>
     <tr><td>High memory pressure</td><td>No balloon driver</td><td class="check">Inject Balloon driver for memory management</td></tr>
@@ -114,7 +114,7 @@ uefi: true
     <div class="card"><div class="icon">🗄️</div><h4>SQL Server</h4>
       <p><strong>Migration safe:</strong> SQL Server data files migrate with the disk. No reinstall needed. VirtIO SCSI provides comparable I/O performance to PVSCSI.<br><strong>Licensing win:</strong> Moving from VMware to KVM may reduce SQL Server licensing costs — KVM hosts are often counted more favorably for per-core licensing.</p></div>
     <div class="card"><div class="icon">📂</div><h4>Active Directory DCs</h4>
-      <p><strong>Approach:</strong> Migrate secondary DCs first. Verify replication. Then migrate primary. Never migrate all DCs simultaneously.<br><strong>hyper2kvm handles:</strong> NIC MAC preservation optional, DNS settings intact, AD database files migrate with disk.</p></div>
+      <p><strong>Approach:</strong> Migrate secondary DCs first. Verify replication. Then migrate primary. Never migrate all DCs simultaneously.<br><strong>h2kvm handles:</strong> NIC MAC preservation optional, DNS settings intact, AD database files migrate with disk.</p></div>
     <div class="card"><div class="icon">📧</div><h4>Exchange Server</h4>
       <p><strong>Tested:</strong> Exchange 2016/2019 migrated successfully. Database mounts correctly after VirtIO driver injection. Recommend maintenance mode during migration window.</p></div>
     <div class="card"><div class="icon">🌐</div><h4>IIS / Web Servers</h4>
@@ -133,12 +133,12 @@ uefi: true
   <h2 class="st">Boot <span>Verification</span></h2>
   <p class="sub">Every Windows migration is verified before handoff.</p>
   <div class="card-grid">
-    <div class="card"><div class="icon">✅</div><h4>Automatic Boot Test</h4><p>hyper2kvm starts the converted VM in KVM, waits for Windows to reach login screen, verifies no BSOD. Automated — no manual checking needed.</p></div>
+    <div class="card"><div class="icon">✅</div><h4>Automatic Boot Test</h4><p>h2kvm starts the converted VM in KVM, waits for Windows to reach login screen, verifies no BSOD. Automated — no manual checking needed.</p></div>
     <div class="card"><div class="icon">🖥️</div><h4>Console Access</h4><p>VNC/noVNC console available for visual verification. See exactly what the migrated VM displays on first boot. Debug any issues in real-time.</p></div>
     <div class="card"><div class="icon">📊</div><h4>Health Checks</h4><p>Post-boot validation: disk I/O test, network connectivity, service status. Reports pass/fail for each check. Auditable results.</p></div>
     <div class="card"><div class="icon">🔄</div><h4>Rollback Ready</h4><p>Source VMDKs preserved until verification passes. If anything fails, original VM is untouched on VMware. Zero-risk migration.</p></div>
   </div>
-  <div class="footer"><p>hyper2kvm — Windows VM Migration | Proprietary (Zyvor AI Labs)</p></div>
+  <div class="footer"><p>h2kvm — Windows VM Migration | Proprietary (Zyvor AI Labs)</p></div>
 </div>
 </body>
 </html>

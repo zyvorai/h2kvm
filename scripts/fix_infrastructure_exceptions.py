@@ -12,7 +12,7 @@ from pathlib import Path
 
 def fix_snapshot_manager():
     """Fix exceptions in snapshot_manager.py"""
-    file_path = Path("hyper2kvm/infrastructure/rollback/snapshot_manager.py")
+    file_path = Path("h2kvm/infrastructure/rollback/snapshot_manager.py")
     content = file_path.read_text()
 
     # Fix source image not found

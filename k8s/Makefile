@@ -1,13 +1,13 @@
-# Makefile for hyper2kvm Worker Job Protocol Kubernetes deployment
+# Makefile for h2kvm Worker Job Protocol Kubernetes deployment
 # Usage: make deploy-all
 
-NAMESPACE := hyper2kvm-workers
+NAMESPACE := h2kvm-workers
 KUBECONFIG ?= ~/.kube/config
 KUBECTL := kubectl --kubeconfig=$(KUBECONFIG)
 
 .PHONY: help
 help: ## Show this help message
-	@echo "hyper2kvm Worker Job Protocol - Kubernetes Deployment"
+	@echo "h2kvm Worker Job Protocol - Kubernetes Deployment"
 	@echo ""
 	@echo "Usage: make [target]"
 	@echo ""
@@ -24,8 +24,8 @@ check-prereqs: ## Check prerequisites
 
 .PHONY: build-image
 build-image: ## Build worker container image
-	@echo "Building hyper2kvm:worker image..."
-	docker build --target worker -t hyper2kvm:worker ..
+	@echo "Building h2kvm:worker image..."
+	docker build --target worker -t h2kvm:worker ..
 	@echo "✓ Image built successfully"
 
 .PHONY: load-image-k3d
@@ -35,7 +35,7 @@ load-image-k3d: ## Load image into k3d cluster (requires CLUSTER_NAME)
 		exit 1; \
 	fi
 	@echo "Loading image into k3d cluster: $(CLUSTER_NAME)"
-	k3d image import hyper2kvm:worker -c $(CLUSTER_NAME)
+	k3d image import h2kvm:worker -c $(CLUSTER_NAME)
 	@echo "✓ Image loaded into k3d cluster"
 
 .PHONY: create-namespace
@@ -52,7 +52,7 @@ label-nodes: ## Label nodes as worker-enabled (requires NODE_NAMES)
 	fi
 	@echo "Labeling nodes: $(NODE_NAMES)"
 	@for node in $(NODE_NAMES); do \
-		$(KUBECTL) label nodes $$node hyper2kvm.io/worker-enabled=true --overwrite; \
+		$(KUBECTL) label nodes $$node h2kvm.io/worker-enabled=true --overwrite; \
 	done
 	@echo "✓ Nodes labeled"
 
@@ -121,7 +121,7 @@ status: ## Show deployment status
 	@$(KUBECTL) get namespace $(NAMESPACE)
 	@echo ""
 	@echo "Worker Pods:"
-	@$(KUBECTL) get pods -n $(NAMESPACE) -l app=hyper2kvm-worker -o wide
+	@$(KUBECTL) get pods -n $(NAMESPACE) -l app=h2kvm-worker -o wide
 	@echo ""
 	@echo "Services:"
 	@$(KUBECTL) get svc -n $(NAMESPACE)
@@ -133,7 +133,7 @@ status: ## Show deployment status
 logs: ## Show worker logs (use POD_NAME= to specify pod)
 	@if [ -z "$(POD_NAME)" ]; then \
 		echo "Following logs from all worker pods..."; \
-		$(KUBECTL) logs -n $(NAMESPACE) -l app=hyper2kvm-worker --tail=50 -f; \
+		$(KUBECTL) logs -n $(NAMESPACE) -l app=h2kvm-worker --tail=50 -f; \
 	else \
 		echo "Following logs from pod: $(POD_NAME)"; \
 		$(KUBECTL) logs -n $(NAMESPACE) $(POD_NAME) -f; \
@@ -142,7 +142,7 @@ logs: ## Show worker logs (use POD_NAME= to specify pod)
 .PHONY: exec
 exec: ## Exec into worker pod (requires POD_NAME)
 	@if [ -z "$(POD_NAME)" ]; then \
-		echo "ERROR: POD_NAME not set. Usage: make exec POD_NAME=hyper2kvm-worker-xxxxx"; \
+		echo "ERROR: POD_NAME not set. Usage: make exec POD_NAME=h2kvm-worker-xxxxx"; \
 		exit 1; \
 	fi
 	@$(KUBECTL) exec -n $(NAMESPACE) -it $(POD_NAME) -- /bin/bash
@@ -159,17 +159,17 @@ submit-job: ## Submit a job (requires JOB_FILE)
 	fi
 	@JOB_ID=$$(cat $(JOB_FILE) | grep job_id | cut -d'"' -f4); \
 	echo "Submitting job: $$JOB_ID"; \
-	$(KUBECTL) create configmap hyper2kvm-job-$$JOB_ID \
+	$(KUBECTL) create configmap h2kvm-job-$$JOB_ID \
 		--from-file=job-spec.json=$(JOB_FILE) \
 		-n $(NAMESPACE) --dry-run=client -o yaml | $(KUBECTL) apply -f -; \
-	POD=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
+	POD=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
 	echo "Executing job in pod: $$POD"; \
 	$(KUBECTL) exec -n $(NAMESPACE) $$POD -- \
-		python3 -m hyper2kvm.worker.cli run /data/job-spec.json --worker-id $$POD
+		python3 -m h2kvm.worker.cli run /data/job-spec.json --worker-id $$POD
 
 .PHONY: cleanup
 cleanup: ## Delete all resources
-	@echo "WARNING: This will delete all hyper2kvm resources in namespace $(NAMESPACE)"
+	@echo "WARNING: This will delete all h2kvm resources in namespace $(NAMESPACE)"
 	@read -p "Are you sure? [y/N] " -n 1 -r; \
 	echo; \
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
@@ -183,29 +183,29 @@ cleanup: ## Delete all resources
 .PHONY: restart-workers
 restart-workers: ## Restart all worker pods
 	@echo "Restarting worker pods..."
-	@$(KUBECTL) delete pods -n $(NAMESPACE) -l app=hyper2kvm-worker
+	@$(KUBECTL) delete pods -n $(NAMESPACE) -l app=h2kvm-worker
 	@echo "✓ Pods restarted"
 
 .PHONY: describe-worker
 describe-worker: ## Describe worker pod (requires POD_NAME)
 	@if [ -z "$(POD_NAME)" ]; then \
-		POD_NAME=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
+		POD_NAME=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
 	fi; \
 	echo "Describing pod: $$POD_NAME"; \
 	$(KUBECTL) describe pod -n $(NAMESPACE) $$POD_NAME
 
 .PHONY: capabilities
 capabilities: ## Show worker capabilities
-	@POD_NAME=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
+	@POD_NAME=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
 	echo "Checking capabilities on pod: $$POD_NAME"; \
 	$(KUBECTL) exec -n $(NAMESPACE) $$POD_NAME -- \
-		python3 -m hyper2kvm.worker.cli capabilities
+		python3 -m h2kvm.worker.cli capabilities
 
 .PHONY: list-jobs
 list-jobs: ## List all jobs
-	@POD_NAME=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
+	@POD_NAME=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
 	$(KUBECTL) exec -n $(NAMESPACE) $$POD_NAME -- \
-		python3 -m hyper2kvm.worker.cli list
+		python3 -m h2kvm.worker.cli list
 
 .PHONY: job-status
 job-status: ## Show job status (requires JOB_ID)
@@ -213,9 +213,9 @@ job-status: ## Show job status (requires JOB_ID)
 		echo "ERROR: JOB_ID not set. Usage: make job-status JOB_ID=my-job-001"; \
 		exit 1; \
 	fi
-	@POD_NAME=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
+	@POD_NAME=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
 	$(KUBECTL) exec -n $(NAMESPACE) $$POD_NAME -- \
-		python3 -m hyper2kvm.worker.cli status $(JOB_ID)
+		python3 -m h2kvm.worker.cli status $(JOB_ID)
 
 .PHONY: job-events
 job-events: ## Show job events (requires JOB_ID)
@@ -223,6 +223,6 @@ job-events: ## Show job events (requires JOB_ID)
 		echo "ERROR: JOB_ID not set. Usage: make job-events JOB_ID=my-job-001"; \
 		exit 1; \
 	fi
-	@POD_NAME=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=hyper2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
+	@POD_NAME=$$($(KUBECTL) get pods -n $(NAMESPACE) -l app=h2kvm-worker -o jsonpath='{.items[0].metadata.name}'); \
 	$(KUBECTL) exec -n $(NAMESPACE) $$POD_NAME -- \
-		python3 -m hyper2kvm.worker.cli events $(JOB_ID)
+		python3 -m h2kvm.worker.cli events $(JOB_ID)

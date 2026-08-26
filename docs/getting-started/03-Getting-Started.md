@@ -1,6 +1,6 @@
-# Getting Started with hyper2kvm Production Tools
+# Getting Started with h2kvm Production Tools
 
-This guide walks you through using the hyper2kvm production tools for VM migration, security auditing, and forensic analysis.
+This guide walks you through using the h2kvm production tools for VM migration, security auditing, and forensic analysis.
 
 ---
 
@@ -79,8 +79,8 @@ pip install pyyaml
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/your-org/h2kvm.git
+cd h2kvm
 
 # Install Python dependencies
 pip install -r requirements.txt
@@ -96,7 +96,7 @@ export PATH="$PATH:$(pwd)/examples"
 python3 --version  # Should be 3.10+
 
 # Test import
-python3 -c "from hyper2kvm.vmcraft.main import VMCraft; print('✓ Installation successful')"
+python3 -c "from h2kvm.vmcraft.main import VMCraft; print('✓ Installation successful')"
 
 # Run quick validation
 cd examples
@@ -595,27 +595,27 @@ python3 analytics_report_generator.py --format html
 Copy the example configuration:
 
 ```bash
-mkdir -p ~/.config/hyper2kvm
-cp examples/hyper2kvm-tools.yaml.example ~/.config/hyper2kvm/tools.yaml
+mkdir -p ~/.config/h2kvm
+cp examples/h2kvm-tools.yaml.example ~/.config/h2kvm/tools.yaml
 ```
 
 Edit the configuration:
 
 ```bash
-vi ~/.config/hyper2kvm/tools.yaml
+vi ~/.config/h2kvm/tools.yaml
 ```
 
 ### Environment Variables
 
 ```bash
 # Override output directory
-export HYPER2KVM_OUTPUT_DIR=/var/lib/hyper2kvm/reports
+export H2KVM_OUTPUT_DIR=/var/lib/h2kvm/reports
 
 # Enable verbose logging
-export HYPER2KVM_VERBOSE=1
+export H2KVM_VERBOSE=1
 
 # Set default format
-export HYPER2KVM_FORMAT=html
+export H2KVM_FORMAT=html
 ```
 
 ### Command-Line Options
@@ -722,14 +722,14 @@ sudo zypper install python3-guestfs
 3. **Check logs**:
    ```bash
    # System logs
-   journalctl -xe | grep hyper2kvm
+   journalctl -xe | grep h2kvm
 
    # Tool logs (if configured)
-   tail -f /var/log/hyper2kvm/tools.log
+   tail -f /var/log/h2kvm/tools.log
    ```
 
 4. **Report issues**:
-   - GitHub Issues: https://github.com/your-org/hyper2kvm/issues
+   - GitHub Issues: https://github.com/your-org/h2kvm/issues
    - Include: Tool version, OS version, error message, VM disk format
 
 ---

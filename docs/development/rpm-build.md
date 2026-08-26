@@ -1,4 +1,4 @@
-# Building the hyper2kvm RPM
+# Building the h2kvm RPM
 
 ## Prerequisites
 
@@ -11,7 +11,7 @@ sudo dnf install -y rpm-build python3-devel python3-setuptools python3-pip \
 ## Quick Build
 
 ```bash
-cd /path/to/hyper2kvm
+cd /path/to/h2kvm
 
 # 1. Clean old build artifacts
 sudo rm -rf dist/ build/ *.egg-info
@@ -23,8 +23,8 @@ python3 -m build --wheel --no-isolation
 mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 # 4. Create source tarball
-tar czf ~/rpmbuild/SOURCES/hyper2kvm-0.3.0.tar.gz \
-    --transform 's,^,hyper2kvm-0.3.0/,' \
+tar czf ~/rpmbuild/SOURCES/h2kvm-0.3.0.tar.gz \
+    --transform 's,^,h2kvm-0.3.0/,' \
     --exclude='.git' --exclude='__pycache__' --exclude='*.pyc' \
     --exclude='*.egg-info' --exclude='build' \
     --exclude='*.vmdk' --exclude='*.qcow2' --exclude='*.ova' \
@@ -34,22 +34,22 @@ tar czf ~/rpmbuild/SOURCES/hyper2kvm-0.3.0.tar.gz \
     .
 
 # 5. Build the RPM
-rpmbuild -bb hyper2kvm.spec
+rpmbuild -bb h2kvm.spec
 ```
 
-The RPM will be at `~/rpmbuild/RPMS/noarch/hyper2kvm-0.3.0-1.*.noarch.rpm`.
+The RPM will be at `~/rpmbuild/RPMS/noarch/h2kvm-0.3.0-1.*.noarch.rpm`.
 
 ## Install
 
 ```bash
 # Fresh install
-sudo dnf install -y ~/rpmbuild/RPMS/noarch/hyper2kvm-0.3.0-1.*.noarch.rpm
+sudo dnf install -y ~/rpmbuild/RPMS/noarch/h2kvm-0.3.0-1.*.noarch.rpm
 
 # Upgrade from previous version
-sudo rpm -Uvh ~/rpmbuild/RPMS/noarch/hyper2kvm-0.3.0-1.*.noarch.rpm
+sudo rpm -Uvh ~/rpmbuild/RPMS/noarch/h2kvm-0.3.0-1.*.noarch.rpm
 
 # Force reinstall (if same version)
-sudo rpm -Uvh --force ~/rpmbuild/RPMS/noarch/hyper2kvm-0.3.0-1.*.noarch.rpm
+sudo rpm -Uvh --force ~/rpmbuild/RPMS/noarch/h2kvm-0.3.0-1.*.noarch.rpm
 ```
 
 ## Verify Installation
@@ -60,10 +60,10 @@ h2kvmctl --version
 # Expected: 0.3.0
 
 # Check installed files
-rpm -ql hyper2kvm | head -20
+rpm -ql h2kvm | head -20
 
 # Check Python module
-python3 -c "import hyper2kvm; print(hyper2kvm.__version__)"
+python3 -c "import h2kvm; print(h2kvm.__version__)"
 
 # Check binary location
 which h2kvmctl
@@ -75,18 +75,18 @@ which h2kvmctl
 | Path | Description |
 |------|-------------|
 | `/usr/bin/h2kvmctl` | Primary CLI binary |
-| `/usr/lib/python3.*/site-packages/hyper2kvm/` | Python package |
-| `/etc/hyper2kvm/config.yaml` | System-wide configuration |
-| `/etc/hyper2kvm/daemon.yaml` | Daemon mode configuration |
-| `/etc/hyper2kvm/migrations/*.yaml` | Example migration configs |
-| `/etc/modprobe.d/hyper2kvm-nbd.conf` | NBD module config (max_part=16) |
-| `/etc/sysctl.d/99-hyper2kvm-nbd.conf` | File descriptor limits |
-| `/usr/lib/systemd/system/hyper2kvm.service` | Daemon service unit |
-| `/usr/lib/systemd/system/hyper2kvm@.service` | Template service unit |
-| `/usr/share/doc/hyper2kvm/` | Documentation |
-| `/usr/share/man/man1/hyper2kvm*.1` | Man pages |
-| `/var/lib/hyper2kvm/` | Working data directory |
-| `/var/log/hyper2kvm/` | Log directory |
+| `/usr/lib/python3.*/site-packages/h2kvm/` | Python package |
+| `/etc/h2kvm/config.yaml` | System-wide configuration |
+| `/etc/h2kvm/daemon.yaml` | Daemon mode configuration |
+| `/etc/h2kvm/migrations/*.yaml` | Example migration configs |
+| `/etc/modprobe.d/h2kvm-nbd.conf` | NBD module config (max_part=16) |
+| `/etc/sysctl.d/99-h2kvm-nbd.conf` | File descriptor limits |
+| `/usr/lib/systemd/system/h2kvm.service` | Daemon service unit |
+| `/usr/lib/systemd/system/h2kvm@.service` | Template service unit |
+| `/usr/share/doc/h2kvm/` | Documentation |
+| `/usr/share/man/man1/h2kvm*.1` | Man pages |
+| `/var/lib/h2kvm/` | Working data directory |
+| `/var/log/h2kvm/` | Log directory |
 
 ## Runtime Dependencies
 
@@ -108,13 +108,13 @@ sudo dnf install -y libguestfs-tools qemu-kvm libvirt-client \
 
 ```bash
 # Run a migration
-sudo h2kvmctl --config /etc/hyper2kvm/migrations/photon-example.yaml
+sudo h2kvmctl --config /etc/h2kvm/migrations/photon-example.yaml
 
 # Or create a test config
 cat > /tmp/test.yaml <<'EOF'
 cmd: local
 vmdk: /path/to/your.vmdk
-output_dir: /tmp/hyper2kvm-test
+output_dir: /tmp/h2kvm-test
 flatten: true
 out_format: qcow2
 regen_initramfs: true
@@ -129,19 +129,19 @@ sudo h2kvmctl --config /tmp/test.yaml
 
 ## Updating the Spec for New Releases
 
-1. Update `Version:` in `hyper2kvm.spec`
+1. Update `Version:` in `h2kvm.spec`
 2. Reset `Release:` to `1%{?dist}`
-3. Update `__version__` in `hyper2kvm/__init__.py` and `pyproject.toml`
+3. Update `__version__` in `h2kvm/__init__.py` and `pyproject.toml`
 4. Add a `%changelog` entry
-5. Rebuild: `python3 -m build --wheel --no-isolation && rpmbuild -bb hyper2kvm.spec`
+5. Rebuild: `python3 -m build --wheel --no-isolation && rpmbuild -bb h2kvm.spec`
 
 ## Troubleshooting
 
-**"conflicting requests: nothing provides user(hyper2kvm)"**
-The RPM creates a system user in `%pre`. Use `rpm -Uvh` instead of `dnf install`, or run: `sudo useradd -r -s /sbin/nologin hyper2kvm` first.
+**"conflicting requests: nothing provides user(h2kvm)"**
+The RPM creates a system user in `%pre`. Use `rpm -Uvh` instead of `dnf install`, or run: `sudo useradd -r -s /sbin/nologin h2kvm` first.
 
 **"Could not install packages: Permission denied"**
-A previous version is pip-installed system-wide. The spec uses `--ignore-installed` to handle this. If you still see it, uninstall first: `sudo pip uninstall hyper2kvm`.
+A previous version is pip-installed system-wide. The spec uses `--ignore-installed` to handle this. If you still see it, uninstall first: `sudo pip uninstall h2kvm`.
 
 **Stale 0.2.x wheel in dist/**
 Clean before building: `sudo rm -rf dist/ build/ *.egg-info`. The `dist/*.whl` glob must match only one wheel.

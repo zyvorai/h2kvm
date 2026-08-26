@@ -20,10 +20,10 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from hyper2kvm.runtime.worker import JobSpec, OperationType, WorkerCapabilities
-from hyper2kvm.runtime.worker.capabilities import get_detector
-from hyper2kvm.runtime.worker.engine import WorkerEngine, create_sample_job_spec
-from hyper2kvm.runtime.worker.schemas import ArtifactConfig, AuditInfo, ImageSpec
+from h2kvm.runtime.worker import JobSpec, OperationType, WorkerCapabilities
+from h2kvm.runtime.worker.capabilities import get_detector
+from h2kvm.runtime.worker.engine import WorkerEngine, create_sample_job_spec
+from h2kvm.runtime.worker.schemas import ArtifactConfig, AuditInfo, ImageSpec
 
 
 def print_banner(text: str):
@@ -184,7 +184,7 @@ def demonstrate_worker_registration():
 
 def main():
     """Run complete example workflow."""
-    print_banner("🎯 hyper2kvm Worker Job Protocol - Example")
+    print_banner("🎯 h2kvm Worker Job Protocol - Example")
 
     print("This example demonstrates the Worker Job Protocol v1.")
     print("It will:")

@@ -38,7 +38,7 @@ export function DesktopTierPicker({ tier, onChange, compact = false }: Props) {
   return (
     <div className="space-y-3" data-testid="desktop-tier-picker">
       <p className="text-sm text-white/55">
-        Choose how much of the hyper2kvm desktop to show — like macOS simplicity vs. pro tools.
+        Choose how much of the h2kvm desktop to show — like macOS simplicity vs. pro tools.
       </p>
       <div className="grid gap-2 sm:grid-cols-3">
         {TIERS.map((key) => (

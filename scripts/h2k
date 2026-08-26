@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# h2k — unified hyper2kvm Kubernetes CLI
+# h2k — unified h2kvm Kubernetes CLI
 # =============================================================================
 # Single entry point for all Kubernetes migration operations.
 #
@@ -17,11 +17,11 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-CLUSTER="${K3D_CLUSTER:-hyper2kvm-test}"
+CLUSTER="${K3D_CLUSTER:-h2kvm-test}"
 KUBEVIRT_VERSION="${KUBEVIRT_VERSION:-v1.7.0}"
 CDI_VERSION="${CDI_VERSION:-v1.64.0}"
-NS_MIGRATION="hyper2kvm-migration"
-NS_OPERATOR="hyper2kvm-system"
+NS_MIGRATION="h2kvm-migration"
+NS_OPERATOR="h2kvm-system"
 
 # Colors
 R='\033[0;31m'; G='\033[0;32m'; Y='\033[1;33m'; B='\033[0;34m'; C='\033[0;36m'; N='\033[0m'
@@ -113,13 +113,13 @@ EOF
 
     # 6. Build and load worker image
     log "Step 6/6: Building and loading worker image..."
-    if docker images hyper2kvm:worker --format "{{.ID}}" 2>/dev/null | head -1 | grep -q .; then
+    if docker images h2kvm:worker --format "{{.ID}}" 2>/dev/null | head -1 | grep -q .; then
         ok "Worker image exists"
     else
-        docker build --target worker -t hyper2kvm:worker -f "$PROJECT_DIR/Dockerfile" "$PROJECT_DIR" 2>&1 | tail -1
+        docker build --target worker -t h2kvm:worker -f "$PROJECT_DIR/Dockerfile" "$PROJECT_DIR" 2>&1 | tail -1
         ok "Worker image built"
     fi
-    k3d image import hyper2kvm:worker -c "$CLUSTER" 2>&1 | tail -1
+    k3d image import h2kvm:worker -c "$CLUSTER" 2>&1 | tail -1
     ok "Image loaded into k3d"
 
     echo ""
@@ -170,8 +170,8 @@ cmd_migrate_job() {
 
     # Copy VMDK into k3d node
     log "Step 1/4: Copying VMDK into k3d node..."
-    docker exec "k3d-${CLUSTER}-agent-0" mkdir -p /tmp/hyper2kvm-input 2>/dev/null
-    docker cp "$VMDK" "k3d-${CLUSTER}-agent-0:/tmp/hyper2kvm-input/" 2>&1
+    docker exec "k3d-${CLUSTER}-agent-0" mkdir -p /tmp/h2kvm-input 2>/dev/null
+    docker cp "$VMDK" "k3d-${CLUSTER}-agent-0:/tmp/h2kvm-input/" 2>&1
     ok "VMDK copied ($(du -h "$VMDK" | cut -f1))"
 
     # Create migration config
@@ -246,7 +246,7 @@ spec:
         - {name: host, mountPath: /host-input, readOnly: true}
         - {name: input, mountPath: /input}
       volumes:
-      - {name: host, hostPath: {path: /tmp/hyper2kvm-input}}
+      - {name: host, hostPath: {path: /tmp/h2kvm-input}}
       - {name: input, persistentVolumeClaim: {claimName: vmdk-input}}
 ---
 apiVersion: batch/v1
@@ -268,7 +268,7 @@ spec:
         - {name: modules, mountPath: /lib/modules, readOnly: true}
       containers:
       - name: migrate
-        image: hyper2kvm:worker
+        image: h2kvm:worker
         imagePullPolicy: IfNotPresent
         command:
         - /bin/bash
@@ -339,7 +339,7 @@ cmd_migrate_operator() {
     local HC_NAME="migration-$(date +%s)"
 
     kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: $HC_NAME
@@ -400,15 +400,15 @@ cmd_deploy_operator() {
     log "Deploying operator..."
 
     # Build operator image
-    if ! docker images hyper2kvm-operator --format "{{.ID}}" 2>/dev/null | head -1 | grep -q .; then
+    if ! docker images h2kvm-operator --format "{{.ID}}" 2>/dev/null | head -1 | grep -q .; then
         log "Building operator image..."
-        docker build -t hyper2kvm-operator:latest -f "$PROJECT_DIR/operator/Dockerfile" "$PROJECT_DIR/operator/" 2>&1 | tail -1
+        docker build -t h2kvm-operator:latest -f "$PROJECT_DIR/operator/Dockerfile" "$PROJECT_DIR/operator/" 2>&1 | tail -1
     fi
-    k3d image import hyper2kvm-operator:latest -c "$CLUSTER" 2>&1 | tail -1
+    k3d image import h2kvm-operator:latest -c "$CLUSTER" 2>&1 | tail -1
 
     # Install CRDs
-    kubectl apply -f "$PROJECT_DIR/operator/config/crd/bases/hyper2kvm.io_hyperconversions.yaml" >/dev/null 2>&1
-    kubectl apply -f "$PROJECT_DIR/operator/config/crd/hyper2kvm.io_validations.yaml" >/dev/null 2>&1
+    kubectl apply -f "$PROJECT_DIR/operator/config/crd/bases/h2kvm.io_hyperconversions.yaml" >/dev/null 2>&1
+    kubectl apply -f "$PROJECT_DIR/operator/config/crd/h2kvm.io_validations.yaml" >/dev/null 2>&1
 
     # Deploy
     kubectl apply -f "$PROJECT_DIR/k8s/operator-deploy/deploy-operator-migrate.yaml" 2>&1 | grep -v unchanged || true
@@ -465,11 +465,11 @@ cmd_status() {
 
 cmd_teardown() {
     banner
-    local SCOPE="${1:---hyper2kvm}"
+    local SCOPE="${1:---h2kvm}"
 
     case "$SCOPE" in
         --all)
-            log "Removing EVERYTHING (hyper2kvm + KubeVirt + CDI + k3d cluster)..."
+            log "Removing EVERYTHING (h2kvm + KubeVirt + CDI + k3d cluster)..."
             read -p "Are you sure? This deletes the entire cluster. (yes/no): " CONFIRM
             [ "$CONFIRM" = "yes" ] || { warn "Aborted"; exit 0; }
             "$SCRIPT_DIR/uninstall.sh" --all
@@ -540,15 +540,15 @@ metadata:
   name: $VM_NAME
   namespace: $NS
   labels:
-    app: hyper2kvm
-    hyper2kvm.io/migrated: "true"
+    app: h2kvm
+    h2kvm.io/migrated: "true"
 spec:
   runStrategy: Always
   template:
     metadata:
       labels:
         kubevirt.io/vm: $VM_NAME
-        app: hyper2kvm
+        app: h2kvm
     spec:
       domain:
         cpu:
@@ -637,7 +637,7 @@ cmd_export() {
     local NS="$NS_MIGRATION"
     local PVC="qcow2-output"
     local DEFINE=false
-    local VM_NAME="hyper2kvm-exported"
+    local VM_NAME="h2kvm-exported"
     local MEMORY=4096
     local VCPUS=2
 
@@ -660,7 +660,7 @@ cmd_export() {
                 echo "  -n, --namespace <ns>    Namespace (default: $NS_MIGRATION)"
                 echo "  -p, --pvc <name>        Source PVC name (default: qcow2-output)"
                 echo "  -d, --define            Define the domain in libvirt after export"
-                echo "  --vm-name <name>        VM name for libvirt XML (default: hyper2kvm-exported)"
+                echo "  --vm-name <name>        VM name for libvirt XML (default: h2kvm-exported)"
                 echo "  --memory <MiB>          Memory in MiB (default: 4096)"
                 echo "  --vcpus <n>             vCPUs (default: 2)"
                 exit 0
@@ -692,7 +692,7 @@ metadata:
   name: $EXPORT_POD
   namespace: $NS
   labels:
-    app: hyper2kvm-export
+    app: h2kvm-export
 spec:
   restartPolicy: Never
   containers:
@@ -1022,7 +1022,7 @@ cmd_help() {
     echo ""
     echo -e "${C}Setup & Teardown:${N}"
     echo "  setup                          Create k3d cluster + KubeVirt + CDI + operator"
-    echo "  teardown                       Remove hyper2kvm components"
+    echo "  teardown                       Remove h2kvm components"
     echo "  teardown --all                 Remove everything including k3d cluster"
     echo "  teardown --operator            Remove operator only"
     echo "  teardown --migrations          Remove migration resources only"
@@ -1048,7 +1048,7 @@ cmd_help() {
     echo "  backup                         Backup operator + worker state"
     echo ""
     echo -e "${C}Environment:${N}"
-    echo "  K3D_CLUSTER=name               Override k3d cluster name (default: hyper2kvm-test)"
+    echo "  K3D_CLUSTER=name               Override k3d cluster name (default: h2kvm-test)"
     echo "  KUBEVIRT_VERSION=v1.7.0        Override KubeVirt version"
     echo "  CDI_VERSION=v1.64.0            Override CDI version"
 }

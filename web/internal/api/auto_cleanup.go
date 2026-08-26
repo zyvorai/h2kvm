@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-const cleanupConfigPath = "/var/lib/hyper2kvm/cleanup-config.json"
+const cleanupConfigPath = "/var/lib/h2kvm/cleanup-config.json"
 
 // activeJobMinAge protects in-progress artifacts from phase-2 (oldest-first) cleanup.
 const activeJobMinAge = 2 * time.Hour
@@ -128,7 +128,7 @@ func (s *Server) runAutoCleanup() {
 
 	// Check disk usage using syscall.Statfs.
 	var stat syscall.Statfs_t
-	if err := syscall.Statfs("/var/lib/hyper2kvm", &stat); err != nil {
+	if err := syscall.Statfs("/var/lib/h2kvm", &stat); err != nil {
 		log.Printf("[auto-cleanup] statfs failed: %v", err)
 		return
 	}
@@ -142,8 +142,8 @@ func (s *Server) runAutoCleanup() {
 
 	// Resolve allowed directories.
 	allowedDirs := map[string]string{
-		"output": "/var/lib/hyper2kvm/output",
-		"input":  "/var/lib/hyper2kvm/input",
+		"output": "/var/lib/h2kvm/output",
+		"input":  "/var/lib/h2kvm/input",
 	}
 
 	var targetDirs []string
@@ -153,7 +153,7 @@ func (s *Server) runAutoCleanup() {
 		}
 	}
 	if len(targetDirs) == 0 {
-		targetDirs = []string{"/var/lib/hyper2kvm/output", "/var/lib/hyper2kvm/input"}
+		targetDirs = []string{"/var/lib/h2kvm/output", "/var/lib/h2kvm/input"}
 	}
 
 	// Phase 1: age-based cleanup.
@@ -166,7 +166,7 @@ func (s *Server) runAutoCleanup() {
 			if err != nil || info.IsDir() {
 				return nil
 			}
-			if !strings.HasPrefix(path, "/var/lib/hyper2kvm/") {
+			if !strings.HasPrefix(path, "/var/lib/h2kvm/") {
 				return nil
 			}
 			if isProtectedFromCleanup(path, info) {
@@ -187,7 +187,7 @@ func (s *Server) runAutoCleanup() {
 	}
 
 	// Phase 2: if still over threshold, delete oldest files first.
-	if err := syscall.Statfs("/var/lib/hyper2kvm", &stat); err == nil {
+	if err := syscall.Statfs("/var/lib/h2kvm", &stat); err == nil {
 		usedPercent = 100.0 - (float64(stat.Bavail) / float64(stat.Blocks) * 100.0)
 	}
 
@@ -204,7 +204,7 @@ func (s *Server) runAutoCleanup() {
 				if err != nil || info.IsDir() {
 					return nil
 				}
-				if !strings.HasPrefix(path, "/var/lib/hyper2kvm/") {
+				if !strings.HasPrefix(path, "/var/lib/h2kvm/") {
 					return nil
 				}
 				if isProtectedFromCleanup(path, info) {
@@ -230,7 +230,7 @@ func (s *Server) runAutoCleanup() {
 			freedBytes += f.size
 
 			// Re-check disk usage.
-			if err := syscall.Statfs("/var/lib/hyper2kvm", &stat); err == nil {
+			if err := syscall.Statfs("/var/lib/h2kvm", &stat); err == nil {
 				usedPercent = 100.0 - (float64(stat.Bavail) / float64(stat.Blocks) * 100.0)
 				if usedPercent <= float64(threshold) {
 					break
@@ -259,7 +259,7 @@ func (s *Server) handleGetCleanupSettings(w http.ResponseWriter, r *http.Request
 	// Also include current disk usage.
 	var diskPercent float64
 	var stat syscall.Statfs_t
-	if err := syscall.Statfs("/var/lib/hyper2kvm", &stat); err == nil {
+	if err := syscall.Statfs("/var/lib/h2kvm", &stat); err == nil {
 		diskPercent = 100.0 - (float64(stat.Bavail) / float64(stat.Blocks) * 100.0)
 	}
 

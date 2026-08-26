@@ -305,7 +305,7 @@ func TestHandleUploadInit(t *testing.T) {
 		{
 			name:       "valid init returns upload_id",
 			body:       `{"filename":"disk.vmdk","size":104857600}`,
-			wantStatus: 0, // depends on filesystem permissions (needs /var/lib/hyper2kvm)
+			wantStatus: 0, // depends on filesystem permissions (needs /var/lib/h2kvm)
 			wantKey:    "",
 		},
 	}

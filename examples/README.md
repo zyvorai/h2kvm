@@ -1,10 +1,10 @@
-# hyper2kvm Examples
+# h2kvm Examples
 
-Comprehensive examples demonstrating all features of hyper2kvm.
+Comprehensive examples demonstrating all features of h2kvm.
 
 ## Performance Highlights
 
-The examples leverage hyper2kvm's enterprise improvements:
+The examples leverage h2kvm's enterprise improvements:
 - **7x Faster LVM Activation** - Enterprise-grade LVM with device filtering
 - **100% Host Protection** - Safe VG activation prevents corruption
 - **Production Validated** - Tested with RHEL 8.8 and openSUSE Leap 15.4

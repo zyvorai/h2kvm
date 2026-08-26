@@ -4,7 +4,7 @@
 
 """kubevirt_guest_profile unit tests."""
 
-from hyper2kvm.infrastructure.deployers.kubevirt_guest_profile import (
+from h2kvm.infrastructure.deployers.kubevirt_guest_profile import (
     kubevirt_os_variant,
     kubevirt_os_variant_from_name,
 )

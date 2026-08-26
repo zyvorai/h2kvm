@@ -248,7 +248,7 @@ All critical and important features are complete! The remaining items are nice-t
 ### Basic HTTP Migration
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: simple-migration
@@ -266,7 +266,7 @@ spec:
 ### S3 Migration with Offline Fixes
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: s3-with-fixes
@@ -363,9 +363,9 @@ kubectl apply -f config/crd/bases/
 helm install hyperconversion ./charts/hyperconversion-operator
 
 # Verify
-kubectl get deployment -n hyper2kvm-system
-kubectl get pods -n hyper2kvm-system
-kubectl logs -n hyper2kvm-system -l app=hyperconversion-operator
+kubectl get deployment -n h2kvm-system
+kubectl get pods -n h2kvm-system
+kubectl logs -n h2kvm-system -l app=hyperconversion-operator
 ```
 
 ### Post-Installation

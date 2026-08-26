@@ -12,12 +12,12 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	hyper2kvmv1 "github.com/hyper2kvm/operator/api/v1"
+	h2kvmv1 "github.com/h2kvm/operator/api/v1"
 	kubevirtv1 "kubevirt.io/api/core/v1"
 )
 
 // BuildKubeVirtVMSpec builds a KubeVirt VirtualMachine spec from the validation
-func BuildKubeVirtVMSpec(validation *hyper2kvmv1.Validation) (*kubevirtv1.VirtualMachineSpec, error) {
+func BuildKubeVirtVMSpec(validation *h2kvmv1.Validation) (*kubevirtv1.VirtualMachineSpec, error) {
 	// If user provided a custom template, use it
 	if validation.Spec.KubeVirtTemplate != nil {
 		var vmSpec kubevirtv1.VirtualMachineSpec
@@ -35,8 +35,8 @@ func BuildKubeVirtVMSpec(validation *hyper2kvmv1.Validation) (*kubevirtv1.Virtua
 		Template: &kubevirtv1.VirtualMachineInstanceTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
 				Labels: map[string]string{
-					"app":                     "hyper2kvm",
-					"hyper2kvm.io/validation": validation.Name,
+					"app":                     "h2kvm",
+					"h2kvm.io/validation": validation.Name,
 				},
 			},
 			Spec: kubevirtv1.VirtualMachineInstanceSpec{

@@ -2,7 +2,7 @@
 #   h2kvmctl --config 20-live-fix/live-fix-dry-run.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config 20-live-fix/live-fix-dry-run.yaml
+#   h2kvm --config 20-live-fix/live-fix-dry-run.yaml
 
 command: live-fix
 host: vm.example.com

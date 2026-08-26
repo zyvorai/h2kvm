@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.platforms.containers.detector module."""
+"""Tests for h2kvm.platforms.containers.detector module."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from unittest.mock import Mock, call
 
 import pytest
 
-from hyper2kvm.platforms.containers.detector import (
+from h2kvm.platforms.containers.detector import (
     ContainerDetector,
     ContainerInfo,
     ContainerRuntime,

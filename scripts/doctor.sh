@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
-# hyper2kvm doctor — system readiness check
+# h2kvm doctor — system readiness check
 #
 # Usage: ./scripts/doctor.sh
 #   or:  h2kvmctl doctor (if wired into CLI)
@@ -14,7 +14,7 @@ usage() {
     cat <<EOF
 Usage: $0 [options]
 
-Check system readiness for hyper2kvm VM migrations.
+Check system readiness for h2kvm VM migrations.
 
 Checks: KVM, qemu-img, libvirt, govc, Python, disk space, permissions.
 
@@ -48,7 +48,7 @@ info()  { echo -e "  ${C}ℹ${N} $1"; }
 header(){ echo -e "\n${W}━━━ $1 ━━━${N}"; }
 
 echo -e "${W}"
-echo "  hyper2kvm doctor"
+echo "  h2kvm doctor"
 echo "  System readiness check"
 echo -e "${N}"
 
@@ -228,8 +228,8 @@ fi
 # --- SECTION 4b: VirtIO Windows Drivers ---
 header "VirtIO Windows Drivers"
 
-if [ -f /var/lib/hyper2kvm/virtio-win.iso ]; then
-    pass "virtio-win.iso: /var/lib/hyper2kvm/virtio-win.iso ($(du -h /var/lib/hyper2kvm/virtio-win.iso | awk '{print $1}'))"
+if [ -f /var/lib/h2kvm/virtio-win.iso ]; then
+    pass "virtio-win.iso: /var/lib/h2kvm/virtio-win.iso ($(du -h /var/lib/h2kvm/virtio-win.iso | awk '{print $1}'))"
 elif [ -f /usr/share/virtio-win/virtio-win.iso ]; then
     pass "virtio-win.iso: /usr/share/virtio-win/virtio-win.iso (RPM, $(du -h /usr/share/virtio-win/virtio-win.iso | awk '{print $1}'))"
 else
@@ -237,9 +237,9 @@ else
     info "Install: sudo dnf install virtio-win  OR  sudo ./scripts/install-deps.sh --virtio-win"
 fi
 
-if [ -d /var/lib/hyper2kvm/virtio-win-extracted/viostor ]; then
-    pass "VirtIO ISO cache: /var/lib/hyper2kvm/virtio-win-extracted/ (pre-extracted)"
-elif [ -f /var/lib/hyper2kvm/virtio-win.iso ]; then
+if [ -d /var/lib/h2kvm/virtio-win-extracted/viostor ]; then
+    pass "VirtIO ISO cache: /var/lib/h2kvm/virtio-win-extracted/ (pre-extracted)"
+elif [ -f /var/lib/h2kvm/virtio-win.iso ]; then
     info "VirtIO ISO cache not yet extracted — will be created on first Windows migration"
 fi
 
@@ -320,10 +320,10 @@ for pkg in pyvmomi libvirt-python; do
     fi
 done
 
-if python3 -c "import hyper2kvm" 2>/dev/null; then
-    pass "hyper2kvm Python package importable"
+if python3 -c "import h2kvm" 2>/dev/null; then
+    pass "h2kvm Python package importable"
 else
-    fail "hyper2kvm Python package not importable"
+    fail "h2kvm Python package not importable"
 fi
 
 # --- SECTION 8: vSphere Connectivity ---

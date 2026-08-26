@@ -2,7 +2,7 @@
 # Makefile for zkvm (Go Bubble Tea TUI)
 
 BINARY   := zkvm
-MODULE   := github.com/hyper2kvm/zkvm
+MODULE   := github.com/h2kvm/zkvm
 VERSION  ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS  := -s -w -X main.version=$(VERSION)
 GOFLAGS  ?=

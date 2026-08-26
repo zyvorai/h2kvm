@@ -6,7 +6,7 @@ Integration of the Worker Job Protocol v1 with Kubernetes orchestration.
 
 ## Overview
 
-Successfully integrated the Worker Job Protocol with Kubernetes, enabling production-grade deployment of hyper2kvm workers across a cluster.
+Successfully integrated the Worker Job Protocol with Kubernetes, enabling production-grade deployment of h2kvm workers across a cluster.
 
 ## Components Delivered
 
@@ -66,12 +66,12 @@ Successfully integrated the Worker Job Protocol with Kubernetes, enabling produc
 │   Data Plane (Worker DaemonSet)   │
 │                                   │
 │   Node 1:                         │
-│     - hyper2kvm-worker pod        │
+│     - h2kvm-worker pod        │
 │     - NBD module loaded           │
 │     - Capabilities detected       │
 │                                   │
 │   Node 2:                         │
-│     - hyper2kvm-worker pod        │
+│     - h2kvm-worker pod        │
 │     - NBD module loaded           │
 │     - Capabilities detected       │
 └───────────────────────────────────┘
@@ -81,7 +81,7 @@ Successfully integrated the Worker Job Protocol with Kubernetes, enabling produc
 
 ```
 ┌─────────────────────────────────────┐
-│  hyper2kvm-worker Pod               │
+│  h2kvm-worker Pod               │
 │                                     │
 │  Init Container:                    │
 │    └─ nbd-module-loader             │
@@ -97,7 +97,7 @@ Successfully integrated the Worker Job Protocol with Kubernetes, enabling produc
 │    ├─ /dev (device access)          │
 │    ├─ /data/incoming (watch dir)    │
 │    ├─ /data/output (results)        │
-│    ├─ /var/lib/hyper2kvm (state)    │
+│    ├─ /var/lib/h2kvm (state)    │
 │    └─ /lib/modules (NBD module)     │
 └─────────────────────────────────────┘
 ```
@@ -110,7 +110,7 @@ Successfully integrated the Worker Job Protocol with Kubernetes, enabling produc
 
 ```bash
 # Label worker nodes
-kubectl label nodes worker-01 hyper2kvm.io/worker-enabled=true
+kubectl label nodes worker-01 h2kvm.io/worker-enabled=true
 
 # Deploy base resources
 kubectl apply -f k8s/base/namespace.yaml
@@ -125,22 +125,22 @@ kubectl apply -f k8s/worker/configmap.yaml
 kubectl apply -f k8s/worker/daemonset.yaml
 
 # Verify workers running
-kubectl get pods -n hyper2kvm-workers -l app=hyper2kvm-worker
+kubectl get pods -n h2kvm-workers -l app=h2kvm-worker
 ```
 
 ### 3. Submit Jobs
 
 ```bash
 # Create job spec ConfigMap
-kubectl create configmap hyper2kvm-job-001 \
+kubectl create configmap h2kvm-job-001 \
   --from-file=job-spec.json=k8s/worker/examples/convert-job.json \
-  -n hyper2kvm-workers
+  -n h2kvm-workers
 
 # Deploy job
 sed 's/JOBID/001/g' k8s/worker/job-template.yaml | kubectl apply -f -
 
 # Monitor progress
-kubectl logs -n hyper2kvm-workers -f job/hyper2kvm-migration-001
+kubectl logs -n h2kvm-workers -f job/h2kvm-migration-001
 ```
 
 ---
@@ -152,7 +152,7 @@ kubectl logs -n hyper2kvm-workers -f job/hyper2kvm-migration-001
 Workers automatically detect their execution environment on startup:
 
 ```bash
-kubectl exec -n hyper2kvm-workers hyper2kvm-worker-xxxxx -- \
+kubectl exec -n h2kvm-workers h2kvm-worker-xxxxx -- \
   h2kvmctl.worker.cli capabilities
 
 # Output:
@@ -193,7 +193,7 @@ Complete job state machine with persistence:
 Real-time progress events stored in JSON Lines format:
 
 ```bash
-kubectl exec -n hyper2kvm-workers hyper2kvm-worker-xxxxx -- \
+kubectl exec -n h2kvm-workers h2kvm-worker-xxxxx -- \
   h2kvmctl.worker.cli events convert-001 --follow
 
 # Output:
@@ -247,7 +247,7 @@ Workers require privileged mode for:
 5. **Pod Security**: Enforced via Pod Security Standards
 
 ```bash
-kubectl label namespace hyper2kvm-workers \
+kubectl label namespace h2kvm-workers \
   pod-security.kubernetes.io/enforce=privileged
 ```
 
@@ -261,7 +261,7 @@ kubectl label namespace hyper2kvm-workers \
 ```yaml
 livenessProbe:
   exec:
-    command: ['python3', '-c', 'import os; exit(0 if os.path.exists("/var/lib/hyper2kvm/worker.pid") else 1)']
+    command: ['python3', '-c', 'import os; exit(0 if os.path.exists("/var/lib/h2kvm/worker.pid") else 1)']
   periodSeconds: 30
 ```
 
@@ -269,7 +269,7 @@ livenessProbe:
 ```yaml
 readinessProbe:
   exec:
-    command: ['python3', '-m', 'hyper2kvm.worker.cli', 'capabilities', '--json-output']
+    command: ['python3', '-m', 'h2kvm.worker.cli', 'capabilities', '--json-output']
   periodSeconds: 30
 ```
 
@@ -279,20 +279,20 @@ Workers log to stdout/stderr for collection by Kubernetes logging infrastructure
 
 ```bash
 # View worker logs
-kubectl logs -n hyper2kvm-workers -l app=hyper2kvm-worker --tail=100 -f
+kubectl logs -n h2kvm-workers -l app=h2kvm-worker --tail=100 -f
 
 # View specific job logs
-kubectl logs -n hyper2kvm-workers job/hyper2kvm-migration-001 -f
+kubectl logs -n h2kvm-workers job/h2kvm-migration-001 -f
 ```
 
 ### Future: Prometheus Metrics
 
 Planned metrics endpoints:
-- `hyper2kvm_migration_duration_seconds`
-- `hyper2kvm_migration_total`
-- `hyper2kvm_migration_failures_total`
-- `hyper2kvm_vmdk_size_bytes`
-- `hyper2kvm_worker_capability_info`
+- `h2kvm_migration_duration_seconds`
+- `h2kvm_migration_total`
+- `h2kvm_migration_failures_total`
+- `h2kvm_vmdk_size_bytes`
+- `h2kvm_worker_capability_info`
 
 ---
 
@@ -307,22 +307,22 @@ kubectl apply -f k8s/worker/
 
 # 2. Wait for workers ready
 kubectl wait --for=condition=Ready pods \
-  -n hyper2kvm-workers -l app=hyper2kvm-worker \
+  -n h2kvm-workers -l app=h2kvm-worker \
   --timeout=300s
 
 # 3. Submit test conversion job
-kubectl create configmap hyper2kvm-job-test \
+kubectl create configmap h2kvm-job-test \
   --from-file=job-spec.json=k8s/worker/examples/convert-job.json \
-  -n hyper2kvm-workers
+  -n h2kvm-workers
 
 sed 's/JOBID/test/g' k8s/worker/job-template.yaml | kubectl apply -f -
 
 # 4. Verify completion
-kubectl wait --for=condition=Complete job/hyper2kvm-migration-test \
-  -n hyper2kvm-workers --timeout=3600s
+kubectl wait --for=condition=Complete job/h2kvm-migration-test \
+  -n h2kvm-workers --timeout=3600s
 
 # 5. Check output
-kubectl exec -n hyper2kvm-workers job/hyper2kvm-migration-test -- \
+kubectl exec -n h2kvm-workers job/h2kvm-migration-test -- \
   ls -lh /output/
 ```
 
@@ -392,7 +392,7 @@ Successfully integrated the Worker Job Protocol v1 with Kubernetes, providing:
 4. **Comprehensive documentation** covering all deployment scenarios
 5. **Example job specifications** for common operations
 
-The integration enables hyper2kvm to scale horizontally across Kubernetes clusters while maintaining security isolation and providing complete observability through the Worker Job Protocol.
+The integration enables h2kvm to scale horizontally across Kubernetes clusters while maintaining security isolation and providing complete observability through the Worker Job Protocol.
 
 ---
 

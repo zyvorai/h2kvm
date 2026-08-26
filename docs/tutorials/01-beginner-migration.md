@@ -9,7 +9,7 @@
 ## What You'll Learn
 
 By the end of this tutorial, you will:
-- ✅ Install Hyper2KVM and dependencies
+- ✅ Install H2KVM and dependencies
 - ✅ Perform your first VM migration
 - ✅ Understand automatic fixes applied during migration
 - ✅ Validate the migrated VM
@@ -38,14 +38,14 @@ By the end of this tutorial, you will:
 ### Install via pip (Recommended)
 
 ```bash
-# Install Hyper2KVM
-pip install hyper2kvm
+# Install H2KVM
+pip install h2kvm
 
 # Verify installation
 
 > **Note**: After installation, you have two command names:
 > - `h2kvmctl` (primary, kubectl-style, recommended)
-> - `hyper2kvm` (legacy, backwards compatible)
+> - `h2kvm` (legacy, backwards compatible)
 >
 > Both commands are identical. This tutorial uses `h2kvmctl`.
 
@@ -54,7 +54,7 @@ h2kvmctl --version
 
 Expected output:
 ```
-hyper2kvm version 1.0.0
+h2kvm version 1.0.0
 ```
 
 ### Install System Dependencies
@@ -146,13 +146,13 @@ out_format: qcow2
 fstab_mode: stabilize-all
 regen_initramfs: true
 windows: true
-virtio_win_iso: /usr/share/virtio-win/virtio-win.iso  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+virtio_win_iso: /usr/share/virtio-win/virtio-win.iso  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 compress: true
 verbose: 1
 ```
 
 > **Tip**: If you ran `quickstart.sh` or `sudo ./scripts/install-deps.sh --virtio-win`,
-> the VirtIO ISO is already at `/var/lib/hyper2kvm/virtio-win.iso` and will be
+> the VirtIO ISO is already at `/var/lib/h2kvm/virtio-win.iso` and will be
 > auto-discovered. You can omit the `virtio_win_iso` line entirely.
 
 ```bash
@@ -170,7 +170,7 @@ h2kvmctl --cmd local \
     --fstab-mode stabilize-all \
     --regen-initramfs \
     --windows \
-    --virtio-win-iso /usr/share/virtio-win/virtio-win.iso \  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+    --virtio-win-iso /usr/share/virtio-win/virtio-win.iso \  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
     --compress \
     --verbose
 ```
@@ -187,7 +187,7 @@ h2kvmctl --cmd local \
 | `--fstab-mode stabilize-all` | Stabilize fstab with UUIDs |
 | `--regen-initramfs` | Regenerate initramfs with virtio drivers |
 | `--windows` | Enable Windows guest mode |
-| `--virtio-win-iso` | Path to VirtIO driver ISO for Windows (optional — auto-discovered at `/var/lib/hyper2kvm/virtio-win.iso`) |
+| `--virtio-win-iso` | Path to VirtIO driver ISO for Windows (optional — auto-discovered at `/var/lib/h2kvm/virtio-win.iso`) |
 | `--compress` | Compress output (for qcow2) |
 | `--verbose` | Show detailed progress |
 
@@ -236,7 +236,7 @@ You'll see output like:
 
 ## Step 4: Understanding Automatic Fixes
 
-Hyper2KVM automatically applies these fixes during migration:
+H2KVM automatically applies these fixes during migration:
 
 ### Bootloader Fix
 **Problem**: Hyper-V/VMware bootloader won't work on KVM
@@ -536,7 +536,7 @@ h2kvmctl --cmd local \
 sudo ./scripts/install-deps.sh --virtio-win
 
 # Re-run with Windows VirtIO driver injection
-# (auto-discovers /var/lib/hyper2kvm/virtio-win.iso)
+# (auto-discovers /var/lib/h2kvm/virtio-win.iso)
 h2kvmctl --cmd local \
     --vmdk /vms/source/windows-server.vhdx \
     --output-dir /vms/migrated \
@@ -571,7 +571,7 @@ Congratulations! You've completed your first VM migration. Here's what to explor
 
 ## Summary Checklist
 
-- ✅ Installed Hyper2KVM and dependencies
+- ✅ Installed H2KVM and dependencies
 - ✅ Prepared source VM disk image
 - ✅ Executed first migration with automatic fixes
 - ✅ Validated migrated VM
@@ -586,7 +586,7 @@ Congratulations! You've completed your first VM migration. Here's what to explor
 - **Documentation Hub**: [docs/index.md](../index.md)
 - **Troubleshooting**: [guides/troubleshooting.md](../guides/troubleshooting.md)
 - **Migration Recipes**: [recipes/01-common-scenarios.md](../recipes/01-common-scenarios.md)
-- **GitHub Issues**: https://github.com/ssahani/hyper2kvm/issues
+- **GitHub Issues**: https://github.com/ssahani/h2kvm/issues
 
 **Time to completion**: 30-45 minutes ✅
 

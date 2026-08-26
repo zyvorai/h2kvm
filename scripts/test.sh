@@ -79,7 +79,7 @@ if ! command -v pytest &> /dev/null; then
     exit 1
 fi
 
-echo "🧪 === hyper2kvm Test Runner ==="
+echo "🧪 === h2kvm Test Runner ==="
 echo
 
 # Build pytest command
@@ -97,7 +97,7 @@ fi
 # Add coverage
 if [ "$RUN_COVERAGE" = true ]; then
     PYTEST_ARGS+=(
-        "--cov=hyper2kvm"
+        "--cov=h2kvm"
         "--cov-report=term-missing:skip-covered"
         "--cov-report=html"
         "--cov-report=xml"

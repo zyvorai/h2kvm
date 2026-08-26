@@ -13,7 +13,7 @@ export const MIGRATION_FIELD_HELP: Record<
   virsh_define: {
     title: 'virsh define',
     body:
-      'Defines a libvirt domain from hyper2kvm-generated XML on this host. This is the supported libvirt deploy path — not virt-install. Requires emit_domain_xml and a reachable libvirtd.',
+      'Defines a libvirt domain from h2kvm-generated XML on this host. This is the supported libvirt deploy path — not virt-install. Requires emit_domain_xml and a reachable libvirtd.',
   },
   fstab_mode: {
     title: 'fstab mode',
@@ -23,7 +23,7 @@ export const MIGRATION_FIELD_HELP: Record<
   deploy_target: {
     title: 'Deploy target',
     body:
-      'Where hyper2kvm deploys after convert + guest fix. Libvirt uses virsh define; KubeVirt uploads disk + creates a VM; OpenStack uploads to Glance (optional Nova boot). None leaves QCOW2 on disk only.',
+      'Where h2kvm deploys after convert + guest fix. Libvirt uses virsh define; KubeVirt uploads disk + creates a VM; OpenStack uploads to Glance (optional Nova boot). None leaves QCOW2 on disk only.',
   },
 };
 

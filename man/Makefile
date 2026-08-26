@@ -30,10 +30,10 @@ clean:
 install:
 	install -d $(DESTDIR)/usr/share/man/man1
 	install -d $(DESTDIR)/usr/share/man/man5
-	install -m 644 $(BUILDDIR)/man/hyper2kvm.1 $(DESTDIR)/usr/share/man/man1/
-	install -m 644 $(BUILDDIR)/man/hyper2kvm-local.1 $(DESTDIR)/usr/share/man/man1/
-	install -m 644 $(BUILDDIR)/man/hyper2kvm-vsphere.1 $(DESTDIR)/usr/share/man/man1/
-	install -m 644 $(BUILDDIR)/man/hyper2kvm-hyperv.1 $(DESTDIR)/usr/share/man/man1/
-	install -m 644 $(BUILDDIR)/man/hyper2kvm-azure.1 $(DESTDIR)/usr/share/man/man1/
-	install -m 644 $(BUILDDIR)/man/hyper2kvm.conf.5 $(DESTDIR)/usr/share/man/man5/
+	install -m 644 $(BUILDDIR)/man/h2kvm.1 $(DESTDIR)/usr/share/man/man1/
+	install -m 644 $(BUILDDIR)/man/h2kvm-local.1 $(DESTDIR)/usr/share/man/man1/
+	install -m 644 $(BUILDDIR)/man/h2kvm-vsphere.1 $(DESTDIR)/usr/share/man/man1/
+	install -m 644 $(BUILDDIR)/man/h2kvm-hyperv.1 $(DESTDIR)/usr/share/man/man1/
+	install -m 644 $(BUILDDIR)/man/h2kvm-azure.1 $(DESTDIR)/usr/share/man/man1/
+	install -m 644 $(BUILDDIR)/man/h2kvm.conf.5 $(DESTDIR)/usr/share/man/man5/
 	@echo "Man pages installed to $(DESTDIR)/usr/share/man"

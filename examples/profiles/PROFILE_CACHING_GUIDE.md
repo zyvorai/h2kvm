@@ -20,7 +20,7 @@ Profile caching improves performance for batch conversions by avoiding redundant
 By default, all `ProfileLoader` instances share a global cache:
 
 ```python
-from hyper2kvm.profiles import ProfileLoader
+from h2kvm.profiles import ProfileLoader
 
 # Both loaders share the same global cache
 loader1 = ProfileLoader()
@@ -65,7 +65,7 @@ profile3 = loader.load_profile("custom", custom_profile_path="/profiles")
 ### Basic Usage
 
 ```python
-from hyper2kvm.profiles import ProfileLoader
+from h2kvm.profiles import ProfileLoader
 
 # Create loader with caching enabled (default)
 loader = ProfileLoader()
@@ -84,7 +84,7 @@ print(f"Hits: {stats['hits']}, Misses: {stats['misses']}")
 ### Disable Caching
 
 ```python
-from hyper2kvm.profiles import ProfileLoader
+from h2kvm.profiles import ProfileLoader
 
 # Disable caching for testing or debugging
 loader = ProfileLoader(enable_cache=False)
@@ -97,7 +97,7 @@ profile2 = loader.load_profile("production")  # Re-reads from disk
 ### Custom Cache Instance
 
 ```python
-from hyper2kvm.profiles import ProfileLoader, ProfileCache
+from h2kvm.profiles import ProfileLoader, ProfileCache
 
 # Create custom cache with specific configuration
 custom_cache = ProfileCache(enabled=True)
@@ -109,7 +109,7 @@ loader = ProfileLoader(cache=custom_cache)
 ### Cache Statistics
 
 ```python
-from hyper2kvm.profiles import ProfileLoader
+from h2kvm.profiles import ProfileLoader
 
 loader = ProfileLoader()
 
@@ -140,7 +140,7 @@ for profile_name, entry_stats in stats['entries'].items():
 ### Log Statistics
 
 ```python
-from hyper2kvm.profiles import ProfileLoader
+from h2kvm.profiles import ProfileLoader
 
 loader = ProfileLoader()
 
@@ -160,8 +160,8 @@ loader.log_cache_statistics()
 For batch conversions with many VMs using the same profile, caching provides significant performance improvements:
 
 ```python
-from hyper2kvm.manifest.batch_orchestrator import BatchOrchestrator
-from hyper2kvm.profiles import ProfileLoader
+from h2kvm.manifest.batch_orchestrator import BatchOrchestrator
+from h2kvm.profiles import ProfileLoader
 
 # Create loader with caching enabled
 loader = ProfileLoader(enable_cache=True)
@@ -199,7 +199,7 @@ loader.log_cache_statistics()
 Custom profiles are automatically invalidated when files change:
 
 ```python
-from hyper2kvm.profiles import ProfileLoader
+from h2kvm.profiles import ProfileLoader
 from pathlib import Path
 import time
 
@@ -221,7 +221,7 @@ profile2 = loader.load_profile("custom", custom_profile_path="/profiles")
 ### Manual Invalidation
 
 ```python
-from hyper2kvm.profiles import get_global_cache
+from h2kvm.profiles import get_global_cache
 
 # Get global cache
 cache = get_global_cache()
@@ -236,7 +236,7 @@ cache.clear()
 ### Reset Global Cache
 
 ```python
-from hyper2kvm.profiles import reset_global_cache
+from h2kvm.profiles import reset_global_cache
 
 # Reset global cache (useful for testing)
 reset_global_cache()
@@ -249,7 +249,7 @@ reset_global_cache()
 The cache is thread-safe for parallel batch processing:
 
 ```python
-from hyper2kvm.profiles import ProfileLoader
+from h2kvm.profiles import ProfileLoader
 import concurrent.futures
 
 loader = ProfileLoader()
@@ -382,8 +382,8 @@ The cache scales well for typical workloads:
 ## Example: Batch with Caching
 
 ```python
-from hyper2kvm.manifest.batch_orchestrator import BatchOrchestrator
-from hyper2kvm.profiles import ProfileLoader, get_global_cache
+from h2kvm.manifest.batch_orchestrator import BatchOrchestrator
+from h2kvm.profiles import ProfileLoader, get_global_cache
 
 # Enable caching (default)
 loader = ProfileLoader(enable_cache=True)
@@ -408,9 +408,9 @@ get_global_cache().log_statistics()
 
 ## Related Documentation
 
-- [Migration Profiles Guide](../../hyper2kvm/profiles/README.md)
+- [Migration Profiles Guide](../../h2kvm/profiles/README.md)
 - [Batch Migration Guide](../../docs/Batch-Migration-Features-Guide.md)
-- [ProfileCache API Reference](../../hyper2kvm/profiles/profile_cache.py)
+- [ProfileCache API Reference](../../h2kvm/profiles/profile_cache.py)
 
 ## Conclusion
 

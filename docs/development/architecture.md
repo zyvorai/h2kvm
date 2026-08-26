@@ -4,7 +4,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         hyper2kvm Orange Theme System                   │
+│                         h2kvm Orange Theme System                   │
 └─────────────────────────────────────────────────────────────────────────┘
                                     │
                 ┌───────────────────┴────────────────────┐
@@ -42,7 +42,7 @@
 ### 1. TUI System Hierarchy
 
 ```
-hyper2kvm.tui
+h2kvm.tui
     │
     ├── __init__.py (Auto-detection logic)
     │   ├── get_dashboard_type() → 'textual' | 'curses' | 'cli'
@@ -76,7 +76,7 @@ hyper2kvm.tui
 ### 2. Progress Bar System
 
 ```
-hyper2kvm.core.progress
+h2kvm.core.progress
     │
     ├── Colors (ANSI color codes)
     │   ├── BRIGHT_ORANGE = \033[38;5;208m
@@ -235,7 +235,7 @@ create_progress_bar()
 ## Module Dependencies
 
 ```
-hyper2kvm/
+h2kvm/
     │
     ├── core/
     │   ├── optional_imports.py

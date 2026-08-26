@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm/fixers/offline_fixer.py (OfflineFixConfig, OfflineFSFix.__init__)."""
+"""Tests for h2kvm/fixers/offline_fixer.py (OfflineFixConfig, OfflineFSFix.__init__)."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ import pytest
 # OfflineFSFix imports many heavy modules at module-level. We use a conditional
 # import: test the dataclass always, but skip OfflineFSFix tests if import fails.
 
-from hyper2kvm.fixers.offline_fixer import OfflineFixConfig
+from h2kvm.fixers.offline_fixer import OfflineFixConfig
 
 
 # ---------------------------------------------------------------------------
@@ -117,7 +117,7 @@ class TestOfflineFixConfigDefaults:
 
     def test_luks_mapper_prefix_default(self):
         cfg = OfflineFixConfig(image=Path("/x"))
-        assert cfg.luks_mapper_prefix == "hyper2kvm-crypt"
+        assert cfg.luks_mapper_prefix == "h2kvm-crypt"
 
     def test_filesystem_repair_enable_default(self):
         cfg = OfflineFixConfig(image=Path("/x"))
@@ -224,7 +224,7 @@ class TestOfflineFixConfigCustom:
 
 
 try:
-    from hyper2kvm.fixers.offline_fixer import OfflineFSFix
+    from h2kvm.fixers.offline_fixer import OfflineFSFix
 
     _HAS_OFFLINE_FS_FIX = True
 except ImportError:
@@ -283,7 +283,7 @@ class TestOfflineFSFixInit:
         cfg = _make_config()
         fixer = OfflineFSFix(mock_logger, cfg)
         assert isinstance(fixer.report, dict)
-        assert fixer.report["tool"] == "hyper2kvm"
+        assert fixer.report["tool"] == "h2kvm"
         assert "changes" in fixer.report
         assert "analysis" in fixer.report
 

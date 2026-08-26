@@ -1,6 +1,6 @@
 # Performance Benchmarks
 
-This document contains performance benchmarks and optimization guidelines for hyper2kvm.
+This document contains performance benchmarks and optimization guidelines for h2kvm.
 
 ## Benchmarking Tools
 
@@ -64,7 +64,7 @@ h2kvmctl.vmspawn.benchmarks.profiler compare
 
 ```python
 # Good - Async for parallel
-from hyper2kvm.vmspawn.async_manager import AsyncVMManager
+from h2kvm.vmspawn.async_manager import AsyncVMManager
 
 manager = AsyncVMManager(max_parallel=50)
 results = await manager.validate_batch(configs)

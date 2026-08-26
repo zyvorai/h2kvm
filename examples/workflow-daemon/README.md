@@ -32,13 +32,13 @@ workflow_dir/
 
 ```bash
 # Using config file
-sudo hyper2kvm --config workflow-daemon.yaml
+sudo h2kvm --config workflow-daemon.yaml
 
 # Or via command line
-sudo hyper2kvm daemon \
+sudo h2kvm daemon \
   --workflow-mode \
-  --workflow-dir /var/lib/hyper2kvm/workflow \
-  --output-dir /var/lib/hyper2kvm/output \
+  --workflow-dir /var/lib/h2kvm/workflow \
+  --output-dir /var/lib/h2kvm/output \
   --max-concurrent-jobs 3
 ```
 
@@ -48,13 +48,13 @@ Simply copy VM disk files into `to_be_processed/`:
 
 ```bash
 # VMware
-cp my-vm.vmdk /var/lib/hyper2kvm/workflow/to_be_processed/
+cp my-vm.vmdk /var/lib/h2kvm/workflow/to_be_processed/
 
 # Hyper-V
-cp my-vm.vhdx /var/lib/hyper2kvm/workflow/to_be_processed/
+cp my-vm.vhdx /var/lib/h2kvm/workflow/to_be_processed/
 
 # OVA
-cp my-vm.ova /var/lib/hyper2kvm/workflow/to_be_processed/
+cp my-vm.ova /var/lib/h2kvm/workflow/to_be_processed/
 ```
 
 The daemon will:
@@ -67,13 +67,13 @@ The daemon will:
 
 ```bash
 # Watch the processing directory
-watch ls -lh /var/lib/hyper2kvm/workflow/processing/
+watch ls -lh /var/lib/h2kvm/workflow/processing/
 
 # Check daemon logs
-tail -f /var/log/hyper2kvm/workflow-daemon.log
+tail -f /var/log/h2kvm/workflow-daemon.log
 
 # View completed jobs
-ls -lh /var/lib/hyper2kvm/workflow/processed/$(date +%Y-%m-%d)/
+ls -lh /var/lib/h2kvm/workflow/processed/$(date +%Y-%m-%d)/
 ```
 
 ## Using Job Config Files
@@ -95,8 +95,8 @@ regen_initramfs: true
 Drop both the VMDK and the config file:
 
 ```bash
-cp my-vm.vmdk /var/lib/hyper2kvm/workflow/to_be_processed/
-cp my-vm-job.yaml /var/lib/hyper2kvm/workflow/to_be_processed/
+cp my-vm.vmdk /var/lib/h2kvm/workflow/to_be_processed/
+cp my-vm-job.yaml /var/lib/h2kvm/workflow/to_be_processed/
 ```
 
 ### Batch Job
@@ -120,7 +120,7 @@ jobs:
 ```
 
 ```bash
-cp batch-job.yaml /var/lib/hyper2kvm/workflow/to_be_processed/
+cp batch-job.yaml /var/lib/h2kvm/workflow/to_be_processed/
 ```
 
 ## Supported File Types
@@ -172,16 +172,16 @@ For failed jobs, error details are saved as `<filename>.error.json`:
 ### Service File
 
 ```bash
-# /etc/systemd/system/hyper2kvm-workflow.service
+# /etc/systemd/system/h2kvm-workflow.service
 [Unit]
-Description=hyper2kvm Workflow Daemon
+Description=h2kvm Workflow Daemon
 After=network.target
 
 [Service]
 Type=simple
-User=hyper2kvm
-Group=hyper2kvm
-ExecStart=/usr/bin/python3 -m hyper2kvm --config /etc/hyper2kvm/workflow-daemon.yaml
+User=h2kvm
+Group=h2kvm
+ExecStart=/usr/bin/python3 -m h2kvm --config /etc/h2kvm/workflow-daemon.yaml
 Restart=on-failure
 RestartSec=10s
 
@@ -192,8 +192,8 @@ WantedBy=multi-user.target
 ### Start Service
 
 ```bash
-sudo systemctl enable --now hyper2kvm-workflow.service
-sudo systemctl status hyper2kvm-workflow.service
+sudo systemctl enable --now h2kvm-workflow.service
+sudo systemctl status h2kvm-workflow.service
 ```
 
 ## Advanced Configuration
@@ -202,10 +202,10 @@ sudo systemctl status hyper2kvm-workflow.service
 
 ```yaml
 # Organize output by date and VM name
-output_dir: /var/lib/hyper2kvm/output
+output_dir: /var/lib/h2kvm/output
 
 # Results will be in:
-# /var/lib/hyper2kvm/output/2026-01-24/vm-name/
+# /var/lib/h2kvm/output/2026-01-24/vm-name/
 ```
 
 ### Worker Pool Tuning
@@ -232,28 +232,28 @@ regen_initramfs: true    # Rebuild initramfs
 
 ```bash
 # List failed jobs
-ls -lh /var/lib/hyper2kvm/workflow/failed/$(date +%Y-%m-%d)/
+ls -lh /var/lib/h2kvm/workflow/failed/$(date +%Y-%m-%d)/
 
 # View error details
-cat /var/lib/hyper2kvm/workflow/failed/2026-01-24/my-vm.vhd.error.json
+cat /var/lib/h2kvm/workflow/failed/2026-01-24/my-vm.vhd.error.json
 ```
 
 ### Monitor Active Jobs
 
 ```bash
 # Check what's currently processing
-ls -lh /var/lib/hyper2kvm/workflow/processing/
+ls -lh /var/lib/h2kvm/workflow/processing/
 
 # Daemon logs
-journalctl -u hyper2kvm-workflow.service -f
+journalctl -u h2kvm-workflow.service -f
 ```
 
 ### Reprocess Failed Jobs
 
 ```bash
 # Move failed job back to to_be_processed
-mv /var/lib/hyper2kvm/workflow/failed/2026-01-24/my-vm.vmdk \
-   /var/lib/hyper2kvm/workflow/to_be_processed/
+mv /var/lib/h2kvm/workflow/failed/2026-01-24/my-vm.vmdk \
+   /var/lib/h2kvm/workflow/to_be_processed/
 ```
 
 ## Examples

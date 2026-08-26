@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.orchestration.disk_processor.DiskProcessor."""
+"""Tests for h2kvm.orchestration.disk_processor.DiskProcessor."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from hyper2kvm.orchestration.disk_processor import DiskProcessor
+from h2kvm.orchestration.disk_processor import DiskProcessor
 
 
 # ---------------------------------------------------------------------------
@@ -44,7 +44,7 @@ def _make_processor(mock_logger, **overrides):
         luks_passphrase=None,
         luks_passphrase_env=None,
         luks_keyfile=None,
-        luks_mapper_prefix="hyper2kvm-crypt",
+        luks_mapper_prefix="h2kvm-crypt",
         backend="vmcraft",
         container_isolation=True,
         conversion_dir=None,

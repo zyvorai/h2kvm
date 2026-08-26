@@ -1,4 +1,4 @@
-# GitHub Actions Workflow for hyper2kvm VM Migrations
+# GitHub Actions Workflow for h2kvm VM Migrations
 #
 # Place this file in: .github/workflows/vm-migration.yml
 #
@@ -11,7 +11,7 @@
 #
 # Prerequisites:
 # - Self-hosted runner with KVM support
-# - hyper2kvm installed on runner
+# - h2kvm installed on runner
 # - GitHub Secrets configured (vCenter credentials)
 # - GitHub Environment protection rules (optional)
 
@@ -78,9 +78,9 @@ jobs:
           echo "batch=${{ github.event.inputs.migration_batch || 'dev' }}" >> $GITHUB_OUTPUT
           mkdir -p ${MIGRATION_BASE}/{configs,logs,reports}
 
-      - name: Check hyper2kvm version
+      - name: Check h2kvm version
         run: |
-          python -m hyper2kvm --version | tee ${MIGRATION_BASE}/logs/version.log
+          python -m h2kvm --version | tee ${MIGRATION_BASE}/logs/version.log
 
       - name: Check KVM host resources
         run: |
@@ -188,7 +188,7 @@ jobs:
         run: |
           echo "=== Migrating: ${VM_NAME} ==="
 
-          python -m hyper2kvm vsphere \
+          python -m h2kvm vsphere \
             --vcenter ${VCENTER_HOST} \
             --username ${VCENTER_USER} \
             --password ${VCENTER_PASSWORD} \

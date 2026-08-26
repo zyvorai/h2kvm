@@ -4,7 +4,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 """
-Code quality checker for hyper2kvm.
+Code quality checker for h2kvm.
 
 Performs various code quality checks including:
 - Syntax validation (AST parsing)
@@ -172,8 +172,8 @@ class CodeQualityChecker:
 
     def check_all(self) -> int:
         """Check all Python files in the repository."""
-        # Find all Python files in hyper2kvm package
-        package_dir = self.root / "hyper2kvm"
+        # Find all Python files in h2kvm package
+        package_dir = self.root / "h2kvm"
         if not package_dir.exists():
             print(f"Error: Package directory not found: {package_dir}")
             return 1

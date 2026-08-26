@@ -58,7 +58,7 @@
 <div class="cover">
   <h1>VMware <span>Exit</span> Strategy</h1>
   <h2>A Practical Migration Guide for Enterprises</h2>
-  <p class="sub">Step-by-step plan for moving from VMware vSphere to KVM/libvirt and KubeVirt — with hyper2kvm + hypersdk.</p>
+  <p class="sub">Step-by-step plan for moving from VMware vSphere to KVM/libvirt and KubeVirt — with h2kvm + hypersdk.</p>
 </div>
 
 <!-- PAGE: WHY EXIT NOW -->
@@ -107,7 +107,7 @@
       <div class="timeline-dot">1</div>
       <div class="timeline-content">
         <h4>Assessment (Week 1-2)</h4>
-        <p>Inventory all VMs. Classify by criticality (dev/staging/production). Identify dependencies. Estimate disk sizes. Map network requirements. Run pre-flight checks with hyper2kvm.</p>
+        <p>Inventory all VMs. Classify by criticality (dev/staging/production). Identify dependencies. Estimate disk sizes. Map network requirements. Run pre-flight checks with h2kvm.</p>
       </div>
     </div>
     <div class="timeline-item">
@@ -191,7 +191,7 @@
         <li>Critical VMs on KVM/libvirt (simple, reliable)</li>
         <li>Cloud-native workloads on KubeVirt</li>
         <li>Edge sites on K3s + KubeVirt</li>
-        <li>hyper2kvm deploys to both targets</li>
+        <li>h2kvm deploys to both targets</li>
         <li>Migrate once, deploy anywhere</li>
       </ul>
     </div>
@@ -201,10 +201,10 @@
 <!-- PAGE: RISK MITIGATION -->
 <div class="page page-dark">
   <h2 class="st">Risk <span>Mitigation</span></h2>
-  <p class="sub">How hyper2kvm eliminates common migration failures.</p>
+  <p class="sub">How h2kvm eliminates common migration failures.</p>
 
   <table>
-    <tr><th>Risk</th><th>Without hyper2kvm</th><th>With hyper2kvm</th></tr>
+    <tr><th>Risk</th><th>Without h2kvm</th><th>With h2kvm</th></tr>
     <tr><td>VM won't boot after migration</td><td class="danger">Common — wrong drivers, broken fstab</td><td class="check">Auto-fixed: initramfs rebuild, fstab stabilization</td></tr>
     <tr><td>Corrupt disk during conversion</td><td class="danger">Silent corruption, discovered late</td><td class="check">Pre-flight validation catches issues before conversion</td></tr>
     <tr><td>Windows blue screen (BSOD)</td><td class="danger">Missing VirtIO drivers</td><td class="check">Auto-inject VirtIO drivers + registry fix</td></tr>
@@ -216,7 +216,7 @@
   </table>
 
   <div class="quote">
-    "The difference between a migration project and a migration disaster is automation. hyper2kvm eliminates the manual steps where things go wrong."
+    "The difference between a migration project and a migration disaster is automation. h2kvm eliminates the manual steps where things go wrong."
   </div>
 </div>
 
@@ -234,7 +234,7 @@
     <div class="card">
       <div class="icon">2️⃣</div>
       <h4>Proof of Concept</h4>
-      <p>Pick 3-5 VMs. We migrate them live using hyper2kvm. You verify they boot and run. Takes 1-2 hours. Zero risk to production.</p>
+      <p>Pick 3-5 VMs. We migrate them live using h2kvm. You verify they boot and run. Takes 1-2 hours. Zero risk to production.</p>
     </div>
     <div class="card">
       <div class="icon">3️⃣</div>
@@ -250,11 +250,11 @@
 
   <div class="cta">
     <h3>Start Your VMware Exit Today</h3>
-    <p>The longer you wait, the more you pay. hyper2kvm is ready now.<br>No vendor lock-in.</p>
+    <p>The longer you wait, the more you pay. h2kvm is ready now.<br>No vendor lock-in.</p>
   </div>
 
   <div class="footer">
-    <p>hyper2kvm + hypersdk — Enterprise VM Migration Platform<br>Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p>
+    <p>h2kvm + hypersdk — Enterprise VM Migration Platform<br>Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p>
   </div>
 </div>
 

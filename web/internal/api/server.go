@@ -34,9 +34,9 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"gopkg.in/yaml.v3"
 
-	"github.com/hyper2kvm/web/internal/domain"
-	"github.com/hyper2kvm/web/internal/ports"
-	"github.com/hyper2kvm/web/internal/registry"
+	"github.com/h2kvm/web/internal/domain"
+	"github.com/h2kvm/web/internal/ports"
+	"github.com/h2kvm/web/internal/registry"
 )
 
 // AuditEntry represents a single audit log entry.
@@ -112,8 +112,8 @@ type Server struct {
 	cleanup *cleanupState
 }
 
-const webhookPersistPath = "/var/lib/hyper2kvm/webhooks.json"
-const emailPersistPath = "/var/lib/hyper2kvm/email.json"
+const webhookPersistPath = "/var/lib/h2kvm/webhooks.json"
+const emailPersistPath = "/var/lib/h2kvm/email.json"
 
 // loadWebhooks reads persisted webhooks from disk. Missing or corrupt files
 // are handled gracefully (server starts with an empty list).
@@ -329,7 +329,7 @@ func NewServer(cfg ServerConfig, manager ports.JobManager, reg *registry.Registr
 	s.loadEmailConfig()
 
 	// Enable provider credential persistence and auto-reconnect saved providers.
-	reg.SetPersistPath("/var/lib/hyper2kvm/providers.json")
+	reg.SetPersistPath("/var/lib/h2kvm/providers.json")
 	for _, saved := range reg.LoadSaved() {
 		if err := reg.Connect(context.Background(), saved); err != nil {
 			log.Printf("[providers] auto-reconnect %s failed: %v", saved.Name, err)
@@ -368,7 +368,7 @@ func NewServer(cfg ServerConfig, manager ports.JobManager, reg *registry.Registr
 				s.FireWebhooks(msgType, jobID, status, vmName)
 
 				// Send email notification.
-				subject := fmt.Sprintf("[hyper2kvm] Job %s: %s", status, jobID)
+				subject := fmt.Sprintf("[h2kvm] Job %s: %s", status, jobID)
 				body := fmt.Sprintf("Migration job %s has %s.\n\nJob ID: %s\nVM: %s\nTime: %s\n",
 					jobID, status, jobID, vmName, time.Now().Format(time.RFC3339))
 				s.sendEmailNotification(subject, body)
@@ -1580,7 +1580,7 @@ func formatBytesHuman(b int64) string {
 }
 
 func (s *Server) handleListArtifacts(w http.ResponseWriter, r *http.Request) {
-	dirs := []string{"/var/lib/hyper2kvm/output", "/var/lib/hyper2kvm/input"}
+	dirs := []string{"/var/lib/h2kvm/output", "/var/lib/h2kvm/input"}
 
 	type artifact struct {
 		Name      string `json:"name"`
@@ -1630,8 +1630,8 @@ func (s *Server) handleStorageCleanup(w http.ResponseWriter, r *http.Request) {
 
 	// Validate dirs whitelist.
 	allowedDirs := map[string]string{
-		"output": "/var/lib/hyper2kvm/output",
-		"input":  "/var/lib/hyper2kvm/input",
+		"output": "/var/lib/h2kvm/output",
+		"input":  "/var/lib/h2kvm/input",
 	}
 	var targetDirs []string
 	for _, d := range req.Dirs {
@@ -1659,8 +1659,8 @@ func (s *Server) handleStorageCleanup(w http.ResponseWriter, r *http.Request) {
 			if err != nil || info.IsDir() {
 				return nil
 			}
-			// Safety: never delete anything outside /var/lib/hyper2kvm/
-			if !strings.HasPrefix(path, "/var/lib/hyper2kvm/") {
+			// Safety: never delete anything outside /var/lib/h2kvm/
+			if !strings.HasPrefix(path, "/var/lib/h2kvm/") {
 				return nil
 			}
 			if !cutoff.IsZero() && info.ModTime().After(cutoff) {
@@ -2262,8 +2262,8 @@ func (s *Server) handleTestEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	subject := "[hyper2kvm] Test Email"
-	body := fmt.Sprintf("This is a test email from hyper2kvm.\n\nSent at: %s\nSMTP Host: %s:%d\n", time.Now().Format(time.RFC3339), cfg.Host, cfg.Port)
+	subject := "[h2kvm] Test Email"
+	body := fmt.Sprintf("This is a test email from h2kvm.\n\nSent at: %s\nSMTP Host: %s:%d\n", time.Now().Format(time.RFC3339), cfg.Host, cfg.Port)
 
 	if err := sendEmail(cfg, subject, body); err != nil {
 		jsonResponse(w, http.StatusOK, map[string]interface{}{
@@ -2303,7 +2303,7 @@ func (s *Server) handleConfigExport(w http.ResponseWriter, r *http.Request) {
 	export["exported_at"] = time.Now().Format(time.RFC3339)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Disposition", "attachment; filename=hyper2kvm-config.json")
+	w.Header().Set("Content-Disposition", "attachment; filename=h2kvm-config.json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(export)
 }
@@ -2783,7 +2783,7 @@ func (s *Server) handleAPIDocs(w http.ResponseWriter, r *http.Request) {
 		{Method: "POST", Path: "/api/v1/storage/relocate", Description: "Relocate libvirt image storage to a new path",
 			ExampleReq: `{"target_dir":"/data/libvirt/images","move_data":true}`},
 		{Method: "GET", Path: "/api/v1/storage/artifacts", Description: "List conversion output and input artifacts with sizes",
-			ExampleResp: `{"artifacts":[{"name":"vm.qcow2","path":"/var/lib/hyper2kvm/output/vm.qcow2","size_bytes":10737418240,"modified":"2026-04-09T12:00:00Z","dir":"output"}],"total_bytes":10737418240,"total_human":"10.0 GB"}`},
+			ExampleResp: `{"artifacts":[{"name":"vm.qcow2","path":"/var/lib/h2kvm/output/vm.qcow2","size_bytes":10737418240,"modified":"2026-04-09T12:00:00Z","dir":"output"}],"total_bytes":10737418240,"total_human":"10.0 GB"}`},
 		{Method: "POST", Path: "/api/v1/storage/cleanup", Description: "Delete conversion artifacts (output and/or input files)",
 			ExampleReq:  `{"dirs":["output","input"],"older_than_hours":0}`,
 			ExampleResp: `{"deleted":5,"freed_bytes":12345678900,"freed_human":"12.3 GB"}`},
@@ -2840,7 +2840,7 @@ var allowedUploadExts = map[string]bool{
 // filenameSanitizer replaces anything that isn't alphanumeric, dash, underscore, or dot.
 var filenameSanitizer = regexp.MustCompile(`[^a-zA-Z0-9._-]`)
 
-const uploadDir = "/var/lib/hyper2kvm/input"
+const uploadDir = "/var/lib/h2kvm/input"
 
 // uploadMu prevents concurrent uploads of the same filename from racing.
 var uploadMu sync.Mutex
@@ -3278,7 +3278,7 @@ func (s *Server) handleUploadStatus(w http.ResponseWriter, r *http.Request) {
 // allowedDownloadDirs lists directories from which files may be downloaded.
 var allowedDownloadDirs = []string{
 	"/var/lib/libvirt/images/",
-	"/var/lib/hyper2kvm/",
+	"/var/lib/h2kvm/",
 	"/data/demo/",
 }
 

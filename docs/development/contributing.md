@@ -1,14 +1,14 @@
-# Contributing to hyper2kvm
+# Contributing to h2kvm
 
-Thank you for your interest in contributing to hyper2kvm!
+Thank you for your interest in contributing to h2kvm!
 
 ## 📦 Repository Locations
 
-hyper2kvm is available on multiple platforms:
+h2kvm is available on multiple platforms:
 
-- **GitHub (Primary)**: https://github.com/ssahani/hyper2kvm
-- **GitLab (Mirror)**: https://gitlab.com/ssahani/hyper2kvm - Auto-synced from GitHub
-- **PyPI**: https://pypi.org/project/hyper2kvm/
+- **GitHub (Primary)**: https://github.com/ssahani/h2kvm
+- **GitLab (Mirror)**: https://gitlab.com/ssahani/h2kvm - Auto-synced from GitHub
+- **PyPI**: https://pypi.org/project/h2kvm/
 
 **Note:** All development happens on GitHub. GitLab is an automatic mirror for users who prefer that platform.
 
@@ -17,8 +17,8 @@ hyper2kvm is available on multiple platforms:
 The GitLab repository automatically syncs from GitHub using:
 - **Method**: GitLab Pull Mirroring
 - **Frequency**: Every 5 minutes
-- **Source**: https://github.com/ssahani/hyper2kvm
-- **Target**: https://gitlab.com/ssahani/hyper2kvm
+- **Source**: https://github.com/ssahani/h2kvm
+- **Target**: https://gitlab.com/ssahani/h2kvm
 
 ### For Maintainers: Mirror Configuration
 
@@ -26,7 +26,7 @@ If you need to set up mirroring on a new repository:
 
 1. Go to GitLab: Settings → Repository → Mirroring repositories
 2. Add mirror:
-   - **Git repository URL**: `https://github.com/ssahani/hyper2kvm.git`
+   - **Git repository URL**: `https://github.com/ssahani/h2kvm.git`
    - **Mirror direction**: Pull
    - **Authentication**: Use GitHub Personal Access Token with `repo` scope
 3. Enable: "Mirror only protected branches" (optional)
@@ -48,8 +48,8 @@ The mirror will automatically pull changes every 5 minutes.
 
 ```bash
 # Clone the repository
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 
 # Install system dependencies (Fedora/RHEL)
 # VMCraft is the default backend
@@ -122,7 +122,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 pytest tests/unit/ -v
 
 # With coverage
-pytest tests/unit/ --cov=hyper2kvm --cov-report=html
+pytest tests/unit/ --cov=h2kvm --cov-report=html
 
 # Specific test file
 pytest tests/unit/test_fixers/test_fstab_conversion.py -v
@@ -139,11 +139,11 @@ pytest tests/unit/test_fixers/test_fstab_conversion.py -v
 
 Key components:
 
-- **hyper2kvm/orchestrator/**: Main pipeline orchestration
-- **hyper2kvm/fixers/**: Guest OS fixes (offline and live)
-- **hyper2kvm/vmware/**: vSphere integration (powered by hypersdk)
-- **hyper2kvm/converters/**: Disk format conversion
-- **hyper2kvm/testers/**: Boot testing (QEMU, libvirt)
+- **h2kvm/orchestrator/**: Main pipeline orchestration
+- **h2kvm/fixers/**: Guest OS fixes (offline and live)
+- **h2kvm/vmware/**: vSphere integration (powered by hypersdk)
+- **h2kvm/converters/**: Disk format conversion
+- **h2kvm/testers/**: Boot testing (QEMU, libvirt)
 
 See [01-Architecture.md](01-Architecture.md) for detailed architecture documentation.
 
@@ -177,8 +177,8 @@ make fmt
 make lint
 
 # Manual commands
-ruff format hyper2kvm/
-ruff check --fix hyper2kvm/
+ruff format h2kvm/
+ruff check --fix h2kvm/
 ```
 
 ### Style Guidelines
@@ -191,13 +191,13 @@ ruff check --fix hyper2kvm/
 
 ## 🤝 Community
 
-- **GitHub Issues**: https://github.com/ssahani/hyper2kvm/issues
-- **Discussions**: https://github.com/ssahani/hyper2kvm/discussions
+- **GitHub Issues**: https://github.com/ssahani/h2kvm/issues
+- **Discussions**: https://github.com/ssahani/h2kvm/discussions
 - **Maintainer**: ZyvorAI Labs Private Limited (ssahani@zyvor.dev)
 
 ## 📜 License
 
-hyper2kvm is licensed under **Proprietary (Zyvor AI Labs)**. By contributing, you agree that your contributions will be licensed under the same license.
+h2kvm is licensed under **Proprietary (Zyvor AI Labs)**. By contributing, you agree that your contributions will be licensed under the same license.
 
 See [LICENSE](../LICENSE) for the full license text.
 
@@ -205,4 +205,4 @@ See [LICENSE](../LICENSE) for the full license text.
 
 ## 🙏 Thank You!
 
-Every contribution helps make hyper2kvm better for everyone. Whether it's code, documentation, bug reports, or feature requests - we appreciate your help!
+Every contribution helps make h2kvm better for everyone. Whether it's code, documentation, bug reports, or feature requests - we appreciate your help!

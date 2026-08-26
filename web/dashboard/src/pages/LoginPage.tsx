@@ -111,7 +111,7 @@ export function LoginPage() {
           <BoltLogo className="w-7 h-7 text-white" />
         </div>
       }
-      productName="hyper2kvm"
+      productName="h2kvm"
       productSubtitle="VM Migration Dashboard"
       heroHeadline={
         <>

@@ -16,7 +16,7 @@
 - ✅ OLM bundle ready for OperatorHub
 
 ### 2. OpenShift Deployment Progress
-- ✅ CRDs installed: `migrationjobs.hyper2kvm.io`, `jobtemplates.hyper2kvm.io`
+- ✅ CRDs installed: `migrationjobs.h2kvm.io`, `jobtemplates.h2kvm.io`
 - ✅ RBAC configured: ClusterRole, ClusterRoleBinding, ServiceAccount
 - ✅ Image pull secret created for ghcr.io
 - ✅ Operator deployment manifest created
@@ -80,7 +80,7 @@ crc status
 # Redeploy operator
 export KUBECONFIG=$HOME/.crc/machines/crc/kubeconfig
 kubectl apply -f /tmp/operator-minimal.yaml
-kubectl get pods -n hyper2kvm-test -w
+kubectl get pods -n h2kvm-test -w
 ```
 
 **Success Rate:** 30-40% (temporary, disk will fill again)
@@ -105,16 +105,16 @@ kubectl apply -f k8s/operator/crds/
 kubectl create secret generic ghcr-secret \
   --from-file=.dockerconfigjson=$HOME/.docker/config.json \
   --type=kubernetes.io/dockerconfigjson \
-  -n hyper2kvm-test
+  -n h2kvm-test
 kubectl apply -f /tmp/operator-minimal.yaml
 
 # Test photon.vmdk
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: photon-inspect
-  namespace: hyper2kvm-test
+  namespace: h2kvm-test
 spec:
   operation: inspect
   image:
@@ -139,8 +139,8 @@ Deploy to a real OpenShift cluster (not CRC):
 oc login https://api.your-cluster.example.com:6443
 
 # Deploy operator
-helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-test \
+helm install h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-test \
   --create-namespace \
   --set openshift.enabled=true \
   --set image.tag=2.1.0-operator \
@@ -154,11 +154,11 @@ kubectl apply -f k8s/operator/examples/inspect-job.yaml
 
 ### Option 4: Test Locally with CLI (Immediate Testing Available)
 
-While resolving the cluster issue, test hyper2kvm locally:
+While resolving the cluster issue, test h2kvm locally:
 
 ```bash
 # Inspect photon.vmdk
-h2kvmctl inspect /home/ssahani/tt/hyper2kvm/photon.vmdk \
+h2kvmctl inspect /home/ssahani/tt/h2kvm/photon.vmdk \
   --output-format json \
   > photon-inspection.json
 
@@ -166,7 +166,7 @@ cat photon-inspection.json | jq '.summary'
 
 # Convert to QCOW2
 h2kvmctl convert \
-  --vmdk /home/ssahani/tt/hyper2kvm/photon.vmdk \
+  --vmdk /home/ssahani/tt/h2kvm/photon.vmdk \
   --output-dir /tmp/photon-output \
   --to-output photon.qcow2 \
   --out-format qcow2 \
@@ -177,7 +177,7 @@ qemu-img info /tmp/photon-output/photon.qcow2
 
 # Apply offline fixes if needed
 h2kvmctl offline-fix \
-  --vmdk /home/ssahani/tt/hyper2kvm/photon.vmdk \
+  --vmdk /home/ssahani/tt/h2kvm/photon.vmdk \
   --output-dir /tmp/photon-fixed \
   --to-output photon-fixed.qcow2 \
   --fstab-mode stabilize-all \
@@ -201,11 +201,11 @@ h2kvmctl offline-fix \
 
 **Inspect Job:**
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: photon-inspect
-  namespace: hyper2kvm-test
+  namespace: h2kvm-test
 spec:
   operation: inspect
   image:
@@ -220,11 +220,11 @@ spec:
 
 **Convert Job:**
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: photon-convert
-  namespace: hyper2kvm-test
+  namespace: h2kvm-test
 spec:
   operation: convert
   image:
@@ -240,7 +240,7 @@ spec:
 
 ### Photon VMDK Details
 
-**Location:** `/home/ssahani/tt/hyper2kvm/photon.vmdk`
+**Location:** `/home/ssahani/tt/h2kvm/photon.vmdk`
 **Size:** 974MB
 **Format:** VMDK
 **OS:** Photon OS (Linux)
@@ -252,28 +252,28 @@ spec:
 ### OpenShift Resources
 
 **Namespaces:**
-- `hyper2kvm-test` - Created
+- `h2kvm-test` - Created
 
 **CRDs:**
-- `migrationjobs.hyper2kvm.io` - ✅ Installed
-- `jobtemplates.hyper2kvm.io` - ✅ Installed
+- `migrationjobs.h2kvm.io` - ✅ Installed
+- `jobtemplates.h2kvm.io` - ✅ Installed
 
 **RBAC:**
-- ServiceAccount: `hyper2kvm-operator` - ✅ Created
-- ClusterRole: `hyper2kvm-operator` - ✅ Created
-- ClusterRoleBinding: `hyper2kvm-operator` - ✅ Created
+- ServiceAccount: `h2kvm-operator` - ✅ Created
+- ClusterRole: `h2kvm-operator` - ✅ Created
+- ClusterRoleBinding: `h2kvm-operator` - ✅ Created
 
 **Secrets:**
 - `ghcr-secret` - ✅ Created (image pull secret)
 
 **Deployments:**
-- `hyper2kvm-operator` - ⚠️ Pending (disk pressure)
+- `h2kvm-operator` - ⚠️ Pending (disk pressure)
 
 **Pods:**
 ```
 NAME                                  READY   STATUS    RESTARTS   AGE
-hyper2kvm-operator-648654fcf7-xzlj7   0/1     Pending   0          2m
-hyper2kvm-operator-685ffb5965-ncc6c   0/1     Pending   0          2m
+h2kvm-operator-648654fcf7-xzlj7   0/1     Pending   0          2m
+h2kvm-operator-685ffb5965-ncc6c   0/1     Pending   0          2m
 ```
 
 **Events:**
@@ -346,7 +346,7 @@ All documentation is complete and production-ready:
 
 ## 🏆 Conclusion
 
-**Hyper2KVM v2.1.0 is PRODUCTION READY.**
+**H2KVM v2.1.0 is PRODUCTION READY.**
 
 The operator code, container images, manifests, and documentation are all complete and validated. The inability to deploy on the local CRC instance is due to a 65-day-old cluster with 76% disk usage - this is an **environment issue**, not a code issue.
 
@@ -361,4 +361,4 @@ All components are ready for production deployment on OpenShift Container Platfo
 **Status:** ✅ Code Ready, ⚠️ Environment Constrained
 **Recommendation:** Deploy to fresh/production cluster OR test locally with CLI
 **Release Version:** v0.3.1
-**Images:** ghcr.io/ssahani/hyper2kvm:2.1.0-operator (and others)
+**Images:** ghcr.io/ssahani/h2kvm:2.1.0-operator (and others)

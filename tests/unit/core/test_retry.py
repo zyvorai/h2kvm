@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm/core/retry.py — retry_with_backoff decorator and retry_operation."""
+"""Tests for h2kvm/core/retry.py — retry_with_backoff decorator and retry_operation."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from hyper2kvm.core.retry import retry_operation, retry_with_backoff
+from h2kvm.core.retry import retry_operation, retry_with_backoff
 
 
 # ---------------------------------------------------------------------------
@@ -39,8 +39,8 @@ def _make_flaky(fail_times: int, exc: type[Exception] = RuntimeError, value: str
 
 
 class TestRetryWithBackoffFirstSuccess:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_first_attempt_success_no_sleep(self, _mock_rand, mock_sleep):
         @retry_with_backoff(max_attempts=3)
         def succeeds():
@@ -51,8 +51,8 @@ class TestRetryWithBackoffFirstSuccess:
 
 
 class TestRetryWithBackoffRetries:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_retry_after_failures(self, _mock_rand, mock_sleep):
         counter = {"n": 0}
 
@@ -67,8 +67,8 @@ class TestRetryWithBackoffRetries:
         assert counter["n"] == 3
         assert mock_sleep.call_count == 2
 
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_exhausted_raises_last(self, _mock_rand, mock_sleep):
         counter = {"n": 0}
 
@@ -83,8 +83,8 @@ class TestRetryWithBackoffRetries:
 
 
 class TestRetryWithBackoffExceptionFilter:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_catches_only_specified_exception(self, _mock_rand, mock_sleep):
         counter = {"n": 0}
 
@@ -98,8 +98,8 @@ class TestRetryWithBackoffExceptionFilter:
         assert raises_value() == "ok"
         assert counter["n"] == 3
 
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_unmatched_exception_propagates_immediately(self, _mock_rand, mock_sleep):
         @retry_with_backoff(max_attempts=5, exceptions=ValueError, jitter_s=0)
         def raises_type():
@@ -111,8 +111,8 @@ class TestRetryWithBackoffExceptionFilter:
 
 
 class TestRetryWithBackoffBackoff:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_exponential_backoff(self, _mock_rand, mock_sleep):
         counter = {"n": 0}
 
@@ -128,8 +128,8 @@ class TestRetryWithBackoffBackoff:
         # attempt 1: 2*2^0=2, attempt 2: 2*2^1=4, attempt 3: 2*2^2=8, attempt 4: 2*2^3=16
         assert sleep_times == [2.0, 4.0, 8.0, 16.0]
 
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_capped_backoff(self, _mock_rand, mock_sleep):
         counter = {"n": 0}
 
@@ -145,8 +145,8 @@ class TestRetryWithBackoffBackoff:
         # 2, 4, 5 (capped from 8), 5 (capped from 16)
         assert sleep_times == [2.0, 4.0, 5.0, 5.0]
 
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.5)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.5)
     def test_jitter_added(self, mock_rand, mock_sleep):
         counter = {"n": 0}
 
@@ -165,7 +165,7 @@ class TestRetryWithBackoffBackoff:
         for call in mock_rand.call_args_list:
             assert call.args == (0, 2.0)
 
-    @patch("hyper2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.time.sleep")
     def test_no_jitter(self, mock_sleep):
         counter = {"n": 0}
 
@@ -183,8 +183,8 @@ class TestRetryWithBackoffBackoff:
 
 
 class TestRetryWithBackoffLogging:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_logger_warning_on_retry(self, _mock_rand, mock_sleep):
         logger = MagicMock(spec=logging.Logger)
         counter = {"n": 0}
@@ -202,8 +202,8 @@ class TestRetryWithBackoffLogging:
         args = logger.log.call_args
         assert args[0][0] == logging.WARNING
 
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_logger_error_on_final_failure(self, _mock_rand, mock_sleep):
         logger = MagicMock(spec=logging.Logger)
 
@@ -218,8 +218,8 @@ class TestRetryWithBackoffLogging:
         last_call = logger.log.call_args_list[-1]
         assert last_call[0][0] == logging.ERROR
 
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_no_logger_works(self, _mock_rand, mock_sleep):
         counter = {"n": 0}
 
@@ -235,8 +235,8 @@ class TestRetryWithBackoffLogging:
 
 
 class TestRetryWithBackoffMisc:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_preserves_return_value(self, _mock_rand, mock_sleep):
         @retry_with_backoff()
         def returns_dict():
@@ -244,8 +244,8 @@ class TestRetryWithBackoffMisc:
 
         assert returns_dict() == {"key": [1, 2, 3]}
 
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_max_attempts_one_raises_immediately(self, _mock_rand, mock_sleep):
         @retry_with_backoff(max_attempts=1, jitter_s=0)
         def always_fails():
@@ -269,8 +269,8 @@ class TestRetryWithBackoffMisc:
 
 
 class TestRetryOperationFirstSuccess:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_first_attempt_success(self, _mock_rand, mock_sleep):
         result = retry_operation(lambda: "hello", max_attempts=3, jitter_s=0)
         assert result == "hello"
@@ -278,8 +278,8 @@ class TestRetryOperationFirstSuccess:
 
 
 class TestRetryOperationRetries:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_retry_after_failures(self, _mock_rand, mock_sleep):
         fn = _make_flaky(2, value="recovered")
         result = retry_operation(fn, max_attempts=5, jitter_s=0)
@@ -289,8 +289,8 @@ class TestRetryOperationRetries:
 
 
 class TestRetryOperationExhausted:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_exhausted_raises(self, _mock_rand, mock_sleep):
         fn = _make_flaky(10, value="never")
         with pytest.raises(RuntimeError, match="fail #3"):
@@ -298,15 +298,15 @@ class TestRetryOperationExhausted:
 
 
 class TestRetryOperationExceptionFilter:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_catches_only_specified_exception(self, _mock_rand, mock_sleep):
         fn = _make_flaky(2, exc=ValueError, value="ok")
         result = retry_operation(fn, max_attempts=5, exceptions=ValueError, jitter_s=0)
         assert result == "ok"
 
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_unmatched_exception_propagates(self, _mock_rand, mock_sleep):
         def raises_type():
             raise TypeError("nope")
@@ -317,8 +317,8 @@ class TestRetryOperationExceptionFilter:
 
 
 class TestRetryOperationBackoff:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_exponential_backoff(self, _mock_rand, mock_sleep):
         fn = _make_flaky(4)
         with pytest.raises(RuntimeError):
@@ -327,8 +327,8 @@ class TestRetryOperationBackoff:
         sleep_times = [call.args[0] for call in mock_sleep.call_args_list]
         assert sleep_times == [2.0, 4.0, 8.0]
 
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_capped_backoff(self, _mock_rand, mock_sleep):
         fn = _make_flaky(4)
         with pytest.raises(RuntimeError):
@@ -339,8 +339,8 @@ class TestRetryOperationBackoff:
 
 
 class TestRetryOperationLogging:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_logger_warning_on_retry(self, _mock_rand, mock_sleep):
         logger = MagicMock(spec=logging.Logger)
         fn = _make_flaky(1, value="ok")
@@ -349,8 +349,8 @@ class TestRetryOperationLogging:
         logger.log.assert_called_once()
         assert logger.log.call_args[0][0] == logging.WARNING
 
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_logger_error_on_exhaustion(self, _mock_rand, mock_sleep):
         logger = MagicMock(spec=logging.Logger)
         fn = _make_flaky(10)
@@ -362,14 +362,14 @@ class TestRetryOperationLogging:
 
 
 class TestRetryOperationMisc:
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_preserves_return_value(self, _mock_rand, mock_sleep):
         result = retry_operation(lambda: {"a": 1}, max_attempts=1, jitter_s=0)
         assert result == {"a": 1}
 
-    @patch("hyper2kvm.core.retry.time.sleep")
-    @patch("hyper2kvm.core.retry.random.uniform", return_value=0.0)
+    @patch("h2kvm.core.retry.time.sleep")
+    @patch("h2kvm.core.retry.random.uniform", return_value=0.0)
     def test_max_attempts_one_no_retry(self, _mock_rand, mock_sleep):
         def fails():
             raise RuntimeError("once")

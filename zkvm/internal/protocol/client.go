@@ -35,13 +35,13 @@ type Client struct {
 // the process is running as root or a regular user.
 func DefaultSocketPath() string {
 	if os.Getuid() == 0 {
-		return "/run/hyper2kvm/zkvm.sock"
+		return "/run/h2kvm/zkvm.sock"
 	}
 	xdg := os.Getenv("XDG_RUNTIME_DIR")
 	if xdg == "" {
 		xdg = fmt.Sprintf("/run/user/%d", os.Getuid())
 	}
-	return filepath.Join(xdg, "hyper2kvm", "zkvm.sock")
+	return filepath.Join(xdg, "h2kvm", "zkvm.sock")
 }
 
 // NewClient creates a new socket client.

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>hyper2kvm — Multi-Distro VMware to KVM Migration Demo</title>
+<title>h2kvm — Multi-Distro VMware to KVM Migration Demo</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -53,7 +53,7 @@
 
 <!-- COVER -->
 <div class="cover">
-  <h1>hyper2kvm <span>Multi-Distro Migration</span></h1>
+  <h1>h2kvm <span>Multi-Distro Migration</span></h1>
   <h2>4 VMware VMs &rarr; KVM on Bare-Metal AlmaLinux 9</h2>
   <p class="sub">Live end-to-end migration demonstration: Rocky Linux 9.4, Ubuntu 24.04 LTS, Ubuntu Server 22.04 LTS, and CentOS Stream 9 &mdash; all converted from VMware VMDK to KVM with automated offline fixes, virtio driver injection, netplan repair, and verified SSH connectivity. Single command per VM. Zero manual intervention.</p>
   <div class="badge">4 Distros | VMware VMDK &rarr; KVM QCOW2 | VirtIO | Libvirt | DHCP + SSH Verified</div>
@@ -63,7 +63,7 @@
 <!-- PAGE 1: Host Environment -->
 <div class="page page-dark">
   <h2 class="st">Test Environment: <span>Bare-Metal Host</span></h2>
-  <p class="sub">All migrations executed on a Worldstream dedicated server running AlmaLinux 9.7 &mdash; a RHEL-derivative without qemu-system-x86_64 or SPICE, validating hyper2kvm's cross-distro auto-detection.</p>
+  <p class="sub">All migrations executed on a Worldstream dedicated server running AlmaLinux 9.7 &mdash; a RHEL-derivative without qemu-system-x86_64 or SPICE, validating h2kvm's cross-distro auto-detection.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -97,19 +97,19 @@ Graphics:    VNC (auto-detected, no SPICE)
   <div class="card-grid">
     <div class="card">
       <h4>QEMU Binary Path</h4>
-      <p>AlmaLinux uses <code>/usr/libexec/qemu-kvm</code> instead of Fedora's <code>/usr/bin/qemu-system-x86_64</code>. hyper2kvm auto-detects the correct binary across Fedora, RHEL, AlmaLinux, Debian, and Ubuntu.</p>
+      <p>AlmaLinux uses <code>/usr/libexec/qemu-kvm</code> instead of Fedora's <code>/usr/bin/qemu-system-x86_64</code>. h2kvm auto-detects the correct binary across Fedora, RHEL, AlmaLinux, Debian, and Ubuntu.</p>
     </div>
     <div class="card">
       <h4>Graphics Backend</h4>
-      <p>AlmaLinux QEMU is built without SPICE support. hyper2kvm detects this and falls back to VNC automatically &mdash; no user configuration needed.</p>
+      <p>AlmaLinux QEMU is built without SPICE support. h2kvm detects this and falls back to VNC automatically &mdash; no user configuration needed.</p>
     </div>
     <div class="card">
       <h4>Netplan VMware NIC Names</h4>
-      <p>Ubuntu VMs use <code>ens33</code> (VMware PCI slot). On KVM it becomes <code>ens3</code>. hyper2kvm replaces hardcoded names with <code>match: name: "en*"</code> for universal compatibility.</p>
+      <p>Ubuntu VMs use <code>ens33</code> (VMware PCI slot). On KVM it becomes <code>ens3</code>. h2kvm replaces hardcoded names with <code>match: name: "en*"</code> for universal compatibility.</p>
     </div>
     <div class="card">
       <h4>Initramfs VirtIO Injection</h4>
-      <p>VMware VMs ship without virtio drivers in initramfs. hyper2kvm runs <code>dracut --add-drivers virtio_blk virtio_net...</code> inside the guest via chroot to ensure first-boot success.</p>
+      <p>VMware VMs ship without virtio drivers in initramfs. h2kvm runs <code>dracut --add-drivers virtio_blk virtio_net...</code> inside the guest via chroot to ensure first-boot success.</p>
     </div>
   </div>
 
@@ -132,7 +132,7 @@ Kernel:    5.14.0-427.13.1.el9_4.x86_64
   </pre>
 
   <div class="step">Migration Command</div>
-  <pre>$ run-demo.sh /root/hyper2kvm/RockyLinux_9.4_VMM_LinuxVMImages.COM.vmdk</pre>
+  <pre>$ run-demo.sh /root/h2kvm/RockyLinux_9.4_VMM_LinuxVMImages.COM.vmdk</pre>
 
   <div class="step">Pipeline Output (key steps)</div>
   <pre>
@@ -200,7 +200,7 @@ Desktop:   GNOME (snap-based Firefox, firmware-updater, snap-store)
   </pre>
 
   <div class="step">Migration Command</div>
-  <pre>$ run-demo.sh /root/hyper2kvm/Ubuntu_24.04_VM_LinuxVMImages.COM.vmdk</pre>
+  <pre>$ run-demo.sh /root/h2kvm/Ubuntu_24.04_VM_LinuxVMImages.COM.vmdk</pre>
 
   <div class="step">Pipeline Output (key steps)</div>
   <pre>
@@ -279,7 +279,7 @@ network:
       <p>On KVM, the NIC becomes <code>ens3</code> &mdash; netplan won't match <code>ens33</code>, so <strong>no network</strong>.</p>
     </div>
     <div class="card">
-      <h4>After (hyper2kvm auto-fix)</h4>
+      <h4>After (h2kvm auto-fix)</h4>
       <pre>
 # /etc/netplan/00-installer-config.yaml
 network:
@@ -290,7 +290,7 @@ network:
         name: en*    # &larr; matches any backend
   version: 2
       </pre>
-      <p>hyper2kvm detects VMware NIC names (ens33, ens160, etc.) and replaces with wildcard match. <strong>Works everywhere.</strong></p>
+      <p>h2kvm detects VMware NIC names (ens33, ens160, etc.) and replaces with wildcard match. <strong>Works everywhere.</strong></p>
     </div>
   </div>
 
@@ -351,7 +351,7 @@ Kernel:    5.14.0-22.el9.x86_64
   </pre>
 
   <div class="step">Migration Command</div>
-  <pre>$ run-demo.sh /root/hyper2kvm/CentOS_Stream_9_VMM_LinuxVMImages.COM.vmdk</pre>
+  <pre>$ run-demo.sh /root/h2kvm/CentOS_Stream_9_VMM_LinuxVMImages.COM.vmdk</pre>
 
   <div class="step">Pipeline Output (key steps)</div>
   <pre>
@@ -460,7 +460,7 @@ vda (virtio, LVM: cs)
     </tr>
   </table>
 
-  <h3>What hyper2kvm Did Automatically</h3>
+  <h3>What h2kvm Did Automatically</h3>
   <div class="card-grid-4">
     <div class="card">
       <h4>Disk Conversion</h4>
@@ -498,7 +498,7 @@ vda (virtio, LVM: cs)
 
   <h3>Host Compatibility Fixes Applied</h3>
   <table>
-    <tr><th>Issue</th><th>Fedora/Debian</th><th>AlmaLinux 9</th><th>hyper2kvm Fix</th></tr>
+    <tr><th>Issue</th><th>Fedora/Debian</th><th>AlmaLinux 9</th><th>h2kvm Fix</th></tr>
     <tr><td>QEMU binary</td><td>/usr/bin/qemu-system-x86_64</td><td>/usr/libexec/qemu-kvm</td><td>find_qemu_binary() auto-detect</td></tr>
     <tr><td>Graphics</td><td>SPICE available</td><td>No SPICE (VNC only)</td><td>_default_graphics() checks libspice-server.so</td></tr>
     <tr><td>Netplan NIC</td><td>N/A</td><td>N/A</td><td>Replace ens33/ens160 with match: name: "en*"</td></tr>
@@ -515,7 +515,7 @@ vda (virtio, LVM: cs)
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.3.0 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm &mdash; Enterprise VM Migration Platform | Version 0.3.0 | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

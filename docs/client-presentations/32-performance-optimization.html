@@ -344,7 +344,7 @@ ethtool -G eth0 rx 1024 tx 1024</pre>
   <h3>Priority-Ordered Tuning Steps</h3>
   <table>
     <tr><th style="width:5%">#</th><th style="width:18%">Optimization</th><th style="width:10%">Impact</th><th style="width:10%">Effort</th><th style="width:32%">Command / Config</th><th style="width:25%">When to Apply</th></tr>
-    <tr><td>1</td><td>VirtIO drivers</td><td class="check">HIGH</td><td>Low</td><td>hyper2kvm handles automatically</td><td>Always (migration default)</td></tr>
+    <tr><td>1</td><td>VirtIO drivers</td><td class="check">HIGH</td><td>Low</td><td>h2kvm handles automatically</td><td>Always (migration default)</td></tr>
     <tr><td>2</td><td>cache='none' + io='native'</td><td class="check">HIGH</td><td>Low</td><td>Libvirt XML disk driver attrs</td><td>All production VMs</td></tr>
     <tr><td>3</td><td>CPU pinning</td><td class="check">HIGH</td><td>Medium</td><td><code>virsh vcpupin &lt;vm&gt; &lt;vcpu&gt; &lt;core&gt;</code></td><td>Latency-sensitive, databases</td></tr>
     <tr><td>4</td><td>NUMA binding</td><td class="check">HIGH</td><td>Medium</td><td>numatune strict in XML</td><td>Multi-socket hosts, &gt;16GB VMs</td></tr>
@@ -387,10 +387,10 @@ ethtool -G eth0 rx 1024 tx 1024</pre>
     <p style="font-size:0.9em;">
       With proper tuning, KVM on modern hardware achieves 95-105% of VMware ESXi performance.<br>
       CPU pinning + NUMA + hugepages = the critical three. VirtIO multiqueue for I/O-heavy VMs.<br>
-      <strong>hyper2kvm generates optimized libvirt XML with VirtIO and recommended settings.</strong>
+      <strong>h2kvm generates optimized libvirt XML with VirtIO and recommended settings.</strong>
     </p>
   </div>
-  <div class="footer"><p>hyper2kvm &mdash; Performance Optimization Guide | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm &mdash; Performance Optimization Guide | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

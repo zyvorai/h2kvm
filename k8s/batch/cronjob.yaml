@@ -1,11 +1,11 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: hyper2kvm-batch-nightly
+  name: h2kvm-batch-nightly
   namespace: vm-migration
   labels:
-    app: hyper2kvm-batch
-    app.kubernetes.io/name: hyper2kvm
+    app: h2kvm-batch
+    app.kubernetes.io/name: h2kvm
     app.kubernetes.io/component: batch
 spec:
   # Run at 2 AM daily
@@ -21,16 +21,16 @@ spec:
   jobTemplate:
     metadata:
       labels:
-        app: hyper2kvm-batch
-        app.kubernetes.io/name: hyper2kvm
+        app: h2kvm-batch
+        app.kubernetes.io/name: h2kvm
         app.kubernetes.io/component: batch
-        app.kubernetes.io/part-of: hyper2kvm
+        app.kubernetes.io/part-of: h2kvm
     spec:
       backoffLimit: 1
 
       template:
         spec:
-          serviceAccountName: hyper2kvm
+          serviceAccountName: h2kvm
           restartPolicy: OnFailure
 
           initContainers:
@@ -46,11 +46,11 @@ spec:
 
           containers:
             - name: batch
-              image: ghcr.io/ssahani/hyper2kvm-batch:0.3.0
+              image: ghcr.io/ssahani/h2kvm-batch:0.3.0
               imagePullPolicy: IfNotPresent
 
               env:
-                - name: HYPER2KVM_MODE
+                - name: H2KVM_MODE
                   value: "batch"
                 - name: BATCH_PARALLEL
                   value: "4"
@@ -62,10 +62,10 @@ spec:
 
               volumeMounts:
                 - name: batch-config
-                  mountPath: /etc/hyper2kvm/batch.yaml
+                  mountPath: /etc/h2kvm/batch.yaml
                   subPath: batch.yaml
                 - name: batch-manifest
-                  mountPath: /etc/hyper2kvm/manifest.json
+                  mountPath: /etc/h2kvm/manifest.json
                   subPath: manifest.json
                 - name: vmdk-storage
                   mountPath: /data/vmdk
@@ -87,10 +87,10 @@ spec:
           volumes:
             - name: batch-config
               configMap:
-                name: hyper2kvm-batch-config
+                name: h2kvm-batch-config
             - name: batch-manifest
               configMap:
-                name: hyper2kvm-batch-manifest
+                name: h2kvm-batch-manifest
             - name: vmdk-storage
               persistentVolumeClaim:
                 claimName: vmdk-batch-pvc
@@ -105,7 +105,7 @@ spec:
                 path: /lib/modules
 
           nodeSelector:
-            hyper2kvm-enabled: "true"
+            h2kvm-enabled: "true"
 
           tolerations:
             - key: "privileged-workload"

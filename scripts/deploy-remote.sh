@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================================
-# deploy-remote.sh — Full hyper2kvm deployment to a remote server
+# deploy-remote.sh — Full h2kvm deployment to a remote server
 # ============================================================================
 # AlmaLinux 9 and CentOS Stream 9 use the same DNF/AppStream layout (CRB, Python 3.12,
 # Node 20, firewall). On EL9 (RHEL/Alma/Rocky/CentOS Stream 9), virt-filesystems is in the
@@ -12,7 +12,7 @@
 #   1. Rsync repo to remote
 #   2. Run quickstart.sh (system packages, libvirt, KVM, OVMF, govc, etc)
 #   3. Run install-deps.sh (hivex, bsdtar, boto3, virtio-win ISO)
-#   4. pip install hyper2kvm from source
+#   4. pip install h2kvm from source
 #   5. Build h2kweb dashboard locally (npm), compile Go on remote (linux/PAM), start service
 #   6. Verify everything works
 #
@@ -23,7 +23,7 @@
 #   ./scripts/deploy-remote.sh 185.165.240.194 sus mypassword
 #   ./scripts/deploy-remote.sh 10.0.0.1 root                  # SSH key auth
 #   ./scripts/deploy-remote.sh 10.0.0.1 root pass --quick     # skip quickstart
-#   ./scripts/deploy-remote.sh 10.0.0.1 root pass --uninstall # remove hyper2kvm
+#   ./scripts/deploy-remote.sh 10.0.0.1 root pass --uninstall # remove h2kvm
 #
 # Environment variables:
 #   DEPLOY_HOST=185.165.240.194
@@ -31,7 +31,7 @@
 #   DEPLOY_PASS=mypassword
 #   DEPLOY_DIR=/home/user/.deployments  (auto-detected from login user)
 #
-# Remote install-deps uses HYPER2KVM_PYTHON (same interpreter as pip/h2kvmctl), set automatically.
+# Remote install-deps uses H2KVM_PYTHON (same interpreter as pip/h2kvmctl), set automatically.
 # ============================================================================
 
 set -euo pipefail
@@ -73,12 +73,12 @@ for arg in "$@"; do
             echo "       $0 sus@host [--quick]  |  ./scripts/deploy remote --quick"
             echo ""
             echo "  --quick      Skip quickstart.sh (only rsync + pip install)"
-            echo "  --uninstall  Remove hyper2kvm from remote server"
-            echo "  --keep-sources  Keep remote checkout in ~/.deployments/hyper2kvm"
+            echo "  --uninstall  Remove h2kvm from remote server"
+            echo "  --keep-sources  Keep remote checkout in ~/.deployments/h2kvm"
             echo "  --verbose    Show full logs (skip highlights-only output)"
             echo ""
             echo "Full mode installs everything: Python, qemu, libvirt, KVM,"
-            echo "OVMF, govc, hivex, bsdtar, boto3, virtio-win, hyper2kvm."
+            echo "OVMF, govc, hivex, bsdtar, boto3, virtio-win, h2kvm."
             exit 0
             ;;
         *)  POSITIONAL+=("$arg") ;;
@@ -89,15 +89,15 @@ HOST="${POSITIONAL[0]:-${DEPLOY_HOST:-}}"
 USER="${POSITIONAL[1]:-${DEPLOY_USER:-root}}"
 PASS="${POSITIONAL[2]:-${DEPLOY_PASS:-}}"
 
-hyper2kvm_parse_target HOST USER
-if [ -z "$HOST" ] && hyper2kvm_load_deploy_last "$REPO_DIR"; then
+h2kvm_parse_target HOST USER
+if [ -z "$HOST" ] && h2kvm_load_deploy_last "$REPO_DIR"; then
     info "Using .deploy-last → ${USER}@${HOST}"
 fi
 
 [ -z "$HOST" ] && error "Usage: $0 <host> [user] [password]  or  $0 --quick"
 
 START_TS=$(date +%s)
-LOG_FILE="/tmp/hyper2kvm-deploy-${HOST}-$(date +%Y%m%d-%H%M%S).log"
+LOG_FILE="/tmp/h2kvm-deploy-${HOST}-$(date +%Y%m%d-%H%M%S).log"
 LAST_ACTION="initialization"
 CURRENT_STEP_TITLE=""
 CURRENT_STEP_TS=0
@@ -125,7 +125,7 @@ if [ "$USER" = "root" ]; then
 else
     REMOTE_HOME="/home/${USER}"
 fi
-REMOTE_DIR="${DEPLOY_DIR:-${REMOTE_HOME}/.deployments/hyper2kvm}"
+REMOTE_DIR="${DEPLOY_DIR:-${REMOTE_HOME}/.deployments/h2kvm}"
 # h2kweb listen port (see web/h2kweb.default H2KWEB_ADDR)
 H2KWEB_PORT=5070
 
@@ -133,8 +133,8 @@ H2KWEB_PORT=5070
 SUDO=""
 [ "$USER" != "root" ] && SUDO="sudo"
 
-[ -f "$REPO_DIR/pyproject.toml" ] || error "Not in hyper2kvm repo: $REPO_DIR"
-hyper2kvm_build_metadata "$REPO_DIR"
+[ -f "$REPO_DIR/pyproject.toml" ] || error "Not in h2kvm repo: $REPO_DIR"
+h2kvm_build_metadata "$REPO_DIR"
 
 # SSH options for all remote commands (including long pip installs).
 # ControlMaster=no avoids stale master sockets; ServerAlive* prevents NAT idle drops mid-pip.
@@ -268,7 +268,7 @@ _ssh_stream_and_preview() {
     return 0
 }
 
-# Same interpreter selection as local deploy-local.sh (Python ≥ 3.10 for hyper2kvm).
+# Same interpreter selection as local deploy-local.sh (Python ≥ 3.10 for h2kvm).
 _remote_resolve_python() {
     local out
     out=$(_ssh_batch "
@@ -335,34 +335,34 @@ if $UNINSTALL_MODE; then
     deploy_ui_kv "🎯" "Host" "${USER}@${HOST}"
     echo ""
 
-    step "Uninstalling hyper2kvm"
+    step "Uninstalling h2kvm"
     _ssh "
         # Uninstall pip package
         for py in python3.12 python3.11 python3.10; do
             if command -v \$py &>/dev/null; then
-                $SUDO \$py -m pip uninstall hyper2kvm -y 2>/dev/null && break
+                $SUDO \$py -m pip uninstall h2kvm -y 2>/dev/null && break
             fi
         done
-        $SUDO pip3 uninstall hyper2kvm -y 2>/dev/null || true
+        $SUDO pip3 uninstall h2kvm -y 2>/dev/null || true
 
         # Remove binaries
-        $SUDO rm -f /usr/local/bin/h2kvmctl /usr/local/bin/hyper2kvm /usr/bin/h2kvmctl /usr/bin/hyper2kvm 2>/dev/null || true
+        $SUDO rm -f /usr/local/bin/h2kvmctl /usr/local/bin/h2kvm /usr/bin/h2kvmctl /usr/bin/h2kvm 2>/dev/null || true
 
         # Remove repo
         rm -rf $REMOTE_DIR
 
         # Remove caches and data (optional — keep VirtIO ISO)
-        $SUDO rm -rf /var/lib/hyper2kvm/conversions 2>/dev/null || true
-        $SUDO rm -rf /var/lib/hyper2kvm/virtio-win-extracted 2>/dev/null || true
-        $SUDO rm -rf /var/cache/hyper2kvm 2>/dev/null || true
-        $SUDO rm -rf ${REMOTE_HOME}/.cache/hyper2kvm 2>/dev/null || true
+        $SUDO rm -rf /var/lib/h2kvm/conversions 2>/dev/null || true
+        $SUDO rm -rf /var/lib/h2kvm/virtio-win-extracted 2>/dev/null || true
+        $SUDO rm -rf /var/cache/h2kvm 2>/dev/null || true
+        $SUDO rm -rf ${REMOTE_HOME}/.cache/h2kvm 2>/dev/null || true
 
         echo 'Done'
     " 2>&1
 
-    info "hyper2kvm removed from ${HOST}"
+    info "h2kvm removed from ${HOST}"
     echo ""
-    echo "  📁 Kept: /var/lib/hyper2kvm/virtio-win.iso (reusable)"
+    echo "  📁 Kept: /var/lib/h2kvm/virtio-win.iso (reusable)"
     echo "  📁 Kept: system packages (qemu, libvirt, etc)"
     echo ""
     exit 0
@@ -371,7 +371,7 @@ fi
 TOTAL_STEPS=8
 $QUICK_MODE && TOTAL_STEPS=6
 
-deploy_ui_banner "Remote Deploy" "${HYPER2KVM_VERSION} (${HYPER2KVM_COMMIT}) → ${USER}@${HOST}" "🔄"
+deploy_ui_banner "Remote Deploy" "${H2KVM_VERSION} (${H2KVM_COMMIT}) → ${USER}@${HOST}" "🔄"
 deploy_ui_kv "🎯" "Target" "${USER}@${HOST}"
 deploy_ui_kv "🔐" "Auth" "$([ -n "$PASS" ] && echo 'password' || echo 'SSH key')"
 deploy_ui_kv "🛡️" "Sudo" "$([ "$USER" != "root" ] && echo 'prompt when needed' || echo 'root')"
@@ -475,7 +475,7 @@ fi
 
 if ! $QUICK_MODE; then
     # ── Step 3: Uninstall old version ──
-    step "Step 3/${TOTAL_STEPS}: 🗑️  Uninstalling old hyper2kvm"
+    step "Step 3/${TOTAL_STEPS}: 🗑️  Uninstalling old h2kvm"
     [ "$USER" != "root" ] && echo "  💬 If prompted, enter your sudo password for the remote user ($USER)."
 
     # Do not pipe this ssh through grep: line-buffering can hide the sudo prompt until newline.
@@ -483,12 +483,12 @@ if ! $QUICK_MODE; then
         # Find the right pip for Python >= 3.10
         for py in python3.12 python3.11 python3.10; do
             if command -v \$py &>/dev/null; then
-                $SUDO \$py -m pip uninstall hyper2kvm -y 2>/dev/null || true
+                $SUDO \$py -m pip uninstall h2kvm -y 2>/dev/null || true
                 break
             fi
         done
-        $SUDO pip3 uninstall hyper2kvm -y 2>/dev/null || true
-        $SUDO rm -f /usr/local/bin/h2kvmctl /usr/local/bin/hyper2kvm 2>/dev/null || true
+        $SUDO pip3 uninstall h2kvm -y 2>/dev/null || true
+        $SUDO rm -f /usr/local/bin/h2kvmctl /usr/local/bin/h2kvm 2>/dev/null || true
     " 2>&1
     info "Old version removed"
 
@@ -497,7 +497,7 @@ if ! $QUICK_MODE; then
 
     _ssh_stream_and_preview "
         cd $REMOTE_DIR
-        $SUDO env HYPER2KVM_REMOTE_INSTALL=1 bash scripts/quickstart.sh
+        $SUDO env H2KVM_REMOTE_INSTALL=1 bash scripts/quickstart.sh
     " '^\[|Step|installed|enabled|loaded|govc' 30
     info "System dependencies installed"
 
@@ -510,7 +510,7 @@ if ! $QUICK_MODE; then
 
     _ssh_stream_and_preview "
         cd $REMOTE_DIR
-        $SUDO env HYPER2KVM_REMOTE_INSTALL=1 HYPER2KVM_PYTHON=$REMOTE_PY bash scripts/install-deps.sh --hivex --boto3 --virtio-win
+        $SUDO env H2KVM_REMOTE_INSTALL=1 H2KVM_PYTHON=$REMOTE_PY bash scripts/install-deps.sh --hivex --boto3 --virtio-win
         if command -v dnf &>/dev/null; then
             $SUDO dnf install -y augeas-libs augeas 2>&1 | tail -1
         elif command -v apt-get &>/dev/null; then
@@ -519,25 +519,25 @@ if ! $QUICK_MODE; then
     " '^\[|installed|virtio|hivex|boto3|bsdtar|extracted' 15
     info "Extras installed"
 
-    # ── Step 6: pip install hyper2kvm ──
-    step "Step 6/${TOTAL_STEPS}: 🐍 Installing hyper2kvm from source"
+    # ── Step 6: pip install h2kvm ──
+    step "Step 6/${TOTAL_STEPS}: 🐍 Installing h2kvm from source"
 else
     # Quick mode: just uninstall + install
-    step "Step 3/${TOTAL_STEPS}: 🗑️  Uninstalling old hyper2kvm"
+    step "Step 3/${TOTAL_STEPS}: 🗑️  Uninstalling old h2kvm"
     [ "$USER" != "root" ] && echo "  💬 If prompted, enter your sudo password for the remote user ($USER)."
 
     _ssh "
         for py in python3.12 python3.11 python3.10; do
             if command -v \$py &>/dev/null; then
-                $SUDO \$py -m pip uninstall hyper2kvm -y 2>/dev/null || true
+                $SUDO \$py -m pip uninstall h2kvm -y 2>/dev/null || true
                 break
             fi
         done
-        $SUDO rm -f /usr/local/bin/h2kvmctl /usr/local/bin/hyper2kvm 2>/dev/null || true
+        $SUDO rm -f /usr/local/bin/h2kvmctl /usr/local/bin/h2kvm 2>/dev/null || true
     " 2>&1
     info "Old version removed"
 
-    step "Step 4/${TOTAL_STEPS}: 🐍 Installing hyper2kvm from source"
+    step "Step 4/${TOTAL_STEPS}: 🐍 Installing h2kvm from source"
 fi
 
 # Resolve interpreter for pip (full mode already set REMOTE_PY before install-deps).
@@ -555,7 +555,7 @@ set +e
 _ssh_stream_and_preview "
     set -e
     cd $REMOTE_DIR
-    PIP_LOG=/tmp/hyper2kvm-pip-install.log
+    PIP_LOG=/tmp/h2kvm-pip-install.log
     : >\"\$PIP_LOG\"
     echo \"📄 pip log: \$PIP_LOG\"
 
@@ -623,37 +623,37 @@ _ssh_stream_and_preview "
         tail -n 30 \"\$PIP_LOG\" >&2 || true
         exit 1
     fi
-    echo '✅ hyper2kvm pip install complete'
+    echo '✅ h2kvm pip install complete'
 " 'pip|Installing|Successfully|Collecting|Building|error:|ERROR|externally-managed|augeas|h2kvmctl|complete' 40 "$_ssh_pip_tty"
 _pip_rc=$?
 set -e
 if [ "$_pip_rc" -ne 0 ]; then
     warn "Fetching remote pip log tail..."
-    _ssh_batch "tail -n 50 /tmp/hyper2kvm-pip-install.log 2>/dev/null || true" 2>/dev/null || true
-    error "pip install failed on ${HOST} (ssh exit ${_pip_rc}). Re-run with --verbose or inspect /tmp/hyper2kvm-pip-install.log on the server."
+    _ssh_batch "tail -n 50 /tmp/h2kvm-pip-install.log 2>/dev/null || true" 2>/dev/null || true
+    error "pip install failed on ${HOST} (ssh exit ${_pip_rc}). Re-run with --verbose or inspect /tmp/h2kvm-pip-install.log on the server."
 fi
-info "hyper2kvm installed to /usr/local/bin"
+info "h2kvm installed to /usr/local/bin"
 
 _ssh_batch "
     cd $REMOTE_DIR || exit 0
     if ! $REMOTE_PY -c 'import hivex' 2>/dev/null; then
         echo '🔄 hivex: bindings missing for $REMOTE_PY — running install-deps.sh --hivex'
-        $SUDO env HYPER2KVM_REMOTE_INSTALL=1 HYPER2KVM_PYTHON=$REMOTE_PY bash scripts/install-deps.sh --hivex || true
+        $SUDO env H2KVM_REMOTE_INSTALL=1 H2KVM_PYTHON=$REMOTE_PY bash scripts/install-deps.sh --hivex || true
     fi
     $REMOTE_PY -c 'import hivex; print(\"hivex:\", \"OK\")' 2>/dev/null || echo '⚠️  hivex: import still failing — check install-deps logs'
 " 2>&1 | tail -12 || true
 info "hivex interpreter check ($REMOTE_PY)"
 
-# ── Create runtime directories (NBD locking needs /run/hyper2kvm) ──
+# ── Create runtime directories (NBD locking needs /run/h2kvm) ──
 _ssh "
-    if [ -f $REMOTE_DIR/etc/tmpfiles.d/hyper2kvm.conf ]; then
-        $SUDO cp $REMOTE_DIR/etc/tmpfiles.d/hyper2kvm.conf /etc/tmpfiles.d/hyper2kvm.conf
-        $SUDO systemd-tmpfiles --create /etc/tmpfiles.d/hyper2kvm.conf 2>/dev/null || $SUDO mkdir -p /run/hyper2kvm
+    if [ -f $REMOTE_DIR/etc/tmpfiles.d/h2kvm.conf ]; then
+        $SUDO cp $REMOTE_DIR/etc/tmpfiles.d/h2kvm.conf /etc/tmpfiles.d/h2kvm.conf
+        $SUDO systemd-tmpfiles --create /etc/tmpfiles.d/h2kvm.conf 2>/dev/null || $SUDO mkdir -p /run/h2kvm
     else
-        $SUDO mkdir -p /run/hyper2kvm
+        $SUDO mkdir -p /run/h2kvm
     fi
 " 2>&1
-info "Runtime dirs: /run/hyper2kvm"
+info "Runtime dirs: /run/h2kvm"
 
 # ── Auto-link libguestfs for the active Python version ──
 step "Linking libguestfs for $REMOTE_PY"
@@ -674,7 +674,7 @@ _ssh "
     GUESTFS_SO=''
     # Prefer same Python minor as the interpreter (EL9 ships libguestfs for 3.9; do not link cpython-39 .so into 3.12).
     for search_dir in /usr/lib64/python\${PY_MM}/site-packages /usr/lib/python\${PY_MM}/site-packages \
-                      /opt/hyper2kvm-venv/lib/python\${PY_MM}/site-packages \
+                      /opt/h2kvm-venv/lib/python\${PY_MM}/site-packages \
                       /usr/lib64/python*/site-packages /usr/lib/python*/site-packages \
                       /usr/local/lib/python*/site-packages /usr/local/lib64/python*/site-packages; do
         [ -d \"\$search_dir\" ] || continue
@@ -726,7 +726,7 @@ _ssh_stream_and_preview "
     if command -v nbdkit &>/dev/null; then
         echo \"nbdkit: \$(command -v nbdkit)\"
     else
-        echo 'nbdkit: not installed (optional for hyper2kvm; recommended for migration tooling)'
+        echo 'nbdkit: not installed (optional for h2kvm; recommended for migration tooling)'
     fi
 
     $SUDO systemctl daemon-reload 2>/dev/null || true
@@ -773,11 +773,11 @@ _ssh "
     echo \"📍 h2kvmctl: \$(which h2kvmctl 2>/dev/null || echo NOT_FOUND)\"
     echo \"📍 version:  \$(h2kvmctl --version 2>/dev/null || echo FAILED)\"
     cd /tmp
-    $REMOTE_PY -c 'from hyper2kvm.providers.aws_ec2 import AWSConfig; print(\"📍 AWS EC2 provider: OK\")'
-    $REMOTE_PY -c 'from hyper2kvm.providers.azure import AzureConfig; print(\"📍 Azure provider:   OK\")'
-    $REMOTE_PY -c 'from hyper2kvm.vmcraft.main import VMCraft; print(\"📍 VMCraft hivex:     OK\")'
-    $REMOTE_PY -c 'from hyper2kvm.fixers.windows.virtio.core import _VIRTIO_CACHE_DIR; print(\"📍 VirtIO cache:     OK\")'
-    $REMOTE_PY -c 'from hyper2kvm.fixers.offline_fixer import OfflineFSFix; print(\"📍 Offline fixer:    OK\")'
+    $REMOTE_PY -c 'from h2kvm.providers.aws_ec2 import AWSConfig; print(\"📍 AWS EC2 provider: OK\")'
+    $REMOTE_PY -c 'from h2kvm.providers.azure import AzureConfig; print(\"📍 Azure provider:   OK\")'
+    $REMOTE_PY -c 'from h2kvm.vmcraft.main import VMCraft; print(\"📍 VMCraft hivex:     OK\")'
+    $REMOTE_PY -c 'from h2kvm.fixers.windows.virtio.core import _VIRTIO_CACHE_DIR; print(\"📍 VirtIO cache:     OK\")'
+    $REMOTE_PY -c 'from h2kvm.fixers.offline_fixer import OfflineFSFix; print(\"📍 Offline fixer:    OK\")'
 
     # EL 9+: virt-filesystems is in guestfs-tools RPM (/usr/sbin), not always pulled by libguestfs-tools alone.
     export PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\${PATH}\"
@@ -820,22 +820,22 @@ _ssh "
     command -v bsdtar &>/dev/null && echo '📍 bsdtar:           OK' || echo '⚠️  bsdtar: not installed'
 
     # Check virtio-win
-    [ -f /var/lib/hyper2kvm/virtio-win.iso ] && echo '📍 virtio-win.iso:   OK' || echo '⚠️  virtio-win.iso: not found'
-    [ -d /var/lib/hyper2kvm/virtio-win-extracted/viostor ] && echo '📍 VirtIO ISO cache: OK (pre-extracted)' || echo '📍 VirtIO ISO cache: will extract on first Windows migration'
+    [ -f /var/lib/h2kvm/virtio-win.iso ] && echo '📍 virtio-win.iso:   OK' || echo '⚠️  virtio-win.iso: not found'
+    [ -d /var/lib/h2kvm/virtio-win-extracted/viostor ] && echo '📍 VirtIO ISO cache: OK (pre-extracted)' || echo '📍 VirtIO ISO cache: will extract on first Windows migration'
 " 2>&1
 
-# ── Deploy hyper2kvm daemon service ──
-step "Deploying hyper2kvm daemon service"
+# ── Deploy h2kvm daemon service ──
+step "Deploying h2kvm daemon service"
 _ssh "
-    $SUDO mkdir -p /etc/hyper2kvm /var/lib/hyper2kvm/queue /var/lib/hyper2kvm/output /var/log/hyper2kvm
-    $SUDO chmod 755 /var/lib/hyper2kvm /var/lib/hyper2kvm/output
+    $SUDO mkdir -p /etc/h2kvm /var/lib/h2kvm/queue /var/lib/h2kvm/output /var/log/h2kvm
+    $SUDO chmod 755 /var/lib/h2kvm /var/lib/h2kvm/output
 
     # Create daemon config if not present
-    if [ ! -f /etc/hyper2kvm/daemon.yaml ]; then
-        $SUDO tee /etc/hyper2kvm/daemon.yaml > /dev/null << 'DCEOF'
+    if [ ! -f /etc/h2kvm/daemon.yaml ]; then
+        $SUDO tee /etc/h2kvm/daemon.yaml > /dev/null << 'DCEOF'
 cmd: daemon
-watch_dir: /var/lib/hyper2kvm/queue
-output_dir: /var/lib/hyper2kvm/output
+watch_dir: /var/lib/h2kvm/queue
+output_dir: /var/lib/h2kvm/output
 flatten: true
 out_format: qcow2
 compress: true
@@ -848,19 +848,19 @@ DCEOF
     fi
 
     # Install systemd service (fix: run as root, use h2kvmctl)
-    $SUDO tee /etc/systemd/system/hyper2kvm.service > /dev/null << 'SVCEOF'
+    $SUDO tee /etc/systemd/system/h2kvm.service > /dev/null << 'SVCEOF'
 [Unit]
-Description=hyper2kvm VM Conversion Daemon
-Documentation=https://github.com/ssahani/hyper2kvm
+Description=h2kvm VM Conversion Daemon
+Documentation=https://github.com/ssahani/h2kvm
 After=network.target libvirtd.service
 
 [Service]
 Type=simple
 Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-WorkingDirectory=/var/lib/hyper2kvm
-RuntimeDirectory=hyper2kvm
+WorkingDirectory=/var/lib/h2kvm
+RuntimeDirectory=h2kvm
 RuntimeDirectoryMode=0755
-ExecStart=/usr/local/bin/h2kvmctl --config /etc/hyper2kvm/daemon.yaml
+ExecStart=/usr/local/bin/h2kvmctl --config /etc/h2kvm/daemon.yaml
 Restart=on-failure
 RestartSec=10s
 TimeoutStartSec=30s
@@ -871,16 +871,16 @@ WantedBy=multi-user.target
 SVCEOF
 
     $SUDO systemctl daemon-reload
-    $SUDO systemctl enable --now hyper2kvm.service 2>/dev/null
-    $SUDO systemctl restart hyper2kvm.service
+    $SUDO systemctl enable --now h2kvm.service 2>/dev/null
+    $SUDO systemctl restart h2kvm.service
     sleep 2
-    if $SUDO systemctl is-active hyper2kvm &>/dev/null; then
-        echo 'hyper2kvm daemon: running'
-        echo 'hyper2kvm daemon: systemctl status'
-        $SUDO systemctl status hyper2kvm --no-pager
+    if $SUDO systemctl is-active h2kvm &>/dev/null; then
+        echo 'h2kvm daemon: running'
+        echo 'h2kvm daemon: systemctl status'
+        $SUDO systemctl status h2kvm --no-pager
     else
-        echo 'hyper2kvm daemon: FAILED TO START'
-        $SUDO journalctl -u hyper2kvm --no-pager -n 3
+        echo 'h2kvm daemon: FAILED TO START'
+        $SUDO journalctl -u h2kvm --no-pager -n 3
     fi
 " 2>&1
 info "Daemon service deployed"
@@ -1011,7 +1011,7 @@ _ssh "
     }
 
     echo ''
-    echo '  ── hyper2kvm endpoints ──'
+    echo '  ── h2kvm endpoints ──'
     test_endpoint 'Dashboard'       'https://localhost:5070/'                200
     test_endpoint 'Health'          'https://localhost:5070/api/v1/health'   200
     test_endpoint 'API Docs'        'https://localhost:5070/api/v1/docs'    401
@@ -1026,7 +1026,7 @@ _ssh "
         echo '  ── 🔍 Diagnostics ──'
 
         # Service state
-        for svc in h2kweb hyper2kvm; do
+        for svc in h2kweb h2kvm; do
             state=\$(systemctl is-active \$svc 2>/dev/null || echo 'not-found')
             if [ \"\$state\" != 'active' ]; then
                 echo \"  ⚠️  Service \$svc: \$state\"
@@ -1062,12 +1062,12 @@ _ssh "
         fi
 
         # TLS cert
-        if [ ! -f /var/lib/hyper2kvm/tls/server.crt ]; then
-            echo '  ❌ TLS cert missing: /var/lib/hyper2kvm/tls/server.crt'
+        if [ ! -f /var/lib/h2kvm/tls/server.crt ]; then
+            echo '  ❌ TLS cert missing: /var/lib/h2kvm/tls/server.crt'
         fi
 
         # Disk space
-        avail=\$(df -h /var/lib/hyper2kvm 2>/dev/null | awk 'NR==2{print \$4}')
+        avail=\$(df -h /var/lib/h2kvm 2>/dev/null | awk 'NR==2{print \$4}')
         echo \"  📍 Disk available: \$avail\"
 
         # Firewall
@@ -1108,7 +1108,7 @@ finish_last_step_timer
 TOTAL_SECS=$(( $(date +%s) - START_TS ))
 
 # Final checklist (live checks from remote).
-DAEMON_STATE=$(_ssh_batch "systemctl is-active hyper2kvm 2>/dev/null || echo inactive" | tr -d '\r')
+DAEMON_STATE=$(_ssh_batch "systemctl is-active h2kvm 2>/dev/null || echo inactive" | tr -d '\r')
 if [ "$DAEMON_STATE" = "active" ]; then
     DAEMON_STATUS="OK"
 else
@@ -1128,7 +1128,7 @@ else
 fi
 
 MODE_LABEL=$($QUICK_MODE && echo quick || echo full)
-hyper2kvm_save_deploy_last "$REPO_DIR" "$HOST" "$USER" "$MODE_LABEL"
+h2kvm_save_deploy_last "$REPO_DIR" "$HOST" "$USER" "$MODE_LABEL"
 
 deploy_ui_highlight "📋 Final checklist"
 deploy_ui_checklist "daemon" "${DAEMON_STATUS}"
@@ -1136,7 +1136,7 @@ deploy_ui_checklist "dashboard" "${DASHBOARD_STATUS}"
 deploy_ui_checklist "health API" "${HEALTH_STATUS}"
 deploy_ui_checklist "sources" "${SOURCES_STATUS}"
 
-hyper2kvm_print_success "$HOST" "$TOTAL_SECS"
+h2kvm_print_success "$HOST" "$TOTAL_SECS"
 deploy_ui_kv "🔗" "SSH" "ssh ${USER}@${HOST}"
 echo ""
 if $KEEP_SOURCES; then

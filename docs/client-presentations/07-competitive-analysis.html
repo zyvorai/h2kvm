@@ -34,14 +34,14 @@
 <div class="cover">
   <h1>Competitive <span>Analysis</span></h1>
   <h2>VM Migration Tools Comparison</h2>
-  <p class="sub">hyper2kvm + hypersdk vs Red Hat MTV, AWS Application Migration Service, Azure Migrate, virt-v2v, and Carbonite Migrate. Feature-by-feature, cost-by-cost.</p>
+  <p class="sub">h2kvm + hypersdk vs Red Hat MTV, AWS Application Migration Service, Azure Migrate, virt-v2v, and Carbonite Migrate. Feature-by-feature, cost-by-cost.</p>
 </div>
 
 <div class="page page-light">
   <h2 class="st">Feature <span>Matrix</span></h2>
   <p class="sub">Comprehensive comparison across all major migration tools.</p>
   <table>
-    <tr><th style="width:22%">Capability</th><th style="width:13%">hyper2kvm + hypersdk</th><th style="width:13%">Red Hat MTV</th><th style="width:13%">virt-v2v</th><th style="width:13%">AWS SMS/MGN</th><th style="width:13%">Azure Migrate</th><th style="width:13%">Carbonite</th></tr>
+    <tr><th style="width:22%">Capability</th><th style="width:13%">h2kvm + hypersdk</th><th style="width:13%">Red Hat MTV</th><th style="width:13%">virt-v2v</th><th style="width:13%">AWS SMS/MGN</th><th style="width:13%">Azure Migrate</th><th style="width:13%">Carbonite</th></tr>
     <tr><td><strong>VMware vSphere export</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
     <tr><td><strong>Hyper-V support</strong></td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
     <tr><td><strong>AWS/Azure/GCP export</strong></td><td class="check">&#10003; (10 clouds)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td>AWS only</td><td>Azure only</td><td class="partial">Limited</td></tr>
@@ -68,7 +68,7 @@
   <p class="sub">Total cost of the migration tool itself — not the target platform.</p>
   <table>
     <tr><th>Tool</th><th>License Cost</th><th>Requires</th><th>Lock-in Risk</th></tr>
-    <tr><td><strong>hyper2kvm + hypersdk</strong></td><td class="check">Contact for pricing* (Proprietary (Zyvor AI Labs))</td><td>Any Linux</td><td class="check">None — portable</td></tr>
+    <tr><td><strong>h2kvm + hypersdk</strong></td><td class="check">Contact for pricing* (Proprietary (Zyvor AI Labs))</td><td>Any Linux</td><td class="check">None — portable</td></tr>
     <tr><td>Red Hat MTV</td><td>$0 (with OpenShift sub)</td><td>OpenShift ($50K+/yr)</td><td class="partial">Tied to OpenShift platform</td></tr>
     <tr><td>virt-v2v</td><td class="check">$0 (GPL)</td><td>RHEL/Fedora</td><td class="check">None — but limited features</td></tr>
     <tr><td>AWS MGN</td><td>Free for 90 days, then $$/VM</td><td>AWS account</td><td class="cross">Locked to AWS cloud</td></tr>
@@ -78,15 +78,15 @@
 
   <h3>Key Differentiators</h3>
   <div class="card-grid">
-    <div class="card"><h4>vs Red Hat MTV</h4><p>MTV requires OpenShift ($50K+/yr). hyper2kvm works on any Linux + any K8s (K3s, vanilla, EKS). MTV can't deploy to standalone KVM/libvirt. hyper2kvm does both.</p></div>
-    <div class="card"><h4>vs virt-v2v</h4><p>virt-v2v is CLI-only, no TUI, no batch queue, no KubeVirt deploy, no progress streaming, no pre-flight checks. hyper2kvm wraps virt-v2v capabilities and adds enterprise features.</p></div>
-    <div class="card"><h4>vs AWS MGN / Azure Migrate</h4><p>Cloud tools only migrate TO their cloud. hyper2kvm migrates FROM any cloud TO any target. Perfect for repatriation — the opposite direction cloud vendors want.</p></div>
-    <div class="card"><h4>vs Carbonite</h4><p>Carbonite costs $3-10K/yr, requires Windows, GUI-only. No YAML automation, no KubeVirt, no air-gap support. hyper2kvm is free, Linux-native, fully automatable.</p></div>
+    <div class="card"><h4>vs Red Hat MTV</h4><p>MTV requires OpenShift ($50K+/yr). h2kvm works on any Linux + any K8s (K3s, vanilla, EKS). MTV can't deploy to standalone KVM/libvirt. h2kvm does both.</p></div>
+    <div class="card"><h4>vs virt-v2v</h4><p>virt-v2v is CLI-only, no TUI, no batch queue, no KubeVirt deploy, no progress streaming, no pre-flight checks. h2kvm wraps virt-v2v capabilities and adds enterprise features.</p></div>
+    <div class="card"><h4>vs AWS MGN / Azure Migrate</h4><p>Cloud tools only migrate TO their cloud. h2kvm migrates FROM any cloud TO any target. Perfect for repatriation — the opposite direction cloud vendors want.</p></div>
+    <div class="card"><h4>vs Carbonite</h4><p>Carbonite costs $3-10K/yr, requires Windows, GUI-only. No YAML automation, no KubeVirt, no air-gap support. h2kvm is free, Linux-native, fully automatable.</p></div>
   </div>
 </div>
 
 <div class="page page-light">
-  <h2 class="st">Why <span>hyper2kvm Wins</span></h2>
+  <h2 class="st">Why <span>h2kvm Wins</span></h2>
   <p class="sub">The only tool that covers all migration paths with zero licensing cost.</p>
   <div class="highlight">
     <h3 style="margin-top: 0;">Unique Capabilities (No Competitor Has All of These)</h3>
@@ -101,7 +101,7 @@
       <tr><td>Proprietary (Zyvor AI Labs) license</td><td>No vendor risk, no rug-pull, full code audit</td></tr>
     </table>
   </div>
-  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs)</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs)</p></div>
 </div>
 </body>
 </html>

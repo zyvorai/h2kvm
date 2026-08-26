@@ -18,7 +18,7 @@ from pathlib import Path
 import logging
 
 # Check what's available
-from hyper2kvm.core.optional_imports import PYDANTIC_AVAILABLE, TENACITY_AVAILABLE
+from h2kvm.core.optional_imports import PYDANTIC_AVAILABLE, TENACITY_AVAILABLE
 
 print("=" * 60)
 print("Enhanced Features Example")
@@ -31,7 +31,7 @@ print()
 
 # Example 1: Configuration Validation
 # Works with or without pydantic!
-from hyper2kvm.config.validation import NetworkConfig, VMwareSourceConfig, ConfigValidationError
+from h2kvm.config.validation import NetworkConfig, VMwareSourceConfig, ConfigValidationError
 
 print("1. Configuration Validation Example")
 print("-" * 60)
@@ -73,7 +73,7 @@ print()
 
 # Example 2: Enhanced Retry Logic
 # Works with or without tenacity!
-from hyper2kvm.core.retry_enhanced import retry_network_operation, RetryContext
+from h2kvm.core.retry_enhanced import retry_network_operation, RetryContext
 
 print("2. Enhanced Retry Logic Example")
 print("-" * 60)
@@ -123,7 +123,7 @@ print()
 
 # Example 3: Using the Built-in Logger
 # Already excellent - no structlog needed!
-from hyper2kvm.core.logger import Log
+from h2kvm.core.logger import Log
 
 print("3. Built-in Logging Example")
 print("-" * 60)
@@ -157,7 +157,7 @@ json_logger = Log.setup(
     json_logs=True,  # NDJSON output
     show_proc=True,
     show_pid=True,
-    logger_name="hyper2kvm.json",
+    logger_name="h2kvm.json",
 )
 
 json_logger.info("Migration started", extra={"ctx": {"vm": "web-01", "hypervisor": "vmware"}})

@@ -22,8 +22,8 @@ import time
 from pathlib import Path
 
 # Check what's available
-from hyper2kvm.core.optional_imports import WATCHDOG_AVAILABLE
-from hyper2kvm.core.metrics import PROMETHEUS_AVAILABLE
+from h2kvm.core.optional_imports import WATCHDOG_AVAILABLE
+from h2kvm.core.metrics import PROMETHEUS_AVAILABLE
 
 print("=" * 70)
 print("Daemon Mode + Prometheus Metrics Example")
@@ -36,15 +36,15 @@ print("=" * 70)
 print()
 
 # Setup logging
-from hyper2kvm.core.logger import Log
+from h2kvm.core.logger import Log
 
 logger = Log.setup(verbose=2, json_logs=False, show_proc=True)
 
 # Import components
-from hyper2kvm.runtime.daemon.manifest_watcher import DaemonManifestWatcher
-from hyper2kvm.runtime.daemon.manifest_processor import create_manifest_processor_callback
-from hyper2kvm.runtime.daemon.metrics_server import start_metrics_server
-from hyper2kvm.core.metrics import (
+from h2kvm.runtime.daemon.manifest_watcher import DaemonManifestWatcher
+from h2kvm.runtime.daemon.manifest_processor import create_manifest_processor_callback
+from h2kvm.runtime.daemon.metrics_server import start_metrics_server
+from h2kvm.core.metrics import (
     manifests_processed_total,
     manifest_vms_total,
     migrations_total,
@@ -52,8 +52,8 @@ from hyper2kvm.core.metrics import (
 )
 
 # Configuration
-WATCH_DIR = Path("/tmp/hyper2kvm-daemon-example/manifests")
-OUTPUT_DIR = Path("/tmp/hyper2kvm-daemon-example/output")
+WATCH_DIR = Path("/tmp/h2kvm-daemon-example/manifests")
+OUTPUT_DIR = Path("/tmp/h2kvm-daemon-example/output")
 METRICS_PORT = 9091  # Use 9091 to avoid conflicts
 
 # Create directories
@@ -187,7 +187,7 @@ def main():
                     metrics = get_metrics().decode("utf-8")
                     # Extract interesting metrics
                     for line in metrics.split("\n"):
-                        if "hyper2kvm_manifests" in line and not line.startswith("#"):
+                        if "h2kvm_manifests" in line and not line.startswith("#"):
                             logger.info(f"  Metric: {line}")
 
     except KeyboardInterrupt:

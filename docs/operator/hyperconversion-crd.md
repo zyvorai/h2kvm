@@ -4,7 +4,7 @@ Complete reference for the HyperConversion Custom Resource Definition.
 
 ## API Group
 
-- **Group**: `hyper2kvm.io`
+- **Group**: `h2kvm.io`
 - **Version**: `v1alpha1`
 - **Kind**: `HyperConversion`
 
@@ -22,7 +22,7 @@ A HyperConversion represents an end-to-end VM disk conversion and KubeVirt Virtu
 Standard Kubernetes metadata fields:
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: my-conversion      # Required: unique name
@@ -280,7 +280,7 @@ Standard Kubernetes conditions:
 ### Minimal Example
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: minimal
@@ -298,7 +298,7 @@ spec:
 ### Complete Example
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: complete-example

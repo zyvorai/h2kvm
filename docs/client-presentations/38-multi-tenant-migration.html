@@ -45,7 +45,7 @@
 <div class="cover">
   <h1>Multi-Tenant <span>Migration</span></h1>
   <h2>MSP &amp; Hosting Provider VM Isolation on KVM</h2>
-  <p class="sub">MSPs and hosting providers managing multiple customer environments on VMware face compounding Broadcom license costs. Migrating to KVM with proper tenant isolation — cgroups, namespaces, VLAN separation, resource quotas — delivers the same multi-tenant guarantees at zero software cost. hyper2kvm automates per-tenant migration waves.</p>
+  <p class="sub">MSPs and hosting providers managing multiple customer environments on VMware face compounding Broadcom license costs. Migrating to KVM with proper tenant isolation — cgroups, namespaces, VLAN separation, resource quotas — delivers the same multi-tenant guarantees at zero software cost. h2kvm automates per-tenant migration waves.</p>
   <div class="badge">Tenant Isolation | cgroups v2 | VLAN Separation | Resource Quotas | Per-Tenant Billing | KubeVirt Namespaces</div>
 </div>
 
@@ -126,7 +126,7 @@ echo "8589934592" > /sys/fs/cgroup/tenant-acme/memory.max
 VM_NAME="$1"
 ACTION="$2"
 if [[ "$ACTION" == "started" ]]; then
-  TENANT=$(grep -l "$VM_NAME" /etc/hyper2kvm/tenants/*/vms.list | head -1 | cut -d/ -f5)
+  TENANT=$(grep -l "$VM_NAME" /etc/h2kvm/tenants/*/vms.list | head -1 | cut -d/ -f5)
   for pid in $(virsh qemu-monitor-command "$VM_NAME" --hmp info cpus | grep -oP 'thread_id=\K\d+'); do
     echo "$pid" > /sys/fs/cgroup/tenant-${TENANT}/cgroup.procs
   done
@@ -547,10 +547,10 @@ print(json.dumps(usage, indent=2))</pre>
 
   <div class="verdict">
     <h3>KVM Multi-Tenancy: Same Isolation, Zero License Cost, 3x Profit Margin</h3>
-    <p>cgroups v2 + OVS VLANs + Ceph pool quotas deliver the same tenant isolation as VMware resource pools + dvSwitch + vSAN policies. hyper2kvm migrates each tenant independently with per-tenant YAML configs. MSPs save $990K over 3 years while tripling their profit margin — or pass savings to customers and grow faster.</p>
+    <p>cgroups v2 + OVS VLANs + Ceph pool quotas deliver the same tenant isolation as VMware resource pools + dvSwitch + vSAN policies. h2kvm migrates each tenant independently with per-tenant YAML configs. MSPs save $990K over 3 years while tripling their profit margin — or pass savings to customers and grow faster.</p>
   </div>
 
-  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Multi-Tenant Migration for MSPs &amp; Hosting Providers</div>
+  <div class="footer">h2kvm.io | Proprietary (Zyvor AI Labs) | Multi-Tenant Migration for MSPs &amp; Hosting Providers</div>
 </div>
 
 </body>

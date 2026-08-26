@@ -10,7 +10,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from hyper2kvm.orchestration.disk_processor import DiskProcessor
+from h2kvm.orchestration.disk_processor import DiskProcessor
 
 
 def _make_processor(mock_logger, **overrides):
@@ -36,7 +36,7 @@ def _make_processor(mock_logger, **overrides):
         luks_passphrase=None,
         luks_passphrase_env=None,
         luks_keyfile=None,
-        luks_mapper_prefix="hyper2kvm-crypt",
+        luks_mapper_prefix="h2kvm-crypt",
         backend="vmcraft",
         container_isolation=True,
         conversion_dir=None,
@@ -127,7 +127,7 @@ class TestAutoDetectUefiFromPartitions:
             return Mock(returncode=0, stdout="", stderr="")
 
         with patch("subprocess.run", side_effect=fake_run):
-            with patch("hyper2kvm.orchestration.disk_processor.Path") as path_cls:
+            with patch("h2kvm.orchestration.disk_processor.Path") as path_cls:
                 path_cls.return_value.exists.return_value = True
                 path_cls.return_value.read_text.return_value = "0"
                 proc._auto_detect_uefi_from_partitions(disk)
@@ -145,7 +145,7 @@ class TestAutoDetectUefiFromPartitions:
             "subprocess.run",
             return_value=Mock(returncode=1, stdout="", stderr=""),
         ):
-            with patch("hyper2kvm.orchestration.disk_processor.Path") as path_cls:
+            with patch("h2kvm.orchestration.disk_processor.Path") as path_cls:
                 path_cls.return_value.exists.return_value = False
                 proc._auto_detect_uefi_from_partitions(disk)
 

@@ -1,8 +1,8 @@
-# hyper2kvm: Pipeline Architecture
+# h2kvm: Pipeline Architecture
 
 ## Core Concept
 
-**hyper2kvm is a multi-stage pipeline** that transforms VMs from any hypervisor to KVM-ready format.
+**h2kvm is a multi-stage pipeline** that transforms VMs from any hypervisor to KVM-ready format.
 
 Think of it like an assembly line: each stage does one job, passes the result to the next stage.
 
@@ -155,7 +155,7 @@ ELSE IF Linux:
 ### Stage 5: FIX
 **Purpose:** Apply offline fixes to ensure boot on KVM
 
-**The Critical Stage** - This is what makes hyper2kvm unique!
+**The Critical Stage** - This is what makes h2kvm unique!
 
 #### Fix Subsystems
 
@@ -492,7 +492,7 @@ FETCH → FLATTEN → INSPECT → [NEW STAGE] → FIX → CONVERT
 
 ## Summary
 
-**hyper2kvm = 7-stage pipeline that makes any VM boot on KVM**
+**h2kvm = 7-stage pipeline that makes any VM boot on KVM**
 
 ```
 Source VM → FETCH → FLATTEN → INSPECT → PLAN → FIX → CONVERT → VALIDATE → KVM-ready VM

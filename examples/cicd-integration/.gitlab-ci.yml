@@ -1,4 +1,4 @@
-# GitLab CI/CD Pipeline for hyper2kvm VM Migrations
+# GitLab CI/CD Pipeline for h2kvm VM Migrations
 #
 # Features:
 # - Automated VM migration on commit
@@ -9,7 +9,7 @@
 #
 # Prerequisites:
 # - GitLab Runner with KVM support
-# - hyper2kvm installed on runner
+# - h2kvm installed on runner
 # - CI/CD variables configured (vCenter credentials)
 
 variables:
@@ -44,7 +44,7 @@ validate:preflight:
     - kvm-migration
   script:
     - echo "=== Pre-flight Checks ==="
-    - python -m hyper2kvm --version
+    - python -m h2kvm --version
     - virsh version
     - free -h
     - df -h /data
@@ -64,7 +64,7 @@ validate:configs:
       for config in configs/migrations/*.yaml; do
         echo "Validating: $config"
         # Dry-run validation
-        python -m hyper2kvm --config "$config" --dry-run || exit 1
+        python -m h2kvm --config "$config" --dry-run || exit 1
       done
   only:
     changes:
@@ -131,7 +131,7 @@ migrate:web_servers:
       for vm in $(yq e '.web_servers[].name' configs/vm-list.yaml); do
         echo "Migrating: $vm"
 
-        python -m hyper2kvm vsphere \
+        python -m h2kvm vsphere \
           --vcenter ${VCENTER_HOST} \
           --username ${VCENTER_USER} \
           --password ${VCENTER_PASSWORD} \
@@ -167,7 +167,7 @@ migrate:database_servers:
       for vm in $(yq e '.database_servers[].name' configs/vm-list.yaml); do
         echo "Migrating: $vm (sequential for data integrity)"
 
-        python -m hyper2kvm vsphere \
+        python -m h2kvm vsphere \
           --vcenter ${VCENTER_HOST} \
           --username ${VCENTER_USER} \
           --password ${VCENTER_PASSWORD} \

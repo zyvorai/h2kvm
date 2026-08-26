@@ -34,21 +34,21 @@ Before you begin, ensure you have:
 
 ```bash
 # Navigate to operator directory
-cd hyper2kvm/operator
+cd h2kvm/operator
 
 # Install CRDs
 make install
 
 # Deploy operator with pre-built image
-make deploy IMG=ghcr.io/ssahani/hyper2kvm-operator:latest
+make deploy IMG=ghcr.io/ssahani/h2kvm-operator:latest
 ```
 
 ### Option 2: Build and Install from Source
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm/operator
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm/operator
 
 # Download Go dependencies
 go mod download
@@ -57,16 +57,16 @@ go mod download
 make test
 
 # Build operator image
-make docker-build IMG=hyper2kvm-operator:dev
+make docker-build IMG=h2kvm-operator:dev
 
 # Load image to local cluster (k3d example)
-k3d image import hyper2kvm-operator:dev
+k3d image import h2kvm-operator:dev
 
 # Install CRDs
 make install
 
 # Deploy operator
-make deploy IMG=hyper2kvm-operator:dev
+make deploy IMG=h2kvm-operator:dev
 ```
 
 ## Verify Installation
@@ -75,17 +75,17 @@ Check that the operator is running:
 
 ```bash
 # Check operator pod
-kubectl get pods -n hyper2kvm-system
+kubectl get pods -n h2kvm-system
 
 # Expected output:
 # NAME                                        READY   STATUS    RESTARTS   AGE
 # hyperconversion-operator-xxxxxxxxxx-xxxxx   1/1     Running   0          30s
 
 # Check operator logs
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager -f
+kubectl logs -n h2kvm-system -l control-plane=controller-manager -f
 
 # Verify CRD installed
-kubectl get crd hyperconversions.hyper2kvm.io
+kubectl get crd hyperconversions.h2kvm.io
 ```
 
 ## Your First HyperConversion
@@ -95,7 +95,7 @@ kubectl get crd hyperconversions.hyper2kvm.io
 Create a file `my-first-conversion.yaml`:
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: my-first-conversion
@@ -194,7 +194,7 @@ virtctl console my-first-conversion
 Convert a disk without creating a VM:
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: disk-only
@@ -215,7 +215,7 @@ The created DataVolume can be used later to manually create a VM.
 ### Windows VM with UEFI Secure Boot
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: windows-server
@@ -242,7 +242,7 @@ spec:
 ### Multi-Network VM
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: multi-net-vm
@@ -300,5 +300,5 @@ make uninstall
 ## Getting Help
 
 - **Documentation**: See [docs/operator/](.)
-- **Issues**: https://github.com/ssahani/hyper2kvm/issues
+- **Issues**: https://github.com/ssahani/h2kvm/issues
 - **Examples**: [operator/config/samples/](../../operator/config/samples/)

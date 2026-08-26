@@ -1,4 +1,4 @@
-# hyper2kvm Library API
+# h2kvm Library API
 
 ## Table of Contents
 
@@ -38,7 +38,7 @@
 
 ## Overview
 
-hyper2kvm can be used both as a **command-line tool** and as a **Python library**. The library API provides programmatic control over VM migration, allowing you to:
+h2kvm can be used both as a **command-line tool** and as a **Python library**. The library API provides programmatic control over VM migration, allowing you to:
 
 - **Embed migrations** in custom workflows
 - **Build automation tools** for large-scale migrations
@@ -58,25 +58,25 @@ hyper2kvm can be used both as a **command-line tool** and as a **Python library*
 
 ### From PyPI (Recommended)
 
-hyper2kvm is published on PyPI and can be installed with pip:
+h2kvm is published on PyPI and can be installed with pip:
 
 ```bash
-pip install hyper2kvm
+pip install h2kvm
 ```
 
-**PyPI Package:** https://pypi.org/project/hyper2kvm/
+**PyPI Package:** https://pypi.org/project/h2kvm/
 
 ### From Source
 
 For development or to get the latest unreleased features:
 
 ```bash
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 pip install -e .
 ```
 
-**GitHub Repository:** https://github.com/ssahani/hyper2kvm
+**GitHub Repository:** https://github.com/ssahani/h2kvm
 
 ### Dependencies
 
@@ -109,7 +109,7 @@ sudo apt install -y \
 ### Basic Local Conversion
 
 ```python
-from hyper2kvm import DiskProcessor
+from h2kvm import DiskProcessor
 
 # Convert VMDK to qcow2
 processor = DiskProcessor()
@@ -126,7 +126,7 @@ print(f"Conversion complete: {result.output_path}")
 ### Detect Guest OS
 
 ```python
-from hyper2kvm import GuestDetector
+from h2kvm import GuestDetector
 
 # Detect guest operating system
 detector = GuestDetector()
@@ -139,7 +139,7 @@ print(f"Type: {guest.guest_type}")
 ### Full Migration Workflow
 
 ```python
-from hyper2kvm import Orchestrator, VMwareClient
+from h2kvm import Orchestrator, VMwareClient
 
 # Connect to vSphere
 client = VMwareClient(
@@ -169,7 +169,7 @@ print(f"Migration complete: {result.output_path}")
 For most users, the high-level API provides everything needed:
 
 ```python
-from hyper2kvm import (
+from h2kvm import (
     # Main orchestrator
     Orchestrator,
     DiskProcessor,
@@ -199,23 +199,23 @@ from hyper2kvm import (
 For advanced users who need more control:
 
 ```python
-from hyper2kvm.orchestrator import (
+from h2kvm.orchestrator import (
     VsphereExporter,
 )
 
-from hyper2kvm.converters import (
+from h2kvm.converters import (
     Flatten,
     Convert,
     OVF,
 )
 
-from hyper2kvm.fixers import (
+from h2kvm.fixers import (
     OfflineFSFix,
     NetworkFixer,
     LiveFixer,
 )
 
-from hyper2kvm.testers import (
+from h2kvm.testers import (
     QemuTest,
     LibvirtTest,
 )
@@ -231,11 +231,11 @@ from hyper2kvm.testers import (
 For library developers and specialized workflows:
 
 ```python
-from hyper2kvm.vmware.clients import VMwareClient
-from hyper2kvm.vmware.transports import VDDKTransport, HTTPTransport
-from hyper2kvm.fixers.bootloader import GrubFixer
-from hyper2kvm.fixers.filesystem import FstabFixer
-from hyper2kvm.fixers.network import NetworkTopology
+from h2kvm.vmware.clients import VMwareClient
+from h2kvm.vmware.transports import VDDKTransport, HTTPTransport
+from h2kvm.fixers.bootloader import GrubFixer
+from h2kvm.fixers.filesystem import FstabFixer
+from h2kvm.fixers.network import NetworkTopology
 ```
 
 **Use cases:**
@@ -252,7 +252,7 @@ from hyper2kvm.fixers.network import NetworkTopology
 Convert a local VMDK file to qcow2 with compression:
 
 ```python
-from hyper2kvm import DiskProcessor, GuestDetector
+from h2kvm import DiskProcessor, GuestDetector
 
 # Initialize processor
 processor = DiskProcessor()
@@ -282,7 +282,7 @@ print(f"  Time:   {result.duration}s")
 Migrate a VM from vCenter/ESXi to KVM:
 
 ```python
-from hyper2kvm import VMwareClient, Orchestrator
+from h2kvm import VMwareClient, Orchestrator
 
 # Connect to vSphere
 client = VMwareClient(
@@ -315,7 +315,7 @@ print(f"  Path:  {result.output_dir}")
 Migrate a VM from Azure to KVM:
 
 ```python
-from hyper2kvm import AzureSourceProvider, AzureConfig, Orchestrator
+from h2kvm import AzureSourceProvider, AzureConfig, Orchestrator
 
 # Configure Azure source
 config = AzureConfig(
@@ -350,8 +350,8 @@ print(f"  Fixes:  {len(result.fixes_applied)}")
 Apply offline fixes to a converted disk image:
 
 ```python
-from hyper2kvm.fixers import OfflineFSFix
-from hyper2kvm import GuestDetector
+from h2kvm.fixers import OfflineFSFix
+from h2kvm import GuestDetector
 
 # Detect guest type
 detector = GuestDetector()
@@ -392,7 +392,7 @@ print(f"\nReport saved to: {report.path}")
 Test a migrated VM boots correctly:
 
 ```python
-from hyper2kvm.testers import QemuTest
+from h2kvm.testers import QemuTest
 
 # Test boot with QEMU
 tester = QemuTest(
@@ -420,10 +420,10 @@ else:
 Build a custom migration pipeline:
 
 ```python
-from hyper2kvm import VMwareClient, GuestDetector
-from hyper2kvm.converters import Flatten, Convert
-from hyper2kvm.fixers import OfflineFSFix
-from hyper2kvm.testers import LibvirtTest
+from h2kvm import VMwareClient, GuestDetector
+from h2kvm.converters import Flatten, Convert
+from h2kvm.fixers import OfflineFSFix
+from h2kvm.testers import LibvirtTest
 import logging
 
 # Setup logging
@@ -857,8 +857,8 @@ class LibvirtTest:
 All library functions raise exceptions on errors. Use standard Python exception handling:
 
 ```python
-from hyper2kvm import VMwareClient, Orchestrator
-from hyper2kvm.exceptions import (
+from h2kvm import VMwareClient, Orchestrator
+from h2kvm.exceptions import (
     ConnectionError,
     ConversionError,
     GuestDetectionError,
@@ -920,7 +920,7 @@ fixer = OfflineFSFix(image_path)  # Will auto-detect, but slower
 ### 2. Use Context Managers for Cleanup
 
 ```python
-from hyper2kvm import VMwareClient
+from h2kvm import VMwareClient
 
 with VMwareClient(host='vcenter.example.com', ...) as client:
     result = client.export_vm('vm-name', '/output')
@@ -937,13 +937,13 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
-# Now all hyper2kvm operations will log details
+# Now all h2kvm operations will log details
 ```
 
 ### 4. Test Boots Before Production
 
 ```python
-from hyper2kvm.testers import QemuTest
+from h2kvm.testers import QemuTest
 
 # Always test boot after migration
 tester = QemuTest(image_path=result.output_path, timeout=180)
@@ -1013,7 +1013,7 @@ sudo h2kvmctl vsphere \
 
 ```python
 import os
-from hyper2kvm import VMwareClient, Orchestrator
+from h2kvm import VMwareClient, Orchestrator
 
 # Get password from environment
 password = os.environ['VC_PASSWORD']
@@ -1050,7 +1050,7 @@ done
 Library:
 
 ```python
-from hyper2kvm import VMwareClient, Orchestrator
+from h2kvm import VMwareClient, Orchestrator
 
 client = VMwareClient(...)
 orchestrator = Orchestrator(vmware_client=client)
@@ -1067,7 +1067,7 @@ for vm_name in ['vm1', 'vm2', 'vm3']:
 
 ## Batch Migration APIs
 
-hyper2kvm provides enterprise-grade batch migration capabilities with comprehensive APIs for batch processing, automation, and integration.
+h2kvm provides enterprise-grade batch migration capabilities with comprehensive APIs for batch processing, automation, and integration.
 
 ### Batch Orchestration
 
@@ -1077,7 +1077,7 @@ Convert multiple VMs in parallel with centralized orchestration and progress tra
 
 **Import**:
 ```python
-from hyper2kvm.manifest.batch_orchestrator import BatchOrchestrator
+from h2kvm.manifest.batch_orchestrator import BatchOrchestrator
 ```
 
 **Basic usage**:
@@ -1117,10 +1117,10 @@ print(f"Failed: {result['failed']}")
 
 **Resume from checkpoint**:
 ```python
-from hyper2kvm.manifest.checkpoint_manager import CheckpointManager
+from h2kvm.manifest.checkpoint_manager import CheckpointManager
 
 # Load existing checkpoint
-checkpoint_file = Path("/output/.hyper2kvm-checkpoint-batch-id.json")
+checkpoint_file = Path("/output/.h2kvm-checkpoint-batch-id.json")
 checkpoint = CheckpointManager.load_checkpoint(checkpoint_file)
 
 if checkpoint:
@@ -1150,7 +1150,7 @@ Reusable configuration templates with inheritance support.
 
 **Import**:
 ```python
-from hyper2kvm.profiles.profile_loader import ProfileLoader
+from h2kvm.profiles.profile_loader import ProfileLoader
 ```
 
 **Load built-in profile**:
@@ -1180,7 +1180,7 @@ from pathlib import Path
 loader = ProfileLoader()
 
 # Load custom profile from directory
-custom_profile_dir = Path("/etc/hyper2kvm/profiles")
+custom_profile_dir = Path("/etc/h2kvm/profiles")
 profile = loader.load_profile(
     "my-custom-profile",
     custom_profile_path=custom_profile_dir / "my-custom-profile.yaml"
@@ -1220,14 +1220,14 @@ custom_profile = {
 }
 
 # Merge with built-in profile
-from hyper2kvm.config.config import Config
+from h2kvm.config.config import Config
 base_profile = loader.load_profile("production")
 merged = Config.merge_dicts(base_profile, custom_profile)
 ```
 
 **Profile caching** (Phase 7.3):
 ```python
-from hyper2kvm.profiles.profile_cache import get_global_cache
+from h2kvm.profiles.profile_cache import get_global_cache
 
 # Get cache statistics
 cache = get_global_cache()
@@ -1248,7 +1248,7 @@ Execute custom scripts, Python functions, or HTTP webhooks at pipeline stages.
 
 **Import**:
 ```python
-from hyper2kvm.hooks.hook_runner import HookRunner
+from h2kvm.hooks.hook_runner import HookRunner
 ```
 
 **Create from manifest**:
@@ -1280,7 +1280,7 @@ success = runner.execute_stage_hooks("post_convert", context)
 
 **Script hook**:
 ```python
-from hyper2kvm.hooks.hook_types import ScriptHook
+from h2kvm.hooks.hook_types import ScriptHook
 
 hook = ScriptHook(
     path="/scripts/backup.sh",
@@ -1299,7 +1299,7 @@ print(f"Exit code: {result['exit_code']}")
 
 **Python hook**:
 ```python
-from hyper2kvm.hooks.hook_types import PythonHook
+from h2kvm.hooks.hook_types import PythonHook
 
 hook = PythonHook(
     module="my_validators",
@@ -1314,7 +1314,7 @@ result = hook.execute({"output_path": "/converted/disk.qcow2"})
 
 **HTTP hook with retry** (Phase 7.2):
 ```python
-from hyper2kvm.hooks.hook_types import HttpHook
+from h2kvm.hooks.hook_types import HttpHook
 
 hook = HttpHook(
     url="https://api.example.com/notify",
@@ -1351,7 +1351,7 @@ Automatic domain creation and storage pool management.
 
 **Import**:
 ```python
-from hyper2kvm.libvirt.libvirt_manager import LibvirtManager
+from h2kvm.libvirt.libvirt_manager import LibvirtManager
 ```
 
 **Define domain from XML**:
@@ -1388,7 +1388,7 @@ snapshot_name = manager.create_snapshot(
 
 **Import**:
 ```python
-from hyper2kvm.libvirt.pool_manager import PoolManager
+from h2kvm.libvirt.pool_manager import PoolManager
 ```
 
 **Import disk to pool**:
@@ -1407,7 +1407,7 @@ print(f"Imported volume: {volume_name}")
 
 **Complete libvirt workflow**:
 ```python
-from hyper2kvm.libvirt import LibvirtManager, PoolManager
+from h2kvm.libvirt import LibvirtManager, PoolManager
 
 # Import disk
 pool_mgr = PoolManager()
@@ -1440,7 +1440,7 @@ Extensible validation with multiple severity levels.
 
 **Import**:
 ```python
-from hyper2kvm.validation import (
+from h2kvm.validation import (
     DiskValidator,
     XMLValidator,
     ValidationRunner,
@@ -1502,7 +1502,7 @@ print(f"All passed: {not summary['has_errors']}")
 
 **Custom validator**:
 ```python
-from hyper2kvm.validation import BaseValidator, ValidationSeverity
+from h2kvm.validation import BaseValidator, ValidationSeverity
 
 class NetworkValidator(BaseValidator):
     def validate(self, context):
@@ -1545,7 +1545,7 @@ Real-time progress persistence for monitoring long-running conversions.
 
 **Import**:
 ```python
-from hyper2kvm.manifest.batch_progress import (
+from h2kvm.manifest.batch_progress import (
     ProgressTracker,
     VMStatus,
     BatchProgress
@@ -1585,7 +1585,7 @@ tracker.cleanup()  # Remove progress file
 ```python
 # Load progress from file (for monitoring tools)
 progress = ProgressTracker.load_progress(
-    Path("/output/.hyper2kvm-batch-progress-batch-id.json")
+    Path("/output/.h2kvm-batch-progress-batch-id.json")
 )
 
 if progress:

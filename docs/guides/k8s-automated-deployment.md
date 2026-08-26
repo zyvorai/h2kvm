@@ -1,6 +1,6 @@
 # Automated Kubernetes/k3s Deployment
 
-hyper2kvm now supports **fully automated end-to-end migration** from VMware to Kubernetes/k3s clusters with KubeVirt. No manual steps required!
+h2kvm now supports **fully automated end-to-end migration** from VMware to Kubernetes/k3s clusters with KubeVirt. No manual steps required!
 
 ## Overview
 
@@ -159,7 +159,7 @@ sudo ./h2kvmctl --config production-migration.yaml
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚀 hyper2kvm - Production-Grade Hypervisor to KVM Migration Toolkit
+🚀 h2kvm - Production-Grade Hypervisor to KVM Migration Toolkit
    Built for the Enterprise Linux ecosystem (Fedora/RHEL/CentOS)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ➡️ Sanity checks
@@ -419,7 +419,7 @@ pip install kubernetes
 sudo pip install kubernetes
 ```
 
-**Important:** If running hyper2kvm with `sudo`, the kubernetes package must be installed for root.
+**Important:** If running h2kvm with `sudo`, the kubernetes package must be installed for root.
 
 ### Kubernetes Access
 
@@ -581,4 +581,4 @@ sudo ./h2kvmctl --config centos9.yaml --deploy-k8s
 - [KubeVirt Documentation](https://kubevirt.io/user-guide/)
 - [k3s Documentation](https://docs.k3s.io/)
 - [Longhorn Documentation](https://longhorn.io/docs/)
-- [hyper2kvm Migration Guide](../migration/quick-reference.md)
+- [h2kvm Migration Guide](../migration/quick-reference.md)

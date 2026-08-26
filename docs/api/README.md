@@ -1,6 +1,6 @@
-# Hyper2KVM API Reference
+# H2KVM API Reference
 
-Comprehensive API documentation for all Hyper2KVM modules and features.
+Comprehensive API documentation for all H2KVM modules and features.
 
 ---
 
@@ -21,7 +21,7 @@ Guest filesystem manipulation API with 480+ comprehensive methods for VM manipul
 
 **Quick Example**:
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 vmcraft = VMCraft(logger)
 vmcraft.add_disk("/vms/server.qcow2")
@@ -53,7 +53,7 @@ Post-migration validation framework with automated health checks.
 
 **Quick Example**:
 ```python
-from hyper2kvm.validation import ValidationOrchestrator
+from h2kvm.validation import ValidationOrchestrator
 
 orchestrator = ValidationOrchestrator(logger)
 report = orchestrator.validate_migration(
@@ -84,7 +84,7 @@ Migration rollback and recovery framework with snapshot management.
 
 **Quick Example**:
 ```python
-from hyper2kvm.rollback import RollbackOrchestrator
+from h2kvm.rollback import RollbackOrchestrator
 
 orchestrator = RollbackOrchestrator(logger)
 
@@ -120,7 +120,7 @@ Rich terminal interface with interactive wizard and configuration management.
 
 **Quick Example**:
 ```python
-from hyper2kvm.cli import MigrationWizard, ProgressBar
+from h2kvm.cli import MigrationWizard, ProgressBar
 
 # Interactive wizard
 wizard = MigrationWizard(logger)
@@ -151,7 +151,7 @@ Live migration with minimal downtime using HyperSDK integration.
 
 **Quick Example**:
 ```python
-from hyper2kvm.live import LiveMigrationAnalyzer, HybridMigrationManager
+from h2kvm.live import LiveMigrationAnalyzer, HybridMigrationManager
 
 # Analyze feasibility
 analyzer = LiveMigrationAnalyzer(logger)
@@ -183,7 +183,7 @@ Backup restore and DR testing integration.
 
 **Quick Example**:
 ```python
-from hyper2kvm.backup import VeeamBackupSource
+from h2kvm.backup import VeeamBackupSource
 
 # Restore from Veeam
 source = VeeamBackupSource("/backups/veeam-repo", logger)
@@ -218,7 +218,7 @@ source.restore_vm(
 
 ```python
 import logging
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -240,7 +240,7 @@ finally:
 ### Error Handling
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 try:
     vmcraft = VMCraft(logger)
@@ -262,7 +262,7 @@ finally:
 ### Context Manager (Recommended)
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 # Using context manager for automatic cleanup
 with VMCraft(logger) as vmcraft:
@@ -314,16 +314,16 @@ See the [examples directory](../../examples/) for complete, runnable examples:
 - **Documentation**: This directory
 - **Tutorials**: [docs/tutorials/](../tutorials/)
 - **Recipes**: [docs/recipes/](../recipes/)
-- **Issues**: [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
+- **Issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
 
 ---
 
 ## Contributing
 
-Help improve Hyper2KVM APIs:
+Help improve H2KVM APIs:
 
-- **Report Issues**: [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
-- **Suggest Features**: [Feature Requests](https://github.com/ssahani/hyper2kvm/issues/new?labels=enhancement)
+- **Report Issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+- **Suggest Features**: [Feature Requests](https://github.com/ssahani/h2kvm/issues/new?labels=enhancement)
 - **Submit PRs**: [Contributing Guide](../development/contributing.md)
 
 ---

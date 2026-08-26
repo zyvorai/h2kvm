@@ -1,4 +1,4 @@
-# hyper2kvm migration configuration
+# h2kvm migration configuration
 # Testing with vmcraft backend (fast pure-Python LVM)
 cmd: local
 

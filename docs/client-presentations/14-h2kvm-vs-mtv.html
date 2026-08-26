@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>h2kvm + hypersdk vs Red Hat MTV — Complete Advantage Analysis</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #701a75, #86198f, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #e879f9; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 750px; margin-top: 1em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #e879f9; }
+  .page-dark h2.st span { color: #e879f9; }
+  h3 { font-size: 1.1em; font-weight: 600; margin: 0.8em 0 0.3em; color: #c026d3; }
+  .page-dark h3 { color: #e879f9; }
+  p { margin-bottom: 0.6em; font-size: 0.93em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.2em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.7em 0; font-size: 0.8em; }
+  th { background: #86198f; color: #fff; padding: 7px 10px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; } .partial { color: #f59e0b; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.8em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0.8em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 16px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.98em; font-weight: 600; margin-bottom: 5px; color: #c026d3; } .card p { font-size: 0.83em; opacity: 0.85; margin-bottom: 0; }
+  .page-dark .card h4 { color: #e879f9; }
+  .card ul { padding-left: 16px; font-size: 0.83em; margin: 0; } .card li { margin-bottom: 3px; }
+  .highlight { background: rgba(232,121,249,0.08); border: 1px solid rgba(232,121,249,0.2); border-radius: 8px; padding: 14px; margin: 0.8em 0; }
+  .page-dark .highlight { background: rgba(232,121,249,0.06); border: 1px solid rgba(232,121,249,0.15); }
+  .stat-box { text-align: center; padding: 16px; }
+  .stat-box .num { font-size: 2em; font-weight: 800; color: #e879f9; } .stat-box .label { font-size: 0.82em; opacity: 0.7; }
+  .vs-row { display: flex; gap: 18px; margin: 0.8em 0; }
+  .vs-col { flex: 1; padding: 14px; border-radius: 10px; }
+  .vs-h2k { background: rgba(34,197,94,0.08); border: 2px solid rgba(34,197,94,0.3); }
+  .vs-mtv { background: rgba(239,68,68,0.05); border: 2px solid rgba(239,68,68,0.15); }
+  .page-dark .vs-h2k { background: rgba(34,197,94,0.06); border: 2px solid rgba(34,197,94,0.2); }
+  .page-dark .vs-mtv { background: rgba(239,68,68,0.04); border: 2px solid rgba(239,68,68,0.12); }
+  .vs-col h4 { font-size: 1em; font-weight: 700; margin-bottom: 8px; }
+  .vs-col ul { padding-left: 16px; font-size: 0.85em; } .vs-col li { margin-bottom: 4px; }
+  .cost-table td:nth-child(2), .cost-table td:nth-child(3) { font-weight: 600; }
+  .verdict { background: linear-gradient(135deg, rgba(134,25,143,0.15), rgba(192,38,211,0.08)); border: 2px solid #c026d3; border-radius: 12px; padding: 18px; margin: 1em 0; text-align: center; }
+  .verdict h3 { color: #e879f9; font-size: 1.2em; margin-bottom: 6px; }
+  .footer { text-align: center; padding: 12px; font-size: 0.72em; opacity: 0.4; }
+  code { background: rgba(232,121,249,0.1); padding: 2px 5px; border-radius: 4px; font-size: 0.88em; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600; margin-right: 4px; }
+  .tag-free { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .tag-paid { background: rgba(239,68,68,0.15); color: #ef4444; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>h2kvm + hypersdk<br>vs <span>Red Hat MTV</span></h1>
+  <h2>Why the Open Platform Beats the Walled Garden</h2>
+  <p class="sub">A comprehensive technical and financial comparison. MTV locks you into OpenShift at $50K+/year. h2kvm + hypersdk deploys to any KVM host, any Kubernetes cluster, any cloud — contact for pricing.* Here's every advantage, feature by feature.</p>
+</div>
+
+<!-- PAGE 1: The $50K Question -->
+<div class="page page-light">
+  <h2 class="st">The <span>$50K Question</span></h2>
+  <p class="sub">MTV is "free" — but only if you already pay for OpenShift. Here's the real cost.</p>
+
+  <div class="card-grid">
+    <div class="stat-box card"><div class="num">Licensed*</div><div class="label">h2kvm + hypersdk<br>Proprietary (Zyvor AI Labs) — licensed (Zyvor AI Labs)</div></div>
+    <div class="stat-box card"><div class="num">$50K+</div><div class="label">MTV minimum viable cost<br>OpenShift subscription required</div></div>
+    <div class="stat-box card"><div class="num">$150K+</div><div class="label">MTV production deployment<br>3-year OpenShift + support</div></div>
+    <div class="stat-box card"><div class="num">Licensed*</div><div class="label">h2kvm on K3s / vanilla K8s<br>Free Kubernetes, licensed migration tool</div></div>
+  </div>
+
+  <h3>Total Cost of Ownership — 3 Year Comparison</h3>
+  <table class="cost-table">
+    <tr><th style="width:30%">Cost Item</th><th style="width:35%">h2kvm + hypersdk</th><th style="width:35%">Red Hat MTV</th></tr>
+    <tr><td><strong>Migration tool license</strong></td><td class="check">Contact for pricing* (Proprietary (Zyvor AI Labs))</td><td>$0 (bundled with OpenShift)</td></tr>
+    <tr><td><strong>Platform requirement</strong></td><td class="check">Any Linux ($0)</td><td class="cross">OpenShift ($50K-200K/yr)</td></tr>
+    <tr><td><strong>Kubernetes (if needed)</strong></td><td class="check">K3s / vanilla K8s ($0)</td><td class="cross">Must be OpenShift ($50K+/yr)</td></tr>
+    <tr><td><strong>KubeVirt runtime</strong></td><td class="check">Open source KubeVirt ($0)</td><td>OpenShift Virtualization (bundled)</td></tr>
+    <tr><td><strong>Training</strong></td><td>1-2 days (CLI + TUI)</td><td>5-10 days (OpenShift + MTV + K8s)</td></tr>
+    <tr><td><strong>Infrastructure</strong></td><td>Existing Linux servers</td><td>Dedicated OpenShift cluster (3+ nodes)</td></tr>
+    <tr><td><strong>Support</strong></td><td>Lilo Technologies + optional commercial</td><td>Red Hat subscription</td></tr>
+    <tr><td style="font-weight:700; font-size:1em;">3-Year Total (100 VMs)</strong></td><td style="color:#22c55e; font-weight:800; font-size:1.1em;">$0 - $15K</td><td style="color:#ef4444; font-weight:800; font-size:1.1em;">$150K - $600K</td></tr>
+  </table>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Key insight:</strong> MTV isn't a migration tool you buy — it's a feature of OpenShift you're forced to subscribe to. If you don't already run OpenShift, you're paying $50K+ just to get access to a migration tool. h2kvm works on any Linux box you already have.</p>
+  </div>
+</div>
+
+<!-- PAGE 2: Feature Matrix -->
+<div class="page page-dark">
+  <h2 class="st">Feature <span>Matrix</span></h2>
+  <p class="sub">Every capability compared head-to-head.</p>
+  <table>
+    <tr><th style="width:30%">Capability</th><th style="width:35%">h2kvm + hypersdk</th><th style="width:35%">Red Hat MTV</th></tr>
+    <tr><td><strong>VMware vSphere export</strong></td><td class="check">&#10003; Built-in govc + VDDK</td><td class="check">&#10003; vSphere provider</td></tr>
+    <tr><td><strong>Hyper-V migration</strong></td><td class="check">&#10003; Native VHD/VHDX</td><td class="partial">Partial (community effort)</td></tr>
+    <tr><td><strong>Cloud sources (AWS, Azure, GCP...)</strong></td><td class="check">&#10003; 10 cloud providers</td><td class="cross">&#10007; Not supported</td></tr>
+    <tr><td><strong>Target: Standalone KVM/libvirt</strong></td><td class="check">&#10003; Primary target</td><td class="cross">&#10007; KubeVirt only</td></tr>
+    <tr><td><strong>Target: KubeVirt</strong></td><td class="check">&#10003; Any K8s cluster</td><td class="check">&#10003; OpenShift only</td></tr>
+    <tr><td><strong>Target: K3s / vanilla K8s</strong></td><td class="check">&#10003; Verified on K3s, EKS</td><td class="cross">&#10007; OpenShift required</td></tr>
+    <tr><td><strong>Target: OpenShift</strong></td><td class="check">&#10003; Supported</td><td class="check">&#10003; Native</td></tr>
+    <tr><td><strong>Interactive TUI</strong></td><td class="check">&#10003; zkvm (Bubble Tea)</td><td class="cross">&#10007; Web UI only</td></tr>
+    <tr><td><strong>CLI automation</strong></td><td class="check">&#10003; h2kvmctl + YAML</td><td class="partial">kubectl + CRDs</td></tr>
+    <tr><td><strong>Offline guest OS fixes</strong></td><td class="check">&#10003; VMCraft engine</td><td class="partial">Limited (virt-v2v subset)</td></tr>
+    <tr><td><strong>Windows VirtIO injection</strong></td><td class="check">&#10003; Full pipeline</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Boot verification</strong></td><td class="check">&#10003; Automated test</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Live progress streaming</strong></td><td class="check">&#10003; Real-time + ETA</td><td class="partial">Web UI progress only</td></tr>
+    <tr><td><strong>Pre-flight validation</strong></td><td class="check">&#10003; h2kvmctl doctor</td><td class="partial">Basic validation</td></tr>
+    <tr><td><strong>Job scheduling</strong></td><td class="check">&#10003; hypersdk scheduler</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Carbon-aware scheduling</strong></td><td class="check">&#10003; Green migration</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Cost estimation</strong></td><td class="check">&#10003; Per-VM cost calc</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Air-gap / offline</strong></td><td class="check">&#10003; Fully offline</td><td class="partial">Partial (needs OCP)</td></tr>
+    <tr><td><strong>No libguestfs required</strong></td><td class="check">&#10003; VMCraft = Python + qemu-nbd</td><td class="cross">&#10007; Uses libguestfs</td></tr>
+    <tr><td><strong>Hexagonal architecture</strong></td><td class="check">&#10003; 13+ port interfaces</td><td class="cross">&#10007; Monolithic operator</td></tr>
+    <tr><td><strong>Webhook notifications</strong></td><td class="check">&#10003; Slack, Teams, custom</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>RBAC + audit trail</strong></td><td class="check">&#10003; Built-in</td><td>Inherits from OpenShift</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 3: KubeVirt Deployment — The Big Advantage -->
+<div class="page page-light">
+  <h2 class="st">KubeVirt Deployment — <span>The Big Advantage</span></h2>
+  <p class="sub">Both tools deploy to KubeVirt. But the platform requirements couldn't be more different.</p>
+
+  <div class="vs-row">
+    <div class="vs-col vs-h2k">
+      <h4 style="color:#22c55e;">h2kvm KubeVirt Deploy</h4>
+      <ul>
+        <li><strong>Any Kubernetes:</strong> K3s, vanilla K8s, EKS, GKE, AKS, OpenShift</li>
+        <li><strong>Minimal cluster:</strong> Single-node K3s works (tested)</li>
+        <li><strong>Free runtime:</strong> Open source KubeVirt + CDI</li>
+        <li><strong>Manifest generation:</strong> Auto-creates VirtualMachine YAML</li>
+        <li><strong>Disk upload:</strong> Automated PVC creation + image upload</li>
+        <li><strong>Dual target:</strong> Same pipeline does KVM and/or KubeVirt</li>
+        <li><strong>Edge-ready:</strong> K3s on a Raspberry Pi or edge box</li>
+        <li><strong>No operator lock-in:</strong> Standard K8s resources</li>
+      </ul>
+    </div>
+    <div class="vs-col vs-mtv">
+      <h4 style="color:#ef4444;">MTV KubeVirt Deploy</h4>
+      <ul>
+        <li><strong>OpenShift only:</strong> Will not run on vanilla K8s or K3s</li>
+        <li><strong>Full cluster required:</strong> 3+ control plane + 3+ worker nodes</li>
+        <li><strong>Paid runtime:</strong> OpenShift Virtualization (subscription)</li>
+        <li><strong>CRD-based:</strong> MTV-specific custom resources</li>
+        <li><strong>Operator dependency:</strong> MTV operator + OCP operator lifecycle</li>
+        <li><strong>No standalone KVM:</strong> Cannot deploy to libvirt at all</li>
+        <li><strong>Heavy footprint:</strong> Not suitable for edge / small sites</li>
+        <li><strong>Vendor lock:</strong> Tied to OpenShift ecosystem</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <h3 style="margin-top:0;">Real-World Example: 50-Site Edge Deployment</h3>
+    <p>A retail chain with 50 stores needs to migrate VMware VMs to KubeVirt at each site.</p>
+    <table>
+      <tr><th style="width:30%">Factor</th><th style="width:35%">h2kvm + K3s</th><th style="width:35%">MTV + OpenShift</th></tr>
+      <tr><td><strong>Per-site hardware</strong></td><td>1 server (any Linux)</td><td>6+ servers (3 control + 3 worker)</td></tr>
+      <tr><td><strong>Per-site software cost</strong></td><td class="check">$0</td><td class="cross">$50K+ OpenShift sub</td></tr>
+      <tr><td><strong>50-site total cost</strong></td><td class="check">$0</td><td class="cross">$2.5M+ in licenses alone</td></tr>
+      <tr><td><strong>Setup time per site</strong></td><td>30 minutes (K3s + h2kvm)</td><td>2-3 days (OpenShift install + MTV)</td></tr>
+      <tr><td><strong>Operator expertise</strong></td><td>Basic Linux admin</td><td>OpenShift certified admin</td></tr>
+      <tr><td><strong>Air-gap support</strong></td><td class="check">Yes — single binary + images</td><td class="partial">Complex — mirror registry needed</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- PAGE 4: Architecture Comparison -->
+<div class="page page-dark">
+  <h2 class="st">Architecture <span>Comparison</span></h2>
+  <p class="sub">Modular platform vs monolithic operator.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>h2kvm + hypersdk: Two-Layer Platform</h4>
+      <ul>
+        <li><strong>hypersdk (Go daemon):</strong> Cloud API abstraction, 10 providers, hexagonal architecture with 13+ port interfaces</li>
+        <li><strong>h2kvmctl (Python):</strong> Disk conversion, VMCraft guest fixes, libvirt XML generation, KubeVirt manifests</li>
+        <li><strong>zkvm (Go TUI):</strong> Interactive terminal UI, vSphere discovery, live progress, file browser</li>
+        <li><strong>Clean separation:</strong> Each layer can be used independently or together</li>
+        <li><strong>Extensible:</strong> Add a new cloud provider by implementing one Go interface</li>
+        <li><strong>Lightweight:</strong> No appliance boot, no supermin, pure Python + qemu-nbd</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>MTV: Kubernetes Operator</h4>
+      <ul>
+        <li><strong>Single operator:</strong> Runs inside OpenShift as a set of pods</li>
+        <li><strong>CRD-driven:</strong> Migration plans defined as custom resources</li>
+        <li><strong>Depends on:</strong> OpenShift, OLM, OpenShift Virtualization, CDI, virt-v2v</li>
+        <li><strong>VMware-focused:</strong> Primary support is vSphere, limited Hyper-V</li>
+        <li><strong>No standalone use:</strong> Cannot run outside Kubernetes/OpenShift</li>
+        <li><strong>Heavy dependencies:</strong> libguestfs appliance, virt-v2v, nbdkit stack</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Provider & Source Coverage</h3>
+  <table>
+    <tr><th style="width:25%">Source Platform</th><th style="width:37%">h2kvm + hypersdk</th><th style="width:38%">MTV</th></tr>
+    <tr><td><strong>VMware vSphere</strong></td><td class="check">&#10003; govc + VDDK + OVA/OVF</td><td class="check">&#10003; vSphere provider</td></tr>
+    <tr><td><strong>Hyper-V</strong></td><td class="check">&#10003; Native VHD/VHDX</td><td class="partial">Partial / community</td></tr>
+    <tr><td><strong>AWS EC2</strong></td><td class="check">&#10003; EBS snapshot export</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Microsoft Azure</strong></td><td class="check">&#10003; Managed disk export</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Google Cloud</strong></td><td class="check">&#10003; Persistent disk export</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Oracle Cloud (OCI)</strong></td><td class="check">&#10003; Boot volume export</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>OpenStack</strong></td><td class="check">&#10003; Glance / Cinder</td><td class="partial">Community provider</td></tr>
+    <tr><td><strong>Alibaba Cloud</strong></td><td class="check">&#10003; ECS disk export</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Proxmox VE</strong></td><td class="check">&#10003; API export</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>KubeVirt (cross-cluster)</strong></td><td class="check">&#10003; PVC export</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Local disk images</strong></td><td class="check">&#10003; VMDK/VHD/RAW/OVA</td><td class="cross">&#10007; (must be on vSphere)</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 5: Enterprise Features MTV Doesn't Have -->
+<div class="page page-light">
+  <h2 class="st">Enterprise Features <span>MTV Doesn't Have</span></h2>
+  <p class="sub">Capabilities that only h2kvm + hypersdk provides.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Standalone KVM Deploy</h4>
+      <p>Generate optimized libvirt domain XML, virsh define, and boot test — all automated. MTV has <strong>zero</strong> standalone KVM capability. If you're migrating to traditional KVM/QEMU hosts, MTV simply cannot help.</p>
+    </div>
+    <div class="card">
+      <h4>Boot Verification</h4>
+      <p>After conversion, h2kvm automatically starts the VM, verifies it boots, and reports status. MTV migrates the disk and hopes for the best — no automated boot test.</p>
+    </div>
+    <div class="card">
+      <h4>Interactive TUI (zkvm)</h4>
+      <p>Terminal-based guided workflow with file browser, vSphere discovery, form fields, and live progress. MTV has a web UI — but it requires an OpenShift console and browser access.</p>
+    </div>
+    <div class="card">
+      <h4>Job Scheduling</h4>
+      <p>hypersdk provides cron scheduling, time windows, priority queues, retry policies, and concurrency limits. Schedule migrations for off-peak hours. MTV has no scheduler.</p>
+    </div>
+    <div class="card">
+      <h4>Carbon-Aware Scheduling</h4>
+      <p>Schedule migrations when grid carbon intensity is low. ESG compliance, sustainability reporting. No competitor — including MTV — offers this capability.</p>
+    </div>
+    <div class="card">
+      <h4>Cost Estimation</h4>
+      <p>Estimate per-VM migration cost including compute, storage, and network. Budget planning before migration starts. MTV provides no cost visibility.</p>
+    </div>
+    <div class="card">
+      <h4>Webhook Notifications</h4>
+      <p>Push migration events to Slack, Teams, PagerDuty, or any webhook endpoint. Track progress without watching a console. MTV has no notification system.</p>
+    </div>
+    <div class="card">
+      <h4>Cloud Repatriation</h4>
+      <p>Export VMs from AWS, Azure, GCP, OCI — bring them on-prem to KVM or KubeVirt. MTV cannot touch cloud workloads. Only vSphere (and limited Hyper-V).</p>
+    </div>
+    <div class="card">
+      <h4>Prometheus Metrics</h4>
+      <p>hypersdk exposes /metrics for migration throughput, job queue depth, error rates, and provider latency. Plug into existing Grafana dashboards. MTV has basic operator metrics only.</p>
+    </div>
+    <div class="card">
+      <h4>Pre-Flight Doctor</h4>
+      <p><code>h2kvmctl doctor</code> checks 9 system areas: disk space, dependencies, permissions, network, libvirt, KubeVirt readiness. MTV discovers issues at runtime.</p>
+    </div>
+    <div class="card">
+      <h4>VMCraft Engine</h4>
+      <p>Pure Python + qemu-nbd for offline guest fixes. No libguestfs appliance boot (~30s overhead). Works on minimal Linux, containers, edge devices. MTV depends on libguestfs.</p>
+    </div>
+    <div class="card">
+      <h4>Dual-Target Pipeline</h4>
+      <p>Same migration run can output both libvirt XML and KubeVirt manifest. Deploy the same VM to traditional KVM <em>and</em> Kubernetes simultaneously. MTV is KubeVirt-only.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: Deployment Flexibility -->
+<div class="page page-dark">
+  <h2 class="st">Deployment <span>Flexibility</span></h2>
+  <p class="sub">h2kvm runs everywhere. MTV runs on OpenShift — period.</p>
+
+  <table>
+    <tr><th style="width:25%">Deployment Model</th><th style="width:37%">h2kvm + hypersdk</th><th style="width:38%">MTV</th></tr>
+    <tr><td><strong>Bare metal Linux</strong></td><td class="check">&#10003; Primary use case</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Any VM (RHEL, Ubuntu, etc)</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>K3s (lightweight K8s)</strong></td><td class="check">&#10003; Verified, single-node</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Vanilla Kubernetes</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Amazon EKS</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Google GKE</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Azure AKS</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>OpenShift</strong></td><td class="check">&#10003;</td><td class="check">&#10003; Required</td></tr>
+    <tr><td><strong>Container (Podman/Docker)</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Edge / single-server</strong></td><td class="check">&#10003;</td><td class="cross">&#10007; (needs 6+ node cluster)</td></tr>
+    <tr><td><strong>Air-gapped environment</strong></td><td class="check">&#10003; Single binary</td><td class="partial">Complex mirror registry</td></tr>
+    <tr><td><strong>CI/CD pipeline</strong></td><td class="check">&#10003; YAML + CLI</td><td class="partial">CRDs (complex)</td></tr>
+  </table>
+
+  <h3>Infrastructure Requirements</h3>
+  <div class="vs-row">
+    <div class="vs-col vs-h2k">
+      <h4 style="color:#22c55e;">h2kvm Minimum Requirements</h4>
+      <ul>
+        <li>Any Linux distribution (RHEL, Fedora, Ubuntu, Debian, SUSE...)</li>
+        <li>Python 3.8+ and qemu-img</li>
+        <li>Optional: libvirt for KVM deploy</li>
+        <li>Optional: kubectl + KubeVirt for K8s deploy</li>
+        <li>Optional: K3s for single-node KubeVirt</li>
+        <li><strong>Runs on your existing infrastructure</strong></li>
+      </ul>
+    </div>
+    <div class="vs-col vs-mtv">
+      <h4 style="color:#ef4444;">MTV Minimum Requirements</h4>
+      <ul>
+        <li>OpenShift 4.x cluster (RHCOS nodes)</li>
+        <li>3 control plane nodes + 3 worker nodes minimum</li>
+        <li>OpenShift Virtualization operator installed</li>
+        <li>MTV operator from OperatorHub</li>
+        <li>OLM (Operator Lifecycle Manager)</li>
+        <li><strong>Requires dedicated infrastructure</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7: Migration Workflow Comparison -->
+<div class="page page-light">
+  <h2 class="st">Migration Workflow <span>Comparison</span></h2>
+  <p class="sub">Migrating 100 VMware VMs to KubeVirt — step by step.</p>
+
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:18%">Step</th><th style="width:38%">h2kvm + hypersdk</th><th style="width:39%">MTV</th></tr>
+    <tr><td>0</td><td><strong>Platform setup</strong></td><td class="check">Install Python + qemu-img + K3s (30 min)</td><td class="cross">Deploy OpenShift cluster (1-3 days)</td></tr>
+    <tr><td>1</td><td><strong>Tool installation</strong></td><td class="check"><code>pip install h2kvm</code> (2 min)</td><td>Install MTV operator via OLM (15 min)</td></tr>
+    <tr><td>2</td><td><strong>Pre-flight check</strong></td><td class="check"><code>h2kvmctl doctor</code> — 9 area check</td><td class="cross">No equivalent</td></tr>
+    <tr><td>3</td><td><strong>Discover VMs</strong></td><td class="check">zkvm TUI: browse vCenter, see CPU/RAM/state</td><td class="check">Add vSphere provider, inventory sync</td></tr>
+    <tr><td>4</td><td><strong>Plan migration</strong></td><td class="check">Select VMs in TUI, review execution plan</td><td class="check">Create Migration Plan CR</td></tr>
+    <tr><td>5</td><td><strong>Execute</strong></td><td class="check">Ctrl+R — batch export + convert + deploy</td><td class="check">Start migration plan</td></tr>
+    <tr><td>6</td><td><strong>Monitor progress</strong></td><td class="check">Real-time streaming + ETA + speed</td><td class="partial">Web UI progress bars</td></tr>
+    <tr><td>7</td><td><strong>Guest fixes</strong></td><td class="check">Automatic: fstab, initramfs, VirtIO, network</td><td class="partial">virt-v2v subset (limited)</td></tr>
+    <tr><td>8</td><td><strong>Boot verification</strong></td><td class="check">Automated boot test per VM</td><td class="cross">Manual verification required</td></tr>
+    <tr><td>9</td><td><strong>Also deploy to KVM?</strong></td><td class="check">Yes — dual target in same pipeline</td><td class="cross">Not possible — KubeVirt only</td></tr>
+    <tr><td>10</td><td><strong>Notifications</strong></td><td class="check">Webhook to Slack/Teams on completion</td><td class="cross">Check web UI manually</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>Total Time to Migrate 100 VMs</h3>
+    <p style="font-size:1.05em;"><strong>h2kvm:</strong> 30 min setup + ~8 hours migration = <strong>under 1 day</strong><br>
+    <strong>MTV:</strong> 1-3 days OCP setup + 1 day MTV setup + ~10 hours migration = <strong>3-5 days</strong></p>
+    <p style="font-size:0.85em; opacity:0.7; margin-bottom:0;">h2kvm is faster to set up, faster to run, and is licensed* in platform fees.</p>
+  </div>
+</div>
+
+<!-- PAGE 8: Use Cases Where h2kvm Wins -->
+<div class="page page-dark">
+  <h2 class="st">Use Cases Where <span>h2kvm Wins</span></h2>
+  <p class="sub">Scenarios where MTV simply cannot compete.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>1. VMware Exit to Standalone KVM</h4>
+      <p>The most common migration target is plain KVM/libvirt — not Kubernetes. MTV <strong>cannot deploy to standalone KVM at all</strong>. h2kvm generates libvirt XML, defines the domain, and boot-tests it. This is the #1 use case MTV misses entirely.</p>
+    </div>
+    <div class="card">
+      <h4>2. Cloud Repatriation</h4>
+      <p>Bring VMs home from AWS, Azure, GCP, or OCI. hypersdk exports from 10 cloud providers, h2kvmctl converts and deploys. MTV has <strong>zero cloud source support</strong> — it's VMware-to-OpenShift only.</p>
+    </div>
+    <div class="card">
+      <h4>3. Edge / Branch Office</h4>
+      <p>50 retail stores each need 3-5 VMs migrated. h2kvm + K3s runs on a single server per site ($0). MTV requires a 6+ node OpenShift cluster per site ($50K+ per site). <strong>$2.5M vs $0.</strong></p>
+    </div>
+    <div class="card">
+      <h4>4. Budget-Constrained Organization</h4>
+      <p>Startup, government agency, or nonprofit that can't afford OpenShift. h2kvm is Proprietary (Zyvor AI Labs) — zero cost, forever. Full enterprise features without a subscription.</p>
+    </div>
+    <div class="card">
+      <h4>5. Multi-Cloud Consolidation</h4>
+      <p>VMs scattered across VMware, AWS, and Azure — consolidate to on-prem KVM. One tool (h2kvm + hypersdk) handles all three sources. MTV can only handle VMware.</p>
+    </div>
+    <div class="card">
+      <h4>6. Air-Gapped / Classified</h4>
+      <p>Defense, intelligence, or regulated environments with no internet. h2kvm is a single binary + Python package. MTV requires mirroring an entire OpenShift release + operator catalog — a multi-day project.</p>
+    </div>
+    <div class="card">
+      <h4>7. CI/CD Migration Pipeline</h4>
+      <p>Automate VM migration in Jenkins/GitLab CI. h2kvm uses YAML configs and CLI commands. MTV requires kubectl + CRDs + operator lifecycle — far more complex to automate.</p>
+    </div>
+    <div class="card">
+      <h4>8. Hybrid Deploy (KVM + KubeVirt)</h4>
+      <p>Some VMs go to traditional KVM hosts, others to KubeVirt. h2kvm handles both from the same pipeline with <code>emit_domain_xml + deploy_k8s</code>. MTV can only do KubeVirt — the KVM VMs need a different tool.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 9: Technical Deep Dive -->
+<div class="page page-light">
+  <h2 class="st">Technical <span>Deep Dive</span></h2>
+  <p class="sub">Why the architecture matters for long-term success.</p>
+
+  <h3>hypersdk: Hexagonal Architecture</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Domain Layer</h4>
+      <p>70+ canonical Go types: Job, Schedule, VM, Cost, Carbon, Webhook, Audit, RBAC. Zero external dependencies. Business logic is portable and testable.</p>
+    </div>
+    <div class="card">
+      <h4>Ports Layer</h4>
+      <p>13+ interfaces: JobManager, ScheduleManager, CapabilityDetector, CostEstimator, CarbonTracker, AuditLogger. Clean contracts, easy to mock and test.</p>
+    </div>
+    <div class="card">
+      <h4>Adapters Layer</h4>
+      <p>REST API, provider clients, SQLite store, Prometheus metrics, webhook dispatcher, secrets vault. Swap any adapter without touching business logic.</p>
+    </div>
+  </div>
+
+  <h3>Conversion Engine Comparison</h3>
+  <table>
+    <tr><th style="width:25%">Aspect</th><th style="width:37%">h2kvm (VMCraft)</th><th style="width:38%">MTV (virt-v2v)</th></tr>
+    <tr><td><strong>Implementation</strong></td><td>Pure Python + qemu-nbd</td><td>OCaml + libguestfs + supermin</td></tr>
+    <tr><td><strong>Startup overhead</strong></td><td class="check">~0s (direct mount)</td><td class="cross">~30s (appliance boot per VM)</td></tr>
+    <tr><td><strong>Dependencies</strong></td><td class="check">Python 3, qemu-utils</td><td class="cross">libguestfs, supermin, kernel modules</td></tr>
+    <tr><td><strong>Container-friendly</strong></td><td class="check">Yes — runs in any container</td><td class="cross">Needs /dev/kvm + kernel modules</td></tr>
+    <tr><td><strong>Hardened systems</strong></td><td class="check">Works on SELinux enforcing</td><td class="cross">Often fails on restricted systems</td></tr>
+    <tr><td><strong>Package size</strong></td><td class="check">~5 MB</td><td class="cross">~500 MB+ with appliance</td></tr>
+    <tr><td><strong>Extensibility</strong></td><td class="check">Add fix in Python — easy</td><td class="cross">Modify OCaml — steep learning curve</td></tr>
+    <tr><td><strong>Test suite</strong></td><td class="check">1,273 Python + 116 Go tests</td><td>Limited upstream tests</td></tr>
+  </table>
+
+  <div class="highlight">
+    <h3 style="margin-top:0;">Quality Assurance</h3>
+    <p>h2kvm has <strong>1,273 Python tests</strong> and <strong>116 Go tests</strong> — all passing. The codebase is actively maintained with comprehensive coverage of edge cases: VMDK descriptor parsing, multi-extent disks, UEFI/BIOS detection, Windows registry manipulation, fstab UUID conversion, and KubeVirt manifest generation.</p>
+  </div>
+</div>
+
+<!-- PAGE 10: Final Verdict -->
+<div class="page page-dark">
+  <h2 class="st">Final <span>Verdict</span></h2>
+  <p class="sub">The complete picture — why h2kvm + hypersdk is the better choice.</p>
+
+  <table>
+    <tr><th style="width:25%">Dimension</th><th style="width:37%">h2kvm + hypersdk</th><th style="width:38%">Red Hat MTV</th></tr>
+    <tr><td><strong>Cost</strong></td><td><span class="tag tag-free">FREE</span> Proprietary (Zyvor AI Labs)</td><td><span class="tag tag-paid">$50K+/yr</span> OpenShift required</td></tr>
+    <tr><td><strong>Scope</strong></td><td>Full migration platform</td><td>VMware-to-KubeVirt converter</td></tr>
+    <tr><td><strong>Sources</strong></td><td>VMware, Hyper-V, 10 clouds, local</td><td>VMware (limited Hyper-V)</td></tr>
+    <tr><td><strong>KVM target</strong></td><td class="check">&#10003; Primary target</td><td class="cross">&#10007; Not supported</td></tr>
+    <tr><td><strong>KubeVirt target</strong></td><td class="check">&#10003; Any K8s</td><td>OpenShift only</td></tr>
+    <tr><td><strong>Platform lock-in</strong></td><td class="check">None — runs anywhere</td><td class="cross">OpenShift ecosystem</td></tr>
+    <tr><td><strong>UI</strong></td><td>CLI + TUI + YAML</td><td>Web UI (needs OCP console)</td></tr>
+    <tr><td><strong>Boot verification</strong></td><td class="check">&#10003; Automated</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Scheduling</strong></td><td class="check">&#10003; Cron, priority, carbon-aware</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Edge / small sites</strong></td><td class="check">&#10003; Single server</td><td class="cross">&#10007; 6+ node cluster</td></tr>
+    <tr><td><strong>Air-gap</strong></td><td class="check">&#10003; Simple</td><td class="partial">Complex mirror setup</td></tr>
+    <tr><td><strong>Dependencies</strong></td><td class="check">Lightweight (Python + qemu)</td><td class="cross">Heavy (libguestfs + OCP)</td></tr>
+    <tr><td><strong>Architecture</strong></td><td>Hexagonal, 13+ ports</td><td>Monolithic operator</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>Bottom Line</h3>
+    <p style="font-size:1.05em;">MTV is a capable tool — <em>if you're already committed to OpenShift</em>.<br>
+    For everyone else, <strong>h2kvm + hypersdk</strong> delivers more features, more flexibility,<br>
+    more deployment targets, and more source platforms — at <strong>zero cost</strong>.</p>
+    <p style="font-size:0.9em; opacity:0.8; margin-bottom:0;">
+    Don't pay $150K+ for a migration tool locked to one platform.<br>
+    Use the open platform that works everywhere.
+    </p>
+  </div>
+
+  <div class="footer"><p>h2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
+</div>
+
+</body>
+</html>

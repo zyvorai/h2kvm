@@ -8,7 +8,7 @@ package ports
 import (
 	"context"
 
-	"github.com/hyper2kvm/web/internal/domain"
+	"github.com/h2kvm/web/internal/domain"
 )
 
 // ComputeProvider abstracts VM discovery for a cloud/hypervisor provider.

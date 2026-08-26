@@ -48,7 +48,7 @@ source.url must use http, https, or s3 scheme, got: ftp
 $ kubectl apply -f small-disk.yaml
 Warning: storage.size is less than 1GB, this may be too small for most VM images
 Warning: LiveMigrate eviction strategy requires ReadWriteMany access mode for shared storage
-hyperconversion.hyper2kvm.io/test created
+hyperconversion.h2kvm.io/test created
 ```
 
 ### Mutation Webhook
@@ -73,7 +73,7 @@ The operator includes a MutatingWebhookConfiguration that automatically sets sen
 **Example**:
 ```yaml
 # Input
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: minimal-example
@@ -89,7 +89,7 @@ spec:
     memory: 8Gi
 
 # After Mutation (defaults added automatically)
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: minimal-example
@@ -139,15 +139,15 @@ kubectl get validatingwebhookconfigurations | grep hyperconversion
 kubectl get mutatingwebhookconfigurations | grep hyperconversion
 
 # Check webhook service
-kubectl get svc -n hyper2kvm-system webhook-service
+kubectl get svc -n h2kvm-system webhook-service
 
 # Check certificates
-kubectl get certificate -n hyper2kvm-system
-kubectl get secret -n hyper2kvm-system webhook-server-cert
+kubectl get certificate -n h2kvm-system
+kubectl get secret -n h2kvm-system webhook-server-cert
 
 # Test validation
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: test-validation
@@ -183,7 +183,7 @@ The operator exposes Prometheus metrics via a ServiceMonitor resource (requires 
 **Accessing Metrics**:
 ```bash
 # Port-forward to operator pod
-kubectl port-forward -n hyper2kvm-system deployment/hyperconversion-operator 8443:8443
+kubectl port-forward -n h2kvm-system deployment/hyperconversion-operator 8443:8443
 
 # Query metrics (if auth disabled)
 curl -k https://localhost:8443/metrics
@@ -198,7 +198,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: hyperconversion-operator
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   selector:
     matchLabels:
@@ -230,7 +230,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: hyperconversion-operator-pdb
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   minAvailable: 1
   selector:
@@ -245,8 +245,8 @@ spec:
 
 **Verify PDB**:
 ```bash
-kubectl get pdb -n hyper2kvm-system
-kubectl describe pdb hyperconversion-operator-pdb -n hyper2kvm-system
+kubectl get pdb -n h2kvm-system
+kubectl describe pdb hyperconversion-operator-pdb -n h2kvm-system
 ```
 
 ---
@@ -272,7 +272,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: hyperconversion-operator-netpol
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   podSelector:
     matchLabels:
@@ -300,8 +300,8 @@ spec:
 kubectl apply -f config/network/network-policy.yaml
 
 # Verify policy
-kubectl get netpol -n hyper2kvm-system
-kubectl describe netpol hyperconversion-operator-netpol -n hyper2kvm-system
+kubectl get netpol -n h2kvm-system
+kubectl describe netpol hyperconversion-operator-netpol -n h2kvm-system
 
 # Test operator still works
 kubectl apply -f config/samples/simple-vmdk-to-vm.yaml
@@ -347,7 +347,7 @@ readinessProbe:
 **Testing Health Checks**:
 ```bash
 # Port-forward to operator pod
-kubectl port-forward -n hyper2kvm-system deployment/hyperconversion-operator 8081:8081
+kubectl port-forward -n h2kvm-system deployment/hyperconversion-operator 8081:8081
 
 # Check liveness
 curl http://localhost:8081/healthz
@@ -381,7 +381,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: selfsigned-issuer
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   selfSigned: {}
 ---
@@ -389,11 +389,11 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: serving-cert
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   dnsNames:
-  - webhook-service.hyper2kvm-system.svc
-  - webhook-service.hyper2kvm-system.svc.cluster.local
+  - webhook-service.h2kvm-system.svc
+  - webhook-service.h2kvm-system.svc.cluster.local
   issuerRef:
     kind: Issuer
     name: selfsigned-issuer
@@ -403,14 +403,14 @@ spec:
 **Verify Certificates**:
 ```bash
 # Check certificate status
-kubectl get certificate -n hyper2kvm-system serving-cert
-kubectl describe certificate -n hyper2kvm-system serving-cert
+kubectl get certificate -n h2kvm-system serving-cert
+kubectl describe certificate -n h2kvm-system serving-cert
 
 # Check secret created
-kubectl get secret -n hyper2kvm-system webhook-server-cert
+kubectl get secret -n h2kvm-system webhook-server-cert
 
 # View certificate details
-kubectl get secret -n hyper2kvm-system webhook-server-cert -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -text -noout
+kubectl get secret -n h2kvm-system webhook-server-cert -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -text -noout
 ```
 
 ---
@@ -421,7 +421,7 @@ kubectl get secret -n hyper2kvm-system webhook-server-cert -o jsonpath='{.data.t
 
 ```bash
 cd operator
-make deploy IMG=hyper2kvm-operator:latest
+make deploy IMG=h2kvm-operator:latest
 ```
 
 ### Deployment with Webhooks
@@ -448,7 +448,7 @@ cd operator
 kubectl apply -f config/prometheus/monitor.yaml
 
 # Verify metrics are being scraped
-kubectl get servicemonitor -n hyper2kvm-system
+kubectl get servicemonitor -n h2kvm-system
 ```
 
 ### Deployment with Network Policy
@@ -459,7 +459,7 @@ cd operator
 kubectl apply -f config/network/network-policy.yaml
 
 # Verify policy
-kubectl get netpol -n hyper2kvm-system
+kubectl get netpol -n h2kvm-system
 ```
 
 ### Complete Production Deployment
@@ -473,12 +473,12 @@ cd operator
 kustomize build config/default_with_webhooks | kubectl apply -f -
 
 # 3. Verify deployment
-kubectl get pods -n hyper2kvm-system
-kubectl get svc -n hyper2kvm-system
-kubectl get certificate -n hyper2kvm-system
-kubectl get pdb -n hyper2kvm-system
-kubectl get netpol -n hyper2kvm-system
-kubectl get servicemonitor -n hyper2kvm-system
+kubectl get pods -n h2kvm-system
+kubectl get svc -n h2kvm-system
+kubectl get certificate -n h2kvm-system
+kubectl get pdb -n h2kvm-system
+kubectl get netpol -n h2kvm-system
+kubectl get servicemonitor -n h2kvm-system
 
 # 4. Test webhooks
 kubectl apply -f config/samples/simple-vmdk-to-vm.yaml

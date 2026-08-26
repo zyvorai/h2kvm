@@ -28,7 +28,7 @@ Interactive tools to help you make informed migration decisions.
 - Output formats (QCOW2, Raw, VDI, VMDK)
 - Deployment options (Standalone, Kubernetes, OpenShift)
 - OS support (15+ Linux, 10+ Windows versions)
-- Tool comparison (Hyper2KVM vs alternatives)
+- Tool comparison (H2KVM vs alternatives)
 
 **Use when**: Evaluating options, comparing approaches, choosing formats
 

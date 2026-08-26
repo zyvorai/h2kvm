@@ -15,7 +15,7 @@ If you have [GitHub CLI](https://cli.github.com/) installed:
 
 ### Option 2: Manual (Web Interface)
 
-1. Go to https://github.com/ssahani/hyper2kvm/labels
+1. Go to https://github.com/ssahani/h2kvm/labels
 2. Click "New label"
 3. Create each label from the list below
 
@@ -109,7 +109,7 @@ When creating an issue, add appropriate labels:
 gh label create "new-label" --color "ffffff" --description "Description"
 
 # Or via web interface
-# https://github.com/ssahani/hyper2kvm/labels/new
+# https://github.com/ssahani/h2kvm/labels/new
 ```
 
 ### Editing Existing Labels

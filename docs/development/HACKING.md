@@ -1,8 +1,8 @@
 # Developer Guide
 
-**Welcome to hyper2kvm development!**
+**Welcome to h2kvm development!**
 
-This guide will help you get started with contributing to hyper2kvm.
+This guide will help you get started with contributing to h2kvm.
 
 ---
 
@@ -19,8 +19,8 @@ This guide will help you get started with contributing to hyper2kvm.
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 
 # Create virtual environment
 python3 -m venv venv
@@ -33,7 +33,7 @@ pip install -e .[dev,test]
 pre-commit install
 
 # Verify installation
-python -c "import hyper2kvm; print(hyper2kvm.__version__)"
+python -c "import h2kvm; print(h2kvm.__version__)"
 pytest tests/unit/ -v
 ```
 
@@ -70,13 +70,13 @@ ruff format .
 ruff check --fix .
 
 # Type check
-mypy hyper2kvm/
+mypy h2kvm/
 
 # Run unit tests
 pytest tests/unit/
 
 # Run with coverage
-pytest --cov=hyper2kvm --cov-report=html
+pytest --cov=h2kvm --cov-report=html
 ```
 
 ### 4. Write Tests
@@ -86,7 +86,7 @@ All new code must have tests:
 ```python
 # tests/unit/test_mymodule.py
 import pytest
-from hyper2kvm.mymodule import my_function
+from h2kvm.mymodule import my_function
 
 class TestMyFunction:
     """Tests for my_function()."""
@@ -138,7 +138,7 @@ Then create PR on GitHub.
 ## Project Structure
 
 ```text
-hyper2kvm/
+h2kvm/
 ├── core/              # Foundation (utilities, logging, validation)
 ├── vmcraft/           # VM analysis/modification API
 │   ├── block_device.py   # Loop device + NBD manager
@@ -187,7 +187,7 @@ pytest tests/unit/test_vmcraft/
 pytest tests/unit/test_vmcraft/test_block_device.py::TestLoopDevice::test_attach_success
 
 # With coverage
-pytest --cov=hyper2kvm --cov-report=html
+pytest --cov=h2kvm --cov-report=html
 
 # Parallel execution (faster)
 pytest -n auto
@@ -276,7 +276,7 @@ ruff check .
 ruff check --fix .
 
 # Check specific file
-ruff check hyper2kvm/vmcraft/storage.py
+ruff check h2kvm/vmcraft/storage.py
 ```
 
 Configuration: `ruff.toml`
@@ -287,13 +287,13 @@ Type hints are required:
 
 ```bash
 # Check all code
-mypy hyper2kvm/
+mypy h2kvm/
 
 # Check specific file
-mypy hyper2kvm/vmcraft/storage.py
+mypy h2kvm/vmcraft/storage.py
 
 # Show error codes
-mypy --show-error-codes hyper2kvm/
+mypy --show-error-codes h2kvm/
 ```
 
 Configuration: `mypy.ini`
@@ -325,8 +325,8 @@ Configuration: `.pre-commit-config.yaml`
 ### Enable Debug Logging
 
 ```bash
-export HYPER2KVM_LOG_LEVEL=DEBUG
-hyper2kvm-migrate ...
+export H2KVM_LOG_LEVEL=DEBUG
+h2kvm-migrate ...
 ```
 
 ### Interactive Debugging
@@ -359,7 +359,7 @@ pytest tests/unit/
 
 ### Add New Module
 
-1. Create module file: `hyper2kvm/mymodule.py`
+1. Create module file: `h2kvm/mymodule.py`
 2. Add type hints and docstrings
 3. Create test file: `tests/unit/test_mymodule.py`
 4. Write comprehensive tests
@@ -426,13 +426,13 @@ We follow [Semantic Versioning](https://semver.org/):
 - [CODING_STYLE.md](CODING_STYLE.md) - Coding standards
 - [CONTRIBUTING.md](../CONTRIBUTING.md) - Contribution guidelines
 - [CODE_METRICS.md](../CODE_METRICS.md) - Code quality metrics
-- [API Documentation](https://hyper2kvm.readthedocs.io) - Online docs
+- [API Documentation](https://h2kvm.readthedocs.io) - Online docs
 
 ### Community
 
-- **GitHub Issues**: <https://github.com/ssahani/hyper2kvm/issues>
-- **GitHub Discussions**: <https://github.com/ssahani/hyper2kvm/discussions>
-- **Pull Requests**: <https://github.com/ssahani/hyper2kvm/pulls>
+- **GitHub Issues**: <https://github.com/ssahani/h2kvm/issues>
+- **GitHub Discussions**: <https://github.com/ssahani/h2kvm/discussions>
+- **Pull Requests**: <https://github.com/ssahani/h2kvm/pulls>
 
 ### Asking Questions
 
@@ -441,7 +441,7 @@ When asking for help, include:
 1. What you're trying to do
 2. What you've tried
 3. Error messages (full traceback)
-4. Environment (OS, Python version, hyper2kvm version)
+4. Environment (OS, Python version, h2kvm version)
 5. Minimal reproducible example
 
 ---
@@ -512,7 +512,7 @@ Settings (`.vscode/settings.json`):
 
 ```bash
 # Profile with cProfile
-python -m cProfile -o profile.stats hyper2kvm/cli/main.py
+python -m cProfile -o profile.stats h2kvm/cli/main.py
 
 # Visualize with snakeviz
 pip install snakeviz
@@ -533,7 +533,7 @@ python -m memory_profiler script.py
 
 ```bash
 # Generate coverage report
-pytest --cov=hyper2kvm --cov-report=html
+pytest --cov=h2kvm --cov-report=html
 
 # Open in browser
 open htmlcov/index.html  # macOS
@@ -563,8 +563,8 @@ See `.github/workflows/` for configuration.
 # Run what CI will run
 ruff format --check .
 ruff check .
-mypy hyper2kvm/
-pytest tests/unit/ --cov=hyper2kvm
+mypy h2kvm/
+pytest tests/unit/ --cov=h2kvm
 ```
 
 ---
@@ -592,7 +592,7 @@ git commit
 pip install -e .[dev,test]
 
 # Check installation
-python -c "import hyper2kvm; print(hyper2kvm.__file__)"
+python -c "import h2kvm; print(h2kvm.__file__)"
 ```
 
 ### Test Failures
@@ -646,7 +646,7 @@ pre-commit install
 # Development
 ruff format .                    # Format
 ruff check --fix .               # Lint
-mypy hyper2kvm/                  # Type check
+mypy h2kvm/                  # Type check
 pytest tests/unit/               # Test
 
 # Commit
@@ -654,7 +654,7 @@ git add .
 git commit -m "feat: add feature"  # Pre-commit runs
 
 # Quality
-pytest --cov=hyper2kvm --cov-report=html
+pytest --cov=h2kvm --cov-report=html
 open htmlcov/index.html
 ```
 

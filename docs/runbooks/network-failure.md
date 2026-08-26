@@ -16,19 +16,19 @@ Network connectivity lost between migration worker and source systems during act
 ### Kubernetes Migrations
 ```bash
 # Check pod events for network errors
-kubectl describe pod -n hyper2kvm-migration -l job-name=migration | grep -A10 Events
+kubectl describe pod -n h2kvm-migration -l job-name=migration | grep -A10 Events
 # Look for: "connection refused", "timeout", "connection reset"
 
 # Check CDI DataVolume import status
 kubectl get dv -A
-kubectl get dv -n hyper2kvm-migration -o yaml | grep -A5 "phase:"
+kubectl get dv -n h2kvm-migration -o yaml | grep -A5 "phase:"
 # Look for: ImportInProgress (stuck), Failed
 
 # Check operator logs for timeout errors
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager --tail=50 | grep -iE "timeout|connection|network"
+kubectl logs -n h2kvm-system -l control-plane=controller-manager --tail=50 | grep -iE "timeout|connection|network"
 
 # Check CDI importer logs
-kubectl logs -n hyper2kvm-migration -l app=containerized-data-importer | grep -E "ERROR|WARN"
+kubectl logs -n h2kvm-migration -l app=containerized-data-importer | grep -E "ERROR|WARN"
 ```
 
 ### CLI Migrations (vSphere/govc)
@@ -41,7 +41,7 @@ export GOVC_INSECURE=1
 govc ls  # test connection
 
 # Check for timeout errors in logs
-grep -i "timeout\|connection" /tmp/hyper2kvm-*/migration.log
+grep -i "timeout\|connection" /tmp/h2kvm-*/migration.log
 
 # Test ESXi host network reachability
 ping <esxi-host>
@@ -72,33 +72,33 @@ mtr -r vcenter.example.com  # detailed path analysis
 ### 1. Identify failure point
 ```bash
 # Check when the failure occurred
-kubectl get events -n hyper2kvm-migration --sort-by=.lastTimestamp | tail -20
+kubectl get events -n h2kvm-migration --sort-by=.lastTimestamp | tail -20
 
 # Check HyperConversion progress before failure
-kubectl describe hc <name> -n hyper2kvm-migration | grep -A20 status
+kubectl describe hc <name> -n h2kvm-migration | grep -A20 status
 
 # For CLI migrations, check progress in logs
-tail -100 /tmp/hyper2kvm-*/migration.log | grep PROGRESS
+tail -100 /tmp/h2kvm-*/migration.log | grep PROGRESS
 ```
 
 ### 2. Determine network path
 ```bash
 # Identify source system
-kubectl get hc <name> -n hyper2kvm-migration -o yaml | grep -E "sourceVmdk|vsphereUrl"
+kubectl get hc <name> -n h2kvm-migration -o yaml | grep -E "sourceVmdk|vsphereUrl"
 
 # Test network path from worker pod
-kubectl exec -n hyper2kvm-migration <pod> -- curl -k https://vcenter.example.com
-kubectl exec -n hyper2kvm-migration <pod> -- nc -zv <esxi-host> 902  # HTTPS datastore access
+kubectl exec -n h2kvm-migration <pod> -- curl -k https://vcenter.example.com
+kubectl exec -n h2kvm-migration <pod> -- nc -zv <esxi-host> 902  # HTTPS datastore access
 ```
 
 ### 3. Check for partial download
 ```bash
 # Kubernetes: check PVC size
-kubectl get pvc -n hyper2kvm-migration -o yaml | grep storage
+kubectl get pvc -n h2kvm-migration -o yaml | grep storage
 
 # CLI: check downloaded size
-ls -lh /tmp/hyper2kvm-*/
-du -sh /tmp/hyper2kvm-*/*.vmdk
+ls -lh /tmp/h2kvm-*/
+du -sh /tmp/h2kvm-*/*.vmdk
 
 # Compare with expected size (from vSphere)
 govc vm.info -json <vm-name> | jq '.VirtualMachines[].Config.Hardware.Device[] | select(.Backing.FileName) | .Backing.FileName, .CapacityInBytes'
@@ -145,10 +145,10 @@ h2kvmctl --cmd vsphere \
   --vs-action export_vm \
   --vs-export-retries 5 \
   --vs-export-timeout 3600 \
-  --output-dir /tmp/hyper2kvm-retry
+  --output-dir /tmp/h2kvm-retry
 
 # Or edit Kubernetes HyperConversion CR
-kubectl edit hc <name> -n hyper2kvm-migration
+kubectl edit hc <name> -n h2kvm-migration
 # Add: exportRetries: 5, exportTimeout: 3600
 ```
 
@@ -160,7 +160,7 @@ govc export.ovf -vm <vm-name> /tmp/manual-export/
 # Then convert locally
 h2kvmctl --cmd local \
   --vmdk /tmp/manual-export/<vm-name>-disk-0.vmdk \
-  --output-dir /tmp/hyper2kvm-converted \
+  --output-dir /tmp/h2kvm-converted \
   --output-format qcow2
 ```
 
@@ -168,27 +168,27 @@ h2kvmctl --cmd local \
 
 #### 1. Check DataVolume status
 ```bash
-kubectl get dv -n hyper2kvm-migration
-kubectl describe dv <name> -n hyper2kvm-migration
+kubectl get dv -n h2kvm-migration
+kubectl describe dv <name> -n h2kvm-migration
 ```
 
 #### 2. If stuck in ImportInProgress
 ```bash
 # CDI has built-in retry logic (default: 3 retries)
 # Wait for automatic retry (check logs)
-kubectl logs -n hyper2kvm-migration -l app=containerized-data-importer --follow
+kubectl logs -n h2kvm-migration -l app=containerized-data-importer --follow
 
 # Check retry count
-kubectl get dv <name> -n hyper2kvm-migration -o yaml | grep -A5 restartCount
+kubectl get dv <name> -n h2kvm-migration -o yaml | grep -A5 restartCount
 ```
 
 #### 3. If Failed permanently
 ```bash
 # Delete and recreate DataVolume
-kubectl delete dv <name> -n hyper2kvm-migration
+kubectl delete dv <name> -n h2kvm-migration
 
 # Delete and reapply HyperConversion CR
-kubectl delete hc <name> -n hyper2kvm-migration
+kubectl delete hc <name> -n h2kvm-migration
 kubectl apply -f <hyperconversion.yaml>
 ```
 
@@ -197,17 +197,17 @@ kubectl apply -f <hyperconversion.yaml>
 #### 1. Check copy stage completion
 ```bash
 # If copy-vmdk job succeeded, VMDK is local (no network needed)
-kubectl get job copy-vmdk -n hyper2kvm-migration
+kubectl get job copy-vmdk -n h2kvm-migration
 
 # Check PVC with VMDK
-kubectl get pvc vmdk-input -n hyper2kvm-migration
-kubectl exec -n hyper2kvm-migration <pod> -- ls -lh /mnt/vmdk-input/
+kubectl get pvc vmdk-input -n h2kvm-migration
+kubectl exec -n h2kvm-migration <pod> -- ls -lh /mnt/vmdk-input/
 ```
 
 #### 2. Resume migration from local PVC
 ```bash
 # If copy succeeded, migration job reads locally
-kubectl delete job migration -n hyper2kvm-migration  # delete failed job
+kubectl delete job migration -n h2kvm-migration  # delete failed job
 kubectl apply -f <migration-job.yaml>  # retry
 
 # Migration will use local PVC, no network needed
@@ -258,7 +258,7 @@ sudo iptables -L -n
 ### Retry Configuration
 ```yaml
 # HyperConversion CR with retry settings
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: migration-with-retries
@@ -282,10 +282,10 @@ h2kvmctl --cmd vsphere \
 ### Network Monitoring
 ```bash
 # Monitor CDI importer progress
-kubectl logs -n hyper2kvm-migration -l app=containerized-data-importer --follow | grep PROGRESS
+kubectl logs -n h2kvm-migration -l app=containerized-data-importer --follow | grep PROGRESS
 
 # Monitor vSphere export progress (CLI)
-tail -f /tmp/hyper2kvm-*/migration.log | grep -E "PROGRESS|download"
+tail -f /tmp/h2kvm-*/migration.log | grep -E "PROGRESS|download"
 
 # Set up network alerts (Prometheus example)
 # Alert if migration pod has network errors >3 in 5 minutes

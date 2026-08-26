@@ -2,7 +2,7 @@
 #   h2kvmctl --config 10-local/local-linux-cloud-init.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config 10-local/local-linux-cloud-init.yaml
+#   h2kvm --config 10-local/local-linux-cloud-init.yaml
 
 command: local
 vmdk: /path/to/linux.vmdk

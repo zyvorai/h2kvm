@@ -1,4 +1,4 @@
-# Prometheus Configuration for hyper2kvm
+# Prometheus Configuration for h2kvm
 
 global:
   scrape_interval: 15s      # Scrape metrics every 15 seconds
@@ -13,20 +13,20 @@ alerting:
 
 # Load rules once and periodically evaluate them
 rule_files:
-  # - "hyper2kvm_alerts.yml"
+  # - "h2kvm_alerts.yml"
 
 # Scrape configurations
 scrape_configs:
-  # hyper2kvm metrics
-  - job_name: 'hyper2kvm'
+  # h2kvm metrics
+  - job_name: 'h2kvm'
     static_configs:
       - targets: ['localhost:9090']
         labels:
-          instance: 'hyper2kvm-main'
+          instance: 'h2kvm-main'
           environment: 'production'
 
-  # If running multiple hyper2kvm instances
-  - job_name: 'hyper2kvm-workers'
+  # If running multiple h2kvm instances
+  - job_name: 'h2kvm-workers'
     static_configs:
       - targets:
           - 'worker1:9090'

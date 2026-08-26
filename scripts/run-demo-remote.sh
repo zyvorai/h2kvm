@@ -2,8 +2,8 @@
 # run-demo-remote.sh — Convert a VMware VM and boot it on KVM
 #
 # Usage:
-#   ./run-demo-remote.sh /root/hyper2kvm/RockyLinux_9.4_VMM_LinuxVMImages.COM.vmdk
-#   ./run-demo-remote.sh /root/hyper2kvm/win10.ova
+#   ./run-demo-remote.sh /root/h2kvm/RockyLinux_9.4_VMM_LinuxVMImages.COM.vmdk
+#   ./run-demo-remote.sh /root/h2kvm/win10.ova
 #
 # Supports: .vmdk .ova .ovf .vhd .raw
 
@@ -66,7 +66,7 @@ ORIG_SRC="$1"
 [[ -f "$ORIG_SRC" ]] || die "File not found: $ORIG_SRC"
 
 # Copy source to a safe working directory (avoids /root/* security restriction)
-WORKDIR="/var/lib/hyper2kvm/input"
+WORKDIR="/var/lib/h2kvm/input"
 mkdir -p "$WORKDIR"
 BASENAME_ORIG="$(basename "$ORIG_SRC")"
 SRC="$WORKDIR/$BASENAME_ORIG"
@@ -88,7 +88,7 @@ if [[ -n "${SUDO_USER:-}" ]]; then
 else
     _USER_HOME="${HOME:-$(eval echo ~"$(whoami)")}"
 fi
-OUTPUT_DIR="${HYPER2KVM_OUTPUT:-${_USER_HOME}/hyper2kvm/output}/${VM_NAME}"
+OUTPUT_DIR="${H2KVM_OUTPUT:-${_USER_HOME}/h2kvm/output}/${VM_NAME}"
 
 # Disk space check: need ~3x source size for conversion
 SRC_SIZE_MB=$(( $(stat -c%s "$SRC" 2>/dev/null || echo 0) / 1048576 ))
@@ -126,7 +126,7 @@ else
     info "No existing VM named '$VM_NAME'"
 fi
 
-rm -rf "$OUTPUT_DIR" /var/lib/hyper2kvm/conversions/*
+rm -rf "$OUTPUT_DIR" /var/lib/h2kvm/conversions/*
 info "Cleaned output directories"
 
 # ── 2. Convert ──────────────────────────────────────────────────────────

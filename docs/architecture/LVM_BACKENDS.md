@@ -1,6 +1,6 @@
 # LVM Backend Architecture
 
-Hyper2KVM provides three backend options for LVM operations during offline guest fixes, each with different trade-offs between speed, security, and reliability.
+H2KVM provides three backend options for LVM operations during offline guest fixes, each with different trade-offs between speed, security, and reliability.
 
 All backends support **container isolation** (enabled by default), which runs LVM discovery inside a hardened podman/docker container for safe VG scanning without touching host LVM metadata.
 
@@ -70,7 +70,7 @@ The discovered VG names are activated on the host using the same strict device f
 │  Host                                       │
 │                                             │
 │  1. Create isolated LVM_SYSTEM_DIR          │
-│     /tmp/hyper2kvm-lvm-<pid>/               │
+│     /tmp/h2kvm-lvm-<pid>/               │
 │                                             │
 │  2. Prime host LVM cache (filtered)         │
 │     pvscan --cache --config '<filter>'      │
@@ -119,7 +119,7 @@ The two-phase design eliminates this class of bugs entirely:
 
 ### Container Image
 
-On first use, a container image `localhost/hyper2kvm-lvm:latest` is automatically built and cached:
+On first use, a container image `localhost/h2kvm-lvm:latest` is automatically built and cached:
 
 ```dockerfile
 FROM registry.fedoraproject.org/fedora-minimal:latest
@@ -240,7 +240,7 @@ Pure Python backend using `qemu-nbd` + native Linux tools. Fastest startup, mini
 **Architecture:**
 
 ```
-hyper2kvm/vmcraft/lvm.py
+h2kvm/vmcraft/lvm.py
 ├── Core command runner (_run, udev_settle)
 ├── Caching layer (_cache_get/set, invalidate)
 ├── List operations (pvs, vgs, lvs)
@@ -261,7 +261,7 @@ Uses Linux `unshare` to create isolated mount/PID namespace. Maximum security �
 **Architecture:**
 
 ```
-hyper2kvm/vmcraft/namespace_lvm.py
+h2kvm/vmcraft/namespace_lvm.py
 ├── NBD Manager (device pooling, connection monitoring)
 ├── Namespace LVM (strict filtering, unshare execution)
 └── Engine (context manager, start/mount/stop)
@@ -303,7 +303,7 @@ compress: true
 ### Python API
 
 ```python
-from hyper2kvm.fixers.offline_fixer import OfflineFixConfig, OfflineFSFix
+from h2kvm.fixers.offline_fixer import OfflineFixConfig, OfflineFSFix
 
 config = OfflineFixConfig(
     image=Path("disk.qcow2"),
@@ -328,12 +328,12 @@ fixer.run()
 which podman docker
 
 # Test container image
-podman image exists localhost/hyper2kvm-lvm:latest
+podman image exists localhost/h2kvm-lvm:latest
 # or
-docker image inspect localhost/hyper2kvm-lvm:latest
+docker image inspect localhost/h2kvm-lvm:latest
 
 # Rebuild image manually
-podman build -t localhost/hyper2kvm-lvm:latest -f - <<'EOF'
+podman build -t localhost/h2kvm-lvm:latest -f - <<'EOF'
 FROM registry.fedoraproject.org/fedora-minimal:latest
 RUN microdnf install -y --nodocs lvm2 device-mapper && microdnf clean all
 EOF
@@ -360,7 +360,7 @@ sudo modprobe nbd max_part=16
 
 ## See Also
 
-- [hyper2kvm/vmcraft/storage.py](../../hyper2kvm/vmcraft/storage.py) - LVMActivator with container isolation
-- [hyper2kvm/vmcraft/lvm_executor.py](../../hyper2kvm/vmcraft/lvm_executor.py) - _PodmanWorker and container runtime detection
-- [hyper2kvm/vmcraft/lvm.py](../../hyper2kvm/vmcraft/lvm.py) - Pure Python LVM operations
-- [hyper2kvm/vmcraft/namespace_lvm.py](../../hyper2kvm/vmcraft/namespace_lvm.py) - Namespace isolation
+- [h2kvm/vmcraft/storage.py](../../h2kvm/vmcraft/storage.py) - LVMActivator with container isolation
+- [h2kvm/vmcraft/lvm_executor.py](../../h2kvm/vmcraft/lvm_executor.py) - _PodmanWorker and container runtime detection
+- [h2kvm/vmcraft/lvm.py](../../h2kvm/vmcraft/lvm.py) - Pure Python LVM operations
+- [h2kvm/vmcraft/namespace_lvm.py](../../h2kvm/vmcraft/namespace_lvm.py) - Namespace isolation

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Security &amp; Compliance with hyper2kvm + hypersdk — Enterprise Migration Security</title>
+<title>Security &amp; Compliance with h2kvm + hypersdk — Enterprise Migration Security</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -54,7 +54,7 @@
 <!-- COVER -->
 <div class="cover">
   <h1>Security &amp; <span>Compliance</span></h1>
-  <h2>How hyper2kvm + hypersdk Protect Your Data During Migration</h2>
+  <h2>How h2kvm + hypersdk Protect Your Data During Migration</h2>
   <p class="sub">Zero telemetry. Zero cloud upload. Full air-gap support. HIPAA, SOC 2, GDPR, PCI DSS, FedRAMP, and STIG alignment. Open-source code auditable by your security team. Audit trail for every operation. Credential protection with vault integration. The most secure VM migration platform available.</p>
   <div class="badge">Zero Telemetry | Air-Gap Ready | HIPAA/SOC2/GDPR/FedRAMP | Full Code Audit | Proprietary (Zyvor AI Labs)</div>
 </div>
@@ -75,7 +75,7 @@
     <div class="card">
       <h4>No Cloud Upload</h4>
       <ul>
-        <li>hyper2kvm runs entirely on your infrastructure</li>
+        <li>h2kvm runs entirely on your infrastructure</li>
         <li>Disk images converted locally — never uploaded</li>
         <li>No external API calls during conversion</li>
         <li>No analytics, metrics, or usage tracking</li>
@@ -113,9 +113,9 @@
     <ul style="padding-left:18px; font-size:0.88em; margin-top:6px;">
       <li><strong>Install:</strong> Copy RPM/DEB/Python wheel + Go binary via USB or approved media</li>
       <li><strong>Export:</strong> Transfer VMDKs/VHDs via encrypted external drive (FIPS-approved if required)</li>
-      <li><strong>Convert:</strong> Run hyper2kvm on isolated network — no internet, no DNS, no NTP dependency</li>
+      <li><strong>Convert:</strong> Run h2kvm on isolated network — no internet, no DNS, no NTP dependency</li>
       <li><strong>Deploy:</strong> virsh define locally or kubectl apply on air-gapped K8s cluster</li>
-      <li><strong>No phone-home:</strong> hyper2kvm has zero network calls — no license check, no update check, no telemetry</li>
+      <li><strong>No phone-home:</strong> h2kvm has zero network calls — no license check, no update check, no telemetry</li>
       <li><strong>Verified:</strong> Checksums (SHA256) for all binaries — verify integrity before deployment</li>
     </ul>
   </div>
@@ -124,10 +124,10 @@
 <!-- PAGE 2: Regulatory Compliance -->
 <div class="page page-light">
   <h2 class="st">Regulatory <span>Compliance</span></h2>
-  <p class="sub">How hyper2kvm aligns with every major compliance framework.</p>
+  <p class="sub">How h2kvm aligns with every major compliance framework.</p>
 
   <table>
-    <tr><th style="width:10%">Framework</th><th style="width:22%">Requirement</th><th style="width:33%">hyper2kvm Compliance</th><th style="width:35%">Evidence / Control</th></tr>
+    <tr><th style="width:10%">Framework</th><th style="width:22%">Requirement</th><th style="width:33%">h2kvm Compliance</th><th style="width:35%">Evidence / Control</th></tr>
     <tr><td><strong><span class="shield shield-blue">HIPAA</span></strong></td><td>PHI must stay in controlled environment</td><td class="check">All processing local, no cloud upload</td><td>Network audit: zero outbound connections during migration</td></tr>
     <tr><td><strong><span class="shield shield-blue">HIPAA</span></strong></td><td>Audit trail for PHI access</td><td class="check">Structured JSON logging with trace IDs</td><td>hypersdk audit log: user, action, timestamp, IP, result</td></tr>
     <tr><td><strong><span class="shield shield-blue">HIPAA</span></strong></td><td>Encryption of PHI at rest</td><td class="check">LUKS-encrypted QCOW2 output</td><td>qemu-img create with -o encrypt.format=luks</td></tr>
@@ -245,10 +245,10 @@ AuditEventConfigChange    // System configuration changed
 <!-- PAGE 4: Guest VM Security Hardening -->
 <div class="page page-light">
   <h2 class="st">Guest VM <span>Security Hardening</span></h2>
-  <p class="sub">hyper2kvm doesn't just migrate VMs — it hardens them during the process.</p>
+  <p class="sub">h2kvm doesn't just migrate VMs — it hardens them during the process.</p>
 
   <table>
-    <tr><th style="width:22%">Hardening Action</th><th style="width:30%">What hyper2kvm Does</th><th style="width:25%">Security Benefit</th><th style="width:23%">Compliance Alignment</th></tr>
+    <tr><th style="width:22%">Hardening Action</th><th style="width:30%">What h2kvm Does</th><th style="width:25%">Security Benefit</th><th style="width:23%">Compliance Alignment</th></tr>
     <tr><td><strong>SELinux relabel</strong></td><td>Creates /.autorelabel for full restorecon on first boot</td><td>All file contexts correct for KVM — no permissive mode needed</td><td>STIG, HIPAA, FedRAMP</td></tr>
     <tr><td><strong>VMware Tools removal</strong></td><td>Removes open-vm-tools packages, services, and agents</td><td>Eliminates unnecessary attack surface from source hypervisor</td><td>CIS Benchmarks, SOC 2</td></tr>
     <tr><td><strong>Hyper-V IC removal</strong></td><td>Disables hv_kvp, hv_vss, hv_fcopy daemons</td><td>Removes services that could leak info or accept commands</td><td>CIS Benchmarks, SOC 2</td></tr>
@@ -265,7 +265,7 @@ AuditEventConfigChange    // System configuration changed
   <h3>What Happens Without Security Hardening</h3>
   <div class="card-grid">
     <div class="card">
-      <h4>Naive Migration (Without hyper2kvm)</h4>
+      <h4>Naive Migration (Without h2kvm)</h4>
       <ul>
         <li>VMware Tools still running — unnecessary services, potential info leak</li>
         <li>SELinux in permissive or disabled (broken contexts)</li>
@@ -277,7 +277,7 @@ AuditEventConfigChange    // System configuration changed
       </ul>
     </div>
     <div class="card">
-      <h4>hyper2kvm Migration (Hardened)</h4>
+      <h4>h2kvm Migration (Hardened)</h4>
       <ul>
         <li>Source hypervisor tools removed completely</li>
         <li>SELinux enforcing with correct file contexts</li>
@@ -312,7 +312,7 @@ AuditEventConfigChange    // System configuration changed
   <pre>
   Source Hypervisor                    Conversion Host                    Target Infrastructure
   ┌──────────────┐                    ┌──────────────┐                   ┌──────────────┐
-  │ vSphere /     │   TLS 1.2+        │ hyper2kvm    │                   │ KVM / libvirt│
+  │ vSphere /     │   TLS 1.2+        │ h2kvm    │                   │ KVM / libvirt│
   │ Hyper-V /     │ ──────────────►   │              │   Local only      │              │
   │ Cloud API     │   Encrypted        │ VMCraft      │ ──────────────►  │ virsh define │
   │              │   export           │ engine       │   QCOW2 +        │              │
@@ -352,7 +352,7 @@ boot_test: true
     <div class="card">
       <h4>Full Code Audit</h4>
       <ul>
-        <li>Every line of hyper2kvm + hypersdk is on GitHub</li>
+        <li>Every line of h2kvm + hypersdk is on GitHub</li>
         <li>Your security team can audit the entire codebase</li>
         <li>No hidden backdoors, no obfuscated code</li>
         <li>Static analysis tools (gosec, bandit) can scan freely</li>
@@ -397,7 +397,7 @@ boot_test: true
 
   <h3>Security Comparison: Open Source vs Proprietary Migration Tools</h3>
   <table>
-    <tr><th style="width:25%">Security Aspect</th><th style="width:25%">hyper2kvm (Open Source)</th><th style="width:25%">Proprietary Tools</th><th style="width:25%">Why It Matters</th></tr>
+    <tr><th style="width:25%">Security Aspect</th><th style="width:25%">h2kvm (Open Source)</th><th style="width:25%">Proprietary Tools</th><th style="width:25%">Why It Matters</th></tr>
     <tr><td><strong>Code audit</strong></td><td class="check">Full source available</td><td class="cross">Binary-only, no audit</td><td>Can't verify what proprietary tools do with your data</td></tr>
     <tr><td><strong>Telemetry</strong></td><td class="check">Zero — verifiable in source</td><td class="cross">Often enabled by default</td><td>VM metadata, disk sizes, IP addresses may be collected</td></tr>
     <tr><td><strong>Patch speed</strong></td><td class="check">Hours (fix yourself)</td><td class="cross">Weeks-months (vendor cycle)</td><td>Zero-day exposure window is critical</td></tr>
@@ -412,14 +412,14 @@ boot_test: true
 <!-- PAGE 7: Compliance Scenarios -->
 <div class="page page-dark">
   <h2 class="st" style="color:#e8e6df;">Compliance <span>Scenarios</span></h2>
-  <p class="sub">How organizations use hyper2kvm in regulated environments.</p>
+  <p class="sub">How organizations use h2kvm in regulated environments.</p>
 
   <div class="card-grid">
     <div class="card">
       <h4>Healthcare (HIPAA)</h4>
       <ul>
         <li><strong>Challenge:</strong> Migrate EMR VMs from VMware — PHI must stay on-premises</li>
-        <li><strong>Solution:</strong> hyper2kvm runs locally, zero cloud upload, audit trail for BAA</li>
+        <li><strong>Solution:</strong> h2kvm runs locally, zero cloud upload, audit trail for BAA</li>
         <li><strong>Controls:</strong> LUKS encryption on QCOW2, RBAC access, JSON audit log</li>
         <li><strong>Evidence:</strong> Network capture proves zero outbound connections during migration</li>
         <li><strong>Auditor happy:</strong> YAML config + audit log proves exactly what was done</li>
@@ -459,7 +459,7 @@ boot_test: true
 
   <h3>Compliance Checklist for Auditors</h3>
   <table>
-    <tr><th style="width:5%">#</th><th style="width:25%">Control</th><th style="width:35%">hyper2kvm Evidence</th><th style="width:35%">How to Verify</th></tr>
+    <tr><th style="width:5%">#</th><th style="width:25%">Control</th><th style="width:35%">h2kvm Evidence</th><th style="width:35%">How to Verify</th></tr>
     <tr><td>1</td><td><strong>No data exfiltration</strong></td><td>Zero outbound network connections</td><td>tcpdump during migration — no external traffic</td></tr>
     <tr><td>2</td><td><strong>Access control</strong></td><td>sudo + RBAC (admin/operator/viewer)</td><td>Review /etc/sudoers + hypersdk user config</td></tr>
     <tr><td>3</td><td><strong>Audit trail</strong></td><td>JSON audit log with user, action, timestamp</td><td>Review audit log file, ship to SIEM</td></tr>
@@ -557,7 +557,7 @@ boot_test: true
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

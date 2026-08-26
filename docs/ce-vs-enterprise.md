@@ -1,13 +1,13 @@
-# Community vs Enterprise — hyper2kvm
+# Community vs Enterprise — h2kvm
 
 **Community / public eval (this repo) proves convert + offline guest fix.**  
 **Enterprise is what you buy for cutover night.**
 
 CE is for labs. The moment you need HA operators, Windows war-room runbooks, SAN/Ceph pipelines, GuestKit fleet risk scoring, or LTS/CVE under contract — that is Enterprise. Day-2 lands on **Zeus OS**. One failed first-boot wave usually costs more than the license.
 
-Enterprise tree: commercial hyper2kvm builds. Product: [zyvor.dev/hyper2kvm](https://zyvor.dev/hyper2kvm?utm_source=github&utm_medium=hyper2kvm) · [Book an Enterprise demo](https://zyvor.dev/contact?intent=demo) · [30-day PoC](https://zyvor.dev/poc) · [sales@zyvor.dev](mailto:sales@zyvor.dev)
+Enterprise tree: commercial h2kvm builds. Product: [zyvor.dev/h2kvm](https://zyvor.dev/h2kvm?utm_source=github&utm_medium=h2kvm) · [Book an Enterprise demo](https://zyvor.dev/contact?intent=demo) · [30-day PoC](https://zyvor.dev/poc) · [sales@zyvor.dev](mailto:sales@zyvor.dev)
 
-Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **hyper2kvm** (convert) → **[GuestKit](https://github.com/hypersdk/guestkit)** (assure) → **[Zeus OS](https://zyvor.dev/zeus-os)** (operate)
+Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **h2kvm** (convert) → **[GuestKit](https://github.com/hypersdk/guestkit)** (assure) → **[Zeus OS](https://zyvor.dev/zeus-os)** (operate)
 
 ---
 
@@ -113,4 +113,4 @@ Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **
 
 **CE proves the science. Buy Enterprise when the estate must move.**
 
-**→ [Book an Enterprise demo](https://zyvor.dev/contact?intent=demo)** · **[30-day PoC](https://zyvor.dev/poc)** · **[Pricing](https://zyvor.dev/pricing)** · **[hyper2kvm product](https://zyvor.dev/hyper2kvm)**
+**→ [Book an Enterprise demo](https://zyvor.dev/contact?intent=demo)** · **[30-day PoC](https://zyvor.dev/poc)** · **[Pricing](https://zyvor.dev/pricing)** · **[h2kvm product](https://zyvor.dev/h2kvm)**

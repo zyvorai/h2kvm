@@ -123,16 +123,16 @@ luks-... (252:0)  # Only host LUKS device
 ### 1. VMCraft Mount Import Errors ✅
 
 **Files Fixed**:
-- `hyper2kvm/core/vmcraft/api/filesystem_mixin.py`
+- `h2kvm/core/vmcraft/api/filesystem_mixin.py`
   - Added: `run_sudo`, `svc_list_partitions_cached`, `svc_invalidate_partition_cache`, `os`
 
-- `hyper2kvm/core/vmcraft/api/storage_mixin.py`
+- `h2kvm/core/vmcraft/api/storage_mixin.py`
   - Added: `LVMActivator`, `run_sudo`, `execute_chroot_command`
 
-- `hyper2kvm/core/vmcraft/api/partition_mixin.py`
+- `h2kvm/core/vmcraft/api/partition_mixin.py`
   - Added: `run_sudo`
 
-- `hyper2kvm/core/vmcraft/api/inspection_mixin.py`
+- `h2kvm/core/vmcraft/api/inspection_mixin.py`
   - Added: `run_sudo`
 
 **Before Fix**:
@@ -268,32 +268,32 @@ All 11 btrfs subvolumes correctly handled and hardened with `nofail` flags.
 ### Files Modified (13 total)
 
 **Core LVM Improvements**:
-1. `hyper2kvm/daemon/nbd_prep.py` (+200 lines)
+1. `h2kvm/daemon/nbd_prep.py` (+200 lines)
    - Device-filtered LVM activation
    - VG tracking for safe cleanup
    - NBD locking with fcntl
    - Retry logic with exponential backoff
 
-2. `hyper2kvm/core/vmcraft/storage.py` (+100 lines)
+2. `h2kvm/core/vmcraft/storage.py` (+100 lines)
    - Safe VG activation with device filtering
    - dmsetup fallback for busy LVs
    - VG enumeration improvements
 
-3. `hyper2kvm/fixers/offline_vm/fix_initramfs.py` (+100 lines)
+3. `h2kvm/fixers/offline_vm/fix_initramfs.py` (+100 lines)
    - Parallel initramfs regeneration
    - ThreadPoolExecutor for multi-kernel VMs
 
 **VMCraft Mount Bug Fixes**:
-4. `hyper2kvm/core/vmcraft/api/filesystem_mixin.py`
+4. `h2kvm/core/vmcraft/api/filesystem_mixin.py`
    - Added missing imports: `run_sudo`, `svc_list_partitions_cached`, `svc_invalidate_partition_cache`, `os`
 
-5. `hyper2kvm/core/vmcraft/api/storage_mixin.py`
+5. `h2kvm/core/vmcraft/api/storage_mixin.py`
    - Added missing imports: `LVMActivator`, `run_sudo`, `execute_chroot_command`
 
-6. `hyper2kvm/core/vmcraft/api/partition_mixin.py`
+6. `h2kvm/core/vmcraft/api/partition_mixin.py`
    - Added missing import: `run_sudo`
 
-7. `hyper2kvm/core/vmcraft/api/inspection_mixin.py`
+7. `h2kvm/core/vmcraft/api/inspection_mixin.py`
    - Added missing import: `run_sudo`
 
 **Import Script**:

@@ -2,7 +2,7 @@
 # Requires privileged pod with /dev mounted and nbd kernel module on the host.
 #
 # Build from repo root:
-#   docker build -f operator/Dockerfile.fixer -t hyper2kvm/fixer:latest .
+#   docker build -f operator/Dockerfile.fixer -t h2kvm/fixer:latest .
 FROM fedora:43
 
 RUN dnf install -y --setopt=install_weak_deps=False \
@@ -15,8 +15,8 @@ RUN dnf install -y --setopt=install_weak_deps=False \
     nbd \
     && dnf clean all
 
-# Install hyper2kvm from the repo (only needed files)
-COPY hyper2kvm/ /src/hyper2kvm/
+# Install h2kvm from the repo (only needed files)
+COPY h2kvm/ /src/h2kvm/
 COPY pyproject.toml /src/
 RUN pip3 install --no-cache-dir /src && rm -rf /src
 

@@ -1,13 +1,13 @@
 # YAML Configuration vs Manifests: Understanding the Difference
 
-**When to use YAML configs vs manifest files in Hyper2KVM**
+**When to use YAML configs vs manifest files in H2KVM**
 
 ---
 
 ## Quick Answer
 
 - **YAML Config Files** → Direct CLI execution for interactive work (`h2kvmctl --config migration.yaml`)
-- **Manifest Files** → Daemon-mode workflow processing for automation (`hyper2kvm daemon --manifest-workflow-mode`)
+- **Manifest Files** → Daemon-mode workflow processing for automation (`h2kvm daemon --manifest-workflow-mode`)
 
 Both are YAML or JSON files, but serve fundamentally different purposes with different execution models.
 
@@ -124,11 +124,11 @@ Daemon-mode workflow processing with explicit pipeline stages, state tracking, a
 ### Execution Model
 ```bash
 # Start daemon (runs continuously)
-hyper2kvm daemon --manifest-workflow-mode \
-  --manifest-workflow-dir /var/lib/hyper2kvm/manifest-workflow
+h2kvm daemon --manifest-workflow-mode \
+  --manifest-workflow-dir /var/lib/h2kvm/manifest-workflow
 
 # Drop manifest files for processing
-cp vm-manifest.json /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+cp vm-manifest.json /var/lib/h2kvm/manifest-workflow/to_be_processed/
 # Daemon picks it up automatically and processes asynchronously
 ```
 
@@ -213,8 +213,8 @@ For batch migrations, create one Artifact Manifest v1.0 file per VM and drop the
 Drop each VM's manifest into the queue:
 
 ```bash
-cp web-server-manifest.json /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
-cp database-manifest.json /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+cp web-server-manifest.json /var/lib/h2kvm/manifest-workflow/to_be_processed/
+cp database-manifest.json /var/lib/h2kvm/manifest-workflow/to_be_processed/
 ```
 
 ### Output Reports
@@ -282,7 +282,7 @@ For failed conversions:
 | **Format** | YAML (or CLI flags) | JSON or YAML |
 | **Pipeline Control** | Implicit | Explicit (inspect → fix → convert → validate → kubevirt) |
 | **Use Case** | Interactive migrations | Automated workflows |
-| **Command** | `h2kvmctl --config config.yaml` | `hyper2kvm daemon --manifest-workflow-mode` |
+| **Command** | `h2kvmctl --config config.yaml` | `h2kvm daemon --manifest-workflow-mode` |
 | **Best For** | Quick one-off migrations | Production automation |
 | **Complexity** | Simple | Advanced |
 
@@ -321,9 +321,9 @@ h2kvmctl --config migration.yaml
 
 ```bash
 # Start daemon (runs continuously)
-hyper2kvm daemon --manifest-workflow-mode \
-  --manifest-workflow-dir /var/lib/hyper2kvm/manifest-workflow \
-  --output-dir /var/lib/hyper2kvm/output \
+h2kvm daemon --manifest-workflow-mode \
+  --manifest-workflow-dir /var/lib/h2kvm/manifest-workflow \
+  --output-dir /var/lib/h2kvm/output \
   --max-concurrent-jobs 4
 
 # Create one manifest per VM (Artifact Manifest v1.0)
@@ -350,13 +350,13 @@ cat > vm2-manifest.json <<EOF
 EOF
 
 # Drop each manifest for processing
-cp vm1-manifest.json vm2-manifest.json /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+cp vm1-manifest.json vm2-manifest.json /var/lib/h2kvm/manifest-workflow/to_be_processed/
 
 # Monitor progress
-watch -n 5 'ls -lh /var/lib/hyper2kvm/manifest-workflow/*/'
+watch -n 5 'ls -lh /var/lib/h2kvm/manifest-workflow/*/'
 
 # Check results
-cat /var/lib/hyper2kvm/manifest-workflow/processed/2026-03-24/vm1-manifest.json.report.json
+cat /var/lib/h2kvm/manifest-workflow/processed/2026-03-24/vm1-manifest.json.report.json
 ```
 
 **Why**: Automated, observable, detailed reporting, batch processing.
@@ -373,15 +373,15 @@ envsubst < vm-template.json > "${VM_NAME}-manifest.json"
 
 # Drop into daemon's watch directory
 scp "${VM_NAME}-manifest.json" \
-    migration-server:/var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+    migration-server:/var/lib/h2kvm/manifest-workflow/to_be_processed/
 
 # Poll for completion
-while [ ! -f "/var/lib/hyper2kvm/manifest-workflow/processed/*/${VM_NAME}-manifest.json" ]; do
+while [ ! -f "/var/lib/h2kvm/manifest-workflow/processed/*/${VM_NAME}-manifest.json" ]; do
   sleep 10
 done
 
 # Parse results
-jq '.stages.convert.status' /var/lib/hyper2kvm/manifest-workflow/processed/*/${VM_NAME}-manifest.json.report.json
+jq '.stages.convert.status' /var/lib/h2kvm/manifest-workflow/processed/*/${VM_NAME}-manifest.json.report.json
 ```
 
 **Why**: Automated, non-blocking, machine-parseable results.
@@ -463,23 +463,23 @@ h2kvmctl --config migration.yaml --compress --verbose 3
 
 ```bash
 # Start daemon
-hyper2kvm daemon --manifest-workflow-mode \
-  --manifest-workflow-dir /var/lib/hyper2kvm/manifest-workflow \
-  --output-dir /var/lib/hyper2kvm/output \
+h2kvm daemon --manifest-workflow-mode \
+  --manifest-workflow-dir /var/lib/h2kvm/manifest-workflow \
+  --output-dir /var/lib/h2kvm/output \
   --max-concurrent-jobs 2
 
 # Drop manifest for processing
-cp my-manifest.json /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+cp my-manifest.json /var/lib/h2kvm/manifest-workflow/to_be_processed/
 
 # Monitor directories
-watch ls -lh /var/lib/hyper2kvm/manifest-workflow/*/
+watch ls -lh /var/lib/h2kvm/manifest-workflow/*/
 
 # View report
-cat /var/lib/hyper2kvm/manifest-workflow/processed/*/my-manifest.json.report.json
+cat /var/lib/h2kvm/manifest-workflow/processed/*/my-manifest.json.report.json
 
 # Reprocess failed manifest
-mv /var/lib/hyper2kvm/manifest-workflow/failed/*/my-manifest.json \
-   /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+mv /var/lib/h2kvm/manifest-workflow/failed/*/my-manifest.json \
+   /var/lib/h2kvm/manifest-workflow/to_be_processed/
 ```
 
 ---
@@ -496,7 +496,7 @@ mv /var/lib/hyper2kvm/manifest-workflow/failed/*/my-manifest.json \
 - **Nature**: Declarative pipeline workflow
 - **Model**: Asynchronous, daemon-processed
 - **Use**: Production automation, batch processing, CI/CD
-- **Command**: `hyper2kvm daemon --manifest-workflow-mode` (then drop manifests)
+- **Command**: `h2kvm daemon --manifest-workflow-mode` (then drop manifests)
 
 **Both are valid** - choose based on your use case:
 - Quick migration? → YAML config

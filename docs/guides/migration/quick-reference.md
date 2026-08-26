@@ -1,6 +1,6 @@
 # Migration Quick Reference
 
-**Quick Reference Card for Common hyper2kvm Migration Scenarios**
+**Quick Reference Card for Common h2kvm Migration Scenarios**
 
 One-page guide for the most frequent migration tasks with copy-paste commands.
 
@@ -14,15 +14,15 @@ One-page guide for the most frequent migration tasks with copy-paste commands.
 
 ```bash
 # Single command migration
-hyper2kvm convert /path/to/vm.vmdk --output /var/lib/libvirt/images/vm.qcow2
+h2kvm convert /path/to/vm.vmdk --output /var/lib/libvirt/images/vm.qcow2
 
 # With offline fixes (recommended)
-hyper2kvm convert /path/to/vm.vmdk \
+h2kvm convert /path/to/vm.vmdk \
   --output /var/lib/libvirt/images/vm.qcow2 \
   --offline-fixes
 
 # With automatic libvirt domain creation
-hyper2kvm convert /path/to/vm.vmdk \
+h2kvm convert /path/to/vm.vmdk \
   --output /var/lib/libvirt/images/vm.qcow2 \
   --offline-fixes \
   --libvirt-domain my-vm \
@@ -42,12 +42,12 @@ hyper2kvm convert /path/to/vm.vmdk \
 
 ```bash
 # Direct conversion
-hyper2kvm convert /path/to/vm.vhdx \
+h2kvm convert /path/to/vm.vhdx \
   --output /var/lib/libvirt/images/vm.qcow2 \
   --format qcow2
 
 # With Windows-specific fixes
-hyper2kvm convert /path/to/vm.vhdx \
+h2kvm convert /path/to/vm.vhdx \
   --output /var/lib/libvirt/images/vm.qcow2 \
   --offline-fixes \
   --inject-virtio \
@@ -67,13 +67,13 @@ hyper2kvm convert /path/to/vm.vhdx \
 
 ```bash
 # Basic cloud-init configuration
-hyper2kvm customize ubuntu-cloud.qcow2 \
+h2kvm customize ubuntu-cloud.qcow2 \
   --cloud-init user-data.yaml \
   --hostname my-server \
   --output customized.qcow2
 
 # With network and user setup
-hyper2kvm customize fedora-cloud.qcow2 \
+h2kvm customize fedora-cloud.qcow2 \
   --user admin \
   --ssh-key ~/.ssh/id_rsa.pub \
   --root-password "$PASSWORD" \
@@ -118,13 +118,13 @@ shared_config:
 EOF
 
 # Run batch migration
-hyper2kvm batch batch.yaml
+h2kvm batch batch.yaml
 
 # Resume interrupted batch
-hyper2kvm batch batch.yaml --resume
+h2kvm batch batch.yaml --resume
 
 # Continue on errors
-hyper2kvm batch batch.yaml --continue-on-error
+h2kvm batch batch.yaml --continue-on-error
 ```
 
 **Batch Options**:
@@ -146,16 +146,16 @@ export VSPHERE_USER="administrator@vsphere.local"
 export VSPHERE_PASSWORD="password"
 
 # List available VMs
-hyper2kvm vsphere list --host $VSPHERE_HOST
+h2kvm vsphere list --host $VSPHERE_HOST
 
 # Export single VM
-hyper2kvm vsphere export \
+h2kvm vsphere export \
   --vm "Production Web Server" \
   --output /exports/web-server.qcow2 \
   --format qcow2
 
 # Export with snapshot
-hyper2kvm vsphere export \
+h2kvm vsphere export \
   --vm "Database Server" \
   --snapshot "Pre-migration" \
   --output /exports/db-server.qcow2
@@ -178,7 +178,7 @@ hyper2kvm vsphere export \
 
 ```bash
 # Migrate all disks
-hyper2kvm convert /vmware/vm-disk1.vmdk \
+h2kvm convert /vmware/vm-disk1.vmdk \
   --additional-disks /vmware/vm-disk2.vmdk,/vmware/vm-disk3.vmdk \
   --output-dir /var/lib/libvirt/images/multi-disk-vm \
   --offline-fixes
@@ -197,16 +197,16 @@ hyper2kvm convert /vmware/vm-disk1.vmdk \
 
 ```bash
 # Enable compression
-hyper2kvm convert /source/vm.vmdk \
+h2kvm convert /source/vm.vmdk \
   --output /dest/vm.qcow2 \
   --compression zstd \
   --compression-level 6
 
 # Trim unused space
-hyper2kvm optimize /dest/vm.qcow2 --trim
+h2kvm optimize /dest/vm.qcow2 --trim
 
 # Convert to thin provisioning
-hyper2kvm convert /source/thick.vmdk \
+h2kvm convert /source/thick.vmdk \
   --output /dest/thin.qcow2 \
   --preallocation off
 ```
@@ -225,18 +225,18 @@ hyper2kvm convert /source/thick.vmdk \
 
 ```bash
 # Automatic network stabilization
-hyper2kvm convert /source/vm.vmdk \
+h2kvm convert /source/vm.vmdk \
   --output /dest/vm.qcow2 \
   --offline-fixes \
   --network-stable
 
 # Manual network mapping
-hyper2kvm convert /source/vm.vmdk \
+h2kvm convert /source/vm.vmdk \
   --output /dest/vm.qcow2 \
   --network-mapping "VM Network=br0,Management=br1"
 
 # Convert to NetworkManager
-hyper2kvm fixnet /dest/vm.qcow2 \
+h2kvm fixnet /dest/vm.qcow2 \
   --to-networkmanager
 ```
 
@@ -253,16 +253,16 @@ hyper2kvm fixnet /dest/vm.qcow2 \
 
 ```bash
 # Auto-detect and repair GRUB
-hyper2kvm fixboot /path/to/vm.qcow2
+h2kvm fixboot /path/to/vm.qcow2
 
 # Force GRUB2 reinstall
-hyper2kvm fixboot /path/to/vm.qcow2 --reinstall-grub
+h2kvm fixboot /path/to/vm.qcow2 --reinstall-grub
 
 # Enhanced chroot repair (for complex boot issues)
-hyper2kvm fixboot /path/to/vm.qcow2 --enhanced-chroot
+h2kvm fixboot /path/to/vm.qcow2 --enhanced-chroot
 
 # Specify boot device
-hyper2kvm fixboot /path/to/vm.qcow2 --boot-device /dev/vda
+h2kvm fixboot /path/to/vm.qcow2 --boot-device /dev/vda
 ```
 
 **Bootloader Options**:
@@ -279,16 +279,16 @@ hyper2kvm fixboot /path/to/vm.qcow2 --boot-device /dev/vda
 
 ```bash
 # Convert /etc/fstab to stable identifiers
-hyper2kvm fixfstab /path/to/vm.qcow2
+h2kvm fixfstab /path/to/vm.qcow2
 
 # Force UUID-based mounting
-hyper2kvm fixfstab /path/to/vm.qcow2 --prefer uuid
+h2kvm fixfstab /path/to/vm.qcow2 --prefer uuid
 
 # Force LABEL-based mounting
-hyper2kvm fixfstab /path/to/vm.qcow2 --prefer label
+h2kvm fixfstab /path/to/vm.qcow2 --prefer label
 
 # Validate without changes
-hyper2kvm fixfstab /path/to/vm.qcow2 --dry-run
+h2kvm fixfstab /path/to/vm.qcow2 --dry-run
 ```
 
 **Fstab Options**:
@@ -307,11 +307,11 @@ hyper2kvm fixfstab /path/to/vm.qcow2 --dry-run
 
 ```bash
 # Launch TUI
-hyper2kvm-tui
+h2kvm-tui
 
 # Or with specific features
-hyper2kvm-tui --theme dark
-hyper2kvm-tui --config ~/.config/hyper2kvm/custom-tui.json
+h2kvm-tui --theme dark
+h2kvm-tui --config ~/.config/h2kvm/custom-tui.json
 ```
 
 **TUI Keyboard Shortcuts**:
@@ -340,19 +340,19 @@ hyper2kvm-tui --config ~/.config/hyper2kvm/custom-tui.json
 
 ```bash
 # Full inspection
-hyper2kvm inspect /path/to/vm.vmdk
+h2kvm inspect /path/to/vm.vmdk
 
 # Check migration readiness
-hyper2kvm readiness-check /path/to/vm.vmdk
+h2kvm readiness-check /path/to/vm.vmdk
 
 # Operating system detection
-hyper2kvm os-info /path/to/vm.vmdk
+h2kvm os-info /path/to/vm.vmdk
 
 # Filesystem analysis
-hyper2kvm fs-info /path/to/vm.vmdk
+h2kvm fs-info /path/to/vm.vmdk
 
 # Boot configuration
-hyper2kvm boot-info /path/to/vm.vmdk
+h2kvm boot-info /path/to/vm.vmdk
 ```
 
 **Inspection Output Includes**:
@@ -373,16 +373,16 @@ hyper2kvm boot-info /path/to/vm.vmdk
 
 ```bash
 # Boot validation
-hyper2kvm validate-boot /dest/vm.qcow2
+h2kvm validate-boot /dest/vm.qcow2
 
 # Network validation
-hyper2kvm validate-network /dest/vm.qcow2
+h2kvm validate-network /dest/vm.qcow2
 
 # Compare with source
-hyper2kvm compare /source/vm.vmdk /dest/vm.qcow2
+h2kvm compare /source/vm.vmdk /dest/vm.qcow2
 
 # Generate migration report
-hyper2kvm report /dest/vm.qcow2 --output migration-report.json
+h2kvm report /dest/vm.qcow2 --output migration-report.json
 ```
 
 ---
@@ -394,45 +394,45 @@ hyper2kvm report /dest/vm.qcow2 --output migration-report.json
 **Migration fails with GRUB error**:
 ```bash
 # Apply enhanced chroot fix
-hyper2kvm fixboot /vm.qcow2 --enhanced-chroot
+h2kvm fixboot /vm.qcow2 --enhanced-chroot
 ```
 
 **VM doesn't boot (black screen)**:
 ```bash
 # Check boot configuration
-hyper2kvm boot-info /vm.qcow2
+h2kvm boot-info /vm.qcow2
 
 # Reinstall GRUB
-hyper2kvm fixboot /vm.qcow2 --reinstall-grub --boot-device /dev/vda
+h2kvm fixboot /vm.qcow2 --reinstall-grub --boot-device /dev/vda
 ```
 
 **Network interfaces not working**:
 ```bash
 # Stabilize network configuration
-hyper2kvm fixnet /vm.qcow2 --network-stable
+h2kvm fixnet /vm.qcow2 --network-stable
 
 # Or convert to NetworkManager
-hyper2kvm fixnet /vm.qcow2 --to-networkmanager
+h2kvm fixnet /vm.qcow2 --to-networkmanager
 ```
 
 **Filesystem mount failures**:
 ```bash
 # Fix fstab with UUIDs
-hyper2kvm fixfstab /vm.qcow2 --prefer uuid
+h2kvm fixfstab /vm.qcow2 --prefer uuid
 
 # Check filesystem layout
-hyper2kvm fs-info /vm.qcow2
+h2kvm fs-info /vm.qcow2
 ```
 
 **Windows VM stuck at boot**:
 ```bash
 # Inject VirtIO drivers
-hyper2kvm convert source.vhdx --output dest.qcow2 \
+h2kvm convert source.vhdx --output dest.qcow2 \
   --inject-virtio \
   --driver-repo /usr/share/virtio-win
 
 # Apply Windows registry fixes
-hyper2kvm fixwin dest.qcow2
+h2kvm fixwin dest.qcow2
 ```
 
 ---
@@ -445,7 +445,7 @@ hyper2kvm fixwin dest.qcow2
 
 ```bash
 # Create profile
-cat > ~/.config/hyper2kvm/profiles/production.yaml <<EOF
+cat > ~/.config/h2kvm/profiles/production.yaml <<EOF
 format: qcow2
 offline_fixes: true
 compression: zstd
@@ -458,12 +458,12 @@ memory: 8192
 EOF
 
 # Use profile
-hyper2kvm convert /source/vm.vmdk \
+h2kvm convert /source/vm.vmdk \
   --profile production \
   --output /dest/vm.qcow2
 
 # Override profile settings
-hyper2kvm convert /source/vm.vmdk \
+h2kvm convert /source/vm.vmdk \
   --profile production \
   --cpu 8 \
   --memory 16384 \
@@ -495,7 +495,7 @@ hooks:
 EOF
 
 # Run migration with hooks
-hyper2kvm migrate migration.yaml
+h2kvm migrate migration.yaml
 ```
 
 ---
@@ -509,17 +509,17 @@ export VSPHERE_USER="administrator@vsphere.local"
 export VSPHERE_PASSWORD="secret"
 
 # Storage locations
-export HYPER2KVM_OUTPUT_DIR="/var/lib/libvirt/images"
-export HYPER2KVM_TEMP_DIR="/tmp/hyper2kvm"
+export H2KVM_OUTPUT_DIR="/var/lib/libvirt/images"
+export H2KVM_TEMP_DIR="/tmp/h2kvm"
 
 # Default settings
-export HYPER2KVM_FORMAT="qcow2"
-export HYPER2KVM_COMPRESSION="zstd"
-export HYPER2KVM_OFFLINE_FIXES="true"
+export H2KVM_FORMAT="qcow2"
+export H2KVM_COMPRESSION="zstd"
+export H2KVM_OFFLINE_FIXES="true"
 
 # Logging
-export HYPER2KVM_LOG_LEVEL="info"
-export HYPER2KVM_LOG_FILE="/var/log/hyper2kvm.log"
+export H2KVM_LOG_LEVEL="info"
+export H2KVM_LOG_FILE="/var/log/h2kvm.log"
 ```
 
 ---
@@ -530,24 +530,24 @@ export HYPER2KVM_LOG_FILE="/var/log/hyper2kvm.log"
 
 ```bash
 # Limit CPU usage (nice level)
-nice -n 10 hyper2kvm convert /source/vm.vmdk --output /dest/vm.qcow2
+nice -n 10 h2kvm convert /source/vm.vmdk --output /dest/vm.qcow2
 
 # Set I/O priority (ionice)
-ionice -c 3 hyper2kvm convert /source/vm.vmdk --output /dest/vm.qcow2
+ionice -c 3 h2kvm convert /source/vm.vmdk --output /dest/vm.qcow2
 
 # Combine CPU and I/O limits
-nice -n 10 ionice -c 3 hyper2kvm convert /source/vm.vmdk --output /dest/vm.qcow2
+nice -n 10 ionice -c 3 h2kvm convert /source/vm.vmdk --output /dest/vm.qcow2
 ```
 
 ### Parallel Operations
 
 ```bash
 # Batch migration with parallelism
-hyper2kvm batch manifest.yaml --parallel-limit 4
+h2kvm batch manifest.yaml --parallel-limit 4
 
 # Process multiple VMs concurrently
 for vm in web1 web2 web3 web4; do
-  hyper2kvm convert /source/$vm.vmdk --output /dest/$vm.qcow2 &
+  h2kvm convert /source/$vm.vmdk --output /dest/$vm.qcow2 &
 done
 wait  # Wait for all to complete
 ```
@@ -556,13 +556,13 @@ wait  # Wait for all to complete
 
 ```bash
 # Fast compression (lz4)
-hyper2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --compression lz4
+h2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --compression lz4
 
 # Balanced (zstd level 3)
-hyper2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --compression zstd --compression-level 3
+h2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --compression zstd --compression-level 3
 
 # Maximum compression (zstd level 9)
-hyper2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --compression zstd --compression-level 9
+h2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --compression zstd --compression-level 9
 ```
 
 ---
@@ -571,21 +571,21 @@ hyper2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --compression zstd --c
 
 ```bash
 # General help
-hyper2kvm --help
+h2kvm --help
 
 # Command-specific help
-hyper2kvm convert --help
-hyper2kvm batch --help
-hyper2kvm vsphere --help
+h2kvm convert --help
+h2kvm batch --help
+h2kvm vsphere --help
 
 # Show version
-hyper2kvm --version
+h2kvm --version
 
 # Enable verbose logging
-hyper2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --verbose
+h2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --verbose
 
 # Debug mode (very verbose)
-hyper2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --debug
+h2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --debug
 ```
 
 ---
@@ -594,34 +594,34 @@ hyper2kvm convert /source/vm.vmdk --output /dest/vm.qcow2 --debug
 
 ```bash
 # Basic conversion
-hyper2kvm convert <source> --output <dest> [OPTIONS]
+h2kvm convert <source> --output <dest> [OPTIONS]
 
 # With offline fixes
-hyper2kvm convert <source> --output <dest> --offline-fixes
+h2kvm convert <source> --output <dest> --offline-fixes
 
 # Batch migration
-hyper2kvm batch <manifest.yaml> [OPTIONS]
+h2kvm batch <manifest.yaml> [OPTIONS]
 
 # vSphere export
-hyper2kvm vsphere export --vm "<name>" --output <dest> [OPTIONS]
+h2kvm vsphere export --vm "<name>" --output <dest> [OPTIONS]
 
 # Bootloader repair
-hyper2kvm fixboot <image> [OPTIONS]
+h2kvm fixboot <image> [OPTIONS]
 
 # Network stabilization
-hyper2kvm fixnet <image> [OPTIONS]
+h2kvm fixnet <image> [OPTIONS]
 
 # Fstab stabilization
-hyper2kvm fixfstab <image> [OPTIONS]
+h2kvm fixfstab <image> [OPTIONS]
 
 # Inspection
-hyper2kvm inspect <image>
-hyper2kvm os-info <image>
-hyper2kvm fs-info <image>
-hyper2kvm boot-info <image>
+h2kvm inspect <image>
+h2kvm os-info <image>
+h2kvm fs-info <image>
+h2kvm boot-info <image>
 
 # TUI
-hyper2kvm-tui
+h2kvm-tui
 ```
 
 ---
@@ -632,7 +632,7 @@ hyper2kvm-tui
 
 **Common Use Case**: VMware to KVM with all fixes
 ```bash
-hyper2kvm convert /vmware/production.vmdk \
+h2kvm convert /vmware/production.vmdk \
   --output /var/lib/libvirt/images/production.qcow2 \
   --offline-fixes \
   --network-stable \

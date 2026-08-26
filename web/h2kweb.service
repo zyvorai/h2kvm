@@ -1,6 +1,6 @@
 [Unit]
-Description=hyper2kvm Web Dashboard
-Documentation=https://github.com/ssahani/hyper2kvm
+Description=h2kvm Web Dashboard
+Documentation=https://github.com/ssahani/h2kvm
 After=network-online.target libvirtd.service
 Wants=network-online.target
 

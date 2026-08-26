@@ -17,15 +17,15 @@ import boto3
 import pytest
 from moto import mock_aws
 
-from hyper2kvm.providers.aws_ec2.client import AWSClient
-from hyper2kvm.providers.aws_ec2.downloader import Downloader
-from hyper2kvm.providers.aws_ec2.exceptions import (
+from h2kvm.providers.aws_ec2.client import AWSClient
+from h2kvm.providers.aws_ec2.downloader import Downloader
+from h2kvm.providers.aws_ec2.exceptions import (
     AWSProviderError,
     DownloadFailed,
     InstanceNotFound,
     VolumeNotFound,
 )
-from hyper2kvm.providers.aws_ec2.models import (
+from h2kvm.providers.aws_ec2.models import (
     AWSConfig,
     AWSDownloadConfig,
     AWSExportConfig,
@@ -36,7 +36,7 @@ from hyper2kvm.providers.aws_ec2.models import (
     InstanceInfo,
     VolumeInfo,
 )
-from hyper2kvm.providers.aws_ec2.utils import (
+from h2kvm.providers.aws_ec2.utils import (
     instance_name_from_tags,
     load_state,
     retry,
@@ -95,7 +95,7 @@ class TestModels:
             task_id="export-123",
             status="completed",
             s3_bucket="my-bucket",
-            s3_key="hyper2kvm/snap-123/disk.vmdk",
+            s3_key="h2kvm/snap-123/disk.vmdk",
         )
         assert task.status == "completed"
         assert task.s3_key.endswith(".vmdk")
@@ -459,7 +459,7 @@ class TestDownloader:
 
 class TestConverter:
     def test_run_h2kvmctl_builds_correct_command(self):
-        from hyper2kvm.providers.aws_ec2.converter import Converter
+        from h2kvm.providers.aws_ec2.converter import Converter
 
         converter = Converter()
 
@@ -487,7 +487,7 @@ class TestConverter:
         assert "test-vm" in cmd
 
     def test_run_h2kvmctl_no_optional_flags(self):
-        from hyper2kvm.providers.aws_ec2.converter import Converter
+        from h2kvm.providers.aws_ec2.converter import Converter
 
         converter = Converter()
 
@@ -515,8 +515,8 @@ class TestConverter:
 
 class TestExporter:
     def test_wait_timeout(self):
-        from hyper2kvm.providers.aws_ec2.exceptions import ExportFailed
-        from hyper2kvm.providers.aws_ec2.exporter import Exporter
+        from h2kvm.providers.aws_ec2.exceptions import ExportFailed
+        from h2kvm.providers.aws_ec2.exporter import Exporter
 
         mock_ec2 = MagicMock()
         mock_ec2.describe_export_image_tasks.return_value = {
@@ -534,7 +534,7 @@ class TestExporter:
             exporter.wait("export-123", poll_interval=0.01, timeout=0.05)
 
     def test_wait_completed(self):
-        from hyper2kvm.providers.aws_ec2.exporter import Exporter
+        from h2kvm.providers.aws_ec2.exporter import Exporter
 
         mock_ec2 = MagicMock()
         mock_ec2.describe_export_image_tasks.return_value = {
@@ -544,7 +544,7 @@ class TestExporter:
                     "Status": "completed",
                     "S3ExportLocation": {
                         "S3Bucket": "my-bucket",
-                        "S3Key": "hyper2kvm/snap-123/disk.vmdk",
+                        "S3Key": "h2kvm/snap-123/disk.vmdk",
                     },
                 }
             ]
@@ -557,8 +557,8 @@ class TestExporter:
         assert task.s3_key.endswith(".vmdk")
 
     def test_wait_failed(self):
-        from hyper2kvm.providers.aws_ec2.exceptions import ExportFailed
-        from hyper2kvm.providers.aws_ec2.exporter import Exporter
+        from h2kvm.providers.aws_ec2.exceptions import ExportFailed
+        from h2kvm.providers.aws_ec2.exporter import Exporter
 
         mock_ec2 = MagicMock()
         mock_ec2.describe_export_image_tasks.return_value = {
@@ -576,8 +576,8 @@ class TestExporter:
             exporter.wait("export-123", poll_interval=0.01)
 
     def test_wait_task_disappeared(self):
-        from hyper2kvm.providers.aws_ec2.exceptions import ExportFailed
-        from hyper2kvm.providers.aws_ec2.exporter import Exporter
+        from h2kvm.providers.aws_ec2.exceptions import ExportFailed
+        from h2kvm.providers.aws_ec2.exporter import Exporter
 
         mock_ec2 = MagicMock()
         mock_ec2.describe_export_image_tasks.return_value = {"ExportImageTasks": []}
@@ -587,7 +587,7 @@ class TestExporter:
             exporter.wait("export-gone", poll_interval=0.01)
 
     def test_cleanup_temp_amis(self):
-        from hyper2kvm.providers.aws_ec2.exporter import Exporter
+        from h2kvm.providers.aws_ec2.exporter import Exporter
 
         mock_ec2 = MagicMock()
         exporter = Exporter(mock_ec2)
@@ -598,7 +598,7 @@ class TestExporter:
         assert exporter._temp_ami_ids == []
 
     def test_cleanup_temp_amis_error_continues(self):
-        from hyper2kvm.providers.aws_ec2.exporter import Exporter
+        from h2kvm.providers.aws_ec2.exporter import Exporter
 
         mock_ec2 = MagicMock()
         mock_ec2.deregister_image.side_effect = [Exception("fail"), None]
@@ -618,7 +618,7 @@ class TestExporter:
 class TestProviderConfig:
     def test_missing_bucket_raises(self):
         with pytest.raises(AWSProviderError, match="bucket"):
-            from hyper2kvm.providers.aws_ec2.provider import AWSProvider
+            from h2kvm.providers.aws_ec2.provider import AWSProvider
 
             AWSProvider(AWSConfig(bucket=""), log=logger)
 

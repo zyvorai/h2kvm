@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.ai.workload.WorkloadClassifier.
+"""Tests for h2kvm.ai.workload.WorkloadClassifier.
 
 Covers classification of all supported workload types, confidence
 scaling, mixed workloads, and recommendation generation.
@@ -10,8 +10,8 @@ scaling, mixed workloads, and recommendation generation.
 
 from __future__ import annotations
 
-from hyper2kvm.ai.models import MigrationFeatures, WorkloadType
-from hyper2kvm.ai.workload import WorkloadClassifier
+from h2kvm.ai.models import MigrationFeatures, WorkloadType
+from h2kvm.ai.workload import WorkloadClassifier
 
 
 # ---------------------------------------------------------------------------

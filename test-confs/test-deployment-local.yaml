@@ -3,20 +3,20 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: hyper2kvm-test
+  name: h2kvm-test
   labels:
-    app.kubernetes.io/name: hyper2kvm
-    app.kubernetes.io/part-of: hyper2kvm
+    app.kubernetes.io/name: h2kvm
+    app.kubernetes.io/part-of: h2kvm
 
 ---
 # ServiceAccount
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-test
+  name: h2kvm-operator
+  namespace: h2kvm-test
   labels:
-    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/name: h2kvm-operator
     app.kubernetes.io/component: operator
 
 ---
@@ -24,15 +24,15 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: hyper2kvm-operator-test
+  name: h2kvm-operator-test
   labels:
-    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/name: h2kvm-operator
 rules:
   # MigrationJob CRD
-  - apiGroups: ["hyper2kvm.io"]
+  - apiGroups: ["h2kvm.io"]
     resources: ["migrationjobs", "migrationjobs/status", "migrationjobs/finalizers"]
     verbs: ["*"]
-  - apiGroups: ["hyper2kvm.io"]
+  - apiGroups: ["h2kvm.io"]
     resources: ["jobtemplates", "jobtemplates/status"]
     verbs: ["*"]
   # Pods
@@ -69,25 +69,25 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: hyper2kvm-operator-test
+  name: h2kvm-operator-test
   labels:
-    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/name: h2kvm-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: hyper2kvm-operator-test
+  name: h2kvm-operator-test
 subjects:
   - kind: ServiceAccount
-    name: hyper2kvm-operator
-    namespace: hyper2kvm-test
+    name: h2kvm-operator
+    namespace: h2kvm-test
 
 ---
 # Role for leader election
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: hyper2kvm-operator-leader-election
-  namespace: hyper2kvm-test
+  name: h2kvm-operator-leader-election
+  namespace: h2kvm-test
 rules:
   - apiGroups: [""]
     resources: ["configmaps"]
@@ -101,47 +101,47 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: hyper2kvm-operator-leader-election
-  namespace: hyper2kvm-test
+  name: h2kvm-operator-leader-election
+  namespace: h2kvm-test
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: hyper2kvm-operator-leader-election
+  name: h2kvm-operator-leader-election
 subjects:
   - kind: ServiceAccount
-    name: hyper2kvm-operator
-    namespace: hyper2kvm-test
+    name: h2kvm-operator
+    namespace: h2kvm-test
 
 ---
 # Deployment (using production image with operator entrypoint)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-test
+  name: h2kvm-operator
+  namespace: h2kvm-test
   labels:
-    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/name: h2kvm-operator
     app.kubernetes.io/component: operator
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: hyper2kvm-operator
+      app.kubernetes.io/name: h2kvm-operator
       app.kubernetes.io/component: operator
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: hyper2kvm-operator
+        app.kubernetes.io/name: h2kvm-operator
         app.kubernetes.io/component: operator
     spec:
-      serviceAccountName: hyper2kvm-operator
+      serviceAccountName: h2kvm-operator
       securityContext:
         runAsNonRoot: true
         # Let OpenShift assign UID/GID from namespace range
         # runAsUser will be assigned from range [1000650000, 1000659999]
       containers:
         - name: operator
-          image: hyper2kvm-operator:test
+          image: h2kvm-operator:test
           imagePullPolicy: Never
           securityContext:
             allowPrivilegeEscalation: false
@@ -207,10 +207,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-test
+  name: h2kvm-operator
+  namespace: h2kvm-test
   labels:
-    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/name: h2kvm-operator
     app.kubernetes.io/component: operator
 spec:
   type: ClusterIP
@@ -220,5 +220,5 @@ spec:
       targetPort: 8080
       protocol: TCP
   selector:
-    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/name: h2kvm-operator
     app.kubernetes.io/component: operator

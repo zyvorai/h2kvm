@@ -33,7 +33,7 @@ kubectl create configmap ubuntu-cloud-init \
 Reference in HyperConversion:
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: ubuntu-vm
@@ -60,7 +60,7 @@ spec:
 For small cloud-init configs, use inline:
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: simple-ubuntu
@@ -101,7 +101,7 @@ kubectl create secret generic ubuntu-cloud-init-secret \
 ```
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: ubuntu-vm-secure
@@ -382,7 +382,7 @@ kubectl create configmap ubuntu-server-init \
 
 # 3. Create HyperConversion
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: my-ubuntu-server

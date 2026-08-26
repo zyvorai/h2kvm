@@ -217,11 +217,11 @@ Small Batch → Choose Approach
          done
 
          # Option 2: Daemon mode (recommended)
-         hyper2kvm daemon start
+         h2kvm daemon start
          for config in vm*.yaml; do
-           hyper2kvm daemon submit $config
+           h2kvm daemon submit $config
          done
-         hyper2kvm daemon status
+         h2kvm daemon status
          ```
 
          → [Daemon User Guide](features/daemon-user-guide.md)
@@ -243,13 +243,13 @@ Large Scale Migration → Choose Platform
 │  │  └─→ Deployment:
 │  │     ```bash
 │  │     # Install operator
-│  │     helm install hyper2kvm-operator \
-│  │       https://ssahani.github.io/hyper2kvm-charts/hyper2kvm-operator \
-│  │       -n hyper2kvm-system --create-namespace
+│  │     helm install h2kvm-operator \
+│  │       https://ssahani.github.io/h2kvm-charts/h2kvm-operator \
+│  │       -n h2kvm-system --create-namespace
 │  │
 │  │     # Submit migration jobs
 │  │     kubectl apply -f - <<EOF
-│  │     apiVersion: hyper2kvm.io/v1
+│  │     apiVersion: h2kvm.io/v1
 │  │     kind: MigrationJob
 │  │     metadata:
 │  │       name: migrate-vm-001
@@ -283,10 +283,10 @@ Large Scale Migration → Choose Platform
 │     └─→ Setup:
 │        ```bash
 │        # Start daemon
-│        hyper2kvm daemon start
+│        h2kvm daemon start
 │
 │        # Configure workers
-│        export HYPER2KVM_WORKERS=4
+│        export H2KVM_WORKERS=4
 │
 │        # Submit jobs
 │        for vmdk in /vmware/*.vmdk; do
@@ -298,11 +298,11 @@ Large Scale Migration → Choose Platform
 │        fstab_mode: stabilize-all
 │        regen_initramfs: true
 │        EOF
-│          hyper2kvm daemon submit "job-$(basename $vmdk .vmdk).yaml"
+│          h2kvm daemon submit "job-$(basename $vmdk .vmdk).yaml"
 │        done
 │
 │        # Monitor progress
-│        watch -n 5 'hyper2kvm daemon status'
+│        watch -n 5 'h2kvm daemon status'
 │        ```
 │
 │        Benefits:
@@ -350,7 +350,7 @@ Cold Migration Flow:
 │
 1. Shutdown source VM
 2. Export VMDK
-3. Run Hyper2KVM
+3. Run H2KVM
 4. Test on KVM
 5. Switchover when ready
 │
@@ -599,7 +599,7 @@ Cloud Import:
 └─ Process:
    1. Export from cloud provider
    2. Download to local storage
-   3. Convert with Hyper2KVM
+   3. Convert with H2KVM
    4. Deploy to KVM environment
 ```
 
@@ -674,7 +674,7 @@ High-Security Migration:
 
    # Enable detailed logging
    log_level: DEBUG
-   log_file: /var/log/hyper2kvm/migration-audit.log
+   log_file: /var/log/h2kvm/migration-audit.log
    ```
 
    Post-migration:
@@ -761,7 +761,7 @@ After choosing your approach:
 4. **Get help if needed**
    - [FAQ](FAQ.md)
    - [Troubleshooting Flowchart](TROUBLESHOOTING_FLOWCHART.md)
-   - [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
+   - [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
 
 ---
 

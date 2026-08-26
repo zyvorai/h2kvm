@@ -1,0 +1,222 @@
+# Default values for h2kvm-worker
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Worker configuration
+worker:
+  # Image configuration
+  image:
+    repository: h2kvm
+    tag: worker
+    pullPolicy: IfNotPresent
+
+  # Number of worker pods (DaemonSet schedules one per labeled node)
+  # This is informational only - actual count determined by node labels
+  expectedCount: 3
+
+  # Worker resources
+  resources:
+    requests:
+      cpu: "2"
+      memory: "4Gi"
+    limits:
+      cpu: "8"
+      memory: "16Gi"
+
+  # Node selector for worker pods
+  nodeSelector:
+    h2kvm.io/worker-enabled: "true"
+
+  # Tolerations for tainted nodes
+  tolerations:
+    - key: h2kvm.io/privileged
+      operator: Exists
+      effect: NoSchedule
+
+  # Security context (requires privileged for NBD/LVM/mount)
+  securityContext:
+    privileged: true
+    capabilities:
+      add:
+        - SYS_ADMIN
+        - MKNOD
+        - SYS_CHROOT
+
+  # Health checks
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    timeoutSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+
+  # Grace period for pod termination (allows migrations to complete)
+  terminationGracePeriodSeconds: 7200
+
+  # Pod affinity/anti-affinity rules
+  affinity: {}
+  # Example: spread workers across nodes
+  # affinity:
+  #   podAntiAffinity:
+  #     preferredDuringSchedulingIgnoredDuringExecution:
+  #       - weight: 100
+  #         podAffinityTerm:
+  #           labelSelector:
+  #             matchExpressions:
+  #               - key: app
+  #                 operator: In
+  #                 values:
+  #                   - h2kvm-worker
+  #           topologyKey: kubernetes.io/hostname
+
+  # PriorityClass name for worker pods
+  priorityClassName: ""
+  # Example: use a custom priority class for migration workloads
+  # priorityClassName: h2kvm-high-priority
+
+# Storage configuration
+storage:
+  # Worker state (jobs, state machine)
+  state:
+    enabled: true
+    size: 10Gi
+    storageClass: ""  # Use default if empty
+    accessMode: ReadWriteMany
+
+  # Events (progress events, logs)
+  events:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+    accessMode: ReadWriteMany
+
+  # Input VMDKs
+  input:
+    enabled: true
+    size: 1Ti
+    storageClass: "nfs-storage"  # NFS recommended for large files
+    accessMode: ReadOnlyMany
+
+  # Output qcow2
+  output:
+    enabled: true
+    size: 500Gi
+    storageClass: "ceph-rbd-fast"  # Fast storage recommended
+    accessMode: ReadWriteMany
+
+  # Conversion temp
+  temp:
+    enabled: true
+    size: 200Gi
+    storageClass: "local-nvme"  # Local NVMe recommended
+    accessMode: ReadWriteOnce
+
+# Init container configuration (NBD module loading)
+initContainer:
+  enabled: true
+  image: alpine:latest
+
+# Monitoring configuration
+monitoring:
+  # Prometheus metrics
+  metrics:
+    enabled: true
+    port: 9090
+    path: /metrics
+
+  # ServiceMonitor for Prometheus Operator
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    labels: {}
+
+  # Grafana dashboard
+  grafanaDashboard:
+    enabled: true
+    labels:
+      grafana_dashboard: "1"
+
+# RBAC configuration
+rbac:
+  create: true
+  serviceAccount:
+    create: true
+    name: h2kvm-worker
+    annotations: {}
+
+# PodDisruptionBudget
+pdb:
+  enabled: false
+  # minAvailable: 1
+  maxUnavailable: 1
+
+# Network policy
+networkPolicy:
+  enabled: false
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53  # DNS
+
+# Alerting rules
+alerting:
+  enabled: true
+  rules:
+    workerDown:
+      enabled: true
+      severity: critical
+      duration: 5m
+    jobFailed:
+      enabled: true
+      severity: warning
+      duration: 1m
+    migrationSlow:
+      enabled: true
+      severity: warning
+      threshold: 7200  # seconds
+    tempStorageFull:
+      enabled: true
+      severity: warning
+      threshold: 0.9  # 90%
+
+# Configuration
+config:
+  worker:
+    event_dir: /var/lib/h2kvm/events
+    state_dir: /var/lib/h2kvm/jobs
+    queue_dir: /var/lib/h2kvm/queue
+    max_concurrent_jobs: 2
+    heartbeat_interval_seconds: 30
+
+  daemon:
+    workflow_mode: true
+    workflow_dir: /data/incoming
+    output_dir: /data/output
+    max_concurrent_jobs: 2
+    out_format: qcow2
+    compress: true
+    fstab_mode: stabilize-all
+    regen_initramfs: true
+    verbose: 1
+    use_worker_protocol: true
+
+# Additional labels for all resources
+labels: {}
+
+# Additional annotations for all resources
+annotations: {}

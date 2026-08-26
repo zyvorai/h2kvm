@@ -1,4 +1,4 @@
-# zkvm — Terminal UI for hyper2kvm
+# zkvm — Terminal UI for h2kvm
 
 Interactive TUI built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) for managing VM migrations from the terminal.
 

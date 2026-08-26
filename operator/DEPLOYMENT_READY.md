@@ -31,7 +31,7 @@
 ### Generated Manifests
 
 #### CRD
-- ✅ `config/crd/bases/hyper2kvm.io_hyperconversions.yaml` (422 lines, 18KB)
+- ✅ `config/crd/bases/h2kvm.io_hyperconversions.yaml` (422 lines, 18KB)
   - Comprehensive OpenAPI v3 schema
   - Pattern, enum, and range validation
   - Default values for all optional fields
@@ -64,7 +64,7 @@
 - ✅ `disk-only-conversion.yaml` - Disk conversion without VM
 - ✅ `advanced-multi-network.yaml` - Multi-network VM with UEFI Secure Boot
 - ✅ `ubuntu-with-cloudinit.yaml` - Ubuntu VM with cloud-init
-- ✅ `hyper2kvm_v1alpha1_hyperconversion.yaml` - Default sample
+- ✅ `h2kvm_v1alpha1_hyperconversion.yaml` - Default sample
 
 ### Testing
 
@@ -118,7 +118,7 @@ make test
 make build
 
 # Build container image
-make docker-build IMG=hyper2kvm-operator:latest
+make docker-build IMG=h2kvm-operator:latest
 ```
 
 ### 2. Deploy to Cluster
@@ -128,11 +128,11 @@ make docker-build IMG=hyper2kvm-operator:latest
 make install
 
 # Deploy operator
-make deploy IMG=hyper2kvm-operator:latest
+make deploy IMG=h2kvm-operator:latest
 
 # Verify deployment
-kubectl get pods -n hyper2kvm-system
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager -f
+kubectl get pods -n h2kvm-system
+kubectl logs -n h2kvm-system -l control-plane=controller-manager -f
 ```
 
 ### 3. Test with Sample
@@ -245,7 +245,7 @@ operator/
 │   └── main.go
 ├── config/                    # Kubernetes manifests
 │   ├── crd/bases/
-│   │   └── hyper2kvm.io_hyperconversions.yaml
+│   │   └── h2kvm.io_hyperconversions.yaml
 │   ├── rbac/
 │   │   ├── role.yaml
 │   │   ├── role_binding.yaml
@@ -260,7 +260,7 @@ operator/
 │       ├── disk-only-conversion.yaml
 │       ├── advanced-multi-network.yaml
 │       ├── ubuntu-with-cloudinit.yaml
-│       └── hyper2kvm_v1alpha1_hyperconversion.yaml
+│       └── h2kvm_v1alpha1_hyperconversion.yaml
 ├── controllers/               # Reconciliation logic
 │   └── hyperconversion_controller.go
 ├── pkg/                       # Helper packages
@@ -309,15 +309,15 @@ make manifests generate
 
 ```bash
 # Create cluster
-k3d cluster create hyper2kvm-test --agents 2
+k3d cluster create h2kvm-test --agents 2
 
 # Install CDI and KubeVirt
 # (see operator/README.md for commands)
 
 # Build and deploy
-make docker-build IMG=hyper2kvm-operator:dev
-k3d image import hyper2kvm-operator:dev
-make deploy IMG=hyper2kvm-operator:dev
+make docker-build IMG=h2kvm-operator:dev
+k3d image import h2kvm-operator:dev
+make deploy IMG=h2kvm-operator:dev
 
 # Test
 ./tests/integration/e2e_test.sh
@@ -392,7 +392,7 @@ The HyperConversion operator is:
 ## 🚀 Deploy Now!
 
 ```bash
-make install deploy IMG=hyper2kvm-operator:latest
+make install deploy IMG=h2kvm-operator:latest
 kubectl apply -f config/samples/simple-vmdk-to-vm.yaml
 kubectl get hc -w
 ```

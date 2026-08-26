@@ -4,7 +4,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 """
-Example: Local VMDK to qcow2 conversion using hyper2kvm library.
+Example: Local VMDK to qcow2 conversion using h2kvm library.
 
 This example demonstrates:
 - Converting a local VMDK file to qcow2
@@ -20,7 +20,7 @@ import logging
 import sys
 from pathlib import Path
 
-from hyper2kvm import DiskProcessor, GuestDetector
+from h2kvm import DiskProcessor, GuestDetector
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# Full-stack health check for hyper2kvm deployment
+# Full-stack health check for h2kvm deployment
 # =============================================================================
 # Validates all components are healthy and functioning.
 #
@@ -44,22 +44,22 @@ for comp in cdi-operator cdi-apiserver cdi-deployment cdi-uploadproxy; do
 done
 
 hdr "=== Operator ==="
-OP_PODS=$(kubectl get pods -n hyper2kvm-system -l control-plane=controller-manager --field-selector=status.phase=Running --no-headers 2>/dev/null | wc -l)
+OP_PODS=$(kubectl get pods -n h2kvm-system -l control-plane=controller-manager --field-selector=status.phase=Running --no-headers 2>/dev/null | wc -l)
 [ "$OP_PODS" -gt 0 ] && ok "Operator: $OP_PODS pod(s) Running" || warn "Operator: not running"
 # Check health endpoint
-OP_POD=$(kubectl get pods -n hyper2kvm-system -l control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
+OP_POD=$(kubectl get pods -n h2kvm-system -l control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
 if [ -n "$OP_POD" ]; then
-    HEALTH=$(kubectl exec -n hyper2kvm-system "$OP_POD" -- wget -q -O- http://localhost:8081/healthz 2>/dev/null || echo "")
+    HEALTH=$(kubectl exec -n h2kvm-system "$OP_POD" -- wget -q -O- http://localhost:8081/healthz 2>/dev/null || echo "")
     [ "$HEALTH" = "ok" ] && ok "Operator health: ok" || warn "Operator health probe: $HEALTH"
 fi
 
 hdr "=== Workers ==="
-W_PODS=$(kubectl get pods -n hyper2kvm-workers --field-selector=status.phase=Running --no-headers 2>/dev/null | wc -l)
+W_PODS=$(kubectl get pods -n h2kvm-workers --field-selector=status.phase=Running --no-headers 2>/dev/null | wc -l)
 [ "$W_PODS" -gt 0 ] && ok "Workers: $W_PODS Running" || warn "Workers: none deployed"
 
 hdr "=== CRDs ==="
-kubectl get crd hyperconversions.hyper2kvm.io >/dev/null 2>&1 && ok "HyperConversion CRD" || warn "HyperConversion CRD missing"
-kubectl get crd validations.hyper2kvm.io >/dev/null 2>&1 && ok "Validation CRD" || warn "Validation CRD missing"
+kubectl get crd hyperconversions.h2kvm.io >/dev/null 2>&1 && ok "HyperConversion CRD" || warn "HyperConversion CRD missing"
+kubectl get crd validations.h2kvm.io >/dev/null 2>&1 && ok "Validation CRD" || warn "Validation CRD missing"
 
 hdr "=== HyperConversions ==="
 HC_COUNT=$(kubectl get hc -A --no-headers 2>/dev/null | wc -l)

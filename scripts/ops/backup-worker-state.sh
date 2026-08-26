@@ -6,16 +6,16 @@
 #   ./backup-worker-state.sh [namespace] [output-dir]
 #
 # Example:
-#   ./backup-worker-state.sh hyper2kvm-workers /backup/2026-01-30
+#   ./backup-worker-state.sh h2kvm-workers /backup/2026-01-30
 #
 
 set -euo pipefail
 
-NAMESPACE="${1:-hyper2kvm-workers}"
+NAMESPACE="${1:-h2kvm-workers}"
 OUTPUT_DIR="${2:-./worker-backup-$(date +%Y%m%d-%H%M%S)}"
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 
-echo "=== Hyper2KVM Worker State Backup ==="
+echo "=== H2KVM Worker State Backup ==="
 echo "Namespace: $NAMESPACE"
 echo "Output: $OUTPUT_DIR"
 echo "Timestamp: $TIMESTAMP"
@@ -25,7 +25,7 @@ echo ""
 mkdir -p "$OUTPUT_DIR"
 
 # Get all worker pods
-PODS=$(kubectl get pods -n "$NAMESPACE" -l app=hyper2kvm-worker -o jsonpath='{.items[*].metadata.name}')
+PODS=$(kubectl get pods -n "$NAMESPACE" -l app=h2kvm-worker -o jsonpath='{.items[*].metadata.name}')
 
 if [ -z "$PODS" ]; then
     echo "ERROR: No worker pods found in namespace $NAMESPACE"
@@ -44,20 +44,20 @@ for POD in $PODS; do
     # Backup job state
     echo "  - Job state..."
     kubectl exec -n "$NAMESPACE" "$POD" -- \
-        tar czf - -C /var/lib/hyper2kvm/jobs . 2>/dev/null | \
+        tar czf - -C /var/lib/h2kvm/jobs . 2>/dev/null | \
         tar xzf - -C "$POD_DIR" || echo "    No job state found"
 
     # Backup events
     echo "  - Events..."
     mkdir -p "$POD_DIR/events"
     kubectl exec -n "$NAMESPACE" "$POD" -- \
-        tar czf - -C /var/lib/hyper2kvm/events . 2>/dev/null | \
+        tar czf - -C /var/lib/h2kvm/events . 2>/dev/null | \
         tar xzf - -C "$POD_DIR/events" || echo "    No events found"
 
     # Backup worker capabilities
     echo "  - Capabilities..."
     kubectl exec -n "$NAMESPACE" "$POD" -- \
-        python3 -m hyper2kvm.worker.cli capabilities --format json \
+        python3 -m h2kvm.worker.cli capabilities --format json \
         > "$POD_DIR/capabilities.json" 2>/dev/null || echo "    Failed to get capabilities"
 
     # Get pod metadata
@@ -95,7 +95,7 @@ EOF
 # Create archive
 echo ""
 echo "Creating backup archive..."
-ARCHIVE_NAME="hyper2kvm-worker-backup-$TIMESTAMP.tar.gz"
+ARCHIVE_NAME="h2kvm-worker-backup-$TIMESTAMP.tar.gz"
 tar czf "$ARCHIVE_NAME" -C "$(dirname "$OUTPUT_DIR")" "$(basename "$OUTPUT_DIR")"
 
 echo ""

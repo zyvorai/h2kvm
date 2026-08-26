@@ -1,12 +1,12 @@
 #!/bin/bash
-# install-venv.sh — Install hyper2kvm in a Python virtual environment
+# install-venv.sh — Install h2kvm in a Python virtual environment
 #
 # Works on: Fedora, RHEL, CentOS, Rocky, Alma, Ubuntu, Debian, SUSE
 #
 # Usage:
-#   ./scripts/install-venv.sh                    # install to /opt/hyper2kvm
+#   ./scripts/install-venv.sh                    # install to /opt/h2kvm
 #   ./scripts/install-venv.sh /path/to/venv      # custom location
-#   ./scripts/install-venv.sh --user              # install to ~/.local/hyper2kvm
+#   ./scripts/install-venv.sh --user              # install to ~/.local/h2kvm
 #   ./scripts/install-venv.sh --uninstall         # remove installation
 #
 # After install:
@@ -18,7 +18,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 VERSION=$(grep '^version' "$REPO_ROOT/pyproject.toml" | head -1 | sed 's/.*"\(.*\)"/\1/')
-DEFAULT_VENV="/opt/hyper2kvm"
+DEFAULT_VENV="/opt/h2kvm"
 SYMLINK_DIR="/usr/local/sbin"
 
 # ---------- Parse args ----------
@@ -28,7 +28,7 @@ UNINSTALL=false
 for arg in "$@"; do
     case "$arg" in
         --user)
-            VENV_DIR="$HOME/.local/hyper2kvm"
+            VENV_DIR="$HOME/.local/h2kvm"
             SYMLINK_DIR="$HOME/.local/bin"
             ;;
         --uninstall|--remove)
@@ -37,14 +37,14 @@ for arg in "$@"; do
         --help|-h)
             echo "Usage: $0 [VENV_PATH] [--user] [--uninstall]"
             echo ""
-            echo "  VENV_PATH    Install location (default: /opt/hyper2kvm)"
-            echo "  --user       Install to ~/.local/hyper2kvm"
-            echo "  --uninstall  Remove hyper2kvm venv and symlinks"
+            echo "  VENV_PATH    Install location (default: /opt/h2kvm)"
+            echo "  --user       Install to ~/.local/h2kvm"
+            echo "  --uninstall  Remove h2kvm venv and symlinks"
             echo ""
             echo "Examples:"
-            echo "  sudo $0                        # /opt/hyper2kvm"
-            echo "  sudo $0 /srv/hyper2kvm         # custom path"
-            echo "  $0 --user                      # ~/.local/hyper2kvm"
+            echo "  sudo $0                        # /opt/h2kvm"
+            echo "  sudo $0 /srv/h2kvm         # custom path"
+            echo "  $0 --user                      # ~/.local/h2kvm"
             echo "  sudo $0 --uninstall            # remove"
             exit 0
             ;;
@@ -60,8 +60,8 @@ done
 
 # ---------- Uninstall ----------
 if $UNINSTALL; then
-    echo "=== Uninstalling hyper2kvm ==="
-    for link in h2kvmctl hyper2kvm hyper2kvm-encrypt hyper2kvm-luks; do
+    echo "=== Uninstalling h2kvm ==="
+    for link in h2kvmctl h2kvm h2kvm-encrypt h2kvm-luks; do
         for dir in /usr/local/sbin /usr/local/bin "$HOME/.local/bin"; do
             if [ -L "$dir/$link" ]; then
                 rm -f "$dir/$link"
@@ -77,7 +77,7 @@ if $UNINSTALL; then
     exit 0
 fi
 
-echo "=== hyper2kvm venv installer ==="
+echo "=== h2kvm venv installer ==="
 echo "Version:  $VERSION"
 echo "Source:   $REPO_ROOT"
 echo "Venv:     $VENV_DIR"
@@ -137,22 +137,22 @@ fi
 python3 -m venv "$VENV_DIR" --system-site-packages --upgrade-deps 2>/dev/null || \
 python3 -m venv "$VENV_DIR" --system-site-packages
 
-# ---------- Install hyper2kvm ----------
-echo "Installing hyper2kvm $VERSION..."
+# ---------- Install h2kvm ----------
+echo "Installing h2kvm $VERSION..."
 "$VENV_DIR/bin/pip" install --upgrade pip setuptools wheel -q 2>/dev/null || true
 
 # Install from source (editable) or wheel
 if [ -f "$REPO_ROOT/pyproject.toml" ]; then
     "$VENV_DIR/bin/pip" install -e "$REPO_ROOT" -q 2>&1 | tail -3
 else
-    "$VENV_DIR/bin/pip" install hyper2kvm -q 2>&1 | tail -3
+    "$VENV_DIR/bin/pip" install h2kvm -q 2>&1 | tail -3
 fi
 
 # ---------- Create symlinks ----------
 echo ""
 echo "Creating symlinks in $SYMLINK_DIR..."
 mkdir -p "$SYMLINK_DIR"
-for cmd in h2kvmctl hyper2kvm hyper2kvm-encrypt hyper2kvm-luks; do
+for cmd in h2kvmctl h2kvm h2kvm-encrypt h2kvm-luks; do
     if [ -f "$VENV_DIR/bin/$cmd" ]; then
         ln -sf "$VENV_DIR/bin/$cmd" "$SYMLINK_DIR/$cmd"
         echo "  $SYMLINK_DIR/$cmd -> $VENV_DIR/bin/$cmd"
@@ -163,38 +163,38 @@ done
 if [ "$(id -u)" -eq 0 ]; then
     echo ""
     echo "Installing system configs..."
-    if [ -d "$REPO_ROOT/etc/hyper2kvm" ]; then
-        mkdir -p /etc/hyper2kvm/migrations
-        [ -f /etc/hyper2kvm/config.yaml ] || \
-            install -m 644 "$REPO_ROOT/etc/hyper2kvm/config.yaml.sample" /etc/hyper2kvm/config.yaml
-        [ -f /etc/hyper2kvm/daemon.yaml ] || \
-            install -m 644 "$REPO_ROOT/etc/hyper2kvm/daemon.yaml.sample" /etc/hyper2kvm/daemon.yaml
-        install -m 644 "$REPO_ROOT/etc/hyper2kvm/migrations/"*.yaml /etc/hyper2kvm/migrations/ 2>/dev/null || true
-        echo "  /etc/hyper2kvm/config.yaml"
+    if [ -d "$REPO_ROOT/etc/h2kvm" ]; then
+        mkdir -p /etc/h2kvm/migrations
+        [ -f /etc/h2kvm/config.yaml ] || \
+            install -m 644 "$REPO_ROOT/etc/h2kvm/config.yaml.sample" /etc/h2kvm/config.yaml
+        [ -f /etc/h2kvm/daemon.yaml ] || \
+            install -m 644 "$REPO_ROOT/etc/h2kvm/daemon.yaml.sample" /etc/h2kvm/daemon.yaml
+        install -m 644 "$REPO_ROOT/etc/h2kvm/migrations/"*.yaml /etc/h2kvm/migrations/ 2>/dev/null || true
+        echo "  /etc/h2kvm/config.yaml"
     fi
 
     if [ -d "$REPO_ROOT/etc/modprobe.d" ]; then
         mkdir -p /etc/modprobe.d
-        install -m 644 "$REPO_ROOT/etc/modprobe.d/nbd.conf" /etc/modprobe.d/hyper2kvm-nbd.conf
-        echo "  /etc/modprobe.d/hyper2kvm-nbd.conf"
+        install -m 644 "$REPO_ROOT/etc/modprobe.d/nbd.conf" /etc/modprobe.d/h2kvm-nbd.conf
+        echo "  /etc/modprobe.d/h2kvm-nbd.conf"
     fi
 
     if [ -d "$REPO_ROOT/systemd" ]; then
         UNIT_DIR="/etc/systemd/system"
-        install -m 644 "$REPO_ROOT/systemd/hyper2kvm.service" "$UNIT_DIR/"
-        install -m 644 "$REPO_ROOT/systemd/hyper2kvm@.service" "$UNIT_DIR/"
+        install -m 644 "$REPO_ROOT/systemd/h2kvm.service" "$UNIT_DIR/"
+        install -m 644 "$REPO_ROOT/systemd/h2kvm@.service" "$UNIT_DIR/"
         systemctl daemon-reload 2>/dev/null || true
-        echo "  $UNIT_DIR/hyper2kvm.service"
+        echo "  $UNIT_DIR/h2kvm.service"
     fi
 
-    mkdir -p /var/lib/hyper2kvm /var/log/hyper2kvm
+    mkdir -p /var/lib/h2kvm /var/log/h2kvm
 fi
 
 # ---------- Verify ----------
 echo ""
 echo "=== Verification ==="
 "$VENV_DIR/bin/h2kvmctl" --version
-"$VENV_DIR/bin/python" -c "import hyper2kvm; print(f'Module: {hyper2kvm.__version__}')"
+"$VENV_DIR/bin/python" -c "import h2kvm; print(f'Module: {h2kvm.__version__}')"
 echo "Python:  $("$VENV_DIR/bin/python" --version)"
 echo "Venv:    $VENV_DIR"
 echo "Binary:  $(readlink -f "$SYMLINK_DIR/h2kvmctl")"

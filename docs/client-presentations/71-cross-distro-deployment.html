@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Cross-Distribution Deployment — hyper2kvm</title>
+<title>Cross-Distribution Deployment — h2kvm</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -66,14 +66,14 @@
   <h1>Cross-Distribution<br>Deployment</h1>
   <h2>Fedora, RHEL, AlmaLinux, Ubuntu &mdash; One Script, Any Host</h2>
   <div class="badge">Auto-Detect | deploy-remote.sh | hivex Rebuild | SPICE/VNC | Proprietary (Zyvor AI Labs)</div>
-  <div class="url">github.com/ssahani/hyper2kvm</div>
+  <div class="url">github.com/ssahani/h2kvm</div>
   <div class="date">April 2026 &mdash; v0.3.0</div>
 </div>
 
 <!-- PAGE 1: The Challenge -->
 <div class="page page-dark">
   <h2 class="title"><span>1.</span> The Challenge</h2>
-  <p class="desc">Every Linux distribution ships different packages, paths, and Python versions. hyper2kvm handles all of them.</p>
+  <p class="desc">Every Linux distribution ships different packages, paths, and Python versions. h2kvm handles all of them.</p>
 
   <table>
     <tr><th style="width:18%">Component</th><th style="width:20%">Fedora 43</th><th style="width:20%">RHEL 8.8</th><th style="width:22%">AlmaLinux 9</th><th style="width:20%">Ubuntu 24.04</th></tr>
@@ -115,7 +115,7 @@
   <div class="highlight">
     <p style="margin-bottom:0;"><strong>Goal:</strong> Run <code>deploy-remote.sh</code> on any supported distro and get a fully working migration environment. No manual package hunting, no path editing, no configuration files.</p>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 1</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 1</div>
 </div>
 
 <!-- PAGE 2: deploy-remote.sh -->
@@ -148,7 +148,7 @@
         <li>Downloads virtio-win ISO to <code>/usr/share/virtio-win/</code></li>
         <li>Installs h2kvmctl to <code>/usr/local/sbin/</code></li>
         <li>Installs h2kweb systemd service</li>
-        <li>Creates tmpfiles.d entry for <code>/run/hyper2kvm</code></li>
+        <li>Creates tmpfiles.d entry for <code>/run/h2kvm</code></li>
       </ul>
     </div>
     <div class="card">
@@ -206,12 +206,12 @@
         <li>rich, click</li>
         <li>requests</li>
         <li>libvirt-python</li>
-        <li>hyper2kvm (editable)</li>
+        <li>h2kvm (editable)</li>
         <li>h2kweb frontend build</li>
       </ul>
     </div>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 2</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 2</div>
 </div>
 
 <!-- PAGE 3: Auto-Detection -->
@@ -269,7 +269,7 @@
       <h4>VirtIO-Win ISO</h4>
       <ul>
         <li><code>/usr/share/virtio-win/</code> (packaged)</li>
-        <li><code>/var/lib/hyper2kvm/</code> (downloaded)</li>
+        <li><code>/var/lib/h2kvm/</code> (downloaded)</li>
         <li>Auto-download from fedorapeople.org</li>
         <li>Version detection from filename</li>
         <li>Attached as CD-ROM in domain XML</li>
@@ -288,7 +288,7 @@
     <span class="feat feat-amber">OVMF firmware</span>
     <span class="feat feat-green">VirtIO ISO auto-download</span>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 3</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 3</div>
 </div>
 
 <!-- PAGE 4: Dependency Resolution -->
@@ -362,7 +362,7 @@
     <tr><td>Ubuntu 24.04</td><td class="warn">Source</td><td class="check">&#10003; Package</td><td class="check">&#10003; Package</td><td class="check">&#10003; Module</td><td class="check">&#10003; Ready</td></tr>
     <tr><td>Ubuntu 22.04</td><td class="warn">Source</td><td class="check">&#10003; Package</td><td class="check">&#10003; Package</td><td class="check">&#10003; Module</td><td class="check">&#10003; Ready</td></tr>
   </table>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 4</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 4</div>
 </div>
 
 <!-- PAGE 5: Runtime Infrastructure -->
@@ -372,9 +372,9 @@
 
   <div class="card-grid">
     <div class="card">
-      <h4>/run/hyper2kvm</h4>
+      <h4>/run/h2kvm</h4>
       <ul>
-        <li>Created by tmpfiles.d on boot: <code>d /run/hyper2kvm 0755 root root -</code></li>
+        <li>Created by tmpfiles.d on boot: <code>d /run/h2kvm 0755 root root -</code></li>
         <li>Also created by h2kweb service on startup</li>
         <li>Stores runtime PID files and lock files</li>
         <li>NBD device lock files prevent concurrent access</li>
@@ -385,7 +385,7 @@
     <div class="card">
       <h4>NBD Locking</h4>
       <ul>
-        <li>Lock file per NBD device: <code>/run/hyper2kvm/nbd0.lock</code></li>
+        <li>Lock file per NBD device: <code>/run/h2kvm/nbd0.lock</code></li>
         <li>Prevents two conversions from using same <code>/dev/nbd*</code></li>
         <li>Acquired before <code>qemu-nbd --connect</code></li>
         <li>Released after <code>qemu-nbd --disconnect</code></li>
@@ -399,9 +399,9 @@
     <div class="card">
       <h4>Conversion Directories</h4>
       <ul>
-        <li>Input: <code>/var/lib/hyper2kvm/incoming/</code></li>
-        <li>Output: <code>/var/lib/hyper2kvm/converted/</code></li>
-        <li>Temp: <code>/tmp/hyper2kvm-*</code> (16GB tmpfs)</li>
+        <li>Input: <code>/var/lib/h2kvm/incoming/</code></li>
+        <li>Output: <code>/var/lib/h2kvm/converted/</code></li>
+        <li>Temp: <code>/tmp/h2kvm-*</code> (16GB tmpfs)</li>
         <li>Configurable via CLI or daemon config</li>
         <li>Auto-cleanup of temp files on completion</li>
       </ul>
@@ -409,9 +409,9 @@
     <div class="card">
       <h4>Daemon Config</h4>
       <pre style="font-size:0.72em;">
-# /etc/hyper2kvm/daemon.yaml
-watch_dir: /var/lib/hyper2kvm/incoming
-output_dir: /var/lib/hyper2kvm/converted
+# /etc/h2kvm/daemon.yaml
+watch_dir: /var/lib/h2kvm/incoming
+output_dir: /var/lib/h2kvm/converted
 auto_deploy: true
 concurrency: 2
 log_level: info
@@ -435,12 +435,12 @@ log_level: info
     <tr><td><code>/usr/local/sbin/h2kvmctl</code></td><td>Main CLI binary (editable install symlink)</td></tr>
     <tr><td><code>/usr/bin/zkvm</code></td><td>TUI binary (Go, Bubble Tea)</td></tr>
     <tr><td><code>/usr/bin/h2kweb</code></td><td>Web dashboard binary (Go + embedded frontend)</td></tr>
-    <tr><td><code>/run/hyper2kvm/</code></td><td>Runtime: PID, locks, progress (tmpfs)</td></tr>
-    <tr><td><code>/var/lib/hyper2kvm/</code></td><td>Persistent: converted images, virtio-win ISO</td></tr>
-    <tr><td><code>/etc/hyper2kvm/</code></td><td>Configuration: daemon.yaml</td></tr>
+    <tr><td><code>/run/h2kvm/</code></td><td>Runtime: PID, locks, progress (tmpfs)</td></tr>
+    <tr><td><code>/var/lib/h2kvm/</code></td><td>Persistent: converted images, virtio-win ISO</td></tr>
+    <tr><td><code>/etc/h2kvm/</code></td><td>Configuration: daemon.yaml</td></tr>
     <tr><td><code>/usr/share/virtio-win/</code></td><td>VirtIO drivers ISO</td></tr>
   </table>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 5</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 5</div>
 </div>
 
 <!-- PAGE 6: Migration Readiness Dashboard -->
@@ -465,7 +465,7 @@ log_level: info
     <tr><td>13</td><td>virt-install</td><td>VM creation tool available</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
     <tr><td>14</td><td>Network bridge/NAT</td><td>Default libvirt network active</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
     <tr><td>15</td><td>Disk space</td><td>Sufficient free space for conversion</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
-    <tr><td>16</td><td>Runtime directory</td><td><code>/run/hyper2kvm</code> exists and writable</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>16</td><td>Runtime directory</td><td><code>/run/h2kvm</code> exists and writable</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
     <tr><td>17</td><td>supermin appliance</td><td>libguestfs appliance built and cached</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
     <tr><td>18</td><td>ntfs-3g</td><td>NTFS mount support for Windows guests</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
     <tr><td>19</td><td>govc (optional)</td><td>VMware vSphere CLI for remote migration</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
@@ -487,7 +487,7 @@ log_level: info
     <span class="feat feat-green">One-command deploy</span>
     <span class="feat">doctor.sh diagnostics</span>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 6</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 6</div>
 </div>
 
 </body>

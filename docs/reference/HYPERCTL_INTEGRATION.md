@@ -2,7 +2,7 @@
 
 ## Overview
 
-hyper2kvm now supports **hyperctl** from the `hypersdk` package as a high-performance alternative to `govc` for VMware vSphere exports.
+h2kvm now supports **hyperctl** from the `hypersdk` package as a high-performance alternative to `govc` for VMware vSphere exports.
 
 ### Why hyperctl?
 
@@ -66,7 +66,7 @@ export GOVC_INSECURE=1
 hypervisord
 
 # Method 3: With config file
-hypervisord --config /etc/hyper2kvm/config.yaml
+hypervisord --config /etc/h2kvm/config.yaml
 ```
 
 ### Verify Installation
@@ -84,7 +84,7 @@ hyperctl --version
 ### Simple Example
 
 ```python
-from hyper2kvm.vmware.transports import export_vm_hyperctl
+from h2kvm.vmware.transports import export_vm_hyperctl
 
 # Export VM using hyperctl
 result = export_vm_hyperctl(
@@ -100,7 +100,7 @@ print(f"Export completed: {result['job_id']}")
 ### With Progress Callback
 
 ```python
-from hyper2kvm.vmware.transports import export_vm_hyperctl
+from h2kvm.vmware.transports import export_vm_hyperctl
 
 def show_progress(status):
     """Display progress updates."""
@@ -117,7 +117,7 @@ result = export_vm_hyperctl(
 ### Advanced Usage with HyperCtlRunner
 
 ```python
-from hyper2kvm.vmware.transports import create_hyperctl_runner
+from h2kvm.vmware.transports import create_hyperctl_runner
 
 # Create runner
 runner = create_hyperctl_runner(
@@ -152,7 +152,7 @@ result = runner.wait_for_job_completion(
 ### Batch Processing Multiple VMs
 
 ```python
-from hyper2kvm.vmware.transports import create_hyperctl_runner
+from h2kvm.vmware.transports import create_hyperctl_runner
 
 runner = create_hyperctl_runner()
 
@@ -189,7 +189,7 @@ for vm_path, job_id in job_ids:
 
 **Before (using govc):**
 ```python
-from hyper2kvm.vmware.transports.govc_export import export_vm_govc
+from h2kvm.vmware.transports.govc_export import export_vm_govc
 
 result = export_vm_govc(
     vm_path="/datacenter/vm/my-vm",
@@ -199,7 +199,7 @@ result = export_vm_govc(
 
 **After (using hyperctl):**
 ```python
-from hyper2kvm.vmware.transports import export_vm_hyperctl
+from h2kvm.vmware.transports import export_vm_hyperctl
 
 result = export_vm_hyperctl(
     vm_path="/datacenter/vm/my-vm",
@@ -211,8 +211,8 @@ result = export_vm_hyperctl(
 ### Fallback Pattern (try hyperctl, fallback to govc)
 
 ```python
-from hyper2kvm.vmware.transports import HYPERCTL_AVAILABLE, export_vm_hyperctl
-from hyper2kvm.vmware.transports.govc_export import export_vm_govc
+from h2kvm.vmware.transports import HYPERCTL_AVAILABLE, export_vm_hyperctl
+from h2kvm.vmware.transports.govc_export import export_vm_govc
 
 def export_vm_with_fallback(vm_path, output_path):
     """Try hyperctl first, fallback to govc."""
@@ -266,7 +266,7 @@ sudo journalctl -u hypervisord -f
 ### Connection Refused
 
 ```python
-from hyper2kvm.vmware.transports import create_hyperctl_runner
+from h2kvm.vmware.transports import create_hyperctl_runner
 
 # Try with explicit URL
 runner = create_hyperctl_runner(
@@ -319,4 +319,4 @@ sudo dnf install hypersdk
 
 ---
 
-**Part of the hyper2kvm project family**
+**Part of the h2kvm project family**

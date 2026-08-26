@@ -19,7 +19,7 @@
 
 ### Target Configuration
 - **Format**: QCOW2 (compressed)
-- **Output**: `/home/ssahani/tt/hyper2kvm/out/centos8-test/centos8.qcow2`
+- **Output**: `/home/ssahani/tt/h2kvm/out/centos8-test/centos8.qcow2`
 - **Final Size**: 1.3 GiB
 - **Compression**: Enabled (48% reduction)
 - **Platform**: libvirt/KVM on Fedora 43
@@ -28,7 +28,7 @@
 ```yaml
 cmd: local
 vmdk: /home/ssahani/Downloads/centos8/64bit/centos8.vmdk
-output_dir: /home/ssahani/tt/hyper2kvm/out/centos8-test
+output_dir: /home/ssahani/tt/h2kvm/out/centos8-test
 to_output: centos8.qcow2
 out_format: qcow2
 compress: true
@@ -68,14 +68,14 @@ libvirt_import: true
 1. **VMDK Detection**: Identified as sparse monolithicSparse format
 2. **Conversion Strategy**: Two-step (VMDK → RAW → QCOW2)
 3. **Sparse Detection**: Enabled (no LVM detected)
-4. **Conversion Directory**: `/root/.cache/hyper2kvm/conversions`
+4. **Conversion Directory**: `/root/.cache/h2kvm/conversions`
 
 **Metrics**:
 - Step 1 (VMDK → RAW): 20 seconds
 - Step 2 (RAW → QCOW2): 5 seconds
 - Total conversion time: 25 seconds
 - Virtual size verification: ✅ 500 GiB
-- Conversion path preserved: `/root/.cache/hyper2kvm/conversions/centos8.qcow2`
+- Conversion path preserved: `/root/.cache/h2kvm/conversions/centos8.qcow2`
 
 **Observations**:
 - ✅ Conversion completed successfully
@@ -175,8 +175,8 @@ Updated fstab:
 ### ✅ Phase 5: Image Finalization (PASSED)
 
 **Final Conversion**:
-- **Source**: `/root/.cache/hyper2kvm/conversions/centos8.qcow2`
-- **Destination**: `/home/ssahani/tt/hyper2kvm/out/centos8-test/centos8.qcow2`
+- **Source**: `/root/.cache/h2kvm/conversions/centos8.qcow2`
+- **Destination**: `/home/ssahani/tt/h2kvm/out/centos8-test/centos8.qcow2`
 - **Format**: qcow2 → qcow2 (with compression)
 - **Compression**: Enabled
 - **Duration**: 44 seconds
@@ -201,7 +201,7 @@ Updated fstab:
   <devices>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
-      <source file='/home/ssahani/tt/hyper2kvm/out/centos8-test/centos8.qcow2'/>
+      <source file='/home/ssahani/tt/h2kvm/out/centos8-test/centos8.qcow2'/>
       <target dev='vda' bus='virtio'/>
     </disk>
     <interface type='network'>
@@ -356,9 +356,9 @@ CentOS 8 VM successfully migrated from VMware VMDK to KVM/libvirt with:
 ## Artifacts
 
 ### Generated Files
-- **Migrated Image**: `/home/ssahani/tt/hyper2kvm/out/centos8-test/centos8.qcow2`
-- **Migration Report**: `/home/ssahani/tt/hyper2kvm/out/centos8-test/migration-report.md`
-- **JSON Report**: `/home/ssahani/tt/hyper2kvm/out/centos8-test/migration-report.json`
+- **Migrated Image**: `/home/ssahani/tt/h2kvm/out/centos8-test/centos8.qcow2`
+- **Migration Report**: `/home/ssahani/tt/h2kvm/out/centos8-test/migration-report.md`
+- **JSON Report**: `/home/ssahani/tt/h2kvm/out/centos8-test/migration-report.json`
 - **Libvirt XML**: `/tmp/centos8-libvirt.xml`
 
 ### VM Access
@@ -378,5 +378,5 @@ sudo virsh destroy centos8-test  # Force stop
 ---
 
 **Platform**: Fedora 43 (6.18.6-200.fc43.x86_64)
-**hyper2kvm Version**: Latest (commit aa962e9)
+**h2kvm Version**: Latest (commit aa962e9)
 **Date**: January 28, 2026

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Windows VM Migration Deep-Dive — hyper2kvm</title>
+<title>Windows VM Migration Deep-Dive — h2kvm</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -65,7 +65,7 @@
   <h1>Windows VM Migration<br>Deep Technical Guide</h1>
   <h2>Win10 / Win11 / Server &mdash; Zero-Touch Driver Installation</h2>
   <div class="badge">VirtIO Injection | Registry Editing | Firstboot Scripts | UEFI + BIOS | Proprietary (Zyvor AI Labs)</div>
-  <div class="url">github.com/ssahani/hyper2kvm</div>
+  <div class="url">github.com/ssahani/h2kvm</div>
   <div class="date">April 2026 &mdash; v0.3.0</div>
 </div>
 
@@ -134,7 +134,7 @@
   <div class="highlight">
     <p style="margin-bottom:0;"><strong>Key principle:</strong> Every modification happens offline via qemu-nbd. The VM never needs to boot with broken drivers. VirtIO storage is registered as Start=0 (boot-start) so Windows loads it before any other disk driver.</p>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 1</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 1</div>
 </div>
 
 <!-- PAGE 2: VirtIO Driver Injection -->
@@ -190,7 +190,7 @@
     <span class="feat">viorng.sys (entropy)</span>
     <span class="feat feat-green">All registered offline via hivex</span>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 2</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 2</div>
 </div>
 
 <!-- PAGE 3: Firstboot Architecture -->
@@ -229,7 +229,7 @@
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-fix">VirtIO ISO pnputil<br><small>all driver folders</small></div>
     <div class="flow-arrow">&rarr;</div>
-    <div class="flow-step flow-fix">Custom PNP<br><small>C:\hyper2kvm-drivers</small></div>
+    <div class="flow-step flow-fix">Custom PNP<br><small>C:\h2kvm-drivers</small></div>
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-fix">Network Apply<br><small>PowerShell script</small></div>
     <div class="flow-arrow">&rarr;</div>
@@ -256,13 +256,13 @@
         <li>RunOnce key auto-removed by Windows</li>
         <li>Staged scripts removed from guest</li>
         <li>Auto-login reverted to normal behavior</li>
-        <li>No hyper2kvm artifacts remain post-migration</li>
+        <li>No h2kvm artifacts remain post-migration</li>
       </ul>
     </div>
     <div class="card">
       <h4>Logging</h4>
       <ul>
-        <li>All output to <code>C:\hyper2kvm\firstboot.log</code></li>
+        <li>All output to <code>C:\h2kvm\firstboot.log</code></li>
         <li>pnputil results captured per driver</li>
         <li>Network apply log at <code>apply-network.log</code></li>
         <li>Exit codes recorded for troubleshooting</li>
@@ -274,7 +274,7 @@
   <div class="highlight">
     <p style="margin-bottom:0;"><strong>Dual-method reliability:</strong> rhsrvany service executes before user login. RunOnce key provides a fallback at user login. Both methods are staged, so even if one path fails, the other completes driver installation.</p>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 3</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 3</div>
 </div>
 
 <!-- PAGE 4: Registry Editing -->
@@ -349,7 +349,7 @@ h.commit(None)  # Write changes back to hive file
       </ul>
     </div>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 4</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 4</div>
 </div>
 
 <!-- PAGE 5: Auto-Detect & Compatibility -->
@@ -382,7 +382,7 @@ h.commit(None)  # Write changes back to hive file
       <h4>VirtIO ISO Discovery</h4>
       <ul>
         <li>Check: <code>/usr/share/virtio-win/virtio-win.iso</code></li>
-        <li>Check: <code>/var/lib/hyper2kvm/virtio-win.iso</code></li>
+        <li>Check: <code>/var/lib/h2kvm/virtio-win.iso</code></li>
         <li>deploy-remote.sh auto-downloads if missing</li>
         <li>Version matched to guest OS (w10, w11, 2k22)</li>
         <li>Architecture: amd64 selected for 64-bit guests</li>
@@ -422,7 +422,7 @@ h.commit(None)  # Write changes back to hive file
     <span class="feat">Q35 + PCIe topology</span>
     <span class="feat">host-passthrough CPU</span>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 5</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 5</div>
 </div>
 
 <!-- PAGE 6: Tested Platforms -->
@@ -463,7 +463,7 @@ h.commit(None)  # Write changes back to hive file
     <span class="feat">Secure Boot compatible</span>
     <span class="feat feat-green">Zero BSOD incidents</span>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 6</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 6</div>
 </div>
 
 </body>

@@ -41,20 +41,20 @@ That sequence prevents **INACCESSIBLE_BOOT_DEVICE** when the VirtIO storage driv
 
 For Windows VM migration, you need:
 
-- ✓ hyper2kvm installed ([Installation Guide](02-Installation.md))
+- ✓ h2kvm installed ([Installation Guide](02-Installation.md))
 - ✓ VirtIO drivers ISO available (see below)
 - ✓ Windows source VM disk (VMDK, VHD, etc.)
 - ✓ Understanding of [Windows Boot Cycle](11-Windows-Boot-Cycle.md)
 
 ### VirtIO Drivers ISO
 
-The VirtIO drivers ISO is **automatically discovered** at `/var/lib/hyper2kvm/virtio-win.iso`. Download it with:
+The VirtIO drivers ISO is **automatically discovered** at `/var/lib/h2kvm/virtio-win.iso`. Download it with:
 
 ```bash
 sudo ./scripts/install-deps.sh --virtio-win
 ```
 
-Once downloaded, hyper2kvm finds the ISO automatically -- no extra flags needed. Use `--virtio-drivers-dir` only to override with a custom path.
+Once downloaded, h2kvm finds the ISO automatically -- no extra flags needed. Use `--virtio-drivers-dir` only to override with a custom path.
 
 ### 0) Host prerequisites (Fedora/RHEL family)
 
@@ -77,7 +77,7 @@ Libvirt often runs QEMU under a confined user/service context. Even if the qcow2
 
 ```bash
 sudo mkdir -p /var/lib/libvirt/images
-sudo cp -a /home/ssahani/tt/hyper2kvm/out/windows10-fixed.qcow2 /var/lib/libvirt/images/
+sudo cp -a /home/ssahani/tt/h2kvm/out/windows10-fixed.qcow2 /var/lib/libvirt/images/
 sudo chmod 644 /var/lib/libvirt/images/windows10-fixed.qcow2
 ```bash
 
@@ -201,7 +201,7 @@ You should now see the Windows boot sequence. On the first boot, expect Windows 
 
 ## After Windows boots: install VirtIO drivers (so you can switch to VirtIO safely)
 
-Once you can log in successfully, install VirtIO inside Windows. Attach the VirtIO driver ISO (at `/var/lib/hyper2kvm/virtio-win.iso` if installed via `install-deps.sh --virtio-win`) as a CDROM and run the installer, or use Device Manager to point to the mounted ISO.
+Once you can log in successfully, install VirtIO inside Windows. Attach the VirtIO driver ISO (at `/var/lib/h2kvm/virtio-win.iso` if installed via `install-deps.sh --virtio-win`) as a CDROM and run the installer, or use Device Manager to point to the mounted ISO.
 
 After VirtIO storage drivers are installed, you can switch:
 
@@ -242,7 +242,7 @@ Boot with SATA, install VirtIO drivers in Windows, then switch.
 If you want, I can also add the **follow-up section** that shows the *VirtIO version* of the same XML (disk bus virtio + virtio-net) and a minimal snippet for attaching a `virtio-win.iso` CDROM in libvirt.
 # WINDOWS.md — Windows Migration Deep Dive
 
-This document explains how `hyper2kvm` handles Windows guests and **why each step exists**.
+This document explains how `h2kvm` handles Windows guests and **why each step exists**.
 
 ---
 
@@ -329,7 +329,7 @@ Caused by:
 - missing CDD
 - wrong storage driver selected
 
-`hyper2kvm` fixes all three before first boot.
+`h2kvm` fixes all three before first boot.
 
 ## Next Steps
 
@@ -342,5 +342,5 @@ For Windows migrations:
 ## Getting Help
 
 - [Troubleshooting Guide](90-Failure-Modes.md)
-- [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
+- [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
 

@@ -123,9 +123,9 @@ windows:
 
 **First-Boot Process**:
 1. PowerShell script executes as LocalSystem
-2. Loads license info from `C:\hyper2kvm\license\license-info.json`
+2. Loads license info from `C:\h2kvm\license\license-info.json`
 3. Executes appropriate `slmgr.vbs` commands
-4. Logs results to `C:\hyper2kvm\license\reactivation.log`
+4. Logs results to `C:\h2kvm\license\reactivation.log`
 
 ---
 
@@ -608,12 +608,12 @@ windows:
 ### License Management
 
 1. **Product Keys**: Never logged in plaintext
-   - Stored in `C:\hyper2kvm\license\license-info.json` (guest filesystem)
+   - Stored in `C:\h2kvm\license\license-info.json` (guest filesystem)
    - Accessible only during first boot as LocalSystem
    - Not persisted in host logs
 
 2. **Reactivation Logs**: Sensitive information
-   - Location: `C:\Windows\Temp\hyper2kvm-firstboot.log`
+   - Location: `C:\Windows\Temp\h2kvm-firstboot.log`
    - Contains slmgr.vbs output
    - May include partial product key info
    - Recommend deletion after successful activation
@@ -661,13 +661,13 @@ windows:
 **Check**:
 ```powershell
 # View reactivation log
-Get-Content C:\hyper2kvm\license\reactivation.log
+Get-Content C:\h2kvm\license\reactivation.log
 
 # Check activation status
 slmgr.vbs /dli
 
 # Check license info
-Get-Content C:\hyper2kvm\license\license-info.json
+Get-Content C:\h2kvm\license\license-info.json
 ```
 
 **Common Issues**:
@@ -691,13 +691,13 @@ Get-Content C:\hyper2kvm\license\license-info.json
 **Check**:
 ```powershell
 # View rejoin log (credential method)
-Get-Content C:\hyper2kvm\ad\rejoin.log
+Get-Content C:\h2kvm\ad\rejoin.log
 
 # View offline join log (unattended method)
-Get-Content C:\hyper2kvm\ad\offline-join.log
+Get-Content C:\h2kvm\ad\offline-join.log
 
 # Check domain info
-Get-Content C:\hyper2kvm\ad\domain-info.json
+Get-Content C:\h2kvm\ad\domain-info.json
 
 # Test domain connectivity
 Test-ComputerSecureChannel -Verbose

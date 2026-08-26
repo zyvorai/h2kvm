@@ -16,7 +16,7 @@ export const DESKTOP_TIER_LABELS: Record<DesktopTier, string> = {
 export const DESKTOP_TIER_HINTS: Record<DesktopTier, string> = {
   normal: 'Clean desktop — dashboard, migrate hub, VMs, and jobs. Dock-first layout.',
   power: 'Full migration toolkit — providers, infrastructure, and audit log.',
-  advanced: 'Complete hyper2kvm surface — API docs and all admin panes.',
+  advanced: 'Complete h2kvm surface — API docs and all admin panes.',
 };
 
 const TIER_RANK: Record<DesktopTier, number> = {

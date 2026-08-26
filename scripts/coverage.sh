@@ -39,7 +39,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-echo "📊 === hyper2kvm Coverage Reporter ==="
+echo "📊 === h2kvm Coverage Reporter ==="
 echo
 
 # Check if coverage is installed
@@ -53,7 +53,7 @@ fi
 echo "🧪 Running tests with coverage..."
 pytest tests/unit/ \
     -n auto \
-    --cov=hyper2kvm \
+    --cov=h2kvm \
     --cov-report=term-missing:skip-covered \
     --cov-report=xml \
     --cov-report=html \

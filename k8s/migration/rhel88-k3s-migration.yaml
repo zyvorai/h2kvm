@@ -14,9 +14,9 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: hyper2kvm-migration
+  name: h2kvm-migration
   labels:
-    app: hyper2kvm
+    app: h2kvm
     purpose: migration
 
 ---
@@ -27,7 +27,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: rhel88-migration-config
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
 data:
   migration.yaml: |
     command: local
@@ -58,7 +58,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: rhel88-vmdk-input
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
 spec:
   accessModes:
     - ReadWriteOnce
@@ -75,7 +75,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: rhel88-qcow2-output
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
 spec:
   accessModes:
     - ReadWriteOnce
@@ -92,16 +92,16 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: rhel88-copy-vmdk
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
   labels:
-    app: hyper2kvm
+    app: h2kvm
     step: copy-input
 spec:
   backoffLimit: 1
   template:
     metadata:
       labels:
-        app: hyper2kvm
+        app: h2kvm
         step: copy-input
     spec:
       restartPolicy: Never
@@ -125,7 +125,7 @@ spec:
       volumes:
       - name: host-vmdk
         hostPath:
-          path: /tmp/hyper2kvm-input
+          path: /tmp/h2kvm-input
           type: Directory
       - name: vmdk-input
         persistentVolumeClaim:
@@ -139,16 +139,16 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: rhel88-migration
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
   labels:
-    app: hyper2kvm
+    app: h2kvm
     step: migrate
 spec:
   backoffLimit: 1
   template:
     metadata:
       labels:
-        app: hyper2kvm
+        app: h2kvm
         step: migrate
     spec:
       restartPolicy: Never
@@ -170,7 +170,7 @@ spec:
           readOnly: true
       containers:
       - name: migrate
-        image: hyper2kvm:worker
+        image: h2kvm:worker
         imagePullPolicy: IfNotPresent
         command:
         - /bin/bash
@@ -231,13 +231,13 @@ apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   name: rhel88-migrated
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
   labels:
     app: rhel88-vm
     os: rhel
     version: "8.8"
     migrated-from: vmware
-    migration-tool: hyper2kvm
+    migration-tool: h2kvm
   annotations:
     description: "RHEL 8.8 migrated from VMware ESXi via in-cluster h2kvmctl Job"
 spec:
@@ -293,7 +293,7 @@ spec:
             #cloud-config
             hostname: rhel88-kubevirt
             runcmd:
-              - echo "RHEL 8.8 migrated by hyper2kvm" > /etc/motd
+              - echo "RHEL 8.8 migrated by h2kvm" > /etc/motd
       terminationGracePeriodSeconds: 30
 
 ---
@@ -304,7 +304,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rhel88-ssh
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
 spec:
   type: NodePort
   selector:

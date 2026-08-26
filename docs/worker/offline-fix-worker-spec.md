@@ -3,7 +3,7 @@
 **Status:** Draft
 **Version:** 1.0
 **Date:** 2026-01-31
-**Author:** hyper2kvm Team
+**Author:** h2kvm Team
 
 ---
 
@@ -125,7 +125,7 @@ The offline-fix worker communicates via **JSON files**:
 
 ### OfflineFixRequest
 
-Full schema: `hyper2kvm/worker/offline_fix_contract.py::OfflineFixRequest`
+Full schema: `h2kvm/worker/offline_fix_contract.py::OfflineFixRequest`
 
 **Required Fields:**
 ```json
@@ -209,7 +209,7 @@ Provide OS hints to **optimize** fix operations (skip unnecessary detection):
 
 ### OfflineFixResponse
 
-Full schema: `hyper2kvm/worker/offline_fix_contract.py::OfflineFixResponse`
+Full schema: `h2kvm/worker/offline_fix_contract.py::OfflineFixResponse`
 
 **Required Fields:**
 ```json
@@ -677,8 +677,8 @@ Initial release with basic offline-fix operations.
 
 ## References
 
-- Contract Implementation: `hyper2kvm/worker/offline_fix_contract.py`
-- Mock Runner: `hyper2kvm/worker/offline_fix_mock.py`
+- Contract Implementation: `h2kvm/worker/offline_fix_contract.py`
+- Mock Runner: `h2kvm/worker/offline_fix_mock.py`
 - VM Image Build: `vm-image/Dockerfile.offline-fix`
 
 ---

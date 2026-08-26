@@ -19,7 +19,7 @@
 
 ### Target Configuration
 - **Format**: QCOW2 (compressed)
-- **Output**: `/home/ssahani/tt/hyper2kvm/out/centos9-download-test/centos9.qcow2`
+- **Output**: `/home/ssahani/tt/h2kvm/out/centos9-download-test/centos9.qcow2`
 - **Final Size**: 1.2 GiB
 - **Compression**: Enabled
 - **Platform**: libvirt/KVM on Fedora 43
@@ -28,7 +28,7 @@
 ```yaml
 cmd: local
 vmdk: /home/ssahani/Downloads/centos9/64bit/centos9.vmdk
-output_dir: /home/ssahani/tt/hyper2kvm/out/centos9-download-test
+output_dir: /home/ssahani/tt/h2kvm/out/centos9-download-test
 to_output: centos9.qcow2
 out_format: qcow2
 compress: true
@@ -68,14 +68,14 @@ libvirt_import: true
 1. **VMDK Detection**: Identified as sparse monolithicSparse format
 2. **Conversion Strategy**: Two-step (VMDK → RAW → QCOW2)
 3. **Sparse Detection**: Enabled (no LVM detected)
-4. **Conversion Directory**: `~/.cache/hyper2kvm/conversions`
+4. **Conversion Directory**: `~/.cache/h2kvm/conversions`
 
 **Metrics**:
 - Step 1 (VMDK → RAW): 19 seconds
 - Step 2 (RAW → QCOW2): 4 seconds
 - Total conversion time: 23 seconds
 - Virtual size verification: ✅ 500 GiB
-- Conversion path preserved: `/root/.cache/hyper2kvm/conversions/centos9.qcow2`
+- Conversion path preserved: `/root/.cache/h2kvm/conversions/centos9.qcow2`
 
 **Observations**:
 - ✅ Conversion completed successfully
@@ -175,8 +175,8 @@ Updated fstab:
 ### ✅ Phase 5: Image Finalization (PASSED)
 
 **Final Conversion**:
-- **Source**: `/root/.cache/hyper2kvm/conversions/centos9.qcow2`
-- **Destination**: `/home/ssahani/tt/hyper2kvm/out/centos9-download-test/centos9.qcow2`
+- **Source**: `/root/.cache/h2kvm/conversions/centos9.qcow2`
+- **Destination**: `/home/ssahani/tt/h2kvm/out/centos9-download-test/centos9.qcow2`
 - **Format**: qcow2 → qcow2 (with compression)
 - **Compression**: Enabled
 - **Duration**: 36 seconds
@@ -201,7 +201,7 @@ Updated fstab:
   <devices>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
-      <source file='/home/ssahani/tt/hyper2kvm/out/centos9-download-test/centos9.qcow2'/>
+      <source file='/home/ssahani/tt/h2kvm/out/centos9-download-test/centos9.qcow2'/>
       <target dev='vda' bus='virtio'/>
     </disk>
     <interface type='network'>
@@ -263,7 +263,7 @@ Used memory:    4194304 KiB
 ## Key Achievements
 
 ### ✅ Technical Successes
-1. **Configurable Conversion Directory**: Successfully used `~/.cache/hyper2kvm/conversions`
+1. **Configurable Conversion Directory**: Successfully used `~/.cache/h2kvm/conversions`
 2. **Sparse Conversion**: Properly detected and utilized sparse conversion (2.11 GiB → 1.2 GiB)
 3. **XFS UUID Handling**: Automatically detected duplicate UUIDs and regenerated
 4. **fstab Stabilization**: Converted all entries to stable UUID references
@@ -342,9 +342,9 @@ CentOS Stream 9 VM successfully migrated from VMware VMDK to KVM/libvirt with:
 ## Artifacts
 
 ### Generated Files
-- **Migrated Image**: `/home/ssahani/tt/hyper2kvm/out/centos9-download-test/centos9.qcow2`
-- **Migration Report**: `/home/ssahani/tt/hyper2kvm/out/centos9-download-test/migration-report.md`
-- **JSON Report**: `/home/ssahani/tt/hyper2kvm/out/centos9-download-test/migration-report.json`
+- **Migrated Image**: `/home/ssahani/tt/h2kvm/out/centos9-download-test/centos9.qcow2`
+- **Migration Report**: `/home/ssahani/tt/h2kvm/out/centos9-download-test/migration-report.md`
+- **JSON Report**: `/home/ssahani/tt/h2kvm/out/centos9-download-test/migration-report.json`
 - **Libvirt XML**: `/tmp/centos9-libvirt.xml`
 
 ### VM Access
@@ -364,5 +364,5 @@ sudo virsh destroy centos9-download  # Force stop
 ---
 
 **Platform**: Fedora 43 (6.18.6-200.fc43.x86_64)
-**hyper2kvm Version**: Latest (commit 063fae9)
+**h2kvm Version**: Latest (commit 063fae9)
 **Date**: January 28, 2026

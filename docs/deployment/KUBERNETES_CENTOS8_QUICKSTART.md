@@ -1,6 +1,6 @@
-# Hyper2KVM on Kubernetes + CentOS 8 - Quick Start
+# H2KVM on Kubernetes + CentOS 8 - Quick Start
 
-Deploy Hyper2KVM on Kubernetes with CentOS 8 worker nodes in under 10 minutes.
+Deploy H2KVM on Kubernetes with CentOS 8 worker nodes in under 10 minutes.
 
 ---
 
@@ -10,7 +10,7 @@ Deploy Hyper2KVM on Kubernetes with CentOS 8 worker nodes in under 10 minutes.
 # 1. Prepare nodes
 ./scripts/deploy-k8s-centos8.sh prepare
 
-# 2. Deploy Hyper2KVM
+# 2. Deploy H2KVM
 ./scripts/deploy-k8s-centos8.sh deploy
 
 # 3. Run test
@@ -64,16 +64,16 @@ exit
 **Label the nodes**:
 
 ```bash
-kubectl label node worker-node-1 hyper2kvm=enabled
-kubectl label node worker-node-2 hyper2kvm=enabled
+kubectl label node worker-node-1 h2kvm=enabled
+kubectl label node worker-node-2 h2kvm=enabled
 
 # Verify
-kubectl get nodes -L hyper2kvm
+kubectl get nodes -L h2kvm
 ```
 
 ---
 
-### Step 2: Deploy Hyper2KVM
+### Step 2: Deploy H2KVM
 
 Deploy the core components:
 
@@ -89,7 +89,7 @@ KVM_STORAGE_SIZE=1Ti \
 ```
 
 **What this creates**:
-- Namespace: `hyper2kvm-system`
+- Namespace: `h2kvm-system`
 - ServiceAccount and RBAC
 - PersistentVolumeClaims for source/destination storage
 - ConfigMaps for configuration
@@ -100,8 +100,8 @@ KVM_STORAGE_SIZE=1Ti \
 ./scripts/deploy-k8s-centos8.sh status
 
 # Or manually:
-kubectl get all -n hyper2kvm-system
-kubectl get pvc -n hyper2kvm-system
+kubectl get all -n h2kvm-system
+kubectl get pvc -n h2kvm-system
 ```
 
 ---
@@ -134,14 +134,14 @@ kubectl run -it --rm upload-vmdk \
       }]
     }
   }' \
-  --namespace=hyper2kvm-system
+  --namespace=h2kvm-system
 
 # Inside the pod, you can use wget, scp, or mount NFS
 # For example:
 wget -O /mnt/vmware/test-vm.vmdk http://your-server/test-vm.vmdk
 
 # Or use kubectl cp from outside:
-kubectl cp local-vm.vmdk hyper2kvm-system/upload-vmdk:/mnt/vmware/test-vm.vmdk
+kubectl cp local-vm.vmdk h2kvm-system/upload-vmdk:/mnt/vmware/test-vm.vmdk
 
 # Exit when done
 exit
@@ -153,7 +153,7 @@ If using NFS storage, you can copy directly:
 
 ```bash
 # Mount NFS on your local machine
-sudo mount -t nfs nfs-server:/export/hyper2kvm /mnt/nfs
+sudo mount -t nfs nfs-server:/export/h2kvm /mnt/nfs
 
 # Copy VMDKs
 sudo cp /vmware/vms/*.vmdk /mnt/nfs/vmware/
@@ -174,20 +174,20 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: migrate-test-vm
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   template:
     metadata:
       labels:
-        app: hyper2kvm
+        app: h2kvm
     spec:
-      serviceAccountName: hyper2kvm-worker
+      serviceAccountName: h2kvm-worker
       restartPolicy: Never
       nodeSelector:
-        hyper2kvm: enabled
+        h2kvm: enabled
       containers:
-      - name: hyper2kvm
-        image: ghcr.io/ssahani/hyper2kvm:latest
+      - name: h2kvm
+        image: ghcr.io/ssahani/h2kvm:latest
         command:
           - h2kvmctl
           - --cmd
@@ -234,13 +234,13 @@ EOF
 
 ```bash
 # Watch job status
-kubectl get jobs -n hyper2kvm-system -w
+kubectl get jobs -n h2kvm-system -w
 
 # View logs
-kubectl logs -n hyper2kvm-system -f job/migrate-test-vm
+kubectl logs -n h2kvm-system -f job/migrate-test-vm
 
 # Check completion
-kubectl wait --for=condition=complete job/migrate-test-vm -n hyper2kvm-system --timeout=3600s
+kubectl wait --for=condition=complete job/migrate-test-vm -n h2kvm-system --timeout=3600s
 ```
 
 ---
@@ -273,7 +273,7 @@ kubectl run -it --rm download-qcow2 \
       }]
     }
   }' \
-  --namespace=hyper2kvm-system
+  --namespace=h2kvm-system
 
 # List migrated files
 ls -lh /mnt/kvm/
@@ -282,7 +282,7 @@ ls -lh /mnt/kvm/
 exit
 
 # Copy to local machine
-kubectl cp hyper2kvm-system/download-qcow2:/mnt/kvm/test-vm.qcow2 ./test-vm.qcow2
+kubectl cp h2kvm-system/download-qcow2:/mnt/kvm/test-vm.qcow2 ./test-vm.qcow2
 ```
 
 ---
@@ -297,7 +297,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: batch-manifest
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 data:
   manifest.json: |
     {
@@ -321,19 +321,19 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: batch-migration
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   parallelism: 3
   completions: 3
   template:
     spec:
-      serviceAccountName: hyper2kvm-worker
+      serviceAccountName: h2kvm-worker
       restartPolicy: Never
       nodeSelector:
-        hyper2kvm: enabled
+        h2kvm: enabled
       containers:
-      - name: hyper2kvm
-        image: ghcr.io/ssahani/hyper2kvm:latest
+      - name: h2kvm
+        image: ghcr.io/ssahani/h2kvm:latest
         command:
           - h2kvmctl
           - --cmd
@@ -378,8 +378,8 @@ spec:
 EOF
 
 # Monitor
-kubectl get jobs -n hyper2kvm-system -w
-kubectl logs -n hyper2kvm-system -l app=hyper2kvm
+kubectl get jobs -n h2kvm-system -w
+kubectl logs -n h2kvm-system -l app=h2kvm
 ```
 
 ---
@@ -390,42 +390,42 @@ kubectl logs -n hyper2kvm-system -l app=hyper2kvm
 
 ```bash
 # List all jobs
-kubectl get jobs -n hyper2kvm-system
+kubectl get jobs -n h2kvm-system
 
 # Check job status
-kubectl get jobs -n hyper2kvm-system -o wide
+kubectl get jobs -n h2kvm-system -o wide
 
 # View job details
-kubectl describe job migrate-test-vm -n hyper2kvm-system
+kubectl describe job migrate-test-vm -n h2kvm-system
 ```
 
 ### Debug Failed Migration
 
 ```bash
 # Get pod name
-POD=$(kubectl get pods -n hyper2kvm-system -l job-name=migrate-test-vm -o jsonpath='{.items[0].metadata.name}')
+POD=$(kubectl get pods -n h2kvm-system -l job-name=migrate-test-vm -o jsonpath='{.items[0].metadata.name}')
 
 # View logs
-kubectl logs -n hyper2kvm-system $POD
+kubectl logs -n h2kvm-system $POD
 
 # Get events
-kubectl get events -n hyper2kvm-system --field-selector involvedObject.name=$POD
+kubectl get events -n h2kvm-system --field-selector involvedObject.name=$POD
 
 # Shell into pod (if still running)
-kubectl exec -it -n hyper2kvm-system $POD -- /bin/bash
+kubectl exec -it -n h2kvm-system $POD -- /bin/bash
 ```
 
 ### Clean Up Old Jobs
 
 ```bash
 # Delete completed jobs older than 24 hours
-kubectl delete jobs -n hyper2kvm-system --field-selector status.successful=1
+kubectl delete jobs -n h2kvm-system --field-selector status.successful=1
 
 # Delete failed jobs
-kubectl delete jobs -n hyper2kvm-system --field-selector status.failed=1
+kubectl delete jobs -n h2kvm-system --field-selector status.failed=1
 
 # Delete all jobs
-kubectl delete jobs -n hyper2kvm-system --all
+kubectl delete jobs -n h2kvm-system --all
 ```
 
 ---
@@ -436,21 +436,21 @@ kubectl delete jobs -n hyper2kvm-system --all
 
 **Check**:
 ```bash
-kubectl describe pod -n hyper2kvm-system <pod-name>
+kubectl describe pod -n h2kvm-system <pod-name>
 ```
 
 **Common causes**:
-- No nodes with label `hyper2kvm=enabled`
+- No nodes with label `h2kvm=enabled`
 - Insufficient resources
 - PVC not bound
 
 **Fix**:
 ```bash
 # Check node labels
-kubectl get nodes -L hyper2kvm
+kubectl get nodes -L h2kvm
 
 # Check PVC status
-kubectl get pvc -n hyper2kvm-system
+kubectl get pvc -n h2kvm-system
 
 # Check node resources
 kubectl top nodes
@@ -479,14 +479,14 @@ sudo setenforce 0
 
 ## Cleanup
 
-Remove all Hyper2KVM resources:
+Remove all H2KVM resources:
 
 ```bash
 # Using script
 ./scripts/deploy-k8s-centos8.sh cleanup
 
 # Or manually
-kubectl delete namespace hyper2kvm-system
+kubectl delete namespace h2kvm-system
 ```
 
 ---
@@ -502,9 +502,9 @@ kubectl delete namespace hyper2kvm-system
 
 ## Support
 
-- **Documentation**: [https://github.com/ssahani/hyper2kvm/docs](https://github.com/ssahani/hyper2kvm/docs)
-- **Issues**: [https://github.com/ssahani/hyper2kvm/issues](https://github.com/ssahani/hyper2kvm/issues)
-- **Discussions**: [https://github.com/ssahani/hyper2kvm/discussions](https://github.com/ssahani/hyper2kvm/discussions)
+- **Documentation**: [https://github.com/ssahani/h2kvm/docs](https://github.com/ssahani/h2kvm/docs)
+- **Issues**: [https://github.com/ssahani/h2kvm/issues](https://github.com/ssahani/h2kvm/issues)
+- **Discussions**: [https://github.com/ssahani/h2kvm/discussions](https://github.com/ssahani/h2kvm/discussions)
 
 ---
 

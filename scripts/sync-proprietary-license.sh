@@ -19,7 +19,7 @@ REPOS=(
     Aether
     cockpit
     forge
-    hyper2kvm-
+    h2kvm-
     hypercluster
     hypersdk-
     hypersdk-web
@@ -36,7 +36,7 @@ REPOS=(
 
 echo "Source: ${SOURCE_LICENSE}"
 echo "Parent: ${PARENT}"
-echo "Excluded (keep OSS license files): guestkit (LGPL), tt/cloud-netconfig, tt/hyper2kvm,"
+echo "Excluded (keep OSS license files): guestkit (LGPL), tt/cloud-netconfig, tt/h2kvm,"
 echo "  tt/hypersdk, tt/hypersdk-org-profile, tt/netctl, tt/netevd"
 echo ""
 

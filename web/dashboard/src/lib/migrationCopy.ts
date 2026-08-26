@@ -2,11 +2,11 @@
 // Proprietary software — see LICENSE in the repository root.
 // https://zyvor.dev · info@zyvor.dev
 
-/** Shared labels for the hyper2kvm migration pipeline (dashboard + docs parity). */
+/** Shared labels for the h2kvm migration pipeline (dashboard + docs parity). */
 
 export type MigrationDeployTarget = 'libvirt' | 'kubevirt' | 'openstack' | 'none';
 
-export const MIGRATION_ENGINE = 'hyper2kvm';
+export const MIGRATION_ENGINE = 'h2kvm';
 export const MIGRATION_CLI = 'h2kvmctl';
 
 export const MIGRATION_PIPELINE_TITLE = 'Full Migration Pipeline';
@@ -15,14 +15,14 @@ export const MIGRATION_PIPELINE_SUBTITLE = 'Export → Convert → Fix guest OS 
 export const MIGRATION_PIPELINE_STAGES = ['Export', 'Convert', 'Fix OS', 'Deploy'] as const;
 
 export const MIGRATION_PIPELINE_BANNER =
-  'Runs on this host via hyper2kvm (h2kvmctl). Libvirt deploy uses virsh define + domain XML — not virt-install.';
+  'Runs on this host via h2kvm (h2kvmctl). Libvirt deploy uses virsh define + domain XML — not virt-install.';
 
-export const MIGRATION_GUEST_FIXES_HINT = 'Applied inside hyper2kvm guest repair';
+export const MIGRATION_GUEST_FIXES_HINT = 'Applied inside h2kvm guest repair';
 
 export const MIGRATION_NETWORK_HINT =
   'Libvirt network name (default). Ignored for KubeVirt and OpenStack deploy.';
 
-export const MIGRATION_DEPLOY_TARGET_LABEL = 'Deploy target (hyper2kvm stage)';
+export const MIGRATION_DEPLOY_TARGET_LABEL = 'Deploy target (h2kvm stage)';
 
 export type DeployTargetOption = {
   value: MigrationDeployTarget | '';
@@ -33,8 +33,8 @@ export type DeployTargetOption = {
 export const MIGRATION_DEPLOY_TARGETS: DeployTargetOption[] = [
   {
     value: 'libvirt',
-    label: 'Libvirt / KVM (hyper2kvm · virsh define)',
-    description: 'Defines a libvirt domain from hyper2kvm-generated XML (VirtIO Linux, SATA/e1000e Windows).',
+    label: 'Libvirt / KVM (h2kvm · virsh define)',
+    description: 'Defines a libvirt domain from h2kvm-generated XML (VirtIO Linux, SATA/e1000e Windows).',
   },
   {
     value: 'kubevirt',

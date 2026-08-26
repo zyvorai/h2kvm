@@ -1,7 +1,7 @@
 {
   "dashboard": {
-    "title": "hyper2kvm Migration Dashboard",
-    "tags": ["hyper2kvm", "migration", "kubevirt"],
+    "title": "h2kvm Migration Dashboard",
+    "tags": ["h2kvm", "migration", "kubevirt"],
     "timezone": "browser",
     "schemaVersion": 38,
     "version": 1,
@@ -13,7 +13,7 @@
         "type": "stat",
         "targets": [
           {
-            "expr": "sum(rate(hyper2kvm_migrations_succeeded_total[5m])) / sum(rate(hyper2kvm_migrations_total[5m])) * 100",
+            "expr": "sum(rate(h2kvm_migrations_succeeded_total[5m])) / sum(rate(h2kvm_migrations_total[5m])) * 100",
             "legendFormat": "Success Rate"
           }
         ],
@@ -43,7 +43,7 @@
         "type": "stat",
         "targets": [
           {
-            "expr": "sum(hyper2kvm_migrations_active)",
+            "expr": "sum(h2kvm_migrations_active)",
             "legendFormat": "Active"
           }
         ],
@@ -55,7 +55,7 @@
         "type": "stat",
         "targets": [
           {
-            "expr": "sum(increase(hyper2kvm_migrations_total[24h]))",
+            "expr": "sum(increase(h2kvm_migrations_total[24h]))",
             "legendFormat": "Total"
           }
         ],
@@ -67,7 +67,7 @@
         "type": "stat",
         "targets": [
           {
-            "expr": "avg(rate(hyper2kvm_migration_duration_seconds_sum[5m]) / rate(hyper2kvm_migration_duration_seconds_count[5m]))",
+            "expr": "avg(rate(h2kvm_migration_duration_seconds_sum[5m]) / rate(h2kvm_migration_duration_seconds_count[5m]))",
             "legendFormat": "Avg Duration"
           }
         ],
@@ -82,7 +82,7 @@
         "type": "graph",
         "targets": [
           {
-            "expr": "sum(rate(hyper2kvm_migrations_total[5m])) by (source_type)",
+            "expr": "sum(rate(h2kvm_migrations_total[5m])) by (source_type)",
             "legendFormat": "{{source_type}}"
           }
         ],
@@ -94,11 +94,11 @@
         "type": "graph",
         "targets": [
           {
-            "expr": "sum(rate(hyper2kvm_migrations_succeeded_total[5m]))",
+            "expr": "sum(rate(h2kvm_migrations_succeeded_total[5m]))",
             "legendFormat": "Success"
           },
           {
-            "expr": "sum(rate(hyper2kvm_migrations_failed_total[5m]))",
+            "expr": "sum(rate(h2kvm_migrations_failed_total[5m]))",
             "legendFormat": "Failure"
           }
         ],
@@ -110,7 +110,7 @@
         "type": "graph",
         "targets": [
           {
-            "expr": "sum(hyper2kvm_migrations_active) by (phase)",
+            "expr": "sum(h2kvm_migrations_active) by (phase)",
             "legendFormat": "{{phase}}"
           }
         ],
@@ -123,15 +123,15 @@
         "type": "graph",
         "targets": [
           {
-            "expr": "histogram_quantile(0.50, sum(rate(hyper2kvm_migration_duration_seconds_bucket[5m])) by (le))",
+            "expr": "histogram_quantile(0.50, sum(rate(h2kvm_migration_duration_seconds_bucket[5m])) by (le))",
             "legendFormat": "p50"
           },
           {
-            "expr": "histogram_quantile(0.90, sum(rate(hyper2kvm_migration_duration_seconds_bucket[5m])) by (le))",
+            "expr": "histogram_quantile(0.90, sum(rate(h2kvm_migration_duration_seconds_bucket[5m])) by (le))",
             "legendFormat": "p90"
           },
           {
-            "expr": "histogram_quantile(0.99, sum(rate(hyper2kvm_migration_duration_seconds_bucket[5m])) by (le))",
+            "expr": "histogram_quantile(0.99, sum(rate(h2kvm_migration_duration_seconds_bucket[5m])) by (le))",
             "legendFormat": "p99"
           }
         ],
@@ -143,7 +143,7 @@
         "type": "graph",
         "targets": [
           {
-            "expr": "avg(hyper2kvm_conversion_compression_ratio) by (format)",
+            "expr": "avg(h2kvm_conversion_compression_ratio) by (format)",
             "legendFormat": "{{format}}"
           }
         ],
@@ -155,7 +155,7 @@
         "type": "graph",
         "targets": [
           {
-            "expr": "sum(rate(hyper2kvm_multi_disk_migrations_total[5m])) by (disk_count)",
+            "expr": "sum(rate(h2kvm_multi_disk_migrations_total[5m])) by (disk_count)",
             "legendFormat": "{{disk_count}} disks"
           }
         ],
@@ -167,11 +167,11 @@
         "type": "stat",
         "targets": [
           {
-            "expr": "sum(increase(hyper2kvm_dry_run_validations_total{result=\"success\"}[1h]))",
+            "expr": "sum(increase(h2kvm_dry_run_validations_total{result=\"success\"}[1h]))",
             "legendFormat": "Success"
           },
           {
-            "expr": "sum(increase(hyper2kvm_dry_run_validations_total{result=\"failure\"}[1h]))",
+            "expr": "sum(increase(h2kvm_dry_run_validations_total{result=\"failure\"}[1h]))",
             "legendFormat": "Failure"
           }
         ],
@@ -183,7 +183,7 @@
         "type": "graph",
         "targets": [
           {
-            "expr": "sum(rate(hyper2kvm_dry_run_issues_found_total[5m])) by (issue_type)",
+            "expr": "sum(rate(h2kvm_dry_run_issues_found_total[5m])) by (issue_type)",
             "legendFormat": "{{issue_type}}"
           }
         ],
@@ -195,7 +195,7 @@
         "type": "stat",
         "targets": [
           {
-            "expr": "sum(increase(hyper2kvm_vms_created_total[24h]))",
+            "expr": "sum(increase(h2kvm_vms_created_total[24h]))",
             "legendFormat": "Created (24h)"
           }
         ],
@@ -207,7 +207,7 @@
         "type": "stat",
         "targets": [
           {
-            "expr": "sum(hyper2kvm_vms_running)",
+            "expr": "sum(h2kvm_vms_running)",
             "legendFormat": "Running"
           }
         ],
@@ -219,7 +219,7 @@
         "type": "pie",
         "targets": [
           {
-            "expr": "sum(increase(hyper2kvm_operator_webhook_validations_total[1h])) by (result)",
+            "expr": "sum(increase(h2kvm_operator_webhook_validations_total[1h])) by (result)",
             "legendFormat": "{{result}}"
           }
         ],
@@ -231,7 +231,7 @@
         "type": "table",
         "targets": [
           {
-            "expr": "topk(10, sum(increase(hyper2kvm_migrations_failed_total[24h])) by (reason))",
+            "expr": "topk(10, sum(increase(h2kvm_migrations_failed_total[24h])) by (reason))",
             "legendFormat": "{{reason}}",
             "format": "table"
           }

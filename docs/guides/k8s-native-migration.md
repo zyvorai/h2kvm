@@ -2,7 +2,7 @@
 
 🎉 **World's First Cloud-Native VM Migration Platform!**
 
-hyper2kvm now supports **fully Kubernetes-native migrations** using the `MigrationJob` custom resource. No host machine with sudo required - everything runs inside Kubernetes!
+h2kvm now supports **fully Kubernetes-native migrations** using the `MigrationJob` custom resource. No host machine with sudo required - everything runs inside Kubernetes!
 
 ## 🌟 Why This is Revolutionary
 
@@ -46,7 +46,7 @@ kubectl apply -f k8s/daemon/nbd-prep-daemonset.yaml
 
 ```bash
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: my-first-migration
@@ -107,7 +107,7 @@ kubectl get vm
                             ⬇️
 ┌─────────────────────────────────────────────────────────────┐
 │  4. Operator selects NBD-capable node                       │
-│     Looks for nodes with hyper2kvm.io/nbd-capable=true      │
+│     Looks for nodes with h2kvm.io/nbd-capable=true      │
 └─────────────────────────────────────────────────────────────┘
                             ⬇️
 ┌─────────────────────────────────────────────────────────────┐
@@ -118,7 +118,7 @@ kubectl get vm
 └─────────────────────────────────────────────────────────────┘
                             ⬇️
 ┌─────────────────────────────────────────────────────────────┐
-│  6. Migration pod runs hyper2kvm                            │
+│  6. Migration pod runs h2kvm                            │
 │     - Offline fixes (fstab, GRUB, initramfs)                │
 │     - Converts to QCOW2                                     │
 │     - Writes to destination PVC                             │
@@ -337,10 +337,10 @@ kubectl get events --field-selector involvedObject.name=migrate-centos9
 
 ```bash
 # Migration pod logs
-kubectl logs -l migration.hyper2kvm.io/job=migrate-centos9
+kubectl logs -l migration.h2kvm.io/job=migrate-centos9
 
 # Operator logs
-kubectl logs -n hyper2kvm-system deployment/hyper2kvm-operator
+kubectl logs -n h2kvm-system deployment/h2kvm-operator
 ```
 
 ## 🔧 Troubleshooting
@@ -351,7 +351,7 @@ kubectl logs -n hyper2kvm-system deployment/hyper2kvm-operator
 
 **Solution**: Ensure nodes have label:
 ```bash
-kubectl label nodes <node-name> hyper2kvm.io/nbd-capable=true
+kubectl label nodes <node-name> h2kvm.io/nbd-capable=true
 ```
 
 ### Migration Stuck in "Preparing"
@@ -360,10 +360,10 @@ kubectl label nodes <node-name> hyper2kvm.io/nbd-capable=true
 
 **Solution**: Check DaemonSet:
 ```bash
-kubectl get daemonset -n hyper2kvm-system nbd-prep
+kubectl get daemonset -n h2kvm-system nbd-prep
 
 # Check pod logs
-kubectl logs -n hyper2kvm-system -l app=nbd-prep
+kubectl logs -n h2kvm-system -l app=nbd-prep
 ```
 
 ### Migration Failed in "Uploading"
@@ -401,7 +401,7 @@ kubectl get events --field-selector involvedObject.kind=VirtualMachineInstance
 ### Example 1: Migrate from URL with Custom Settings
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: web-server-migration
@@ -440,7 +440,7 @@ spec:
 ### Example 2: Migrate from Existing PVC (No VM Creation)
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: database-migration
@@ -492,9 +492,9 @@ The operator requires these permissions:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: hyper2kvm-operator
+  name: h2kvm-operator
 rules:
-  - apiGroups: ["hyper2kvm.io"]
+  - apiGroups: ["h2kvm.io"]
     resources: ["migrationjobs", "migrationjobs/status"]
     verbs: ["*"]
   - apiGroups: [""]
@@ -518,7 +518,7 @@ Multiple migrations run in parallel:
 ```bash
 for i in {1..100}; do
   kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: migrate-vm-$i

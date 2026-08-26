@@ -1,6 +1,6 @@
-# Hyper2KVM Backend Options
+# H2KVM Backend Options
 
-Hyper2KVM supports multiple backends for offline guest fixes, each with different trade-offs between speed, security, and reliability.
+H2KVM supports multiple backends for offline guest fixes, each with different trade-offs between speed, security, and reliability.
 
 ## Overview
 
@@ -47,7 +47,7 @@ config = OfflineFixConfig(
     image=Path("guest.qcow2"),
     backend="vmcraft",
     fstab_mode="stabilize-all",
-    conversion_dir="/var/tmp/hyper2kvm",  # VMCraft working directory
+    conversion_dir="/var/tmp/h2kvm",  # VMCraft working directory
 )
 
 fixer = OfflineFSFix(logger, config)
@@ -93,10 +93,10 @@ getcap $(which unshare)
 
 **Direct Usage (Standalone):**
 ```python
-from hyper2kvm.vmcraft.namespace_lvm import Hyper2KVM
+from h2kvm.vmcraft.namespace_lvm import H2KVM
 
 # Use context manager for automatic cleanup
-with Hyper2KVM(image="guest.qcow2") as engine:
+with H2KVM(image="guest.qcow2") as engine:
     volumes = engine.start()
 
     for vol in volumes:
@@ -107,7 +107,7 @@ with Hyper2KVM(image="guest.qcow2") as engine:
 
 **Via Storage Activator:**
 ```python
-from hyper2kvm.vmcraft.storage import LVMActivator
+from h2kvm.vmcraft.storage import LVMActivator
 
 audit = LVMActivator.activate_namespace(
     logger,
@@ -171,7 +171,7 @@ filesystem_repair_enable: true
 backend: vmcraft
 fstab_mode: by-uuid
 regen_initramfs: true
-conversion_dir: /mnt/fast-ssd/hyper2kvm
+conversion_dir: /mnt/fast-ssd/h2kvm
 ```
 
 ### Security-Hardened (Isolation)
@@ -185,7 +185,7 @@ dry_run: true  # Read-only inspection
 
 ## Fallback Strategy
 
-Hyper2KVM automatically falls back to more reliable backends on failure:
+H2KVM automatically falls back to more reliable backends on failure:
 
 ```
 namespace → vmcraft
@@ -267,6 +267,6 @@ lsblk -o NAME,SIZE,TYPE,MOUNTPOINT
 
 ## See Also
 
-- [LVM Implementation](../hyper2kvm/vmcraft/lvm.py) - Native Python LVM
-- [Namespace LVM](../hyper2kvm/vmcraft/namespace_lvm.py) - Unshare-based isolation
+- [LVM Implementation](../h2kvm/vmcraft/lvm.py) - Native Python LVM
+- [Namespace LVM](../h2kvm/vmcraft/namespace_lvm.py) - Unshare-based isolation
 - [Backend Comparison Example](../examples/backend_comparison.py) - Demo script

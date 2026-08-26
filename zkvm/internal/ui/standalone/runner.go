@@ -86,7 +86,7 @@ func findBinary(override string) string {
 	}
 
 	// Check PATH first — prefer the Python entry point.
-	for _, name := range []string{"h2kvmctl", "hyper2kvm"} {
+	for _, name := range []string{"h2kvmctl", "h2kvm"} {
 		if p, err := exec.LookPath(name); err == nil {
 			return p
 		}

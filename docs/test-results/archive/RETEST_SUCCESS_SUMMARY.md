@@ -25,7 +25,7 @@
 ✅ INFO Activated VG: rhel (from /dev/nbd0)
 ✅ INFO Detected Linux OS on /dev/mapper/rhel-root
 ✅ INFO Mounted root at / using /dev/mapper/rhel-root
-✅ INFO Output: /home/ssahani/tt/hyper2kvm/output/rhel8.8-fixed.qcow2
+✅ INFO Output: /home/ssahani/tt/h2kvm/output/rhel8.8-fixed.qcow2
 ```
 
 ---
@@ -116,16 +116,16 @@ $ sudo dmsetup ls | wc -l
 ### 1. VMCraft Mount Import Errors ✅
 
 **Files Fixed**:
-- `hyper2kvm/core/vmcraft/api/filesystem_mixin.py`
+- `h2kvm/core/vmcraft/api/filesystem_mixin.py`
   - Added: `run_sudo`, `svc_list_partitions_cached`, `svc_invalidate_partition_cache`, `os`
 
-- `hyper2kvm/core/vmcraft/api/storage_mixin.py`
+- `h2kvm/core/vmcraft/api/storage_mixin.py`
   - Added: `LVMActivator`, `run_sudo`, `execute_chroot_command`
 
-- `hyper2kvm/core/vmcraft/api/partition_mixin.py`
+- `h2kvm/core/vmcraft/api/partition_mixin.py`
   - Added: `run_sudo`
 
-- `hyper2kvm/core/vmcraft/api/inspection_mixin.py`
+- `h2kvm/core/vmcraft/api/inspection_mixin.py`
   - Added: `run_sudo`
 
 **Impact**:
@@ -255,7 +255,7 @@ Validation: PASS (qemu-img check)
    ↳ GRUB regeneration working
 
 ✅ Generated images:
-   - /home/ssahani/tt/hyper2kvm/output/rhel8.8-fixed.qcow2
+   - /home/ssahani/tt/h2kvm/output/rhel8.8-fixed.qcow2
    ↳ FULL SUCCESS!
 ```
 

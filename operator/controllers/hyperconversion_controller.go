@@ -42,12 +42,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	hyper2kvmv1 "github.com/hyper2kvm/operator/api/v1alpha1"
-	opmetrics "github.com/hyper2kvm/operator/pkg/metrics"
+	h2kvmv1 "github.com/h2kvm/operator/api/v1alpha1"
+	opmetrics "github.com/h2kvm/operator/pkg/metrics"
 )
 
 const (
-	hyperConversionFinalizer = "hyper2kvm.io/hyperconversion-finalizer"
+	hyperConversionFinalizer = "h2kvm.io/hyperconversion-finalizer"
 )
 
 // HyperConversionReconciler reconciles a HyperConversion object
@@ -57,9 +57,9 @@ type HyperConversionReconciler struct {
 	Recorder record.EventRecorder
 }
 
-//+kubebuilder:rbac:groups=hyper2kvm.io,resources=hyperconversions,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=hyper2kvm.io,resources=hyperconversions/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=hyper2kvm.io,resources=hyperconversions/finalizers,verbs=update
+//+kubebuilder:rbac:groups=h2kvm.io,resources=hyperconversions,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=h2kvm.io,resources=hyperconversions/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=h2kvm.io,resources=hyperconversions/finalizers,verbs=update
 //+kubebuilder:rbac:groups=cdi.kubevirt.io,resources=datavolumes,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=kubevirt.io,resources=virtualmachines,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;delete
@@ -74,7 +74,7 @@ func (r *HyperConversionReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	logger := log.FromContext(ctx)
 
 	// Fetch the HyperConversion instance
-	hc := &hyper2kvmv1.HyperConversion{}
+	hc := &h2kvmv1.HyperConversion{}
 	if err := r.Get(ctx, req.NamespacedName, hc); err != nil {
 		if errors.IsNotFound(err) {
 			logger.Info("HyperConversion resource not found, ignoring reconcile")
@@ -103,19 +103,19 @@ func (r *HyperConversionReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 	// Handle phase transitions
 	switch hc.Status.Phase {
-	case "", hyper2kvmv1.PhasePending:
+	case "", h2kvmv1.PhasePending:
 		return r.handlePending(ctx, hc)
-	case hyper2kvmv1.PhaseUploading:
+	case h2kvmv1.PhaseUploading:
 		return r.handleUploading(ctx, hc)
-	case hyper2kvmv1.PhaseConverting:
+	case h2kvmv1.PhaseConverting:
 		return r.handleConverting(ctx, hc)
-	case hyper2kvmv1.PhaseFixing:
+	case h2kvmv1.PhaseFixing:
 		return r.handleFixing(ctx, hc)
-	case hyper2kvmv1.PhaseCreatingVM:
+	case h2kvmv1.PhaseCreatingVM:
 		return r.handleCreatingVM(ctx, hc)
-	case hyper2kvmv1.PhaseReady:
+	case h2kvmv1.PhaseReady:
 		return ctrl.Result{}, nil
-	case hyper2kvmv1.PhaseFailed:
+	case h2kvmv1.PhaseFailed:
 		// Terminal state, no further reconciliation needed
 		return ctrl.Result{}, nil
 	}
@@ -124,13 +124,13 @@ func (r *HyperConversionReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 }
 
 // handlePending creates the CDI DataVolume from the source URL and transitions to Uploading.
-func (r *HyperConversionReconciler) handlePending(ctx context.Context, hc *hyper2kvmv1.HyperConversion) (ctrl.Result, error) {
+func (r *HyperConversionReconciler) handlePending(ctx context.Context, hc *h2kvmv1.HyperConversion) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 	logger.Info("Handling Pending phase", "name", hc.Name)
 
 	// Set start time
 	now := metav1.Now()
-	hc.Status.Phase = hyper2kvmv1.PhaseUploading
+	hc.Status.Phase = h2kvmv1.PhaseUploading
 	hc.Status.StartTime = &now
 	hc.Status.Progress = 0
 	hc.Status.Message = "Creating DataVolume for disk import"
@@ -140,10 +140,10 @@ func (r *HyperConversionReconciler) handlePending(ctx context.Context, hc *hyper
 	if err != nil {
 		logger.Error(err, "Failed to create DataVolume")
 		opmetrics.RecordReconcileError("pending")
-		hc.Status.Phase = hyper2kvmv1.PhaseFailed
+		hc.Status.Phase = h2kvmv1.PhaseFailed
 		hc.Status.Message = fmt.Sprintf("Failed to create DataVolume: %v", err)
 		meta.SetStatusCondition(&hc.Status.Conditions, metav1.Condition{
-			Type:               hyper2kvmv1.ConditionTypeDataVolumeReady,
+			Type:               h2kvmv1.ConditionTypeDataVolumeReady,
 			Status:             metav1.ConditionFalse,
 			Reason:             "CreateFailed",
 			Message:            err.Error(),
@@ -159,7 +159,7 @@ func (r *HyperConversionReconciler) handlePending(ctx context.Context, hc *hyper
 	hc.Status.Message = fmt.Sprintf("DataVolume %s created, waiting for import to complete", dvName)
 
 	meta.SetStatusCondition(&hc.Status.Conditions, metav1.Condition{
-		Type:               hyper2kvmv1.ConditionTypeDataVolumeReady,
+		Type:               h2kvmv1.ConditionTypeDataVolumeReady,
 		Status:             metav1.ConditionFalse,
 		Reason:             "Importing",
 		Message:            "DataVolume import in progress",
@@ -176,12 +176,12 @@ func (r *HyperConversionReconciler) handlePending(ctx context.Context, hc *hyper
 }
 
 // handleUploading watches DataVolume progress, updates status, and transitions to Converting when done.
-func (r *HyperConversionReconciler) handleUploading(ctx context.Context, hc *hyper2kvmv1.HyperConversion) (ctrl.Result, error) {
+func (r *HyperConversionReconciler) handleUploading(ctx context.Context, hc *h2kvmv1.HyperConversion) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
 	if hc.Status.DataVolumeName == "" {
 		logger.Error(nil, "DataVolumeName is empty in Uploading phase, transitioning to Failed")
-		hc.Status.Phase = hyper2kvmv1.PhaseFailed
+		hc.Status.Phase = h2kvmv1.PhaseFailed
 		hc.Status.Message = "DataVolume name missing in Uploading phase"
 		_ = r.Status().Update(ctx, hc)
 		return ctrl.Result{}, nil
@@ -203,7 +203,7 @@ func (r *HyperConversionReconciler) handleUploading(ctx context.Context, hc *hyp
 	if err := r.Get(ctx, dvKey, dv); err != nil {
 		if errors.IsNotFound(err) {
 			logger.Error(err, "DataVolume not found")
-			hc.Status.Phase = hyper2kvmv1.PhaseFailed
+			hc.Status.Phase = h2kvmv1.PhaseFailed
 			hc.Status.Message = "DataVolume disappeared during import"
 			_ = r.Status().Update(ctx, hc)
 			return ctrl.Result{}, nil
@@ -227,7 +227,7 @@ func (r *HyperConversionReconciler) handleUploading(ctx context.Context, hc *hyp
 		if elapsed > time.Duration(timeoutMinutes)*time.Minute {
 			logger.Info("Import timeout exceeded", "elapsed", elapsed, "timeout", timeoutMinutes)
 			opmetrics.RecordReconcileError("uploading")
-			hc.Status.Phase = hyper2kvmv1.PhaseFailed
+			hc.Status.Phase = h2kvmv1.PhaseFailed
 			hc.Status.Message = fmt.Sprintf("Import timeout exceeded after %d minutes", timeoutMinutes)
 			now := metav1.Now()
 			hc.Status.CompletionTime = &now
@@ -241,12 +241,12 @@ func (r *HyperConversionReconciler) handleUploading(ctx context.Context, hc *hyp
 	case "Succeeded":
 		logger.Info("DataVolume import succeeded", "datavolume", hc.Status.DataVolumeName)
 		now := metav1.Now()
-		hc.Status.Phase = hyper2kvmv1.PhaseConverting
+		hc.Status.Phase = h2kvmv1.PhaseConverting
 		hc.Status.Progress = 50
 		hc.Status.Message = "DataVolume import complete, starting conversion"
 
 		meta.SetStatusCondition(&hc.Status.Conditions, metav1.Condition{
-			Type:               hyper2kvmv1.ConditionTypeDataVolumeReady,
+			Type:               h2kvmv1.ConditionTypeDataVolumeReady,
 			Status:             metav1.ConditionTrue,
 			Reason:             "ImportSucceeded",
 			Message:            "DataVolume import completed successfully",
@@ -263,7 +263,7 @@ func (r *HyperConversionReconciler) handleUploading(ctx context.Context, hc *hyp
 	case "Failed":
 		logger.Info("DataVolume import failed", "datavolume", hc.Status.DataVolumeName)
 		now := metav1.Now()
-		hc.Status.Phase = hyper2kvmv1.PhaseFailed
+		hc.Status.Phase = h2kvmv1.PhaseFailed
 		hc.Status.CompletionTime = &now
 
 		// Try to extract the failure message from DataVolume conditions
@@ -286,7 +286,7 @@ func (r *HyperConversionReconciler) handleUploading(ctx context.Context, hc *hyp
 		hc.Status.Message = failureMsg
 
 		meta.SetStatusCondition(&hc.Status.Conditions, metav1.Condition{
-			Type:               hyper2kvmv1.ConditionTypeDataVolumeReady,
+			Type:               h2kvmv1.ConditionTypeDataVolumeReady,
 			Status:             metav1.ConditionFalse,
 			Reason:             "ImportFailed",
 			Message:            failureMsg,
@@ -303,7 +303,7 @@ func (r *HyperConversionReconciler) handleUploading(ctx context.Context, hc *hyp
 
 		now := metav1.Now()
 		if hc.Status.UploadProgress == nil {
-			hc.Status.UploadProgress = &hyper2kvmv1.UploadProgressStatus{}
+			hc.Status.UploadProgress = &h2kvmv1.UploadProgressStatus{}
 		}
 		hc.Status.UploadProgress.LastUpdateTime = &now
 
@@ -322,14 +322,14 @@ func (r *HyperConversionReconciler) handleUploading(ctx context.Context, hc *hyp
 
 // handleConverting transitions from CDI import to either offline fixes (Fixing phase)
 // or directly to VM creation, depending on whether offlineFixes is enabled.
-func (r *HyperConversionReconciler) handleConverting(ctx context.Context, hc *hyper2kvmv1.HyperConversion) (ctrl.Result, error) {
+func (r *HyperConversionReconciler) handleConverting(ctx context.Context, hc *h2kvmv1.HyperConversion) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 	logger.Info("Handling Converting phase", "name", hc.Name)
 
 	now := metav1.Now()
 
 	meta.SetStatusCondition(&hc.Status.Conditions, metav1.Condition{
-		Type:               hyper2kvmv1.ConditionTypeConversionComplete,
+		Type:               h2kvmv1.ConditionTypeConversionComplete,
 		Status:             metav1.ConditionTrue,
 		Reason:             "ConversionComplete",
 		Message:            "Disk image conversion completed (handled by CDI)",
@@ -338,7 +338,7 @@ func (r *HyperConversionReconciler) handleConverting(ctx context.Context, hc *hy
 
 	// If offline fixes are enabled, transition to Fixing phase
 	if hc.Spec.Conversion != nil && hc.Spec.Conversion.OfflineFixes {
-		hc.Status.Phase = hyper2kvmv1.PhaseFixing
+		hc.Status.Phase = h2kvmv1.PhaseFixing
 		hc.Status.Progress = 55
 		hc.Status.Message = "Conversion complete, starting offline fixes (LVM, initramfs, fstab)"
 
@@ -352,7 +352,7 @@ func (r *HyperConversionReconciler) handleConverting(ctx context.Context, hc *hy
 
 	// No offline fixes — skip to VM creation or Ready
 	if hc.Spec.VM == nil {
-		hc.Status.Phase = hyper2kvmv1.PhaseReady
+		hc.Status.Phase = h2kvmv1.PhaseReady
 		hc.Status.Progress = 100
 		hc.Status.CompletionTime = &now
 		hc.Status.Message = "Disk import and conversion complete (no VM creation requested)"
@@ -365,7 +365,7 @@ func (r *HyperConversionReconciler) handleConverting(ctx context.Context, hc *hy
 		return ctrl.Result{}, nil
 	}
 
-	hc.Status.Phase = hyper2kvmv1.PhaseCreatingVM
+	hc.Status.Phase = h2kvmv1.PhaseCreatingVM
 	hc.Status.Progress = 75
 	hc.Status.Message = "Conversion complete, creating VirtualMachine"
 
@@ -379,7 +379,7 @@ func (r *HyperConversionReconciler) handleConverting(ctx context.Context, hc *hy
 
 // handleFixing spawns a privileged fixer Job that runs h2kvmctl offline fixes
 // (LVM activation, initramfs regen, fstab rewrite, network fix) on the imported disk.
-func (r *HyperConversionReconciler) handleFixing(ctx context.Context, hc *hyper2kvmv1.HyperConversion) (ctrl.Result, error) {
+func (r *HyperConversionReconciler) handleFixing(ctx context.Context, hc *h2kvmv1.HyperConversion) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 	logger.Info("Handling Fixing phase", "name", hc.Name)
 
@@ -390,7 +390,7 @@ func (r *HyperConversionReconciler) handleFixing(ctx context.Context, hc *hyper2
 			logger.Error(err, "Failed to create fixer Job")
 			opmetrics.RecordReconcileError("fixing")
 			now := metav1.Now()
-			hc.Status.Phase = hyper2kvmv1.PhaseFailed
+			hc.Status.Phase = h2kvmv1.PhaseFailed
 			hc.Status.CompletionTime = &now
 			hc.Status.Message = fmt.Sprintf("Failed to create fixer Job: %v", err)
 			if updateErr := r.Status().Update(ctx, hc); updateErr != nil {
@@ -422,7 +422,7 @@ func (r *HyperConversionReconciler) handleFixing(ctx context.Context, hc *hyper2
 		if errors.IsNotFound(err) {
 			logger.Error(err, "Fixer Job not found")
 			now := metav1.Now()
-			hc.Status.Phase = hyper2kvmv1.PhaseFailed
+			hc.Status.Phase = h2kvmv1.PhaseFailed
 			hc.Status.CompletionTime = &now
 			hc.Status.Message = "Fixer Job disappeared"
 			if updateErr := r.Status().Update(ctx, hc); updateErr != nil {
@@ -440,7 +440,7 @@ func (r *HyperConversionReconciler) handleFixing(ctx context.Context, hc *hyper2
 			now := metav1.Now()
 
 			meta.SetStatusCondition(&hc.Status.Conditions, metav1.Condition{
-				Type:               hyper2kvmv1.ConditionTypeFixesComplete,
+				Type:               h2kvmv1.ConditionTypeFixesComplete,
 				Status:             metav1.ConditionTrue,
 				Reason:             "FixesComplete",
 				Message:            "Offline fixes completed (LVM, initramfs, fstab)",
@@ -448,12 +448,12 @@ func (r *HyperConversionReconciler) handleFixing(ctx context.Context, hc *hyper2
 			})
 
 			if hc.Spec.VM == nil {
-				hc.Status.Phase = hyper2kvmv1.PhaseReady
+				hc.Status.Phase = h2kvmv1.PhaseReady
 				hc.Status.Progress = 100
 				hc.Status.CompletionTime = &now
 				hc.Status.Message = "Disk import, conversion, and offline fixes complete (no VM creation requested)"
 			} else {
-				hc.Status.Phase = hyper2kvmv1.PhaseCreatingVM
+				hc.Status.Phase = h2kvmv1.PhaseCreatingVM
 				hc.Status.Progress = 75
 				hc.Status.Message = "Offline fixes complete, creating VirtualMachine"
 			}
@@ -469,12 +469,12 @@ func (r *HyperConversionReconciler) handleFixing(ctx context.Context, hc *hyper2
 		if cond.Type == batchv1.JobFailed && cond.Status == corev1.ConditionTrue {
 			logger.Info("Fixer Job failed", "job", job.Name, "reason", cond.Reason)
 			now := metav1.Now()
-			hc.Status.Phase = hyper2kvmv1.PhaseFailed
+			hc.Status.Phase = h2kvmv1.PhaseFailed
 			hc.Status.CompletionTime = &now
 			hc.Status.Message = fmt.Sprintf("Fixer Job failed: %s", cond.Message)
 
 			meta.SetStatusCondition(&hc.Status.Conditions, metav1.Condition{
-				Type:               hyper2kvmv1.ConditionTypeFixesComplete,
+				Type:               h2kvmv1.ConditionTypeFixesComplete,
 				Status:             metav1.ConditionFalse,
 				Reason:             "FixesFailed",
 				Message:            cond.Message,
@@ -503,7 +503,7 @@ func (r *HyperConversionReconciler) handleFixing(ctx context.Context, hc *hyper2
 				logger.Error(delErr, "Failed to delete timed-out fixer Job")
 			}
 			now := metav1.Now()
-			hc.Status.Phase = hyper2kvmv1.PhaseFailed
+			hc.Status.Phase = h2kvmv1.PhaseFailed
 			hc.Status.CompletionTime = &now
 			hc.Status.Message = fmt.Sprintf("Fixer Job timeout exceeded after %d minutes", timeoutMinutes)
 			if updateErr := r.Status().Update(ctx, hc); updateErr != nil {
@@ -527,12 +527,12 @@ func getFixerImage() string {
 	if img := os.Getenv("FIXER_IMAGE"); img != "" {
 		return img
 	}
-	return "ghcr.io/ssahani/hyper2kvm-fixer:0.3.0"
+	return "ghcr.io/ssahani/h2kvm-fixer:0.3.0"
 }
 
 // createFixerJob builds and creates a privileged Job that runs h2kvmctl offline fixes.
 // The Job mounts the CDI DataVolume PVC and runs the fixer script against the disk image.
-func (r *HyperConversionReconciler) createFixerJob(ctx context.Context, hc *hyper2kvmv1.HyperConversion) (*batchv1.Job, error) {
+func (r *HyperConversionReconciler) createFixerJob(ctx context.Context, hc *h2kvmv1.HyperConversion) (*batchv1.Job, error) {
 	jobName := fmt.Sprintf("%s-fixer", hc.Name)
 	privileged := true
 	backoffLimit := int32(0)
@@ -558,9 +558,9 @@ func (r *HyperConversionReconciler) createFixerJob(ctx context.Context, hc *hype
 			Name:      jobName,
 			Namespace: hc.Namespace,
 			Labels: map[string]string{
-				"app":                          "hyper2kvm",
-				"hyper2kvm.io/hyperconversion": hc.Name,
-				"hyper2kvm.io/component":       "fixer",
+				"app":                          "h2kvm",
+				"h2kvm.io/hyperconversion": hc.Name,
+				"h2kvm.io/component":       "fixer",
 			},
 		},
 		Spec: batchv1.JobSpec{
@@ -569,9 +569,9 @@ func (r *HyperConversionReconciler) createFixerJob(ctx context.Context, hc *hype
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app":                          "hyper2kvm",
-						"hyper2kvm.io/hyperconversion": hc.Name,
-						"hyper2kvm.io/component":       "fixer",
+						"app":                          "h2kvm",
+						"h2kvm.io/hyperconversion": hc.Name,
+						"h2kvm.io/component":       "fixer",
 					},
 				},
 				Spec: corev1.PodSpec{
@@ -658,14 +658,14 @@ func (r *HyperConversionReconciler) createFixerJob(ctx context.Context, hc *hype
 }
 
 // handleCreatingVM creates the KubeVirt VirtualMachine and transitions to Ready.
-func (r *HyperConversionReconciler) handleCreatingVM(ctx context.Context, hc *hyper2kvmv1.HyperConversion) (ctrl.Result, error) {
+func (r *HyperConversionReconciler) handleCreatingVM(ctx context.Context, hc *h2kvmv1.HyperConversion) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 	logger.Info("Handling CreatingVM phase", "name", hc.Name)
 
 	// Check if VM spec is nil (no VM requested after fixes)
 	if hc.Spec.VM == nil {
 		now := metav1.Now()
-		hc.Status.Phase = hyper2kvmv1.PhaseReady
+		hc.Status.Phase = h2kvmv1.PhaseReady
 		hc.Status.Progress = 100
 		hc.Status.CompletionTime = &now
 		hc.Status.Message = "Conversion and fixes complete (no VM creation requested)"
@@ -693,13 +693,13 @@ func (r *HyperConversionReconciler) handleCreatingVM(ctx context.Context, hc *hy
 		if err := r.Get(ctx, vmKey, existingVM); err == nil {
 			// VM already exists, transition to Ready
 			now := metav1.Now()
-			hc.Status.Phase = hyper2kvmv1.PhaseReady
+			hc.Status.Phase = h2kvmv1.PhaseReady
 			hc.Status.Progress = 100
 			hc.Status.CompletionTime = &now
 			hc.Status.Message = fmt.Sprintf("VirtualMachine %s is ready", hc.Status.VirtualMachineName)
 
 			meta.SetStatusCondition(&hc.Status.Conditions, metav1.Condition{
-				Type:               hyper2kvmv1.ConditionTypeVMReady,
+				Type:               h2kvmv1.ConditionTypeVMReady,
 				Status:             metav1.ConditionTrue,
 				Reason:             "VMCreated",
 				Message:            fmt.Sprintf("VirtualMachine %s created", hc.Status.VirtualMachineName),
@@ -720,12 +720,12 @@ func (r *HyperConversionReconciler) handleCreatingVM(ctx context.Context, hc *hy
 		opmetrics.RecordKubeVirtVMCreation("failed", vmCreateDuration)
 		opmetrics.RecordReconcileError("creating_vm")
 		now := metav1.Now()
-		hc.Status.Phase = hyper2kvmv1.PhaseFailed
+		hc.Status.Phase = h2kvmv1.PhaseFailed
 		hc.Status.CompletionTime = &now
 		hc.Status.Message = fmt.Sprintf("Failed to create VirtualMachine: %v", err)
 
 		meta.SetStatusCondition(&hc.Status.Conditions, metav1.Condition{
-			Type:               hyper2kvmv1.ConditionTypeVMReady,
+			Type:               h2kvmv1.ConditionTypeVMReady,
 			Status:             metav1.ConditionFalse,
 			Reason:             "CreateFailed",
 			Message:            err.Error(),
@@ -741,14 +741,14 @@ func (r *HyperConversionReconciler) handleCreatingVM(ctx context.Context, hc *hy
 
 	vmName, _, _ := unstructured.NestedString(vm.Object, "metadata", "name")
 	now := metav1.Now()
-	hc.Status.Phase = hyper2kvmv1.PhaseReady
+	hc.Status.Phase = h2kvmv1.PhaseReady
 	hc.Status.Progress = 100
 	hc.Status.VirtualMachineName = vmName
 	hc.Status.CompletionTime = &now
 	hc.Status.Message = fmt.Sprintf("VirtualMachine %s created successfully", vmName)
 
 	meta.SetStatusCondition(&hc.Status.Conditions, metav1.Condition{
-		Type:               hyper2kvmv1.ConditionTypeVMReady,
+		Type:               h2kvmv1.ConditionTypeVMReady,
 		Status:             metav1.ConditionTrue,
 		Reason:             "VMCreated",
 		Message:            fmt.Sprintf("VirtualMachine %s created", vmName),
@@ -765,7 +765,7 @@ func (r *HyperConversionReconciler) handleCreatingVM(ctx context.Context, hc *hy
 }
 
 // createDataVolume builds and creates a CDI DataVolume with an HTTP source from the HyperConversion spec.
-func (r *HyperConversionReconciler) createDataVolume(ctx context.Context, hc *hyper2kvmv1.HyperConversion) (*unstructured.Unstructured, error) {
+func (r *HyperConversionReconciler) createDataVolume(ctx context.Context, hc *h2kvmv1.HyperConversion) (*unstructured.Unstructured, error) {
 	dvName := fmt.Sprintf("%s-dv", hc.Name)
 
 	// Build the DataVolume source spec based on the URL scheme
@@ -819,9 +819,9 @@ func (r *HyperConversionReconciler) createDataVolume(ctx context.Context, hc *hy
 				"name":      dvName,
 				"namespace": hc.Namespace,
 				"labels": map[string]interface{}{
-					"app":                              "hyper2kvm",
-					"hyper2kvm.io/hyperconversion":     hc.Name,
-					"hyper2kvm.io/hyperconversion-uid": string(hc.UID),
+					"app":                              "h2kvm",
+					"h2kvm.io/hyperconversion":     hc.Name,
+					"h2kvm.io/hyperconversion-uid": string(hc.UID),
 				},
 			},
 			"spec": map[string]interface{}{
@@ -834,7 +834,7 @@ func (r *HyperConversionReconciler) createDataVolume(ctx context.Context, hc *hy
 	// Add checksum annotation if provided
 	if hc.Spec.Source.Checksum != "" {
 		annotations := map[string]interface{}{
-			"hyper2kvm.io/source-checksum": hc.Spec.Source.Checksum,
+			"h2kvm.io/source-checksum": hc.Spec.Source.Checksum,
 		}
 		_ = unstructured.SetNestedField(dv.Object, annotations, "metadata", "annotations")
 	}
@@ -866,7 +866,7 @@ func (r *HyperConversionReconciler) createDataVolume(ctx context.Context, hc *hy
 }
 
 // createVirtualMachine builds and creates a KubeVirt VirtualMachine from the HyperConversion spec.
-func (r *HyperConversionReconciler) createVirtualMachine(ctx context.Context, hc *hyper2kvmv1.HyperConversion) (*unstructured.Unstructured, error) {
+func (r *HyperConversionReconciler) createVirtualMachine(ctx context.Context, hc *h2kvmv1.HyperConversion) (*unstructured.Unstructured, error) {
 	if hc.Spec.VM == nil {
 		return nil, fmt.Errorf("VM spec is nil — add a 'vm' section to the HyperConversion spec to define CPU, memory, and network settings for the target VirtualMachine")
 	}
@@ -1080,9 +1080,9 @@ func (r *HyperConversionReconciler) createVirtualMachine(ctx context.Context, hc
 	templateSpec := map[string]interface{}{
 		"metadata": map[string]interface{}{
 			"labels": map[string]interface{}{
-				"app":                              "hyper2kvm",
-				"hyper2kvm.io/hyperconversion":     hc.Name,
-				"hyper2kvm.io/hyperconversion-uid": string(hc.UID),
+				"app":                              "h2kvm",
+				"h2kvm.io/hyperconversion":     hc.Name,
+				"h2kvm.io/hyperconversion-uid": string(hc.UID),
 				"kubevirt.io/vm":                   vmName,
 			},
 		},
@@ -1104,9 +1104,9 @@ func (r *HyperConversionReconciler) createVirtualMachine(ctx context.Context, hc
 				"name":      vmName,
 				"namespace": vmNamespace,
 				"labels": map[string]interface{}{
-					"app":                              "hyper2kvm",
-					"hyper2kvm.io/hyperconversion":     hc.Name,
-					"hyper2kvm.io/hyperconversion-uid": string(hc.UID),
+					"app":                              "h2kvm",
+					"h2kvm.io/hyperconversion":     hc.Name,
+					"h2kvm.io/hyperconversion-uid": string(hc.UID),
 				},
 			},
 			"spec": map[string]interface{}{
@@ -1142,7 +1142,7 @@ func (r *HyperConversionReconciler) createVirtualMachine(ctx context.Context, hc
 }
 
 // handleDeletion handles cleanup when a HyperConversion resource is deleted.
-func (r *HyperConversionReconciler) handleDeletion(ctx context.Context, hc *hyper2kvmv1.HyperConversion) (ctrl.Result, error) {
+func (r *HyperConversionReconciler) handleDeletion(ctx context.Context, hc *h2kvmv1.HyperConversion) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
 	if !controllerutil.ContainsFinalizer(hc, hyperConversionFinalizer) {
@@ -1235,7 +1235,7 @@ func (r *HyperConversionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	dvObj.SetGroupVersionKind(dvGVK)
 
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&hyper2kvmv1.HyperConversion{}).
+		For(&h2kvmv1.HyperConversion{}).
 		Owns(&corev1.PersistentVolumeClaim{}).
 		Owns(&batchv1.Job{}).
 		Owns(dvObj).

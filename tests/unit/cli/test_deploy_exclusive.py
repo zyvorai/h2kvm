@@ -10,7 +10,7 @@ import argparse
 
 import pytest
 
-from hyper2kvm.cli.args.validators import validate_deploy_exclusive
+from h2kvm.cli.args.validators import validate_deploy_exclusive
 
 
 def test_k8s_and_openstack_rejected():

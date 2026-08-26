@@ -1,6 +1,6 @@
 # Validation API Reference
 
-**Module**: `hyper2kvm.validation`
+**Module**: `h2kvm.validation`
 **Version**: 1.0.0
 **Status**: Production-Ready
 
@@ -23,8 +23,8 @@ The Validation API provides comprehensive post-migration validation to ensure mi
 ## Quick Start
 
 ```python
-from hyper2kvm.validation import ValidationOrchestrator
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.validation import ValidationOrchestrator
+from h2kvm.vmcraft import VMCraft
 import logging
 
 # Setup
@@ -71,7 +71,7 @@ vmcraft.shutdown()
 
 **Import**:
 ```python
-from hyper2kvm.validation import ValidationOrchestrator
+from h2kvm.validation import ValidationOrchestrator
 ```
 
 **Constructor**:
@@ -229,7 +229,7 @@ print(f"Markdown: {reports['markdown']}")
 
 **Import**:
 ```python
-from hyper2kvm.validation import HealthChecker
+from h2kvm.validation import HealthChecker
 ```
 
 **Constructor**:
@@ -325,7 +325,7 @@ if result.status == HealthCheckStatus.PASS:
 
 **Import**:
 ```python
-from hyper2kvm.validation import ServiceValidator
+from h2kvm.validation import ServiceValidator
 ```
 
 **Constructor**:
@@ -406,7 +406,7 @@ print(f"State: {result.state}")
 
 **Import**:
 ```python
-from hyper2kvm.validation import NetworkValidator
+from h2kvm.validation import NetworkValidator
 ```
 
 **Constructor**:
@@ -466,7 +466,7 @@ if result.status == HealthCheckStatus.PASS:
 
 **Import**:
 ```python
-from hyper2kvm.validation import DatabaseValidator
+from h2kvm.validation import DatabaseValidator
 ```
 
 **Constructor**:
@@ -528,7 +528,7 @@ if result.status == HealthCheckStatus.PASS:
 
 **Import**:
 ```python
-from hyper2kvm.validation import PerformanceValidator
+from h2kvm.validation import PerformanceValidator
 ```
 
 **Constructor**:
@@ -649,8 +649,8 @@ class ValidationReport:
 ```python
 import logging
 from pathlib import Path
-from hyper2kvm.vmcraft import VMCraft
-from hyper2kvm.validation import ValidationOrchestrator
+from h2kvm.vmcraft import VMCraft
+from h2kvm.validation import ValidationOrchestrator
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)

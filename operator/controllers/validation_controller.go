@@ -20,14 +20,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	hyper2kvmv1 "github.com/hyper2kvm/operator/api/v1"
-	opmetrics "github.com/hyper2kvm/operator/pkg/metrics"
-	validationpkg "github.com/hyper2kvm/operator/pkg/validation"
+	h2kvmv1 "github.com/h2kvm/operator/api/v1"
+	opmetrics "github.com/h2kvm/operator/pkg/metrics"
+	validationpkg "github.com/h2kvm/operator/pkg/validation"
 	kubevirtv1 "kubevirt.io/api/core/v1"
 )
 
 const (
-	validationFinalizer = "hyper2kvm.io/finalizer"
+	validationFinalizer = "h2kvm.io/finalizer"
 )
 
 // ValidationReconciler reconciles a Validation object
@@ -37,9 +37,9 @@ type ValidationReconciler struct {
 	Clientset kubernetes.Interface
 }
 
-//+kubebuilder:rbac:groups=hyper2kvm.io,resources=validations,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=hyper2kvm.io,resources=validations/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=hyper2kvm.io,resources=validations/finalizers,verbs=update
+//+kubebuilder:rbac:groups=h2kvm.io,resources=validations,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=h2kvm.io,resources=validations/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=h2kvm.io,resources=validations/finalizers,verbs=update
 //+kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch;create;delete
 //+kubebuilder:rbac:groups="",resources=pods/log,verbs=get
 //+kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list
@@ -51,7 +51,7 @@ func (r *ValidationReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	logger := log.FromContext(ctx)
 
 	// Fetch the Validation instance
-	validation := &hyper2kvmv1.Validation{}
+	validation := &h2kvmv1.Validation{}
 	if err := r.Get(ctx, req.NamespacedName, validation); err != nil {
 		if errors.IsNotFound(err) {
 			logger.Info("Validation resource not found, ignoring reconcile")
@@ -77,15 +77,15 @@ func (r *ValidationReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Handle validation based on current phase
 	switch validation.Status.Phase {
-	case "", hyper2kvmv1.PhasePending:
+	case "", h2kvmv1.PhasePending:
 		return r.handlePending(ctx, validation)
-	case hyper2kvmv1.PhaseRunning:
+	case h2kvmv1.PhaseRunning:
 		return r.handleRunning(ctx, validation)
-	case hyper2kvmv1.PhaseValidated:
+	case h2kvmv1.PhaseValidated:
 		return r.handleValidated(ctx, validation)
-	case hyper2kvmv1.PhaseFailed:
+	case h2kvmv1.PhaseFailed:
 		return ctrl.Result{}, nil
-	case hyper2kvmv1.PhaseKubeVirtCreated:
+	case h2kvmv1.PhaseKubeVirtCreated:
 		return ctrl.Result{}, nil
 	}
 
@@ -93,13 +93,13 @@ func (r *ValidationReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 }
 
 // handlePending creates the validation pod and transitions to Running phase
-func (r *ValidationReconciler) handlePending(ctx context.Context, validation *hyper2kvmv1.Validation) (ctrl.Result, error) {
+func (r *ValidationReconciler) handlePending(ctx context.Context, validation *h2kvmv1.Validation) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 	logger.Info("Starting validation", "name", validation.Name)
 
 	// Update phase to Running
 	now := metav1.Now()
-	validation.Status.Phase = hyper2kvmv1.PhaseRunning
+	validation.Status.Phase = h2kvmv1.PhaseRunning
 	validation.Status.StartTime = &now
 	validation.Status.Message = "Creating validation pod"
 
@@ -117,7 +117,7 @@ func (r *ValidationReconciler) handlePending(ctx context.Context, validation *hy
 		logger.Error(err, "Failed to create validation pod")
 		opmetrics.ActiveValidations.Dec()
 		opmetrics.RecordReconcileError("pending")
-		validation.Status.Phase = hyper2kvmv1.PhaseFailed
+		validation.Status.Phase = h2kvmv1.PhaseFailed
 		validation.Status.Message = fmt.Sprintf("Failed to create validation pod: %v", err)
 		_ = r.Status().Update(ctx, validation)
 		return ctrl.Result{}, err
@@ -134,7 +134,7 @@ func (r *ValidationReconciler) handlePending(ctx context.Context, validation *hy
 }
 
 // handleRunning checks the validation pod status and processes results
-func (r *ValidationReconciler) handleRunning(ctx context.Context, validation *hyper2kvmv1.Validation) (ctrl.Result, error) {
+func (r *ValidationReconciler) handleRunning(ctx context.Context, validation *h2kvmv1.Validation) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
 	// Get validation pod
@@ -147,7 +147,7 @@ func (r *ValidationReconciler) handleRunning(ctx context.Context, validation *hy
 	if err := r.Get(ctx, podName, pod); err != nil {
 		if errors.IsNotFound(err) {
 			logger.Error(err, "Validation pod not found")
-			validation.Status.Phase = hyper2kvmv1.PhaseFailed
+			validation.Status.Phase = h2kvmv1.PhaseFailed
 			validation.Status.Message = "Validation pod disappeared"
 			_ = r.Status().Update(ctx, validation)
 			return ctrl.Result{}, nil
@@ -167,7 +167,7 @@ func (r *ValidationReconciler) handleRunning(ctx context.Context, validation *hy
 			opmetrics.ActiveValidations.Dec()
 			opmetrics.ValidationTimeouts.Inc()
 			opmetrics.RecordValidationResult("timeout", elapsed)
-			validation.Status.Phase = hyper2kvmv1.PhaseFailed
+			validation.Status.Phase = h2kvmv1.PhaseFailed
 			validation.Status.Message = fmt.Sprintf("Validation timeout exceeded (%0.0fs)", elapsed)
 			validation.Status.Validated = false
 			now := metav1.Now()
@@ -201,7 +201,7 @@ func (r *ValidationReconciler) handleRunning(ctx context.Context, validation *hy
 }
 
 // handleValidationSuccess processes successful validation results
-func (r *ValidationReconciler) handleValidationSuccess(ctx context.Context, validation *hyper2kvmv1.Validation, pod *corev1.Pod) (ctrl.Result, error) {
+func (r *ValidationReconciler) handleValidationSuccess(ctx context.Context, validation *h2kvmv1.Validation, pod *corev1.Pod) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 	logger.Info("Validation succeeded", "name", validation.Name)
 
@@ -214,11 +214,11 @@ func (r *ValidationReconciler) handleValidationSuccess(ctx context.Context, vali
 	checks, err := validationpkg.ParseValidationResults(ctx, r.Clientset, pod.Name, pod.Namespace)
 	if err != nil {
 		logger.Error(err, "Failed to parse validation results")
-		validation.Status.Phase = hyper2kvmv1.PhaseFailed
+		validation.Status.Phase = h2kvmv1.PhaseFailed
 		validation.Status.Message = fmt.Sprintf("Failed to parse results: %v", err)
 		validation.Status.Validated = false
 	} else {
-		validation.Status.Phase = hyper2kvmv1.PhaseValidated
+		validation.Status.Phase = h2kvmv1.PhaseValidated
 		validation.Status.Message = "Validation successful"
 		validation.Status.Validated = true
 		validation.Status.Checks = checks
@@ -240,7 +240,7 @@ func (r *ValidationReconciler) handleValidationSuccess(ctx context.Context, vali
 }
 
 // handleValidationFailure processes failed validation
-func (r *ValidationReconciler) handleValidationFailure(ctx context.Context, validation *hyper2kvmv1.Validation, pod *corev1.Pod) (ctrl.Result, error) {
+func (r *ValidationReconciler) handleValidationFailure(ctx context.Context, validation *h2kvmv1.Validation, pod *corev1.Pod) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 	logger.Info("Validation failed", "name", validation.Name)
 
@@ -249,7 +249,7 @@ func (r *ValidationReconciler) handleValidationFailure(ctx context.Context, vali
 		opmetrics.RecordValidationResult("failed", time.Since(validation.Status.StartTime.Time).Seconds())
 	}
 
-	validation.Status.Phase = hyper2kvmv1.PhaseFailed
+	validation.Status.Phase = h2kvmv1.PhaseFailed
 	validation.Status.Validated = false
 
 	// Get failure reason from pod
@@ -279,7 +279,7 @@ func (r *ValidationReconciler) handleValidationFailure(ctx context.Context, vali
 }
 
 // handleValidated creates KubeVirt VM if requested
-func (r *ValidationReconciler) handleValidated(ctx context.Context, validation *hyper2kvmv1.Validation) (ctrl.Result, error) {
+func (r *ValidationReconciler) handleValidated(ctx context.Context, validation *h2kvmv1.Validation) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
 	// Check if KubeVirt VM creation is requested
@@ -307,7 +307,7 @@ func (r *ValidationReconciler) handleValidated(ctx context.Context, validation *
 
 	opmetrics.RecordKubeVirtVMCreation("success", vmCreateDuration)
 
-	validation.Status.Phase = hyper2kvmv1.PhaseKubeVirtCreated
+	validation.Status.Phase = h2kvmv1.PhaseKubeVirtCreated
 	validation.Status.KubeVirtVM = vm.Name
 	validation.Status.Message = fmt.Sprintf("KubeVirt VM created: %s", vm.Name)
 
@@ -320,7 +320,7 @@ func (r *ValidationReconciler) handleValidated(ctx context.Context, validation *
 }
 
 // createValidationPod creates a pod that runs the validation
-func (r *ValidationReconciler) createValidationPod(ctx context.Context, validation *hyper2kvmv1.Validation) (*corev1.Pod, error) {
+func (r *ValidationReconciler) createValidationPod(ctx context.Context, validation *h2kvmv1.Validation) (*corev1.Pod, error) {
 	podSpec := validationpkg.BuildValidationPodSpec(validation)
 
 	pod := &corev1.Pod{
@@ -328,9 +328,9 @@ func (r *ValidationReconciler) createValidationPod(ctx context.Context, validati
 			Name:      fmt.Sprintf("%s-validation", validation.Name),
 			Namespace: validation.Namespace,
 			Labels: map[string]string{
-				"app":                         "hyper2kvm-validation",
-				"hyper2kvm.io/validation":     validation.Name,
-				"hyper2kvm.io/validation-uid": string(validation.UID),
+				"app":                         "h2kvm-validation",
+				"h2kvm.io/validation":     validation.Name,
+				"h2kvm.io/validation-uid": string(validation.UID),
 			},
 		},
 		Spec: *podSpec,
@@ -358,7 +358,7 @@ func (r *ValidationReconciler) createValidationPod(ctx context.Context, validati
 }
 
 // createKubeVirtVM creates a KubeVirt VirtualMachine from the validation
-func (r *ValidationReconciler) createKubeVirtVM(ctx context.Context, validation *hyper2kvmv1.Validation) (*kubevirtv1.VirtualMachine, error) {
+func (r *ValidationReconciler) createKubeVirtVM(ctx context.Context, validation *h2kvmv1.Validation) (*kubevirtv1.VirtualMachine, error) {
 	vmSpec, err := validationpkg.BuildKubeVirtVMSpec(validation)
 	if err != nil {
 		return nil, err
@@ -369,8 +369,8 @@ func (r *ValidationReconciler) createKubeVirtVM(ctx context.Context, validation 
 			Name:      fmt.Sprintf("%s-vm", validation.Name),
 			Namespace: validation.Namespace,
 			Labels: map[string]string{
-				"app":                     "hyper2kvm",
-				"hyper2kvm.io/validation": validation.Name,
+				"app":                     "h2kvm",
+				"h2kvm.io/validation": validation.Name,
 			},
 		},
 		Spec: *vmSpec,
@@ -389,7 +389,7 @@ func (r *ValidationReconciler) createKubeVirtVM(ctx context.Context, validation 
 }
 
 // handleDeletion handles cleanup when Validation is deleted
-func (r *ValidationReconciler) handleDeletion(ctx context.Context, validation *hyper2kvmv1.Validation) (ctrl.Result, error) {
+func (r *ValidationReconciler) handleDeletion(ctx context.Context, validation *h2kvmv1.Validation) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
 	if controllerutil.ContainsFinalizer(validation, validationFinalizer) {
@@ -420,7 +420,7 @@ func (r *ValidationReconciler) handleDeletion(ctx context.Context, validation *h
 // SetupWithManager sets up the controller with the Manager
 func (r *ValidationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&hyper2kvmv1.Validation{}).
+		For(&h2kvmv1.Validation{}).
 		Owns(&corev1.Pod{}).
 		Owns(&kubevirtv1.VirtualMachine{}).
 		Complete(r)

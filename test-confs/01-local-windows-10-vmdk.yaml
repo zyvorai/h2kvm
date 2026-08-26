@@ -5,7 +5,7 @@
 # Converts a local Windows 10 VMDK to QCOW2 format with VirtIO drivers
 #
 # Usage:
-#   hyper2kvm --config 01-local-windows-10-vmdk.yaml local
+#   h2kvm --config 01-local-windows-10-vmdk.yaml local
 #
 # Features:
 #   ✅ Offline VirtIO driver injection
@@ -22,17 +22,17 @@
 cmd: local
 
 # Source VMDK
-vmdk: /home/ssahani/tt/hyper2kvm/win10/windows10.vmdk
+vmdk: /home/ssahani/tt/h2kvm/win10/windows10.vmdk
 
 # Output Configuration
-output_dir: /home/ssahani/tt/hyper2kvm/out
-to_output: /home/ssahani/tt/hyper2kvm/out/windows10-fixed.qcow2
+output_dir: /home/ssahani/tt/h2kvm/out
+to_output: /home/ssahani/tt/h2kvm/out/windows10-fixed.qcow2
 out_format: qcow2
 compress: true
 checksum: true
 
 # Working Directory
-workdir: /home/ssahani/tt/hyper2kvm/out/work
+workdir: /home/ssahani/tt/h2kvm/out/work
 
 # Filesystem Fixes
 fstab_mode: stabilize-all
@@ -44,7 +44,7 @@ dry_run: false
 
 # VirtIO Driver Injection
 # IMPORTANT: Must be an extracted directory, NOT an ISO
-virtio_drivers_dir: /home/ssahani/tt/hyper2kvm/virtio-win-extracted
+virtio_drivers_dir: /home/ssahani/tt/h2kvm/virtio-win-extracted
 
 # Validation Testing (disabled by default)
 libvirt_test: false

@@ -1,5 +1,5 @@
 # Basic Disk Inspection Pipeline
-# Uses existing hyper2kvm NBD infrastructure with auto-detection
+# Uses existing h2kvm NBD infrastructure with auto-detection
 
 # Source disk to inspect
 image: /path/to/disk.vmdk

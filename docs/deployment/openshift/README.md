@@ -1,6 +1,6 @@
 # OpenShift Deployment
 
-OpenShift-specific deployment documentation for Hyper2KVM.
+OpenShift-specific deployment documentation for H2KVM.
 
 ---
 

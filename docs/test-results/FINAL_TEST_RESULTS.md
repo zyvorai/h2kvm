@@ -217,7 +217,7 @@ virt-install --import \
 
 #### Option 2: KubeVirt Deployment
 ```yaml
-apiVersion: hyper2kvm.io/v1
+apiVersion: h2kvm.io/v1
 kind: Validation
 metadata:
   name: rhel88-production
@@ -336,6 +336,6 @@ The migration pipeline successfully converted **ESX 8.0 RHEL 8.8** from VMware t
 ---
 
 **Test Completed:** 2026-02-19  
-**Pipeline Version:** hyper2kvm with vmspawn SDK  
+**Pipeline Version:** h2kvm with vmspawn SDK  
 **Test Framework:** test_simple_migration.py  
 **Configuration:** test-config.yaml

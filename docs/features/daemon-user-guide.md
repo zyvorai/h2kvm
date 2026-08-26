@@ -20,7 +20,7 @@
 
 ## Overview
 
-The enhanced daemon mode transforms hyper2kvm into a production-ready, always-on VM conversion service. It monitors a directory for incoming VM files and automatically converts them with enterprise-grade features:
+The enhanced daemon mode transforms h2kvm into a production-ready, always-on VM conversion service. It monitors a directory for incoming VM files and automatically converts them with enterprise-grade features:
 
 - **🚀 Concurrent Processing** - Convert multiple VMs simultaneously
 - **⏱️ File Completion Detection** - Wait for uploads to finish before processing
@@ -38,11 +38,11 @@ The enhanced daemon mode transforms hyper2kvm into a production-ready, always-on
 ### Prerequisites
 
 ```bash
-# Install hyper2kvm
-pip install hyper2kvm
+# Install h2kvm
+pip install h2kvm
 
 # Verify installation
-hyper2kvm --version
+h2kvm --version
 ```
 
 ### Quick Start
@@ -50,13 +50,13 @@ hyper2kvm --version
 **1. Create a configuration file:**
 
 ```bash
-mkdir -p /etc/hyper2kvm
-cat > /etc/hyper2kvm/daemon.yaml <<'EOF'
+mkdir -p /etc/h2kvm
+cat > /etc/h2kvm/daemon.yaml <<'EOF'
 command: daemon
 daemon: true
-watch_dir: /var/lib/hyper2kvm/queue
-output_dir: /var/lib/hyper2kvm/output
-work_dir: /var/lib/hyper2kvm/work
+watch_dir: /var/lib/h2kvm/queue
+output_dir: /var/lib/h2kvm/output
+work_dir: /var/lib/h2kvm/work
 
 # Enable all enhancements
 max_concurrent_jobs: 3
@@ -77,21 +77,21 @@ EOF
 **2. Create directories:**
 
 ```bash
-sudo mkdir -p /var/lib/hyper2kvm/{queue,output,work}
-sudo chown -R $(whoami):$(whoami) /var/lib/hyper2kvm
+sudo mkdir -p /var/lib/h2kvm/{queue,output,work}
+sudo chown -R $(whoami):$(whoami) /var/lib/h2kvm
 ```
 
 **3. Start the daemon:**
 
 ```bash
-sudo h2kvmctl --config /etc/hyper2kvm/daemon.yaml
+sudo h2kvmctl --config /etc/h2kvm/daemon.yaml
 ```
 
 **4. Drop VM files into the queue:**
 
 ```bash
 # Daemon will automatically detect and convert them
-cp my-vm.vmdk /var/lib/hyper2kvm/queue/
+cp my-vm.vmdk /var/lib/h2kvm/queue/
 ```
 
 ---
@@ -138,7 +138,7 @@ max_concurrent_jobs: 4
 
 ```bash
 # Check how many jobs are currently processing
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stats
 
 # Output shows:
 #   Queue Depth: 3       ← Jobs waiting to process
@@ -237,7 +237,7 @@ file_stable_timeout: 120  # 2 minutes
 Check daemon logs to see stability detection:
 
 ```bash
-tail -f /var/log/hyper2kvm/daemon.log
+tail -f /var/log/h2kvm/daemon.log
 
 # You'll see:
 # INFO: Waiting for file stability: large-vm.vmdk
@@ -277,7 +277,7 @@ Tracks comprehensive metrics about daemon performance, success rates, and proces
 ```bash
 # Get current statistics
 h2kvmctl.cli.daemon_ctl \
-  --output-dir /var/lib/hyper2kvm/output \
+  --output-dir /var/lib/h2kvm/output \
   stats
 
 # Example output:
@@ -294,7 +294,7 @@ h2kvmctl.cli.daemon_ctl \
 
 ```bash
 # Read stats.json directly
-cat /var/lib/hyper2kvm/output/.daemon/stats.json | python3 -m json.tool
+cat /var/lib/h2kvm/output/.daemon/stats.json | python3 -m json.tool
 
 # Output structure:
 {
@@ -326,7 +326,7 @@ cat /var/lib/hyper2kvm/output/.daemon/stats.json | python3 -m json.tool
 
 ```bash
 # Watch statistics update every 5 seconds
-watch -n 5 'h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats'
+watch -n 5 'h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stats'
 ```
 
 **2. Automated Monitoring (Prometheus/Grafana):**
@@ -334,18 +334,18 @@ watch -n 5 'h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats
 ```bash
 # Script to export metrics for Prometheus
 #!/bin/bash
-STATS_FILE="/var/lib/hyper2kvm/output/.daemon/stats.json"
+STATS_FILE="/var/lib/h2kvm/output/.daemon/stats.json"
 
 # Export to Prometheus text format
 python3 << 'PYEOF'
 import json
-with open("/var/lib/hyper2kvm/output/.daemon/stats.json") as f:
+with open("/var/lib/h2kvm/output/.daemon/stats.json") as f:
     stats = json.load(f)
-    print(f"hyper2kvm_processed_total {stats['total_processed']}")
-    print(f"hyper2kvm_failed_total {stats['total_failed']}")
-    print(f"hyper2kvm_success_rate {stats['success_rate']}")
-    print(f"hyper2kvm_queue_depth {stats['current_queue_depth']}")
-    print(f"hyper2kvm_avg_processing_time_seconds {stats['average_processing_time_seconds']}")
+    print(f"h2kvm_processed_total {stats['total_processed']}")
+    print(f"h2kvm_failed_total {stats['total_failed']}")
+    print(f"h2kvm_success_rate {stats['success_rate']}")
+    print(f"h2kvm_queue_depth {stats['current_queue_depth']}")
+    print(f"h2kvm_avg_processing_time_seconds {stats['average_processing_time_seconds']}")
 PYEOF
 ```
 
@@ -354,7 +354,7 @@ PYEOF
 ```bash
 # Check if success rate drops below threshold
 #!/bin/bash
-SUCCESS_RATE=$(h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats --json | \
+SUCCESS_RATE=$(h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stats --json | \
   jq -r '.stats.success_rate')
 
 if (( $(echo "$SUCCESS_RATE < 90" | bc -l) )); then
@@ -472,7 +472,7 @@ retry_policy:
 
 ```bash
 # Files in retry queue have retry count in stats
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats --json | \
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stats --json | \
   jq '.stats.current_jobs[] | select(.retry_count > 0)'
 
 # Example output:
@@ -488,7 +488,7 @@ h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats --json | \
 **Watch daemon logs:**
 
 ```bash
-tail -f /var/log/hyper2kvm/daemon.log | grep -i retry
+tail -f /var/log/h2kvm/daemon.log | grep -i retry
 
 # Output:
 # INFO: Retry 1/3 for vm-042.vmdk (next retry in 5.0 minutes)
@@ -522,8 +522,8 @@ tail -f /var/log/hyper2kvm/daemon.log | grep -i retry
 
 ```bash
 # Move file from .errors back to queue
-mv /var/lib/hyper2kvm/queue/.errors/vm-042.vmdk \
-   /var/lib/hyper2kvm/queue/
+mv /var/lib/h2kvm/queue/.errors/vm-042.vmdk \
+   /var/lib/h2kvm/queue/
 
 # Daemon will process as new file
 ```
@@ -532,8 +532,8 @@ mv /var/lib/hyper2kvm/queue/.errors/vm-042.vmdk \
 
 ```bash
 # Restart daemon to clear in-memory retry queue
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stop
-sudo h2kvmctl --config /etc/hyper2kvm/daemon.yaml
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stop
+sudo h2kvmctl --config /etc/h2kvm/daemon.yaml
 ```
 
 ---
@@ -548,22 +548,22 @@ Provides runtime control of the daemon via Unix socket. Manage daemon without re
 
 ```bash
 # Check daemon status
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output status
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output status
 
 # Get statistics
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stats
 
 # Pause processing (finish current jobs, don't start new ones)
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output pause
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output pause
 
 # Resume processing
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output resume
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output resume
 
 # Drain and stop (finish current jobs, then exit)
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output drain
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output drain
 
 # Stop immediately (graceful shutdown)
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stop
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stop
 ```
 
 ### Configuration
@@ -580,7 +580,7 @@ h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stop
 #### `status` - Check Daemon State
 
 ```bash
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output status
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output status
 
 # Output:
   Status: ▶️  RUNNING
@@ -595,7 +595,7 @@ h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output status
 #### `stats` - Get Statistics
 
 ```bash
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stats
 
 # Output:
 📊 Daemon Statistics:
@@ -607,13 +607,13 @@ h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats
   Queue Depth: 3
 
 # Add --json for machine-readable output:
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats --json
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stats --json
 ```
 
 #### `pause` - Pause Processing
 
 ```bash
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output pause
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output pause
 
 # Use cases:
 # - Maintenance window (backup storage)
@@ -630,19 +630,19 @@ h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output pause
 
 **Resume when ready:**
 ```bash
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output resume
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output resume
 ```
 
 #### `drain` - Graceful Shutdown
 
 ```bash
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output drain
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output drain
 
 # Use cases:
 # - Planned daemon restart
 # - Server maintenance
 # - Configuration changes
-# - Upgrading hyper2kvm
+# - Upgrading h2kvm
 ```
 
 **What happens:**
@@ -664,7 +664,7 @@ h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output drain
 #### `stop` - Immediate Shutdown
 
 ```bash
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stop
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stop
 
 # Use case: Emergency shutdown
 ```
@@ -681,31 +681,31 @@ h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stop
 
 ```bash
 # Pause daemon before storage maintenance
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output pause
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output pause
 
 # Perform storage backup
-rsync -av /var/lib/hyper2kvm/output/ backup-server:/backups/
+rsync -av /var/lib/h2kvm/output/ backup-server:/backups/
 
 # Resume processing
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output resume
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output resume
 ```
 
 **Example 2: Safe Restart for Config Changes**
 
 ```bash
 # Drain current work
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output drain
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output drain
 
 # Wait for completion (or check status)
-while h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output status | grep -q RUNNING; do
+while h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output status | grep -q RUNNING; do
   sleep 5
 done
 
 # Update configuration
-vim /etc/hyper2kvm/daemon.yaml
+vim /etc/h2kvm/daemon.yaml
 
 # Restart daemon
-sudo h2kvmctl --config /etc/hyper2kvm/daemon.yaml
+sudo h2kvmctl --config /etc/h2kvm/daemon.yaml
 ```
 
 **Example 3: Monitoring Script**
@@ -716,12 +716,12 @@ sudo h2kvmctl --config /etc/hyper2kvm/daemon.yaml
 
 while true; do
   clear
-  echo "=== Hyper2KVM Daemon Monitor ==="
+  echo "=== H2KVM Daemon Monitor ==="
   echo
 
-  h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output status
+  h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output status
   echo
-  h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats
+  h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stats
 
   sleep 10
 done
@@ -731,16 +731,16 @@ done
 
 ```bash
 # Default location:
-/var/lib/hyper2kvm/output/.daemon/control.sock
+/var/lib/h2kvm/output/.daemon/control.sock
 
 # Permissions:
 srwxr-xr-x 1 root root 0 Jan 17 08:36 control.sock
 
 # Check if socket exists:
-ls -l /var/lib/hyper2kvm/output/.daemon/control.sock
+ls -l /var/lib/h2kvm/output/.daemon/control.sock
 
 # Test connectivity:
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output status
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output status
 ```
 
 ### Troubleshooting Control API
@@ -748,7 +748,7 @@ h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output status
 **Error: "Connection refused"**
 ```bash
 # Daemon not running - start it
-sudo h2kvmctl --config /etc/hyper2kvm/daemon.yaml
+sudo h2kvmctl --config /etc/h2kvm/daemon.yaml
 ```
 
 **Error: "Socket not found"**
@@ -760,10 +760,10 @@ h2kvmctl.cli.daemon_ctl --output-dir /correct/path/to/output status
 **Error: "Timeout"**
 ```bash
 # Daemon busy or hung - check logs
-tail -f /var/log/hyper2kvm/daemon.log
+tail -f /var/log/h2kvm/daemon.log
 
 # Force stop if needed
-sudo pkill -TERM -f "hyper2kvm.*daemon"
+sudo pkill -TERM -f "h2kvm.*daemon"
 ```
 
 ---
@@ -824,9 +824,9 @@ notifications:
   smtp_use_tls: true
   smtp_username: "your-email@gmail.com"
   smtp_password: "your-app-password"  # Use app-specific password
-  email_from: "hyper2kvm@yourcompany.com"
+  email_from: "h2kvm@yourcompany.com"
   email_to: "ops-team@yourcompany.com"
-  email_subject_prefix: "[Hyper2KVM]"
+  email_subject_prefix: "[H2KVM]"
 ```
 
 **Combined (Webhook + Email):**
@@ -846,7 +846,7 @@ notifications:
   smtp_use_tls: true
   smtp_username: "notifications@company.com"
   smtp_password: "password"
-  email_from: "hyper2kvm@company.com"
+  email_from: "h2kvm@company.com"
   email_to: "oncall@company.com"
 
   # Event filters
@@ -865,7 +865,7 @@ notifications:
 - Select channel (e.g., #vm-conversions)
 - Copy webhook URL
 
-**2. Configure hyper2kvm:**
+**2. Configure h2kvm:**
 
 ```yaml
 notifications:
@@ -878,7 +878,7 @@ notifications:
 
 ```bash
 # Trigger a test failure to see notification
-echo "test" > /var/lib/hyper2kvm/queue/test.vmdk
+echo "test" > /var/lib/h2kvm/queue/test.vmdk
 # (Will fail, triggering notification)
 ```
 
@@ -891,7 +891,7 @@ echo "test" > /var/lib/hyper2kvm/queue/test.vmdk
 - Choose channel (e.g., #vm-alerts)
 - Copy webhook URL
 
-**2. Configure hyper2kvm:**
+**2. Configure h2kvm:**
 
 ```yaml
 notifications:
@@ -905,7 +905,7 @@ notifications:
 **Conversion Success:**
 ```
 ✅ Conversion Successful
-vm-042.vmdk → /var/lib/hyper2kvm/output/2026-01-17/vm-042
+vm-042.vmdk → /var/lib/h2kvm/output/2026-01-17/vm-042
 Size: 51.2GB
 Duration: 4m 32s
 ```
@@ -951,7 +951,7 @@ Duration: 5m 12s
       {"title": "Error", "value": "Connection timeout", "short": false},
       {"title": "Retry", "value": "1/3 (next in 5.0 min)", "short": true}
     ],
-    "footer": "Hyper2KVM Daemon",
+    "footer": "H2KVM Daemon",
     "ts": 1705488000
   }]
 }
@@ -981,7 +981,7 @@ Duration: 5m 12s
 ```bash
 # Manual webhook test (Slack)
 curl -X POST -H 'Content-Type: application/json' \
-  -d '{"text":"Test from hyper2kvm"}' \
+  -d '{"text":"Test from h2kvm"}' \
   https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 ```
 
@@ -992,9 +992,9 @@ curl -X POST -H 'Content-Type: application/json' \
 import smtplib
 from email.mime.text import MIMEText
 
-msg = MIMEText("Test email from hyper2kvm")
-msg['Subject'] = '[Hyper2KVM] Test Notification'
-msg['From'] = 'hyper2kvm@company.com'
+msg = MIMEText("Test email from h2kvm")
+msg['Subject'] = '[H2KVM] Test Notification'
+msg['From'] = 'h2kvm@company.com'
 msg['To'] = 'you@company.com'
 
 with smtplib.SMTP('smtp.company.com', 587) as server:
@@ -1032,7 +1032,7 @@ notifications:
 
 ```bash
 # Check daemon logs
-tail -f /var/log/hyper2kvm/daemon.log | grep -i notif
+tail -f /var/log/h2kvm/daemon.log | grep -i notif
 
 # Common issues:
 # - Invalid webhook URL
@@ -1047,10 +1047,10 @@ tail -f /var/log/hyper2kvm/daemon.log | grep -i notif
 verbose: 3  # In config file
 
 # Trigger test failure
-echo "test" > /var/lib/hyper2kvm/queue/test-notify.vmdk
+echo "test" > /var/lib/h2kvm/queue/test-notify.vmdk
 
 # Watch logs for webhook attempt
-tail -f /var/log/hyper2kvm/daemon.log | grep -i "webhook\|notification"
+tail -f /var/log/h2kvm/daemon.log | grep -i "webhook\|notification"
 ```
 
 ---
@@ -1137,10 +1137,10 @@ enable_deduplication: false
 
 ```bash
 # Database stored at:
-/var/lib/hyper2kvm/output/.daemon/deduplication.db
+/var/lib/h2kvm/output/.daemon/deduplication.db
 
 # SQLite database file
-ls -lh /var/lib/hyper2kvm/output/.daemon/deduplication.db
+ls -lh /var/lib/h2kvm/output/.daemon/deduplication.db
 # -rw-r--r-- 1 root root 245K Jan 17 14:30 deduplication.db
 ```
 
@@ -1167,17 +1167,17 @@ CREATE INDEX idx_md5 ON processed_files(md5_hash);
 **Check if file was processed:**
 
 ```bash
-sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
+sqlite3 /var/lib/h2kvm/output/.daemon/deduplication.db \
   "SELECT * FROM processed_files WHERE filename = 'vm-001.vmdk';"
 
 # Output:
-# vm-001.vmdk|/var/lib/hyper2kvm/queue/vm-001.vmdk|107374182400|a1b2c3...|2026-01-17T14:30:00|/var/lib/hyper2kvm/output/2026-01-17/vm-001|success
+# vm-001.vmdk|/var/lib/h2kvm/queue/vm-001.vmdk|107374182400|a1b2c3...|2026-01-17T14:30:00|/var/lib/h2kvm/output/2026-01-17/vm-001|success
 ```
 
 **List all processed files:**
 
 ```bash
-sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
+sqlite3 /var/lib/h2kvm/output/.daemon/deduplication.db \
   "SELECT filename, file_size/1024/1024/1024 AS size_gb, processed_at, status FROM processed_files ORDER BY processed_at DESC LIMIT 10;"
 
 # Output:
@@ -1189,7 +1189,7 @@ sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
 **Count processed files:**
 
 ```bash
-sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
+sqlite3 /var/lib/h2kvm/output/.daemon/deduplication.db \
   "SELECT status, COUNT(*) FROM processed_files GROUP BY status;"
 
 # Output:
@@ -1200,7 +1200,7 @@ sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
 **Find duplicate files (same MD5):**
 
 ```bash
-sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
+sqlite3 /var/lib/h2kvm/output/.daemon/deduplication.db \
   "SELECT md5_hash, COUNT(*), GROUP_CONCAT(filename) FROM processed_files WHERE md5_hash IS NOT NULL GROUP BY md5_hash HAVING COUNT(*) > 1;"
 
 # Output shows files with identical content but different names
@@ -1212,11 +1212,11 @@ sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
 
 ```bash
 # User uploads vm-001.vmdk
-cp /mnt/import/vm-001.vmdk /var/lib/hyper2kvm/queue/
+cp /mnt/import/vm-001.vmdk /var/lib/h2kvm/queue/
 # ✅ Processed successfully
 
 # User accidentally uploads again
-cp /mnt/import/vm-001.vmdk /var/lib/hyper2kvm/queue/
+cp /mnt/import/vm-001.vmdk /var/lib/h2kvm/queue/
 # ℹ️ Skipped (duplicate detected)
 
 # Daemon log:
@@ -1233,12 +1233,12 @@ deduplication_use_md5: true
 
 ```bash
 # Process original
-cp /mnt/import/production-db.vmdk /var/lib/hyper2kvm/queue/
+cp /mnt/import/production-db.vmdk /var/lib/h2kvm/queue/
 # ✅ Processed (MD5: a1b2c3d4...)
 
 # Someone renames and uploads again
 cp /mnt/import/production-db.vmdk /mnt/import/db-backup-2026-01.vmdk
-cp /mnt/import/db-backup-2026-01.vmdk /var/lib/hyper2kvm/queue/
+cp /mnt/import/db-backup-2026-01.vmdk /var/lib/h2kvm/queue/
 # ℹ️ Skipped (same MD5 hash detected)
 
 # Daemon log:
@@ -1251,11 +1251,11 @@ cp /mnt/import/db-backup-2026-01.vmdk /var/lib/hyper2kvm/queue/
 
 ```bash
 # Remove file from deduplication database
-sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
+sqlite3 /var/lib/h2kvm/output/.daemon/deduplication.db \
   "DELETE FROM processed_files WHERE filename = 'vm-001.vmdk';"
 
 # Now file can be reprocessed
-cp /mnt/import/vm-001.vmdk /var/lib/hyper2kvm/queue/
+cp /mnt/import/vm-001.vmdk /var/lib/h2kvm/queue/
 # ✅ Processing (not a duplicate anymore)
 ```
 
@@ -1265,10 +1265,10 @@ cp /mnt/import/vm-001.vmdk /var/lib/hyper2kvm/queue/
 
 ```bash
 # Check database size
-du -h /var/lib/hyper2kvm/output/.daemon/deduplication.db
+du -h /var/lib/h2kvm/output/.daemon/deduplication.db
 
 # Compact database (reclaim space)
-sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db "VACUUM;"
+sqlite3 /var/lib/h2kvm/output/.daemon/deduplication.db "VACUUM;"
 ```
 
 **Purge old records:**
@@ -1288,7 +1288,7 @@ VACUUM;
 #!/bin/bash
 # cleanup-dedup-db.sh
 
-DB_PATH="/var/lib/hyper2kvm/output/.daemon/deduplication.db"
+DB_PATH="/var/lib/h2kvm/output/.daemon/deduplication.db"
 RETENTION_DAYS=90
 
 sqlite3 "$DB_PATH" <<SQL
@@ -1320,19 +1320,19 @@ echo "Cleaned up records older than $RETENTION_DAYS days"
 ```bash
 # Another process accessing database
 # Wait and retry, or restart daemon
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stop
-sudo h2kvmctl --config /etc/hyper2kvm/daemon.yaml
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stop
+sudo h2kvmctl --config /etc/h2kvm/daemon.yaml
 ```
 
 **False duplicate detection:**
 
 ```bash
 # Check database entry
-sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
+sqlite3 /var/lib/h2kvm/output/.daemon/deduplication.db \
   "SELECT * FROM processed_files WHERE filename = 'suspected-false-positive.vmdk';"
 
 # If incorrect, delete entry
-sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
+sqlite3 /var/lib/h2kvm/output/.daemon/deduplication.db \
   "DELETE FROM processed_files WHERE filename = 'suspected-false-positive.vmdk';"
 ```
 
@@ -1355,7 +1355,7 @@ Creates detailed JSON error files with comprehensive debugging information when 
 
 **Location:**
 ```
-/var/lib/hyper2kvm/queue/.errors/vm-failed.vmdk.error.json
+/var/lib/h2kvm/queue/.errors/vm-failed.vmdk.error.json
 ```
 
 **Content:**
@@ -1363,12 +1363,12 @@ Creates detailed JSON error files with comprehensive debugging information when 
 ```json
 {
   "filename": "vm-failed.vmdk",
-  "filepath": "/var/lib/hyper2kvm/queue/vm-failed.vmdk",
+  "filepath": "/var/lib/h2kvm/queue/vm-failed.vmdk",
   "file_size_mb": 51200.0,
   "timestamp": "2026-01-17T14:30:15.123456",
   "error": "Connection timeout to vSphere server",
   "phase": "export",
-  "exception_traceback": "Traceback (most recent call last):\n  File \"hyper2kvm/orchestrator.py\", line 245, in run\n    ...",
+  "exception_traceback": "Traceback (most recent call last):\n  File \"h2kvm/orchestrator.py\", line 245, in run\n    ...",
   "suggestion": "Check network connectivity to vSphere server. Verify credentials and server URL.",
   "system_info": {
     "python_version": "3.14.2 (main, Dec  5 2025, 00:00:00) [GCC 15.2.1]",
@@ -1451,10 +1451,10 @@ The system provides intelligent suggestions based on error patterns:
 
 ```bash
 # Check latest error
-ls -lt /var/lib/hyper2kvm/queue/.errors/ | head -n 2
+ls -lt /var/lib/h2kvm/queue/.errors/ | head -n 2
 
 # Read error details
-cat /var/lib/hyper2kvm/queue/.errors/vm-failed.vmdk.error.json | \
+cat /var/lib/h2kvm/queue/.errors/vm-failed.vmdk.error.json | \
   jq '{error: .error, suggestion: .suggestion}'
 
 # Output:
@@ -1468,7 +1468,7 @@ cat /var/lib/hyper2kvm/queue/.errors/vm-failed.vmdk.error.json | \
 
 ```bash
 # Find all errors by type
-cd /var/lib/hyper2kvm/queue/.errors/
+cd /var/lib/h2kvm/queue/.errors/
 for f in *.error.json; do
   echo "=== $f ==="
   jq -r '.error' "$f"
@@ -1489,11 +1489,11 @@ jq -r '.error' *.error.json | sort | uniq -c | sort -rn
 # Check if file succeeded on retry
 FILE="vm-123.vmdk"
 
-if [ -f "/var/lib/hyper2kvm/queue/.errors/${FILE}.error.json" ]; then
+if [ -f "/var/lib/h2kvm/queue/.errors/${FILE}.error.json" ]; then
   echo "Failed initially:"
-  jq -r '.error' "/var/lib/hyper2kvm/queue/.errors/${FILE}.error.json"
+  jq -r '.error' "/var/lib/h2kvm/queue/.errors/${FILE}.error.json"
 
-  if [ -d "/var/lib/hyper2kvm/output/2026-01-17/vm-123" ]; then
+  if [ -d "/var/lib/h2kvm/output/2026-01-17/vm-123" ]; then
     echo "✅ But succeeded on retry!"
   fi
 fi
@@ -1505,10 +1505,10 @@ fi
 #!/bin/bash
 # generate-error-report.sh
 
-ERROR_DIR="/var/lib/hyper2kvm/queue/.errors"
+ERROR_DIR="/var/lib/h2kvm/queue/.errors"
 REPORT_FILE="error-report-$(date +%Y%m%d).txt"
 
-echo "Hyper2KVM Error Report - $(date)" > "$REPORT_FILE"
+echo "H2KVM Error Report - $(date)" > "$REPORT_FILE"
 echo "======================================" >> "$REPORT_FILE"
 echo >> "$REPORT_FILE"
 
@@ -1540,7 +1540,7 @@ echo "Report saved to: $REPORT_FILE"
 #!/bin/bash
 # export-errors-to-monitoring.sh
 
-ERROR_DIR="/var/lib/hyper2kvm/queue/.errors"
+ERROR_DIR="/var/lib/h2kvm/queue/.errors"
 MONITORING_ENDPOINT="https://monitoring.company.com/api/errors"
 
 for error_file in "$ERROR_DIR"/*.error.json; do
@@ -1565,7 +1565,7 @@ import json
 import glob
 from datetime import datetime, timedelta
 
-ERROR_DIR = "/var/lib/hyper2kvm/queue/.errors"
+ERROR_DIR = "/var/lib/h2kvm/queue/.errors"
 CRITICAL_PATTERNS = [
     "disk space",
     "permission denied",
@@ -1608,7 +1608,7 @@ else:
 
 ```bash
 # Remove error files older than 30 days
-find /var/lib/hyper2kvm/queue/.errors/ \
+find /var/lib/h2kvm/queue/.errors/ \
   -name "*.error.json" \
   -mtime +30 \
   -delete
@@ -1618,7 +1618,7 @@ find /var/lib/hyper2kvm/queue/.errors/ \
 
 ```bash
 # Add to crontab
-0 2 * * * find /var/lib/hyper2kvm/queue/.errors/ -name "*.error.json" -mtime +30 -delete
+0 2 * * * find /var/lib/h2kvm/queue/.errors/ -name "*.error.json" -mtime +30 -delete
 ```
 
 **Archive before cleanup:**
@@ -1627,8 +1627,8 @@ find /var/lib/hyper2kvm/queue/.errors/ \
 #!/bin/bash
 # archive-errors.sh
 
-ERROR_DIR="/var/lib/hyper2kvm/queue/.errors"
-ARCHIVE_DIR="/var/lib/hyper2kvm/error-archives"
+ERROR_DIR="/var/lib/h2kvm/queue/.errors"
+ARCHIVE_DIR="/var/lib/h2kvm/error-archives"
 RETENTION_DAYS=30
 
 # Create monthly archive
@@ -1665,52 +1665,52 @@ echo "Archived errors to: $ARCHIVE_FILE"
 
 ### Installation Steps
 
-**1. Install hyper2kvm:**
+**1. Install h2kvm:**
 
 ```bash
 # Production installation
-sudo pip3 install hyper2kvm
+sudo pip3 install h2kvm
 
 # Verify
-hyper2kvm --version
+h2kvm --version
 ```
 
 **2. Create system user:**
 
 ```bash
 # Create dedicated user for daemon
-sudo useradd -r -s /bin/bash -d /var/lib/hyper2kvm -m hyper2kvm
+sudo useradd -r -s /bin/bash -d /var/lib/h2kvm -m h2kvm
 
 # Add to required groups
-sudo usermod -aG kvm hyper2kvm
+sudo usermod -aG kvm h2kvm
 ```
 
 **3. Create directory structure:**
 
 ```bash
-sudo mkdir -p /var/lib/hyper2kvm/{queue,output,work}
-sudo mkdir -p /etc/hyper2kvm
-sudo mkdir -p /var/log/hyper2kvm
+sudo mkdir -p /var/lib/h2kvm/{queue,output,work}
+sudo mkdir -p /etc/h2kvm
+sudo mkdir -p /var/log/h2kvm
 
 # Set ownership
-sudo chown -R hyper2kvm:hyper2kvm /var/lib/hyper2kvm
-sudo chown -R hyper2kvm:hyper2kvm /var/log/hyper2kvm
+sudo chown -R h2kvm:h2kvm /var/lib/h2kvm
+sudo chown -R h2kvm:h2kvm /var/log/h2kvm
 ```
 
 **4. Create production configuration:**
 
 ```bash
-sudo tee /etc/hyper2kvm/daemon.yaml > /dev/null <<'EOF'
+sudo tee /etc/h2kvm/daemon.yaml > /dev/null <<'EOF'
 command: daemon
 daemon: true
 
 # Directories
-watch_dir: /var/lib/hyper2kvm/queue
-output_dir: /var/lib/hyper2kvm/output
-work_dir: /var/lib/hyper2kvm/work
+watch_dir: /var/lib/h2kvm/queue
+output_dir: /var/lib/h2kvm/output
+work_dir: /var/lib/h2kvm/work
 
 # Logging
-log_file: /var/log/hyper2kvm/daemon.log
+log_file: /var/log/h2kvm/daemon.log
 verbose: 2
 
 # Performance
@@ -1750,16 +1750,16 @@ vsphere:
 EOF
 
 # Secure the config file
-sudo chmod 600 /etc/hyper2kvm/daemon.yaml
-sudo chown hyper2kvm:hyper2kvm /etc/hyper2kvm/daemon.yaml
+sudo chmod 600 /etc/h2kvm/daemon.yaml
+sudo chown h2kvm:h2kvm /etc/h2kvm/daemon.yaml
 ```
 
 **5. Create systemd service:**
 
 ```bash
-sudo tee /etc/systemd/system/hyper2kvm-daemon.service > /dev/null <<'EOF'
+sudo tee /etc/systemd/system/h2kvm-daemon.service > /dev/null <<'EOF'
 [Unit]
-Description=Hyper2KVM Daemon - Automated VM Conversion Service
+Description=H2KVM Daemon - Automated VM Conversion Service
 After=network.target
 Wants=network-online.target
 
@@ -1767,9 +1767,9 @@ Wants=network-online.target
 Type=simple
 User=root
 Group=root
-WorkingDirectory=/var/lib/hyper2kvm
-ExecStart=/usr/local/bin/h2kvmctl --config /etc/hyper2kvm/daemon.yaml
-ExecStop=/usr/bin/h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output drain
+WorkingDirectory=/var/lib/h2kvm
+ExecStart=/usr/local/bin/h2kvmctl --config /etc/h2kvm/daemon.yaml
+ExecStop=/usr/bin/h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output drain
 
 # Restart policy
 Restart=always
@@ -1786,7 +1786,7 @@ PrivateTmp=true
 # Logging
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=hyper2kvm
+SyslogIdentifier=h2kvm
 
 [Install]
 WantedBy=multi-user.target
@@ -1800,30 +1800,30 @@ sudo systemctl daemon-reload
 
 ```bash
 # Enable on boot
-sudo systemctl enable hyper2kvm-daemon
+sudo systemctl enable h2kvm-daemon
 
 # Start service
-sudo systemctl start hyper2kvm-daemon
+sudo systemctl start h2kvm-daemon
 
 # Check status
-sudo systemctl status hyper2kvm-daemon
+sudo systemctl status h2kvm-daemon
 ```
 
 ### Log Rotation
 
 ```bash
-sudo tee /etc/logrotate.d/hyper2kvm > /dev/null <<'EOF'
-/var/log/hyper2kvm/daemon.log {
+sudo tee /etc/logrotate.d/h2kvm > /dev/null <<'EOF'
+/var/log/h2kvm/daemon.log {
     daily
     rotate 30
     compress
     delaycompress
     missingok
     notifempty
-    create 0644 hyper2kvm hyper2kvm
+    create 0644 h2kvm h2kvm
     sharedscripts
     postrotate
-        systemctl reload hyper2kvm-daemon > /dev/null 2>&1 || true
+        systemctl reload h2kvm-daemon > /dev/null 2>&1 || true
     endscript
 }
 EOF
@@ -1834,15 +1834,15 @@ EOF
 **1. Create monitoring script:**
 
 ```bash
-sudo tee /usr/local/bin/hyper2kvm-healthcheck > /dev/null <<'EOF'
+sudo tee /usr/local/bin/h2kvm-healthcheck > /dev/null <<'EOF'
 #!/bin/bash
 # Health check script for monitoring systems
 
-OUTPUT_DIR="/var/lib/hyper2kvm/output"
+OUTPUT_DIR="/var/lib/h2kvm/output"
 STATS_FILE="$OUTPUT_DIR/.daemon/stats.json"
 
 # Check if daemon is running
-if ! systemctl is-active --quiet hyper2kvm-daemon; then
+if ! systemctl is-active --quiet h2kvm-daemon; then
     echo "CRITICAL: Daemon not running"
     exit 2
 fi
@@ -1870,7 +1870,7 @@ echo "OK: Daemon healthy"
 exit 0
 EOF
 
-sudo chmod +x /usr/local/bin/hyper2kvm-healthcheck
+sudo chmod +x /usr/local/bin/h2kvm-healthcheck
 ```
 
 **2. Add to monitoring system:**
@@ -1880,8 +1880,8 @@ sudo chmod +x /usr/local/bin/hyper2kvm-healthcheck
 define service {
     use                     generic-service
     host_name               vm-conversion-server
-    service_description     Hyper2KVM Daemon
-    check_command           check_by_ssh!/usr/local/bin/hyper2kvm-healthcheck
+    service_description     H2KVM Daemon
+    check_command           check_by_ssh!/usr/local/bin/h2kvm-healthcheck
     check_interval          5
     retry_interval          1
 }
@@ -1891,22 +1891,22 @@ define service {
 
 ```bash
 #!/bin/bash
-# /usr/local/bin/hyper2kvm-backup
+# /usr/local/bin/h2kvm-backup
 
-BACKUP_DIR="/backup/hyper2kvm"
+BACKUP_DIR="/backup/h2kvm"
 DATE=$(date +%Y%m%d-%H%M%S)
 
 mkdir -p "$BACKUP_DIR"
 
 # Backup configuration
-tar -czf "$BACKUP_DIR/config-$DATE.tar.gz" /etc/hyper2kvm/
+tar -czf "$BACKUP_DIR/config-$DATE.tar.gz" /etc/h2kvm/
 
 # Backup deduplication database
-cp /var/lib/hyper2kvm/output/.daemon/deduplication.db \
+cp /var/lib/h2kvm/output/.daemon/deduplication.db \
    "$BACKUP_DIR/deduplication-$DATE.db"
 
 # Backup statistics
-cp /var/lib/hyper2kvm/output/.daemon/stats.json \
+cp /var/lib/h2kvm/output/.daemon/stats.json \
    "$BACKUP_DIR/stats-$DATE.json"
 
 # Keep last 30 days
@@ -1923,10 +1923,10 @@ echo "Backup completed: $DATE"
 
 ```bash
 # Restrict config file access
-sudo chmod 600 /etc/hyper2kvm/daemon.yaml
+sudo chmod 600 /etc/h2kvm/daemon.yaml
 
 # Protect queue directory
-sudo chmod 750 /var/lib/hyper2kvm/queue
+sudo chmod 750 /var/lib/h2kvm/queue
 ```
 
 **2. SELinux (RHEL/CentOS):**
@@ -1953,26 +1953,26 @@ sudo setsebool -P virt_use_samba 1
 **Check daemon status:**
 
 ```bash
-sudo systemctl status hyper2kvm-daemon
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output status
+sudo systemctl status h2kvm-daemon
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output status
 ```
 
 **View recent activity:**
 
 ```bash
-sudo journalctl -u hyper2kvm-daemon -f
+sudo journalctl -u h2kvm-daemon -f
 ```
 
 **Check statistics:**
 
 ```bash
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stats
 ```
 
 **View queue:**
 
 ```bash
-ls -lh /var/lib/hyper2kvm/queue/
+ls -lh /var/lib/h2kvm/queue/
 ```
 
 ### Performance Monitoring
@@ -1981,26 +1981,26 @@ ls -lh /var/lib/hyper2kvm/queue/
 
 ```bash
 # CPU and memory
-ps aux | grep hyper2kvm
+ps aux | grep h2kvm
 
 # Disk I/O
 iostat -x 2 10
 
 # Disk space
-df -h /var/lib/hyper2kvm/
+df -h /var/lib/h2kvm/
 ```
 
 **Conversion metrics:**
 
 ```bash
 # Average processing time
-jq -r '.average_processing_time_seconds' /var/lib/hyper2kvm/output/.daemon/stats.json
+jq -r '.average_processing_time_seconds' /var/lib/h2kvm/output/.daemon/stats.json
 
 # Success rate
-jq -r '.success_rate' /var/lib/hyper2kvm/output/.daemon/stats.json
+jq -r '.success_rate' /var/lib/h2kvm/output/.daemon/stats.json
 
 # Queue depth
-jq -r '.current_queue_depth' /var/lib/hyper2kvm/output/.daemon/stats.json
+jq -r '.current_queue_depth' /var/lib/h2kvm/output/.daemon/stats.json
 ```
 
 ### Maintenance Tasks
@@ -2009,39 +2009,39 @@ jq -r '.current_queue_depth' /var/lib/hyper2kvm/output/.daemon/stats.json
 
 ```bash
 # Drain and stop
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output drain
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output drain
 
 # Wait for completion
-while systemctl is-active --quiet hyper2kvm-daemon; do sleep 5; done
+while systemctl is-active --quiet h2kvm-daemon; do sleep 5; done
 
 # Perform maintenance
 # ...
 
 # Restart
-sudo systemctl start hyper2kvm-daemon
+sudo systemctl start h2kvm-daemon
 ```
 
 **Clear stuck jobs:**
 
 ```bash
 # Pause daemon
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output pause
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output pause
 
 # Move stuck files
-mv /var/lib/hyper2kvm/queue/stuck-file.vmdk /var/lib/hyper2kvm/queue/.errors/
+mv /var/lib/h2kvm/queue/stuck-file.vmdk /var/lib/h2kvm/queue/.errors/
 
 # Resume
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output resume
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output resume
 ```
 
 **Database maintenance:**
 
 ```bash
 # Vacuum deduplication database
-sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db "VACUUM;"
+sqlite3 /var/lib/h2kvm/output/.daemon/deduplication.db "VACUUM;"
 
 # Clean old records
-sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
+sqlite3 /var/lib/h2kvm/output/.daemon/deduplication.db \
   "DELETE FROM processed_files WHERE processed_at < datetime('now', '-90 days');"
 ```
 
@@ -2055,10 +2055,10 @@ sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db \
 
 ```bash
 # Check systemd status
-sudo systemctl status hyper2kvm-daemon
+sudo systemctl status h2kvm-daemon
 
 # View logs
-sudo journalctl -u hyper2kvm-daemon -n 50
+sudo journalctl -u h2kvm-daemon -n 50
 
 # Common causes:
 # - Invalid configuration
@@ -2071,23 +2071,23 @@ sudo journalctl -u hyper2kvm-daemon -n 50
 
 ```bash
 # Check if daemon is paused
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output status
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output status
 
 # Check file stability timeout
 # Files must be stable for file_stable_timeout seconds
 
 # Check logs
-sudo journalctl -u hyper2kvm-daemon -f | grep -i "queued\|processing"
+sudo journalctl -u h2kvm-daemon -f | grep -i "queued\|processing"
 ```
 
 **Issue: High failure rate**
 
 ```bash
 # Check error files
-ls -lh /var/lib/hyper2kvm/queue/.errors/
+ls -lh /var/lib/h2kvm/queue/.errors/
 
 # Analyze common errors
-jq -r '.error' /var/lib/hyper2kvm/queue/.errors/*.error.json | sort | uniq -c | sort -rn
+jq -r '.error' /var/lib/h2kvm/queue/.errors/*.error.json | sort | uniq -c | sort -rn
 
 # Common fixes:
 # - Network connectivity issues
@@ -2100,14 +2100,14 @@ jq -r '.error' /var/lib/hyper2kvm/queue/.errors/*.error.json | sort | uniq -c | 
 
 ```bash
 # Check concurrent jobs
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stats
 
 # Increase workers if CPU/RAM available
-# Edit /etc/hyper2kvm/daemon.yaml:
+# Edit /etc/h2kvm/daemon.yaml:
 # max_concurrent_jobs: 5  # Increase from 3
 
 # Restart daemon
-sudo systemctl restart hyper2kvm-daemon
+sudo systemctl restart h2kvm-daemon
 ```
 
 ### Debug Mode
@@ -2115,16 +2115,16 @@ sudo systemctl restart hyper2kvm-daemon
 Enable verbose logging:
 
 ```yaml
-# In /etc/hyper2kvm/daemon.yaml
+# In /etc/h2kvm/daemon.yaml
 verbose: 3  # Maximum verbosity
 ```
 
 ```bash
 # Restart daemon
-sudo systemctl restart hyper2kvm-daemon
+sudo systemctl restart h2kvm-daemon
 
 # Watch detailed logs
-sudo journalctl -u hyper2kvm-daemon -f
+sudo journalctl -u h2kvm-daemon -f
 ```
 
 ### Support Information
@@ -2135,26 +2135,26 @@ When reporting issues, collect:
 # System info
 uname -a
 python3 --version
-hyper2kvm --version
+h2kvm --version
 
 # Daemon status
-sudo systemctl status hyper2kvm-daemon
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output status
-h2kvmctl.cli.daemon_ctl --output-dir /var/lib/hyper2kvm/output stats
+sudo systemctl status h2kvm-daemon
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output status
+h2kvmctl.cli.daemon_ctl --output-dir /var/lib/h2kvm/output stats
 
 # Recent logs
-sudo journalctl -u hyper2kvm-daemon -n 100 --no-pager
+sudo journalctl -u h2kvm-daemon -n 100 --no-pager
 
 # Recent errors
-ls -lh /var/lib/hyper2kvm/queue/.errors/
-cat /var/lib/hyper2kvm/queue/.errors/recent-error.vmdk.error.json
+ls -lh /var/lib/h2kvm/queue/.errors/
+cat /var/lib/h2kvm/queue/.errors/recent-error.vmdk.error.json
 
 # Configuration (redact passwords!)
-cat /etc/hyper2kvm/daemon.yaml | grep -v password
+cat /etc/h2kvm/daemon.yaml | grep -v password
 ```
 
 ---
 
 **Document Version:** 1.0
 **Last Updated:** 2026-03-29
-**For:** hyper2kvm Enhanced Daemon Mode
+**For:** h2kvm Enhanced Daemon Mode

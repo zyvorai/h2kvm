@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from hyper2kvm.core.structured_log import (
+from h2kvm.core.structured_log import (
     DropEvent,
     _TokenBucketRateLimiter,
     _rate_limit_processor,
@@ -136,7 +136,7 @@ def test_thread_safety():
 
 def test_processor_delegates():
     """_rate_limit_processor calls global _rate_limiter."""
-    import hyper2kvm.core.structured_log as sl
+    import h2kvm.core.structured_log as sl
 
     original = sl._rate_limiter
     mock_limiter = Mock(return_value={"event": "ok"})

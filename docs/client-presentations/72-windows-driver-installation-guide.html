@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Windows VM Migration — Driver Installation Guide — hyper2kvm</title>
+<title>Windows VM Migration — Driver Installation Guide — h2kvm</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -71,7 +71,7 @@
   <h1>Windows VM Migration<br>Driver Installation Guide</h1>
   <h2>SATA Bootstrap &rarr; VirtIO CD-ROM Install &rarr; Production Ready</h2>
   <div class="badge">Win10 | Win11 | Server 2019/2022 | SATA Boot | VirtIO Network | Guest Agent | Proprietary (Zyvor AI Labs)</div>
-  <div class="url">github.com/ssahani/hyper2kvm</div>
+  <div class="url">github.com/ssahani/h2kvm</div>
   <div class="date">April 2026 &mdash; v0.3.0</div>
 </div>
 
@@ -108,7 +108,7 @@
     <span style="color: #94a3b8;"> If pre-install is not possible (e.g., VM already shut down), use the post-migration workflow on the following pages.</span>
   </div>
 
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; 1</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; 1</div>
 </div>
 
 <!-- PAGE 2: Migration Pipeline Overview -->
@@ -178,13 +178,13 @@
   <div class="highlight">
     <p style="margin-bottom:0;"><strong>Key principle:</strong> Boot reliability first. SATA disk bus guarantees Windows boots on KVM. VirtIO drivers for network, balloon, and guest agent are installed post-boot via the CD-ROM installer. The disk stays on SATA &mdash; this is the production configuration.</p>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 1</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 1</div>
 </div>
 
 <!-- PAGE 2: What's Auto-Staged -->
 <div class="page page-slate">
   <h2 class="title"><span>2.</span> What's <class="green">Auto-Staged</class></h2>
-  <p class="desc">hyper2kvm stages multiple driver installation mechanisms during offline fixes. These are best-effort for migrated VMs.</p>
+  <p class="desc">h2kvm stages multiple driver installation mechanisms during offline fixes. These are best-effort for migrated VMs.</p>
 
   <div class="card-grid-3">
     <div class="card">
@@ -230,7 +230,7 @@
       <h4>Domain XML Configuration</h4>
       <pre>&lt;disk type='file' device='cdrom'&gt;
   &lt;driver name='qemu' type='raw'/&gt;
-  &lt;source file='/var/lib/hyper2kvm/virtio-win.iso'/&gt;
+  &lt;source file='/var/lib/h2kvm/virtio-win.iso'/&gt;
   &lt;target dev='sdb' bus='sata'/&gt;
   &lt;readonly/&gt;
 &lt;/disk&gt;</pre>
@@ -239,7 +239,7 @@
     <div class="card">
       <h4>ISO Discovery Paths</h4>
       <ul>
-        <li><code>/var/lib/hyper2kvm/virtio-win.iso</code> (primary)</li>
+        <li><code>/var/lib/h2kvm/virtio-win.iso</code> (primary)</li>
         <li><code>/usr/share/virtio-win/virtio-win.iso</code> (system)</li>
         <li><code>/var/lib/libvirt/images/virtio-win.iso</code> (fallback)</li>
         <li><code>quickstart.sh</code> auto-downloads and extracts the ISO</li>
@@ -252,7 +252,7 @@
   <div class="highlight-green highlight">
     <p style="margin-bottom:0;"><strong>Important:</strong> For migrated VMs, the staged registry entries and driver files establish the foundation, but the <strong>CD-ROM installer</strong> is what reliably activates all drivers. The offline staging ensures the .sys files are present on disk, while the installer handles PnP binding and service registration.</p>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 2</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 2</div>
 </div>
 
 <!-- PAGE 3: First Boot — What You'll See -->
@@ -318,7 +318,7 @@
   <div class="highlight">
     <p style="margin-bottom:0;"><strong>Tip:</strong> If using h2kweb, the VM list will show the VM as "running" but without an IP address. The IP will appear after you install VirtIO drivers and the QEMU Guest Agent starts.</p>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 3</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 3</div>
 </div>
 
 <!-- PAGE 4: Installing Drivers — Step by Step -->
@@ -385,7 +385,7 @@
   <div class="highlight-green highlight">
     <p style="margin-bottom:0;"><strong>No reboot needed</strong> for network, balloon, or guest agent. The VirtIO network driver activates immediately after installation. RDP and SSH access become available as soon as the network is up.</p>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 4</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 4</div>
 </div>
 
 <!-- PAGE 5: After Installation — What Works -->
@@ -465,7 +465,7 @@
       <strong>Network works immediately. Guest agent reports IP. Memory is dynamic. No reboot required.</strong>
     </p>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 5</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 5</div>
 </div>
 
 <!-- PAGE 6: Verification -->
@@ -546,7 +546,7 @@ xfreerdp /v:&lt;ip&gt; /u:Administrator</pre>
     <span class="feat">Device Manager: no warnings</span>
     <span class="feat">h2kweb: green health checks</span>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 6</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 6</div>
 </div>
 
 <!-- PAGE 7: Troubleshooting -->
@@ -559,7 +559,7 @@ xfreerdp /v:&lt;ip&gt; /u:Administrator</pre>
     <tr>
       <td><strong>CD-ROM (D:) not visible</strong></td>
       <td>virtio-win.iso not attached in domain XML or ISO file missing</td>
-      <td>Verify ISO exists: <code>ls /var/lib/hyper2kvm/virtio-win.iso</code>. Check domain XML for <code>&lt;disk device='cdrom'&gt;</code> entry. Run <code>sudo ./scripts/quickstart.sh</code> to download ISO. Or attach manually: <code>virsh attach-disk &lt;vm&gt; /path/to/virtio-win.iso sdb --type cdrom --mode readonly</code></td>
+      <td>Verify ISO exists: <code>ls /var/lib/h2kvm/virtio-win.iso</code>. Check domain XML for <code>&lt;disk device='cdrom'&gt;</code> entry. Run <code>sudo ./scripts/quickstart.sh</code> to download ISO. Or attach manually: <code>virsh attach-disk &lt;vm&gt; /path/to/virtio-win.iso sdb --type cdrom --mode readonly</code></td>
     </tr>
     <tr>
       <td><strong>No network after installer</strong></td>
@@ -606,7 +606,7 @@ xfreerdp /v:&lt;ip&gt; /u:Administrator</pre>
         <li><code>virsh edit &lt;vmname&gt;</code> &rarr; change <code>bus='virtio'</code> to <code>bus='sata'</code></li>
         <li>If stuck at boot, try: <code>virsh destroy &lt;vm&gt; &amp;&amp; virsh start &lt;vm&gt;</code></li>
         <li>For persistent boot issues, re-run migration with <code>inject_virtio_drivers: true</code></li>
-        <li>Check logs: <code>C:\hyper2kvm\firstboot.log</code> (if firstboot ran)</li>
+        <li>Check logs: <code>C:\h2kvm\firstboot.log</code> (if firstboot ran)</li>
       </ul>
     </div>
     <div class="card">
@@ -620,7 +620,7 @@ xfreerdp /v:&lt;ip&gt; /u:Administrator</pre>
       </ul>
     </div>
   </div>
-  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 7</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 7</div>
 </div>
 
 </body>

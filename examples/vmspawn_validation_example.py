@@ -13,11 +13,11 @@ import asyncio
 import logging
 from pathlib import Path
 
-from hyper2kvm.vmspawn import VMSpawnManager, VMValidator
-from hyper2kvm.vmspawn.async_manager import AsyncVMManager
-from hyper2kvm.vmspawn.async_validator import AsyncValidator
-from hyper2kvm.vmspawn.cloudinit import create_cloud_init_config
-from hyper2kvm.vmspawn.cleanup import CleanupEngine
+from h2kvm.vmspawn import VMSpawnManager, VMValidator
+from h2kvm.vmspawn.async_manager import AsyncVMManager
+from h2kvm.vmspawn.async_validator import AsyncValidator
+from h2kvm.vmspawn.cloudinit import create_cloud_init_config
+from h2kvm.vmspawn.cleanup import CleanupEngine
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ def example_sync_validation():
     # Create VM from migrated disk
     machine = manager.create(
         name="test-vm",
-        image=Path("/var/lib/hyper2kvm/migrated-vm.qcow2"),
+        image=Path("/var/lib/h2kvm/migrated-vm.qcow2"),
         memory_mb=2048,
         cpus=2,
     )
@@ -69,7 +69,7 @@ async def example_async_validation():
     """
     logger.info("=== Example 2: Async Validation ===")
 
-    from hyper2kvm.vmspawn.async_machine import AsyncMachine
+    from h2kvm.vmspawn.async_machine import AsyncMachine
 
     # Create cloud-init config
     cloud_init = create_cloud_init_config(
@@ -81,7 +81,7 @@ async def example_async_validation():
 
     machine = AsyncMachine(
         name="test-async-vm",
-        image=Path("/var/lib/hyper2kvm/migrated-vm.qcow2"),
+        image=Path("/var/lib/h2kvm/migrated-vm.qcow2"),
         memory_mb=2048,
         cpus=2,
         tpm=True,  # Enable TPM for testing
@@ -114,13 +114,13 @@ async def example_batch_validation():
     """
     logger.info("=== Example 3: Batch Validation ===")
 
-    from hyper2kvm.vmspawn.async_machine import AsyncMachine
+    from h2kvm.vmspawn.async_machine import AsyncMachine
 
     # Create multiple VMs
     machines = [
         AsyncMachine(
             name=f"vm-{i}",
-            image=Path(f"/var/lib/hyper2kvm/vm-{i}.qcow2"),
+            image=Path(f"/var/lib/h2kvm/vm-{i}.qcow2"),
             memory_mb=1024,
             cpus=1,
         )
@@ -158,13 +158,13 @@ async def example_massive_validation():
     """
     logger.info("=== Example 4: Massive Scale (1000 VMs) ===")
 
-    from hyper2kvm.vmspawn.async_machine import AsyncMachine
+    from h2kvm.vmspawn.async_machine import AsyncMachine
 
     # Simulate 1000 VMs (in production, these would be different images)
     machines = [
         AsyncMachine(
             name=f"scale-test-{i}",
-            image=Path("/var/lib/hyper2kvm/base-vm.qcow2"),
+            image=Path("/var/lib/h2kvm/base-vm.qcow2"),
             memory_mb=512,  # Smaller for scale testing
             cpus=1,
         )
@@ -202,12 +202,12 @@ async def example_kubernetes_validation():
     """
     logger.info("=== Example 5: Kubernetes Node Validation ===")
 
-    from hyper2kvm.vmspawn.async_machine import AsyncMachine
-    from hyper2kvm.vmspawn.validator import KubernetesNodeValidator
+    from h2kvm.vmspawn.async_machine import AsyncMachine
+    from h2kvm.vmspawn.validator import KubernetesNodeValidator
 
     machine = AsyncMachine(
         name="k8s-node-1",
-        image=Path("/var/lib/hyper2kvm/k8s-node.qcow2"),
+        image=Path("/var/lib/h2kvm/k8s-node.qcow2"),
         memory_mb=4096,
         cpus=4,
     )
@@ -237,12 +237,12 @@ async def example_vsock_communication():
     """
     logger.info("=== Example 6: vsock Communication ===")
 
-    from hyper2kvm.vmspawn.async_machine import AsyncMachine
-    from hyper2kvm.vmspawn.vsock import VsockClient
+    from h2kvm.vmspawn.async_machine import AsyncMachine
+    from h2kvm.vmspawn.vsock import VsockClient
 
     machine = AsyncMachine(
         name="vsock-test",
-        image=Path("/var/lib/hyper2kvm/vm.qcow2"),
+        image=Path("/var/lib/h2kvm/vm.qcow2"),
         vsock=True,  # Enable vsock
         memory_mb=2048,
         cpus=2,
@@ -271,7 +271,7 @@ async def example_vsock_communication():
 if __name__ == "__main__":
     # Run examples
     print("\n" + "=" * 80)
-    print("Hyper2KVM vmspawn Validation Examples")
+    print("H2KVM vmspawn Validation Examples")
     print("=" * 80 + "\n")
 
     # Sync example

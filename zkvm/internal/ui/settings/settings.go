@@ -13,9 +13,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/hyper2kvm/zkvm/internal/models"
-	"github.com/hyper2kvm/zkvm/internal/state"
-	"github.com/hyper2kvm/zkvm/internal/ui"
+	"github.com/h2kvm/zkvm/internal/models"
+	"github.com/h2kvm/zkvm/internal/state"
+	"github.com/h2kvm/zkvm/internal/ui"
 )
 
 // category represents one settings section.

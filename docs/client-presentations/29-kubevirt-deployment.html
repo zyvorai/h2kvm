@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>KubeVirt Deployment Guide — Deploy VMs to Any Kubernetes with hyper2kvm</title>
+<title>KubeVirt Deployment Guide — Deploy VMs to Any Kubernetes with h2kvm</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -50,7 +50,7 @@
 <div class="cover">
   <h1><span>KubeVirt</span> Deployment Guide</h1>
   <h2>Deploy Migrated VMs to Any Kubernetes Cluster</h2>
-  <p class="sub">K3s, vanilla Kubernetes, EKS, GKE, AKS, OpenShift — hyper2kvm deploys to all of them. This guide covers KubeVirt installation, CDI setup, PVC upload, VirtualMachine manifests, GitOps fleet management, multi-cluster deployment, and storage options. Run VMs and containers side by side on one platform.</p>
+  <p class="sub">K3s, vanilla Kubernetes, EKS, GKE, AKS, OpenShift — h2kvm deploys to all of them. This guide covers KubeVirt installation, CDI setup, PVC upload, VirtualMachine manifests, GitOps fleet management, multi-cluster deployment, and storage options. Run VMs and containers side by side on one platform.</p>
   <div class="badge">Any K8s | K3s Single-Node | GitOps Fleet | CDI Upload | Dual Target | Proprietary (Zyvor AI Labs)</div>
 </div>
 
@@ -92,11 +92,11 @@
     </div>
   </div>
 
-  <h3>hyper2kvm KubeVirt Pipeline</h3>
+  <h3>h2kvm KubeVirt Pipeline</h3>
   <div class="flow">
     <div class="flow-step">Source VM (VMware/Hyper-V/Cloud)</div>
     <div class="flow-arrow">&rarr;</div>
-    <div class="flow-step">hyper2kvm convert + fix</div>
+    <div class="flow-step">h2kvm convert + fix</div>
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step">QCOW2 + KubeVirt YAML</div>
     <div class="flow-arrow">&rarr;</div>
@@ -107,7 +107,7 @@
 
   <h3>Supported Kubernetes Distributions</h3>
   <table>
-    <tr><th style="width:16%">Distribution</th><th style="width:14%">KubeVirt</th><th style="width:14%">CDI</th><th style="width:14%">Min Nodes</th><th style="width:22%">Best For</th><th style="width:20%">hyper2kvm Tested</th></tr>
+    <tr><th style="width:16%">Distribution</th><th style="width:14%">KubeVirt</th><th style="width:14%">CDI</th><th style="width:14%">Min Nodes</th><th style="width:22%">Best For</th><th style="width:20%">h2kvm Tested</th></tr>
     <tr><td><strong>K3s</strong></td><td class="check">Yes</td><td class="check">Yes</td><td>1</td><td>Edge, dev, small sites</td><td class="check">Verified (Photon OS)</td></tr>
     <tr><td><strong>Vanilla K8s</strong></td><td class="check">Yes</td><td class="check">Yes</td><td>1</td><td>General purpose</td><td class="check">Verified</td></tr>
     <tr><td><strong>kubeadm</strong></td><td class="check">Yes</td><td class="check">Yes</td><td>1</td><td>Self-managed clusters</td><td class="check">Verified</td></tr>
@@ -153,7 +153,7 @@ sudo chmod +x /usr/local/bin/virtctl
 sudo kubectl wait -n kubevirt kv/kubevirt --for=condition=Available --timeout=300s
   </pre>
 
-  <h3>Step 3: Deploy VM with hyper2kvm (5 minutes)</h3>
+  <h3>Step 3: Deploy VM with h2kvm (5 minutes)</h3>
   <pre>
 # Convert VMDK and deploy to KubeVirt in one command
 cat > kubevirt-deploy.yaml &lt;&lt;'EOF'
@@ -177,7 +177,7 @@ sudo kubectl get vmi                 # VirtualMachineInstance running
 sudo virtctl console photon-kv       # Connect to console
   </pre>
 
-  <h3>Generated KubeVirt Manifest (auto-created by hyper2kvm)</h3>
+  <h3>Generated KubeVirt Manifest (auto-created by h2kvm)</h3>
   <pre>
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
@@ -220,7 +220,7 @@ spec:
     <div class="card">
       <h4>ArgoCD / Flux Workflow</h4>
       <ul>
-        <li>Convert VMs at HQ with hyper2kvm</li>
+        <li>Convert VMs at HQ with h2kvm</li>
         <li>Upload disk images to container registry</li>
         <li>Store KubeVirt manifests in Git repo</li>
         <li>ArgoCD/Flux watches repo, syncs to all clusters</li>
@@ -291,7 +291,7 @@ vcpus: 4
   </pre>
 
   <div class="highlight">
-    <p style="margin-bottom:0;"><strong>Dual target:</strong> hyper2kvm generates both libvirt domain XML and KubeVirt VirtualMachine YAML from a single conversion. Deploy the right format per site — KVM for traditional hosts, KubeVirt for K8s clusters. No reconversion needed.</p>
+    <p style="margin-bottom:0;"><strong>Dual target:</strong> h2kvm generates both libvirt domain XML and KubeVirt VirtualMachine YAML from a single conversion. Deploy the right format per site — KVM for traditional hosts, KubeVirt for K8s clusters. No reconversion needed.</p>
   </div>
 </div>
 
@@ -346,7 +346,7 @@ vcpus: 4
       <ul>
         <li>Windows Server 2016-2025 fully supported</li>
         <li>Windows 11 with TPM emulation</li>
-        <li>VirtIO drivers auto-injected by hyper2kvm</li>
+        <li>VirtIO drivers auto-injected by h2kvm</li>
         <li>UEFI + Secure Boot via OVMF</li>
         <li>RDP access via NodePort or LoadBalancer service</li>
       </ul>
@@ -368,11 +368,11 @@ vcpus: 4
     <p style="font-size:0.92em;">
       Run VMs and containers on the same cluster. Manage both with kubectl.<br>
       GitOps deploys VMs like it deploys containers. Same monitoring, same networking.<br>
-      <strong>hyper2kvm converts any VM and deploys it to any Kubernetes — automatically.</strong>
+      <strong>h2kvm converts any VM and deploys it to any Kubernetes — automatically.</strong>
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm — KubeVirt Deployment Guide | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm — KubeVirt Deployment Guide | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

@@ -60,7 +60,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum(hyper2kvm_worker_jobs_active)",
+          "expr": "sum(h2kvm_worker_jobs_active)",
           "refId": "A"
         }
       ],
@@ -109,7 +109,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum(rate(hyper2kvm_migration_total{status=\"success\"}[5m]))",
+          "expr": "sum(rate(h2kvm_migration_total{status=\"success\"}[5m]))",
           "refId": "A"
         }
       ],
@@ -158,7 +158,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum(rate(hyper2kvm_migration_total{status=\"failed\"}[5m]))",
+          "expr": "sum(rate(h2kvm_migration_total{status=\"failed\"}[5m]))",
           "refId": "A"
         }
       ],
@@ -233,7 +233,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum by (worker_id) (hyper2kvm_worker_jobs_active)",
+          "expr": "sum by (worker_id) (h2kvm_worker_jobs_active)",
           "legendFormat": "{{worker_id}}",
           "refId": "A"
         }
@@ -309,7 +309,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum by (status) (rate(hyper2kvm_migration_total[5m]))",
+          "expr": "sum by (status) (rate(h2kvm_migration_total[5m]))",
           "legendFormat": "{{status}}",
           "refId": "A"
         }
@@ -393,17 +393,17 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, sum by (le, operation) (rate(hyper2kvm_migration_duration_seconds_bucket[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le, operation) (rate(h2kvm_migration_duration_seconds_bucket[5m])))",
           "legendFormat": "p50 - {{operation}}",
           "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.95, sum by (le, operation) (rate(hyper2kvm_migration_duration_seconds_bucket[5m])))",
+          "expr": "histogram_quantile(0.95, sum by (le, operation) (rate(h2kvm_migration_duration_seconds_bucket[5m])))",
           "legendFormat": "p95 - {{operation}}",
           "refId": "B"
         },
         {
-          "expr": "histogram_quantile(0.99, sum by (le, operation) (rate(hyper2kvm_migration_duration_seconds_bucket[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le, operation) (rate(h2kvm_migration_duration_seconds_bucket[5m])))",
           "legendFormat": "p99 - {{operation}}",
           "refId": "C"
         }
@@ -449,7 +449,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum by (operation) (hyper2kvm_migration_total)",
+          "expr": "sum by (operation) (h2kvm_migration_total)",
           "legendFormat": "{{operation}}",
           "refId": "A"
         }
@@ -508,7 +508,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum(rate(hyper2kvm_migration_total{status=\"success\"}[5m])) / sum(rate(hyper2kvm_migration_total[5m]))",
+          "expr": "sum(rate(h2kvm_migration_total{status=\"success\"}[5m])) / sum(rate(h2kvm_migration_total[5m]))",
           "refId": "A"
         }
       ],
@@ -587,7 +587,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "hyper2kvm_conversion_temp_usage_bytes / hyper2kvm_conversion_temp_capacity_bytes",
+          "expr": "h2kvm_conversion_temp_usage_bytes / h2kvm_conversion_temp_capacity_bytes",
           "legendFormat": "{{worker_id}}",
           "refId": "A"
         }
@@ -599,7 +599,7 @@
   "refresh": "30s",
   "schemaVersion": 27,
   "style": "dark",
-  "tags": ["hyper2kvm", "worker", "migration"],
+  "tags": ["h2kvm", "worker", "migration"],
   "templating": {
     "list": []
   },
@@ -609,7 +609,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Hyper2KVM Worker - Overview",
-  "uid": "hyper2kvm-worker-overview",
+  "title": "H2KVM Worker - Overview",
+  "uid": "h2kvm-worker-overview",
   "version": 1
 }

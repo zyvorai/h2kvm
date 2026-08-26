@@ -1,13 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 # ============================================
-# hyper2kvm Demo Setup
+# h2kvm Demo Setup
 # ============================================
 # Sets up a remote/baremetal machine for demonstrating
 # VMware → KVM migration with visible results.
 #
 # Installs:
-#   - All hyper2kvm dependencies
+#   - All h2kvm dependencies
 #   - Cockpit web UI (port 9090) for viewing VMs
 #   - VNC tools for console access
 #
@@ -44,8 +44,8 @@ fi
 
 info "Setting up demo on $DISTRO_ID..."
 
-# ── Step 1: Install all hyper2kvm dependencies ──
-info "Step 1/4: Installing hyper2kvm and dependencies..."
+# ── Step 1: Install all h2kvm dependencies ──
+info "Step 1/4: Installing h2kvm and dependencies..."
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 "$SCRIPT_DIR/quickstart.sh"
 

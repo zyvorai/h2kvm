@@ -1,6 +1,6 @@
-# hyper2kvm Container Deployment Guide
+# h2kvm Container Deployment Guide
 
-Complete guide for deploying hyper2kvm in Docker, Podman, and Kubernetes environments with the Worker Job Protocol v1.
+Complete guide for deploying h2kvm in Docker, Podman, and Kubernetes environments with the Worker Job Protocol v1.
 
 ---
 
@@ -19,7 +19,7 @@ Complete guide for deploying hyper2kvm in Docker, Podman, and Kubernetes environ
 
 ## Overview
 
-hyper2kvm provides specialized container images for different deployment scenarios:
+h2kvm provides specialized container images for different deployment scenarios:
 
 | Image Stage | Purpose | Use Case | Privileged Required |
 |-------------|---------|----------|---------------------|
@@ -66,16 +66,16 @@ Build all specialized images:
 
 ```bash
 # Build CLI image (minimal, conversion-only)
-docker build --target cli -t hyper2kvm:cli .
+docker build --target cli -t h2kvm:cli .
 
 # Build daemon image (long-running file watcher)
-docker build --target daemon -t hyper2kvm:daemon .
+docker build --target daemon -t h2kvm:daemon .
 
 # Build worker image (Worker Job Protocol)
-docker build --target worker -t hyper2kvm:worker .
+docker build --target worker -t h2kvm:worker .
 
 # Build production image (full-featured)
-docker build --target production -t hyper2kvm:prod .
+docker build --target production -t h2kvm:prod .
 ```
 
 ### Image Sizes
@@ -147,7 +147,7 @@ docker-compose exec worker \
 docker run --rm \
   -v /path/to/vmdk:/data/input:ro \
   -v /path/to/output:/data/output:rw \
-  hyper2kvm:cli \
+  h2kvm:cli \
   h2kvmctl --cmd local \
   --vmdk /data/input/test.vmdk \
   --output-dir /data/output \
@@ -164,8 +164,8 @@ docker run --rm --privileged \
   -v /lib/modules:/lib/modules:ro \
   -v /data/input:/data/input:ro \
   -v /data/output:/data/output:rw \
-  -e HYPER2KVM_MODE=worker \
-  hyper2kvm:worker \
+  -e H2KVM_MODE=worker \
+  h2kvm:worker \
   h2kvmctl.worker.cli run /data/job-spec.json
 ```
 
@@ -181,7 +181,7 @@ Podman offers better security with rootless containers and native systemd integr
 podman run --rm \
   -v /path/to/vmdk:/data/input:ro,z \
   -v /path/to/output:/data/output:rw,z \
-  hyper2kvm:cli \
+  h2kvm:cli \
   h2kvmctl --cmd local \
   --vmdk /data/input/test.vmdk \
   --output-dir /data/output \
@@ -198,8 +198,8 @@ sudo podman run --rm --privileged \
   -v /lib/modules:/lib/modules:ro \
   -v /data/input:/data/input:ro,z \
   -v /data/output:/data/output:rw,z \
-  -e HYPER2KVM_MODE=worker \
-  hyper2kvm:worker
+  -e H2KVM_MODE=worker \
+  h2kvm:worker
 ```
 
 ### Podman with systemd
@@ -208,18 +208,18 @@ Generate systemd unit:
 
 ```bash
 podman create \
-  --name hyper2kvm-daemon \
+  --name h2kvm-daemon \
   --privileged \
   -v /dev:/dev \
   -v /data/incoming:/data/incoming:rw,z \
   -v /data/output:/data/output:rw,z \
-  -e HYPER2KVM_MODE=daemon \
-  hyper2kvm:daemon
+  -e H2KVM_MODE=daemon \
+  h2kvm:daemon
 
-podman generate systemd --name hyper2kvm-daemon > /etc/systemd/system/hyper2kvm-daemon.service
+podman generate systemd --name h2kvm-daemon > /etc/systemd/system/h2kvm-daemon.service
 
 systemctl daemon-reload
-systemctl enable --now hyper2kvm-daemon
+systemctl enable --now h2kvm-daemon
 ```
 
 ---
@@ -234,7 +234,7 @@ Complete Kubernetes deployment using the Worker Job Protocol.
 
 Label worker nodes:
 ```bash
-kubectl label nodes worker-01 hyper2kvm.io/worker-enabled=true
+kubectl label nodes worker-01 h2kvm.io/worker-enabled=true
 ```
 
 Verify NBD module available:
@@ -272,22 +272,22 @@ kubectl apply -f k8s/worker/configmap.yaml
 kubectl apply -f k8s/worker/daemonset.yaml
 
 # Verify workers running
-kubectl get pods -n hyper2kvm-workers -l app=hyper2kvm-worker
+kubectl get pods -n h2kvm-workers -l app=h2kvm-worker
 ```
 
 #### 4. Submit Migration Job
 
 ```bash
 # Create job spec ConfigMap
-kubectl create configmap hyper2kvm-job-001 \
+kubectl create configmap h2kvm-job-001 \
   --from-file=job-spec.json=k8s/worker/examples/convert-job.json \
-  -n hyper2kvm-workers
+  -n h2kvm-workers
 
 # Deploy job
 sed 's/JOBID/001/g' k8s/worker/job-template.yaml | kubectl apply -f -
 
 # Follow progress
-kubectl logs -n hyper2kvm-workers -f job/hyper2kvm-migration-001
+kubectl logs -n h2kvm-workers -f job/h2kvm-migration-001
 ```
 
 ### Detailed Kubernetes Guide
@@ -347,11 +347,11 @@ The Worker Job Protocol provides production-grade job orchestration.
 
 ```bash
 # Docker
-docker exec hyper2kvm-worker \
+docker exec h2kvm-worker \
   h2kvmctl.worker.cli run /data/convert-job.json --follow
 
 # Kubernetes
-kubectl exec -n hyper2kvm-workers hyper2kvm-worker-xxxxx -- \
+kubectl exec -n h2kvm-workers h2kvm-worker-xxxxx -- \
   h2kvmctl.worker.cli run /data/convert-job.json --follow
 ```
 
@@ -397,7 +397,7 @@ docker run --cap-drop=ALL \
   --cap-add=SYS_CHROOT \
   --device=/dev/nbd0 \
   --device=/dev/nbd1 \
-  hyper2kvm:worker
+  h2kvm:worker
 ```
 
 **Kubernetes:**
@@ -422,11 +422,11 @@ Restrict container egress:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: hyper2kvm-worker-policy
+  name: h2kvm-worker-policy
 spec:
   podSelector:
     matchLabels:
-      app: hyper2kvm-worker
+      app: h2kvm-worker
   egress:
   - to:
     - namespaceSelector:
@@ -443,8 +443,8 @@ Enable audit logging for privileged operations:
 
 ```yaml
 env:
-- name: HYPER2KVM_AUDIT_LOG
-  value: "/var/log/hyper2kvm/audit.log"
+- name: H2KVM_AUDIT_LOG
+  value: "/var/log/h2kvm/audit.log"
 ```
 
 ---
@@ -491,7 +491,7 @@ kubectl get pod -o yaml | grep privileged
 
 ```bash
 # Use cli stage for conversion-only (750 MB)
-docker build --target cli -t hyper2kvm:cli .
+docker build --target cli -t h2kvm:cli .
 
 # Avoid production stage unless needed (1.2 GB)
 ```
@@ -591,4 +591,4 @@ resources:
 
 ---
 
-**Questions?** Open an issue at https://github.com/ssahani/hyper2kvm/issues
+**Questions?** Open an issue at https://github.com/ssahani/h2kvm/issues

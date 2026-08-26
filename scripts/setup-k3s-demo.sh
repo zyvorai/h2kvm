@@ -1,19 +1,19 @@
 #!/bin/bash
 set -euo pipefail
 # ============================================
-# K3s + KubeVirt Demo for hyper2kvm
+# K3s + KubeVirt Demo for h2kvm
 # ============================================
 # Production-grade installer for K3s, KubeVirt, CDI, and virtctl.
-# Demonstrates exporting a VM with hyper2kvm and importing it
+# Demonstrates exporting a VM with h2kvm and importing it
 # as a KubeVirt VirtualMachine.
 #
 # Architecture:
-#   hyper2kvm export → qcow2 → PVC (CDI upload) → KubeVirt VM
+#   h2kvm export → qcow2 → PVC (CDI upload) → KubeVirt VM
 #
 # Prerequisites:
 #   - Linux x86_64 with 4GB+ RAM
 #   - Root access
-#   - hyper2kvm installed (run quickstart.sh first)
+#   - h2kvm installed (run quickstart.sh first)
 #
 # Usage:
 #   sudo ./scripts/setup-k3s-demo.sh           # install k3s + kubevirt
@@ -29,7 +29,7 @@ trap 'echo -e "\n[FATAL] Failed at line $LINENO (exit $?)"; exit 1' ERR
 KUBEVIRT_VERSION="${KUBEVIRT_VERSION:-v1.4.0}"
 CDI_VERSION="${CDI_VERSION:-v1.60.3}"
 DRY_RUN="${DRY_RUN:-false}"
-DEMO_NAME="${DEMO_NAME:-hyper2kvm-demo}"
+DEMO_NAME="${DEMO_NAME:-h2kvm-demo}"
 START_TIME=$(date +%s)
 
 # ── Helpers ──
@@ -42,7 +42,7 @@ dim()   { echo "    $*"; }
 elapsed() { echo "$(($(date +%s) - START_TIME))s"; }
 
 run() {
-    echo "+ $*" >> /tmp/hyper2kvm-k3s.log 2>/dev/null || true
+    echo "+ $*" >> /tmp/h2kvm-k3s.log 2>/dev/null || true
     if [ "$DRY_RUN" = "false" ]; then
         "$@"
     else
@@ -244,7 +244,7 @@ setup_firewall() {
 
 # ── Run Demo ──
 run_demo() {
-    step "hyper2kvm → KubeVirt Demo"
+    step "h2kvm → KubeVirt Demo"
 
     local demo_image=""
 
@@ -444,7 +444,7 @@ verify() {
 # ── Main ──
 main() {
     echo ""
-    echo "hyper2kvm K3s + KubeVirt Setup"
+    echo "h2kvm K3s + KubeVirt Setup"
     echo ""
 
     [ "$DRY_RUN" = "true" ] && warn "DRY RUN — no changes will be made"

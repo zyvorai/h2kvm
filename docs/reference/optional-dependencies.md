@@ -1,6 +1,6 @@
 # Optional Dependencies
 
-hyper2kvm is designed to work with minimal dependencies, making it suitable for enterprise Linux distributions like RHEL where some Python packages may not be available in official repositories.
+h2kvm is designed to work with minimal dependencies, making it suitable for enterprise Linux distributions like RHEL where some Python packages may not be available in official repositories.
 
 ## Installation Options
 
@@ -9,7 +9,7 @@ hyper2kvm is designed to work with minimal dependencies, making it suitable for 
 For systems where only official repositories are available:
 
 ```bash
-pip install hyper2kvm
+pip install h2kvm
 ```
 
 This installs only core dependencies:
@@ -29,7 +29,7 @@ This installs only core dependencies:
 Install with Rich library for better terminal UI:
 
 ```bash
-pip install hyper2kvm[ui]
+pip install h2kvm[ui]
 ```
 
 **Additional features:**
@@ -42,7 +42,7 @@ pip install hyper2kvm[ui]
 For VMware vSphere/vCenter migrations:
 
 ```bash
-pip install hyper2kvm[vsphere]
+pip install h2kvm[vsphere]
 ```
 
 **Additional features:**
@@ -63,7 +63,7 @@ If you have govc or ovftool installed, you don't need the `[vsphere]` extras!
 For Microsoft Azure VM migrations:
 
 ```bash
-pip install hyper2kvm[azure]
+pip install h2kvm[azure]
 ```
 
 **Additional features:**
@@ -77,14 +77,14 @@ pip install hyper2kvm[azure]
 - **Primary (Recommended):** Use Azure CLI (`az`) tool (install separately, no Python deps needed for auth)
 - **Alternative:** Use Python SDK directly (included in `[azure]` extras)
 
-If you have Azure CLI installed and authenticated (`az login`), hyper2kvm can use those credentials automatically without requiring the `[azure]` extras for authentication!
+If you have Azure CLI installed and authenticated (`az login`), h2kvm can use those credentials automatically without requiring the `[azure]` extras for authentication!
 
 ### With AWS Support
 
 For AWS AMI/EBS extraction:
 
 ```bash
-pip install hyper2kvm  # No extras needed - AMI extraction included in core
+pip install h2kvm  # No extras needed - AMI extraction included in core
 ```
 
 **Features:**
@@ -100,18 +100,18 @@ pip install hyper2kvm  # No extras needed - AMI extraction included in core
 Install all optional dependencies:
 
 ```bash
-pip install hyper2kvm[full]
+pip install h2kvm[full]
 ```
 
 Or combine specific extras:
 
 ```bash
-pip install hyper2kvm[ui,vsphere,azure]
+pip install h2kvm[ui,vsphere,azure]
 ```
 
 ## System Dependencies
 
-hyper2kvm uses **VMCraft** (pure Python) as the default guestfs backend.
+h2kvm uses **VMCraft** (pure Python) as the default guestfs backend.
 
 ### Required
 - `qemu-img` - Disk format conversion (VMDK→QCOW2)
@@ -144,14 +144,14 @@ sudo dnf install -y \
     lvm2 \
     python3-pyyaml
 
-# Install hyper2kvm (minimal - only click from PyPI)
-pip install --user hyper2kvm
+# Install h2kvm (minimal - only click from PyPI)
+pip install --user h2kvm
 
 # Or with UI enhancements (requires rich from PyPI)
-pip install --user hyper2kvm[ui]
+pip install --user h2kvm[ui]
 
 # With vSphere support (requires pyvmomi from PyPI)
-pip install --user hyper2kvm[vsphere]
+pip install --user h2kvm[vsphere]
 ```
 
 ### What's NOT in RHEL 10 Base Repos
@@ -178,7 +178,7 @@ All core migration functionality works with only system packages + click from Py
 
 ## Behavior Without Rich
 
-When Rich library is not available, hyper2kvm automatically falls back to:
+When Rich library is not available, h2kvm automatically falls back to:
 
 ### Progress Indicators
 **With Rich:**
@@ -219,13 +219,13 @@ Loading configs ━━━━━━━━━━━━━━━━━━━━━�
 You can check which optional dependencies are installed:
 
 ```bash
-python3 -c "from hyper2kvm.core.optional_imports import *; print(f'Rich: {RICH_AVAILABLE}, Requests: {REQUESTS_AVAILABLE}, PyVmomi: {PYVMOMI_AVAILABLE}')"
+python3 -c "from h2kvm.core.optional_imports import *; print(f'Rich: {RICH_AVAILABLE}, Requests: {REQUESTS_AVAILABLE}, PyVmomi: {PYVMOMI_AVAILABLE}')"
 ```
 
 Or use the built-in diagnostic:
 
 ```bash
-hyper2kvm --version --verbose
+h2kvm --version --verbose
 ```
 
 ## Feature Matrix
@@ -257,7 +257,7 @@ ImportError: cannot import name 'Progress' from 'rich.progress'
 
 This usually means:
 1. You're using a feature that requires optional dependencies
-2. Install the appropriate extras: `pip install hyper2kvm[ui]`
+2. Install the appropriate extras: `pip install h2kvm[ui]`
 
 ### RHEL/CentOS Compatibility
 
@@ -265,13 +265,13 @@ Rich is not available in RHEL 10 base repositories. Options:
 
 1. **Use minimal installation** (recommended for production):
    ```bash
-   pip install hyper2kvm  # Works without Rich
+   pip install h2kvm  # Works without Rich
    ```
 
 2. **Install Rich from PyPI** (if external packages allowed):
    ```bash
    pip install --user rich
-   pip install --user hyper2kvm
+   pip install --user h2kvm
    ```
 
 3. **Build RPM with vendored dependencies** (for air-gapped systems):
@@ -331,7 +331,7 @@ These are installed separately as binaries, not via pip:
 
 ### vSphere Architecture: Control Plane Options
 
-hyper2kvm supports **three control plane options** for vSphere, in order of preference:
+h2kvm supports **three control plane options** for vSphere, in order of preference:
 
 #### Option 1: govc (PRIMARY - Recommended)
 
@@ -346,7 +346,7 @@ curl -L https://github.com/vmware/govmomi/releases/download/${VERSION}/govc_Linu
 govc version
 
 # No pip install needed for vSphere!
-pip install hyper2kvm  # Just core
+pip install h2kvm  # Just core
 ```
 
 **Advantages:**
@@ -382,7 +382,7 @@ ovftool --version
 # Expected: VMware ovftool 5.0.0 (build-...)
 
 # No pip install needed for vSphere!
-pip install hyper2kvm  # Just core
+pip install h2kvm  # Just core
 ```
 
 **Advantages:**
@@ -397,7 +397,7 @@ pip install hyper2kvm  # Just core
 
 ```bash
 # ONLY if you cannot install govc or ovftool
-pip install hyper2kvm[vsphere]  # Includes pyvmomi
+pip install h2kvm[vsphere]  # Includes pyvmomi
 ```
 
 **When to use:**
@@ -409,7 +409,7 @@ pip install hyper2kvm[vsphere]  # Includes pyvmomi
 
 ### Azure Architecture: Authentication Options
 
-hyper2kvm supports **two authentication options** for Azure, in order of preference:
+h2kvm supports **two authentication options** for Azure, in order of preference:
 
 #### Option 1: Azure CLI (PRIMARY - Recommended)
 
@@ -431,8 +431,8 @@ sudo dnf install -y azure-cli
 # Authenticate
 az login
 
-# Install hyper2kvm minimal (no [azure] extras needed for auth!)
-pip install hyper2kvm
+# Install h2kvm minimal (no [azure] extras needed for auth!)
+pip install h2kvm
 ```
 
 **Advantages:**
@@ -444,7 +444,7 @@ pip install hyper2kvm
 - ✅ Works on RHEL without PyPI packages
 
 **How it works:**
-- hyper2kvm uses `DefaultAzureCredential` which checks for Azure CLI credentials first
+- h2kvm uses `DefaultAzureCredential` which checks for Azure CLI credentials first
 - If `az login` was run, credentials are available at `~/.azure/`
 - You still need `[azure]` extras for Azure SDK (VM operations), but NOT for authentication
 
@@ -452,7 +452,7 @@ pip install hyper2kvm
 
 ```bash
 # ONLY if you cannot install Azure CLI
-pip install hyper2kvm[azure]  # Includes all Azure SDKs
+pip install h2kvm[azure]  # Includes all Azure SDKs
 ```
 
 **When to use:**
@@ -483,7 +483,7 @@ sudo dnf install -y \
     python3-pyyaml
 
 # Minimal pip install (only click)
-pip install --user hyper2kvm
+pip install --user h2kvm
 
 # Works for:
 # ✅ Local VMDK/VHD/QCOW2 conversion
@@ -508,7 +508,7 @@ sudo dnf install -y \
     python3-pyyaml
 
 # With Rich for better UX
-pip install --user hyper2kvm[ui]
+pip install --user h2kvm[ui]
 
 # Adds:
 # ✅ Interactive progress bars
@@ -523,8 +523,8 @@ VERSION=v0.33.0
 curl -L https://github.com/vmware/govmomi/releases/download/${VERSION}/govc_Linux_x86_64.tar.gz | \
   sudo tar -C /usr/local/bin -xvzf - govc
 
-# Install hyper2kvm minimal
-pip install --user hyper2kvm
+# Install h2kvm minimal
+pip install --user h2kvm
 
 # You're done! No [vsphere] extra needed with govc
 ```
@@ -532,7 +532,7 @@ pip install --user hyper2kvm
 **Option 3b: With vSphere (Using pyvmomi - Fallback)**
 ```bash
 # ONLY if govc/ovftool not available
-pip install --user hyper2kvm[vsphere]
+pip install --user h2kvm[vsphere]
 
 # Adds:
 # ✅ Direct vSphere VM export (via pyvmomi)
@@ -549,8 +549,8 @@ sudo dnf install -y azure-cli
 # Authenticate
 az login
 
-# Install hyper2kvm with Azure SDK
-pip install --user hyper2kvm[azure]
+# Install h2kvm with Azure SDK
+pip install --user h2kvm[azure]
 
 # Adds:
 # ✅ Azure VM discovery and export
@@ -563,7 +563,7 @@ pip install --user hyper2kvm[azure]
 **Option 3d: With Azure (Python SDK only - Fallback)**
 ```bash
 # ONLY if Azure CLI not available
-pip install --user hyper2kvm[azure]
+pip install --user h2kvm[azure]
 
 # Configure authentication via environment variables:
 export AZURE_CLIENT_ID="your-client-id"
@@ -574,7 +574,7 @@ export AZURE_TENANT_ID="your-tenant-id"
 **Option 4: Full Featured**
 ```bash
 # Everything including Azure
-pip install --user hyper2kvm[full]
+pip install --user h2kvm[full]
 ```
 
 ### Alternative: Using RPM Build
@@ -583,12 +583,12 @@ For air-gapped or strictly controlled RHEL environments, build an RPM with bundl
 
 ```bash
 # On build system (with internet)
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
-make rpm  # or rpmbuild -ba hyper2kvm.spec
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
+make rpm  # or rpmbuild -ba h2kvm.spec
 
 # Transfer RPM to target system
-sudo dnf install ./hyper2kvm-*.rpm
+sudo dnf install ./h2kvm-*.rpm
 ```
 
 The RPM includes all Python dependencies bundled, requiring only system packages like qemu-img and dracut.
@@ -599,7 +599,7 @@ To see what features are available in your installation:
 
 ```bash
 python3 << 'PYEOF'
-from hyper2kvm.core.optional_imports import (
+from h2kvm.core.optional_imports import (
     RICH_AVAILABLE,
     REQUESTS_AVAILABLE, 
     PYVMOMI_AVAILABLE,
@@ -607,7 +607,7 @@ from hyper2kvm.core.optional_imports import (
 )
 
 print(f"""
-hyper2kvm Feature Availability
+h2kvm Feature Availability
 ==============================
 ✅ Core Migration: Always available
 {'✅' if RICH_AVAILABLE else '❌'} Progress Bars: {RICH_AVAILABLE}

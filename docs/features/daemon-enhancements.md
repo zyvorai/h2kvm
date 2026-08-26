@@ -1,4 +1,4 @@
-# hyper2kvm Daemon Mode - Advanced Features
+# h2kvm Daemon Mode - Advanced Features
 
 This document details the 8 major enhancements to daemon mode for production deployments.
 
@@ -48,7 +48,7 @@ max_concurrent_jobs: 3  # Adjust based on system resources
 h2kvmctl.cli.daemon_ctl stats | grep "Queue Depth"
 
 # Monitor CPU usage
-top -p $(pgrep -f "hyper2kvm.*daemon")
+top -p $(pgrep -f "h2kvm.*daemon")
 ```
 
 ---
@@ -141,16 +141,16 @@ h2kvmctl.cli.daemon_ctl stats
 
 **Method 2: JSON File**
 ```bash
-cat /var/lib/hyper2kvm/output/.daemon/stats.json
+cat /var/lib/h2kvm/output/.daemon/stats.json
 ```
 
 **Method 3: Signal (live daemon)**
 ```bash
 # Send SIGUSR1 to print stats to log
-kill -USR1 $(pgrep -f "hyper2kvm.*daemon")
+kill -USR1 $(pgrep -f "h2kvm.*daemon")
 
 # View in journal
-journalctl -u hyper2kvm -n 50
+journalctl -u h2kvm -n 50
 ```
 
 ### Automatic Reporting
@@ -167,12 +167,12 @@ Stats are automatically:
 import json
 from pathlib import Path
 
-stats = json.load(open('/var/lib/hyper2kvm/output/.daemon/stats.json'))
+stats = json.load(open('/var/lib/h2kvm/output/.daemon/stats.json'))
 
-print(f"hyper2kvm_processed_total {stats['total_processed']}")
-print(f"hyper2kvm_failed_total {stats['total_failed']}")
-print(f"hyper2kvm_success_rate {stats['success_rate_percent']}")
-print(f"hyper2kvm_queue_depth {stats['current_queue_depth']}")
+print(f"h2kvm_processed_total {stats['total_processed']}")
+print(f"h2kvm_failed_total {stats['total_failed']}")
+print(f"h2kvm_success_rate {stats['success_rate_percent']}")
+print(f"h2kvm_queue_depth {stats['current_queue_depth']}")
 ```
 
 ---
@@ -224,7 +224,7 @@ retry_policy:
 h2kvmctl.cli.daemon_ctl stats | grep retried
 
 # Check logs for retry attempts
-journalctl -u hyper2kvm | grep -i retry
+journalctl -u h2kvm | grep -i retry
 ```
 
 ### Retry Behavior
@@ -250,7 +250,7 @@ Unix socket-based control interface for runtime management without restarting.
 {output_dir}/.daemon/control.sock
 ```
 
-Default: `/var/lib/hyper2kvm/output/.daemon/control.sock`
+Default: `/var/lib/h2kvm/output/.daemon/control.sock`
 
 ### Available Commands
 
@@ -319,7 +319,7 @@ h2kvmctl.cli.daemon_ctl stop
 #!/bin/bash
 # Health check script for monitoring systems
 
-SOCKET="/var/lib/hyper2kvm/output/.daemon/control.sock"
+SOCKET="/var/lib/h2kvm/output/.daemon/control.sock"
 
 if [ ! -S "$SOCKET" ]; then
     echo "CRITICAL: Daemon not running"
@@ -364,9 +364,9 @@ notifications:
   email_enabled: false
   email_smtp_host: "smtp.gmail.com"
   email_smtp_port: 587
-  email_from: "hyper2kvm@example.com"
+  email_from: "h2kvm@example.com"
   email_to: "admin@example.com"
-  email_username: "hyper2kvm@example.com"
+  email_username: "h2kvm@example.com"
   email_password: "app-specific-password"
 ```
 
@@ -387,7 +387,7 @@ webhook_url: "https://discord.com/api/webhooks/123/abc"
 **Generic (any HTTP endpoint):**
 ```yaml
 webhook_type: "generic"
-webhook_url: "https://your-monitoring.com/webhooks/hyper2kvm"
+webhook_url: "https://your-monitoring.com/webhooks/h2kvm"
 ```
 
 ### Notification Events
@@ -398,7 +398,7 @@ webhook_url: "https://your-monitoring.com/webhooks/hyper2kvm"
   "event": "conversion_success",
   "filename": "vm1.vmdk",
   "duration_seconds": 125.3,
-  "output_path": "/var/lib/hyper2kvm/output/2026-01-17/vm1",
+  "output_path": "/var/lib/h2kvm/output/2026-01-17/vm1",
   "timestamp": "2026-01-17T10:30:00Z"
 }
 ```
@@ -443,10 +443,10 @@ email_password: "your-app-specific-password"
 
 ```bash
 # Trigger a test failure by copying an invalid file
-echo "corrupt" > /var/lib/hyper2kvm/queue/test.vmdk
+echo "corrupt" > /var/lib/h2kvm/queue/test.vmdk
 
 # Check logs for notification attempt
-journalctl -u hyper2kvm | grep -i "webhook\|email"
+journalctl -u h2kvm | grep -i "webhook\|email"
 ```
 
 ---
@@ -505,7 +505,7 @@ deduplication_use_md5: false
 # Database is automatically cleaned up every 90 days on daemon shutdown
 # Manual cleanup can be done with SQLite:
 
-sqlite3 /var/lib/hyper2kvm/output/.daemon/deduplication.db
+sqlite3 /var/lib/h2kvm/output/.daemon/deduplication.db
 
 # View all processed files
 sqlite> SELECT filename, processed_at, status FROM processed_files ORDER BY processed_at DESC LIMIT 10;
@@ -524,7 +524,7 @@ sqlite> .dbinfo
 from pathlib import Path
 import sqlite3
 
-db_path = Path('/var/lib/hyper2kvm/output/.daemon/deduplication.db')
+db_path = Path('/var/lib/h2kvm/output/.daemon/deduplication.db')
 conn = sqlite3.connect(str(db_path))
 
 cursor = conn.execute("""
@@ -557,7 +557,7 @@ Detailed error information with actionable suggestions for faster troubleshootin
 ```json
 {
   "filename": "failed-vm.vmdk",
-  "filepath": "/var/lib/hyper2kvm/queue/failed-vm.vmdk",
+  "filepath": "/var/lib/h2kvm/queue/failed-vm.vmdk",
   "file_size_mb": 50.5,
   "timestamp": "2026-01-17T11:30:00Z",
   "error": "Disk image corrupted: invalid VMDK descriptor",
@@ -598,19 +598,19 @@ The system provides context-aware suggestions based on the error:
 
 ```bash
 # 1. List failed files
-ls -lh /var/lib/hyper2kvm/queue/.errors/
+ls -lh /var/lib/h2kvm/queue/.errors/
 
 # 2. Read error context
-cat /var/lib/hyper2kvm/queue/.errors/failed-vm.vmdk.error.json | jq '.'
+cat /var/lib/h2kvm/queue/.errors/failed-vm.vmdk.error.json | jq '.'
 
 # 3. Follow suggestion
-cat /var/lib/hyper2kvm/queue/.errors/failed-vm.vmdk.error.json | jq -r '.suggestion'
+cat /var/lib/h2kvm/queue/.errors/failed-vm.vmdk.error.json | jq -r '.suggestion'
 
 # 4. Check system state if needed
-cat /var/lib/hyper2kvm/queue/.errors/failed-vm.vmdk.error.json | jq '.system_info'
+cat /var/lib/h2kvm/queue/.errors/failed-vm.vmdk.error.json | jq '.system_info'
 
 # 5. Review full traceback if needed
-cat /var/lib/hyper2kvm/queue/.errors/failed-vm.vmdk.error.json | jq -r '.exception_traceback'
+cat /var/lib/h2kvm/queue/.errors/failed-vm.vmdk.error.json | jq -r '.exception_traceback'
 ```
 
 ---

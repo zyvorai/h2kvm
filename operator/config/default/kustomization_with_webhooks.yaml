@@ -1,5 +1,5 @@
 # Kustomization for deployment with webhooks enabled
-namespace: hyper2kvm-system
+namespace: h2kvm-system
 
 namePrefix: hyperconversion-
 
@@ -26,7 +26,7 @@ patchesStrategicMerge:
 
 images:
 - name: controller
-  newName: hyper2kvm-operator
+  newName: h2kvm-operator
   newTag: webhook-test
 
 vars:

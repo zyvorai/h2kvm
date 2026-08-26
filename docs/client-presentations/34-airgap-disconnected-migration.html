@@ -47,7 +47,7 @@
 <div class="cover">
   <h1>Air-Gap &amp; <span>Disconnected</span> Migration</h1>
   <h2>VMware to KVM in Secure Environments Without Internet</h2>
-  <p class="sub">Classified networks, SCIF facilities, OT/ICS environments, and air-gapped data centers face unique migration challenges. hyper2kvm provides a fully offline migration workflow with encrypted media transfer, chain-of-custody tracking, and FIPS-validated operations.</p>
+  <p class="sub">Classified networks, SCIF facilities, OT/ICS environments, and air-gapped data centers face unique migration challenges. h2kvm provides a fully offline migration workflow with encrypted media transfer, chain-of-custody tracking, and FIPS-validated operations.</p>
   <div class="badge">SCIF | OT/ICS | FIPS 140-2 | Sneakernet | Offline Repos | Two-Person Integrity</div>
 </div>
 
@@ -89,7 +89,7 @@
         <li>No license activation needed</li>
         <li>No phone-home, no telemetry, no audit surprises</li>
         <li>Offline repos: createrepo from ISO media</li>
-        <li>hyper2kvm migration: Contact for pricing* (Proprietary (Zyvor AI Labs) license)</li>
+        <li>h2kvm migration: Contact for pricing* (Proprietary (Zyvor AI Labs) license)</li>
         <li><strong>Total: $0-$13,000/yr — savings up to $163K/yr</strong></li>
       </ul>
     </div>
@@ -188,7 +188,7 @@ dnf download --resolve --destdir=/mnt/offline-repo/ \
   libguestfs-tools python3-libvirt bridge-utils \
   edk2-ovmf swtpm swtpm-tools
 
-# Download hyper2kvm and its Python dependencies
+# Download h2kvm and its Python dependencies
 pip download -d /mnt/offline-repo/python/ \
   pyyaml lxml requests tqdm paramiko
 
@@ -217,8 +217,8 @@ EOF
 dnf install --disablerepo='*' --enablerepo=offline-kvm \
   qemu-kvm libvirt libvirt-client virt-install
 
-# Install hyper2kvm
-pip install --no-index --find-links=/mnt/transfer-media/repo/python/ hyper2kvm
+# Install h2kvm
+pip install --no-index --find-links=/mnt/transfer-media/repo/python/ h2kvm
 
 # Verify installation
 h2kvmctl doctor --offline</pre>
@@ -230,7 +230,7 @@ h2kvmctl doctor --offline</pre>
     <tr><td><strong>libvirt stack</strong></td><td>12 MB</td><td>15 MB</td><td>~30 packages</td><td>VM management daemon</td></tr>
     <tr><td><strong>VirtIO drivers (Windows)</strong></td><td>580 MB</td><td>580 MB</td><td>ISO image</td><td>virtio-win.iso from Fedora</td></tr>
     <tr><td><strong>EDK2/OVMF (UEFI)</strong></td><td>4 MB</td><td>5 MB</td><td>2 packages</td><td>UEFI firmware for VMs</td></tr>
-    <tr><td><strong>hyper2kvm + Python deps</strong></td><td>8 MB</td><td>8 MB</td><td>~15 packages</td><td>Migration toolkit</td></tr>
+    <tr><td><strong>h2kvm + Python deps</strong></td><td>8 MB</td><td>8 MB</td><td>~15 packages</td><td>Migration toolkit</td></tr>
     <tr><td><strong>swtpm (vTPM)</strong></td><td>2 MB</td><td>2 MB</td><td>~5 packages</td><td>For Windows 11 / BitLocker VMs</td></tr>
     <tr><td><strong>Total offline bundle</strong></td><td colspan="2"><strong>~650 MB</strong></td><td>~100 packages</td><td>Fits on any USB stick</td></tr>
   </table>
@@ -388,10 +388,10 @@ h2kvmctl convert \
 
   <h3>Compliance Framework Mapping</h3>
   <table>
-    <tr><th style="width:15%">Framework</th><th style="width:20%">Requirement</th><th style="width:30%">hyper2kvm Implementation</th><th style="width:35%">Evidence / Artifact</th></tr>
+    <tr><th style="width:15%">Framework</th><th style="width:20%">Requirement</th><th style="width:30%">h2kvm Implementation</th><th style="width:35%">Evidence / Artifact</th></tr>
     <tr><td><strong>FIPS 140-2</strong></td><td>Validated cryptographic modules</td><td>Uses OpenSSL FIPS provider; AES-256-GCM for encryption</td><td>FIPS mode: <code>fips-mode-setup --check</code> returns enabled</td></tr>
     <tr><td><strong>DISA STIG</strong></td><td>Hardened OS configuration</td><td>Runs on STIG-compliant RHEL 9; no additional ports opened</td><td>STIG Viewer checklist export, SCAP scan results</td></tr>
-    <tr><td><strong>NIST 800-53</strong></td><td>Access control, audit logging</td><td>All operations logged to syslog; requires root or libvirt group</td><td>Audit log: /var/log/hyper2kvm/migration.log</td></tr>
+    <tr><td><strong>NIST 800-53</strong></td><td>Access control, audit logging</td><td>All operations logged to syslog; requires root or libvirt group</td><td>Audit log: /var/log/h2kvm/migration.log</td></tr>
     <tr><td><strong>CNSSI 1253</strong></td><td>Classified system controls</td><td>No network egress; all operations local; media encryption</td><td>Network capture shows zero outbound connections</td></tr>
     <tr><td><strong>ICD 503</strong></td><td>IC information systems</td><td>Two-person integrity for media handling; GPG-signed manifests</td><td>Signed manifest + DD Form 1149 chain-of-custody</td></tr>
     <tr><td><strong>HIPAA</strong></td><td>PHI protection during transfer</td><td>Encrypted at rest + in transit; audit trail; access controls</td><td>BAA-compatible; encryption verification in manifest</td></tr>
@@ -546,7 +546,7 @@ h2kvmctl convert \
     <div class="card">
       <h4>3-Year Air-Gapped KVM (50 VMs)</h4>
       <ul>
-        <li>hyper2kvm migration (one-time): included*</li>
+        <li>h2kvm migration (one-time): included*</li>
         <li>Migration labor (80 hours): $12,000</li>
         <li>RHEL subscriptions (optional): $13,000/yr x 3 = $39,000</li>
         <li>OS patches from ISO (quarterly): $0</li>
@@ -558,10 +558,10 @@ h2kvmctl convert \
 
   <div class="verdict">
     <h3>3-Year Savings: $582,555 (59% reduction)</h3>
-    <p>Air-gapped environments benefit most from open-source KVM — no license activation, no phone-home telemetry, no per-VM fees, no annual audit surprises. hyper2kvm's fully offline workflow eliminates the #1 barrier to migration in disconnected environments.</p>
+    <p>Air-gapped environments benefit most from open-source KVM — no license activation, no phone-home telemetry, no per-VM fees, no annual audit surprises. h2kvm's fully offline workflow eliminates the #1 barrier to migration in disconnected environments.</p>
   </div>
 
-  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Secure Migration for Disconnected Environments</div>
+  <div class="footer">h2kvm.io | Proprietary (Zyvor AI Labs) | Secure Migration for Disconnected Environments</div>
 </div>
 
 </body>

@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: Apache-2.0
-# Quick publish script for hyper2kvm
+# Quick publish script for h2kvm
 
 set -euo pipefail
 
@@ -66,11 +66,11 @@ if [[ "$MODE" == "test" ]]; then
     echo "Test installation:"
     echo "  python3 -m venv /tmp/test-env"
     echo "  source /tmp/test-env/bin/activate"
-    echo "  pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ hyper2kvm"
+    echo "  pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ h2kvm"
     echo "  h2kvmctl --version"
     echo "  deactivate"
     echo ""
-    echo "View on TestPyPI: https://test.pypi.org/project/hyper2kvm/"
+    echo "View on TestPyPI: https://test.pypi.org/project/h2kvm/"
 
 else
     print_step "Uploading to production PyPI..."
@@ -110,12 +110,12 @@ else
     print_step "Package published to PyPI!"
     echo ""
     echo "Installation:"
-    echo "  pip install hyper2kvm"
+    echo "  pip install h2kvm"
     echo ""
-    echo "View on PyPI: https://pypi.org/project/hyper2kvm/"
+    echo "View on PyPI: https://pypi.org/project/h2kvm/"
     echo ""
     echo "Next steps:"
-    echo "  1. Create GitHub release: https://github.com/ssahani/hyper2kvm/releases/new"
+    echo "  1. Create GitHub release: https://github.com/ssahani/h2kvm/releases/new"
     echo "  2. Announce the release"
     echo "  3. Update documentation"
 fi

@@ -62,12 +62,12 @@ def update_file(file_path: Path):
         return False
 
     # Add SystemdError import if not present
-    if "from hyper2kvm.core.exceptions import SystemdError" not in content:
+    if "from h2kvm.core.exceptions import SystemdError" not in content:
         # Find the imports section and add SystemdError
         if "from __future__ import annotations" in content:
             content = content.replace(
                 "from __future__ import annotations\n",
-                "from __future__ import annotations\n\nfrom hyper2kvm.core.exceptions import SystemdError\n",
+                "from __future__ import annotations\n\nfrom h2kvm.core.exceptions import SystemdError\n",
                 1,
             )
         else:
@@ -87,7 +87,7 @@ def update_file(file_path: Path):
 
             if insert_idx > 0:
                 lines.insert(insert_idx, "")
-                lines.insert(insert_idx + 1, "from hyper2kvm.core.exceptions import SystemdError")
+                lines.insert(insert_idx + 1, "from h2kvm.core.exceptions import SystemdError")
                 content = "\n".join(lines)
 
     # Extract binary name for helpful error message
@@ -123,7 +123,7 @@ def update_file(file_path: Path):
 
 def main():
     """Update all systemd wrapper files."""
-    systemd_dir = Path(__file__).parent.parent / "hyper2kvm" / "systemd"
+    systemd_dir = Path(__file__).parent.parent / "h2kvm" / "systemd"
 
     if not systemd_dir.exists():
         print(f"Error: {systemd_dir} not found")

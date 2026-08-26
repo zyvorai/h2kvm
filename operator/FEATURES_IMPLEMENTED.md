@@ -350,7 +350,7 @@ helm install hyperconversion ./charts/hyperconversion-operator \
 ### Access Metrics
 ```bash
 # Port-forward to metrics endpoint
-kubectl port-forward -n hyper2kvm-system deployment/hyperconversion-operator 8443:8443
+kubectl port-forward -n h2kvm-system deployment/hyperconversion-operator 8443:8443
 
 # Query metrics
 curl -k https://localhost:8443/metrics | grep hyperconversion_

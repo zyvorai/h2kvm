@@ -31,7 +31,7 @@ from pathlib import Path
 # Add parent directory to path for development
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from hyper2kvm.providers.vmware.transports import (
+from h2kvm.providers.vmware.transports import (
     HYPERCTL_AVAILABLE,
     create_hyperctl_runner,
     export_vm_hyperctl,

@@ -7,7 +7,7 @@ This project uses a baseline-driven architecture test to enforce layering increm
 - Test file: `tests/unit/test_architecture/test_layering.py`
 - Baseline file: `tests/unit/test_architecture/layering_baseline.json`
 
-The test computes internal imports for `hyper2kvm/` and enforces these rules:
+The test computes internal imports for `h2kvm/` and enforces these rules:
 
 1. Non-interface modules must not import interface modules.
 2. Domain modules must not import application modules.

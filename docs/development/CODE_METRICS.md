@@ -1,12 +1,12 @@
 # Code Quality Metrics Report
 
 **Generated**: 2026-02-16  
-**Repository**: hyper2kvm  
+**Repository**: h2kvm  
 **Analysis Date**: Post-refactoring phase
 
 ## Executive Summary
 
-This document tracks code quality metrics for the hyper2kvm project following a comprehensive refactoring effort that focused on:
+This document tracks code quality metrics for the h2kvm project following a comprehensive refactoring effort that focused on:
 - Package structure reorganization (29→15 directories)
 - Function parameter reduction (config-based APIs)
 - Nesting depth reduction (14→3 levels max)
@@ -28,7 +28,7 @@ This document tracks code quality metrics for the hyper2kvm project following a 
 ### Directory Organization
 
 ```
-hyper2kvm/
+h2kvm/
 ├── core/              # Foundation (utilities, logging, validation)
 ├── vmcraft/           # VM analysis/modification API
 │   ├── block_device.py   # Loop device + smart NBD fallback manager
@@ -227,35 +227,35 @@ hyper2kvm/
 
 **Recently Added** (2026-02-17 to 2026-02-18 - LUKS + Pipeline + CLI + NBD/LVM Enhancements):
 - ✅ **NBD/LVM Core Enhancements**: Complete GuestKit feature parity (57 tests, 100% passing)
-  - hyper2kvm/vmcraft/block_device.py: Loop device fallback for RAW/IMG/ISO (358 lines)
-  - hyper2kvm/vmcraft/storage.py: LVM isolation, device filters, settlement timing (+139 lines)
+  - h2kvm/vmcraft/block_device.py: Loop device fallback for RAW/IMG/ISO (358 lines)
+  - h2kvm/vmcraft/storage.py: LVM isolation, device filters, settlement timing (+139 lines)
   - tests/unit/test_vmcraft/test_block_device.py: 29 comprehensive tests
   - tests/unit/test_vmcraft/test_storage_lvm_isolation.py: 8 isolation tests
   - tests/unit/test_vmcraft/test_storage_lvm_filters.py: 10 filter tests
   - tests/unit/test_vmcraft/test_storage_device_settlement.py: 10 settlement tests
   - Features: Loop/NBD smart fallback, isolated LVM metadata, regex-based filters, enhanced timing
   - Impact: 50% reduction in qemu-nbd dependency, safe concurrent operations, race condition prevention
-- ✅ **New encryption CLI**: hyper2kvm-encrypt command (9 tests, 100% passing)
-  - hyper2kvm/pipeline/cli.py: User-friendly CLI for conversion pipeline
+- ✅ **New encryption CLI**: h2kvm-encrypt command (9 tests, 100% passing)
+  - h2kvm/pipeline/cli.py: User-friendly CLI for conversion pipeline
   - Commands: convert (execute pipeline), info (show requirements)
-  - bin/hyper2kvm-encrypt: Executable wrapper
+  - bin/h2kvm-encrypt: Executable wrapper
   - tests/unit/test_pipeline/test_cli.py: 9 comprehensive CLI tests
   - pyproject.toml: Added [encryption] optional dependencies + script entries
   - Full help documentation, example usage, error handling
 - ✅ **New pipeline module**: Automated VMware→LUKS+TPM conversion (28 tests, 100% passing)
-  - hyper2kvm/pipeline/vmware_to_luks_tpm.py: Complete 9-step conversion pipeline
+  - h2kvm/pipeline/vmware_to_luks_tpm.py: Complete 9-step conversion pipeline
   - Components: DiskConverter, NBDAttach, RootDetector, LUKSEncryptor, FilesystemMigrator
   - Components: CrypttabUpdater, TPMEnroll, InitramfsBuilder, GrubUpdater
   - tests/unit/test_pipeline/test_vmware_to_luks.py: 28 comprehensive unit tests
-  - contrib/systemd/hyper2kvm-tpm-enroll.service: First-boot TPM enrollment
+  - contrib/systemd/h2kvm-tpm-enroll.service: First-boot TPM enrollment
   - Full automation: VMDK → encrypted RAW with TPM auto-unlock
 - ✅ **New LUKS module**: Complete auto-unlock system (43 tests, 100% passing)
-  - hyper2kvm/luks/unlocker.py: Core unlock logic with TPM2, Vault, keyfile sources
-  - hyper2kvm/luks/tpm.py: TPM2 sealing/unsealing operations
-  - hyper2kvm/luks/cli.py: CLI interface (unlock, list, status, seal commands)
+  - h2kvm/luks/unlocker.py: Core unlock logic with TPM2, Vault, keyfile sources
+  - h2kvm/luks/tpm.py: TPM2 sealing/unsealing operations
+  - h2kvm/luks/cli.py: CLI interface (unlock, list, status, seal commands)
   - tests/unit/test_luks/test_unlocker.py: 28 unit tests for all unlock sources
   - tests/unit/test_luks/test_tpm.py: 15 unit tests for TPM operations
-  - bin/hyper2kvm-luks: CLI executable
+  - bin/h2kvm-luks: CLI executable
   - contrib/: Docker image, Kubernetes DaemonSet, installation script, examples
 - ✅ **Test coverage**: 137/137 tests passing (100%) across all modules (LUKS 43 + pipeline 28 + CLI 9 + NBD/LVM 57)
 - ✅ **Production-ready**: Full documentation, deployment tools, example configs, CLI interfaces
@@ -456,23 +456,23 @@ No high-complexity functions (CC >15) remain! All critical refactoring targets c
 ```bash
 # Cyclomatic complexity
 pip install radon
-radon cc hyper2kvm -a -nb
+radon cc h2kvm -a -nb
 
 # Code quality
 pip install pylint
-pylint hyper2kvm
+pylint h2kvm
 
 # Security scanning
 pip install bandit
-bandit -r hyper2kvm
+bandit -r h2kvm
 
 # Dead code detection
 pip install vulture
-vulture hyper2kvm
+vulture h2kvm
 
 # Test coverage
 pip install pytest-cov
-pytest --cov=hyper2kvm --cov-report=html
+pytest --cov=h2kvm --cov-report=html
 ```
 
 ## Go Operator Development
@@ -530,8 +530,8 @@ pytest --cov=hyper2kvm --cov-report=html
 - `cmd/h2kctl/commands/*.go` - 1,200+ lines (CLI tool)
 
 **Container Images**:
-- Operator: ghcr.io/ssahani/hyper2kvm-operator:v1.2.0
-- Bundle: ghcr.io/ssahani/hyper2kvm-operator-bundle:v1.2.0
+- Operator: ghcr.io/ssahani/h2kvm-operator:v1.2.0
+- Bundle: ghcr.io/ssahani/h2kvm-operator-bundle:v1.2.0
 - Size: ~50MB (operator), ~2MB (bundle)
 - Architectures: amd64, arm64, s390x, ppc64le
 
@@ -637,14 +637,14 @@ pytest --cov=hyper2kvm --cov-report=html
 - ✅ Feature parity with GuestKit (Rust reference implementation)
 
 **Files Created** (5 total):
-1. `hyper2kvm/vmcraft/block_device.py` - Loop device + smart manager (358 lines)
+1. `h2kvm/vmcraft/block_device.py` - Loop device + smart manager (358 lines)
 2. `tests/unit/test_vmcraft/test_block_device.py` - Loop/NBD tests (455 lines)
 3. `tests/unit/test_vmcraft/test_storage_lvm_isolation.py` - Isolation tests (310 lines)
 4. `tests/unit/test_vmcraft/test_storage_lvm_filters.py` - Filter tests (279 lines)
 5. `tests/unit/test_vmcraft/test_storage_device_settlement.py` - Settlement tests (335 lines)
 
 **Files Modified** (1 total):
-1. `hyper2kvm/vmcraft/storage.py` - Added 3 helper methods (+139 lines):
+1. `h2kvm/vmcraft/storage.py` - Added 3 helper methods (+139 lines):
    - `_create_isolated_lvm_env()` - Creates isolated LVM metadata directory
    - `_get_lvm_device_filter()` - Generates regex-based device filter config
    - `_settle_devices()` - Enhanced device settlement with dmsetup + udevadm + sleep
@@ -685,7 +685,7 @@ pytest --cov=hyper2kvm --cov-report=html
 
 **Use Case Example**:
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 # Automatically uses loop device for RAW (P0)
 # Isolated LVM metadata (P1)
@@ -707,7 +707,7 @@ Before:
 After:
   - RAW/IMG/ISO → loop device (50% of cases)
   - QCOW2/VMDK → NBD device
-  - Isolated /tmp/hyper2kvm-lvm-{pid}/ cache
+  - Isolated /tmp/h2kvm-lvm-{pid}/ cache
   - Explicit regex --config filtering
   - Robust _settle_devices() timing
 ```
@@ -744,7 +744,7 @@ After:
    - **Benefit**: Better error categorization and handling
 
 3. **test_critical_features.py** - BitLocker test fixes (4 tests):
-   - Added `@patch("hyper2kvm.fixers.windows.bitlocker.hivex")` decorator
+   - Added `@patch("h2kvm.fixers.windows.bitlocker.hivex")` decorator
    - Mock `Hivex._o` attribute to prevent AttributeError in `__del__`
    - Fixed assertions to use `user_message(include_context=True)`
    - Updated assertion: `"migrate"` → `"migration"` (actual word in error text)
@@ -756,14 +756,14 @@ After:
    - **Root cause**: urllib HTTPError objects contain file-like objects that must be closed
 
 5. **test_vmcraft_partition_mgmt.py** - Integration→Unit conversion (15 tests):
-   - Fixed mock patch path: `hyper2kvm.vmcraft.api.partition_mixin.run_sudo`
+   - Fixed mock patch path: `h2kvm.vmcraft.api.partition_mixin.run_sudo`
    - Removed `@pytest.mark.integration` markers (now true unit tests)
    - Added proper mock return values: `Mock(returncode=0, stdout="", stderr="")`
    - **Tests**: part_init (3), part_add (2), part_del (1), part_disk (2), part_set_name (1), part_set_gpt_type (1), part_get_parttype (4), workflows (2)
    - **Impact**: Can now run without /dev/nbd0 block device
 
 6. **test_vmcraft_enhanced_chroot.py** - Integration→Unit conversion (8 tests):
-   - Fixed mock patch path: `hyper2kvm.vmcraft.api.storage_mixin.run_sudo`
+   - Fixed mock patch path: `h2kvm.vmcraft.api.storage_mixin.run_sudo`
    - Removed `@pytest.mark.integration` markers
    - **Tests**: command_with_mounts operations (bind mounts, cleanup, error handling)
    - **Impact**: Can now run without mount capabilities
@@ -819,8 +819,8 @@ Final:          1962 passed,  0 failed, 42 skipped (100% pass rate) ✅
 **Test Fixes** (1 commit, 30 lines):
 4. **test_vmcraft_blkid.py & test_vmcraft_caching.py** - Corrected mock paths:
    - Issue: run_sudo imported into file_ops_mixin creates local reference
-   - Changed: `@patch('hyper2kvm.vmcraft.main.run_sudo')`
-   - To: `@patch('hyper2kvm.vmcraft.api.file_ops_mixin.run_sudo')`
+   - Changed: `@patch('h2kvm.vmcraft.main.run_sudo')`
+   - To: `@patch('h2kvm.vmcraft.api.file_ops_mixin.run_sudo')`
    - Reason: Must mock at the import location, not the original definition
    - Impact: +12 passing tests
    - All 8 blkid tests now passing ✅
@@ -908,14 +908,14 @@ Final:          1962 passed,  0 failed, 42 skipped (100% pass rate) ✅
 **Files Fixed** (2 test files):
 1. `tests/unit/test_libvirt/test_libvirt_manager.py`:
    - Removed non-existent `LibvirtManagerError` from imports
-   - Changed from: `from hyper2kvm.libvirt import LIBVIRT_AVAILABLE, LibvirtManager, LibvirtManagerError`
-   - Changed to: `from hyper2kvm.libvirt import LIBVIRT_AVAILABLE, LibvirtManager`
+   - Changed from: `from h2kvm.libvirt import LIBVIRT_AVAILABLE, LibvirtManager, LibvirtManagerError`
+   - Changed to: `from h2kvm.libvirt import LIBVIRT_AVAILABLE, LibvirtManager`
    - Test `test_manager_unavailable` now skips properly when libvirt IS available
 
 2. `tests/unit/test_libvirt/test_pool_manager.py`:
    - Removed non-existent `PoolManagerError` from imports
-   - Changed from: `from hyper2kvm.libvirt import LIBVIRT_AVAILABLE, PoolManager, PoolManagerError`
-   - Changed to: `from hyper2kvm.libvirt import LIBVIRT_AVAILABLE, PoolManager`
+   - Changed from: `from h2kvm.libvirt import LIBVIRT_AVAILABLE, PoolManager, PoolManagerError`
+   - Changed to: `from h2kvm.libvirt import LIBVIRT_AVAILABLE, PoolManager`
    - Test `test_manager_unavailable` now skips properly
 
 **Test Results** (before → after):
@@ -979,7 +979,7 @@ Final:          1962 passed,  0 failed, 42 skipped (100% pass rate) ✅
 
 **Exception System Modernization**: Fixed all manifest/checkpoint exception raises to use dataclass format
 
-**Problem**: Hyper2KvmError and subclasses are dataclasses requiring keyword arguments, but many raises used positional strings
+**Problem**: H2KvmError and subclasses are dataclasses requiring keyword arguments, but many raises used positional strings
 - `raise CheckpointError("message")` ❌ → Creates exception with msg="error"
 - `raise CheckpointError(msg="message")` ✅ → Creates exception with correct message
 

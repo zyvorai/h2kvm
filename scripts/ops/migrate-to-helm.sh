@@ -9,15 +9,15 @@
 #   ./migrate-to-helm.sh [namespace]
 #
 # Example:
-#   ./migrate-to-helm.sh hyper2kvm-workers
+#   ./migrate-to-helm.sh h2kvm-workers
 #
 
 set -euo pipefail
 
-NAMESPACE="${1:-hyper2kvm-workers}"
+NAMESPACE="${1:-h2kvm-workers}"
 BACKUP_DIR="./migration-backup-$(date +%Y%m%d-%H%M%S)"
 
-echo "=== Hyper2KVM Migration to Helm ==="
+echo "=== H2KVM Migration to Helm ==="
 echo "Namespace: $NAMESPACE"
 echo "Backup directory: $BACKUP_DIR"
 echo ""
@@ -30,8 +30,8 @@ fi
 
 # Check for existing resources
 echo "Checking existing resources..."
-EXISTING_DAEMONSET=$(kubectl get daemonset -n "$NAMESPACE" -l app=hyper2kvm-worker -o name 2>/dev/null || echo "")
-EXISTING_CONFIGMAP=$(kubectl get configmap -n "$NAMESPACE" -l app=hyper2kvm-worker -o name 2>/dev/null || echo "")
+EXISTING_DAEMONSET=$(kubectl get daemonset -n "$NAMESPACE" -l app=h2kvm-worker -o name 2>/dev/null || echo "")
+EXISTING_CONFIGMAP=$(kubectl get configmap -n "$NAMESPACE" -l app=h2kvm-worker -o name 2>/dev/null || echo "")
 EXISTING_PVCS=$(kubectl get pvc -n "$NAMESPACE" -o name 2>/dev/null || echo "")
 
 if [ -z "$EXISTING_DAEMONSET" ]; then
@@ -90,7 +90,7 @@ cat > "$BACKUP_DIR/helm-values.yaml" <<EOF
 
 worker:
   image:
-    repository: ${IMAGE_REPO:-hyper2kvm}
+    repository: ${IMAGE_REPO:-h2kvm}
     tag: ${IMAGE_TAG:-worker}
 
   resources:
@@ -142,7 +142,7 @@ fi
 # Step 5: Delete existing DaemonSet (but preserve PVCs)
 echo ""
 echo "Step 5: Removing existing DaemonSet..."
-kubectl delete daemonset -n "$NAMESPACE" -l app=hyper2kvm-worker --cascade=orphan
+kubectl delete daemonset -n "$NAMESPACE" -l app=h2kvm-worker --cascade=orphan
 
 echo "DaemonSet deleted (pods orphaned, will be replaced by Helm)"
 
@@ -154,13 +154,13 @@ echo ""
 echo "Step 6: Installing Helm chart..."
 echo ""
 echo "Running Helm install command..."
-echo "helm install hyper2kvm-worker ./helm/hyper2kvm-worker \\"
+echo "helm install h2kvm-worker ./helm/h2kvm-worker \\"
 echo "  --namespace $NAMESPACE \\"
 echo "  --values $BACKUP_DIR/helm-values.yaml \\"
 echo "  --wait"
 echo ""
 
-helm install hyper2kvm-worker ./helm/hyper2kvm-worker \
+helm install h2kvm-worker ./helm/h2kvm-worker \
   --namespace "$NAMESPACE" \
   --values "$BACKUP_DIR/helm-values.yaml" \
   --wait
@@ -170,7 +170,7 @@ echo ""
 echo "Step 7: Verifying deployment..."
 echo ""
 
-kubectl get pods -n "$NAMESPACE" -l app=hyper2kvm-worker
+kubectl get pods -n "$NAMESPACE" -l app=h2kvm-worker
 
 echo ""
 helm list -n "$NAMESPACE"
@@ -182,15 +182,15 @@ echo "Backup preserved at: $BACKUP_DIR"
 echo ""
 echo "Next steps:"
 echo "  1. Verify pods are running:"
-echo "     kubectl get pods -n $NAMESPACE -l app=hyper2kvm-worker"
+echo "     kubectl get pods -n $NAMESPACE -l app=h2kvm-worker"
 echo ""
 echo "  2. Check logs:"
-echo "     kubectl logs -n $NAMESPACE -l app=hyper2kvm-worker --tail=50"
+echo "     kubectl logs -n $NAMESPACE -l app=h2kvm-worker --tail=50"
 echo ""
 echo "  3. Restore worker state if needed:"
 echo "     ./scripts/ops/restore-worker-state.sh $BACKUP_DIR/worker-state-*.tar.gz"
 echo ""
 echo "  4. Manage with Helm:"
-echo "     helm upgrade hyper2kvm-worker ./helm/hyper2kvm-worker \\"
+echo "     helm upgrade h2kvm-worker ./helm/h2kvm-worker \\"
 echo "       --namespace $NAMESPACE \\"
 echo "       --values $BACKUP_DIR/helm-values.yaml"

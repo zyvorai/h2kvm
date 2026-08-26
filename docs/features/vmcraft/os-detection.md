@@ -126,7 +126,7 @@ VMCraft now detects all Windows versions from NT 4.0 to Windows 12, including al
 
 VMCraft has been refactored into a modular directory structure:
 
-**Directory:** `hyper2kvm/vmcraft/`
+**Directory:** `h2kvm/vmcraft/`
 
 **Key Modules:**
 - `inspection.py` - `OSInspector` class - Main OS detection orchestrator
@@ -193,7 +193,7 @@ VMCraft has been refactored into a modular directory structure:
 ## API Usage
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 # Create VMCraft instance
 g = VMCraft(python_return_dict=True)
@@ -224,18 +224,18 @@ g.close()
 ### Existing Code Used as Reference
 
 1. **Windows Detection:**
-   - `hyper2kvm/fixers/windows/virtio/detection.py`
+   - `h2kvm/fixers/windows/virtio/detection.py`
      - `_detect_windows_release()` - Windows version mapping logic
      - `_windows_version_info()` - Registry parsing
      - Build number ranges and version detection
 
 2. **Linux Detection:**
-   - `hyper2kvm/core/guest_identity.py`
+   - `h2kvm/core/guest_identity.py`
      - `collect_linux_identity()` - OS-release parsing
      - `parse_os_release()` - Key-value parsing
 
 3. **Guest Inspection:**
-   - `hyper2kvm/core/guest_inspector.py`
+   - `h2kvm/core/guest_inspector.py`
      - Comprehensive guest inspection patterns
      - Filesystem detection methods
 
@@ -244,7 +244,7 @@ g.close()
 VMCraft has been refactored into a modular directory structure:
 
 ```
-hyper2kvm/vmcraft/
+h2kvm/vmcraft/
 ├── __init__.py              # Public API exports
 ├── main.py                  # Main VMCraft class (orchestrator)
 ├── _utils.py                # Shared utilities
@@ -280,7 +280,7 @@ hyper2kvm/vmcraft/
 ```bash
 # Test with a Linux VM
 sudo python3 -c "
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 g = VMCraft()
 g.add_drive_opts('/path/to/linux.vmdk', readonly=1, format='vmdk')
 g.launch()
@@ -294,7 +294,7 @@ g.shutdown()
 
 # Test with a Windows VM
 sudo python3 -c "
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 g = VMCraft()
 g.add_drive_opts('/path/to/windows.vmdk', readonly=1, format='vmdk')
 g.launch()

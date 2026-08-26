@@ -2,7 +2,7 @@
 #   h2kvmctl --config stabilizeall-esx8-rhel10.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config stabilizeall-esx8-rhel10.yaml
+#   h2kvm --config stabilizeall-esx8-rhel10.yaml
 
 command: vsphere
 vcenter: 192.168.73.42

@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "hyper2kvm"
+name = "h2kvm"
 version = "2.2.6"
 description = "Production-Grade Hypervisor to KVM/QEMU Migration Toolkit"
 readme = "README.md"
@@ -162,34 +162,34 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ssahani/hyper2kvm"
-Documentation = "https://github.com/ssahani/hyper2kvm/tree/main/docs"
-Repository = "https://github.com/ssahani/hyper2kvm"
-"Bug Tracker" = "https://github.com/ssahani/hyper2kvm/issues"
-Changelog = "https://github.com/ssahani/hyper2kvm/releases"
+Homepage = "https://github.com/ssahani/h2kvm"
+Documentation = "https://github.com/ssahani/h2kvm/tree/main/docs"
+Repository = "https://github.com/ssahani/h2kvm"
+"Bug Tracker" = "https://github.com/ssahani/h2kvm/issues"
+Changelog = "https://github.com/ssahani/h2kvm/releases"
 
 [project.scripts]
 # Primary CLI command
-h2kvmctl = "hyper2kvm.__main__:main"
+h2kvmctl = "h2kvm.__main__:main"
 
 # TUI is now a standalone Go binary (zkvm), built from zkvm/ directory.
 # Build with: make build-zkvm
 # Install with: make zkvm-install
 
 # LUKS encryption tools (require [encryption] optional dependencies)
-hyper2kvm-luks = "hyper2kvm.luks.cli:main"
-hyper2kvm-encrypt = "hyper2kvm.pipeline.cli:main"
+h2kvm-luks = "h2kvm.luks.cli:main"
+h2kvm-encrypt = "h2kvm.pipeline.cli:main"
 
 [tool.setuptools]
 include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["hyper2kvm*"]
+include = ["h2kvm*"]
 exclude = ["tests*", "docs*", "examples*"]
 
 [tool.setuptools.package-data]
-hyper2kvm = ["*.yaml", "*.json", "*.conf", "fixers/windows/bin/*.exe"]
+h2kvm = ["*.yaml", "*.json", "*.conf", "fixers/windows/bin/*.exe"]
 
 [tool.black]
 line-length = 120
@@ -200,7 +200,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "--verbose --cov=hyper2kvm --cov-report=html --cov-report=term"
+addopts = "--verbose --cov=h2kvm --cov-report=html --cov-report=term"
 
 [tool.mypy]
 python_version = "3.10"
@@ -223,32 +223,32 @@ dependencies = [
 ]
 
 [tool.hatch.envs.default.scripts]
-pylint = "pylint hyper2kvm/"
+pylint = "pylint h2kvm/"
 # Testing
 test = "pytest tests/unit/ -v --tb=short"
 test-unit = "pytest tests/unit/ -v"
 test-integration = "pytest tests/integration/ -v --tb=short"
 test-all = "pytest tests/ -v"
-test-cov = "pytest tests/unit/ --cov=hyper2kvm --cov-report=html --cov-report=term-missing"
-test-cov-all = "pytest tests/ --cov=hyper2kvm --cov-report=html --cov-report=term-missing"
+test-cov = "pytest tests/unit/ --cov=h2kvm --cov-report=html --cov-report=term-missing"
+test-cov-all = "pytest tests/ --cov=h2kvm --cov-report=html --cov-report=term-missing"
 
 # Code quality
 lint = [
-    "ruff check hyper2kvm/",
-    "mypy hyper2kvm/ --ignore-missing-imports",
+    "ruff check h2kvm/",
+    "mypy h2kvm/ --ignore-missing-imports",
 ]
 fmt = [
-    "ruff format hyper2kvm/",
-    "ruff check --fix hyper2kvm/",
+    "ruff format h2kvm/",
+    "ruff check --fix h2kvm/",
 ]
-fmt-check = "ruff format --check hyper2kvm/"
+fmt-check = "ruff format --check h2kvm/"
 
 # Security
 security = [
-    "bandit -r hyper2kvm/ -ll",
+    "bandit -r h2kvm/ -ll",
     "safety check --json",
 ]
-security-audit = "bandit -r hyper2kvm/ -ll -f json -o security-report.json"
+security-audit = "bandit -r h2kvm/ -ll -f json -o security-report.json"
 
 # All checks (CI pipeline)
 check = [
@@ -292,7 +292,7 @@ python = ["3.10", "3.11", "3.12"]
 
 [tool.hatch.envs.test.scripts]
 run = "pytest tests/unit/ -v --tb=short"
-cov = "pytest tests/unit/ --cov=hyper2kvm --cov-report=term-missing"
+cov = "pytest tests/unit/ --cov=h2kvm --cov-report=term-missing"
 
 # Ruff configuration
 [tool.ruff]
@@ -322,7 +322,7 @@ indent-style = "space"
 # Semantic Release configuration
 [tool.semantic_release]
 version_variables = [
-    "hyper2kvm/__init__.py:__version__",
+    "h2kvm/__init__.py:__version__",
     "pyproject.toml:version",
 ]
 version_toml = ["pyproject.toml:project.version"]

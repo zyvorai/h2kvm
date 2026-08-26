@@ -7,7 +7,7 @@
 
 ## 🎯 Overview
 
-Production-grade worker job protocol for hyper2kvm disk operations requiring privileged access.
+Production-grade worker job protocol for h2kvm disk operations requiring privileged access.
 
 ### Architecture Pattern
 
@@ -31,7 +31,7 @@ Production-grade worker job protocol for hyper2kvm disk operations requiring pri
 
 ### 1. JSON Schemas (Pydantic Models)
 
-**File:** `hyper2kvm/worker/schemas.py` (400+ lines)
+**File:** `h2kvm/worker/schemas.py` (400+ lines)
 
 Comprehensive type-safe schemas for:
 - `JobSpec` - Complete job specification
@@ -49,7 +49,7 @@ Comprehensive type-safe schemas for:
 
 **Example Usage:**
 ```python
-from hyper2kvm.worker import JobSpec, OperationType
+from h2kvm.worker import JobSpec, OperationType
 
 job = JobSpec(
     job_id="uuid-1234",
@@ -67,7 +67,7 @@ job_json = job.model_dump_json(indent=2)
 
 ### 2. Job State Machine
 
-**File:** `hyper2kvm/worker/state_machine.py` (300+ lines)
+**File:** `h2kvm/worker/state_machine.py` (300+ lines)
 
 Complete state lifecycle management:
 
@@ -88,7 +88,7 @@ CREATED → VALIDATED → QUEUED → ASSIGNED → RUNNING
 
 **Example Usage:**
 ```python
-from hyper2kvm.worker import JobStateMachine, JobState
+from h2kvm.worker import JobStateMachine, JobState
 
 sm = JobStateMachine("job-uuid", JobState.CREATED)
 sm.transition(JobState.VALIDATED, "Schema validated")
@@ -102,7 +102,7 @@ if sm.is_terminal():
 
 ### 3. Capability Detection System
 
-**File:** `hyper2kvm/worker/capabilities.py` (300+ lines)
+**File:** `h2kvm/worker/capabilities.py` (300+ lines)
 
 Runtime environment detection:
 
@@ -125,7 +125,7 @@ Runtime environment detection:
 
 **Example Usage:**
 ```python
-from hyper2kvm.worker.capabilities import get_detector
+from h2kvm.worker.capabilities import get_detector
 
 detector = get_detector()
 
@@ -149,7 +149,7 @@ can_run, reason = detector.can_execute_job(requirements)
 
 ### 4. Worker Execution Engine
 
-**File:** `hyper2kvm/worker/engine.py` (400+ lines)
+**File:** `h2kvm/worker/engine.py` (400+ lines)
 
 Complete job execution framework:
 
@@ -173,7 +173,7 @@ Complete job execution framework:
 
 **Example Usage:**
 ```python
-from hyper2kvm.worker import WorkerEngine
+from h2kvm.worker import WorkerEngine
 
 # Create worker engine
 engine = WorkerEngine(
@@ -213,10 +213,10 @@ else:
 
 **CLI Commands:**
 ```bash
-hyper2kvm worker run job.json        # Execute job from file
-hyper2kvm worker submit job.json     # Submit to queue
-hyper2kvm worker status job-uuid     # Check job status
-hyper2kvm worker capabilities        # Show worker capabilities
+h2kvm worker run job.json        # Execute job from file
+h2kvm worker submit job.json     # Submit to queue
+h2kvm worker status job-uuid     # Check job status
+h2kvm worker capabilities        # Show worker capabilities
 ```
 
 **REST API Endpoints:**
@@ -280,8 +280,8 @@ Create a simple job and execute it:
 
 ```python
 #!/usr/bin/env python3
-from hyper2kvm.worker import WorkerEngine, OperationType
-from hyper2kvm.worker.engine import create_sample_job_spec
+from h2kvm.worker import WorkerEngine, OperationType
+from h2kvm.worker.engine import create_sample_job_spec
 
 # Create job specification
 job = create_sample_job_spec(

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>hyper2kvm KubeVirt Migration Demo — VMware Photon OS to K3s</title>
+<title>h2kvm KubeVirt Migration Demo — VMware Photon OS to K3s</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -47,7 +47,7 @@
 
 <!-- COVER -->
 <div class="cover">
-  <h1>hyper2kvm <span>KubeVirt Demo</span></h1>
+  <h1>h2kvm <span>KubeVirt Demo</span></h1>
   <h2>VMware Photon OS VMDK to K3s + KubeVirt &mdash; End-to-End</h2>
   <p class="sub">Live demonstration: VMDK conversion with offline fixes, dual deploy to libvirt domain XML AND KubeVirt VirtualMachine on K3s, PVC upload via CDI, VM running on Kubernetes with VirtIO disk and masquerade networking.</p>
   <div class="badge">Photon OS 5.0 | K3s v1.34 | KubeVirt v1.7.2 | CDI v1.64 | VirtIO | PVC Upload | VM Running</div>
@@ -162,7 +162,7 @@ machine: q35
         <li>PVC: <code>photon-disk</code> (QCOW2 uploaded via CDI)</li>
         <li>Disk bus: VirtIO</li>
         <li>Network: masquerade (pod network)</li>
-        <li>Labels: <code>hyper2kvm.io/migrated: "true"</code></li>
+        <li>Labels: <code>h2kvm.io/migrated: "true"</code></li>
         <li>Ready for: <code>kubectl patch vm ... running:true</code></li>
       </ul>
     </div>
@@ -185,7 +185,7 @@ kind: VirtualMachine
 metadata:
   labels:
     app: photon
-    hyper2kvm.io/migrated: "true"
+    h2kvm.io/migrated: "true"
   name: photon
   namespace: default
 spec:
@@ -316,7 +316,7 @@ persistentvolumeclaim/photon  Bound    pvc-87dcd...   10Gi       local-path
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.3.0 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm &mdash; Enterprise VM Migration Platform | Version 0.3.0 | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

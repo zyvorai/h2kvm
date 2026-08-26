@@ -4,7 +4,7 @@ Troubleshooting guide for Windows VirtIO driver injection during VMware/Hyper-V/
 
 ## How Driver Discovery Works
 
-hyper2kvm uses a multi-step pipeline to find and inject VirtIO drivers:
+h2kvm uses a multi-step pipeline to find and inject VirtIO drivers:
 
 ```
 virtio-win.iso → Extract (cached) → Bucket match → Glob patterns → INF/SYS copy → Registry edit
@@ -16,11 +16,11 @@ The VirtIO driver source is resolved in this order:
 
 1. `--virtio-drivers-dir /path/to/dir` (explicit directory)
 2. `--virtio-drivers-dir /path/to/virtio-win.iso` (ISO file)
-3. Auto-discover at `/var/lib/hyper2kvm/virtio-win.iso` (installed by quickstart.sh)
+3. Auto-discover at `/var/lib/h2kvm/virtio-win.iso` (installed by quickstart.sh)
 
 ### 2. ISO Extraction (Cached)
 
-When an ISO is used, hyper2kvm extracts it **once** and caches at `/var/lib/hyper2kvm/virtio-win-extracted/`:
+When an ISO is used, h2kvm extracts it **once** and caches at `/var/lib/h2kvm/virtio-win-extracted/`:
 
 - **Primary**: `bsdtar` (handles Rock Ridge long names correctly)
 - **Fallback**: `pycdlib` with Rock Ridge name support
@@ -66,7 +66,7 @@ Four driver types are injected by default:
 **Verify fix**: Check that the cached extraction has correct directory names:
 
 ```bash
-ls /var/lib/hyper2kvm/virtio-win-extracted/viostor/
+ls /var/lib/h2kvm/virtio-win-extracted/viostor/
 # Should show: 2k12 2k12R2 2k16 2k19 2k22 2k25 w10 w11 w7 w8 w8.1 xp
 # NOT: w (truncated w11) or w8. (truncated w8.1)
 ```
@@ -74,7 +74,7 @@ ls /var/lib/hyper2kvm/virtio-win-extracted/viostor/
 **If still broken**: Delete the cache and re-run:
 
 ```bash
-sudo rm -rf /var/lib/hyper2kvm/virtio-win-extracted/
+sudo rm -rf /var/lib/h2kvm/virtio-win-extracted/
 sudo h2kvmctl --config your-config.yaml
 ```
 
@@ -150,14 +150,14 @@ sudo h2kvmctl --config config.yaml --virtio-config /path/to/virtio-config.json
 
 ```bash
 # Check cache status
-ls -la /var/lib/hyper2kvm/virtio-win-extracted/.iso_mtime
+ls -la /var/lib/h2kvm/virtio-win-extracted/.iso_mtime
 
 # Force re-extraction
-sudo rm -rf /var/lib/hyper2kvm/virtio-win-extracted/
+sudo rm -rf /var/lib/h2kvm/virtio-win-extracted/
 
 # Check ISO info
-file /var/lib/hyper2kvm/virtio-win.iso
-isoinfo -d -i /var/lib/hyper2kvm/virtio-win.iso | grep -i "rock ridge\|joliet"
+file /var/lib/h2kvm/virtio-win.iso
+isoinfo -d -i /var/lib/h2kvm/virtio-win.iso | grep -i "rock ridge\|joliet"
 ```
 
 ## SATA/e1000 Fallback Mode

@@ -1,6 +1,6 @@
 # Pre/Post Conversion Hooks Examples
 
-This directory contains example configurations and scripts demonstrating hyper2kvm's pre/post conversion hooks feature.
+This directory contains example configurations and scripts demonstrating h2kvm's pre/post conversion hooks feature.
 
 ## Overview
 
@@ -121,7 +121,7 @@ Located in `sample-hooks/`:
 cat > /usr/local/bin/notify-start.sh <<'EOF'
 #!/bin/bash
 echo "Migration starting for $VM_NAME at $(date)"
-logger -t hyper2kvm "Starting migration: $VM_NAME"
+logger -t h2kvm "Starting migration: $VM_NAME"
 EOF
 
 chmod +x /usr/local/bin/notify-start.sh
@@ -189,7 +189,7 @@ cp sample-hooks/migration_validators.py /usr/local/lib/python3/dist-packages/
 
 ```bash
 # Run conversion with hooks enabled
-sudo hyper2kvm --config manifest-with-hooks.json local
+sudo h2kvm --config manifest-with-hooks.json local
 
 # Hooks will execute automatically at each stage
 # Check logs for hook execution details:
@@ -327,12 +327,12 @@ Check:
 
 ### Hook Failing
 
-- Check hyper2kvm logs for detailed error messages
+- Check h2kvm logs for detailed error messages
 - Test script/function independently
 - Use `continue_on_error: true` for non-critical hooks
 
 ## See Also
 
 - Artifact Manifest v1 Specification: `docs/06-Artifact-Manifest-Spec-v1.md`
-- Hook System Implementation: `hyper2kvm/hooks/`
-- Hook Runner Source: `hyper2kvm/hooks/hook_runner.py`
+- Hook System Implementation: `h2kvm/hooks/`
+- Hook Runner Source: `h2kvm/hooks/hook_runner.py`

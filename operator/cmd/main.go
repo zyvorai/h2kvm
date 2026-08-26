@@ -18,9 +18,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
-	hyper2kvmv1 "github.com/hyper2kvm/operator/api/v1"
-	hyper2kvmv1alpha1 "github.com/hyper2kvm/operator/api/v1alpha1"
-	"github.com/hyper2kvm/operator/controllers"
+	h2kvmv1 "github.com/h2kvm/operator/api/v1"
+	h2kvmv1alpha1 "github.com/h2kvm/operator/api/v1alpha1"
+	"github.com/h2kvm/operator/controllers"
 	kubevirtv1 "kubevirt.io/api/core/v1"
 )
 
@@ -31,8 +31,8 @@ var (
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-	utilruntime.Must(hyper2kvmv1.AddToScheme(scheme))
-	utilruntime.Must(hyper2kvmv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(h2kvmv1.AddToScheme(scheme))
+	utilruntime.Must(h2kvmv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(kubevirtv1.AddToScheme(scheme))
 }
 
@@ -61,7 +61,7 @@ func main() {
 		},
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "hyper2kvm.io",
+		LeaderElectionID:       "h2kvm.io",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -92,7 +92,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&hyper2kvmv1alpha1.HyperConversion{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = (&h2kvmv1alpha1.HyperConversion{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "HyperConversion")
 		os.Exit(1)
 	}

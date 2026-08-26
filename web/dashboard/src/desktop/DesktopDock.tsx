@@ -30,7 +30,7 @@ export function DesktopDock({ currentView, onNavigate, onOpenSpotlight }: Props)
   useEffect(() => { setMounted(true); }, []);
 
   const dock = (
-    <footer className="mac-dock flex" role="navigation" aria-label="hyper2kvm dock">
+    <footer className="mac-dock flex" role="navigation" aria-label="h2kvm dock">
       <div className="mac-dock-inner mac-dock-inner-scroll">
         {dockViews.map((view) => {
           const Icon = DOCK_ICONS[view] ?? Home;

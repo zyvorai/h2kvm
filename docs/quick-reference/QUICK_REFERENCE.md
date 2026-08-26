@@ -1,4 +1,4 @@
-# Hyper2KVM Quick Reference Card
+# H2KVM Quick Reference Card
 
 One-page reference for common commands, workflows, and configurations.
 
@@ -8,14 +8,14 @@ One-page reference for common commands, workflows, and configurations.
 
 ```bash
 # Python package
-pip install hyper2kvm
+pip install h2kvm
 
 # From source
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm && pip install -e .
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm && pip install -e .
 
 # Container
-docker pull ghcr.io/ssahani/hyper2kvm:latest
+docker pull ghcr.io/ssahani/h2kvm:latest
 
 # System dependencies + libguestfs (recommended for LVM/LUKS)
 sudo ./scripts/install-deps.sh --all
@@ -29,7 +29,7 @@ sudo ./scripts/install-deps.sh --all
 ### 1. Simple Local Migration (Most Common)
 
 ```bash
-hyper2kvm --config << EOF
+h2kvm --config << EOF
 command: local
 vmdk: /vmware/myvm.vmdk
 output_dir: /kvm/vms
@@ -70,7 +70,7 @@ h2kvmctl tui
 ### 4. Remote vSphere Export
 
 ```bash
-hyper2kvm --config << EOF
+h2kvm --config << EOF
 command: vsphere
 vcenter_host: vcenter.example.com
 vcenter_user: admin@vsphere.local
@@ -161,14 +161,14 @@ luks_passphrase: "password"   # VM prompts at boot after migration
 
 ```bash
 # Submit multiple migrations to daemon
-hyper2kvm daemon start
+h2kvm daemon start
 
 for vmdk in /vmware/*.vmdk; do
-    hyper2kvm daemon submit migration-$(basename $vmdk .vmdk).yaml
+    h2kvm daemon submit migration-$(basename $vmdk .vmdk).yaml
 done
 
 # Monitor progress
-hyper2kvm daemon status
+h2kvm daemon status
 ```
 
 ### Live Fix (Minimal Downtime)
@@ -186,7 +186,7 @@ h2kvmctl fix ssh 192.168.1.100 --user root --key ~/.ssh/id_rsa
 
 ```bash
 # View logs
-journalctl -u hyper2kvm -f
+journalctl -u h2kvm -f
 
 # Check daemon jobs
 h2kvmctl daemon list
@@ -265,7 +265,7 @@ inject_virtio_drivers: true
 windows_version: 2019        # 2012, 2016, 2019, 2022, 10, 11
 # virtio-win ISO auto-detected from:
 #   /usr/share/virtio-win/virtio-win.iso
-#   /var/lib/hyper2kvm/virtio-win.iso
+#   /var/lib/h2kvm/virtio-win.iso
 #   /var/lib/libvirt/images/virtio-win.iso
 ```
 
@@ -344,14 +344,14 @@ memory_limit: 4096            # Limit memory usage (MB)
 ### Quick Deploy with Helm
 
 ```bash
-helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm-charts
-helm install hyper2kvm hyper2kvm/hyper2kvm -n hyper2kvm-system --create-namespace
+helm repo add h2kvm https://ssahani.github.io/h2kvm-charts
+helm install h2kvm h2kvm/h2kvm -n h2kvm-system --create-namespace
 ```
 
 ### Submit Migration Job
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: migrate-web-server
@@ -389,16 +389,16 @@ kubectl logs -f deployment/hyperconversion-operator-controller-manager -n hyperc
 
 ```bash
 # Logging
-export HYPER2KVM_LOG_LEVEL=DEBUG    # DEBUG, INFO, WARNING, ERROR
-export HYPER2KVM_LOG_FILE=/var/log/hyper2kvm.log
+export H2KVM_LOG_LEVEL=DEBUG    # DEBUG, INFO, WARNING, ERROR
+export H2KVM_LOG_FILE=/var/log/h2kvm.log
 
 # Performance
-export HYPER2KVM_WORKERS=4          # Parallel workers
-export HYPER2KVM_CACHE_DIR=/tmp/h2kvm
+export H2KVM_WORKERS=4          # Parallel workers
+export H2KVM_CACHE_DIR=/tmp/h2kvm
 
 # Network
-export HYPER2KVM_TIMEOUT=3600       # Operation timeout
-export HYPER2KVM_RETRY=3            # Retry attempts
+export H2KVM_TIMEOUT=3600       # Operation timeout
+export H2KVM_RETRY=3            # Retry attempts
 ```
 
 ---
@@ -407,26 +407,26 @@ export HYPER2KVM_RETRY=3            # Retry attempts
 
 ```
 # Configuration
-/etc/hyper2kvm/config.yaml          # System config
-/etc/hyper2kvm/daemon.yaml          # Daemon config
-~/.hyper2kvm/config.yaml            # User config
+/etc/h2kvm/config.yaml          # System config
+/etc/h2kvm/daemon.yaml          # Daemon config
+~/.h2kvm/config.yaml            # User config
 
 # Logs
-/var/log/hyper2kvm/                 # System logs
-~/.hyper2kvm/logs/                  # User logs
+/var/log/h2kvm/                 # System logs
+~/.h2kvm/logs/                  # User logs
 
 # Cache
-/var/cache/hyper2kvm/               # System cache
-~/.cache/hyper2kvm/                 # User cache
+/var/cache/h2kvm/               # System cache
+~/.cache/h2kvm/                 # User cache
 
 # Runtime
-/run/hyper2kvm/                     # Runtime directory (created by quickstart/deploy)
-/var/run/hyper2kvm.pid              # Daemon PID
-/var/run/hyper2kvm.sock             # Daemon socket
+/run/h2kvm/                     # Runtime directory (created by quickstart/deploy)
+/var/run/h2kvm.pid              # Daemon PID
+/var/run/h2kvm.sock             # Daemon socket
 
 # VirtIO drivers
 /usr/share/virtio-win/virtio-win.iso       # System virtio-win ISO
-/var/lib/hyper2kvm/virtio-win/             # Pre-extracted virtio-win drivers
+/var/lib/h2kvm/virtio-win/             # Pre-extracted virtio-win drivers
 ```
 
 ---
@@ -491,7 +491,7 @@ timeout: 7200
 ```bash
 cd web && make build && sudo make install
 # → https://localhost:5070 (PAM login, HTTPS by default)
-# TLS: auto-generated self-signed cert at /var/lib/hyper2kvm/tls/
+# TLS: auto-generated self-signed cert at /var/lib/h2kvm/tls/
 # Disable: h2kweb --tls-cert none
 ```
 
@@ -617,9 +617,9 @@ Domain XML video and graphics models are auto-detected at runtime:
 ## Daemon Service
 
 ```bash
-# Systemd unit for hyper2kvm daemon
-sudo systemctl enable --now hyper2kvm
-# Config: /etc/hyper2kvm/daemon.yaml
+# Systemd unit for h2kvm daemon
+sudo systemctl enable --now h2kvm
+# Config: /etc/h2kvm/daemon.yaml
 # Requires: watchdog (core dependency)
 ```
 
@@ -627,7 +627,7 @@ sudo systemctl enable --now hyper2kvm
 
 ## Version Information
 
-**Hyper2KVM**: v0.3.0
+**H2KVM**: v0.3.0
 **API Version**: v1alpha1
 **Kubernetes Operator**: v0.1.0
 **Last Updated**: April 2026
@@ -636,9 +636,9 @@ sudo systemctl enable --now hyper2kvm
 
 ## Support
 
-- **Issues**: https://github.com/ssahani/hyper2kvm/issues
-- **Discussions**: https://github.com/ssahani/hyper2kvm/discussions
-- **Documentation**: https://github.com/ssahani/hyper2kvm/tree/main/docs
+- **Issues**: https://github.com/ssahani/h2kvm/issues
+- **Discussions**: https://github.com/ssahani/h2kvm/discussions
+- **Documentation**: https://github.com/ssahani/h2kvm/tree/main/docs
 
 ---
 

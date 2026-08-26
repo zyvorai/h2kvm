@@ -1,9 +1,9 @@
 # Daemon config: auto-deploy every converted VM to KubeVirt
 #
 # Usage:
-#   1. sudo cp test-confs/daemon-kubevirt-deploy.yaml /etc/hyper2kvm/daemon.yaml
-#   2. sudo systemctl start hyper2kvm.service
-#   3. Drop migration YAMLs into /var/lib/hyper2kvm/daemon/to_be_processed/
+#   1. sudo cp test-confs/daemon-kubevirt-deploy.yaml /etc/h2kvm/daemon.yaml
+#   2. sudo systemctl start h2kvm.service
+#   3. Drop migration YAMLs into /var/lib/h2kvm/daemon/to_be_processed/
 #
 # Prerequisites:
 #   - Kubernetes cluster with KubeVirt installed
@@ -12,8 +12,8 @@
 #
 command: daemon
 manifest_workflow_mode: true
-manifest_workflow_dir: /var/lib/hyper2kvm/daemon
-output_dir: /var/lib/hyper2kvm/output
+manifest_workflow_dir: /var/lib/h2kvm/daemon
+output_dir: /var/lib/h2kvm/output
 
 # Conversion defaults
 out_format: qcow2

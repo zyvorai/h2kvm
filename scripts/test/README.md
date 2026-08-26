@@ -1,6 +1,6 @@
 # Test Scripts
 
-Test and validation scripts for hyper2kvm development.
+Test and validation scripts for h2kvm development.
 
 ## Testing Scripts
 

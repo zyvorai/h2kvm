@@ -949,7 +949,7 @@ sudo dnf install cryptsetup mdadm zfsutils-linux
 ## 🚀 Quick Start
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 # Basic usage
 with VMCraft() as g:
@@ -979,7 +979,7 @@ with VMCraft() as g:
 - [advanced-features.md](./advanced-features.md) - Advanced features (32 methods)
 - [VMCRAFT_TESTING_RESULTS.md](./VMCRAFT_TESTING_RESULTS.md) - Test results
 - [scripts/VMCRAFT_INSPECTOR.md](./scripts/VMCRAFT_INSPECTOR.md) - Inspector CLI tool
-- [hyper2kvm/vmcraft/README.md](./hyper2kvm/vmcraft/README.md) - Module architecture
+- [h2kvm/vmcraft/README.md](./h2kvm/vmcraft/README.md) - Module architecture
 
 ## 🎯 Use Cases
 

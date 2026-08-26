@@ -1,11 +1,11 @@
-# Pod Security Policy for hyper2kvm
+# Pod Security Policy for h2kvm
 # NOTE: PSP is deprecated in Kubernetes 1.25+
 # Consider using Pod Security Admission (PSA) or a policy engine like Kyverno/OPA
 
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: hyper2kvm-privileged
+  name: h2kvm-privileged
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
 spec:

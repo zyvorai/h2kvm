@@ -14,8 +14,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/hyper2kvm/web/internal/domain"
-	"github.com/hyper2kvm/web/internal/ports"
+	"github.com/h2kvm/web/internal/domain"
+	"github.com/h2kvm/web/internal/ports"
 )
 
 // Manager is an in-memory job queue that executes migrations via H2KVMRunner.

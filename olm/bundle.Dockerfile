@@ -4,7 +4,7 @@ FROM scratch
 LABEL operators.operatorframework.io.bundle.mediatype.v1=registry+v1
 LABEL operators.operatorframework.io.bundle.manifests.v1=manifests/
 LABEL operators.operatorframework.io.bundle.metadata.v1=metadata/
-LABEL operators.operatorframework.io.bundle.package.v1=hyper2kvm-operator
+LABEL operators.operatorframework.io.bundle.package.v1=h2kvm-operator
 LABEL operators.operatorframework.io.bundle.channels.v1=stable,preview
 LABEL operators.operatorframework.io.bundle.channel.default.v1=stable
 LABEL operators.operatorframework.io.metrics.builder=operator-sdk-v1.34.0
@@ -18,7 +18,7 @@ LABEL com.redhat.openshift.versions="v4.10-v4.16"
 LABEL operators.operatorframework.io.bundle.disconnected=true
 
 # Container image
-LABEL operators.operatorframework.io.bundle.container-image=ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.0.0
+LABEL operators.operatorframework.io.bundle.container-image=ghcr.io/ssahani/h2kvm-operator-bundle:v2.0.0
 
 # Copy bundle files
 COPY bundle/manifests /manifests/

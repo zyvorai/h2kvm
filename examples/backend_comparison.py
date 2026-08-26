@@ -4,7 +4,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 """
-Hyper2KVM Backend Comparison Example
+H2KVM Backend Comparison Example
 
 Demonstrates the two backend options for offline guest fixes:
 1. VMCraft (default) - Fast pure-Python with native LVM
@@ -25,7 +25,7 @@ logger = logging.getLogger("backend_comparison")
 
 def demo_vmcraft_backend(image_path: Path):
     """Demonstrate VMCraft backend (fast pure-Python)"""
-    from hyper2kvm.fixers.offline_fixer import OfflineFixConfig, OfflineFSFix
+    from h2kvm.fixers.offline_fixer import OfflineFixConfig, OfflineFSFix
 
     logger.info("=" * 70)
     logger.info("BACKEND 1: VMCraft (Pure-Python)")
@@ -52,7 +52,7 @@ def demo_vmcraft_backend(image_path: Path):
 
 def demo_namespace_backend(image_path: Path):
     """Demonstrate Namespace backend (maximum isolation)"""
-    from hyper2kvm.vmcraft.storage import LVMActivator
+    from h2kvm.vmcraft.storage import LVMActivator
 
     logger.info("")
     logger.info("=" * 70)
@@ -86,7 +86,7 @@ def demo_performance_comparison(image_path: Path):
     logger.info("PERFORMANCE MEASUREMENT")
     logger.info("=" * 70)
 
-    from hyper2kvm.fixers.offline_fixer import OfflineFixConfig, OfflineFSFix
+    from h2kvm.fixers.offline_fixer import OfflineFixConfig, OfflineFSFix
 
     config = OfflineFixConfig(image=image_path, dry_run=True, backend="vmcraft", print_fstab=False)
 

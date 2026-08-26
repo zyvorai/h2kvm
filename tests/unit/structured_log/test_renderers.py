@@ -10,7 +10,7 @@ import json
 import logging
 from unittest.mock import Mock
 
-from hyper2kvm.core.structured_log import (
+from h2kvm.core.structured_log import (
     ProcessorFormatter,
     _ConsoleRenderer,
     _JSONRenderer,

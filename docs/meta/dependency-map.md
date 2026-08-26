@@ -1,6 +1,6 @@
 # Dependency Map
 
-Generated from static imports in `hyper2kvm/` (modules: 519, edges: 818).
+Generated from static imports in `h2kvm/` (modules: 519, edges: 818).
 
 ## Top Package Edges
 

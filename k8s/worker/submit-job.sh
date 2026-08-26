@@ -1,19 +1,19 @@
 #!/bin/bash
-# Helper script to submit jobs to hyper2kvm workers
+# Helper script to submit jobs to h2kvm workers
 
 set -e
 
-NAMESPACE="${NAMESPACE:-hyper2kvm-workers}"
+NAMESPACE="${NAMESPACE:-h2kvm-workers}"
 KUBECONFIG="${KUBECONFIG:-$HOME/.kube/config}"
 
 usage() {
     cat << USAGE
-Submit a job to hyper2kvm Worker Job Protocol
+Submit a job to h2kvm Worker Job Protocol
 
 Usage: $0 [OPTIONS] <job-spec.json>
 
 Options:
-  -n, --namespace NAMESPACE    Kubernetes namespace (default: hyper2kvm-workers)
+  -n, --namespace NAMESPACE    Kubernetes namespace (default: h2kvm-workers)
   -k, --kubeconfig PATH        Path to kubeconfig (default: ~/.kube/config)
   -f, --follow                 Follow job execution logs
   -w, --worker POD_NAME        Submit to specific worker pod
@@ -24,7 +24,7 @@ Examples:
   $0 --follow convert-job.json
 
   # Submit to specific worker
-  $0 --worker hyper2kvm-worker-abc123 inspect-job.json
+  $0 --worker h2kvm-worker-abc123 inspect-job.json
 
   # Use custom namespace
   $0 --namespace my-namespace job.json
@@ -94,7 +94,7 @@ echo ""
 
 # Create ConfigMap with job spec
 echo "Creating job specification ConfigMap..."
-kubectl --kubeconfig="$KUBECONFIG" create configmap "hyper2kvm-job-$JOB_ID" \
+kubectl --kubeconfig="$KUBECONFIG" create configmap "h2kvm-job-$JOB_ID" \
     --from-file=job-spec.json="$JOB_FILE" \
     --namespace="$NAMESPACE" \
     --dry-run=client -o yaml | kubectl --kubeconfig="$KUBECONFIG" apply -f -
@@ -107,7 +107,7 @@ if [ -z "$WORKER_POD" ]; then
     echo "Finding available worker pod..."
     WORKER_POD=$(kubectl --kubeconfig="$KUBECONFIG" get pods \
         --namespace="$NAMESPACE" \
-        -l app=hyper2kvm-worker \
+        -l app=h2kvm-worker \
         -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
     
     if [ -z "$WORKER_POD" ]; then
@@ -125,7 +125,7 @@ echo ""
 echo "Copying job specification to worker..."
 kubectl --kubeconfig="$KUBECONFIG" cp \
     "$JOB_FILE" \
-    "$NAMESPACE/$WORKER_POD:/var/lib/hyper2kvm/job-$JOB_ID.json"
+    "$NAMESPACE/$WORKER_POD:/var/lib/h2kvm/job-$JOB_ID.json"
 
 echo "✓ Job specification ready"
 echo ""
@@ -140,8 +140,8 @@ if [ "$FOLLOW" = true ]; then
     kubectl --kubeconfig="$KUBECONFIG" exec \
         --namespace="$NAMESPACE" \
         "$WORKER_POD" -- \
-        python3 -m hyper2kvm.worker.cli run \
-        "/var/lib/hyper2kvm/job-$JOB_ID.json" \
+        python3 -m h2kvm.worker.cli run \
+        "/var/lib/h2kvm/job-$JOB_ID.json" \
         --worker-id "$WORKER_POD" \
         --follow
 else
@@ -149,8 +149,8 @@ else
     kubectl --kubeconfig="$KUBECONFIG" exec \
         --namespace="$NAMESPACE" \
         "$WORKER_POD" -- \
-        python3 -m hyper2kvm.worker.cli run \
-        "/var/lib/hyper2kvm/job-$JOB_ID.json" \
+        python3 -m h2kvm.worker.cli run \
+        "/var/lib/h2kvm/job-$JOB_ID.json" \
         --worker-id "$WORKER_POD" &
     
     JOB_PID=$!
@@ -159,11 +159,11 @@ else
     echo ""
     echo "To check status:"
     echo "  kubectl exec -n $NAMESPACE $WORKER_POD -- \\"
-    echo "    python3 -m hyper2kvm.worker.cli status $JOB_ID"
+    echo "    python3 -m h2kvm.worker.cli status $JOB_ID"
     echo ""
     echo "To view events:"
     echo "  kubectl exec -n $NAMESPACE $WORKER_POD -- \\"
-    echo "    python3 -m hyper2kvm.worker.cli events $JOB_ID --follow"
+    echo "    python3 -m h2kvm.worker.cli events $JOB_ID --follow"
 fi
 
 echo ""

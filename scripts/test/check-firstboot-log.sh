@@ -2,8 +2,8 @@
 set -euo pipefail
 # Extract firstboot log from Windows VM to verify driver installation
 
-QCOW2="/home/ssahani/tt/hyper2kvm/out/win10-virtio-test/win10-virtio.qcow2"
-LOG_PATH="/Windows/Temp/hyper2kvm-firstboot.log"
+QCOW2="/home/ssahani/tt/h2kvm/out/win10-virtio-test/win10-virtio.qcow2"
+LOG_PATH="/Windows/Temp/h2kvm-firstboot.log"
 
 echo "╔═══════════════════════════════════════════════════════════════════╗"
 echo "║       EXTRACTING FIRSTBOOT LOG FROM WINDOWS VM                    ║"
@@ -39,7 +39,7 @@ if sudo guestfish --ro -a "$QCOW2" -m /dev/sda3 -- is-file "$LOG_PATH" 2>/dev/nu
     echo ""
 
     sudo guestfish --ro -a "$QCOW2" -m /dev/sda3 <<'GUESTFISH'
-cat /Windows/Temp/hyper2kvm-firstboot.log
+cat /Windows/Temp/h2kvm-firstboot.log
 GUESTFISH
 
     echo ""

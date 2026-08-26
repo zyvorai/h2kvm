@@ -150,7 +150,7 @@ vcpus: 2
 
 # Logging
 log_level: INFO
-log_file: /var/log/hyper2kvm/rhel9-app-server.log
+log_file: /var/log/h2kvm/rhel9-app-server.log
 ```
 
 **Post-Migration**:
@@ -222,7 +222,7 @@ compress: false  # Database VM
 
 # Logging
 log_level: DEBUG
-log_file: /var/log/hyper2kvm/cloned-db.log
+log_file: /var/log/h2kvm/cloned-db.log
 ```
 
 **Why**: Cloned VMware VMs have duplicate filesystem UUIDs which cause boot failures.
@@ -254,7 +254,7 @@ libvirt_test: false  # Don't auto-start database
 
 # Logging
 log_level: INFO
-log_file: /var/log/hyper2kvm/postgresql-primary.log
+log_file: /var/log/h2kvm/postgresql-primary.log
 ```
 
 **Post-Migration**:
@@ -293,7 +293,7 @@ out_format: qcow2
 
 # Logging
 log_level: INFO
-log_file: /var/log/hyper2kvm/win2019.log
+log_file: /var/log/h2kvm/win2019.log
 ```
 
 ---
@@ -360,7 +360,7 @@ compress: false
 libvirt_test: false
 
 log_level: INFO
-log_file: /var/log/hyper2kvm/dc01.log
+log_file: /var/log/h2kvm/dc01.log
 ```
 
 **Post-Migration**:
@@ -489,7 +489,7 @@ network_retry: 5
 
 # Logging
 log_level: INFO
-log_file: /var/log/hyper2kvm/remote-app-server.log
+log_file: /var/log/h2kvm/remote-app-server.log
 ```
 
 **Run**:
@@ -528,7 +528,7 @@ network_retry: 5
 
 # Logging
 log_level: INFO
-log_file: /var/log/hyper2kvm/vsphere-export.log
+log_file: /var/log/h2kvm/vsphere-export.log
 ```
 
 **Security Note**: Use environment variables for passwords:
@@ -634,7 +634,7 @@ conversion_dir: /fast/nvme/temp  # Use fastest storage
 libvirt_test: false
 
 log_level: INFO
-log_file: /var/log/hyper2kvm/oracle-db.log
+log_file: /var/log/h2kvm/oracle-db.log
 ```
 
 ---
@@ -669,11 +669,11 @@ compress: true
 
 **File**: `k8s-migration-job.yaml`
 ```yaml
-apiVersion: hyper2kvm.io/v1
+apiVersion: h2kvm.io/v1
 kind: MigrationJob
 metadata:
   name: migrate-app-server
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   source:
     type: vmdk
@@ -718,15 +718,15 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: batch-migration-wave1
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 spec:
   parallelism: 3
   completions: 3
   template:
     spec:
       containers:
-      - name: hyper2kvm
-        image: ghcr.io/ssahani/hyper2kvm:latest
+      - name: h2kvm
+        image: ghcr.io/ssahani/h2kvm:latest
         command:
           - h2kvmctl
           - --config
@@ -840,7 +840,7 @@ regen_initramfs: true
 # grub is auto-handled
 compress: true
 
-log_file: /var/log/hyper2kvm/${VM_NAME}.log
+log_file: /var/log/h2kvm/${VM_NAME}.log
 EOF
 
     # Run migration
@@ -867,9 +867,9 @@ echo "=== Batch migration complete ==="
 Use this as a starting point for any migration:
 
 ```yaml
-# Hyper2KVM Migration Configuration Template
+# H2KVM Migration Configuration Template
 # Version: 0.3.0
-# Documentation: https://github.com/ssahani/hyper2kvm
+# Documentation: https://github.com/ssahani/h2kvm
 
 # ============================================
 # BASIC CONFIGURATION (Required)
@@ -926,7 +926,7 @@ libvirt_test: true  # or: false
 # LOGGING
 # ============================================
 log_level: INFO  # or: DEBUG, WARNING, ERROR
-log_file: /var/log/hyper2kvm/migration.log
+log_file: /var/log/h2kvm/migration.log
 
 # ============================================
 # ADVANCED
@@ -942,11 +942,11 @@ log_file: /var/log/hyper2kvm/migration.log
 
 ```bash
 # Download examples directory
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm/examples
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm/examples
 
 # Or copy individual examples
-curl -O https://raw.githubusercontent.com/ssahani/hyper2kvm/main/examples/simple-linux.yaml
+curl -O https://raw.githubusercontent.com/ssahani/h2kvm/main/examples/simple-linux.yaml
 ```
 
 ---

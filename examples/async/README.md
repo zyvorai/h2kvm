@@ -27,7 +27,7 @@ This directory contains examples demonstrating asynchronous/parallel VM migratio
 ## Requirements
 
 ```bash
-pip install 'hyper2kvm[async]'
+pip install 'h2kvm[async]'
 ```
 
 ## Usage

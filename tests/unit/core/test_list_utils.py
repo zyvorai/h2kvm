@@ -2,14 +2,14 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.core.list_utils module.
+"""Tests for h2kvm.core.list_utils module.
 
 Pure logic tests for dedup_preserve_order and dedup_preserve_order_str.
 """
 
 from __future__ import annotations
 
-from hyper2kvm.core.list_utils import dedup_preserve_order, dedup_preserve_order_str
+from h2kvm.core.list_utils import dedup_preserve_order, dedup_preserve_order_str
 
 
 # --- dedup_preserve_order ---

@@ -1,11 +1,11 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: hyper2kvm-operator-role
+  name: h2kvm-operator-role
 rules:
   # Validation CRD permissions
   - apiGroups:
-      - hyper2kvm.io
+      - h2kvm.io
     resources:
       - validations
     verbs:
@@ -17,7 +17,7 @@ rules:
       - update
       - watch
   - apiGroups:
-      - hyper2kvm.io
+      - h2kvm.io
     resources:
       - validations/status
     verbs:
@@ -26,7 +26,7 @@ rules:
       - update
   # HyperConversion CRD permissions
   - apiGroups:
-      - hyper2kvm.io
+      - h2kvm.io
     resources:
       - hyperconversions
     verbs:
@@ -38,7 +38,7 @@ rules:
       - update
       - watch
   - apiGroups:
-      - hyper2kvm.io
+      - h2kvm.io
     resources:
       - hyperconversions/status
       - hyperconversions/finalizers
@@ -130,18 +130,18 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: hyper2kvm-operator-rolebinding
+  name: h2kvm-operator-rolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: hyper2kvm-operator-role
+  name: h2kvm-operator-role
 subjects:
   - kind: ServiceAccount
-    name: hyper2kvm-operator
-    namespace: hyper2kvm-system
+    name: h2kvm-operator
+    namespace: h2kvm-system
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-system
+  name: h2kvm-operator
+  namespace: h2kvm-system

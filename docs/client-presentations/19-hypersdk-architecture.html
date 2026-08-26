@@ -457,7 +457,7 @@
     <tr><td><strong>hypersdk-control</strong></td><td><code>cmd/hypersdk-control</code></td><td>Control plane management</td><td>Multi-node coordination, leader election, HA</td></tr>
   </table>
 
-  <h3>How It Fits Together with hyper2kvm</h3>
+  <h3>How It Fits Together with h2kvm</h3>
   <div class="arch-box">
     <pre style="margin:0;">
   <span class="cm">User Request (CLI / TUI / API / K8s CRD)</span>
@@ -470,7 +470,7 @@
    +-----+------------+
          |  <span class="cm">Exported VMDK / VHD / RAW disk image</span>
    +-----v-----------+
-   |   <span class="fn">h2kvmctl</span>       |   <span class="cm">hyper2kvm — disk conversion + guest fixes</span>
+   |   <span class="fn">h2kvmctl</span>       |   <span class="cm">h2kvm — disk conversion + guest fixes</span>
    |   (Python)       |   <span class="cm">VMCraft engine (qemu-nbd, no libguestfs)</span>
    |                  |   <span class="cm">fstab, initramfs, VirtIO, GRUB, SELinux</span>
    |   <span class="fn">zkvm</span> (Go TUI)  |   <span class="cm">Interactive terminal UI</span>

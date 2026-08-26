@@ -1,4 +1,4 @@
-# Production Deployment Guide - Hyper2KVM OpenShift Operator
+# Production Deployment Guide - H2KVM OpenShift Operator
 
 **Version:** 0.3.0
 **Date:** 2026-01-30
@@ -8,7 +8,7 @@
 
 ## 📋 Executive Summary
 
-The Hyper2KVM OpenShift Operator has completed comprehensive testing with **87.5% overall pass rate** and **100% critical functionality validated**. All components are ready for production deployment on OpenShift Container Platform 4.10-4.16 and Kubernetes 1.24-1.33.
+The H2KVM OpenShift Operator has completed comprehensive testing with **87.5% overall pass rate** and **100% critical functionality validated**. All components are ready for production deployment on OpenShift Container Platform 4.10-4.16 and Kubernetes 1.24-1.33.
 
 ### ✅ Validated Components
 
@@ -48,22 +48,22 @@ Three production deployment methods are available:
 
 ```bash
 # Add Helm repository (once available)
-helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+helm repo add h2kvm https://ssahani.github.io/h2kvm
 helm repo update
 
 # Install on OpenShift
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace \
   --set openshift.enabled=true \
   --set openshift.route.enabled=true \
   --set openshift.scc.create=true \
-  --set image.repository=ghcr.io/ssahani/hyper2kvm \
+  --set image.repository=ghcr.io/ssahani/h2kvm \
   --set image.tag=2.1.0-operator
 
 # Or install on Kubernetes
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace \
   --set openshift.enabled=false
 ```
@@ -76,7 +76,7 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 - ✅ Production-grade configuration
 
 **Resources Created:**
-- Namespace: `hyper2kvm-system`
+- Namespace: `h2kvm-system`
 - Deployments: operator, webhook (optional)
 - Services: operator metrics, webhook
 - RBAC: ServiceAccount, ClusterRole, ClusterRoleBinding
@@ -92,20 +92,20 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 
 ```bash
 # Install via operator-sdk
-operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0 \
-  --namespace hyper2kvm-system
+operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
+  --namespace h2kvm-system
 
 # Or install via OLM catalog
 oc apply -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
-  name: hyper2kvm-catalog
+  name: h2kvm-catalog
   namespace: openshift-marketplace
 spec:
   sourceType: grpc
-  image: ghcr.io/ssahani/hyper2kvm-operator-index:v2.1.0
-  displayName: Hyper2KVM Operator
+  image: ghcr.io/ssahani/h2kvm-operator-index:v2.1.0
+  displayName: H2KVM Operator
   updateStrategy:
     registryPoll:
       interval: 30m
@@ -116,12 +116,12 @@ oc apply -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-system
+  name: h2kvm-operator
+  namespace: h2kvm-system
 spec:
   channel: stable
-  name: hyper2kvm-operator
-  source: hyper2kvm-catalog
+  name: h2kvm-operator
+  source: h2kvm-catalog
   sourceNamespace: openshift-marketplace
   installPlanApproval: Automatic
 EOF
@@ -148,11 +148,11 @@ EOF
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 
 # Deploy using automation script
-./scripts/deploy-to-openshift.sh 2.1.0 manual hyper2kvm-system
+./scripts/deploy-to-openshift.sh 2.1.0 manual h2kvm-system
 
 # Or apply manifests manually
 kubectl apply -f k8s/operator/crds/
@@ -199,15 +199,15 @@ Ensure access to container images:
 
 ```bash
 # Test image pull
-docker pull ghcr.io/ssahani/hyper2kvm:2.1.0-operator
-docker pull ghcr.io/ssahani/hyper2kvm:2.1.0-worker
+docker pull ghcr.io/ssahani/h2kvm:2.1.0-operator
+docker pull ghcr.io/ssahani/h2kvm:2.1.0-worker
 
 # For private registry, create image pull secret
 kubectl create secret docker-registry ghcr-secret \
   --docker-server=ghcr.io \
   --docker-username=<username> \
   --docker-password=<token> \
-  --namespace=hyper2kvm-system
+  --namespace=h2kvm-system
 ```
 
 ### Storage Configuration
@@ -223,8 +223,8 @@ kubectl apply -f - <<EOF
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: hyper2kvm-shared-storage
-  namespace: hyper2kvm-system
+  name: h2kvm-shared-storage
+  namespace: h2kvm-system
 spec:
   accessModes:
     - ReadWriteMany
@@ -248,8 +248,8 @@ If you need to build and push images to your own registry:
 ./scripts/build-operator-images.sh 2.1.0 your-registry.io/your-org
 
 # Or build individually
-docker build --target operator -t your-registry.io/your-org/hyper2kvm:2.1.0-operator .
-docker build --target worker -t your-registry.io/your-org/hyper2kvm:2.1.0-worker .
+docker build --target operator -t your-registry.io/your-org/h2kvm:2.1.0-operator .
+docker build --target worker -t your-registry.io/your-org/h2kvm:2.1.0-worker .
 ```
 
 ### Build OLM Bundle
@@ -260,7 +260,7 @@ docker build --target worker -t your-registry.io/your-org/hyper2kvm:2.1.0-worker
 
 # Or manually
 docker build -f olm/bundle.Dockerfile \
-  -t your-registry.io/your-org/hyper2kvm-operator-bundle:v2.1.0 \
+  -t your-registry.io/your-org/h2kvm-operator-bundle:v2.1.0 \
   olm/
 ```
 
@@ -268,9 +268,9 @@ docker build -f olm/bundle.Dockerfile \
 
 ```bash
 # Push all images
-docker push your-registry.io/your-org/hyper2kvm:2.1.0-operator
-docker push your-registry.io/your-org/hyper2kvm:2.1.0-worker
-docker push your-registry.io/your-org/hyper2kvm-operator-bundle:v2.1.0
+docker push your-registry.io/your-org/h2kvm:2.1.0-operator
+docker push your-registry.io/your-org/h2kvm:2.1.0-worker
+docker push your-registry.io/your-org/h2kvm-operator-bundle:v2.1.0
 ```
 
 ---
@@ -307,8 +307,8 @@ SCCs are automatically created by Helm chart when `openshift.scc.create=true`.
 Minimum required permissions:
 
 **ClusterRole:**
-- `migrationjobs.hyper2kvm.io`: Full CRUD
-- `jobtemplates.hyper2kvm.io`: Full CRUD
+- `migrationjobs.h2kvm.io`: Full CRUD
+- `jobtemplates.h2kvm.io`: Full CRUD
 - `pods`: Read-only (list, watch)
 - `configmaps`: Read-write (leader election)
 - `events`: Create, patch
@@ -328,43 +328,43 @@ Use the provided test script:
 
 ```bash
 # Run comprehensive validation suite
-./scripts/test-openshift-deployment.sh hyper2kvm-system
+./scripts/test-openshift-deployment.sh h2kvm-system
 
 # Test individual components
-kubectl get crd migrationjobs.hyper2kvm.io
-kubectl get pods -n hyper2kvm-system
-kubectl logs -n hyper2kvm-system deployment/hyper2kvm-operator
+kubectl get crd migrationjobs.h2kvm.io
+kubectl get pods -n h2kvm-system
+kubectl logs -n h2kvm-system deployment/h2kvm-operator
 ```
 
 ### Manual Validation Steps
 
 **1. Verify CRDs Installed**
 ```bash
-kubectl get crd | grep hyper2kvm
-# Expected: migrationjobs.hyper2kvm.io, jobtemplates.hyper2kvm.io
+kubectl get crd | grep h2kvm
+# Expected: migrationjobs.h2kvm.io, jobtemplates.h2kvm.io
 ```
 
 **2. Check Operator Running**
 ```bash
-kubectl get pods -n hyper2kvm-system
-# Expected: hyper2kvm-operator-xxx-xxx Running 1/1
+kubectl get pods -n h2kvm-system
+# Expected: h2kvm-operator-xxx-xxx Running 1/1
 ```
 
 **3. Verify RBAC**
 ```bash
-kubectl auth can-i create migrationjobs.hyper2kvm.io --as=system:serviceaccount:hyper2kvm-system:hyper2kvm-operator
+kubectl auth can-i create migrationjobs.h2kvm.io --as=system:serviceaccount:h2kvm-system:h2kvm-operator
 # Expected: yes
 ```
 
 **4. Test Routes (OpenShift)**
 ```bash
-oc get routes -n hyper2kvm-system
-# Expected: hyper2kvm-operator-metrics route with TLS
+oc get routes -n h2kvm-system
+# Expected: h2kvm-operator-metrics route with TLS
 ```
 
 **5. Check Metrics Endpoint**
 ```bash
-kubectl port-forward -n hyper2kvm-system svc/hyper2kvm-operator-metrics 8080:8080
+kubectl port-forward -n h2kvm-system svc/h2kvm-operator-metrics 8080:8080
 curl http://localhost:8080/metrics
 # Expected: Prometheus metrics output
 ```
@@ -373,7 +373,7 @@ curl http://localhost:8080/metrics
 
 ```bash
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: test-conversion
@@ -403,23 +403,23 @@ The operator exposes Prometheus metrics:
 **Metrics Endpoint:** `http://operator-service:8080/metrics`
 
 **Available Metrics:**
-- `hyper2kvm_migrationjob_total` - Total migration jobs
-- `hyper2kvm_migrationjob_status` - Job status by operation
-- `hyper2kvm_migrationjob_duration_seconds` - Job execution time
-- `hyper2kvm_worker_count` - Available workers
-- `hyper2kvm_reconcile_duration_seconds` - Reconciliation performance
+- `h2kvm_migrationjob_total` - Total migration jobs
+- `h2kvm_migrationjob_status` - Job status by operation
+- `h2kvm_migrationjob_duration_seconds` - Job execution time
+- `h2kvm_worker_count` - Available workers
+- `h2kvm_reconcile_duration_seconds` - Reconciliation performance
 
 **ServiceMonitor for OpenShift:**
 ```yaml
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-system
+  name: h2kvm-operator
+  namespace: h2kvm-system
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: hyper2kvm-operator
+      app.kubernetes.io/name: h2kvm-operator
   endpoints:
     - port: metrics
       interval: 30s
@@ -431,10 +431,10 @@ Operator logs are available via kubectl:
 
 ```bash
 # View operator logs
-kubectl logs -n hyper2kvm-system deployment/hyper2kvm-operator --follow
+kubectl logs -n h2kvm-system deployment/h2kvm-operator --follow
 
 # Adjust log level
-kubectl set env deployment/hyper2kvm-operator LOG_LEVEL=DEBUG -n hyper2kvm-system
+kubectl set env deployment/h2kvm-operator LOG_LEVEL=DEBUG -n h2kvm-system
 ```
 
 **Log Levels:**
@@ -480,7 +480,7 @@ openshift:
 
 # Image configuration
 image:
-  repository: ghcr.io/ssahani/hyper2kvm
+  repository: ghcr.io/ssahani/h2kvm
   tag: 2.1.0-operator
   pullPolicy: IfNotPresent
 
@@ -522,7 +522,7 @@ env:
 
 ```bash
 # Check events
-kubectl describe pod -n hyper2kvm-system -l app.kubernetes.io/name=hyper2kvm-operator
+kubectl describe pod -n h2kvm-system -l app.kubernetes.io/name=h2kvm-operator
 
 # Common causes:
 # - Image pull failure → Check image registry access
@@ -534,7 +534,7 @@ kubectl describe pod -n hyper2kvm-system -l app.kubernetes.io/name=hyper2kvm-ope
 
 ```bash
 # Check CRD status
-kubectl get crd migrationjobs.hyper2kvm.io -o yaml
+kubectl get crd migrationjobs.h2kvm.io -o yaml
 
 # Validate against schema
 kubectl apply --dry-run=server -f your-migrationjob.yaml
@@ -544,11 +544,11 @@ kubectl apply --dry-run=server -f your-migrationjob.yaml
 
 ```bash
 # Check ServiceAccount permissions
-kubectl auth can-i '*' migrationjobs.hyper2kvm.io \
-  --as=system:serviceaccount:hyper2kvm-system:hyper2kvm-operator
+kubectl auth can-i '*' migrationjobs.h2kvm.io \
+  --as=system:serviceaccount:h2kvm-system:h2kvm-operator
 
 # Verify ClusterRoleBinding
-kubectl get clusterrolebinding | grep hyper2kvm
+kubectl get clusterrolebinding | grep h2kvm
 ```
 
 **4. Worker Not Discovered**
@@ -565,11 +565,11 @@ kubectl logs <worker-pod> | grep "protocol version"
 
 ```bash
 # Check route status
-oc get route -n hyper2kvm-system
-oc describe route hyper2kvm-operator-metrics
+oc get route -n h2kvm-system
+oc describe route h2kvm-operator-metrics
 
 # Test route connectivity
-curl -k https://$(oc get route hyper2kvm-operator-metrics -o jsonpath='{.spec.host}')/metrics
+curl -k https://$(oc get route h2kvm-operator-metrics -o jsonpath='{.spec.host}')/metrics
 ```
 
 ### Debug Mode
@@ -578,10 +578,10 @@ Enable debug logging:
 
 ```bash
 # Update deployment
-kubectl set env deployment/hyper2kvm-operator LOG_LEVEL=DEBUG -n hyper2kvm-system
+kubectl set env deployment/h2kvm-operator LOG_LEVEL=DEBUG -n h2kvm-system
 
 # Watch logs
-kubectl logs -n hyper2kvm-system deployment/hyper2kvm-operator --follow --tail=100
+kubectl logs -n h2kvm-system deployment/h2kvm-operator --follow --tail=100
 ```
 
 ---
@@ -632,7 +632,7 @@ affinity:
         podAffinityTerm:
           labelSelector:
             matchLabels:
-              app.kubernetes.io/name: hyper2kvm-operator
+              app.kubernetes.io/name: h2kvm-operator
           topologyKey: kubernetes.io/hostname
 ```
 
@@ -644,13 +644,13 @@ affinity:
 
 ```bash
 # Upgrade to new version
-helm upgrade hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm upgrade h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --set image.tag=2.2.0-operator \
   --reuse-values
 
 # Rollback if needed
-helm rollback hyper2kvm-operator -n hyper2kvm-system
+helm rollback h2kvm-operator -n h2kvm-system
 ```
 
 ### OLM Upgrade
@@ -659,11 +659,11 @@ OLM handles upgrades automatically based on subscription channel:
 
 ```bash
 # Check current version
-oc get csv -n hyper2kvm-system
+oc get csv -n h2kvm-system
 
 # Approve manual install plan (if needed)
 oc patch installplan <install-plan-name> \
-  -n hyper2kvm-system \
+  -n h2kvm-system \
   --type merge \
   -p '{"spec":{"approved":true}}'
 ```
@@ -675,12 +675,12 @@ oc patch installplan <install-plan-name> \
 kubectl apply -f k8s/operator/crds/
 
 # Update deployment
-kubectl set image deployment/hyper2kvm-operator \
-  operator=ghcr.io/ssahani/hyper2kvm:2.2.0-operator \
-  -n hyper2kvm-system
+kubectl set image deployment/h2kvm-operator \
+  operator=ghcr.io/ssahani/h2kvm:2.2.0-operator \
+  -n h2kvm-system
 
 # Verify rollout
-kubectl rollout status deployment/hyper2kvm-operator -n hyper2kvm-system
+kubectl rollout status deployment/h2kvm-operator -n h2kvm-system
 ```
 
 ---
@@ -702,8 +702,8 @@ oc version
 **2. Image Preparation**
 ```bash
 # Pull images to verify access
-docker pull ghcr.io/ssahani/hyper2kvm:2.1.0-operator
-docker pull ghcr.io/ssahani/hyper2kvm:2.1.0-worker
+docker pull ghcr.io/ssahani/h2kvm:2.1.0-operator
+docker pull ghcr.io/ssahani/h2kvm:2.1.0-worker
 
 # Or build from source
 ./scripts/build-operator-images.sh 2.1.0
@@ -712,23 +712,23 @@ docker pull ghcr.io/ssahani/hyper2kvm:2.1.0-worker
 **3. Deploy Operator**
 ```bash
 # Using Helm (recommended)
-helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace \
   --set openshift.enabled=true \
   --set image.tag=2.1.0-operator
 
 # Wait for operator ready
 kubectl wait --for=condition=ready pod \
-  -l app.kubernetes.io/name=hyper2kvm-operator \
-  -n hyper2kvm-system \
+  -l app.kubernetes.io/name=h2kvm-operator \
+  -n h2kvm-system \
   --timeout=300s
 ```
 
 **4. Validation**
 ```bash
 # Run test suite
-./scripts/test-openshift-deployment.sh hyper2kvm-system
+./scripts/test-openshift-deployment.sh h2kvm-system
 
 # Create test migration job
 kubectl apply -f k8s/operator/examples/inspect-job.yaml
@@ -742,23 +742,23 @@ kubectl apply -f - <<EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hyper2kvm-worker
-  namespace: hyper2kvm-system
+  name: h2kvm-worker
+  namespace: h2kvm-system
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: hyper2kvm-worker
+      app: h2kvm-worker
   template:
     metadata:
       labels:
-        app: hyper2kvm-worker
-        hyper2kvm.io/worker: "true"
+        app: h2kvm-worker
+        h2kvm.io/worker: "true"
     spec:
-      serviceAccountName: hyper2kvm-worker
+      serviceAccountName: h2kvm-worker
       containers:
         - name: worker
-          image: ghcr.io/ssahani/hyper2kvm:2.1.0-worker
+          image: ghcr.io/ssahani/h2kvm:2.1.0-worker
           securityContext:
             privileged: true
           volumeMounts:
@@ -767,7 +767,7 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: hyper2kvm-shared-storage
+            claimName: h2kvm-shared-storage
 EOF
 ```
 
@@ -778,12 +778,12 @@ kubectl apply -f - <<EOF
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-system
+  name: h2kvm-operator
+  namespace: h2kvm-system
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: hyper2kvm-operator
+      app.kubernetes.io/name: h2kvm-operator
   endpoints:
     - port: metrics
       interval: 30s
@@ -824,9 +824,9 @@ Located in `k8s/operator/examples/`:
 
 ### Support and Community
 
-- **GitHub Issues:** https://github.com/ssahani/hyper2kvm/issues
-- **Discussions:** https://github.com/ssahani/hyper2kvm/discussions
-- **Documentation:** https://ssahani.github.io/hyper2kvm
+- **GitHub Issues:** https://github.com/ssahani/h2kvm/issues
+- **Discussions:** https://github.com/ssahani/h2kvm/discussions
+- **Documentation:** https://ssahani.github.io/h2kvm
 
 ---
 
@@ -905,4 +905,4 @@ For questions or issues during deployment, refer to the troubleshooting section 
 
 ---
 
-*This guide is part of the Hyper2KVM OpenShift Operator v2.1.0 release.*
+*This guide is part of the H2KVM OpenShift Operator v2.1.0 release.*

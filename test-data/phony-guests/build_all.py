@@ -7,7 +7,7 @@
 
 Creates minimal disk images that fool guestfs inspection API heuristics.
 These images contain just enough filesystem structure (fstab, os-release,
-registry hives, GRUB config) for hyper2kvm's detection and fix pipeline
+registry hives, GRUB config) for h2kvm's detection and fix pipeline
 to exercise all code paths without needing real OS installations.
 
 Requires: guestfs (python3-libguestfs), root privileges for NBD/mount.
@@ -285,7 +285,7 @@ def build_windows_multi_disk(output_dir: Path) -> tuple[Path, Path]:
     - sda: blank data disk with NTFS partition (not bootable)
     - sdb: Windows OS disk (the actual boot disk)
 
-    This tests that hyper2kvm correctly identifies the boot disk when
+    This tests that h2kvm correctly identifies the boot disk when
     Windows is NOT on the first disk.
     """
     img_sda = output_dir / "windows-multi-disk-sda.img"

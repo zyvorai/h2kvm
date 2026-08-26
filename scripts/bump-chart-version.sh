@@ -51,7 +51,7 @@ Usage: $0 [OPTIONS]
 Bump Helm chart version(s) following semantic versioning.
 
 OPTIONS:
-    --chart CHART        Chart name (e.g., hyper2kvm-operator, hyper2kvm-worker)
+    --chart CHART        Chart name (e.g., h2kvm-operator, h2kvm-worker)
                          If not specified, bumps all charts
     --type TYPE          Bump type: major, minor, patch (default: patch)
     --version VERSION    Set specific version (overrides --type)
@@ -64,10 +64,10 @@ EXAMPLES:
     $0 --type patch
 
     # Bump minor version of operator chart (1.6.0 -> 1.7.0)
-    $0 --chart hyper2kvm-operator --type minor
+    $0 --chart h2kvm-operator --type minor
 
     # Set specific version
-    $0 --chart hyper2kvm-operator --version 2.0.0
+    $0 --chart h2kvm-operator --version 2.0.0
 
     # Dry run to see changes
     $0 --type minor --dry-run

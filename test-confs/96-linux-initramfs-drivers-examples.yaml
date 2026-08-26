@@ -6,7 +6,7 @@
 # for Linux guests, similar to how Windows VirtIO drivers are injected.
 #
 # Usage:
-#   hyper2kvm --config 96-linux-initramfs-drivers-examples.yaml local
+#   h2kvm --config 96-linux-initramfs-drivers-examples.yaml local
 #
 # Use Cases:
 #   ✅ Add hardware-specific network drivers (e1000e, ixgbe, mlx5_core)
@@ -189,7 +189,7 @@ verbose: 2
 # ------------------------------------------------------------------------------------
 # Use case: Minimal initramfs for specific hardware (advanced)
 #
-# NOTE: When you specify initramfs_add_drivers, hyper2kvm uses your list
+# NOTE: When you specify initramfs_add_drivers, h2kvm uses your list
 # and ADDS it to the defaults. The defaults include essential virtio drivers.
 # If you need ONLY your drivers (no defaults), use the offline_fixer API directly.
 #
@@ -313,7 +313,7 @@ verbose: 2
 #
 # RHEL/CentOS/Rocky/Alma:
 #   - Uses dracut for initramfs generation
-#   - Modules added to /etc/dracut.conf.d/90-hyper2kvm.conf
+#   - Modules added to /etc/dracut.conf.d/90-h2kvm.conf
 #   - Command: dracut --force
 #
 # Debian/Ubuntu:

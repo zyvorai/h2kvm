@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.ai._stats module.
+"""Tests for h2kvm.ai._stats module.
 
 Pure-Python statistics primitives used by the AI migration-intelligence module.
 """
@@ -13,7 +13,7 @@ import math
 
 import pytest
 
-from hyper2kvm.ai._stats import (
+from h2kvm.ai._stats import (
     clamp,
     cosine_similarity,
     linear_regression,

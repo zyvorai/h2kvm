@@ -11,12 +11,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hyper2kvm/zkvm/internal/models"
-	"github.com/hyper2kvm/zkvm/internal/protocol"
+	"github.com/h2kvm/zkvm/internal/models"
+	"github.com/h2kvm/zkvm/internal/protocol"
 )
 
 // settingsDir is the base directory for persistent configuration.
-const settingsDir = ".config/hyper2kvm"
+const settingsDir = ".config/h2kvm"
 
 // settingsFile is the filename for persisted settings.
 const settingsFile = "settings.json"

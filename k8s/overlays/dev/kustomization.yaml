@@ -9,17 +9,17 @@ resources:
 patches:
   - target:
       kind: DaemonSet
-      name: hyper2kvm-worker
+      name: h2kvm-worker
     patch: |
       apiVersion: apps/v1
       kind: DaemonSet
       metadata:
-        name: hyper2kvm-worker
+        name: h2kvm-worker
       spec:
         template:
           spec:
             containers:
-              - name: hyper2kvm-worker
+              - name: h2kvm-worker
                 resources:
                   requests:
                     cpu: "500m"
@@ -30,12 +30,12 @@ patches:
 
   - target:
       kind: HorizontalPodAutoscaler
-      name: hyper2kvm-worker-hpa
+      name: h2kvm-worker-hpa
     patch: |
       apiVersion: autoscaling/v2
       kind: HorizontalPodAutoscaler
       metadata:
-        name: hyper2kvm-worker-hpa
+        name: h2kvm-worker-hpa
       spec:
         minReplicas: 1
         maxReplicas: 3

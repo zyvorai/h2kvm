@@ -29,11 +29,11 @@ GO := go
 OPERATOR_DIR  := operator
 ZKVM_DIR      := zkvm
 K8S_DIR       := k8s
-HYPER2KVM_DIR := hyper2kvm
+H2KVM_DIR := h2kvm
 
 # Binary names
 ZKVM_BINARY := zkvm
-OPERATOR_BINARY := hyper2kvm-operator
+OPERATOR_BINARY := h2kvm-operator
 
 # Install prefix
 PREFIX     ?= /usr
@@ -49,7 +49,7 @@ help: ## Show this help message
 
 install: build-all clean-state ## Build and install everything (Python h2kvmctl + zkvm + operator + h2k) to $(BINDIR)
 	@# Remove any user-level pip install so $(BINDIR) copy takes precedence in PATH
-	-$(PIP) uninstall -y hyper2kvm 2>/dev/null || true
+	-$(PIP) uninstall -y h2kvm 2>/dev/null || true
 	$(PIP) install --prefix=$(PREFIX) --no-warn-script-location .
 	install -Dm755 $(ZKVM_DIR)/$(ZKVM_BINARY) $(BINDIR)/$(ZKVM_BINARY)
 	install -Dm755 $(OPERATOR_DIR)/bin/manager $(BINDIR)/$(OPERATOR_BINARY)
@@ -58,7 +58,7 @@ install: build-all clean-state ## Build and install everything (Python h2kvmctl 
 
 install-dev: ## Install Python package in editable mode with dev deps
 	$(PIP) install -e ".[dev,ui,vsphere,validation,retry,daemon,async]"
-	@echo "Installed hyper2kvm in editable mode with dev dependencies"
+	@echo "Installed h2kvm in editable mode with dev dependencies"
 
 install-deps: ## Download all dependencies (Python + Go modules)
 	$(PIP) install -e ".[dev]"
@@ -91,20 +91,20 @@ test-zkvm: ## Run zkvm Go tests
 test-all: test-unit test-operator test-zkvm ## Run all tests (Python + Go)
 
 test-coverage: ## Run Python tests with coverage report
-	pytest tests/unit/ -v --cov=$(HYPER2KVM_DIR) --cov-report=html --cov-report=term
+	pytest tests/unit/ -v --cov=$(H2KVM_DIR) --cov-report=html --cov-report=term
 
 ##@ Code Quality
 
 lint: ## Run linters (ruff + mypy + go vet)
-	ruff check $(HYPER2KVM_DIR)/
+	ruff check $(H2KVM_DIR)/
 	cd $(ZKVM_DIR) && $(GO) vet ./...
 	cd $(OPERATOR_DIR) && $(GO) vet ./...
 
 lint-fix: ## Run linters and auto-fix issues
-	ruff check --fix $(HYPER2KVM_DIR)/
+	ruff check --fix $(H2KVM_DIR)/
 
 format: ## Format all code (Python + Go)
-	ruff format $(HYPER2KVM_DIR)/
+	ruff format $(H2KVM_DIR)/
 	cd $(ZKVM_DIR) && gofmt -s -w .
 	cd $(OPERATOR_DIR) && $(GO) fmt ./...
 
@@ -121,10 +121,10 @@ build-operator: ## Build operator binary
 	cd $(OPERATOR_DIR) && $(GO) build -ldflags "-s -w" -o bin/manager cmd/main.go
 
 build-operator-image: ## Build operator container image
-	cd $(OPERATOR_DIR) && docker build -t ghcr.io/hyper2kvm/operator:latest .
+	cd $(OPERATOR_DIR) && docker build -t ghcr.io/h2kvm/operator:latest .
 
 build-k8s-image: ## Build k8s worker container image
-	cd $(K8S_DIR) && docker build --target worker -t hyper2kvm:worker ..
+	cd $(K8S_DIR) && docker build --target worker -t h2kvm:worker ..
 
 build-h2kweb: ## Build h2kweb web dashboard (Go + React)
 	@if [ -f web/Makefile ]; then cd web && $(MAKE) build; else echo "web/ not found — skipping h2kweb"; fi
@@ -176,7 +176,7 @@ preflight: ## Pre-flight cluster readiness check
 preflight-fix: ## Pre-flight check with auto-fix
 	@./scripts/preflight-check.sh --fix
 
-uninstall: ## Remove all hyper2kvm components from cluster
+uninstall: ## Remove all h2kvm components from cluster
 	@./scripts/uninstall.sh
 
 uninstall-operator: ## Remove operator only
@@ -188,7 +188,7 @@ uninstall-workers: ## Remove workers only
 uninstall-migrations: ## Remove migration resources only
 	@./scripts/uninstall.sh --migrations
 
-uninstall-all: ## Remove everything (hyper2kvm + KubeVirt + CDI)
+uninstall-all: ## Remove everything (h2kvm + KubeVirt + CDI)
 	@./scripts/uninstall.sh --all
 
 uninstall-k3d: ## Delete entire k3d cluster
@@ -268,10 +268,10 @@ clean: zkvm-clean h2kweb-clean ## Clean build artifacts
 	find . -type f -name '*.pyc' -delete 2>/dev/null || true
 
 clean-state: ## Clean runtime state (workflow dirs, conversions, locks, caches)
-	rm -rf /var/lib/hyper2kvm/conversions/* 2>/dev/null || true
-	rm -rf /var/lib/hyper2kvm/output/* 2>/dev/null || true
-	rm -rf /run/hyper2kvm/workflow/* 2>/dev/null || true
-	systemd-tmpfiles --create hyper2kvm.conf 2>/dev/null || true
+	rm -rf /var/lib/h2kvm/conversions/* 2>/dev/null || true
+	rm -rf /var/lib/h2kvm/output/* 2>/dev/null || true
+	rm -rf /run/h2kvm/workflow/* 2>/dev/null || true
+	systemd-tmpfiles --create h2kvm.conf 2>/dev/null || true
 	@echo "Cleaned runtime state"
 
 clean-all: clean ## Clean everything including Go caches
@@ -317,8 +317,8 @@ release-check: ## Check if ready for release
 
 docs: ## Build documentation (CLI reference + API docs)
 	@mkdir -p docs/_build
-	$(PYTHON) -c "from hyper2kvm.cli.args.parser import build_parser; p = build_parser(); p.print_help()" > docs/_build/cli-reference.txt
-	$(PYTHON) -m pydoc -w hyper2kvm 2>/dev/null || true
+	$(PYTHON) -c "from h2kvm.cli.args.parser import build_parser; p = build_parser(); p.print_help()" > docs/_build/cli-reference.txt
+	$(PYTHON) -m pydoc -w h2kvm 2>/dev/null || true
 	@echo "CLI reference generated at docs/_build/cli-reference.txt"
 
 docs-serve: docs ## Serve documentation locally on port 8080
@@ -328,7 +328,7 @@ docs-serve: docs ## Serve documentation locally on port 8080
 
 security-scan: ## Run security scanning (bandit + pip-audit + detect-secrets)
 	@echo "Running bandit (SAST)..."
-	-bandit -r $(HYPER2KVM_DIR)/ -c pyproject.toml -q 2>/dev/null || bandit -r $(HYPER2KVM_DIR)/ -ll -q
+	-bandit -r $(H2KVM_DIR)/ -c pyproject.toml -q 2>/dev/null || bandit -r $(H2KVM_DIR)/ -ll -q
 	@echo "Running pip-audit (dependency vulnerabilities)..."
 	-pip-audit 2>/dev/null || echo "  pip-audit not installed: pip install pip-audit"
 	@echo "Running detect-secrets..."
@@ -352,11 +352,11 @@ changelog: ## Generate changelog from git commits
 	@echo "Changelog generated at CHANGELOG.generated.md"
 
 lint-all: lint ## Run all linters (ruff + mypy + go vet + shellcheck)
-	-mypy $(HYPER2KVM_DIR)/ --ignore-missing-imports 2>/dev/null || echo "  mypy not installed or has errors"
+	-mypy $(H2KVM_DIR)/ --ignore-missing-imports 2>/dev/null || echo "  mypy not installed or has errors"
 	-shellcheck scripts/*.sh 2>/dev/null || echo "  shellcheck not installed: dnf install ShellCheck"
 
 version: ## Show all component versions
-	@echo "hyper2kvm: $$($(PYTHON) -c 'import hyper2kvm; print(hyper2kvm.__version__)' 2>/dev/null || echo 'not installed')"
+	@echo "h2kvm: $$($(PYTHON) -c 'import h2kvm; print(h2kvm.__version__)' 2>/dev/null || echo 'not installed')"
 	@echo "zkvm:      $$(cd $(ZKVM_DIR) && git describe --tags --always --dirty 2>/dev/null || echo 'dev')"
 	@echo "operator:  $$(cd $(OPERATOR_DIR) && git describe --tags --always --dirty 2>/dev/null || echo 'dev')"
 	@echo "python:    $$($(PYTHON) --version)"

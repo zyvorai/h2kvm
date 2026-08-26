@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>How It Works — hypersdk + hyper2kvm Deep Dive</title>
+<title>How It Works — hypersdk + h2kvm Deep Dive</title>
 <style>
   @page { size: A4; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -51,7 +51,7 @@
 <!-- COVER -->
 <div class="cover">
   <h1>How <span>It Works</span></h1>
-  <h2>hypersdk + hyper2kvm Technical Deep Dive</h2>
+  <h2>hypersdk + h2kvm Technical Deep Dive</h2>
   <p class="sub">A two-layer platform: Go daemon for multi-cloud export + Python engine for disk conversion and guest repair. This document shows exactly how every component works together.</p>
   <div class="badge">For architects, engineers, and technical evaluators</div>
 </div>
@@ -90,7 +90,7 @@
     │            DATA PLANE                  │
     │                                        │
     │   ┌──────────────────────────────┐     │
-    │   │    hyper2kvm (Python)        │     │
+    │   │    h2kvm (Python)        │     │
     │   │  ┌─────────┐ ┌────────────┐  │     │
     │   │  │ Disk     │ │  Guest     │  │     │
     │   │  │ Convert  │ │  Fixer     │  │     │
@@ -112,7 +112,7 @@
 
   <div class="card-grid">
     <div class="card"><span class="lang-tag go-tag">Go</span><h4>hypersdk — Control Plane</h4><p>Multi-cloud VM discovery and export. REST API, job scheduling, RBAC, cost estimation, carbon-aware scheduling. Hexagonal architecture with 13+ port interfaces.</p></div>
-    <div class="card"><span class="lang-tag py-tag">Python</span><h4>hyper2kvm — Data Plane</h4><p>Disk conversion, offline guest OS repair, libvirt XML generation, KubeVirt deployment. 1,273 tests. VMCraft engine for filesystem manipulation.</p></div>
+    <div class="card"><span class="lang-tag py-tag">Python</span><h4>h2kvm — Data Plane</h4><p>Disk conversion, offline guest OS repair, libvirt XML generation, KubeVirt deployment. 1,273 tests. VMCraft engine for filesystem manipulation.</p></div>
   </div>
 </div>
 
@@ -192,9 +192,9 @@ type CarbonScheduler interface {
   </div>
 </div>
 
-<!-- PAGE: HYPER2KVM DEEP DIVE -->
+<!-- PAGE: H2KVM DEEP DIVE -->
 <div class="page page-py">
-  <h2 class="st"><span class="lang-tag py-tag">Python</span> hyper2kvm <span>Pipeline</span></h2>
+  <h2 class="st"><span class="lang-tag py-tag">Python</span> h2kvm <span>Pipeline</span></h2>
   <p class="sub2">What happens to a VM disk from raw export to running on KVM.</p>
 
   <div class="flow">
@@ -209,7 +209,7 @@ type CarbonScheduler interface {
 
   <h3>Python Package Structure</h3>
   <pre>
-hyper2kvm/
+h2kvm/
 ├── orchestration/        # Pipeline orchestrator — chains all stages
 │   ├── orchestrator.py   # Main pipeline: validate → convert → fix → deploy
 │   ├── disk_processor.py # Per-disk processing with retry
@@ -365,7 +365,7 @@ vCenter ──govc──→ VMDK file ──qemu-img──→ qcow2 ──VMCraf
       <pre>hypersdk-agent --control-plane=hq:9393</pre></div>
   </div>
 
-  <div class="footer">hypersdk + hyper2kvm | Proprietary (Zyvor AI Labs) Open Source | github.com/ssahani/hyper2kvm</div>
+  <div class="footer">hypersdk + h2kvm | Proprietary (Zyvor AI Labs) Open Source | github.com/ssahani/h2kvm</div>
 </div>
 
 <!-- PAGE: API EXAMPLES -->
@@ -438,7 +438,7 @@ spec:
     regenInitramfs: true
   </pre>
 
-  <div class="footer">hypersdk + hyper2kvm — How It Works | For architects and engineers</div>
+  <div class="footer">hypersdk + h2kvm — How It Works | For architects and engineers</div>
 </div>
 </body>
 </html>

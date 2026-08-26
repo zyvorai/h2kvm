@@ -36,7 +36,7 @@ func DiagnoseFailure(exitCode int, logs string) *DiagnosisResult {
 			Fixes: []string{
 				"Enable --regen-initramfs",
 				"For Windows: SATA is the default (--win-stage bootstrap)",
-				"For Windows: virtio-win ISO auto-detected from /var/lib/hyper2kvm/",
+				"For Windows: virtio-win ISO auto-detected from /var/lib/h2kvm/",
 				"After boot: install drivers from CD-ROM (D:\\virtio-win-guest-tools.exe)",
 				"Try --disk-bus sata as fallback",
 			},
@@ -74,7 +74,7 @@ func DiagnoseFailure(exitCode int, logs string) *DiagnosisResult {
 				"UEFI/BIOS mismatch",
 			},
 			Fixes: []string{
-				"hyper2kvm auto-fixes GRUB (ensure it ran)",
+				"h2kvm auto-fixes GRUB (ensure it ran)",
 				"Try --uefi if source VM was UEFI",
 				"Omit --no-grub to allow GRUB repair",
 			},
@@ -204,7 +204,7 @@ func DiagnoseFailure(exitCode int, logs string) *DiagnosisResult {
 		Fixes: []string{
 			"Run with -v for verbose output",
 			"Check: h2kvmctl --config <yaml> --dry-run",
-			"Report issue: github.com/ssahani/hyper2kvm/issues",
+			"Report issue: github.com/ssahani/h2kvm/issues",
 		},
 	}
 }

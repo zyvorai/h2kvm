@@ -93,9 +93,9 @@ metadata:
     os: rhel
     version: "8.8"
     migrated-from: vmware
-    migration-tool: hyper2kvm
+    migration-tool: h2kvm
   annotations:
-    description: "RHEL 8.8 VM migrated from VMware ESXi using hyper2kvm"
+    description: "RHEL 8.8 VM migrated from VMware ESXi using h2kvm"
     migration-date: "2026-02-19"
     original-source: "esx8.0-rhel8.8-with-thin-provision-disk1.vmdk"
 spec:

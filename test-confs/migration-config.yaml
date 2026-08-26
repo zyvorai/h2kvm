@@ -1,4 +1,4 @@
-# hyper2kvm Migration Pipeline Configuration
+# h2kvm Migration Pipeline Configuration
 # This config demonstrates the complete migration workflow:
 # VMDK → Conversion → Fixes → Validation → QCOW2
 

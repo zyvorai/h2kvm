@@ -4,7 +4,7 @@
 **Last Updated**: 2026-03-29
 **Audience**: System Administrators, DevOps Engineers, IT Architects
 
-This guide documents recommended approaches and best practices for Windows VM migrations using hyper2kvm in various enterprise scenarios.
+This guide documents recommended approaches and best practices for Windows VM migrations using h2kvm in various enterprise scenarios.
 
 ---
 
@@ -136,11 +136,11 @@ vms:
     maintenance_window: Saturday 22:00-06:00
 ```
 
-**Use hyper2kvm inspect**:
+**Use h2kvm inspect**:
 
 ```bash
 # Automated inspection
-hyper2kvm inspect web-server-01.vmdk > web-server-01-inspection.json
+h2kvm inspect web-server-01.vmdk > web-server-01-inspection.json
 
 # Extract key information
 jq '.os_info, .installed_apps, .network_config' web-server-01-inspection.json
@@ -454,7 +454,7 @@ windows:
 
 ```sql
 -- Run generated reconfiguration script
--- C:\hyper2kvm\appcompat\sql-reconfigure.sql
+-- C:\h2kvm\appcompat\sql-reconfigure.sql
 
 -- Verify server name
 SELECT @@SERVERNAME, SERVERPROPERTY('ServerName');
@@ -1027,7 +1027,7 @@ Pre-Migration:
 Migration:
   - [ ] Source VM shutdown gracefully
   - [ ] Migration config reviewed
-  - [ ] hyper2kvm conversion started
+  - [ ] h2kvm conversion started
   - [ ] Progress monitored
   - [ ] Conversion completed successfully
   - [ ] KVM VM created

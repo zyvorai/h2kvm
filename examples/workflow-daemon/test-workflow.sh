@@ -11,12 +11,12 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}hyper2kvm Workflow Daemon Test${NC}"
+echo -e "${BLUE}h2kvm Workflow Daemon Test${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
 # Setup test directories
-TEST_BASE="/tmp/hyper2kvm-workflow-test"
+TEST_BASE="/tmp/h2kvm-workflow-test"
 echo -e "${GREEN}Setting up test environment...${NC}"
 rm -rf "$TEST_BASE"
 mkdir -p "$TEST_BASE"/{workflow,output}
@@ -29,8 +29,8 @@ cat > "$TEST_BASE/workflow-daemon.yaml" <<'EOF'
 command: daemon
 daemon: true
 workflow_mode: true
-workflow_dir: /tmp/hyper2kvm-workflow-test/workflow
-output_dir: /tmp/hyper2kvm-workflow-test/output
+workflow_dir: /tmp/h2kvm-workflow-test/workflow
+output_dir: /tmp/h2kvm-workflow-test/output
 max_concurrent_jobs: 2
 out_format: qcow2
 compress: true
@@ -83,7 +83,7 @@ tree -L 3 "$TEST_BASE" 2>/dev/null || find "$TEST_BASE" -type d | sort
 
 echo ""
 echo -e "${GREEN}To start the workflow daemon:${NC}"
-echo -e "  sudo python -m hyper2kvm --config $TEST_BASE/workflow-daemon.yaml"
+echo -e "  sudo python -m h2kvm --config $TEST_BASE/workflow-daemon.yaml"
 echo ""
 echo -e "${GREEN}To monitor:${NC}"
 echo -e "  watch ls -lR $TEST_BASE/workflow/"

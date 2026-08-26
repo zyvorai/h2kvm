@@ -5,15 +5,15 @@
 cmd: local
 
 # Source VDI (VirtualBox format)
-# Note: hyper2kvm should handle VDI → QCOW2 conversion
+# Note: h2kvm should handle VDI → QCOW2 conversion
 vmdk: /home/ssahani/Downloads/VMs/extracted/ubuntu/64bit/Ubuntu Server 25.04 (64bit).vdi
 
 # Output Configuration
-output_dir: /home/ssahani/tt/hyper2kvm/out/ubuntu25-test
-to_output: /home/ssahani/tt/hyper2kvm/out/ubuntu25-test/ubuntu25-server.qcow2
+output_dir: /home/ssahani/tt/h2kvm/out/ubuntu25-test
+to_output: /home/ssahani/tt/h2kvm/out/ubuntu25-test/ubuntu25-server.qcow2
 out_format: qcow2
 compress: true
-workdir: /home/ssahani/tt/hyper2kvm/out/ubuntu25-test/work
+workdir: /home/ssahani/tt/h2kvm/out/ubuntu25-test/work
 
 # Core Linux Fixes
 fstab_fixes_enable: true
@@ -44,7 +44,7 @@ libvirt_vcpus: 2
 libvirt_disk_bus: virtio
 
 # Reporting
-report: /home/ssahani/tt/hyper2kvm/out/ubuntu25-test/migration-report.md
-log_file: /home/ssahani/tt/hyper2kvm/out/ubuntu25-test/migration.log
+report: /home/ssahani/tt/h2kvm/out/ubuntu25-test/migration-report.md
+log_file: /home/ssahani/tt/h2kvm/out/ubuntu25-test/migration.log
 verbose: 2
 dry_run: false

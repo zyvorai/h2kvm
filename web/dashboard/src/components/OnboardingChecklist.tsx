@@ -76,7 +76,7 @@ export function OnboardingChecklist({
     () => [
       {
         id: 'kvm',
-        title: 'KVM / hyper2kvm ready',
+        title: 'KVM / h2kvm ready',
         done: state.kvmReady,
         hint: 'Host readiness checks (libvirt, h2kvmctl)',
         action: onOpenReadiness ? { label: 'View readiness', onClick: onOpenReadiness } : undefined,

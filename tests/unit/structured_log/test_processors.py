@@ -13,7 +13,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from hyper2kvm.core.structured_log import (
+from h2kvm.core.structured_log import (
     DropEvent,
     _add_log_level,
     _add_logger_name,
@@ -158,7 +158,7 @@ def test_add_logger_name_without_record(mock_logger, make_event_dict):
 
 
 def test_level_filter_passes_at_threshold(mock_logger, make_event_dict):
-    import hyper2kvm.core.structured_log as sl
+    import h2kvm.core.structured_log as sl
 
     sl._current_level = "warning"
     ed = make_event_dict(level="warning")
@@ -167,7 +167,7 @@ def test_level_filter_passes_at_threshold(mock_logger, make_event_dict):
 
 
 def test_level_filter_passes_above_threshold(mock_logger, make_event_dict):
-    import hyper2kvm.core.structured_log as sl
+    import h2kvm.core.structured_log as sl
 
     sl._current_level = "warning"
     ed = make_event_dict(level="error")
@@ -176,7 +176,7 @@ def test_level_filter_passes_above_threshold(mock_logger, make_event_dict):
 
 
 def test_level_filter_drops_below_threshold(mock_logger, make_event_dict):
-    import hyper2kvm.core.structured_log as sl
+    import h2kvm.core.structured_log as sl
 
     sl._current_level = "warning"
     ed = make_event_dict(level="debug")
@@ -185,7 +185,7 @@ def test_level_filter_drops_below_threshold(mock_logger, make_event_dict):
 
 
 def test_level_filter_defaults_for_missing_level(mock_logger, make_event_dict):
-    import hyper2kvm.core.structured_log as sl
+    import h2kvm.core.structured_log as sl
 
     sl._current_level = "debug"
     ed = make_event_dict()  # no level key
@@ -194,7 +194,7 @@ def test_level_filter_defaults_for_missing_level(mock_logger, make_event_dict):
 
 
 def test_level_filter_defaults_for_non_string_level(mock_logger, make_event_dict):
-    import hyper2kvm.core.structured_log as sl
+    import h2kvm.core.structured_log as sl
 
     sl._current_level = "debug"
     ed = make_event_dict(level=42)
@@ -203,7 +203,7 @@ def test_level_filter_defaults_for_non_string_level(mock_logger, make_event_dict
 
 
 def test_level_filter_case_insensitive(mock_logger, make_event_dict):
-    import hyper2kvm.core.structured_log as sl
+    import h2kvm.core.structured_log as sl
 
     sl._current_level = "warning"
     ed = make_event_dict(level="WARNING")

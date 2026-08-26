@@ -37,7 +37,7 @@ These APIs enable advanced migration scenarios like:
 ### 1. Create GPT Partition Table
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 g = VMCraft("ubuntu-server.vmdk")
 g.launch()
@@ -363,7 +363,7 @@ else:
 ### 1. Convert MBR to GPT During Migration
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 g = VMCraft("legacy-vm.vmdk")
 g.launch()

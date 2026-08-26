@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from hyper2kvm.core.structured_log import (
+from h2kvm.core.structured_log import (
     PhaseTimer,
     TraceContext,
     _generate_span_id,
@@ -110,7 +110,7 @@ def test_trace_context_nested_restore():
 # --- PhaseTimer ---
 
 
-@patch("hyper2kvm.core.structured_log.log_event")
+@patch("h2kvm.core.structured_log.log_event")
 def test_phase_timer_logs_start(mock_log_event):
     with PhaseTimer("start_ev", "complete_ev", phase="test"):
         # On enter, log_event called with event_start
@@ -119,7 +119,7 @@ def test_phase_timer_logs_start(mock_log_event):
         assert args[0][0] == "start_ev"
 
 
-@patch("hyper2kvm.core.structured_log.log_event")
+@patch("h2kvm.core.structured_log.log_event")
 def test_phase_timer_logs_complete_success(mock_log_event):
     with PhaseTimer("start_ev", "complete_ev", phase="test"):
         pass
@@ -131,7 +131,7 @@ def test_phase_timer_logs_complete_success(mock_log_event):
     assert "duration_ms" in complete_call[1]
 
 
-@patch("hyper2kvm.core.structured_log.log_event")
+@patch("h2kvm.core.structured_log.log_event")
 def test_phase_timer_logs_complete_failure(mock_log_event):
     with pytest.raises(ValueError):
         with PhaseTimer("start_ev", "complete_ev", phase="test"):
@@ -140,7 +140,7 @@ def test_phase_timer_logs_complete_failure(mock_log_event):
     assert complete_call[1]["status"] == "failure"
 
 
-@patch("hyper2kvm.core.structured_log.log_event")
+@patch("h2kvm.core.structured_log.log_event")
 @patch("time.monotonic")
 def test_phase_timer_duration_positive(mock_monotonic, mock_log_event):
     mock_monotonic.side_effect = [100.0, 100.05]
@@ -150,7 +150,7 @@ def test_phase_timer_duration_positive(mock_monotonic, mock_log_event):
     assert complete_call[1]["duration_ms"] == 50.0
 
 
-@patch("hyper2kvm.core.structured_log.log_event")
+@patch("h2kvm.core.structured_log.log_event")
 def test_phase_timer_child_span(mock_log_event):
     """Inside timer, span_id differs, parent_span_id = outer."""
     outer_span_tok = _span_id_var.set("outer-span")
@@ -164,7 +164,7 @@ def test_phase_timer_child_span(mock_log_event):
         _span_id_var.reset(outer_span_tok)
 
 
-@patch("hyper2kvm.core.structured_log.log_event")
+@patch("h2kvm.core.structured_log.log_event")
 def test_phase_timer_restores_span(mock_log_event):
     """After exit, span vars restored."""
     outer_span_tok = _span_id_var.set("outer-span")
@@ -179,7 +179,7 @@ def test_phase_timer_restores_span(mock_log_event):
         _parent_span_id_var.reset(outer_parent_tok)
 
 
-@patch("hyper2kvm.core.structured_log.log_event")
+@patch("h2kvm.core.structured_log.log_event")
 def test_phase_timer_extra_kwargs(mock_log_event):
     """Extra kwargs forwarded to both log calls."""
     with PhaseTimer("s", "c", phase="p", custom_field="val"):
@@ -188,7 +188,7 @@ def test_phase_timer_extra_kwargs(mock_log_event):
         assert call[1]["custom_field"] == "val"
 
 
-@patch("hyper2kvm.core.structured_log.log_event")
+@patch("h2kvm.core.structured_log.log_event")
 def test_phase_timer_metrics_import_silent(mock_log_event):
     """Missing metrics module -> no exception."""
     # PhaseTimer tries to import metrics at exit — should not raise

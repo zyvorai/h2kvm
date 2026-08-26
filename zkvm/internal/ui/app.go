@@ -13,10 +13,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/hyper2kvm/zkvm/internal/models"
-	"github.com/hyper2kvm/zkvm/internal/protocol"
-	"github.com/hyper2kvm/zkvm/internal/state"
-	"github.com/hyper2kvm/zkvm/internal/widgets"
+	"github.com/h2kvm/zkvm/internal/models"
+	"github.com/h2kvm/zkvm/internal/protocol"
+	"github.com/h2kvm/zkvm/internal/state"
+	"github.com/h2kvm/zkvm/internal/widgets"
 )
 
 // TabModel is the interface that each tab sub-model must implement.
@@ -55,7 +55,7 @@ const (
 // tickInterval is the periodic refresh interval.
 const tickInterval = 2 * time.Second
 
-// App is the root Bubble Tea model for the hyper2kvm TUI.
+// App is the root Bubble Tea model for the h2kvm TUI.
 type App struct {
 	keys      KeyMap
 	help      help.Model

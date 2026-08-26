@@ -1,11 +1,11 @@
-# hyper2kvm LinkedIn Content Package 📱
+# h2kvm LinkedIn Content Package 📱
 
 I've created **4 different formats** optimized for different LinkedIn content types and audiences.
 
 ---
 
 ## 📄 Option 1: Full Article (LinkedIn Pulse / Long-Form)
-**File**: `hyper2kvm-linkedin-article.md`
+**File**: `h2kvm-linkedin-article.md`
 
 **Format**: LinkedIn Article / Pulse
 **Length**: ~2,500 words
@@ -13,7 +13,7 @@ I've created **4 different formats** optimized for different LinkedIn content ty
 **Best For**: LinkedIn Pulse, blog post, detailed showcase
 
 **Strengths**:
-- Comprehensive coverage of hyper2kvm
+- Comprehensive coverage of h2kvm
 - Includes real-world example (LVM boot failure)
 - Technical depth with accessibility
 - Full feature showcase
@@ -37,7 +37,7 @@ I've created **4 different formats** optimized for different LinkedIn content ty
 ---
 
 ## 📱 Option 2: Short Post (Standard LinkedIn Post)
-**File**: `hyper2kvm-linkedin-short-post.md`
+**File**: `h2kvm-linkedin-short-post.md`
 
 **Format**: Regular LinkedIn post
 **Length**: ~800 words
@@ -74,7 +74,7 @@ I've created **4 different formats** optimized for different LinkedIn content ty
 ---
 
 ## 🎨 Option 3: Carousel Post (Visual Slides)
-**File**: `hyper2kvm-linkedin-carousel-slides.md`
+**File**: `h2kvm-linkedin-carousel-slides.md`
 
 **Format**: PDF/Image carousel (10 slides)
 **Best For**: Visual learners, mobile users, high engagement
@@ -117,7 +117,7 @@ I've created **4 different formats** optimized for different LinkedIn content ty
 ---
 
 ## 🔬 Option 4: Technical Deep-Dive (Engineering Audience)
-**File**: `hyper2kvm-technical-deepdive.md`
+**File**: `h2kvm-technical-deepdive.md`
 
 **Format**: Technical blog post / LinkedIn Article
 **Length**: ~4,000 words
@@ -268,7 +268,7 @@ From 'Boot and Hope' to First-Boot Success"
 - "Comment 'interested' if you want updates"
 
 **For Growth**:
-- "Try it: `pip install hyper2kvm[full]`"
+- "Try it: `pip install h2kvm[full]`"
 - "Check out the docs: [link]"
 - "Join our community: [GitHub/Discord]"
 
@@ -315,7 +315,7 @@ From 'Boot and Hope' to First-Boot Success"
 
 ### Community content:
 - Reddit: r/linux, r/sysadmin, r/devops
-- Hacker News: "Show HN: hyper2kvm - VM migration toolkit"
+- Hacker News: "Show HN: h2kvm - VM migration toolkit"
 - Lobsters: Technical deep-dive link
 
 ### Email newsletter:

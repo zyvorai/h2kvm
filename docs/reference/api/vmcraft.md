@@ -6,7 +6,7 @@
 
 ## Overview
 
-VMCraft is hyper2kvm's advanced disk image manipulation platform, providing comprehensive VM inspection, modification, and intelligence capabilities through a pure Python implementation.
+VMCraft is h2kvm's advanced disk image manipulation platform, providing comprehensive VM inspection, modification, and intelligence capabilities through a pure Python implementation.
 
 **Current Version:** v9.2 (January 2026)
 
@@ -26,7 +26,7 @@ VMCraft is hyper2kvm's advanced disk image manipulation platform, providing comp
 VMCraft uses a modular architecture with focused, single-responsibility components:
 
 ```
-hyper2kvm/vmcraft/
+h2kvm/vmcraft/
 ├── main.py                    # VMCraft orchestrator class
 ├── _utils.py                  # Shared utilities
 │
@@ -355,7 +355,7 @@ VMCraft delivers exceptional performance through native Python implementation:
 ### Basic Usage
 
 ```python
-from hyper2kvm.vmcraft import VMCraft
+from h2kvm.vmcraft import VMCraft
 
 # Context manager for automatic cleanup
 with VMCraft() as g:
@@ -1323,7 +1323,7 @@ sudo apt install exfat-fuse      # Ubuntu/Debian
 
 To add new functionality:
 
-1. Create new module in `hyper2kvm/vmcraft/`
+1. Create new module in `h2kvm/vmcraft/`
 2. Create class with focused responsibility
 3. Use dependency injection for other managers
 4. Add to `main.py` initialization
@@ -1356,7 +1356,7 @@ pytest tests/integration/test_core/test_vmcraft/ -v
 pytest tests/unit/test_core/test_vmcraft/test_linux_detection.py -v
 
 # With coverage
-pytest tests/unit/test_core/test_vmcraft/ --cov=hyper2kvm.vmcraft --cov-report=html
+pytest tests/unit/test_core/test_vmcraft/ --cov=h2kvm.vmcraft --cov-report=html
 ```
 
 ---
@@ -1369,7 +1369,7 @@ SPDX-License-Identifier: Apache-2.0
 
 ## References
 
-- [VMCraft README](../hyper2kvm/vmcraft/README.md) - Module-level documentation
+- [VMCraft README](../h2kvm/vmcraft/README.md) - Module-level documentation
 - [VMCraft v9.0 Summary](vmcraft/VMCRAFT_V9_SUMMARY.md) - v9.0 feature summary
 - [qemu-nbd Documentation](https://www.qemu.org/docs/master/tools/qemu-nbd.html) - NBD server
 - [LVM HOWTO](https://tldp.org/HOWTO/LVM-HOWTO/) - Linux LVM guide
@@ -1379,4 +1379,4 @@ SPDX-License-Identifier: Apache-2.0
 
 **Last Updated:** 2026-03-29
 **VMCraft Version:** v9.0
-**Maintained by:** hyper2kvm project
+**Maintained by:** h2kvm project

@@ -6,7 +6,7 @@
 #   kubectl apply -f k8s/operator-deploy/deploy-operator-migrate.yaml
 #
 # This deploys:
-#   1. hyper2kvm-system namespace + RBAC + CRD
+#   1. h2kvm-system namespace + RBAC + CRD
 #   2. Operator Deployment (watches HyperConversion CRs)
 #   3. HTTP file server serving the converted QCOW2 from PVC
 #   4. HyperConversion CR that triggers: DataVolume → VM creation
@@ -16,7 +16,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: hyper2kvm-system
+  name: h2kvm-system
 
 ---
 # 2. ServiceAccount
@@ -24,21 +24,21 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: hyperconversion-operator
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
 
 ---
 # 3. ClusterRole (full permissions for operator)
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: hyper2kvm-operator-role
+  name: h2kvm-operator-role
 rules:
   # HyperConversion CRD
-  - apiGroups: ["hyper2kvm.io"]
+  - apiGroups: ["h2kvm.io"]
     resources: ["hyperconversions", "hyperconversions/status", "hyperconversions/finalizers"]
     verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
   # Validation CRD
-  - apiGroups: ["hyper2kvm.io"]
+  - apiGroups: ["h2kvm.io"]
     resources: ["validations", "validations/status"]
     verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
   # CDI DataVolumes
@@ -72,15 +72,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: hyper2kvm-operator-rolebinding
+  name: h2kvm-operator-rolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: hyper2kvm-operator-role
+  name: h2kvm-operator-role
 subjects:
   - kind: ServiceAccount
     name: hyperconversion-operator
-    namespace: hyper2kvm-system
+    namespace: h2kvm-system
 
 ---
 # 5. Operator Deployment
@@ -88,7 +88,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hyperconversion-operator
-  namespace: hyper2kvm-system
+  namespace: h2kvm-system
   labels:
     control-plane: controller-manager
     app.kubernetes.io/name: hyperconversion-operator
@@ -105,7 +105,7 @@ spec:
       serviceAccountName: hyperconversion-operator
       containers:
       - name: manager
-        image: hyper2kvm-operator:latest
+        image: h2kvm-operator:latest
         imagePullPolicy: IfNotPresent
         command: ["/manager"]
         args: ["--leader-elect"]
@@ -147,7 +147,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: qcow2-fileserver
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
 spec:
   replicas: 1
   selector:
@@ -185,7 +185,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: qcow2-fileserver
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
 spec:
   selector:
     app: qcow2-fileserver
@@ -195,14 +195,14 @@ spec:
 
 ---
 # 8. HyperConversion CR — operator watches this and creates DataVolume + VM
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: rhel88-operator-migration
-  namespace: hyper2kvm-migration
+  namespace: h2kvm-migration
 spec:
   source:
-    url: "http://qcow2-fileserver.hyper2kvm-migration.svc:8080/rhel8.8-fixed.qcow2"
+    url: "http://qcow2-fileserver.h2kvm-migration.svc:8080/rhel8.8-fixed.qcow2"
 
   storage:
     storageClass: local-path-immediate

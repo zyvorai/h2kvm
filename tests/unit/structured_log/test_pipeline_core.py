@@ -10,7 +10,7 @@ import io
 import sys
 from unittest.mock import Mock, patch
 
-from hyper2kvm.core.structured_log import (
+from h2kvm.core.structured_log import (
     BoundLogger,
     DropEvent,
     PrintLogger,
@@ -243,7 +243,7 @@ def test_configure_sets_globals():
     factory = PrintLoggerFactory()
     _configure(procs, factory)
 
-    import hyper2kvm.core.structured_log as sl
+    import h2kvm.core.structured_log as sl
 
     assert sl._global_processors == procs
     assert sl._global_logger_factory is factory

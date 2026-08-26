@@ -1,10 +1,10 @@
 # Dependencies Guide
 
-This document explains the dependencies for hyper2kvm and how to install them.
+This document explains the dependencies for h2kvm and how to install them.
 
 ## Overview
 
-hyper2kvm has two types of dependencies:
+h2kvm has two types of dependencies:
 
 1. **System Dependencies** - Installed via OS package manager (apt, dnf, zypper)
 2. **Python Dependencies** - Installed via pip
@@ -15,7 +15,7 @@ hyper2kvm has two types of dependencies:
 
 These **MUST** be installed via your system package manager before installing Python dependencies.
 
-**Note:** hyper2kvm uses the **VMCraft engine** (pure Python) for VM manipulation. Native VMCraft engine - no C dependencies.
+**Note:** h2kvm uses the **VMCraft engine** (pure Python) for VM manipulation. Native VMCraft engine - no C dependencies.
 
 ### Required System Packages
 
@@ -129,7 +129,7 @@ source .venv/bin/activate
 # 3. Install Python dependencies
 pip install -r requirements.txt
 
-# 4. Install hyper2kvm
+# 4. Install h2kvm
 pip install -e .
 ```
 
@@ -169,7 +169,7 @@ After installation, verify everything works:
 qemu-img --version
 virsh --version
 
-# 2. Check hyper2kvm
+# 2. Check h2kvm
 h2kvmctl --help
 
 # 3. Run tests (if dev dependencies installed)
@@ -189,7 +189,7 @@ sudo apt-get install qemu-utils
 # Python packages (minimal)
 pip install rich click PyYAML requests
 
-# Install hyper2kvm
+# Install h2kvm
 pip install -e .
 ```
 
@@ -214,7 +214,7 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
-# Install hyper2kvm
+# Install h2kvm
 COPY . /app
 WORKDIR /app
 RUN pip3 install -e .

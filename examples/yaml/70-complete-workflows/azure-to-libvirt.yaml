@@ -9,7 +9,7 @@
 #   → guest fixes → libvirt XML → boot test
 #
 # Prerequisites:
-#   pip install hyper2kvm[azure]
+#   pip install h2kvm[azure]
 #   # Or: pip install azure-identity azure-mgmt-compute azure-mgmt-network \
 #   #       azure-mgmt-resource azure-storage-blob
 #   az login   # Azure CLI login

@@ -4,7 +4,7 @@
 **Last Updated**: 2026-03-29
 **Audience**: System Administrators, Support Engineers
 
-This runbook provides diagnostic procedures and solutions for common Windows VM migration issues with hyper2kvm.
+This runbook provides diagnostic procedures and solutions for common Windows VM migration issues with h2kvm.
 
 ---
 
@@ -81,8 +81,8 @@ virsh domblklist windows-server
 # Check network configuration
 virsh domiflist windows-server
 
-# Verify VirtIO driver ISO at standard path (auto-discovered by hyper2kvm)
-ls -lh /var/lib/hyper2kvm/virtio-win.iso
+# Verify VirtIO driver ISO at standard path (auto-discovered by h2kvm)
+ls -lh /var/lib/h2kvm/virtio-win.iso
 
 # Or check custom driver directory if using --virtio-drivers-dir override
 ls -lh /opt/virtio-drivers/
@@ -121,7 +121,7 @@ VirtIO storage driver not properly injected or loaded
 
 First, ensure the VirtIO ISO is installed:
 ```bash
-# Download to standard path (auto-discovered by hyper2kvm — no --virtio-drivers-dir needed)
+# Download to standard path (auto-discovered by h2kvm — no --virtio-drivers-dir needed)
 sudo ./scripts/install-deps.sh --virtio-win
 ```
 
@@ -133,8 +133,8 @@ virt-win-reg --merge windows-server.qcow2 \
   viostor-injection.reg
 
 # Or re-run migration with forced injection
-# VirtIO ISO is auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
-hyper2kvm convert \
+# VirtIO ISO is auto-discovered at /var/lib/h2kvm/virtio-win.iso
+h2kvm convert \
   --input source.vmdk \
   --output target-fixed.qcow2 \
   --force-virtio-injection
@@ -743,7 +743,7 @@ $PowerMgmt.Put()
 **Solution 2: Enable MSI Interrupts**
 ```powershell
 # Run MSI configuration script
-C:\hyper2kvm\performance\msi-verify.ps1
+C:\h2kvm\performance\msi-verify.ps1
 
 # Or manually enable
 $RegPath = "HKLM:\SYSTEM\CurrentControlSet\Services\netkvm\Parameters\InterruptManagement\MessageSignaledInterruptProperties"
@@ -886,7 +886,7 @@ Test-NetConnection license-server.company.com -Port 27000
 **SQL Server Issues**:
 ```powershell
 # Run reconfiguration script
-sqlcmd -S localhost -E -i C:\hyper2kvm\appcompat\sql-reconfigure.sql
+sqlcmd -S localhost -E -i C:\h2kvm\appcompat\sql-reconfigure.sql
 
 # Update server name in SQL
 sp_dropserver '<old-server-name>'
@@ -1008,7 +1008,7 @@ When troubleshooting is unsuccessful:
 2. **Create support bundle**:
    ```bash
    tar -czf support-$(date +%Y%m%d).tar.gz \
-     /var/log/hyper2kvm/*.log \
+     /var/log/h2kvm/*.log \
      vm-config.xml \
      libvirt-log.txt \
      systeminfo.txt \
@@ -1025,7 +1025,7 @@ When troubleshooting is unsuccessful:
 - [Windows Configuration Schema](../reference/windows-configuration-schema.md)
 - [Microsoft Support](https://support.microsoft.com)
 - [Red Hat VirtIO Drivers](https://access.redhat.com/articles/2470791)
-- **VirtIO ISO standard path**: `/var/lib/hyper2kvm/virtio-win.iso` (install with `sudo ./scripts/install-deps.sh --virtio-win`)
+- **VirtIO ISO standard path**: `/var/lib/h2kvm/virtio-win.iso` (install with `sudo ./scripts/install-deps.sh --virtio-win`)
 
 ---
 

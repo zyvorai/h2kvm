@@ -22,8 +22,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
-	hyper2kvmv1 "github.com/hyper2kvm/operator/api/v1"
-	hyper2kvmv1alpha1 "github.com/hyper2kvm/operator/api/v1alpha1"
+	h2kvmv1 "github.com/h2kvm/operator/api/v1"
+	h2kvmv1alpha1 "github.com/h2kvm/operator/api/v1alpha1"
 	kubevirtv1 "kubevirt.io/api/core/v1"
 )
 
@@ -59,13 +59,13 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
-	err = hyper2kvmv1.AddToScheme(scheme.Scheme)
+	err = h2kvmv1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = kubevirtv1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = hyper2kvmv1alpha1.AddToScheme(scheme.Scheme)
+	err = h2kvmv1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})

@@ -187,7 +187,7 @@ make test-e2e
 
 **Usage**:
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: vmdk-from-s3
@@ -333,7 +333,7 @@ helm install hyperconversion ./charts/hyperconversion-operator \
 ### Access Metrics
 
 ```bash
-kubectl port-forward -n hyper2kvm-system \
+kubectl port-forward -n h2kvm-system \
   deployment/hyperconversion-operator 8443:8443
 
 curl -k https://localhost:8443/metrics | grep hyperconversion_
@@ -369,7 +369,7 @@ kubectl create secret generic s3-credentials \
 
 # Apply HyperConversion
 kubectl apply -f - <<EOF
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: HyperConversion
 metadata:
   name: vmdk-from-s3

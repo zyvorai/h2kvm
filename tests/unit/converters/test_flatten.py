@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm/converters/flatten.py (Flatten static helpers)."""
+"""Tests for h2kvm/converters/flatten.py (Flatten static helpers)."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from hyper2kvm.converters.flatten import Flatten
+from h2kvm.converters.flatten import Flatten
 
 
 # ---------------------------------------------------------------------------
@@ -24,7 +24,7 @@ from hyper2kvm.converters.flatten import Flatten
 class TestQemuImgInfo:
     """Flatten._qemu_img_info: runs qemu-img info --output=json, returns dict."""
 
-    @patch("hyper2kvm.converters.flatten.subprocess.run")
+    @patch("h2kvm.converters.flatten.subprocess.run")
     def test_returns_parsed_json(self, mock_run, mock_logger):
         payload = {"format": "vmdk", "virtual-size": 10737418240}
         cp = MagicMock()
@@ -37,7 +37,7 @@ class TestQemuImgInfo:
         assert result["virtual-size"] == 10737418240
         mock_run.assert_called_once()
 
-    @patch("hyper2kvm.converters.flatten.subprocess.run")
+    @patch("h2kvm.converters.flatten.subprocess.run")
     def test_returns_empty_dict_on_failure(self, mock_run, mock_logger):
         mock_run.side_effect = subprocess.CalledProcessError(1, "qemu-img")
 
@@ -45,7 +45,7 @@ class TestQemuImgInfo:
 
         assert result == {}
 
-    @patch("hyper2kvm.converters.flatten.subprocess.run")
+    @patch("h2kvm.converters.flatten.subprocess.run")
     def test_returns_empty_dict_on_non_dict_json(self, mock_run, mock_logger):
         cp = MagicMock()
         cp.stdout = '"just a string"'
@@ -55,7 +55,7 @@ class TestQemuImgInfo:
 
         assert result == {}
 
-    @patch("hyper2kvm.converters.flatten.subprocess.run")
+    @patch("h2kvm.converters.flatten.subprocess.run")
     def test_calls_correct_command(self, mock_run, mock_logger):
         cp = MagicMock()
         cp.stdout = "{}"

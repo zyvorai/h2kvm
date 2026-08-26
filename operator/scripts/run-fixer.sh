@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# run-fixer.sh — Entrypoint for the hyper2kvm fixer Job pod.
+# run-fixer.sh — Entrypoint for the h2kvm fixer Job pod.
 # Runs offline fixes (LVM activation, initramfs regen, fstab rewrite)
 # on a disk image stored in a PVC.
 #

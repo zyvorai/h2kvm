@@ -1,8 +1,8 @@
-# Hyper2KVM Documentation Hub
+# H2KVM Documentation Hub
 
 **Enterprise-Grade VM Migration from Any Hypervisor to KVM/Libvirt**
 
-Welcome to the comprehensive documentation for Hyper2KVM, a production-ready VM migration toolkit designed for seamless hypervisor transitions.
+Welcome to the comprehensive documentation for H2KVM, a production-ready VM migration toolkit designed for seamless hypervisor transitions.
 
 ---
 
@@ -47,7 +47,7 @@ Welcome to the comprehensive documentation for Hyper2KVM, a production-ready VM 
 ## 📚 Documentation Structure
 
 ### 🚀 Getting Started
-**New to hyper2kvm? Start here!**
+**New to h2kvm? Start here!**
 
 | Document | Description |
 |----------|-------------|
@@ -127,7 +127,7 @@ Welcome to the comprehensive documentation for Hyper2KVM, a production-ready VM 
 - [Troubleshooting Flowchart](guides/decision-support/TROUBLESHOOTING_FLOWCHART.md) - Diagnose issues
 
 ### 🏗️ Architecture & Internals
-**Understanding how hyper2kvm works**
+**Understanding how h2kvm works**
 
 | Component | Documentation |
 |-----------|---------------|
@@ -322,9 +322,9 @@ Welcome to the comprehensive documentation for Hyper2KVM, a production-ready VM 
 
 | Document | Description |
 |----------|-------------|
-| [LinkedIn Article](marketing/hyper2kvm-linkedin-article.md) | Long-form article |
-| [LinkedIn Short Post](marketing/hyper2kvm-linkedin-short-post.md) | Social post |
-| [LinkedIn Carousel](marketing/hyper2kvm-linkedin-carousel-slides.md) | Visual slides |
+| [LinkedIn Article](marketing/h2kvm-linkedin-article.md) | Long-form article |
+| [LinkedIn Short Post](marketing/h2kvm-linkedin-short-post.md) | Social post |
+| [LinkedIn Carousel](marketing/h2kvm-linkedin-carousel-slides.md) | Visual slides |
 | [Content Guide](marketing/linkedin-content-guide.md) | Content strategy |
 
 ### 📝 Documentation Meta
@@ -392,9 +392,9 @@ Welcome to the comprehensive documentation for Hyper2KVM, a production-ready VM 
 
 ## 📚 External Resources
 
-- **GitHub Repository**: https://github.com/ssahani/hyper2kvm
-- **PyPI Package**: https://pypi.org/project/hyper2kvm/
-- **Issue Tracker**: https://github.com/ssahani/hyper2kvm/issues
+- **GitHub Repository**: https://github.com/ssahani/h2kvm
+- **PyPI Package**: https://pypi.org/project/h2kvm/
+- **Issue Tracker**: https://github.com/ssahani/h2kvm/issues
 
 ---
 

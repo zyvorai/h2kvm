@@ -467,7 +467,7 @@ python post_migration_validation.py /kvm/db-server.qcow2
 
 **Core Requirements**:
 - Python 3.8+
-- VMCraft library (hyper2kvm)
+- VMCraft library (h2kvm)
 - qemu-nbd
 - sudo privileges
 
@@ -480,8 +480,8 @@ python post_migration_validation.py /kvm/db-server.qcow2
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 
 # Install dependencies
 pip install -e .
@@ -807,7 +807,7 @@ Track migration success with these metrics:
    - Enterprise example: `../enterprise_migration_master.py`
 
 3. **Issues**
-   - Report bugs: https://github.com/ssahani/hyper2kvm/issues
+   - Report bugs: https://github.com/ssahani/h2kvm/issues
    - Feature requests: GitHub Issues
 
 ### Contributing
@@ -822,7 +822,7 @@ Contributions welcome! Please submit PRs for:
 
 ## License
 
-This project is licensed under the same license as the hyper2kvm project.
+This project is licensed under the same license as the h2kvm project.
 
 ---
 

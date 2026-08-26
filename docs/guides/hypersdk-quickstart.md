@@ -6,7 +6,7 @@
 
 ## Prerequisites
 
-- hyper2kvm installed (`make install` puts binaries in `/usr/bin`)
+- h2kvm installed (`make install` puts binaries in `/usr/bin`)
 - HyperSDK repository cloned
 - Go 1.19+ installed
 - Python 3.8+ installed
@@ -33,9 +33,9 @@ go build -o hyperctl .
 ## 2. Set Up Workflow Directories
 
 ```bash
-sudo mkdir -p /var/lib/hyper2kvm/manifest-workflow/{to_be_processed,processing,processed,failed}
-sudo mkdir -p /var/lib/hyper2kvm/output
-sudo chown -R $(whoami):$(whoami) /var/lib/hyper2kvm
+sudo mkdir -p /var/lib/h2kvm/manifest-workflow/{to_be_processed,processing,processed,failed}
+sudo mkdir -p /var/lib/h2kvm/output
+sudo chown -R $(whoami):$(whoami) /var/lib/h2kvm
 ```
 
 ---
@@ -47,8 +47,8 @@ cat > /tmp/manifest-daemon.yaml <<EOF
 command: daemon
 daemon: true
 manifest_workflow_mode: true
-manifest_workflow_dir: /var/lib/hyper2kvm/manifest-workflow
-output_dir: /var/lib/hyper2kvm/output
+manifest_workflow_dir: /var/lib/h2kvm/manifest-workflow
+output_dir: /var/lib/h2kvm/output
 max_concurrent_jobs: 3
 verbose: 2
 log_file: /tmp/workflow-daemon.log
@@ -99,10 +99,10 @@ EOF
 h2kvmctl --config /tmp/manifest-daemon.yaml
 
 # Submit manifest (in terminal 2)
-cp /tmp/test-vm.json /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+cp /tmp/test-vm.json /var/lib/h2kvm/manifest-workflow/to_be_processed/
 
 # Watch progress
-watch -n 1 'ls -lR /var/lib/hyper2kvm/manifest-workflow/'
+watch -n 1 'ls -lR /var/lib/h2kvm/manifest-workflow/'
 ```
 
 ### Option B: Using HyperCTL
@@ -137,7 +137,7 @@ firefox http://localhost:8080/web/dashboard/
 
 ```bash
 # Via CLI
-ls -la /var/lib/hyper2kvm/manifest-workflow/processing/
+ls -la /var/lib/h2kvm/manifest-workflow/processing/
 
 # Via HyperCTL
 /home/ssahani/go/github/hypersdk/cmd/hyperctl/hyperctl workflow -op list
@@ -147,20 +147,20 @@ ls -la /var/lib/hyper2kvm/manifest-workflow/processing/
 
 ```bash
 # List completed
-ls -la /var/lib/hyper2kvm/manifest-workflow/processed/
+ls -la /var/lib/h2kvm/manifest-workflow/processed/
 
 # View processing report
-cat /var/lib/hyper2kvm/manifest-workflow/processed/*/your-manifest.json.report.json
+cat /var/lib/h2kvm/manifest-workflow/processed/*/your-manifest.json.report.json
 ```
 
 ### Check Failed Jobs
 
 ```bash
 # List failed
-ls -la /var/lib/hyper2kvm/manifest-workflow/failed/
+ls -la /var/lib/h2kvm/manifest-workflow/failed/
 
 # View error details
-cat /var/lib/hyper2kvm/manifest-workflow/failed/*/your-manifest.json.error.json
+cat /var/lib/h2kvm/manifest-workflow/failed/*/your-manifest.json.error.json
 ```
 
 ---
@@ -266,7 +266,7 @@ For processing multiple VMs:
 h2kvmctl --version
 
 # Check directories exist
-ls -la /var/lib/hyper2kvm/manifest-workflow/
+ls -la /var/lib/h2kvm/manifest-workflow/
 
 # Check logs
 tail -f /tmp/workflow-daemon.log
@@ -276,10 +276,10 @@ tail -f /tmp/workflow-daemon.log
 
 ```bash
 # Check daemon is running
-ps aux | grep hyper2kvm
+ps aux | grep h2kvm
 
 # Check file permissions
-ls -la /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+ls -la /var/lib/h2kvm/manifest-workflow/to_be_processed/
 
 # Check daemon logs
 tail -f /tmp/workflow-daemon.log
@@ -303,14 +303,14 @@ go run ./cmd/daemon --config config.yaml
 ### Try the Demo
 
 ```bash
-cd /home/ssahani/tt/hyper2kvm
+cd /home/ssahani/tt/h2kvm
 ./demo_hypersdk_integration.sh
 ```
 
 ### Run Integration Tests
 
 ```bash
-cd /home/ssahani/tt/hyper2kvm
+cd /home/ssahani/tt/h2kvm
 ./test_hypersdk_integration.sh
 ```
 
@@ -327,11 +327,11 @@ cd /home/ssahani/tt/hyper2kvm
 | File | Location |
 |------|----------|
 | **HyperCTL** | `/home/ssahani/go/github/hypersdk/cmd/hyperctl/hyperctl` |
-| **Workflow Dirs** | `/var/lib/hyper2kvm/manifest-workflow/` |
-| **Output Dirs** | `/var/lib/hyper2kvm/output/` |
-| **Example Manifests** | `/home/ssahani/tt/hyper2kvm/examples/manifest-workflow/` |
-| **Test Scripts** | `/home/ssahani/tt/hyper2kvm/test_*.sh` |
-| **Demo Script** | `/home/ssahani/tt/hyper2kvm/demo_*.sh` |
+| **Workflow Dirs** | `/var/lib/h2kvm/manifest-workflow/` |
+| **Output Dirs** | `/var/lib/h2kvm/output/` |
+| **Example Manifests** | `/home/ssahani/tt/h2kvm/examples/manifest-workflow/` |
+| **Test Scripts** | `/home/ssahani/tt/h2kvm/test_*.sh` |
+| **Demo Script** | `/home/ssahani/tt/h2kvm/demo_*.sh` |
 
 ---
 
@@ -364,7 +364,7 @@ cd /home/ssahani/go/github/hypersdk/cmd/hyperctl && go build .
 h2kvmctl --config /tmp/manifest-daemon.yaml
 
 # Submit manifest
-cp manifest.json /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
+cp manifest.json /var/lib/h2kvm/manifest-workflow/to_be_processed/
 
 # Monitor
 ./hyperctl workflow -op watch
@@ -374,4 +374,4 @@ cp manifest.json /var/lib/hyper2kvm/manifest-workflow/to_be_processed/
 
 **Quick Start Complete!** 🚀
 
-You now have a working HyperSDK + hyper2kvm workflow integration.
+You now have a working HyperSDK + h2kvm workflow integration.

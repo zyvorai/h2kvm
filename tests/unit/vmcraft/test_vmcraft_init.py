@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.vmcraft.main.VMCraft and service-layer helpers."""
+"""Tests for h2kvm.vmcraft.main.VMCraft and service-layer helpers."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from hyper2kvm.vmcraft.services import partition_to_device, partition_to_number
+from h2kvm.vmcraft.services import partition_to_device, partition_to_number
 
 
 # ---------------------------------------------------------------------------
@@ -85,8 +85,8 @@ def vmcraft_class():
     This avoids importing all the ops classes which would pull in the entire
     dependency tree.
     """
-    with patch("hyper2kvm.vmcraft.main.VMCraft._initialize_ops"):
-        from hyper2kvm.vmcraft.main import VMCraft
+    with patch("h2kvm.vmcraft.main.VMCraft._initialize_ops"):
+        from h2kvm.vmcraft.main import VMCraft
 
         yield VMCraft
 
@@ -237,7 +237,7 @@ class TestSync:
         """sync() should be a no-op when not launched."""
         vmcraft.sync()  # must not raise
 
-    @patch("hyper2kvm.vmcraft.main.os.sync")
+    @patch("h2kvm.vmcraft.main.os.sync")
     def test_calls_os_sync_when_launched(self, mock_os_sync, vmcraft):
         vmcraft._launched = True
         vmcraft.sync()

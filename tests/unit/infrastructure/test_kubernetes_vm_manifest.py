@@ -6,7 +6,7 @@
 
 from types import SimpleNamespace
 
-from hyper2kvm.infrastructure.deployers.kubevirt_guest_profile import (
+from h2kvm.infrastructure.deployers.kubevirt_guest_profile import (
     LINUX_SSH_PORT,
     WINDOWS_RDP_PORT,
     build_kubevirt_vm_manifest,
@@ -100,8 +100,8 @@ ID_LIKE="centos fedora"
     labels = vm["metadata"]["labels"]
     assert labels["v9s.io/guest-os"] == "linux"
     assert labels["os.template.kubevirt.io/variant"] == "rhel8.10"
-    assert labels["hyper2kvm.io/os-distro"] == "rhel"
-    assert labels["hyper2kvm.io/os-version"] == "8.10"
+    assert labels["h2kvm.io/os-distro"] == "rhel"
+    assert labels["h2kvm.io/os-version"] == "8.10"
 
     domain = vm["spec"]["template"]["spec"]["domain"]
     assert "os" not in domain

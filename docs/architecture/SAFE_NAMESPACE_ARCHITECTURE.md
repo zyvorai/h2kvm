@@ -32,7 +32,7 @@ The Safe Namespace Engine provides **enterprise-grade isolation** that:
 │  └──────────────────┘                                      │
 │                                                             │
 │  ┌──────────────────────────────────────────────────────┐  │
-│  │     Hyper2KVM Namespace (unshare isolation)          │  │
+│  │     H2KVM Namespace (unshare isolation)          │  │
 │  │                                                       │  │
 │  │  ┌─────────────────────────────────────────────┐     │  │
 │  │  │ Private /dev (tmpfs - NOT host /dev)        │     │  │
@@ -48,7 +48,7 @@ The Safe Namespace Engine provides **enterprise-grade isolation** that:
 │  │  ┌─────────────────────────────────────────────┐     │  │
 │  │  │ Private LVM Cache                           │     │  │
 │  │  │                                              │     │  │
-│  │  │ LVM_SYSTEM_DIR=/tmp/hyper2kvm-<job>/lvm     │     │  │
+│  │  │ LVM_SYSTEM_DIR=/tmp/h2kvm-<job>/lvm     │     │  │
 │  │  │                                              │     │  │
 │  │  │ Device Filter: ["a|nbd0.*|", "r|.*|"]       │     │  │
 │  │  │ → Only NBD devices allowed                  │     │  │
@@ -65,7 +65,7 @@ The Safe Namespace Engine provides **enterprise-grade isolation** that:
 │  │  ┌─────────────────────────────────────────────┐     │  │
 │  │  │ Mounted Guest Root                          │     │  │
 │  │  │                                              │     │  │
-│  │  │ /tmp/hyper2kvm-<job>/root                   │     │  │
+│  │  │ /tmp/h2kvm-<job>/root                   │     │  │
 │  │  └─────────────────────────────────────────────┘     │  │
 │  │                                                       │  │
 │  │  ┌─────────────────────────────────────────────┐     │  │
@@ -148,7 +148,7 @@ Changes inside namespace **cannot affect host**.
 **Each conversion gets isolated workspace:**
 
 ```
-/tmp/hyper2kvm-<uuid>/
+/tmp/h2kvm-<uuid>/
     lvm/           # Isolated LVM cache
     root/          # Guest root mount
     overlay/       # OverlayFS workspace
@@ -196,7 +196,7 @@ Resources are **always freed**, even if operations fail.
 ### Basic Usage
 
 ```python
-from hyper2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine
+from h2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine
 
 # Create engine
 engine = SafeNamespaceEngine("/dev/nbd0")
@@ -218,7 +218,7 @@ finally:
 ### Context Manager
 
 ```python
-from hyper2kvm.vmcraft.safe_namespace_engine import create_safe_namespace
+from h2kvm.vmcraft.safe_namespace_engine import create_safe_namespace
 
 # Automatic cleanup with context manager
 with create_safe_namespace("/dev/nbd0") as engine:
@@ -231,7 +231,7 @@ with create_safe_namespace("/dev/nbd0") as engine:
 ### Parallel Conversions (Thread-Based)
 
 ```python
-from hyper2kvm.vmcraft.parallel_converter import (
+from h2kvm.vmcraft.parallel_converter import (
     ParallelConversionManager,
     ConversionJob,
     ConversionResult,
@@ -278,7 +278,7 @@ for job_id, result in results.items():
 **Recommended for production use** - uses persistent namespaces with process-based parallelism:
 
 ```python
-from hyper2kvm.vmcraft.enterprise_parallel_manager import (
+from h2kvm.vmcraft.enterprise_parallel_manager import (
     EnterpriseParallelManager,
     ConversionJob,
     ConversionResult,
@@ -394,7 +394,7 @@ result = subprocess.run(
     text=True
 )
 
-if "hyper2kvm" in result.stdout:
+if "h2kvm" in result.stdout:
     print("❌ UNSAFE: Leftover mounts!")
 else:
     print("✅ SAFE: Clean cleanup")

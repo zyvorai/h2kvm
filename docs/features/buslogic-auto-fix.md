@@ -77,7 +77,7 @@ When BusLogic is detected, the auto-fix automatically:
 3. **Creates temporary fixed VMDK**
    - Uses workdir location (respects `workdir` config)
    - Avoids `/tmp` space issues
-   - Path: `{workdir}/hyper2kvm-buslogic-fix-{random}/`
+   - Path: `{workdir}/h2kvm-buslogic-fix-{random}/`
 
 4. **Copies extent file** (if present)
    - For split VMDKs: `filename-flat.vmdk`
@@ -99,7 +99,7 @@ The fixed VMDK is used for the rest of the migration pipeline:
 
 1. VM starts with libvirt virtio disk controller
 2. Guest expects LSI Logic (from rewritten descriptor)
-3. Initramfs contains virtio drivers (injected by hyper2kvm)
+3. Initramfs contains virtio drivers (injected by h2kvm)
 4. Virtio drivers load successfully
 5. Root filesystem mounts
 6. Boot completes → login screen appears
@@ -164,10 +164,10 @@ fstab_mode: stabilize-all
    Old: ddb.adapterType = "buslogic"
    New: ddb.adapterType = "lsilogic"
    Copied extent: filename-flat.vmdk
-   ✅ Fixed VMDK: /workdir/hyper2kvm-buslogic-fix-xxxxx/filename.vmdk
+   ✅ Fixed VMDK: /workdir/h2kvm-buslogic-fix-xxxxx/filename.vmdk
 
    ✅ BusLogic auto-fix complete!
-   Using fixed VMDK: /workdir/hyper2kvm-buslogic-fix-xxxxx/filename.vmdk
+   Using fixed VMDK: /workdir/h2kvm-buslogic-fix-xxxxx/filename.vmdk
 
 💡 Recommended solutions:
    ✅ BusLogic auto-fixed: Descriptor rewritten to LSI Logic
@@ -180,7 +180,7 @@ fstab_mode: stabilize-all
 ### Conversion Continues
 
 ```
-📌 Using auto-fixed VMDK: /workdir/hyper2kvm-buslogic-fix-xxxxx/filename.vmdk
+📌 Using auto-fixed VMDK: /workdir/h2kvm-buslogic-fix-xxxxx/filename.vmdk
 
 ➡️ Offline filesystem fixes
 ...
@@ -291,7 +291,7 @@ ddb.geometry.sectors = "63"
 
 ### Code Implementation
 
-**File**: `hyper2kvm/orchestrator/disk_processor.py`
+**File**: `h2kvm/orchestrator/disk_processor.py`
 
 **Method**: `_fix_buslogic_controller(vmdk_path: Path) -> Path`
 
@@ -384,7 +384,7 @@ If missing, ensure `regen_initramfs: true` in config.
 
 ```
 1. User: "Migrate this BusLogic VMDK"
-2. hyper2kvm: ❌ FATAL: BusLogic unsupported - ABORT
+2. h2kvm: ❌ FATAL: BusLogic unsupported - ABORT
 3. User: Must go to VMware, change controller, re-export
 4. User: Retry migration with fixed VMDK
 ```
@@ -395,8 +395,8 @@ If missing, ensure `regen_initramfs: true` in config.
 
 ```
 1. User: "Migrate this BusLogic VMDK"
-2. hyper2kvm: ⚠️  BusLogic detected → Auto-fixing...
-3. hyper2kvm: ✅ Fixed → Continuing migration
+2. h2kvm: ⚠️  BusLogic detected → Auto-fixing...
+3. h2kvm: ✅ Fixed → Continuing migration
 4. User: VM boots successfully
 ```
 
@@ -517,7 +517,7 @@ For issues with BusLogic auto-fix:
 2. Verify `workdir` has sufficient space
 3. Ensure `regen_initramfs: true` in config
 4. Check VM console logs for boot errors
-5. Report issues: https://github.com/ssahani/hyper2kvm/issues
+5. Report issues: https://github.com/ssahani/h2kvm/issues
 
 ## Author
 

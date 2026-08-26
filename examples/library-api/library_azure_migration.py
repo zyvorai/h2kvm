@@ -4,7 +4,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 """
-Example: Azure VM migration using hyper2kvm library.
+Example: Azure VM migration using h2kvm library.
 
 This example demonstrates:
 - Connecting to Azure
@@ -25,7 +25,7 @@ import logging
 import os
 import sys
 
-from hyper2kvm import AzureConfig, AzureSourceProvider, Orchestrator
+from h2kvm import AzureConfig, AzureSourceProvider, Orchestrator
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

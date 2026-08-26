@@ -1,5 +1,5 @@
 # Custom profile example
-# Save as: /etc/hyper2kvm/profiles/my_org.yaml
+# Save as: /etc/h2kvm/profiles/my_org.yaml
 
 description: "Organization-specific migration profile"
 extends: "production"

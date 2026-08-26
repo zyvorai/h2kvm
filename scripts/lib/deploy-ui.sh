@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # shellcheck shell=bash
-# Emoji-rich deploy UI for hyper2kvm (self-contained; no cross-repo imports).
+# Emoji-rich deploy UI for h2kvm (self-contained; no cross-repo imports).
 # Configure via deploy-common.sh before sourcing.
 
-DEPLOY_UI_PROJECT="${DEPLOY_UI_PROJECT:-hyper2kvm}"
+DEPLOY_UI_PROJECT="${DEPLOY_UI_PROJECT:-h2kvm}"
 DEPLOY_UI_ICON="${DEPLOY_UI_ICON:-🔄}"
 DEPLOY_UI_ICON_UNINSTALL="${DEPLOY_UI_ICON_UNINSTALL:-🗑️}"
 DEPLOY_UI_ICON_MAGIC="${DEPLOY_UI_ICON_MAGIC:-✨}"

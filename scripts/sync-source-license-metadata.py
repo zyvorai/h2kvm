@@ -16,7 +16,7 @@ REPOS = [
     "Aether",
     "cockpit",
     "forge",
-    "hyper2kvm-",
+    "h2kvm-",
     "hypercluster",
     "hypersdk-",
     "hypersdk-web",
@@ -35,7 +35,7 @@ REPOS = [
 OPEN_SOURCE_REPO_PATHS = {
     "guestkit",
     "tt/cloud-netconfig",
-    "tt/hyper2kvm",
+    "tt/h2kvm",
     "tt/hypersdk",
     "tt/hypersdk-org-profile",
     "tt/netctl",

@@ -96,6 +96,6 @@
   "log_level": "INFO",
   "verbose": true,
   "enable_recovery": true,
-  "recovery_checkpoint_dir": "/tmp/hyper2kvm-checkpoints",
+  "recovery_checkpoint_dir": "/tmp/h2kvm-checkpoints",
   "post_migration_script": "#!/bin/bash\nset -e\n\n# Import domain\nvirsh define /data/kvm/opensuse-leap-15-server.xml\n\n# Start VM\nvirsh start opensuse-leap-15-server\n\n# Wait for boot\necho \"Waiting for openSUSE Leap to boot...\"\nsleep 45\n\n# Check VM status\nvirsh list | grep opensuse-leap-15-server\n\necho \"openSUSE Leap migration complete\"\necho \"Connect via: virsh console opensuse-leap-15-server\"\necho \"YaST2 may need to be reconfigured for network\"\n"
 }

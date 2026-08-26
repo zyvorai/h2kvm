@@ -12,7 +12,7 @@ using all available systemd tool integrations.
 
 from pathlib import Path
 
-from hyper2kvm.systemd import (
+from h2kvm.systemd import (
     SystemdAnalyze,
     SystemdCat,
     SystemdCgtop,
@@ -129,7 +129,7 @@ def phase_4_prepare_environment():
     print(f"   Cache: {cache_dir}")
 
     # Create migration directories
-    migration_tmp = Path(temp_dir) / "hyper2kvm"
+    migration_tmp = Path(temp_dir) / "h2kvm"
     migration_tmp.mkdir(exist_ok=True, parents=True)
 
     print(f"✅ Created migration temp: {migration_tmp}")

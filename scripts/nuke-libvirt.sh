@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
-# nuke-libvirt.sh — Remove ALL libvirt domains, networks, pools, and hyper2kvm artifacts
+# nuke-libvirt.sh — Remove ALL libvirt domains, networks, pools, and h2kvm artifacts
 #
 # Usage:
 #   sudo ./scripts/nuke-libvirt.sh                    # interactive (asks for confirmation)
@@ -12,7 +12,7 @@
 #   1. Destroy and undefine every libvirt domain (VM) + their snapshots and NVRAM
 #   2. Destroy and undefine every virtual network (unless --keep-networks)
 #   3. Destroy and undefine every storage pool + delete its contents
-#   4. Remove hyper2kvm conversion cache and AI knowledge base
+#   4. Remove h2kvm conversion cache and AI knowledge base
 #
 set -euo pipefail
 
@@ -71,16 +71,16 @@ else
     echo "  Virtual networks:   $NET_COUNT"
 fi
 echo "  Storage pools:      $POOL_COUNT"
-echo "  hyper2kvm cache:    ~/.cache/hyper2kvm/"
+echo "  h2kvm cache:    ~/.cache/h2kvm/"
 echo ""
 
 if [[ "$DOMAIN_COUNT" -eq 0 && "$NET_COUNT" -eq 0 && "$POOL_COUNT" -eq 0 ]]; then
     log "Nothing to clean up — no domains, networks, or pools found."
-    # Still clean up hyper2kvm cache artifacts
-    log "Cleaning hyper2kvm artifacts..."
+    # Still clean up h2kvm cache artifacts
+    log "Cleaning h2kvm artifacts..."
     for cache_dir in \
-        "$USER_HOME/.cache/hyper2kvm" \
-        "/var/lib/hyper2kvm/conversions"; do
+        "$USER_HOME/.cache/h2kvm" \
+        "/var/lib/h2kvm/conversions"; do
         if [[ -d "$cache_dir" ]]; then
             rm -rf "$cache_dir"
             log "  Removed: $cache_dir"
@@ -197,11 +197,11 @@ else
     log "No storage pools to remove."
 fi
 
-# ── 4. Clean up hyper2kvm artifacts ────────────────────────────────────
-log "Cleaning hyper2kvm artifacts..."
+# ── 4. Clean up h2kvm artifacts ────────────────────────────────────
+log "Cleaning h2kvm artifacts..."
 for cache_dir in \
-    "$USER_HOME/.cache/hyper2kvm" \
-    "/var/lib/hyper2kvm/conversions"; do
+    "$USER_HOME/.cache/h2kvm" \
+    "/var/lib/h2kvm/conversions"; do
     if [[ -d "$cache_dir" ]]; then
         rm -rf "$cache_dir"
         log "  Removed: $cache_dir"

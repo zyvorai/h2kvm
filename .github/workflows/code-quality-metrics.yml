@@ -38,7 +38,7 @@ jobs:
         from radon.complexity import cc_visit
         from pathlib import Path
 
-        files = list(Path('hyper2kvm').rglob('*.py'))
+        files = list(Path('h2kvm').rglob('*.py'))
         total_cc = 0
         total_funcs = 0
         high_complexity = []
@@ -52,9 +52,9 @@ jobs:
                         total_cc += r.complexity
                         total_funcs += 1
                         if r.complexity > 15:
-                            very_high.append((str(f.relative_to('hyper2kvm')), r.name, r.complexity))
+                            very_high.append((str(f.relative_to('h2kvm')), r.name, r.complexity))
                         elif r.complexity > 10:
-                            high_complexity.append((str(f.relative_to('hyper2kvm')), r.name, r.complexity))
+                            high_complexity.append((str(f.relative_to('h2kvm')), r.name, r.complexity))
             except:
                 pass
 
@@ -99,7 +99,7 @@ jobs:
         from pathlib import Path
         import sys
 
-        files = list(Path('hyper2kvm').rglob('*.py'))
+        files = list(Path('h2kvm').rglob('*.py'))
         violations = []
 
         for f in files:
@@ -108,7 +108,7 @@ jobs:
                     results = cc_visit(src.read())
                     for r in results:
                         if r.complexity > 20:
-                            violations.append((str(f.relative_to('hyper2kvm')), r.name, r.complexity))
+                            violations.append((str(f.relative_to('h2kvm')), r.name, r.complexity))
             except:
                 pass
 
@@ -146,7 +146,7 @@ jobs:
         echo "" >> vulture-report.md
 
         # Run vulture with reasonable confidence threshold
-        vulture hyper2kvm --min-confidence 80 --sort-by-size > vulture-output.txt 2>&1 || true
+        vulture h2kvm --min-confidence 80 --sort-by-size > vulture-output.txt 2>&1 || true
 
         if [ -s vulture-output.txt ]; then
           echo "## Detected Unused Code (Confidence ≥80%)" >> vulture-report.md
@@ -192,7 +192,7 @@ jobs:
         from radon.metrics import mi_visit
         from pathlib import Path
 
-        files = list(Path('hyper2kvm').rglob('*.py'))
+        files = list(Path('h2kvm').rglob('*.py'))
         mi_scores = []
 
         for f in files:
@@ -200,7 +200,7 @@ jobs:
                 with open(f) as src:
                     mi = mi_visit(src.read(), True)
                     if mi is not None:
-                        mi_scores.append((str(f.relative_to('hyper2kvm')), mi))
+                        mi_scores.append((str(f.relative_to('h2kvm')), mi))
             except:
                 pass
 

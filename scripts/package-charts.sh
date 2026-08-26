@@ -14,7 +14,7 @@ set -e
 # Default configuration
 OUTPUT_DIR="${OUTPUT_DIR:-./charts}"
 UPDATE_INDEX="${UPDATE_INDEX:-false}"
-REPO_URL="${REPO_URL:-https://ssahani.github.io/hyper2kvm}"
+REPO_URL="${REPO_URL:-https://ssahani.github.io/h2kvm}"
 
 # Colors for output
 
@@ -42,7 +42,7 @@ Package Helm charts and generate repository index.
 OPTIONS:
     --output-dir DIR     Output directory for packaged charts (default: ./charts)
     --update-index       Update existing index.yaml instead of creating new one
-    --repo-url URL       Repository URL for index.yaml (default: https://ssahani.github.io/hyper2kvm)
+    --repo-url URL       Repository URL for index.yaml (default: https://ssahani.github.io/h2kvm)
     -h, --help           Show this help message
 
 EXAMPLES:

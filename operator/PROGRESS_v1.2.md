@@ -32,7 +32,7 @@
 
 4. **CLI Tool (h2kctl)** ✅ **COMPLETE**
    - Command-line interface for easier management
-   - Named h2kctl (hyper2kvm control) to avoid conflict with hypersdk
+   - Named h2kctl (h2kvm control) to avoid conflict with hypersdk
    - Full CRUD operations for HyperConversion resources
    - **Impact**: User Experience +2%, Overall +1% (94%)
 

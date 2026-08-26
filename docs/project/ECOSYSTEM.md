@@ -1,4 +1,4 @@
-# hyper2kvm Ecosystem - Complete Guide
+# h2kvm Ecosystem - Complete Guide
 
 **Version:** 0.3.0
 **Last Updated:** 2026-03-29
@@ -21,11 +21,11 @@
 
 ## Overview
 
-The **hyper2kvm ecosystem** is a comprehensive VM migration solution consisting of three main projects:
+The **h2kvm ecosystem** is a comprehensive VM migration solution consisting of three main projects:
 
-### 1. **hyper2kvm** (Python)
-**Repository:** https://github.com/ssahani/hyper2kvm
-**PyPI:** https://pypi.org/project/hyper2kvm/
+### 1. **h2kvm** (Python)
+**Repository:** https://github.com/ssahani/h2kvm
+**PyPI:** https://pypi.org/project/h2kvm/
 **Language:** Python 3.10+
 
 Production-grade VM migration toolkit that converts hypervisor disks (VMware, Hyper-V, AWS AMI, etc.) to KVM-compatible formats with automatic guest OS fixes.
@@ -65,9 +65,9 @@ Pure-Rust VM disk inspection with AI-powered diagnostics for zero-boot, zero-age
 - Pre-migration validation - Detect issues before migration starts
 - Pure Rust - Fast, safe, memory-efficient implementation
 - No agents required - Direct disk inspection
-- Complementary to hyper2kvm - Use together for comprehensive migration workflows
+- Complementary to h2kvm - Use together for comprehensive migration workflows
 
-**Use Case:** Run GuestKit inspection **before** hyper2kvm migration to identify potential issues early and plan fixes accordingly.
+**Use Case:** Run GuestKit inspection **before** h2kvm migration to identify potential issues early and plan fixes accordingly.
 
 **Workflow Integration:**
 ```bash
@@ -92,8 +92,8 @@ The ecosystem follows a **layered architecture** where the Go provider handles h
 graph TB
     User[User / Automation]
 
-    subgraph "Python Layer - hyper2kvm"
-        CLI[hyper2kvm CLI]
+    subgraph "Python Layer - h2kvm"
+        CLI[h2kvm CLI]
         Orchestrator[Migration Orchestrator]
         Fixers[Guest OS Fixers<br/>fstab, grub, network, drivers]
         Converters[Disk Converters<br/>qcow2, raw, vhdx]
@@ -147,7 +147,7 @@ graph TB
 ### Component Interaction Flow
 
 1. **Direct Python Usage** (Standard Path):
-   - User runs `hyper2kvm` command
+   - User runs `h2kvm` command
    - Python orchestrator handles everything end-to-end
    - Uses govc/pyvmomi for vSphere exports
    - Applies guest OS fixes
@@ -164,10 +164,10 @@ graph TB
 
 ## Components
 
-### Python Components (hyper2kvm)
+### Python Components (h2kvm)
 
 #### 1. Command-Line Interface
-**Location:** `hyper2kvm/cli/`
+**Location:** `h2kvm/cli/`
 
 Entry point for all migration operations.
 
@@ -186,7 +186,7 @@ h2kvmctl --config daemon.yaml
 ```
 
 #### 2. Migration Orchestrator
-**Location:** `hyper2kvm/orchestrator/`
+**Location:** `h2kvm/orchestrator/`
 
 Coordinates the entire migration pipeline:
 - FETCH: Acquire disks from source
@@ -198,7 +198,7 @@ Coordinates the entire migration pipeline:
 - VALIDATE: Boot tests
 
 #### 3. Guest OS Fixers
-**Location:** `hyper2kvm/fixers/`
+**Location:** `h2kvm/fixers/`
 
 Platform-specific repair modules:
 
@@ -214,19 +214,19 @@ Platform-specific repair modules:
 - Two-phase boot strategy (SATA → VirtIO)
 
 #### 4. VMware Transports
-**Location:** `hyper2kvm/vmware/transports/`
+**Location:** `h2kvm/vmware/transports/`
 
 Multiple transport mechanisms:
 
 ```python
 # govc (standard)
-from hyper2kvm.vmware.transports.govc_export import export_vm_govc
+from h2kvm.vmware.transports.govc_export import export_vm_govc
 
 # pyvmomi (programmatic)
-from hyper2kvm.vmware import VMwareClient
+from h2kvm.vmware import VMwareClient
 
 # hyperctl (high-performance) - NEW!
-from hyper2kvm.vmware.transports import (
+from h2kvm.vmware.transports import (
     HYPERCTL_AVAILABLE,
     export_vm_hyperctl,
     create_hyperctl_runner
@@ -316,7 +316,7 @@ Features:
 - qemu-img and qemu-nbd
 - qemu-img
 
-### Install hyper2kvm (Python)
+### Install h2kvm (Python)
 
 #### Method 1: From PyPI
 
@@ -325,30 +325,30 @@ Features:
 sudo dnf install -y qemu-img qemu-system-x86  # Fedora/RHEL
 sudo apt install -y qemu-utils               # Ubuntu/Debian
 
-# Install hyper2kvm
-pip install hyper2kvm
+# Install h2kvm
+pip install h2kvm
 
 # Full installation with all optional dependencies
-pip install 'hyper2kvm[full]'
+pip install 'h2kvm[full]'
 
 # Install specific providers
-pip install 'hyper2kvm[vsphere]'  # VMware support
-pip install 'hyper2kvm[azure]'    # Azure support
-pip install 'hyper2kvm[ui]'       # Rich UI enhancements
+pip install 'h2kvm[vsphere]'  # VMware support
+pip install 'h2kvm[azure]'    # Azure support
+pip install 'h2kvm[ui]'       # Rich UI enhancements
 ```
 
 #### Method 2: From Source
 
 ```bash
-git clone https://github.com/ssahani/hyper2kvm
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm
+cd h2kvm
 
 # Install in development mode
 pip install -e .
 
 # Or build and install
 python -m build
-pip install dist/hyper2kvm-*.whl
+pip install dist/h2kvm-*.whl
 ```
 
 ### Install hypersdk (Go)
@@ -406,7 +406,7 @@ sudo systemctl status hypervisord
 ```bash
 # Check Python package
 h2kvmctl --version
-python -c "from hyper2kvm.vmware.transports import HYPERCTL_AVAILABLE; print(f'hyperctl available: {HYPERCTL_AVAILABLE}')"
+python -c "from h2kvm.vmware.transports import HYPERCTL_AVAILABLE; print(f'hyperctl available: {HYPERCTL_AVAILABLE}')"
 
 # Check Go binaries
 hypervisord --version
@@ -414,7 +414,7 @@ hyperctl --version
 hyperexport --version 2>&1 | head -3
 
 # Check if hyperctl is detected by Python
-python -c "from hyper2kvm.vmware.transports import HYPERCTL_AVAILABLE; print(HYPERCTL_AVAILABLE)"
+python -c "from h2kvm.vmware.transports import HYPERCTL_AVAILABLE; print(HYPERCTL_AVAILABLE)"
 # Should print: True
 ```
 
@@ -425,13 +425,13 @@ python -c "from hyper2kvm.vmware.transports import HYPERCTL_AVAILABLE; print(HYP
 ### Unit Tests (Python)
 
 ```bash
-cd hyper2kvm
+cd h2kvm
 
 # Run all tests
 pytest tests/
 
 # Run with coverage
-pytest --cov=hyper2kvm tests/
+pytest --cov=h2kvm tests/
 
 # Run specific test file
 pytest tests/test_hyperctl_common.py
@@ -445,7 +445,7 @@ pytest -v tests/
 ```bash
 # Test hyperctl integration
 python -c "
-from hyper2kvm.vmware.transports import create_hyperctl_runner
+from h2kvm.vmware.transports import create_hyperctl_runner
 
 runner = create_hyperctl_runner()
 print('✅ Runner created successfully')
@@ -483,7 +483,7 @@ hyperctl status
 
 # 3. Test Python integration
 python3 << 'EOF'
-from hyper2kvm.vmware.transports import HYPERCTL_AVAILABLE, create_hyperctl_runner
+from h2kvm.vmware.transports import HYPERCTL_AVAILABLE, create_hyperctl_runner
 
 print(f"✅ HYPERCTL_AVAILABLE: {HYPERCTL_AVAILABLE}")
 
@@ -549,7 +549,7 @@ hypervisord &
 **Python Script:**
 ```python
 #!/usr/bin/env python3
-from hyper2kvm.vmware.transports import HYPERCTL_AVAILABLE, export_vm_hyperctl
+from h2kvm.vmware.transports import HYPERCTL_AVAILABLE, export_vm_hyperctl
 
 if not HYPERCTL_AVAILABLE:
     print("❌ hyperctl not available, install hypersdk")
@@ -586,15 +586,15 @@ hyperctl query --all
 
 ### Example 4: Batch Migration with Daemon Mode
 
-**Configuration:** `/etc/hyper2kvm/daemon.yaml`
+**Configuration:** `/etc/h2kvm/daemon.yaml`
 ```yaml
 command: daemon
 daemon: true
 
 # Directories
-watch_dir: /var/lib/hyper2kvm/queue
-output_dir: /var/lib/hyper2kvm/output
-workdir: /var/lib/hyper2kvm/work
+watch_dir: /var/lib/h2kvm/queue
+output_dir: /var/lib/h2kvm/output
+workdir: /var/lib/h2kvm/work
 
 # Conversion options
 flatten: true
@@ -608,25 +608,25 @@ regen_initramfs: true
 windows: true
 
 # Logging
-log_file: /var/log/hyper2kvm/daemon.log
+log_file: /var/log/h2kvm/daemon.log
 verbose: 1
 ```
 
 **Start Daemon:**
 ```bash
-sudo mkdir -p /var/lib/hyper2kvm/{queue,output,work}
-sudo h2kvmctl --config /etc/hyper2kvm/daemon.yaml
+sudo mkdir -p /var/lib/h2kvm/{queue,output,work}
+sudo h2kvmctl --config /etc/h2kvm/daemon.yaml
 ```
 
 **Drop Files for Processing:**
 ```bash
 # Copy VMDKs to queue directory
-cp vm1.vmdk /var/lib/hyper2kvm/queue/
-cp vm2.ova /var/lib/hyper2kvm/queue/
-cp vm3.vhd /var/lib/hyper2kvm/queue/
+cp vm1.vmdk /var/lib/h2kvm/queue/
+cp vm2.ova /var/lib/h2kvm/queue/
+cp vm3.vhd /var/lib/h2kvm/queue/
 
 # Daemon automatically processes them
-# Output appears in /var/lib/hyper2kvm/output/vm1/, vm2/, vm3/
+# Output appears in /var/lib/h2kvm/output/vm1/, vm2/, vm3/
 ```
 
 ### Example 5: Interactive Export
@@ -654,7 +654,7 @@ hyperexport
 **Step 1: Check Availability**
 
 ```python
-from hyper2kvm.vmware.transports import HYPERCTL_AVAILABLE
+from h2kvm.vmware.transports import HYPERCTL_AVAILABLE
 
 if HYPERCTL_AVAILABLE:
     print("✅ hyperctl is available for high-performance exports")
@@ -665,7 +665,7 @@ else:
 **Step 2: Create Runner**
 
 ```python
-from hyper2kvm.vmware.transports import create_hyperctl_runner, HyperCtlRunner
+from h2kvm.vmware.transports import create_hyperctl_runner, HyperCtlRunner
 
 # Use environment variables for configuration
 # HYPERVISORD_URL, HYPERCTL_PATH
@@ -710,7 +710,7 @@ print(f"✅ Export completed: {result}")
 **Step 5: Convenience Function**
 
 ```python
-from hyper2kvm.vmware.transports import export_vm_hyperctl
+from h2kvm.vmware.transports import export_vm_hyperctl
 
 # One-step export with wait
 result = export_vm_hyperctl(
@@ -728,8 +728,8 @@ print(f"✅ Done: {result}")
 Gracefully fall back to govc if hyperctl is not available:
 
 ```python
-from hyper2kvm.vmware.transports import HYPERCTL_AVAILABLE, export_vm_hyperctl
-from hyper2kvm.vmware.transports.govc_export import export_vm_govc
+from h2kvm.vmware.transports import HYPERCTL_AVAILABLE, export_vm_hyperctl
+from h2kvm.vmware.transports.govc_export import export_vm_govc
 
 def export_vm(vm_path, output_path):
     """Export VM using best available method."""
@@ -771,7 +771,7 @@ sudo cp /path/to/hypersdk/build/hyperctl /usr/local/bin/
 
 # Verify
 which hyperctl
-python -c "from hyper2kvm.vmware.transports import HYPERCTL_AVAILABLE; print(HYPERCTL_AVAILABLE)"
+python -c "from h2kvm.vmware.transports import HYPERCTL_AVAILABLE; print(HYPERCTL_AVAILABLE)"
 ```
 
 ### Issue: Daemon Not Running
@@ -864,7 +864,7 @@ systemctl restart hypervisord
 
 - **hypervisord:** ~50-100 MB RAM (idle)
 - **hypervisord:** ~200-500 MB RAM (active export, 8 workers)
-- **hyper2kvm:** ~100-200 MB RAM (per conversion)
+- **h2kvm:** ~100-200 MB RAM (per conversion)
 
 ### Disk Space Requirements
 
@@ -877,15 +877,15 @@ systemctl restart hypervisord
 
 ### Report Issues
 
-- **hyper2kvm:** https://github.com/ssahani/hyper2kvm/issues
+- **h2kvm:** https://github.com/ssahani/h2kvm/issues
 - **hypersdk:** https://github.com/ssahani/hypersdk/issues
 
 ### Development Setup
 
-**Python (hyper2kvm):**
+**Python (h2kvm):**
 ```bash
-git clone https://github.com/ssahani/hyper2kvm
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm
+cd h2kvm
 pip install -e '.[dev]'
 pytest tests/
 ```
@@ -928,7 +928,7 @@ Both projects are licensed under **Proprietary (Zyvor AI Labs)**.
 
 ### Version 1.0.0 (2026-01-17)
 
-**hyper2kvm:**
+**h2kvm:**
 - ✅ Released version 0.3.1 to PyPI
 - ✅ Renamed h2kvmctl → hyperctl throughout codebase
 - ✅ Updated integration to use hypersdk
@@ -936,7 +936,7 @@ Both projects are licensed under **Proprietary (Zyvor AI Labs)**.
 - ✅ Comprehensive documentation with Mermaid diagrams
 
 **hypersdk:**
-- ✅ Renamed from hyper2kvm-providers
+- ✅ Renamed from h2kvm-providers
 - ✅ Rebranded binaries: hypervisord, hyperctl, hyperexport
 - ✅ Updated UX with orange/amber color scheme
 - ✅ Toned down dramatic messaging

@@ -4,7 +4,7 @@
 
 """Windows firstboot RDP and QEMU-GA script content."""
 
-from hyper2kvm.fixers.windows.registry.firstboot import (
+from h2kvm.fixers.windows.registry.firstboot import (
     _enhanced_virtio_driver_installation_cmd_block,
     _qemu_guest_agent_installation_cmd_block,
     _rdp_enablement_cmd_block,
@@ -52,14 +52,14 @@ def test_enhanced_virtio_block_runs_staged_guest_tools_first():
 
 
 def test_rdp_block_omitted_when_include_rdp_false():
-    from hyper2kvm.fixers.windows.registry.firstboot import (
+    from h2kvm.fixers.windows.registry.firstboot import (
         _firstboot_build_cmd_script,
         _firstboot_windows_paths,
     )
 
     script = _firstboot_build_cmd_script(
-        service_name="hyper2kvm-firstboot",
-        win=_firstboot_windows_paths("hyper2kvm-firstboot"),
+        service_name="h2kvm-firstboot",
+        win=_firstboot_windows_paths("h2kvm-firstboot"),
         include_vmware_removal=False,
         include_rdp=False,
         extra_cmd=None,

@@ -9,7 +9,7 @@
 
 ## Overview
 
-Testing CentOS 9 VMDK migration using Hyper2KVM operator on OpenShift/CRC.
+Testing CentOS 9 VMDK migration using H2KVM operator on OpenShift/CRC.
 
 **Local Test Results:** ✅ Already validated
 - Basic conversion: PASS (1.18 GB QCOW2)
@@ -41,7 +41,7 @@ oc login -u kubeadmin https://api.crc.testing:6443
 ### 2. Install CRDs
 
 ```bash
-cd /home/ssahani/tt/hyper2kvm
+cd /home/ssahani/tt/h2kvm
 kubectl apply -f k8s/operator/crds/
 ```
 
@@ -148,7 +148,7 @@ kubectl delete pod vmdk-uploader -n centos9-test
 **MigrationJob:**
 
 ```yaml
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: centos9-inspect
@@ -290,7 +290,7 @@ securityContext:
 
 | Aspect | Local CLI | OpenShift Operator |
 |--------|-----------|-------------------|
-| **Execution** | Direct `hyper2kvm` command | MigrationJob CR |
+| **Execution** | Direct `h2kvm` command | MigrationJob CR |
 | **Storage** | Local filesystem | PVCs |
 | **Privileges** | `sudo` required | Privileged pods |
 | **Monitoring** | Terminal output | `kubectl` commands |

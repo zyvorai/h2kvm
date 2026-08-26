@@ -1,6 +1,6 @@
-# hyper2kvm Roadmap
+# h2kvm Roadmap
 
-This directory contains detailed implementation plans for future hyper2kvm features and enhancements.
+This directory contains detailed implementation plans for future h2kvm features and enhancements.
 
 ## Active Roadmaps
 
@@ -170,8 +170,8 @@ Features are prioritized based on:
 
 We welcome community input on roadmap priorities:
 
-- 🐛 **Report Issues**: [GitHub Issues](https://github.com/anthropics/hyper2kvm/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/anthropics/hyper2kvm/discussions)
+- 🐛 **Report Issues**: [GitHub Issues](https://github.com/anthropics/h2kvm/issues)
+- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/anthropics/h2kvm/discussions)
 - 🗳️ **Vote on Features**: Upvote issues/discussions you care about
 - 📝 **Submit Proposals**: Create detailed feature proposals in `docs/roadmap/`
 
@@ -185,4 +185,4 @@ We welcome community input on roadmap priorities:
 ---
 
 **Last Updated**: 2026-03-29
-**Roadmap Maintainers**: hyper2kvm core team
+**Roadmap Maintainers**: h2kvm core team

@@ -4,14 +4,14 @@
 cmd: local
 
 # Source VMDK (extracted from OVA)
-vmdk: /home/ssahani/tt/hyper2kvm/photon.vmdk
+vmdk: /home/ssahani/tt/h2kvm/photon.vmdk
 
 # Output Configuration
-output_dir: /home/ssahani/tt/hyper2kvm/out/photon-test
-to_output: /home/ssahani/tt/hyper2kvm/out/photon-test/photon-os.qcow2
+output_dir: /home/ssahani/tt/h2kvm/out/photon-test
+to_output: /home/ssahani/tt/h2kvm/out/photon-test/photon-os.qcow2
 out_format: qcow2
 compress: true
-workdir: /home/ssahani/tt/hyper2kvm/out/photon-test/work
+workdir: /home/ssahani/tt/h2kvm/out/photon-test/work
 
 # Core Linux Fixes
 fstab_fixes_enable: true
@@ -41,7 +41,7 @@ libvirt_vcpus: 2
 libvirt_disk_bus: virtio
 
 # Reporting
-report: /home/ssahani/tt/hyper2kvm/out/photon-test/migration-report.md
-log_file: /home/ssahani/tt/hyper2kvm/out/photon-test/migration.log
+report: /home/ssahani/tt/h2kvm/out/photon-test/migration-report.md
+log_file: /home/ssahani/tt/h2kvm/out/photon-test/migration.log
 verbose: 2
 dry_run: false

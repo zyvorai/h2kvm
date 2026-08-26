@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the enterprise-grade improvements integrated into hyper2kvm from the Enterprise RHEL VM Boot Repair Tool, focusing on safe LVM handling and improved reliability.
+This document describes the enterprise-grade improvements integrated into h2kvm from the Enterprise RHEL VM Boot Repair Tool, focusing on safe LVM handling and improved reliability.
 
 ---
 
@@ -46,7 +46,7 @@ for vg in nbd_vgs:
 
 ## Files Modified
 
-### 1. `/hyper2kvm/daemon/nbd_prep.py`
+### 1. `/h2kvm/daemon/nbd_prep.py`
 
 **Changes**:
 - Added device-filtered LVM activation with `--devicesfile ""` and `--devices`
@@ -95,7 +95,7 @@ def deactivate_lvm(self):
     subprocess.run(["udevadm", "settle"])
 ```
 
-### 2. `/hyper2kvm/core/vmcraft/storage.py`
+### 2. `/h2kvm/core/vmcraft/storage.py`
 
 **Changes**:
 - Added NBD device filtering to `LVMActivator.activate()`
@@ -138,7 +138,7 @@ if "busy" in result.stderr:
 
 ### 1. **Parallel Initramfs Generation**
 
-**File**: `/hyper2kvm/fixers/offline_vm/fix_initramfs.py`
+**File**: `/h2kvm/fixers/offline_vm/fix_initramfs.py`
 
 **Change**: Added parallel rebuild capability using `ThreadPoolExecutor`:
 
@@ -163,7 +163,7 @@ def _rebuild_initramfs_parallel(self, kernels: List[KernelInfo]):
 
 ### 2. **NBD Retry Logic & Locking**
 
-**File**: `/hyper2kvm/daemon/nbd_prep.py`
+**File**: `/h2kvm/daemon/nbd_prep.py`
 
 **Changes**:
 - Added file-based locking to prevent concurrent NBD operations
@@ -196,7 +196,7 @@ def acquire_nbd_lock(self, nbd_device: str):
 
 ### 3. **Enhanced LVM Cleanup**
 
-**File**: `/hyper2kvm/core/vmcraft/storage.py`
+**File**: `/h2kvm/core/vmcraft/storage.py`
 
 **Deactivation Strategy**:
 
@@ -238,7 +238,7 @@ dmsetup ls | grep -v "control"
 
 ```python
 # Test with VM having multiple kernels
-from hyper2kvm.fixers.offline_vm.fix_initramfs import InitramfsFixer
+from h2kvm.fixers.offline_vm.fix_initramfs import InitramfsFixer
 
 fixer = InitramfsFixer(
     root_mount="/mnt/vm",
@@ -269,7 +269,7 @@ python3 -c "from nbd_prep import NBDPrepDaemon; d = NBDPrepDaemon('node1'); d.at
 
 ```python
 # Old (unsafe)
-from hyper2kvm.vmcraft.storage import LVMActivator
+from h2kvm.vmcraft.storage import LVMActivator
 LVMActivator.activate(logger)  # ❌ Activates ALL VGs
 
 # New (safe)
@@ -363,11 +363,11 @@ fixer = InitramfsFixer(
 ## Contributors
 
 - Original enterprise script author: Red Hat Enterprise VM Management Team
-- Integration: hyper2kvm team
+- Integration: h2kvm team
 - LVM safety improvements: Based on enterprise-grade patterns
 
 ---
 
 ## License
 
-Apache-2.0 (consistent with hyper2kvm license)
+Apache-2.0 (consistent with h2kvm license)

@@ -3,7 +3,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 """
-Example Python hooks for hyper2kvm migration validation.
+Example Python hooks for h2kvm migration validation.
 
 These functions can be called as Python hooks in Artifact Manifest v1.
 

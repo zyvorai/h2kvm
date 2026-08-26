@@ -1,6 +1,6 @@
 # Daemon Mode Examples
 
-This directory contains examples for running hyper2kvm in daemon mode with advanced features.
+This directory contains examples for running h2kvm in daemon mode with advanced features.
 
 ## Available Examples
 
@@ -43,10 +43,10 @@ This directory contains examples for running hyper2kvm in daemon mode with advan
 pip install -e .
 
 # With metrics
-pip install 'hyper2kvm[metrics]'
+pip install 'h2kvm[metrics]'
 
 # Full features
-pip install 'hyper2kvm[daemon,metrics]'
+pip install 'h2kvm[daemon,metrics]'
 ```
 
 ## Usage

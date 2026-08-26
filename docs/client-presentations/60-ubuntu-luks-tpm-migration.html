@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>hyper2kvm — Ubuntu LUKS+TPM Migration Demo (VMware to KVM)</title>
+<title>h2kvm — Ubuntu LUKS+TPM Migration Demo (VMware to KVM)</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -45,7 +45,7 @@
 
 <!-- COVER -->
 <div class="cover">
-  <h1>hyper2kvm <span>LUKS+TPM Migration</span></h1>
+  <h1>h2kvm <span>LUKS+TPM Migration</span></h1>
   <h2>Ubuntu 22.04 Encrypted Disk with TPM &mdash; VMware to KVM</h2>
   <p class="sub">End-to-end demonstration: live-fix SSH preparation (LUKS keyslot injection, TPM unbinding), LUKS-encrypted disk conversion with LVM-on-LUKS support, offline guest fixes (fstab, initramfs rebuild with VirtIO drivers), and successful boot on KVM. Solves the virt-v2v LUKS+TPM boot failure (RHEL bug).</p>
   <div class="badge">Ubuntu 22.04.5 LTS | LUKS+LVM | TPM2 | Split VMDK 8.7 GB | QCOW2 | Q35/UEFI | Libvirt Verified</div>
@@ -62,7 +62,7 @@
       <p style="margin-top:6px;"><strong>Affected:</strong> Ubuntu 22.04+ (clevis), Ubuntu 24.04+ (systemd-cryptenroll), Fedora/RHEL with TPM-sealed LUKS.</p>
     </div>
     <div class="card">
-      <h4>hyper2kvm Solution: Two-Phase Fix</h4>
+      <h4>h2kvm Solution: Two-Phase Fix</h4>
       <p><strong>Phase 1 &mdash; Live-Fix (pre-conversion):</strong> SSH into the running VMware guest, detect LUKS+TPM binding (clevis or systemd-cryptenroll), add a recovery passphrase keyslot, and unbind TPM.</p>
       <p style="margin-top:6px;"><strong>Phase 2 &mdash; Conversion:</strong> Flatten VMDK, open LUKS with the recovery passphrase, mount LVM root, apply offline fixes (fstab, initramfs), convert, emit domain XML, boot test.</p>
     </div>
@@ -175,8 +175,8 @@ Flatten snapshot chain (split VMDK, 8 extents)
   Flattening progress: 0% ... 25% ... 50% ... 85%
 <span class="check">Flattened: working-flattened.qcow2 (30 GiB virtual, 8.71 GiB actual)</span>
 
-LUKS: opening /dev/nbd6p3 as hyper2kvm-crypt1
-<span class="check">LUKS: opened /dev/nbd6p3 -&gt; /dev/mapper/hyper2kvm-crypt1</span>
+LUKS: opening /dev/nbd6p3 as h2kvm-crypt1
+<span class="check">LUKS: opened /dev/nbd6p3 -&gt; /dev/mapper/h2kvm-crypt1</span>
 
 LVM after LUKS open (host-direct): /dev/ubuntu-vg/ubuntu-lv
 <span class="check">Detected Linux OS on /dev/mapper/ubuntu--vg-ubuntu--lv</span>
@@ -207,7 +207,7 @@ Libvirt smoke test (emitted XML)
     <tr><th>#</th><th>Step</th><th>Action</th><th>Duration</th><th>Result</th></tr>
     <tr><td>1</td><td>Live-Fix (SSH)</td><td>Add LUKS keyslot 7, detect TPM</td><td>~2s</td><td class="check">1/1 devices prepared</td></tr>
     <tr><td>2</td><td>Flatten</td><td>Split VMDK (8 extents) &rarr; QCOW2</td><td>~30s</td><td class="check">8.71 GiB actual</td></tr>
-    <tr><td>3</td><td>LUKS Open</td><td>cryptsetup open with passphrase</td><td>~2s</td><td class="check">hyper2kvm-crypt1</td></tr>
+    <tr><td>3</td><td>LUKS Open</td><td>cryptsetup open with passphrase</td><td>~2s</td><td class="check">h2kvm-crypt1</td></tr>
     <tr><td>4</td><td>LVM Activate</td><td>pvscan + vgchange (host-direct, --devicesfile "")</td><td>~1s</td><td class="check">ubuntu-vg/ubuntu-lv</td></tr>
     <tr><td>5</td><td>OS Detection</td><td>Mount LVM root, inspect</td><td>~1s</td><td class="check">Ubuntu 22.04.5 LTS</td></tr>
     <tr><td>6</td><td>Offline Fixes</td><td>fstab stabilize, initramfs rebuild</td><td>~30s</td><td class="check">VirtIO drivers injected</td></tr>
@@ -246,7 +246,7 @@ Libvirt smoke test (emitted XML)
     </p>
   </div>
 
-  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

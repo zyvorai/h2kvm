@@ -1,6 +1,6 @@
 # Fixing `INACCESSIBLE_BOOT_DEVICE` after VMware → KVM (VirtIO)
 
-> **Note**: hyper2kvm now automates this entire process via `--virtio-deploy-boot`.
+> **Note**: h2kvm now automates this entire process via `--virtio-deploy-boot`.
 > See [VirtIO Driver Injection Guide](driver-injection.md) for the automated approach.
 > The manual steps below are for reference and troubleshooting.
 

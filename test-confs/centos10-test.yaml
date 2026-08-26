@@ -7,7 +7,7 @@ cmd: local
 vmdk: /home/ssahani/Downloads/VMs/extracted/centos/64bit/centos10.vmdk
 
 # Conversion directory (use /tmp for more space)
-conversion_dir: /tmp/hyper2kvm-conversions
+conversion_dir: /tmp/h2kvm-conversions
 
 # Output Configuration
 output_dir: out/centos10-test

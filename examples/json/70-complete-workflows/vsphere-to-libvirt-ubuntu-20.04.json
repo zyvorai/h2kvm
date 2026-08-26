@@ -71,6 +71,6 @@
   "log_level": "INFO",
   "verbose": true,
   "enable_recovery": true,
-  "recovery_checkpoint_dir": "/tmp/hyper2kvm-recovery",
+  "recovery_checkpoint_dir": "/tmp/h2kvm-recovery",
   "post_migration_script": "#!/bin/bash\n# Import to libvirt\nvirsh define /data/kvm/ubuntu-2004-web-server.xml\n\n# Set autostart\nvirsh autostart ubuntu-2004-web-server\n\n# Start VM\nvirsh start ubuntu-2004-web-server\n\n# Wait for boot\nsleep 30\n\n# Check if VM is running\nvirsh list | grep ubuntu-2004-web-server\n"
 }

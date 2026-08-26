@@ -10,7 +10,7 @@
 
 ### ✅ Phase 1: JSON Schemas (COMPLETE)
 
-**File:** `hyper2kvm/worker/schemas.py` (400 lines)
+**File:** `h2kvm/worker/schemas.py` (400 lines)
 
 Production-grade Pydantic models for:
 - **JobSpec** - Complete job specification with validation
@@ -30,7 +30,7 @@ Production-grade Pydantic models for:
 
 ### ✅ Phase 2: Job State Machine (COMPLETE)
 
-**File:** `hyper2kvm/worker/state_machine.py` (300 lines)
+**File:** `h2kvm/worker/state_machine.py` (300 lines)
 
 Complete state lifecycle:
 ```
@@ -49,7 +49,7 @@ CREATED → VALIDATED → QUEUED → ASSIGNED → RUNNING → PROGRESSING → CO
 
 ### ✅ Phase 3: Capability Detection (COMPLETE)
 
-**File:** `hyper2kvm/worker/capabilities.py` (300 lines)
+**File:** `h2kvm/worker/capabilities.py` (300 lines)
 
 Smart runtime detection:
 
@@ -76,7 +76,7 @@ Smart runtime detection:
 
 ### ✅ Phase 4: Worker Execution Engine (COMPLETE)
 
-**File:** `hyper2kvm/worker/engine.py` (400 lines)
+**File:** `h2kvm/worker/engine.py` (400 lines)
 
 Complete job execution framework:
 
@@ -103,7 +103,7 @@ Complete job execution framework:
 ## 📂 File Structure
 
 ```
-hyper2kvm/worker/
+h2kvm/worker/
 ├── __init__.py              # Package exports
 ├── schemas.py               # Pydantic models (400 lines)
 ├── state_machine.py         # State management (300 lines)
@@ -154,7 +154,7 @@ examples/
 Run the included example:
 
 ```bash
-cd /home/ssahani/tt/hyper2kvm
+cd /home/ssahani/tt/h2kvm
 python3 examples/worker_example.py
 ```
 
@@ -217,7 +217,7 @@ This demonstrates:
 - Add job scheduler
 - Write complete documentation
 
-**Option B: Integrate with Existing hyper2kvm**
+**Option B: Integrate with Existing h2kvm**
 - Wire worker engine to existing operations
 - Add worker mode to main CLI
 - Update Kubernetes manifests for workers
@@ -270,7 +270,7 @@ Ready for:
 
 The foundation is solid and ready for:
 1. Completion of remaining phases
-2. Integration with existing hyper2kvm
+2. Integration with existing h2kvm
 3. Production deployment
 
 **Time invested:** ~4 hours

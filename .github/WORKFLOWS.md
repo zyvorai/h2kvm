@@ -1,6 +1,6 @@
 # .github Directory
 
-This directory contains GitHub-specific configuration and automation for the hyper2kvm project.
+This directory contains GitHub-specific configuration and automation for the h2kvm project.
 
 ## 📁 Directory Structure
 
@@ -69,9 +69,9 @@ Recommended settings for `main` branch:
 Add to README.md:
 
 ```markdown
-![Tests](https://github.com/ssahani/hyper2kvm/workflows/Tests/badge.svg)
-![Security](https://github.com/ssahani/hyper2kvm/workflows/Security%20Checks/badge.svg)
-[![codecov](https://codecov.io/gh/ssahani/hyper2kvm/branch/main/graph/badge.svg)](https://codecov.io/gh/ssahani/hyper2kvm)
+![Tests](https://github.com/ssahani/h2kvm/workflows/Tests/badge.svg)
+![Security](https://github.com/ssahani/h2kvm/workflows/Security%20Checks/badge.svg)
+[![codecov](https://codecov.io/gh/ssahani/h2kvm/branch/main/graph/badge.svg)](https://codecov.io/gh/ssahani/h2kvm)
 ```
 
 ## 🔄 Workflow Details
@@ -106,14 +106,14 @@ Run checks locally before pushing:
 pip install pytest pytest-cov ruff mypy bandit
 
 # Run full test suite
-python -m pytest tests/unit/ -v --cov=hyper2kvm
+python -m pytest tests/unit/ -v --cov=h2kvm
 
 # Check code quality
-ruff check hyper2kvm/
-mypy hyper2kvm/ --ignore-missing-imports
+ruff check h2kvm/
+mypy h2kvm/ --ignore-missing-imports
 
 # Security scan
-bandit -r hyper2kvm/
+bandit -r h2kvm/
 
 # Check documentation links
 markdown-link-check README.md

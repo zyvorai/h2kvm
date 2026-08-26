@@ -95,7 +95,7 @@ TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 REPORT_FILE="$REPORT_DIR/migration-${TIMESTAMP}.md"
 
 echo -e "${GREEN}======================================${NC}"
-echo -e "${GREEN}hyper2kvm Migration Script${NC}"
+echo -e "${GREEN}h2kvm Migration Script${NC}"
 echo -e "${GREEN}======================================${NC}"
 echo ""
 echo -e "Input:       ${YELLOW}$INPUT_VMDK${NC}"
@@ -106,7 +106,7 @@ echo -e "Dry-run:     ${YELLOW}$DRY_RUN${NC}"
 echo -e "Report:      ${YELLOW}$REPORT_FILE${NC}"
 echo ""
 
-# Build hyper2kvm command array
+# Build h2kvm command array
 CMD_ARRAY=(
     sudo h2kvmctl
     --vmdk "$INPUT_VMDK"

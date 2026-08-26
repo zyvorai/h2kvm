@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hyper2kvm/zkvm/internal/models"
-	"github.com/hyper2kvm/zkvm/internal/protocol"
+	"github.com/h2kvm/zkvm/internal/models"
+	"github.com/h2kvm/zkvm/internal/protocol"
 )
 
 func TestNewStore(t *testing.T) {

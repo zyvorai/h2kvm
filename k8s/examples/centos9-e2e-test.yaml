@@ -1,13 +1,13 @@
 # CentOS 9 End-to-End Test MigrationJob
 # Tests complete migration workflow for CentOS 9 VMDK to QCOW2
 
-apiVersion: hyper2kvm.io/v1alpha1
+apiVersion: h2kvm.io/v1alpha1
 kind: MigrationJob
 metadata:
   name: centos9-e2e-test
-  namespace: hyper2kvm-test
+  namespace: h2kvm-test
   labels:
-    app: hyper2kvm
+    app: h2kvm
     test: e2e
     os: centos9
     distro: centos-stream
@@ -86,4 +86,4 @@ spec:
 
   # Worker selection
   workerSelector:
-    hyper2kvm.io/worker-enabled: "true"
+    h2kvm.io/worker-enabled: "true"

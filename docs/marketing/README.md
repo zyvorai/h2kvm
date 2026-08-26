@@ -1,27 +1,27 @@
-# LinkedIn Content Package for hyper2kvm 🚀
+# LinkedIn Content Package for h2kvm 🚀
 
-This directory contains professionally crafted LinkedIn content to promote hyper2kvm and engage with the DevOps/Infrastructure community.
+This directory contains professionally crafted LinkedIn content to promote h2kvm and engage with the DevOps/Infrastructure community.
 
 ## 📦 What's Included
 
-### 1. Full Article (`hyper2kvm-linkedin-article.md`)
+### 1. Full Article (`h2kvm-linkedin-article.md`)
 - **Length**: ~2,500 words (10-12 min read)
 - **Format**: LinkedIn Pulse / Long-form article
 - **Best For**: Comprehensive showcase, blog posts, documentation
 - **Features**: Real-world example, technical depth, full feature showcase
 
-### 2. Short Post (`hyper2kvm-linkedin-short-post.md`)
+### 2. Short Post (`h2kvm-linkedin-short-post.md`)
 - **Length**: ~800 words (3-4 min read)
 - **Format**: Standard LinkedIn post
 - **Best For**: Maximum engagement, viral potential
 - **Features**: Quick hook, clear problem→solution, metrics highlighted
 
-### 3. Carousel Slides (`hyper2kvm-linkedin-carousel-slides.md`)
+### 3. Carousel Slides (`h2kvm-linkedin-carousel-slides.md`)
 - **Format**: 10 visual slides for carousel post
 - **Best For**: Highest engagement, mobile users
 - **Features**: Swipeable slides, visual storytelling, algorithm-friendly
 
-### 4. Technical Deep-Dive (`hyper2kvm-technical-deepdive.md`)
+### 4. Technical Deep-Dive (`h2kvm-technical-deepdive.md`)
 - **Length**: ~4,000 words (15-20 min read)
 - **Format**: Engineering blog post
 - **Best For**: Developer audience, technical decision-makers
@@ -35,7 +35,7 @@ This directory contains professionally crafted LinkedIn content to promote hyper
 
 **Recommended First Post**: Use the **Short Post** version
 
-1. Open `hyper2kvm-linkedin-short-post.md`
+1. Open `h2kvm-linkedin-short-post.md`
 2. Copy content to LinkedIn
 3. Post on Tuesday or Thursday, 8-9 AM
 4. Add 3-5 hashtags: `#VirtualMachine #DevOps #Infrastructure #OpenSource #KVM`
@@ -115,7 +115,7 @@ This directory contains professionally crafted LinkedIn content to promote hyper
 
 **Twitter/X**: Thread the short post (10-15 tweets)
 **Reddit**: r/linux, r/sysadmin, r/devops
-**Hacker News**: "Show HN: hyper2kvm"
+**Hacker News**: "Show HN: h2kvm"
 **Dev.to**: Cross-post technical deep-dive
 **Medium**: Republish full article
 
@@ -152,7 +152,7 @@ For Carousel Post:
 
 ## 📚 Related Resources
 
-- [GitHub Repository](https://github.com/ssahani/hyper2kvm)
+- [GitHub Repository](https://github.com/ssahani/h2kvm)
 - [Documentation](../index.md)
 - [Contributing Guide](../../CONTRIBUTING.md)
 - [Changelog](../../CHANGELOG.md)

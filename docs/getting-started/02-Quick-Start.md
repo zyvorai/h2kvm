@@ -1,6 +1,6 @@
 # Quick Start Guide 🚀
 
-Get started with hyper2kvm in 5 minutes ⚡
+Get started with h2kvm in 5 minutes ⚡
 
 
 ## Table of Contents
@@ -10,7 +10,7 @@ Get started with hyper2kvm in 5 minutes ⚡
   - [Fedora / RHEL / CentOS Stream 🎩](#fedora-rhel-centos-stream)
   - [Ubuntu / Debian](#ubuntu-debian)
   - [Verify Backend (Optional)](#verify-backend-optional)
-- [2. Install hyper2kvm](#2-install-hyper2kvm)
+- [2. Install h2kvm](#2-install-h2kvm)
   - [Option A: Install from Source (Recommended for Development)](#option-a-install-from-source-recommended-for-development)
   - [Option B: Install from PyPI (When Available)](#option-b-install-from-pypi-when-available)
 - [3. Your First Migration 🎯](#3-your-first-migration)
@@ -102,14 +102,14 @@ qemu-img --version
 
 ---
 
-## 2. Install hyper2kvm
+## 2. Install h2kvm
 
 ### Option A: Install from Source (Recommended for Development)
 
 ```bash
 # Clone the repository
-git clone https://github.com/ssahani/hyper2kvm.git
-cd hyper2kvm
+git clone https://github.com/ssahani/h2kvm.git
+cd h2kvm
 
 # Create virtual environment
 python3 -m venv .venv
@@ -127,8 +127,8 @@ h2kvmctl --help
 ### Option B: Install from PyPI (When Available)
 
 ```bash
-pip install hyper2kvm
-hyper2kvm --help
+pip install h2kvm
+h2kvm --help
 ```
 
 ---
@@ -189,11 +189,11 @@ sudo h2kvmctl local \
 ```bash
 # Install VirtIO drivers ISO to the standard path (recommended)
 sudo ./scripts/install-deps.sh --virtio-win
-# Downloads to /var/lib/hyper2kvm/virtio-win.iso
+# Downloads to /var/lib/h2kvm/virtio-win.iso
 # quickstart.sh also auto-downloads it there
 
 # Convert with driver injection
-# (virtio-win.iso is auto-discovered at /var/lib/hyper2kvm/virtio-win.iso — no flag needed)
+# (virtio-win.iso is auto-discovered at /var/lib/h2kvm/virtio-win.iso — no flag needed)
 sudo h2kvmctl local \
   --vmdk windows-vm.vmdk \
   --flatten \
@@ -392,7 +392,7 @@ sudo h2kvmctl local \
 # Install VirtIO drivers ISO if not already present
 sudo ./scripts/install-deps.sh --virtio-win
 
-# Inject VirtIO drivers (auto-discovered at /var/lib/hyper2kvm/virtio-win.iso)
+# Inject VirtIO drivers (auto-discovered at /var/lib/h2kvm/virtio-win.iso)
 sudo h2kvmctl local \
   --vmdk windows.vmdk \
   --to-output windows.qcow2 \
@@ -409,7 +409,7 @@ sudo h2kvmctl local \
 
 - **[Installation Guide](01-Installation.md)** - Detailed installation instructions
 - **[Examples](../examples/)** - 30+ working configuration examples
-- **[Architecture](01-Architecture.md)** - How hyper2kvm works internally
+- **[Architecture](01-Architecture.md)** - How h2kvm works internally
 - **[Troubleshooting](90-Failure-Modes.md)** - Common problems and solutions
 
 ### Try Advanced Features
@@ -421,7 +421,7 @@ sudo h2kvmctl local \
 
 ### Get Help
 
-- **GitHub Issues:** https://github.com/ssahani/hyper2kvm/issues
+- **GitHub Issues:** https://github.com/ssahani/h2kvm/issues
 - **Documentation:** `docs/` directory
 - **Examples:** `examples/` directory
 
@@ -439,7 +439,7 @@ sudo h2kvmctl local --vmdk INPUT.vmdk --flatten --compress --to-output OUTPUT.qc
 # Linux with fixes
 sudo h2kvmctl local --vmdk INPUT.vmdk --fix-network --fix-bootloader --to-output OUTPUT.qcow2
 
-# Windows with VirtIO (auto-discovers /var/lib/hyper2kvm/virtio-win.iso)
+# Windows with VirtIO (auto-discovers /var/lib/h2kvm/virtio-win.iso)
 sudo h2kvmctl local --vmdk INPUT.vmdk --windows --inject-virtio --to-output OUTPUT.qcow2
 
 # Fetch from ESXi
@@ -548,12 +548,12 @@ Now that you've completed your first migration:
 
 1. **[Explore Examples](../examples/README.md)** - 40+ ready-to-use configuration files
 2. **[Read the Cookbook](06-Cookbook.md)** - Common migration recipes
-3. **[Understand Architecture](01-Architecture.md)** - How hyper2kvm works internally
+3. **[Understand Architecture](01-Architecture.md)** - How h2kvm works internally
 4. **[Windows Migrations](10-Windows-Guide.md)** - If you need to migrate Windows VMs
 
 ## Getting Help
 
-- **Issues:** [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
+- **Issues:** [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
 - **Troubleshooting:** [Failure Modes Guide](90-Failure-Modes.md)
 - **Documentation:** All docs in `docs/` directory
 

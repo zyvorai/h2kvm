@@ -1,4 +1,4 @@
-# Pre-commit hooks for hyper2kvm
+# Pre-commit hooks for h2kvm
 # Install: pip install pre-commit && pre-commit install
 # Run manually: pre-commit run --all-files
 
@@ -41,7 +41,7 @@ repos:
   rev: 1.7.10
   hooks:
   - id: bandit
-    args: [-ll, -r, hyper2kvm/]
+    args: [-ll, -r, h2kvm/]
     exclude: ^tests/
 
   # Type checking with mypy
@@ -53,7 +53,7 @@ repos:
     additional_dependencies:
     - types-PyYAML
     - types-requests
-    files: ^hyper2kvm/
+    files: ^h2kvm/
 
   # Markdown linting
 - repo: https://github.com/igorshubovych/markdownlint-cli

@@ -1,8 +1,8 @@
-# Hyper2KVM Architecture Summary
+# H2KVM Architecture Summary
 
 ## Complete Backend Ecosystem
 
-Hyper2KVM now provides **three backend options** for VM conversion, each optimized for different use cases:
+H2KVM now provides **three backend options** for VM conversion, each optimized for different use cases:
 
 ### Backend Options
 
@@ -23,7 +23,7 @@ Host → Python LVM module → Direct NBD → LVM operations
 ```
 
 **Implementation:**
-- `hyper2kvm/vmcraft/lvm.py` (466 lines)
+- `h2kvm/vmcraft/lvm.py` (466 lines)
 - Direct subprocess calls
 - Production-grade semantics
 - Caching + timeout protection
@@ -72,7 +72,7 @@ Host
 ```
 
 **Implementation:**
-- `hyper2kvm/vmcraft/namespace_engine.py` (697 lines)
+- `h2kvm/vmcraft/namespace_engine.py` (697 lines)
 - 6 core components
 - Complete isolation stack
 - Enterprise-grade safety
@@ -199,7 +199,7 @@ config = OfflineFixConfig(
 
 ### Advanced Migration (namespace):
 ```python
-from hyper2kvm.vmcraft.namespace_engine import NamespaceEngine
+from h2kvm.vmcraft.namespace_engine import NamespaceEngine
 
 engine = NamespaceEngine(image="guest.qcow2")
 try:
@@ -292,7 +292,7 @@ Planned improvements:
 
 ## Summary
 
-Hyper2KVM now provides a **complete backend ecosystem** with options for every use case:
+H2KVM now provides a **complete backend ecosystem** with options for every use case:
 
 - **Production:** namespace (safety + speed + capabilities)
 - **Batch:** vmcraft (maximum speed)

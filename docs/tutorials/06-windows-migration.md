@@ -12,7 +12,7 @@ Windows VMs require extra steps compared to Linux:
 3. **Two-phase boot** ensures Windows loads VirtIO drivers safely (SATA first, then VirtIO)
 4. **VMware Tools** must be removed to avoid conflicts
 
-hyper2kvm handles all of this automatically.
+h2kvm handles all of this automatically.
 
 ---
 
@@ -24,7 +24,7 @@ sudo ./scripts/install-deps.sh --qemu --guestfs --libvirt --ovmf
 
 # Install VirtIO drivers ISO (recommended — downloads to standard path)
 sudo ./scripts/install-deps.sh --virtio-win
-# Downloads to /var/lib/hyper2kvm/virtio-win.iso
+# Downloads to /var/lib/h2kvm/virtio-win.iso
 # quickstart.sh also auto-downloads it there
 # h2kvmctl auto-discovers this path — no --virtio-win-iso flag needed
 
@@ -40,7 +40,7 @@ sudo ./scripts/install-deps.sh --virtio-win
 Verify:
 
 ```bash
-ls /var/lib/hyper2kvm/virtio-win.iso
+ls /var/lib/h2kvm/virtio-win.iso
 # or if installed via dnf:
 # ls /usr/share/virtio-win/virtio-win.iso
 ```
@@ -66,7 +66,7 @@ compress: true
 # Windows mode
 windows: true
 guest_os: windows
-virtio_win_iso: /usr/share/virtio-win/virtio-win.iso  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+virtio_win_iso: /usr/share/virtio-win/virtio-win.iso  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 remove_vmware_tools: true
 
 # Two-phase boot: bootstrap first (SATA), then switch to VirtIO
@@ -211,7 +211,7 @@ compress: true
 # Windows mode
 windows: true
 guest_os: windows
-virtio_win_iso: /usr/share/virtio-win/virtio-win.iso  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+virtio_win_iso: /usr/share/virtio-win/virtio-win.iso  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 remove_vmware_tools: true
 win_stage: bootstrap
 
@@ -273,7 +273,7 @@ out_format: qcow2
 compress: true
 windows: true
 guest_os: windows
-virtio_win_iso: /usr/share/virtio-win/virtio-win.iso  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+virtio_win_iso: /usr/share/virtio-win/virtio-win.iso  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 remove_vmware_tools: true
 win_stage: bootstrap
 emit_domain_xml: true
@@ -400,7 +400,7 @@ vcpus: 2
 sudo ./h2kvmctl --cmd local \
     --vmdk /path/to/windows.vmdk \
     --windows \
-    --virtio-win-iso /usr/share/virtio-win/virtio-win.iso \  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+    --virtio-win-iso /usr/share/virtio-win/virtio-win.iso \  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
     --remove-vmware-tools \
     --flatten --to-output win.qcow2 --out-format qcow2 --compress \
     --win-stage bootstrap \
@@ -424,7 +424,7 @@ sudo ./h2kvmctl --cmd vsphere \
     --vm-name windows-10-pro \
     --govc-datacenter Datacenter \
     --windows \
-    --virtio-win-iso /usr/share/virtio-win/virtio-win.iso \  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+    --virtio-win-iso /usr/share/virtio-win/virtio-win.iso \  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
     --flatten --to-output win10.qcow2 --out-format qcow2 --compress \
     --win-stage bootstrap \
     --emit-domain-xml --uefi --machine q35 \
@@ -444,7 +444,7 @@ The VirtIO storage driver wasn't injected correctly or `win_stage` wasn't set to
 ```bash
 # Re-run with bootstrap stage (SATA boot)
 # Ensure virtio_win_iso is available at the standard path
-ls /var/lib/hyper2kvm/virtio-win.iso
+ls /var/lib/h2kvm/virtio-win.iso
 # or install it:
 sudo ./scripts/install-deps.sh --virtio-win
 ```
@@ -475,7 +475,7 @@ timeout: 600   # 10 minutes
 ```bash
 # Recommended: use install-deps.sh (downloads to standard path)
 sudo ./scripts/install-deps.sh --virtio-win
-ls /var/lib/hyper2kvm/virtio-win.iso
+ls /var/lib/h2kvm/virtio-win.iso
 
 # Alternative: Fedora/RHEL package
 sudo dnf install virtio-win
@@ -507,7 +507,7 @@ VMware VM (Windows 10/11/Server)
   |
   v
 h2kvmctl --windows --win-stage bootstrap
-  (virtio-win.iso auto-discovered at /var/lib/hyper2kvm/virtio-win.iso)
+  (virtio-win.iso auto-discovered at /var/lib/h2kvm/virtio-win.iso)
   |
   |-- Flatten VMDK → qcow2
   |-- Inject VirtIO drivers (viostor, NetKVM, vioscsi)

@@ -7,8 +7,8 @@ cmd: local
 vmdk: /home/ssahani/Downloads/VMs/extracted/fedora/64bit/fedora42-server.vmdk
 
 # Output Configuration
-output_dir: /home/ssahani/tt/hyper2kvm/out/fedora42-test
-to_output: /home/ssahani/tt/hyper2kvm/out/fedora42-test/fedora42-server.qcow2
+output_dir: /home/ssahani/tt/h2kvm/out/fedora42-test
+to_output: /home/ssahani/tt/h2kvm/out/fedora42-test/fedora42-server.qcow2
 out_format: qcow2
 compress: true
 
@@ -22,6 +22,6 @@ libvirt_memory_mb: 4096
 libvirt_vcpus: 2
 
 # Reporting
-report: /home/ssahani/tt/hyper2kvm/out/fedora42-test/migration-report.md
+report: /home/ssahani/tt/h2kvm/out/fedora42-test/migration-report.md
 verbose: 2
 dry_run: false

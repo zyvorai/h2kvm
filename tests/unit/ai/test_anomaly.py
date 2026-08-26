@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.ai.anomaly.AnomalyDetector.
+"""Tests for h2kvm.ai.anomaly.AnomalyDetector.
 
 Covers duration, error-rate, and phase-sequence anomaly detection, the
 detect_all() aggregation method, and custom threshold configuration.
@@ -12,8 +12,8 @@ from __future__ import annotations
 
 import pytest
 
-from hyper2kvm.ai.anomaly import AnomalyDetector
-from hyper2kvm.ai.models import AIConfig, MigrationFeatures, MigrationRecord
+from h2kvm.ai.anomaly import AnomalyDetector
+from h2kvm.ai.models import AIConfig, MigrationFeatures, MigrationRecord
 
 
 # ---------------------------------------------------------------------------

@@ -1,15 +1,15 @@
-# Hyper2KVM LUKS Unlocker Container Image
+# H2KVM LUKS Unlocker Container Image
 # For Kubernetes DaemonSet deployment
 #
 # Build:
-#   docker build -f contrib/docker/Dockerfile.luks-unlocker -t hyper2kvm/luks-unlocker:latest .
+#   docker build -f contrib/docker/Dockerfile.luks-unlocker -t h2kvm/luks-unlocker:latest .
 #
 # Run:
 #   kubectl apply -f contrib/kubernetes/daemonset.yaml
 
 FROM python:3.11-slim
 
-LABEL maintainer="Hyper2KVM Project"
+LABEL maintainer="H2KVM Project"
 LABEL description="LUKS auto-unlock for Kubernetes worker nodes"
 LABEL version="1.0.0"
 
@@ -25,9 +25,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Create app directory
 WORKDIR /app
 
-# Copy hyper2kvm package
-COPY hyper2kvm/ /app/hyper2kvm/
-COPY bin/hyper2kvm-luks /usr/bin/hyper2kvm-luks
+# Copy h2kvm package
+COPY h2kvm/ /app/h2kvm/
+COPY bin/h2kvm-luks /usr/bin/h2kvm-luks
 COPY setup.py README.md /app/
 
 # Install Python dependencies
@@ -37,21 +37,21 @@ RUN pip install --no-cache-dir \
     && pip install -e /app
 
 # Make CLI executable
-RUN chmod +x /usr/bin/hyper2kvm-luks
+RUN chmod +x /usr/bin/h2kvm-luks
 
 # Create config directory
-RUN mkdir -p /etc/hyper2kvm
+RUN mkdir -p /etc/h2kvm
 
 # Security: Run as non-root when possible
 # Note: For actual device unlock, privileged mode is required
 # This just sets defaults for non-privileged operations
-RUN useradd -m -u 1000 hyper2kvm
-USER hyper2kvm
+RUN useradd -m -u 1000 h2kvm
+USER h2kvm
 
 # Default command
-ENTRYPOINT ["/usr/bin/hyper2kvm-luks"]
+ENTRYPOINT ["/usr/bin/h2kvm-luks"]
 CMD ["unlock", "-v"]
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD hyper2kvm-luks status || exit 1
+  CMD h2kvm-luks status || exit 1

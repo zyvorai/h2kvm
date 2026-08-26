@@ -1,6 +1,6 @@
 command: local
-vmdk: /home/ssahani/tt/hyper2kvm/esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
-output_dir: /home/hyper2kvm-test
+vmdk: /home/ssahani/tt/h2kvm/esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+output_dir: /home/h2kvm-test
 to_output: rhel88.qcow2
 out_format: qcow2
 fstab_mode: stabilize-all

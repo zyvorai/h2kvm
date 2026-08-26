@@ -2,7 +2,7 @@
 #   h2kvmctl --config photon-azure-qemu.yaml
 #
 # Or using legacy command:
-#   hyper2kvm --config photon-azure-qemu.yaml
+#   h2kvm --config photon-azure-qemu.yaml
 
 command: local
 vmdk: ./photon-azure-5.0-dde71ec57.x86_64.vhd

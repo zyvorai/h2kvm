@@ -12,7 +12,7 @@ for VM preparation and optimization.
 """
 
 from pathlib import Path
-from hyper2kvm.infrastructure.systemd import (
+from h2kvm.infrastructure.systemd import (
     SystemdBootIntegration,
     SystemdRepartManager,
     SystemdGrowfsManager,

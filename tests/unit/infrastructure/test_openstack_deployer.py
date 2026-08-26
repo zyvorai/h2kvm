@@ -11,7 +11,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from hyper2kvm.infrastructure.deployers.openstack import OpenStackDeployer, deploy_to_openstack
+from h2kvm.infrastructure.deployers.openstack import OpenStackDeployer, deploy_to_openstack
 
 
 def test_dry_run_skips_connection(tmp_path):
@@ -32,7 +32,7 @@ def test_missing_image_raises(tmp_path):
     logger = MagicMock()
     args = argparse.Namespace(glance_name="x", dry_run=False, vm_name=None)
     deployer = OpenStackDeployer(logger, args)
-    from hyper2kvm.core.exceptions import InfrastructureError
+    from h2kvm.core.exceptions import InfrastructureError
 
     with pytest.raises(InfrastructureError, match="not found"):
         deployer.deploy(str(tmp_path / "missing.qcow2"))
@@ -52,7 +52,7 @@ def test_boot_instance_requires_flavor_network_key(tmp_path):
         openstack_key_name="kp",
     )
     deployer = OpenStackDeployer(logger, args)
-    from hyper2kvm.core.exceptions import InfrastructureError
+    from h2kvm.core.exceptions import InfrastructureError
 
     with pytest.raises(InfrastructureError, match="flavor"):
         deployer.deploy(str(img))

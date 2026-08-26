@@ -6,7 +6,7 @@
 # and NetworkManager without requiring cloud-init.
 #
 # Usage:
-#   hyper2kvm --config 98-linux-network-config-injection-examples.yaml local
+#   h2kvm --config 98-linux-network-config-injection-examples.yaml local
 #
 # Use Cases:
 #   ✅ Static IP configuration

@@ -99,7 +99,7 @@
       <ul>
         <li><strong>Preferred:</strong> Always-On AG — add KVM replica, failover</li>
         <li><strong>Cold:</strong> Stop SQL Server service before export</li>
-        <li><strong>VirtIO injection:</strong> hyper2kvm handles automatically</li>
+        <li><strong>VirtIO injection:</strong> h2kvm handles automatically</li>
         <li><strong>Licensing win:</strong> KVM CPU pinning reduces per-core licensing 20-40%</li>
         <li><strong>Post-migration:</strong> Verify databases online, AG health, agent jobs</li>
         <li><strong>Tip:</strong> Lock pages in memory + large pages on KVM for performance</li>
@@ -175,11 +175,11 @@
     <h3>Database Migration: Highest Risk, Highest Reward</h3>
     <p style="font-size:0.9em;">
       Use replication for near-zero downtime. Use CPU pinning for SQL Server licensing savings.<br>
-      hyper2kvm handles the VM-level conversion (VirtIO, fstab, initramfs) automatically.<br>
+      h2kvm handles the VM-level conversion (VirtIO, fstab, initramfs) automatically.<br>
       <strong>The database strategy is your choice. The VM migration is automated.</strong>
     </p>
   </div>
-  <div class="footer"><p>hyper2kvm — Database Migration Best Practices | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+  <div class="footer"><p>h2kvm — Database Migration Best Practices | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
 </div>
 
 </body>

@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Integration tests for the hyper2kvm AI module -- end-to-end workflows."""
+"""Integration tests for the h2kvm AI module -- end-to-end workflows."""
 
 from __future__ import annotations
 
@@ -10,9 +10,9 @@ import time
 
 import pytest
 
-from hyper2kvm.ai.diagnostic import DiagnosticEngine
-from hyper2kvm.ai.knowledge_base import KnowledgeBase
-from hyper2kvm.ai.models import (
+from h2kvm.ai.diagnostic import DiagnosticEngine
+from h2kvm.ai.knowledge_base import KnowledgeBase
+from h2kvm.ai.models import (
     HealthStatus,
     MigrationFeatures,
     MigrationRecord,
@@ -20,7 +20,7 @@ from hyper2kvm.ai.models import (
     WorkloadProfile,
     WorkloadType,
 )
-from hyper2kvm.ai.orchestrator import AIOrchestrator
+from h2kvm.ai.orchestrator import AIOrchestrator
 
 
 # ---------------------------------------------------------------------------

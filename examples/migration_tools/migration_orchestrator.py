@@ -45,9 +45,9 @@ from typing import Any
 
 # Import VMCraft
 try:
-    from hyper2kvm.vmcraft.main import VMCraft
+    from h2kvm.vmcraft.main import VMCraft
 except ImportError:
-    print("ERROR: hyper2kvm library not found. Install with: pip install -e .")
+    print("ERROR: h2kvm library not found. Install with: pip install -e .")
     sys.exit(1)
 
 # Import migration tools

@@ -38,7 +38,7 @@
 <div class="cover">
   <h1>Security &amp; <span>Compliance</span></h1>
   <h2>VM Migration Best Practices</h2>
-  <p class="sub">How hyper2kvm ensures data protection, regulatory compliance, and security hardening throughout the migration lifecycle — HIPAA, SOC 2, GDPR, FedRAMP.</p>
+  <p class="sub">How h2kvm ensures data protection, regulatory compliance, and security hardening throughout the migration lifecycle — HIPAA, SOC 2, GDPR, FedRAMP.</p>
   <div class="badge">Zero data exfiltration | Air-gap capable | Audit trail</div>
 </div>
 
@@ -46,7 +46,7 @@
   <h2 class="st">Data <span>Protection</span></h2>
   <p class="sub">Your VM data never leaves your control during migration.</p>
   <div class="card-grid">
-    <div class="card"><div class="icon">🔒</div><h4>No Cloud Upload</h4><p>hyper2kvm runs entirely on-premises. Disk images are converted locally. No data sent to external services, APIs, or analytics platforms. Zero telemetry.</p></div>
+    <div class="card"><div class="icon">🔒</div><h4>No Cloud Upload</h4><p>h2kvm runs entirely on-premises. Disk images are converted locally. No data sent to external services, APIs, or analytics platforms. Zero telemetry.</p></div>
     <div class="card"><div class="icon">🛡️</div><h4>Encryption at Rest</h4><p>Output qcow2 images support LUKS encryption. Source VMDKs with encrypted vSAN/VMFS are handled natively. Keys never leave your infrastructure.</p></div>
     <div class="card"><div class="icon">🔐</div><h4>Encryption in Transit</h4><p>vSphere exports use TLS 1.2+. SSH-based remote exports use ed25519/RSA keys. KubeVirt uploads via HTTPS. No plaintext disk transfers.</p></div>
     <div class="card"><div class="icon">🗑️</div><h4>Secure Cleanup</h4><p>Temporary files in /tmp auto-deleted after conversion. Working directories cleaned on completion. No residual disk data left behind.</p></div>
@@ -54,15 +54,15 @@
 
   <h3>Air-Gapped Migration</h3>
   <div class="alert">
-    <p><strong>For classified, SCIF, or disconnected environments:</strong> hyper2kvm works fully offline. Install via RPM/DEB from USB. Export VMDKs to external drive. Convert on isolated network. No internet required at any stage.</p>
+    <p><strong>For classified, SCIF, or disconnected environments:</strong> h2kvm works fully offline. Install via RPM/DEB from USB. Export VMDKs to external drive. Convert on isolated network. No internet required at any stage.</p>
   </div>
 </div>
 
 <div class="page page-light">
   <h2 class="st">Regulatory <span>Compliance</span></h2>
-  <p class="sub">How hyper2kvm aligns with major compliance frameworks.</p>
+  <p class="sub">How h2kvm aligns with major compliance frameworks.</p>
   <table>
-    <tr><th>Framework</th><th>Requirement</th><th>hyper2kvm Compliance</th></tr>
+    <tr><th>Framework</th><th>Requirement</th><th>h2kvm Compliance</th></tr>
     <tr><td><strong>HIPAA</strong></td><td>PHI must remain in controlled environment</td><td class="check">All processing local, no cloud dependency</td></tr>
     <tr><td><strong>HIPAA</strong></td><td>Audit trail for data access</td><td class="check">Structured JSON logging with trace IDs</td></tr>
     <tr><td><strong>HIPAA</strong></td><td>Encryption of PHI at rest</td><td class="check">LUKS-encrypted qcow2 output supported</td></tr>
@@ -78,7 +78,7 @@
 
 <div class="page page-accent">
   <h2 class="st">Security <span>Hardening</span></h2>
-  <p class="sub">What hyper2kvm does to harden migrated VMs.</p>
+  <p class="sub">What h2kvm does to harden migrated VMs.</p>
   <div class="card-grid card-grid-3">
     <div class="card"><div class="icon">🔑</div><h4>Credential Handling</h4><p>vCenter passwords via env vars or vault references. Never stored in YAML. vc_password_env indirection prevents credential leaks in configs.</p></div>
     <div class="card"><div class="icon">🐧</div><h4>SELinux Relabel</h4><p>Triggers autorelabel on first boot after migration. Ensures all file contexts are correct for the new KVM environment. No permissive mode shortcuts.</p></div>
@@ -102,12 +102,12 @@
   <h2 class="st">Open Source <span>Advantage</span></h2>
   <p class="sub">Why open source is more secure than proprietary migration tools.</p>
   <div class="card-grid">
-    <div class="card"><div class="icon">👁️</div><h4>Full Code Audit</h4><p>Every line of hyper2kvm is visible on GitHub. Your security team can audit the entire codebase. No hidden backdoors, no telemetry, no phone-home.</p></div>
+    <div class="card"><div class="icon">👁️</div><h4>Full Code Audit</h4><p>Every line of h2kvm is visible on GitHub. Your security team can audit the entire codebase. No hidden backdoors, no telemetry, no phone-home.</p></div>
     <div class="card"><div class="icon">🔧</div><h4>Patch Yourself</h4><p>Found a vulnerability? Fix it immediately. No waiting for vendor patches. No support ticket escalation. Fork, fix, deploy in hours.</p></div>
     <div class="card"><div class="icon">📋</div><h4>SBOM Ready</h4><p>Full dependency tree visible in go.mod and pyproject.toml. Generate SBOM for compliance. No hidden third-party components.</p></div>
     <div class="card"><div class="icon">🏛️</div><h4>No Vendor Risk</h4><p>Proprietary (Zyvor AI Labs) license — no vendor can revoke access, change terms, or force upgrades. Your migration tool can't be rug-pulled like VMware was.</p></div>
   </div>
-  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs)</p></div>
+  <div class="footer"><p>h2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs)</p></div>
 </div>
 </body>
 </html>

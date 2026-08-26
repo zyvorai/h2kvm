@@ -1,4 +1,4 @@
-# Docker Compose configuration for hyper2kvm
+# Docker Compose configuration for h2kvm
 # Supports development, testing, and production deployments
 # For production migrations, use cli/daemon/batch services with proper device access
 version: '3.8'
@@ -13,8 +13,8 @@ services:
     build:
       context: .
       target: cli
-    image: hyper2kvm:cli
-    container_name: hyper2kvm-cli
+    image: h2kvm:cli
+    container_name: h2kvm-cli
     privileged: true  # Required for NBD, mount, LVM operations
     devices:
       - /dev/nbd0:/dev/nbd0
@@ -28,9 +28,9 @@ services:
       # Output qcow2 files (read-write)
       - ${OUTPUT_DIR:-./output}:/data/kvm:rw
       # Conversion temp space (fast SSD recommended)
-      - ${CONVERSION_DIR:-/var/lib/hyper2kvm/conversions}:/conversions:rw
+      - ${CONVERSION_DIR:-/var/lib/h2kvm/conversions}:/conversions:rw
     environment:
-      - HYPER2KVM_MODE=cli
+      - H2KVM_MODE=cli
       - PYTHONUNBUFFERED=1
     deploy:
       resources:
@@ -41,7 +41,7 @@ services:
           cpus: '2.0'
           memory: 4G
     networks:
-      - hyper2kvm-net
+      - h2kvm-net
     # Command can be overridden: docker-compose run cli --cmd local --vmdk /data/vmware/test.vmdk
 
   # Daemon - Continuous file watching and processing
@@ -49,8 +49,8 @@ services:
     build:
       context: .
       target: daemon
-    image: hyper2kvm:daemon
-    container_name: hyper2kvm-daemon
+    image: h2kvm:daemon
+    container_name: h2kvm-daemon
     privileged: true  # Required for NBD, mount, LVM operations
     restart: unless-stopped
     devices:
@@ -65,14 +65,14 @@ services:
       # Output directory
       - ${OUTPUT_DIR:-./output}:/data/output:rw
       # Daemon state and metadata
-      - ${DAEMON_STATE:-/var/lib/hyper2kvm}:/var/lib/hyper2kvm:rw
+      - ${DAEMON_STATE:-/var/lib/h2kvm}:/var/lib/h2kvm:rw
       # Configuration
-      - ${DAEMON_CONFIG:-./config/daemon.yaml}:/etc/hyper2kvm/daemon.yaml:ro
+      - ${DAEMON_CONFIG:-./config/daemon.yaml}:/etc/h2kvm/daemon.yaml:ro
     environment:
-      - HYPER2KVM_MODE=daemon
+      - H2KVM_MODE=daemon
       - PYTHONUNBUFFERED=1
     healthcheck:
-      test: ["CMD", "pgrep", "-f", "hyper2kvm.*daemon"]
+      test: ["CMD", "pgrep", "-f", "h2kvm.*daemon"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -86,7 +86,7 @@ services:
           cpus: '2.0'
           memory: 4G
     networks:
-      - hyper2kvm-net
+      - h2kvm-net
     logging:
       driver: "json-file"
       options:
@@ -98,8 +98,8 @@ services:
     build:
       context: .
       target: batch
-    image: hyper2kvm:batch
-    container_name: hyper2kvm-batch
+    image: h2kvm:batch
+    container_name: h2kvm-batch
     privileged: true
     devices:
       - /dev/nbd0:/dev/nbd0
@@ -115,11 +115,11 @@ services:
       # Output directory
       - ${OUTPUT_DIR:-./output}:/data/output:rw
       # Batch configuration
-      - ${BATCH_CONFIG:-./config/batch.yaml}:/etc/hyper2kvm/batch.yaml:ro
+      - ${BATCH_CONFIG:-./config/batch.yaml}:/etc/h2kvm/batch.yaml:ro
       # Batch manifest
-      - ${BATCH_MANIFEST:-./config/manifest.json}:/etc/hyper2kvm/manifest.json:ro
+      - ${BATCH_MANIFEST:-./config/manifest.json}:/etc/h2kvm/manifest.json:ro
     environment:
-      - HYPER2KVM_MODE=batch
+      - H2KVM_MODE=batch
       - BATCH_PARALLEL=${BATCH_PARALLEL:-4}
       - PYTHONUNBUFFERED=1
     deploy:
@@ -131,15 +131,15 @@ services:
           cpus: '8.0'
           memory: 16G
     networks:
-      - hyper2kvm-net
+      - h2kvm-net
 
   # zkvm - Interactive terminal UI
   zkvm:
     build:
       context: .
       target: zkvm
-    image: hyper2kvm:zkvm
-    container_name: hyper2kvm-zkvm
+    image: h2kvm:zkvm
+    container_name: h2kvm-zkvm
     privileged: true
     stdin_open: true
     tty: true
@@ -153,13 +153,13 @@ services:
       - ${VMDK_DIR:-./test-data}:/data/vmware:ro
       - ${OUTPUT_DIR:-./output}:/data/kvm:rw
       # zkvm config persistence
-      - ${ZKVM_CONFIG:-~/.config/hyper2kvm}:/home/hyper2kvm/.config/hyper2kvm:rw
+      - ${ZKVM_CONFIG:-~/.config/h2kvm}:/home/h2kvm/.config/h2kvm:rw
     environment:
-      - HYPER2KVM_MODE=zkvm
+      - H2KVM_MODE=zkvm
       - TERM=xterm-256color
       - PYTHONUNBUFFERED=1
     networks:
-      - hyper2kvm-net
+      - h2kvm-net
     # Run with: docker-compose run --rm zkvm
 
   # ========================================
@@ -173,8 +173,8 @@ services:
       target: development
       args:
         - PYTHON_VERSION=3.12
-    image: hyper2kvm:dev
-    container_name: hyper2kvm-dev
+    image: h2kvm:dev
+    container_name: h2kvm-dev
     volumes:
       # Mount source code for live editing
       - .:/app
@@ -190,46 +190,46 @@ services:
       - PYTHONPATH=/app
       - TERM=xterm-256color
     networks:
-      - hyper2kvm-net
+      - h2kvm-net
 
   # Testing environment
   test:
     build:
       context: .
       target: testing
-    image: hyper2kvm:test
-    container_name: hyper2kvm-test
+    image: h2kvm:test
+    container_name: h2kvm-test
     volumes:
       - .:/app
       - pip-cache:/root/.cache/pip
     working_dir: /app
     command: hatch run ci
     networks:
-      - hyper2kvm-net
+      - h2kvm-net
 
   # Production environment for testing
   prod:
     build:
       context: .
       target: production
-    image: hyper2kvm:prod
-    container_name: hyper2kvm-prod
+    image: h2kvm:prod
+    container_name: h2kvm-prod
     volumes:
       # Mount directories for VM disk operations
       - ./test-data:/data:ro
       - ./output:/output
     working_dir: /data
-    user: hyper2kvm
+    user: h2kvm
     networks:
-      - hyper2kvm-net
+      - h2kvm-net
 
   # Documentation server
   docs:
     build:
       context: .
       target: development
-    image: hyper2kvm:docs
-    container_name: hyper2kvm-docs
+    image: h2kvm:docs
+    container_name: h2kvm-docs
     volumes:
       - .:/app
     working_dir: /app
@@ -237,10 +237,10 @@ services:
     ports:
       - "8000:8000"
     networks:
-      - hyper2kvm-net
+      - h2kvm-net
 
 networks:
-  hyper2kvm-net:
+  h2kvm-net:
     driver: bridge
 
 volumes:

@@ -21,7 +21,7 @@ import logging
 from pathlib import Path
 from datetime import datetime
 
-from hyper2kvm.vmcraft.main import VMCraft
+from h2kvm.vmcraft.main import VMCraft
 
 
 def setup_logging():

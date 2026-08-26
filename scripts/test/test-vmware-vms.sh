@@ -1,5 +1,5 @@
 #!/bin/bash
-# VMware Production VM Test Suite for hyper2kvm
+# VMware Production VM Test Suite for h2kvm
 # Tests actual VMware VMs from /home/ssahani/vmware
 
 set -euo pipefail
@@ -40,7 +40,7 @@ cleanup_env() {
     done
 
     # Clean up any stale mount points
-    sudo umount /tmp/hyper2kvm-guestfs-* 2>/dev/null || true
+    sudo umount /tmp/h2kvm-guestfs-* 2>/dev/null || true
 
     # Wait for devices to settle
     sleep 2
@@ -67,10 +67,10 @@ test_vm() {
     cleanup_env
 
     # Run the conversion
-    local log_file="/tmp/hyper2kvm-vmware-test-$name.log"
+    local log_file="/tmp/h2kvm-vmware-test-$name.log"
     echo "Running conversion (this may take several minutes for large VMs)..."
 
-    if sudo timeout 900 python3 -m hyper2kvm --config "$config" > "$log_file" 2>&1; then
+    if sudo timeout 900 python3 -m h2kvm --config "$config" > "$log_file" 2>&1; then
         echo -e "${GREEN}✓ PASSED: $name${NC}"
         PASSED=$((PASSED + 1))
         TEST_RESULTS["$name"]="PASSED"
@@ -137,7 +137,7 @@ print_summary() {
 
 # Main test execution
 main() {
-    print_header "hyper2kvm VMware Production VM Test Suite"
+    print_header "h2kvm VMware Production VM Test Suite"
     echo "Testing actual VMware VMs from /home/ssahani/vmware"
     echo ""
 

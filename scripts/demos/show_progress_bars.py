@@ -121,7 +121,7 @@ print()
 print("  Python code:")
 print("  " + "-" * 70)
 print("""
-  from hyper2kvm.core.progress import create_progress_bar
+  from h2kvm.core.progress import create_progress_bar
 
   # Automatic detection (uses Rich if available, otherwise fallback)
   with create_progress_bar("Migrating VM", total=100) as progress:
@@ -129,7 +129,7 @@ print("""
           progress.update(i + 1)
 
   # Or use simple progress bar directly
-  from hyper2kvm.core.progress import SimpleProgressBar, ProgressBarConfig
+  from h2kvm.core.progress import SimpleProgressBar, ProgressBarConfig
 
   config = ProgressBarConfig(
       width=40,

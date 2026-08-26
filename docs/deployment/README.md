@@ -1,6 +1,6 @@
 # Deployment & Operations
 
-This directory contains guides for deploying Hyper2KVM in various environments, from standalone installations to enterprise Kubernetes/OpenShift deployments.
+This directory contains guides for deploying H2KVM in various environments, from standalone installations to enterprise Kubernetes/OpenShift deployments.
 
 ## Performance Highlights
 
@@ -77,14 +77,14 @@ This directory contains guides for deploying Hyper2KVM in various environments, 
 
 ```bash
 # Install on OpenShift
-helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace \
   --set openshift.enabled=true
 
 # Install on Kubernetes
-helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace \
   --set openshift.enabled=false
 ```
@@ -95,8 +95,8 @@ helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
 
 ```bash
 # Install via operator-sdk
-operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0 \
-  --namespace hyper2kvm-system
+operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
+  --namespace h2kvm-system
 
 # Or install from OperatorHub UI
 ```
@@ -107,13 +107,13 @@ operator-sdk run bundle ghcr.io/ssahani/hyper2kvm-operator-bundle:v2.1.0 \
 
 ```bash
 # Run operator container
-podman run -d --name hyper2kvm-operator \
-  ghcr.io/ssahani/hyper2kvm:2.1.0-operator
+podman run -d --name h2kvm-operator \
+  ghcr.io/ssahani/h2kvm:2.1.0-operator
 
 # Run worker container
-podman run -d --name hyper2kvm-worker \
+podman run -d --name h2kvm-worker \
   -v /data:/data \
-  ghcr.io/ssahani/hyper2kvm:2.1.0-worker
+  ghcr.io/ssahani/h2kvm:2.1.0-worker
 ```
 
 **Documentation**: [Container Deployment Guide](container-deployment-guide.md)
@@ -122,10 +122,10 @@ podman run -d --name hyper2kvm-worker \
 
 ```bash
 # Install via pip
-pip install "hyper2kvm[full]"
+pip install "h2kvm[full]"
 
 # Run migration
-hyper2kvm --config migration.yaml
+h2kvm --config migration.yaml
 ```
 
 **Documentation**: [Installation Guide](../getting-started/01-Installation.md)
@@ -136,7 +136,7 @@ hyper2kvm --config migration.yaml
 ┌─────────────────────────────────────────────────────┐
 │                OpenShift/Kubernetes                  │
 │  ┌─────────────────┐         ┌──────────────────┐   │
-│  │  Hyper2KVM      │────────▶│  Custom          │   │
+│  │  H2KVM      │────────▶│  Custom          │   │
 │  │  Operator       │         │  Resources       │   │
 │  │  (Kopf)         │◀────────│  (CRDs)          │   │
 │  └─────────────────┘         └──────────────────┘   │
@@ -182,7 +182,7 @@ hyper2kvm --config migration.yaml
 
 ## Getting Help
 
-- **Issues**: [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
+- **Issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
 - **Documentation**: [Main Index](../index.md)
 - **Troubleshooting**: [Troubleshooting Guide](../guides/troubleshooting.md)
 

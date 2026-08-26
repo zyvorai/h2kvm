@@ -1,6 +1,6 @@
 # Features Documentation
 
-Comprehensive documentation for all Hyper2KVM features and capabilities.
+Comprehensive documentation for all H2KVM features and capabilities.
 
 ## Performance Highlights (v2.2.0+)
 
@@ -105,7 +105,7 @@ Comprehensive documentation for all Hyper2KVM features and capabilities.
 
 ### Overview
 
-VMCraft is Hyper2KVM's native Python VM manipulation engine and the default guestfs backend, with **480+ APIs** for guest filesystem operations without requiring external C dependencies.
+VMCraft is H2KVM's native Python VM manipulation engine and the default guestfs backend, with **480+ APIs** for guest filesystem operations without requiring external C dependencies.
 
 **Key Capabilities:**
 - ✅ **Direct filesystem access** - Native Python, no C dependencies
@@ -232,13 +232,13 @@ fstab_mode: stabilize-all
 
 ```bash
 # Start daemon
-hyper2kvm daemon start
+h2kvm daemon start
 
 # Submit job
-hyper2kvm daemon submit migration.yaml
+h2kvm daemon submit migration.yaml
 
 # Check status
-hyper2kvm daemon status
+h2kvm daemon status
 ```
 
 **See**: [Daemon Mode Guide](daemon-mode.md), [Daemon User Guide](daemon-user-guide.md)
@@ -315,7 +315,7 @@ regen_initramfs: true
 ./scripts/vmdk_inspect.py /vmware/prod-vm.vmdk --auto-fix
 
 # 2. Run migration with all features
-hyper2kvm --config << EOF
+h2kvm --config << EOF
 command: local
 vmdk: /vmware/prod-vm.vmdk
 output_dir: /kvm/vms
@@ -440,9 +440,9 @@ EOF
 Have an idea for a new feature?
 
 1. **Check existing features**: Review this documentation
-2. **Search issues**: [GitHub Issues](https://github.com/ssahani/hyper2kvm/issues)
-3. **Create feature request**: [New Feature Request](https://github.com/ssahani/hyper2kvm/issues/new)
-4. **Discuss**: [GitHub Discussions](https://github.com/ssahani/hyper2kvm/discussions)
+2. **Search issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+3. **Create feature request**: [New Feature Request](https://github.com/ssahani/h2kvm/issues/new)
+4. **Discuss**: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
 
 ---
 

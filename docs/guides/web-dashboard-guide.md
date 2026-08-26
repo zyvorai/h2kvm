@@ -139,7 +139,7 @@ Shown only when a Kubernetes cluster is detected. Displays:
 
 ### Disk Images Inventory
 
-Scans standard directories (`/var/lib/libvirt/images/`, `/data/demo/`, `/var/lib/hyper2kvm/demo/`) for disk images. Each file shows:
+Scans standard directories (`/var/lib/libvirt/images/`, `/data/demo/`, `/var/lib/h2kvm/demo/`) for disk images. Each file shows:
 
 - Filename (monospaced)
 - Format badge (qcow2, vmdk, raw)
@@ -173,9 +173,9 @@ The full list of readiness checks:
 | `virt_install` | virt-install binary (optional — **Create VM** only; migration uses virsh define) |
 | `ovmf` | OVMF UEFI firmware found (for UEFI VMs) |
 | `bsdtar` | bsdtar binary available (VirtIO ISO extraction) |
-| `virtio_win_iso` | VirtIO Windows drivers ISO at `/var/lib/hyper2kvm/virtio-win.iso` |
-| `virtio_win_extracted` | VirtIO drivers extracted at `/var/lib/hyper2kvm/virtio-win-extracted/` |
-| `runtime_dir` | `/run/hyper2kvm` directory exists (NBD locking) |
+| `virtio_win_iso` | VirtIO Windows drivers ISO at `/var/lib/h2kvm/virtio-win.iso` |
+| `virtio_win_extracted` | VirtIO drivers extracted at `/var/lib/h2kvm/virtio-win-extracted/` |
+| `runtime_dir` | `/run/h2kvm` directory exists (NBD locking) |
 
 Note: checks with "warning" status mean the tool is optional for your use case. Checks with "error" status may block migrations.
 
@@ -207,7 +207,7 @@ Navigate to **Migration > Migrate** to open the migration hub, then choose a pat
 | **From disk image** | Browse or upload VMDK, OVA, VHD, QCOW2 on the server |
 | **From preset** | Apply a built-in h2kvmctl preset and jump to Configure |
 
-All migration deploy paths use **hyper2kvm (h2kvmctl)**. Libvirt deploy is **virsh define + domain XML** — not `virt-install`. Use **VMs > Create** when you need `virt-install` for new VMs.
+All migration deploy paths use **h2kvm (h2kvmctl)**. Libvirt deploy is **virsh define + domain XML** — not `virt-install`. Use **VMs > Create** when you need `virt-install` for new VMs.
 
 The wizard has three steps after you pick a path.
 
@@ -289,7 +289,7 @@ You can also **save the current configuration as a custom preset** (stored in br
 - Update GRUB -- reconfigure GRUB bootloader
 - Remove VMware Tools -- uninstall VMware guest tools
 
-**Libvirt (hyper2kvm · virsh define)**
+**Libvirt (h2kvm · virsh define)**
 - Emit Domain XML -- generate libvirt domain XML via h2kvmctl
 - Define VM (virsh define) -- register the VM with libvirt (not virt-install)
 - Start VM (virsh start) -- boot the VM after migration
@@ -302,7 +302,7 @@ You can also **save the current configuration as a custom preset** (stored in br
 - Namespace -- Kubernetes namespace (default: `default`)
 
 **OpenStack**
-- Upload to Glance -- `deploy_openstack` after conversion (requires `hyper2kvm[openstack]` on server)
+- Upload to Glance -- `deploy_openstack` after conversion (requires `h2kvm[openstack]` on server)
 - Glance image name, OS_CLOUD, optional Nova flavor/network/keypair and boot/wait toggles
 - Mutually exclusive with KubeVirt and local virsh define/start
 
@@ -591,7 +591,7 @@ Use **Send Test Email** to verify the configuration.
 
 ### Backup / Restore Config
 
-- **Export Config** -- downloads the current configuration as `hyper2kvm-config.json`
+- **Export Config** -- downloads the current configuration as `h2kvm-config.json`
 - **Import Config** -- upload a previously exported JSON file to restore settings
 
 The export includes webhooks and email notification configuration.
@@ -824,7 +824,7 @@ This is the **cleanest approach** because:
 
 1. **Migrate with SATA disk bus** -- In the migration wizard, use the **VMware Windows 10/11** preset or manually set the disk bus to SATA. This ensures Windows boots reliably on KVM without needing VirtIO storage drivers pre-installed.
 
-2. **virtio-win.iso auto-attached** -- hyper2kvm automatically attaches the VirtIO Windows driver ISO (`/var/lib/hyper2kvm/virtio-win.iso`) as a CD-ROM device in the generated libvirt domain XML. This appears as the D: drive inside Windows.
+2. **virtio-win.iso auto-attached** -- h2kvm automatically attaches the VirtIO Windows driver ISO (`/var/lib/h2kvm/virtio-win.iso`) as a CD-ROM device in the generated libvirt domain XML. This appears as the D: drive inside Windows.
 
 3. **First boot** -- Windows boots on the SATA disk controller. There is no network connectivity yet because the VirtIO network driver is not installed. Use the **VNC console** in the VM Management page to access the desktop.
 
@@ -855,8 +855,8 @@ This is the **cleanest approach** because:
 
 - **SATA disk bus is production-ready** -- VirtIO disk bus requires offline registry edits (setting viostor Start=0 before switching), which the GUI installer does not handle. SATA provides reliable performance without this complexity.
 - **VirtIO network works immediately** -- The network driver installed by `virtio-win-guest-tools.exe` activates without a reboot.
-- **CD-ROM not visible?** -- Check that the virtio-win ISO exists at `/var/lib/hyper2kvm/virtio-win.iso` and that the domain XML includes a `<disk type='file' device='cdrom'>` entry. Run `sudo ./scripts/quickstart.sh` to auto-download and extract the ISO.
-- **Why manual install?** -- hyper2kvm stages multiple automated mechanisms (rhsrvany service, Run key, Startup folder, SetupComplete.cmd). However, migrated VMs have pre-existing user sessions where login-triggered scripts don't fire, and unsigned service binaries (rhsrvany.exe) may be blocked by Windows security policies. The CD-ROM install is the only method that works 100% of the time across all Windows versions.
+- **CD-ROM not visible?** -- Check that the virtio-win ISO exists at `/var/lib/h2kvm/virtio-win.iso` and that the domain XML includes a `<disk type='file' device='cdrom'>` entry. Run `sudo ./scripts/quickstart.sh` to auto-download and extract the ISO.
+- **Why manual install?** -- h2kvm stages multiple automated mechanisms (rhsrvany service, Run key, Startup folder, SetupComplete.cmd). However, migrated VMs have pre-existing user sessions where login-triggered scripts don't fire, and unsigned service binaries (rhsrvany.exe) may be blocked by Windows security policies. The CD-ROM install is the only method that works 100% of the time across all Windows versions.
 - **Automated install on fresh login** -- If the user logs out and back in (or reboots), the Startup folder script will attempt to find and run `virtio-win-guest-tools.exe /S` automatically from the CD-ROM. If the CD-ROM is not found, it will show a notification and open the D: drive in Explorer.
 
 ### Migration Wizard

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Edge Computing with h2kvm + hypersdk — Migrate VMware &amp; Cloud to the Edge</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #064e3b, #065f46, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #34d399; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 750px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(52,211,153,0.2); border: 1px solid rgba(52,211,153,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-green { background: linear-gradient(135deg, #064e3b, #0f172a); color: #e8e6df; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #34d399; }
+  .page-light h2.st span { color: #059669; }
+  h3 { font-size: 1.1em; font-weight: 600; margin: 0.8em 0 0.3em; color: #34d399; }
+  .page-light h3 { color: #059669; }
+  p { margin-bottom: 0.6em; font-size: 0.93em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.2em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.7em 0; font-size: 0.8em; }
+  th { background: #059669; color: #fff; padding: 7px 10px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; } .partial { color: #f59e0b; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.8em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0.8em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 16px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.98em; font-weight: 600; margin-bottom: 5px; color: #34d399; } .card p { font-size: 0.83em; opacity: 0.85; margin-bottom: 0; }
+  .page-light .card h4 { color: #059669; }
+  .card ul { padding-left: 16px; font-size: 0.83em; margin: 0; } .card li { margin-bottom: 3px; }
+  .highlight { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.25); border-radius: 8px; padding: 14px; margin: 0.8em 0; }
+  .page-dark .highlight { background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.15); }
+  .stat-box { text-align: center; padding: 16px; }
+  .stat-box .num { font-size: 2em; font-weight: 800; color: #34d399; } .stat-box .label { font-size: 0.82em; opacity: 0.7; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0.8em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.88em; }
+  .flow-arrow { font-size: 1.3em; color: #34d399; }
+  .flow-src { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); }
+  .flow-tool { background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); }
+  .flow-dst { background: rgba(52,211,153,0.2); border: 1px solid rgba(52,211,153,0.4); }
+  .verdict { background: linear-gradient(135deg, rgba(6,78,59,0.2), rgba(5,150,105,0.1)); border: 2px solid #059669; border-radius: 12px; padding: 18px; margin: 1em 0; text-align: center; }
+  .verdict h3 { color: #34d399; font-size: 1.2em; margin-bottom: 6px; }
+  .footer { text-align: center; padding: 12px; font-size: 0.72em; opacity: 0.4; }
+  pre { background: #0f172a; color: #e8e6df; padding: 16px; border-radius: 8px; font-size: 0.82em; line-height: 1.6; font-family: monospace; margin: 0.8em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  code { background: rgba(52,211,153,0.1); padding: 2px 5px; border-radius: 4px; font-size: 0.88em; }
+  .compare-box { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0.8em 0; }
+  .compare-left { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px 0 0 10px; padding: 16px; }
+  .compare-right { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); border-radius: 0 10px 10px 0; padding: 16px; }
+  .compare-left h4 { color: #ef4444; font-size: 0.95em; margin-bottom: 6px; }
+  .compare-right h4 { color: #22c55e; font-size: 0.95em; margin-bottom: 6px; }
+  .compare-left ul, .compare-right ul { padding-left: 16px; font-size: 0.83em; } .compare-left li, .compare-right li { margin-bottom: 3px; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Migrate to the <span>Edge</span></h1>
+  <h2>VMware, AWS, Azure, GCP &rarr; Edge KVM/KubeVirt with h2kvm + hypersdk</h2>
+  <p class="sub">Move workloads from expensive data center hypervisors and cloud platforms to lightweight edge infrastructure. 10 source platforms, zero licensing cost, air-gap ready, single-server deployable. The complete edge migration toolkit.</p>
+  <div class="badge">h2kvm + hypersdk | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE 1: The Migration Paths -->
+<div class="page page-dark">
+  <h2 class="st">Every Source &rarr; <span>Edge KVM</span></h2>
+  <p class="sub">hypersdk exports from 10 platforms. h2kvm converts and deploys to edge infrastructure.</p>
+
+  <h3>VMware &rarr; Edge</h3>
+  <div class="flow">
+    <div class="flow-step flow-src">VMware vSphere</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">hypersdk (govc export)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">h2kvm (convert + fix)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-dst">Edge KVM / K3s + KubeVirt</div>
+  </div>
+
+  <h3>AWS / Azure / GCP &rarr; Edge</h3>
+  <div class="flow">
+    <div class="flow-step flow-src">AWS EC2 / Azure VM / GCP</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">hypersdk (cloud export)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">h2kvm (convert + fix)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-dst">Edge KVM / K3s + KubeVirt</div>
+  </div>
+
+  <h3>Hyper-V / OpenStack / Proxmox &rarr; Edge</h3>
+  <div class="flow">
+    <div class="flow-step flow-src">Hyper-V / OpenStack / Proxmox</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">hypersdk (native export)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">h2kvm (convert + fix)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-dst">Edge KVM / K3s + KubeVirt</div>
+  </div>
+
+  <h3>All 10 Source Platforms</h3>
+  <table>
+    <tr><th>Source</th><th>Export Method</th><th>Edge Target</th><th>Use Case</th></tr>
+    <tr><td><strong>VMware vSphere</strong></td><td>OVA/OVF via govc, VDDK, HTTPS</td><td>KVM or K3s+KubeVirt</td><td>VMware exit at branch offices</td></tr>
+    <tr><td><strong>AWS EC2</strong></td><td>EBS snapshot, AMI export</td><td>On-prem edge KVM</td><td>Cloud repatriation to edge</td></tr>
+    <tr><td><strong>Microsoft Azure</strong></td><td>Managed disk snapshot export</td><td>Edge KVM or K3s</td><td>Reduce Azure egress costs</td></tr>
+    <tr><td><strong>Google Cloud</strong></td><td>Persistent disk, GCS staging</td><td>Edge KVM</td><td>Data sovereignty at edge</td></tr>
+    <tr><td><strong>Hyper-V</strong></td><td>VHD/VHDX direct copy</td><td>Linux KVM edge server</td><td>Windows-to-Linux edge migration</td></tr>
+    <tr><td><strong>Oracle Cloud (OCI)</strong></td><td>Boot volume export</td><td>Edge KVM</td><td>OCI exit, edge deployment</td></tr>
+    <tr><td><strong>OpenStack</strong></td><td>Glance image, Cinder volume</td><td>K3s + KubeVirt</td><td>Consolidate private cloud to edge</td></tr>
+    <tr><td><strong>Alibaba Cloud</strong></td><td>ECS disk export, OSS staging</td><td>Edge KVM</td><td>APAC edge deployments</td></tr>
+    <tr><td><strong>Proxmox VE</strong></td><td>API disk export</td><td>K3s + KubeVirt</td><td>Proxmox-to-K8s modernization</td></tr>
+    <tr><td><strong>KubeVirt (cross-cluster)</strong></td><td>PVC/DataVolume export</td><td>Edge K3s cluster</td><td>HQ KubeVirt to edge KubeVirt</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 2: Why Edge? The Problem -->
+<div class="page page-light">
+  <h2 class="st">Why Move to <span>the Edge?</span></h2>
+  <p class="sub">Centralized data centers and cloud are expensive, slow, and fragile for distributed workloads.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>VMware Licensing Crisis</h4>
+      <p>Broadcom's acquisition of VMware caused 2-10x license increases. Running vSphere at 50 branch offices now costs <strong>$500K-$2M/year</strong> in software alone. Edge sites don't need enterprise hypervisor overhead.</p>
+    </div>
+    <div class="card">
+      <h4>Cloud Egress Costs</h4>
+      <p>Edge workloads generate data locally but cloud VMs pay <strong>$0.09/GB egress</strong>. A factory with 10TB/month of sensor data pays $10,800/year just to move data out of AWS. On-prem edge: $0.</p>
+    </div>
+    <div class="card">
+      <h4>Latency Requirements</h4>
+      <p>Manufacturing SCADA needs <strong>&lt;10ms</strong> response. Retail POS needs instant transaction processing. Healthcare imaging needs real-time access. Cloud round-trip: 20-100ms. Local KVM: <strong>&lt;1ms</strong>.</p>
+    </div>
+    <div class="card">
+      <h4>Data Sovereignty</h4>
+      <p>GDPR, HIPAA, and industry regulations require data to stay on-premises. Cloud storage may cross borders. Edge KVM keeps data <strong>physically at the site</strong> — compliant by design.</p>
+    </div>
+    <div class="card">
+      <h4>Network Unreliability</h4>
+      <p>Remote sites (oil rigs, mines, ships, rural clinics) have intermittent connectivity. Cloud-dependent VMs go down when the link drops. Edge KVM <strong>runs autonomously</strong> — no internet required.</p>
+    </div>
+    <div class="card">
+      <h4>Cost Multiplier Effect</h4>
+      <p>Every edge site multiplies licensing. 50 sites x vSphere + vCenter = financial disaster. <strong>K3s + KVM = $0 per site</strong>. Scale to 500 sites with no software cost increase.</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>The answer:</strong> Move workloads from centralized VMware/cloud platforms to lightweight edge infrastructure powered by KVM + K3s + KubeVirt. h2kvm + hypersdk automates the entire journey.</p>
+  </div>
+</div>
+
+<!-- PAGE 3: The Edge Stack -->
+<div class="page page-dark">
+  <h2 class="st">The Edge <span>Stack</span></h2>
+  <p class="sub">What runs at each edge site — lightweight, free, production-ready.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Option A: Pure KVM</h4>
+      <ul>
+        <li>Any Linux distro (Fedora, RHEL, Ubuntu)</li>
+        <li>libvirt + KVM (built into kernel)</li>
+        <li>h2kvm generates libvirt XML</li>
+        <li>virsh define + start</li>
+        <li><strong>Simplest: 1 server, 0 dependencies</strong></li>
+        <li>Best for: 1-5 VMs per site</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Option B: K3s + KubeVirt</h4>
+      <ul>
+        <li>K3s (single binary, 512MB RAM)</li>
+        <li>KubeVirt for VM workloads</li>
+        <li>GitOps fleet management</li>
+        <li>Container + VM convergence</li>
+        <li><strong>Cloud-native: K8s APIs everywhere</strong></li>
+        <li>Best for: 5-20 VMs + containers</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Option C: Hybrid</h4>
+      <ul>
+        <li>Some VMs on standalone KVM</li>
+        <li>Others on K3s + KubeVirt</li>
+        <li>h2kvm dual-target pipeline</li>
+        <li>Same tool handles both</li>
+        <li><strong>Flexible: mix per workload needs</strong></li>
+        <li>Best for: mixed workload sites</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Per-Site Cost Comparison</h3>
+  <table>
+    <tr><th style="width:22%">Component</th><th style="width:26%">VMware Edge</th><th style="width:26%">Cloud (AWS/Azure)</th><th style="width:26%">h2kvm Edge</th></tr>
+    <tr><td><strong>Hardware</strong></td><td>$3,000 (server)</td><td>N/A (cloud)</td><td>$1,500 (mini PC/NUC)</td></tr>
+    <tr><td><strong>Hypervisor</strong></td><td class="cross">$6,000-15,000/yr (vSphere)</td><td>Included</td><td class="check">$0 (KVM in kernel)</td></tr>
+    <tr><td><strong>Management</strong></td><td class="cross">$4,000/yr (vCenter share)</td><td>$200/mo (monitoring)</td><td class="check">$0 (GitOps / free)</td></tr>
+    <tr><td><strong>Kubernetes</strong></td><td>N/A</td><td>$2,400/yr (EKS/AKS)</td><td class="check">$0 (K3s)</td></tr>
+    <tr><td><strong>Compute (5 VMs)</strong></td><td>Included in HW</td><td class="cross">$3,600/mo</td><td>Included in HW</td></tr>
+    <tr><td><strong>Egress (1TB/mo)</strong></td><td>$0 (local)</td><td class="cross">$1,080/yr</td><td class="check">$0 (local)</td></tr>
+    <tr><td><strong>Migration tool</strong></td><td>N/A</td><td>N/A</td><td class="check">Contact for pricing* (Proprietary (Zyvor AI Labs))</td></tr>
+    <tr><td style="font-weight:700;">Annual cost/site</td><td style="color:#ef4444; font-weight:800;">$10,000-19,000</td><td style="color:#ef4444; font-weight:800;">$46,680</td><td style="color:#22c55e; font-weight:800;">$500 (HW amortized)</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>50 Edge Sites &mdash; 3-Year Savings</h3>
+    <p style="font-size:1em;"><strong>vs VMware:</strong> Save $1.4M - $2.8M | <strong>vs Cloud:</strong> Save $6.9M</p>
+  </div>
+</div>
+
+<!-- PAGE 4: How It Works — Step by Step -->
+<div class="page page-light">
+  <h2 class="st">How It <span>Works</span></h2>
+  <p class="sub">End-to-end: export from VMware/cloud at HQ, convert, deploy to every edge site.</p>
+
+  <h3>Step 1: Export from Source (at HQ or cloud)</h3>
+  <div class="compare-box">
+    <div class="compare-left">
+      <h4>From VMware vSphere</h4>
+      <pre style="background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px; font-size:0.8em;">
+# Using zkvm TUI:
+# 1. Open vSphere tab
+# 2. Connect to vCenter
+# 3. Browse VMs, select batch
+# 4. Ctrl+R to export + convert
+
+# Or CLI:
+sudo h2kvmctl --config edge.yaml</pre>
+    </div>
+    <div class="compare-right">
+      <h4>From AWS / Azure / GCP</h4>
+      <pre style="background:#1e2e1e; color:#e8e6df; padding:10px; border-radius:6px; font-size:0.8em;">
+# hypersdk exports from any cloud:
+# AWS: EBS snapshot → download
+# Azure: Managed disk → export
+# GCP: Persistent disk → GCS
+# OCI: Boot volume → export
+
+# Unified API for all 10 providers</pre>
+    </div>
+  </div>
+
+  <h3>Step 2: Convert + Fix (h2kvm pipeline)</h3>
+  <div class="flow">
+    <div class="flow-step">VMDK/VHD/RAW</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Validate</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Convert to QCOW2</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Offline Guest Fix</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Generate XML/YAML</div>
+  </div>
+  <table>
+    <tr><th>Fix Applied</th><th>What It Does</th><th>Why It's Critical for Edge</th></tr>
+    <tr><td><strong>fstab UUID repair</strong></td><td>Converts device names to UUID-based mounts</td><td>Edge hardware has different device naming — UUIDs are stable</td></tr>
+    <tr><td><strong>initramfs rebuild</strong></td><td>Injects virtio_blk, virtio_net, virtio_scsi</td><td>VM won't boot on KVM without VirtIO drivers</td></tr>
+    <tr><td><strong>GRUB update</strong></td><td>Fixes root= parameter for KVM disk path</td><td>Boot fails without correct root device</td></tr>
+    <tr><td><strong>VMware tools removal</strong></td><td>Removes open-vm-tools packages</td><td>Prevents errors and wasted resources at edge</td></tr>
+    <tr><td><strong>Network cleanup</strong></td><td>Removes VMware/Hyper-V NIC configs</td><td>Edge server has different NIC — clean slate needed</td></tr>
+    <tr><td><strong>Windows VirtIO</strong></td><td>Injects disk/net/balloon drivers + registry fix</td><td>Windows VMs BSOD without VirtIO on KVM</td></tr>
+    <tr><td><strong>SELinux relabel</strong></td><td>Triggers autorelabel on first boot</td><td>Prevents SELinux denials on new hardware</td></tr>
+  </table>
+
+  <h3>Step 3: Deploy to Edge</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Deploy to KVM (libvirt)</h4>
+      <p>h2kvm generates optimized libvirt XML, runs <code>virsh define</code>, and performs automated boot verification. Ship the QCOW2 image to the edge site, deploy with one command.</p>
+    </div>
+    <div class="card">
+      <h4>Deploy to K3s + KubeVirt</h4>
+      <p>h2kvm generates KubeVirt VirtualMachine manifest + PVC. Upload disk image via CDI. Push manifest to Git — ArgoCD/Flux deploys to all edge K3s clusters automatically.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: VMware Exit to Edge -->
+<div class="page page-dark">
+  <h2 class="st">VMware Exit <span>to Edge</span></h2>
+  <p class="sub">The most common scenario: replace vSphere at every branch office with free KVM.</p>
+
+  <h3>Before: VMware at Every Site</h3>
+  <div class="compare-box">
+    <div class="compare-left">
+      <h4>The Pain</h4>
+      <ul>
+        <li>vSphere license per site: $6,000-15,000/yr</li>
+        <li>vCenter license: shared or per-site</li>
+        <li>Broadcom renewal: 2-5x price increase</li>
+        <li>Each site needs ESXi-compatible hardware</li>
+        <li>vSphere expertise needed at every site</li>
+        <li>License audits and compliance burden</li>
+        <li>50 sites = $500K-$1M/yr just for software</li>
+      </ul>
+    </div>
+    <div class="compare-right">
+      <h4>After: KVM/K3s at Every Site</h4>
+      <ul>
+        <li>KVM: $0 (built into Linux kernel)</li>
+        <li>K3s: $0 (CNCF open source)</li>
+        <li>No license renewals, ever</li>
+        <li>Runs on any x86/ARM hardware</li>
+        <li>Basic Linux admin skills sufficient</li>
+        <li>Zero audit burden — Proprietary (Zyvor AI Labs)</li>
+        <li>50 sites = $0/yr in software costs</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Migration Workflow: 50-Site VMware Exit</h3>
+  <table>
+    <tr><th style="width:8%">Phase</th><th style="width:15%">Action</th><th style="width:42%">What h2kvm + hypersdk Does</th><th style="width:35%">Result</th></tr>
+    <tr><td>1</td><td><strong>Discovery</strong></td><td>zkvm TUI connects to vCenter, discovers all VMs across 50 sites. Shows CPU, RAM, disk, power state per VM.</td><td>Complete inventory of 250+ VMs</td></tr>
+    <tr><td>2</td><td><strong>Assessment</strong></td><td><code>h2kvmctl doctor</code> validates edge hardware readiness. Checks disk space, KVM support, network, libvirt.</td><td>Pre-flight green light per site</td></tr>
+    <tr><td>3</td><td><strong>Batch Export</strong></td><td>hypersdk batch-exports VMs from vSphere via govc. Streaming progress with ETA. Handles VMDK, OVA, OVF.</td><td>All disk images downloaded</td></tr>
+    <tr><td>4</td><td><strong>Convert + Fix</strong></td><td>VMCraft engine: VMDK &rarr; QCOW2, rebuild initramfs, fix fstab, remove VMware tools, inject VirtIO (Windows).</td><td>Boot-ready QCOW2 images</td></tr>
+    <tr><td>5</td><td><strong>Deploy</strong></td><td>Generate libvirt XML or KubeVirt manifests. Ship images to edge sites. <code>virsh define</code> or <code>kubectl apply</code>.</td><td>VMs running on edge KVM/K3s</td></tr>
+    <tr><td>6</td><td><strong>Verify</strong></td><td>Automated boot test per VM. Webhook notification to Slack/Teams on success or failure.</td><td>Confirmed working at every site</td></tr>
+    <tr><td>7</td><td><strong>Decommission</strong></td><td>Cancel vSphere licenses site by site as migration completes.</td><td>$0 VMware cost from day 1</td></tr>
+  </table>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Timeline:</strong> 5 sites/week = all 50 sites migrated in 10 weeks. One engineer with h2kvm can handle the entire project.</p>
+  </div>
+</div>
+
+<!-- PAGE 6: Cloud Repatriation to Edge -->
+<div class="page page-light">
+  <h2 class="st">Cloud Repatriation <span>to Edge</span></h2>
+  <p class="sub">Bring workloads home from AWS, Azure, and GCP to on-premises edge infrastructure.</p>
+
+  <h3>Why Repatriate to Edge?</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Egress Costs Are Hidden Taxes</h4>
+      <p>AWS charges $0.09/GB outbound. A factory site pushing 5TB/month of data pays <strong>$5,400/year</strong> just in egress — more than the edge hardware costs. On-prem: $0 egress, forever.</p>
+    </div>
+    <div class="card">
+      <h4>Cloud Bills Only Go Up</h4>
+      <p>Reserved instances expire. Spot instances get terminated. Pricing changes annually. Edge KVM has <strong>fixed, predictable costs</strong> — buy hardware once, run for 5+ years.</p>
+    </div>
+    <div class="card">
+      <h4>Latency-Sensitive Workloads</h4>
+      <p>IoT gateways, real-time analytics, POS systems, SCADA controllers — these need <strong>sub-10ms response</strong>. Cloud adds 20-100ms of unavoidable latency. Edge KVM: &lt;1ms.</p>
+    </div>
+    <div class="card">
+      <h4>Offline Capability</h4>
+      <p>Edge sites must operate during network outages. Cloud VMs are useless without connectivity. Edge KVM <strong>runs autonomously</strong> — syncs when the link comes back.</p>
+    </div>
+  </div>
+
+  <h3>Cloud-to-Edge Migration with hypersdk</h3>
+  <table>
+    <tr><th style="width:18%">Cloud Source</th><th style="width:27%">hypersdk Export Process</th><th style="width:27%">h2kvm Conversion</th><th style="width:28%">Edge Deployment</th></tr>
+    <tr><td><strong>AWS EC2</strong></td><td>EBS snapshot &rarr; S3 export &rarr; download VMDK/RAW</td><td>Convert to QCOW2, rebuild initramfs, fix fstab (Xen &rarr; VirtIO)</td><td>KVM at edge or K3s + KubeVirt</td></tr>
+    <tr><td><strong>Azure VM</strong></td><td>Managed disk snapshot &rarr; SAS URL &rarr; download VHD</td><td>VHD &rarr; QCOW2, remove Hyper-V agents, inject VirtIO</td><td>libvirt XML + virsh define</td></tr>
+    <tr><td><strong>GCP</strong></td><td>Persistent disk &rarr; GCS image export &rarr; download</td><td>RAW &rarr; QCOW2, fix boot for KVM, remove cloud-init</td><td>KubeVirt manifest + PVC upload</td></tr>
+    <tr><td><strong>OCI</strong></td><td>Boot volume &rarr; Object Storage &rarr; download</td><td>Convert + guest fixes for KVM compatibility</td><td>Automated deploy to edge K3s</td></tr>
+  </table>
+
+  <h3>Cost Savings: 20 VMs from Cloud to Edge (3 Years)</h3>
+  <table>
+    <tr><th>Cost Item</th><th>Cloud (AWS/Azure)</th><th>Edge KVM</th><th>Savings</th></tr>
+    <tr><td>Compute</td><td>$720,000</td><td>$60,000 (hardware)</td><td class="check">$660,000</td></tr>
+    <tr><td>Storage</td><td>$180,000</td><td>$15,000 (local NVMe)</td><td class="check">$165,000</td></tr>
+    <tr><td>Egress</td><td>$90,000</td><td>$0</td><td class="check">$90,000</td></tr>
+    <tr><td>Migration (one-time)</td><td>N/A</td><td>$5,000 (h2kvm is free)</td><td>-$5,000</td></tr>
+    <tr><td style="font-weight:700;">3-Year Total</td><td style="font-weight:700;">$990,000</td><td style="font-weight:700;">$80,000</td><td style="color:#22c55e; font-weight:800;">$910,000</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 7: Industry Use Cases -->
+<div class="page page-dark">
+  <h2 class="st">Industry <span>Use Cases</span></h2>
+  <p class="sub">Real-world edge migration scenarios powered by h2kvm + hypersdk.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Manufacturing — Factory Floor</h4>
+      <ul>
+        <li><strong>Source:</strong> VMware vSphere at 30 plants</li>
+        <li><strong>Workloads:</strong> SCADA, MES, quality control VMs</li>
+        <li><strong>Edge target:</strong> Ruggedized server + K3s + KubeVirt</li>
+        <li><strong>Migration:</strong> hypersdk exports from vCenter, h2kvm converts + deploys</li>
+        <li><strong>Benefit:</strong> $280K/yr saved, sub-ms latency for PLC control</li>
+        <li><strong>Advantage:</strong> Air-gap ready — factories can't depend on internet</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Retail — 200 Store Locations</h4>
+      <ul>
+        <li><strong>Source:</strong> AWS EC2 (POS backend) + VMware (inventory)</li>
+        <li><strong>Workloads:</strong> POS processing, inventory management, digital signage</li>
+        <li><strong>Edge target:</strong> Mini PC with K3s per store</li>
+        <li><strong>Migration:</strong> hypersdk pulls from AWS + vSphere, h2kvm converts centrally, GitOps deploys to all stores</li>
+        <li><strong>Benefit:</strong> $1.2M/yr saved, transactions work during internet outages</li>
+        <li><strong>Advantage:</strong> One image converted, deployed to 200 sites via ArgoCD</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Healthcare — 50 Clinics</h4>
+      <ul>
+        <li><strong>Source:</strong> Azure VMs (EMR system) + VMware (imaging)</li>
+        <li><strong>Workloads:</strong> Electronic medical records, PACS imaging, lab systems</li>
+        <li><strong>Edge target:</strong> HIPAA-compliant edge server + KVM</li>
+        <li><strong>Migration:</strong> hypersdk exports from Azure, h2kvm converts VHD &rarr; QCOW2, deploys to local KVM</li>
+        <li><strong>Benefit:</strong> $480K/yr saved, data never leaves clinic (HIPAA)</li>
+        <li><strong>Advantage:</strong> Data sovereignty — patient records stay on-site</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Energy — 100 Remote Substations</h4>
+      <ul>
+        <li><strong>Source:</strong> VMware at substations + GCP (analytics)</li>
+        <li><strong>Workloads:</strong> SCADA monitoring, grid analytics, telemetry</li>
+        <li><strong>Edge target:</strong> ARM-based gateway + K3s</li>
+        <li><strong>Migration:</strong> hypersdk exports from vSphere + GCP, h2kvm converts, deploys to ARM K3s clusters</li>
+        <li><strong>Benefit:</strong> $800K/yr saved, works on satellite link or offline</li>
+        <li><strong>Advantage:</strong> Autonomous operation — no internet dependency</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Telecom — Cell Tower Edge</h4>
+      <ul>
+        <li><strong>Source:</strong> VMware NFV + OpenStack VNFs</li>
+        <li><strong>Workloads:</strong> vRAN, packet core, edge CDN</li>
+        <li><strong>Edge target:</strong> Bare-metal K8s + KubeVirt at tower sites</li>
+        <li><strong>Migration:</strong> hypersdk exports from OpenStack, h2kvm converts VNFs, deploys as KubeVirt VMs</li>
+        <li><strong>Benefit:</strong> 60-80% NFV license savings, path to CNF</li>
+        <li><strong>Advantage:</strong> VNF &rarr; KubeVirt is step 1 toward cloud-native CNF</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Government — Air-Gapped Sites</h4>
+      <ul>
+        <li><strong>Source:</strong> Hyper-V + VMware at classified facilities</li>
+        <li><strong>Workloads:</strong> Mission-critical apps, data processing</li>
+        <li><strong>Edge target:</strong> Hardened Linux + KVM (no internet ever)</li>
+        <li><strong>Migration:</strong> h2kvm runs fully offline — no internet, no phone-home, no telemetry</li>
+        <li><strong>Benefit:</strong> $800K/yr saved, FedRAMP/STIG compliant</li>
+        <li><strong>Advantage:</strong> Single binary, USB-deployable, zero network requirement</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8: Edge Fleet Management -->
+<div class="page page-light">
+  <h2 class="st">Edge Fleet <span>Management</span></h2>
+  <p class="sub">Convert once at HQ, deploy to hundreds of edge sites with GitOps.</p>
+
+  <div class="flow">
+    <div class="flow-step flow-src">VMware / Cloud VMs</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">h2kvm (convert at HQ)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Container Registry</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-dst">ArgoCD/Flux &rarr; 100 Edge Sites</div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Centralized Conversion</h4>
+      <p>Run h2kvm at HQ: export from vSphere/cloud, convert VMDK &rarr; QCOW2, apply all guest fixes. <strong>Convert once, deploy everywhere.</strong> No need to run conversion tools at each edge site.</p>
+    </div>
+    <div class="card">
+      <h4>GitOps Distribution</h4>
+      <p>Push KubeVirt manifests to Git. ArgoCD syncs to every K3s edge cluster. <strong>One git push = deploy to 100 sites.</strong> Rollback by reverting a commit. Full audit trail.</p>
+    </div>
+    <div class="card">
+      <h4>Zero-Touch Edge Setup</h4>
+      <p>New site: plug in hardware, PXE boot, K3s auto-joins fleet. ArgoCD deploys VMs automatically. <strong>No SSH needed. No on-site IT.</strong> Ship the box, plug it in, done.</p>
+    </div>
+    <div class="card">
+      <h4>Central Monitoring</h4>
+      <p>Prometheus + Grafana federated across all sites. <strong>Single dashboard</strong> for CPU, memory, disk, VM health across entire fleet. Alert on anomalies before they become outages.</p>
+    </div>
+  </div>
+
+  <h3>Example: Edge Migration YAML Config</h3>
+  <pre>
+# edge-factory-vm.yaml — Convert VMware VM for edge deployment
+cmd: vsphere
+vcenter: vcenter.hq.corp
+vs_action: export_vm
+vs_vm: factory-scada-01
+output_dir: ./edge-images
+out_format: qcow2
+flatten: true
+compress: true                  # Smaller image for shipping to edge
+regen_initramfs: true           # Inject VirtIO for KVM
+emit_domain_xml: true           # Generate libvirt XML (for pure KVM sites)
+deploy_k8s: true                # Also generate KubeVirt manifest (for K3s sites)
+boot_test: true                 # Verify VM boots before shipping
+  </pre>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Dual target in one run:</strong> <code>emit_domain_xml + deploy_k8s</code> generates both libvirt XML (for pure KVM edge sites) and KubeVirt manifests (for K3s edge sites) from a single conversion. Deploy the right format per site.</p>
+  </div>
+</div>
+
+<!-- PAGE 9: Why h2kvm for Edge -->
+<div class="page page-green">
+  <h2 class="st">Why h2kvm for <span>Edge</span></h2>
+  <p class="sub">Technical advantages that make h2kvm the ideal edge migration tool.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Lightweight Engine</h4>
+      <p>VMCraft = pure Python + qemu-nbd. No libguestfs appliance (500MB+). No supermin boot. Runs on minimal Linux installs, containers, even ARM. <strong>~5MB footprint.</strong></p>
+    </div>
+    <div class="card">
+      <h4>Air-Gap Ready</h4>
+      <p>Single binary + Python package. No internet needed — ever. No telemetry, no phone-home, no license server. <strong>USB-deployable</strong> to classified and disconnected sites.</p>
+    </div>
+    <div class="card">
+      <h4>10 Source Platforms</h4>
+      <p>Export from VMware, AWS, Azure, GCP, Hyper-V, OCI, OpenStack, Alibaba, Proxmox, KubeVirt. <strong>One tool for every source.</strong> One learning curve for every migration.</p>
+    </div>
+    <div class="card">
+      <h4>Dual Target</h4>
+      <p>Deploy to standalone KVM/libvirt <strong>and/or</strong> K3s + KubeVirt from the same pipeline. Mix targets per site. No other tool does both.</p>
+    </div>
+    <div class="card">
+      <h4>Boot Verification</h4>
+      <p>Automated boot test after conversion. <strong>Know it works before shipping to a remote site.</strong> Don't discover boot failures at a location 500 miles away.</p>
+    </div>
+    <div class="card">
+      <h4>Interactive TUI</h4>
+      <p>zkvm guides operators step-by-step. File browser, source auto-detection, live progress. <strong>Remote site staff don't need CLI expertise.</strong></p>
+    </div>
+    <div class="card">
+      <h4>Job Scheduling</h4>
+      <p>hypersdk schedules migrations for off-peak hours. <strong>Carbon-aware scheduling</strong> runs during low grid intensity. Cron, priority queues, retry policies.</p>
+    </div>
+    <div class="card">
+      <h4>Pre-Flight Doctor</h4>
+      <p><code>h2kvmctl doctor</code> checks 9 areas: disk space, KVM support, libvirt, network, permissions. <strong>Validate edge hardware before migration day.</strong></p>
+    </div>
+    <div class="card">
+      <h4>$0 Cost</h4>
+      <p>Proprietary (Zyvor AI Labs) license. No subscription, no per-VM fee, no per-site fee. <strong>Scale from 1 to 1,000 edge sites with zero software cost increase.</strong></p>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>The Edge Migration Platform</h3>
+    <p style="font-size:1em;">Export from any source. Convert with full guest fixes. Deploy to any edge target.<br>
+    Air-gap ready. Lightweight. Free forever.<br>
+    <strong>h2kvm + hypersdk — the only tool built for edge-scale migration.</strong></p>
+  </div>
+
+  <div class="footer"><p>h2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm</p></div>
+</div>
+
+</body>
+</html>

@@ -1,8 +1,8 @@
 # Helm Repository Guide
 
-Official Helm chart repository for hyper2kvm - VM migration toolkit for Kubernetes.
+Official Helm chart repository for h2kvm - VM migration toolkit for Kubernetes.
 
-**Repository URL**: `https://ssahani.github.io/hyper2kvm`
+**Repository URL**: `https://ssahani.github.io/h2kvm`
 
 ---
 
@@ -11,36 +11,36 @@ Official Helm chart repository for hyper2kvm - VM migration toolkit for Kubernet
 ### Add Repository
 
 ```bash
-# Add hyper2kvm Helm repository
-helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+# Add h2kvm Helm repository
+helm repo add h2kvm https://ssahani.github.io/h2kvm
 
 # Update repository index
 helm repo update
 
 # Verify repository
-helm search repo hyper2kvm
+helm search repo h2kvm
 ```
 
 Expected output:
 ```
 NAME                            CHART VERSION   APP VERSION     DESCRIPTION
-hyper2kvm/hyper2kvm-operator    1.6.0           1.6.0           Kubernetes Operator for automated VM migration...
-hyper2kvm/hyper2kvm-worker      1.2.0           1.2.0           Worker pods for VM migration execution
+h2kvm/h2kvm-operator    1.6.0           1.6.0           Kubernetes Operator for automated VM migration...
+h2kvm/h2kvm-worker      1.2.0           1.2.0           Worker pods for VM migration execution
 ```
 
 ### Install Charts
 
 **Operator Chart:**
 ```bash
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace
 ```
 
 **Worker Chart:**
 ```bash
-helm install hyper2kvm-worker hyper2kvm/hyper2kvm-worker \
-  --namespace hyper2kvm-workers \
+helm install h2kvm-worker h2kvm/h2kvm-worker \
+  --namespace h2kvm-workers \
   --create-namespace
 ```
 
@@ -48,7 +48,7 @@ helm install hyper2kvm-worker hyper2kvm/hyper2kvm-worker \
 
 ## Available Charts
 
-### hyper2kvm-operator
+### h2kvm-operator
 
 **Description**: Kubernetes Operator for automated VM migration job orchestration
 
@@ -62,18 +62,18 @@ helm install hyper2kvm-worker hyper2kvm/hyper2kvm-worker \
 
 **Installation:**
 ```bash
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace \
   --set webhook.enabled=true \
   --set webhook.replicaCount=2
 ```
 
-**Chart README**: [hyper2kvm-operator/README.md](../helm/hyper2kvm-operator/README.md)
+**Chart README**: [h2kvm-operator/README.md](../helm/h2kvm-operator/README.md)
 
 **Documentation**: [Operator Deployment Guide](deployment/v1.6.0-helm-chart.md)
 
-### hyper2kvm-worker
+### h2kvm-worker
 
 **Description**: Worker pods for VM migration execution
 
@@ -86,13 +86,13 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 
 **Installation:**
 ```bash
-helm install hyper2kvm-worker hyper2kvm/hyper2kvm-worker \
-  --namespace hyper2kvm-workers \
+helm install h2kvm-worker h2kvm/h2kvm-worker \
+  --namespace h2kvm-workers \
   --create-namespace \
   --set worker.replicas=3
 ```
 
-**Chart README**: [hyper2kvm-worker/README.md](../helm/hyper2kvm-worker/README.md)
+**Chart README**: [h2kvm-worker/README.md](../helm/h2kvm-worker/README.md)
 
 **Documentation**: [Worker Protocol Summary](deployment/WORKER_PROTOCOL_SUMMARY.md)
 
@@ -104,29 +104,29 @@ helm install hyper2kvm-worker hyper2kvm/hyper2kvm-worker \
 
 ```bash
 # Search all charts
-helm search repo hyper2kvm
+helm search repo h2kvm
 
 # Search with versions
-helm search repo hyper2kvm --versions
+helm search repo h2kvm --versions
 
 # Search specific chart
-helm search repo hyper2kvm/hyper2kvm-operator
+helm search repo h2kvm/h2kvm-operator
 ```
 
 ### Show Chart Information
 
 ```bash
 # Show chart metadata
-helm show chart hyper2kvm/hyper2kvm-operator
+helm show chart h2kvm/h2kvm-operator
 
 # Show default values
-helm show values hyper2kvm/hyper2kvm-operator
+helm show values h2kvm/h2kvm-operator
 
 # Show README
-helm show readme hyper2kvm/hyper2kvm-operator
+helm show readme h2kvm/h2kvm-operator
 
 # Show all information
-helm show all hyper2kvm/hyper2kvm-operator
+helm show all h2kvm/h2kvm-operator
 ```
 
 ### Customize Installation
@@ -167,8 +167,8 @@ monitoring:
 **Install with custom values:**
 
 ```bash
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace \
   --values custom-values.yaml
 ```
@@ -180,13 +180,13 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 helm repo update
 
 # Upgrade to latest version
-helm upgrade hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm upgrade h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --values custom-values.yaml
 
 # Upgrade to specific version
-helm upgrade hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm upgrade h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --version 1.7.0
 ```
 
@@ -197,21 +197,21 @@ helm upgrade hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 helm list --all-namespaces
 
 # List in specific namespace
-helm list -n hyper2kvm-system
+helm list -n h2kvm-system
 ```
 
 ### Uninstall Charts
 
 ```bash
 # Uninstall operator
-helm uninstall hyper2kvm-operator -n hyper2kvm-system
+helm uninstall h2kvm-operator -n h2kvm-system
 
 # Uninstall worker
-helm uninstall hyper2kvm-worker -n hyper2kvm-workers
+helm uninstall h2kvm-worker -n h2kvm-workers
 
 # CRDs are kept by default (helm.sh/resource-policy: keep)
 # To remove CRDs manually:
-kubectl delete crd migrationjobs.hyper2kvm.io
+kubectl delete crd migrationjobs.h2kvm.io
 ```
 
 ---
@@ -238,22 +238,22 @@ Charts follow [semantic versioning](https://semver.org/):
 
 ```bash
 # Show all available versions
-helm search repo hyper2kvm/hyper2kvm-operator --versions
+helm search repo h2kvm/h2kvm-operator --versions
 
 # Output:
 # NAME                            CHART VERSION   APP VERSION     DESCRIPTION
-# hyper2kvm/hyper2kvm-operator    1.7.0           1.7.0           Kubernetes Operator...
-# hyper2kvm/hyper2kvm-operator    1.6.0           1.6.0           Kubernetes Operator...
-# hyper2kvm/hyper2kvm-operator    1.5.0           1.5.0           Kubernetes Operator...
+# h2kvm/h2kvm-operator    1.7.0           1.7.0           Kubernetes Operator...
+# h2kvm/h2kvm-operator    1.6.0           1.6.0           Kubernetes Operator...
+# h2kvm/h2kvm-operator    1.5.0           1.5.0           Kubernetes Operator...
 ```
 
 ### Installing Specific Version
 
 ```bash
 # Install specific chart version
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
+helm install h2kvm-operator h2kvm/h2kvm-operator \
   --version 1.6.0 \
-  --namespace hyper2kvm-system \
+  --namespace h2kvm-system \
   --create-namespace
 ```
 
@@ -265,12 +265,12 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 
 ```bash
 # 1. Add repository
-helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+helm repo add h2kvm https://ssahani.github.io/h2kvm
 helm repo update
 
 # 2. Create namespaces
-kubectl create namespace hyper2kvm-system
-kubectl create namespace hyper2kvm-workers
+kubectl create namespace h2kvm-system
+kubectl create namespace h2kvm-workers
 
 # 3. Install cert-manager (for TLS)
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
@@ -315,18 +315,18 @@ networkPolicy:
 EOF
 
 # 6. Install operator
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --values production-values.yaml \
   --wait
 
 # 7. Verify installation
-kubectl get pods -n hyper2kvm-system
-helm test hyper2kvm-operator -n hyper2kvm-system
+kubectl get pods -n h2kvm-system
+helm test h2kvm-operator -n h2kvm-system
 
 # 8. Install workers (if needed)
-helm install hyper2kvm-worker hyper2kvm/hyper2kvm-worker \
-  --namespace hyper2kvm-workers \
+helm install h2kvm-worker h2kvm/h2kvm-worker \
+  --namespace h2kvm-workers \
   --set worker.replicas=5 \
   --wait
 ```
@@ -339,8 +339,8 @@ helm install hyper2kvm-worker hyper2kvm/hyper2kvm-worker \
 
 ```bash
 # Remove and re-add repository
-helm repo remove hyper2kvm
-helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+helm repo remove h2kvm
+helm repo add h2kvm https://ssahani.github.io/h2kvm
 helm repo update
 ```
 
@@ -354,7 +354,7 @@ helm repo update
 helm repo list
 
 # Check GitHub Pages is deployed
-curl -I https://ssahani.github.io/hyper2kvm/index.yaml
+curl -I https://ssahani.github.io/h2kvm/index.yaml
 ```
 
 ### Installation Fails
@@ -367,11 +367,11 @@ kubectl version
 helm version
 
 # Lint chart locally
-helm lint hyper2kvm/hyper2kvm-operator
+helm lint h2kvm/h2kvm-operator
 
 # Dry run installation
-helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator h2kvm/h2kvm-operator \
+  --namespace h2kvm-system \
   --dry-run --debug
 ```
 
@@ -379,13 +379,13 @@ helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
 
 ```bash
 # View current values
-helm get values hyper2kvm-operator -n hyper2kvm-system
+helm get values h2kvm-operator -n h2kvm-system
 
 # View release history
-helm history hyper2kvm-operator -n hyper2kvm-system
+helm history h2kvm-operator -n h2kvm-system
 
 # Rollback if needed
-helm rollback hyper2kvm-operator -n hyper2kvm-system
+helm rollback h2kvm-operator -n h2kvm-system
 ```
 
 ---
@@ -398,31 +398,31 @@ If you're developing charts locally, you can install from the filesystem:
 
 ```bash
 # Install from local directory
-helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-system \
   --create-namespace
 
 # Upgrade from local directory
-helm upgrade hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-system
+helm upgrade h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-system
 ```
 
 ### Testing Charts
 
 ```bash
 # Lint chart
-helm lint ./helm/hyper2kvm-operator
+helm lint ./helm/h2kvm-operator
 
 # Template chart (no installation)
-helm template hyper2kvm-operator ./helm/hyper2kvm-operator
+helm template h2kvm-operator ./helm/h2kvm-operator
 
 # Dry run installation
-helm install hyper2kvm-operator ./helm/hyper2kvm-operator \
-  --namespace hyper2kvm-system \
+helm install h2kvm-operator ./helm/h2kvm-operator \
+  --namespace h2kvm-system \
   --dry-run --debug
 
 # Run Helm tests
-helm test hyper2kvm-operator -n hyper2kvm-system
+helm test h2kvm-operator -n h2kvm-system
 ```
 
 ---
@@ -436,20 +436,20 @@ helm test hyper2kvm-operator -n hyper2kvm-system
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: hyper2kvm-operator
+  name: h2kvm-operator
   namespace: argocd
 spec:
   project: default
   source:
-    chart: hyper2kvm-operator
-    repoURL: https://ssahani.github.io/hyper2kvm
+    chart: h2kvm-operator
+    repoURL: https://ssahani.github.io/h2kvm
     targetRevision: 1.6.0
     helm:
       valueFiles:
         - values-production.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: hyper2kvm-system
+    namespace: h2kvm-system
   syncPolicy:
     automated:
       prune: true
@@ -465,17 +465,17 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: hyper2kvm-operator
-  namespace: hyper2kvm-system
+  name: h2kvm-operator
+  namespace: h2kvm-system
 spec:
   interval: 10m
   chart:
     spec:
-      chart: hyper2kvm-operator
+      chart: h2kvm-operator
       version: 1.6.0
       sourceRef:
         kind: HelmRepository
-        name: hyper2kvm
+        name: h2kvm
         namespace: flux-system
   values:
     webhook:
@@ -490,8 +490,8 @@ spec:
 ### Documentation
 
 - **Chart READMEs**:
-  - [Operator Chart](../helm/hyper2kvm-operator/README.md)
-  - [Worker Chart](../helm/hyper2kvm-worker/README.md)
+  - [Operator Chart](../helm/h2kvm-operator/README.md)
+  - [Worker Chart](../helm/h2kvm-worker/README.md)
 
 - **Deployment Guides**:
   - [Operator Deployment (v1.6.0)](deployment/v1.6.0-helm-chart.md)
@@ -499,9 +499,9 @@ spec:
 
 ### Community
 
-- **GitHub Issues**: [Report bugs](https://github.com/ssahani/hyper2kvm/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ssahani/hyper2kvm/discussions)
-- **Repository**: [https://github.com/ssahani/hyper2kvm](https://github.com/ssahani/hyper2kvm)
+- **GitHub Issues**: [Report bugs](https://github.com/ssahani/h2kvm/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
+- **Repository**: [https://github.com/ssahani/h2kvm](https://github.com/ssahani/h2kvm)
 
 ---
 
@@ -511,7 +511,7 @@ For maintainers publishing new chart versions:
 
 1. **Bump Chart Version**:
    ```bash
-   ./scripts/bump-chart-version.sh --chart hyper2kvm-operator --type minor
+   ./scripts/bump-chart-version.sh --chart h2kvm-operator --type minor
    ```
 
 2. **Package Charts**:
@@ -535,6 +535,6 @@ See [Release Documentation](../scripts/README.md) for details.
 
 ---
 
-**Repository**: https://ssahani.github.io/hyper2kvm
-**Source Code**: https://github.com/ssahani/hyper2kvm
+**Repository**: https://ssahani.github.io/h2kvm
+**Source Code**: https://github.com/ssahani/h2kvm
 **License**: Apache-2.0

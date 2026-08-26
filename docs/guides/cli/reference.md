@@ -1,6 +1,6 @@
 ### Comprehensive CLI Reference 
 
-`hyper2kvm` is a production-minded tool for converting VMware workloads into KVM/QEMU-friendly disk images (qcow2/raw/vdi) while applying the fixes that actually make migrations succeed: stable `/etc/fstab`, bootloader/root= alignment, initramfs regeneration, VMware tools cleanup, Windows virtio enablement, plus “prove it boots” smoke tests.
+`h2kvm` is a production-minded tool for converting VMware workloads into KVM/QEMU-friendly disk images (qcow2/raw/vdi) while applying the fixes that actually make migrations succeed: stable `/etc/fstab`, bootloader/root= alignment, initramfs regeneration, VMware tools cleanup, Windows virtio enablement, plus “prove it boots” smoke tests.
 
 This document is the **interface contract** for the CLI as implemented by your **current `build_parser()` + YAML-driven validator**. It **does not add new flags**. It’s written fresh for the new model: **config selects the operation**, CLI optionally overrides.
 
@@ -8,9 +8,9 @@ This document is the **interface contract** for the CLI as implemented by your *
 
 ## Prerequisites
 
-Before using hyper2kvm commands, ensure you have:
+Before using h2kvm commands, ensure you have:
 
-- ✓ hyper2kvm installed (see [Installation Guide](02-Installation.md))
+- ✓ h2kvm installed (see [Installation Guide](02-Installation.md))
 - ✓ Root/sudo access
 - ✓ Required system dependencies (qemu-img, qemu-nbd, etc.)
 - ✓ Source VM disk files or access to source infrastructure
@@ -334,7 +334,7 @@ These flags exist on the CLI and can also be supplied via config using their arg
 * `--luks-passphrase` *(default: env `VMDK2KVM_LUKS_PASSPHRASE`)*
 * `--luks-passphrase-env` *(default None)*
 * `--luks-keyfile` *(default None)*
-* `--luks-mapper-prefix` *(default `hyper2kvm-crypt`)*
+* `--luks-mapper-prefix` *(default `h2kvm-crypt`)*
 * `--luks-enable` *(store_true)*
 
 ---
@@ -491,7 +491,7 @@ compute_checksums: true
 
 The generated manifest can be used for batch migrations:
 ```bash
-hyper2kvm --manifest ./out/production-db-manifest.json
+h2kvm --manifest ./out/production-db-manifest.json
 ```
 
 ---
@@ -707,5 +707,5 @@ Continue your migration journey:
 
 ## Getting Help
 
-Found an issue? [Report it on GitHub](https://github.com/ssahani/hyper2kvm/issues)
+Found an issue? [Report it on GitHub](https://github.com/ssahani/h2kvm/issues)
 

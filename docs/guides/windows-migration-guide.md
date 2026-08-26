@@ -4,7 +4,7 @@
 **Last Updated**: 2026-03-29
 **Audience**: System Administrators, DevOps Engineers, IT Professionals
 
-This guide provides step-by-step instructions for migrating Windows VMs from VMware, Hyper-V, or other hypervisors to KVM using hyper2kvm with full enterprise feature support.
+This guide provides step-by-step instructions for migrating Windows VMs from VMware, Hyper-V, or other hypervisors to KVM using h2kvm with full enterprise feature support.
 
 ---
 
@@ -27,7 +27,7 @@ This guide provides step-by-step instructions for migrating Windows VMs from VMw
 
 ## Overview
 
-hyper2kvm supports comprehensive Windows VM migration with enterprise features:
+h2kvm supports comprehensive Windows VM migration with enterprise features:
 
 - **Automated driver injection**: VirtIO drivers for storage, network, and peripherals
 - **License preservation**: Extract and reactivate Windows licenses (OEM, Retail, MAK, KMS)
@@ -46,8 +46,8 @@ hyper2kvm supports comprehensive Windows VM migration with enterprise features:
 
 ### Software Requirements
 
-1. **hyper2kvm** v0.5.0 or later
-2. **VirtIO drivers ISO** — auto-downloaded to `/var/lib/hyper2kvm/virtio-win.iso` by `quickstart.sh` or `sudo ./scripts/install-deps.sh --virtio-win`. If the ISO is at the standard path, hyper2kvm auto-discovers it and no `--virtio-drivers-dir` flag is needed. You can also download manually from [Fedora VirtIO](https://fedorapeople.org/groups/virt/virtio-win/).
+1. **h2kvm** v0.5.0 or later
+2. **VirtIO drivers ISO** — auto-downloaded to `/var/lib/h2kvm/virtio-win.iso` by `quickstart.sh` or `sudo ./scripts/install-deps.sh --virtio-win`. If the ISO is at the standard path, h2kvm auto-discovers it and no `--virtio-drivers-dir` flag is needed. You can also download manually from [Fedora VirtIO](https://fedorapeople.org/groups/virt/virtio-win/).
 3. **Source VM files** (VMDK, VHDX, VHD, or OVA)
 4. **KVM hypervisor** (QEMU/KVM, libvirt)
 
@@ -79,8 +79,8 @@ vmware-vdiskmanager -R source.vmdk
 # For Hyper-V VMs
 Get-VHD -Path C:\VMs\source.vhdx | Select-Object *
 
-# Using hyper2kvm inspect
-hyper2kvm inspect source.vmdk
+# Using h2kvm inspect
+h2kvm inspect source.vmdk
 ```
 
 **Document**:
@@ -93,20 +93,20 @@ hyper2kvm inspect source.vmdk
 
 ### 2. Prepare VirtIO Drivers
 
-The easiest way to install VirtIO drivers is to use the built-in script, which downloads the ISO to the standard path (`/var/lib/hyper2kvm/virtio-win.iso`). When the ISO is at this location, hyper2kvm auto-discovers it — no `--virtio-drivers-dir` flag is needed.
+The easiest way to install VirtIO drivers is to use the built-in script, which downloads the ISO to the standard path (`/var/lib/h2kvm/virtio-win.iso`). When the ISO is at this location, h2kvm auto-discovers it — no `--virtio-drivers-dir` flag is needed.
 
 ```bash
-# Recommended: auto-download to standard path (auto-discovered by hyper2kvm)
+# Recommended: auto-download to standard path (auto-discovered by h2kvm)
 sudo ./scripts/install-deps.sh --virtio-win
 
 # Or download manually from Fedora
 wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso
-sudo mkdir -p /var/lib/hyper2kvm
-sudo mv virtio-win.iso /var/lib/hyper2kvm/virtio-win.iso
+sudo mkdir -p /var/lib/h2kvm
+sudo mv virtio-win.iso /var/lib/h2kvm/virtio-win.iso
 
 # Optional: extract drivers to a custom path (only if you need a non-standard location)
 mkdir -p /opt/virtio-drivers
-hyper2kvm extract-drivers virtio-win.iso /opt/virtio-drivers
+h2kvm extract-drivers virtio-win.iso /opt/virtio-drivers
 ```
 
 ### 3. Create Configuration File
@@ -121,7 +121,7 @@ to_output: /data/kvm/windows-server.qcow2
 
 windows:
   # VirtIO driver injection
-  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
   # virtio_drivers_path: /opt/virtio-drivers  # only needed to override the standard path
 
   # License management
@@ -169,21 +169,21 @@ windows:
 
 ```bash
 # Using configuration file
-hyper2kvm migrate --config windows-migration.yaml
+h2kvm migrate --config windows-migration.yaml
 
 # Or inline for simple migrations
-hyper2kvm convert \
+h2kvm convert \
   --input /data/vms/windows-server.vmdk \
   --output /data/kvm/windows-server.qcow2 \
   --windows-optimize
-  # --virtio-drivers-dir /opt/virtio-drivers  # optional override; auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+  # --virtio-drivers-dir /opt/virtio-drivers  # optional override; auto-discovered at /var/lib/h2kvm/virtio-win.iso
 ```
 
 ### Step 2: Monitor Progress
 
 ```bash
 # Check conversion progress
-tail -f /var/log/hyper2kvm/migration.log
+tail -f /var/log/h2kvm/migration.log
 
 # Monitor resource usage
 watch -n 1 'df -h /data/kvm && free -h'
@@ -227,7 +227,7 @@ Connect to the VM console and verify:
 
 #### Automatic License Detection
 
-hyper2kvm automatically extracts Windows license information during migration:
+h2kvm automatically extracts Windows license information during migration:
 
 ```yaml
 windows:
@@ -274,7 +274,7 @@ slmgr.vbs /dli
 slmgr.vbs /dlv
 
 # If reactivation failed, run manually
-C:\hyper2kvm\license\reactivate.ps1
+C:\h2kvm\license\reactivate.ps1
 
 # For KMS clients
 slmgr.vbs /ato
@@ -333,7 +333,7 @@ windows:
 ```
 
 **Steps after first boot**:
-1. Review instructions: `C:\hyper2kvm\activedirectory\domain-rejoin.ps1`
+1. Review instructions: `C:\h2kvm\activedirectory\domain-rejoin.ps1`
 2. Manually unjoin/rejoin using GUI or PowerShell
 3. Reboot to complete
 
@@ -350,7 +350,7 @@ windows:
 ```
 
 **Steps after first boot**:
-1. Run: `C:\hyper2kvm\activedirectory\domain-rejoin.ps1`
+1. Run: `C:\h2kvm\activedirectory\domain-rejoin.ps1`
 2. Enter domain admin credentials when prompted
 3. System will automatically rejoin and reboot
 
@@ -378,7 +378,7 @@ djoin.exe /provision `
   /savefile C:\djoin-blob.txt `
   /printblob
 
-# Copy djoin-blob.txt to hyper2kvm host
+# Copy djoin-blob.txt to h2kvm host
 ```
 
 **Benefits**:
@@ -402,7 +402,7 @@ windows:
 **Manual cleanup script** is also generated:
 ```powershell
 # On domain controller or admin workstation
-C:\hyper2kvm\activedirectory\ad-cleanup.ps1
+C:\h2kvm\activedirectory\ad-cleanup.ps1
 ```
 
 This prevents conflicts when the migrated VM has a different computer name.
@@ -491,7 +491,7 @@ windows:
 
 **Generated reconfiguration script**:
 ```powershell
-# C:\hyper2kvm\appcompat\sql-reconfigure.sql
+# C:\h2kvm\appcompat\sql-reconfigure.sql
 ```
 
 SQL Server may require:
@@ -602,7 +602,7 @@ windows:
 **Verification**:
 ```powershell
 # Run verification script
-C:\hyper2kvm\performance\msi-verify.ps1
+C:\h2kvm\performance\msi-verify.ps1
 
 # Check registry manually
 Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\netkvm\Parameters\InterruptManagement\MessageSignaledInterruptProperties"
@@ -656,7 +656,7 @@ Get-Service | Where-Object {$_.Name -like "vm*" -or $_.Name -like "hv*"}
 slmgr.vbs /dli
 
 # If not activated, run reactivation script
-C:\hyper2kvm\license\reactivate.ps1
+C:\h2kvm\license\reactivate.ps1
 
 # Verify activation
 slmgr.vbs /xpr
@@ -666,7 +666,7 @@ slmgr.vbs /xpr
 
 ```powershell
 # For manual/credential rejoin
-C:\hyper2kvm\activedirectory\domain-rejoin.ps1
+C:\h2kvm\activedirectory\domain-rejoin.ps1
 
 # For unattended rejoin (automatic on first boot)
 # Verify domain membership
@@ -679,7 +679,7 @@ On domain controller or admin workstation:
 
 ```powershell
 # Remove old computer object
-C:\hyper2kvm\activedirectory\ad-cleanup.ps1
+C:\h2kvm\activedirectory\ad-cleanup.ps1
 
 # Or manually via GUI
 dsa.msc  # Active Directory Users and Computers
@@ -702,7 +702,7 @@ cat windows-server-compatibility.md
 
 ```powershell
 # Run SQL Server reconfiguration
-sqlcmd -S localhost -i C:\hyper2kvm\appcompat\sql-reconfigure.sql
+sqlcmd -S localhost -i C:\h2kvm\appcompat\sql-reconfigure.sql
 ```
 
 ### 6. Performance Verification
@@ -711,9 +711,9 @@ Run verification scripts:
 
 ```powershell
 # Verify all performance optimizations
-C:\hyper2kvm\performance\balloon-verify.ps1
-C:\hyper2kvm\performance\trim-verify.ps1
-C:\hyper2kvm\performance\msi-verify.ps1
+C:\h2kvm\performance\balloon-verify.ps1
+C:\h2kvm\performance\trim-verify.ps1
+C:\h2kvm\performance\msi-verify.ps1
 ```
 
 ### 7. Network Configuration
@@ -766,7 +766,7 @@ vmdk: /data/vms/db-server.vmdk
 to_output: /data/kvm/db-server.qcow2
 
 windows:
-  # virtio_drivers_path: /opt/virtio-drivers  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+  # virtio_drivers_path: /opt/virtio-drivers  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 
   license:
     extract: true
@@ -817,7 +817,7 @@ vhdx: /data/vms/workstation.vhdx
 to_output: /data/kvm/workstation.qcow2
 
 windows:
-  # virtio_drivers_path: /opt/virtio-drivers  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+  # virtio_drivers_path: /opt/virtio-drivers  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 
   license:
     extract: true
@@ -862,7 +862,7 @@ vmdk: /data/vms/app-server.vmdk
 to_output: /data/kvm/app-server.qcow2
 
 windows:
-  # virtio_drivers_path: /opt/virtio-drivers  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+  # virtio_drivers_path: /opt/virtio-drivers  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
 
   license:
     extract: true
@@ -922,7 +922,7 @@ vmdk: /data/vms/${name}.vmdk
 to_output: /data/kvm/${name}.qcow2
 
 windows:
-  # virtio_drivers_path: /opt/virtio-drivers  # optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+  # virtio_drivers_path: /opt/virtio-drivers  # optional — auto-discovered at /var/lib/h2kvm/virtio-win.iso
   license:
     extract: true
     reactivate: true
@@ -941,7 +941,7 @@ windows:
       enable: true
 EOF
 
-    hyper2kvm migrate --config "${name}-config.yaml"
+    h2kvm migrate --config "${name}-config.yaml"
 done
 ```
 
@@ -958,8 +958,8 @@ done
 **Solution**:
 ```bash
 # Re-run migration with forced driver injection
-# VirtIO ISO is auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
-hyper2kvm convert \
+# VirtIO ISO is auto-discovered at /var/lib/h2kvm/virtio-win.iso
+h2kvm convert \
   --input source.vmdk \
   --output target.qcow2 \
   --force-virtio-injection
@@ -992,7 +992,7 @@ hyper2kvm convert \
 
 2. **"The account already exists"**
    - Computer object still exists in AD
-   - Run AD cleanup script: `C:\hyper2kvm\activedirectory\ad-cleanup.ps1`
+   - Run AD cleanup script: `C:\h2kvm\activedirectory\ad-cleanup.ps1`
 
 3. **"Access denied"**
    - Incorrect domain admin credentials
@@ -1008,7 +1008,7 @@ hyper2kvm convert \
 Get-WmiObject Win32_PnPSignedDriver | Where-Object {$_.DeviceName -like "*VirtIO*"}
 
 # Verify MSI interrupts
-C:\hyper2kvm\performance\msi-verify.ps1
+C:\h2kvm\performance\msi-verify.ps1
 
 # Check TRIM enabled
 fsutil behavior query DisableDeleteNotification
@@ -1058,9 +1058,9 @@ fsutil behavior query DisableDeleteNotification
 
 For issues or questions:
 
-1. **Check logs**: `/var/log/hyper2kvm/migration.log`
-2. **Review documentation**: [https://github.com/hyper2kvm/docs](https://github.com/hyper2kvm/docs)
-3. **Report bugs**: [https://github.com/hyper2kvm/issues](https://github.com/hyper2kvm/issues)
+1. **Check logs**: `/var/log/h2kvm/migration.log`
+2. **Review documentation**: [https://github.com/h2kvm/docs](https://github.com/h2kvm/docs)
+3. **Report bugs**: [https://github.com/h2kvm/issues](https://github.com/h2kvm/issues)
 
 ---
 

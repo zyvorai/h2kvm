@@ -2,7 +2,7 @@
 # Proprietary software — see LICENSE in the repository root.
 # https://zyvor.dev · info@zyvor.dev
 
-"""Tests for hyper2kvm.ai.knowledge_base.KnowledgeBase.
+"""Tests for h2kvm.ai.knowledge_base.KnowledgeBase.
 
 Covers record storage/retrieval, error-pattern management, similarity
 search, statistics aggregation, pruning, close/reconnect, and basic
@@ -16,8 +16,8 @@ import time
 
 import pytest
 
-from hyper2kvm.ai.knowledge_base import KnowledgeBase
-from hyper2kvm.ai.models import MigrationFeatures, MigrationRecord
+from h2kvm.ai.knowledge_base import KnowledgeBase
+from h2kvm.ai.models import MigrationFeatures, MigrationRecord
 
 
 # ---------------------------------------------------------------------------

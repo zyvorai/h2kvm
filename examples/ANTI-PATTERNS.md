@@ -1,4 +1,4 @@
-# hyper2kvm Anti-Patterns and Common Mistakes
+# h2kvm Anti-Patterns and Common Mistakes
 
 > **"Learn from the mistakes of others. You can't live long enough to make them all yourself."** - Eleanor Roosevelt
 
@@ -27,7 +27,7 @@ This document catalogs common mistakes, anti-patterns, and pitfalls when migrati
 ```bash
 # Migrate entire datacenter in one weekend
 for vm in $(govc ls /DC1/vm/); do
-    hyper2kvm vsphere --vs-vm-name "$vm" &  # Fork bomb!
+    h2kvm vsphere --vs-vm-name "$vm" &  # Fork bomb!
 done
 ```
 
@@ -47,7 +47,7 @@ done
 # Week 5: Production tier-1 (critical 10 VMs)
 
 # One VM at a time with validation
-hyper2kvm --config tier1-database.yaml
+h2kvm --config tier1-database.yaml
 # Test, validate, monitor for 24 hours
 # Only then proceed to next VM
 ```
@@ -89,7 +89,7 @@ govc datastore.download \
     /backups/pre-migration/
 
 # 4. THEN migrate
-hyper2kvm --config production-database.yaml
+h2kvm --config production-database.yaml
 
 # 5. Keep VMware snapshot for 30 days
 # 6. Only delete after successful validation
@@ -104,7 +104,7 @@ hyper2kvm --config production-database.yaml
 **What people do:**
 ```bash
 # Migrate straight to production without testing
-hyper2kvm vsphere --vs-vm-name critical-erp-prod --output-dir /var/lib/libvirt/images/
+h2kvm vsphere --vs-vm-name critical-erp-prod --output-dir /var/lib/libvirt/images/
 virsh start critical-erp-prod  # HOPE IT WORKS!
 ```
 
@@ -120,7 +120,7 @@ virsh start critical-erp-prod  # HOPE IT WORKS!
 govc vm.clone -vm critical-erp-prod -on=false critical-erp-test
 
 # 2. Migrate test clone
-hyper2kvm vsphere --vs-vm-name critical-erp-test \
+h2kvm vsphere --vs-vm-name critical-erp-test \
     --output-dir /test/migrations/
 
 # 3. Boot and validate
@@ -174,7 +174,7 @@ network_mode: preserve      # ← Keeps existing network config
 
 # Logging for troubleshooting
 verbose: 2
-log_file: /var/log/hyper2kvm/{vm-name}.log
+log_file: /var/log/h2kvm/{vm-name}.log
 report: /reports/{vm-name}.md
 
 # Test before production
@@ -255,7 +255,7 @@ Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)
 # ALWAYS regenerate initramfs
 regen_initramfs: true
 
-# hyper2kvm automatically:
+# h2kvm automatically:
 # 1. Detects OS type (RHEL/Ubuntu/SUSE)
 # 2. Runs appropriate command:
 #    - RHEL: dracut -f
@@ -356,7 +356,7 @@ qemu-img convert -O qcow2 -o preallocation=full source.vmdk output.qcow2
 
 **✅ Do this instead:**
 ```yaml
-# Use thin provisioning (default in hyper2kvm)
+# Use thin provisioning (default in h2kvm)
 out_format: qcow2  # Thin by default
 compress: true     # Further reduces size
 
@@ -522,7 +522,7 @@ domain_memory: 16384  # Same as VMware
 **What people do:**
 ```bash
 # Migrate, put in production, hope for the best
-hyper2kvm --config prod-vm.yaml
+h2kvm --config prod-vm.yaml
 virsh start prod-vm
 # Users are the performance testers!
 ```
@@ -879,6 +879,6 @@ Because the only thing more expensive than doing it right the first time... is d
 ---
 
 **Questions? Found a new anti-pattern?**
-Submit a PR or open an issue: https://github.com/ssahani/hyper2kvm/issues
+Submit a PR or open an issue: https://github.com/ssahani/h2kvm/issues
 
 **Remember:** Every expert was once a beginner who refused to give up. Learn from these mistakes so you don't have to make them yourself.

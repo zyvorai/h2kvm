@@ -16,7 +16,7 @@ warn "This bundle may contain sensitive information (pod logs, events, resource 
 echo ""
 
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-OUTPUT_DIR="${1:-/tmp/hyper2kvm-debug-$TIMESTAMP}"
+OUTPUT_DIR="${1:-/tmp/h2kvm-debug-$TIMESTAMP}"
 ARCHIVE="$OUTPUT_DIR.tar.gz"
 
 mkdir -p "$OUTPUT_DIR"
@@ -30,7 +30,7 @@ kubectl version -o yaml > "$OUTPUT_DIR/k8s-version.yaml" 2>&1 || true
 kubectl get nodes -o wide > "$OUTPUT_DIR/nodes.txt" 2>&1 || true
 
 collect "namespace resources"
-for NS in hyper2kvm-system hyper2kvm-workers hyper2kvm-migration kubevirt cdi; do
+for NS in h2kvm-system h2kvm-workers h2kvm-migration kubevirt cdi; do
     mkdir -p "$OUTPUT_DIR/$NS"
     kubectl get all -n "$NS" -o wide > "$OUTPUT_DIR/$NS/all-resources.txt" 2>&1 || true
     kubectl get events -n "$NS" --sort-by=.lastTimestamp > "$OUTPUT_DIR/$NS/events.txt" 2>&1 || true
@@ -38,16 +38,16 @@ for NS in hyper2kvm-system hyper2kvm-workers hyper2kvm-migration kubevirt cdi; d
 done
 
 collect "operator logs"
-kubectl logs -n hyper2kvm-system -l control-plane=controller-manager --tail=500 > "$OUTPUT_DIR/hyper2kvm-system/operator.log" 2>&1 || true
+kubectl logs -n h2kvm-system -l control-plane=controller-manager --tail=500 > "$OUTPUT_DIR/h2kvm-system/operator.log" 2>&1 || true
 
 collect "worker logs"
-for POD in $(kubectl get pods -n hyper2kvm-workers -o jsonpath='{.items[*].metadata.name}' 2>/dev/null); do
-    kubectl logs -n hyper2kvm-workers "$POD" --tail=200 > "$OUTPUT_DIR/hyper2kvm-workers/$POD.log" 2>&1 || true
+for POD in $(kubectl get pods -n h2kvm-workers -o jsonpath='{.items[*].metadata.name}' 2>/dev/null); do
+    kubectl logs -n h2kvm-workers "$POD" --tail=200 > "$OUTPUT_DIR/h2kvm-workers/$POD.log" 2>&1 || true
 done
 
 collect "migration job logs"
-for POD in $(kubectl get pods -n hyper2kvm-migration -o jsonpath='{.items[*].metadata.name}' 2>/dev/null); do
-    kubectl logs -n hyper2kvm-migration "$POD" --all-containers --tail=200 > "$OUTPUT_DIR/hyper2kvm-migration/$POD.log" 2>&1 || true
+for POD in $(kubectl get pods -n h2kvm-migration -o jsonpath='{.items[*].metadata.name}' 2>/dev/null); do
+    kubectl logs -n h2kvm-migration "$POD" --all-containers --tail=200 > "$OUTPUT_DIR/h2kvm-migration/$POD.log" 2>&1 || true
 done
 
 collect "KubeVirt status"
@@ -63,10 +63,10 @@ collect "HyperConversion CRs"
 kubectl get hc -A -o yaml > "$OUTPUT_DIR/hyperconversions.yaml" 2>&1 || true
 
 collect "CRDs"
-kubectl get crd -o name | grep hyper2kvm > "$OUTPUT_DIR/crds.txt" 2>&1 || true
+kubectl get crd -o name | grep h2kvm > "$OUTPUT_DIR/crds.txt" 2>&1 || true
 
 collect "RBAC"
-kubectl get clusterrole,clusterrolebinding -o name | grep hyper2kvm > "$OUTPUT_DIR/rbac.txt" 2>&1 || true
+kubectl get clusterrole,clusterrolebinding -o name | grep h2kvm > "$OUTPUT_DIR/rbac.txt" 2>&1 || true
 
 collect "storage classes"
 kubectl get sc -o wide > "$OUTPUT_DIR/storageclasses.txt" 2>&1 || true
@@ -75,7 +75,7 @@ collect "webhooks"
 kubectl get mutatingwebhookconfiguration,validatingwebhookconfiguration -o name > "$OUTPUT_DIR/webhooks.txt" 2>&1 || true
 
 collect "pod describes (failed/error)"
-for NS in hyper2kvm-system hyper2kvm-workers hyper2kvm-migration; do
+for NS in h2kvm-system h2kvm-workers h2kvm-migration; do
     for POD in $(kubectl get pods -n "$NS" --field-selector=status.phase!=Running,status.phase!=Succeeded -o jsonpath='{.items[*].metadata.name}' 2>/dev/null); do
         kubectl describe pod "$POD" -n "$NS" > "$OUTPUT_DIR/$NS/$POD-describe.txt" 2>&1 || true
     done

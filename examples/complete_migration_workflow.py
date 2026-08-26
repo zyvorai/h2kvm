@@ -27,8 +27,8 @@ from pathlib import Path
 from datetime import datetime
 from typing import Any
 
-from hyper2kvm.vmcraft.main import VMCraft
-from hyper2kvm.core.guest_inspector import GuestDetector
+from h2kvm.vmcraft.main import VMCraft
+from h2kvm.core.guest_inspector import GuestDetector
 
 
 class CompleteMigrationWorkflow:
@@ -327,9 +327,9 @@ class CompleteMigrationWorkflow:
 
         start_time = time.time()
 
-        # Run migration using hyper2kvm CLI (simulated - in production use actual CLI)
+        # Run migration using h2kvm CLI (simulated - in production use actual CLI)
         print("\n[*] Running migration with all fixers enabled...")
-        print("    (In production, this would call: hyper2kvm migrate ...)")
+        print("    (In production, this would call: h2kvm migrate ...)")
 
         # For demo purposes, we'll simulate the migration
         # In real usage, you would run the actual migration command

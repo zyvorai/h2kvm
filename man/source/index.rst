@@ -1,5 +1,5 @@
 ========
-hyper2kvm
+h2kvm
 ========
 
 -------------------------------------------------------------
@@ -14,22 +14,22 @@ Production-Grade Hypervisor to KVM/QEMU Migration Toolkit
 SYNOPSIS
 ========
 
-**hyper2kvm** [*OPTIONS*] *COMMAND* [*COMMAND_OPTIONS*]
+**h2kvm** [*OPTIONS*] *COMMAND* [*COMMAND_OPTIONS*]
 
-**hyper2kvm** **--config** *FILE* *COMMAND*
+**h2kvm** **--config** *FILE* *COMMAND*
 
-**hyper2kvm** **local** [*--vmdk* *FILE*] [*OPTIONS*]
+**h2kvm** **local** [*--vmdk* *FILE*] [*OPTIONS*]
 
-**hyper2kvm** **vsphere** [*--vm* *NAME*] [*OPTIONS*]
+**h2kvm** **vsphere** [*--vm* *NAME*] [*OPTIONS*]
 
-**hyper2kvm** **hyperv** [*--vm* *NAME*] [*OPTIONS*]
+**h2kvm** **hyperv** [*--vm* *NAME*] [*OPTIONS*]
 
-**hyper2kvm** **azure** [*--vm* *NAME*] [*OPTIONS*]
+**h2kvm** **azure** [*--vm* *NAME*] [*OPTIONS*]
 
 DESCRIPTION
 ===========
 
-**hyper2kvm** is a comprehensive toolkit for migrating virtual machines from multiple
+**h2kvm** is a comprehensive toolkit for migrating virtual machines from multiple
 hypervisors and disk ecosystems (VMware vSphere, Hyper-V, Azure, AWS, local disks)
 into reliable, bootable KVM/QEMU systems.
 
@@ -55,19 +55,19 @@ COMMANDS
 
 **local**
     Convert local VMDK, VHD, or VHDx files to QCOW2 format.
-    See **hyper2kvm-local**\(1).
+    See **h2kvm-local**\(1).
 
 **vsphere**
     Migrate VMs from VMware vSphere/ESXi environments.
-    See **hyper2kvm-vsphere**\(1).
+    See **h2kvm-vsphere**\(1).
 
 **hyperv**
     Migrate VMs from Microsoft Hyper-V hosts.
-    See **hyper2kvm-hyperv**\(1).
+    See **h2kvm-hyperv**\(1).
 
 **azure**
     Download and convert VMs from Microsoft Azure.
-    See **hyper2kvm-azure**\(1).
+    See **h2kvm-azure**\(1).
 
 **vhd**
     Convert VHD/VHDx disk images (Azure, Hyper-V).
@@ -83,7 +83,7 @@ GLOBAL OPTIONS
 
 **--config** *FILE*
     Load configuration from YAML or JSON file.
-    See **hyper2kvm.conf**\(5) for format details.
+    See **h2kvm.conf**\(5) for format details.
 
 **--verbose** *LEVEL*, **-v** *LEVEL*
     Set logging verbosity (0-2):
@@ -167,7 +167,7 @@ Convert a local VMDK file
 
 ::
 
-    hyper2kvm local --vmdk /path/to/vm.vmdk --output-dir ./output --compress
+    h2kvm local --vmdk /path/to/vm.vmdk --output-dir ./output --compress
 
 Migrate from vSphere with config file
 --------------------------------------
@@ -188,14 +188,14 @@ Migrate from vSphere with config file
     EOF
 
     export VCENTER_PASSWORD='your-password'
-    hyper2kvm --config vsphere-migration.yaml vsphere
+    h2kvm --config vsphere-migration.yaml vsphere
 
 Convert Windows VM with VirtIO drivers
 ---------------------------------------
 
 ::
 
-    hyper2kvm local \
+    h2kvm local \
       --vmdk /vms/windows10.vmdk \
       --output-dir ./output \
       --virtio-drivers-dir /opt/virtio-win-extracted \
@@ -208,7 +208,7 @@ Download and convert Azure VM
 ::
 
     az login
-    hyper2kvm azure \
+    h2kvm azure \
       --subscription "Production" \
       --resource-group prod-rg \
       --vm webapp-prod-01 \
@@ -218,16 +218,16 @@ Download and convert Azure VM
 FILES
 =====
 
-**/etc/hyper2kvm/hyper2kvm.conf**
+**/etc/h2kvm/h2kvm.conf**
     System-wide configuration file.
 
-**~/.config/hyper2kvm/config.yaml**
+**~/.config/h2kvm/config.yaml**
     User-specific configuration file.
 
-**./hyper2kvm.yaml**
+**./h2kvm.yaml**
     Project-specific configuration file (searched in current directory).
 
-See **hyper2kvm.conf**\(5) for configuration file format.
+See **h2kvm.conf**\(5) for configuration file format.
 
 ENVIRONMENT
 ===========
@@ -271,11 +271,11 @@ EXIT STATUS
 SEE ALSO
 ========
 
-**hyper2kvm-local**\(1),
-**hyper2kvm-vsphere**\(1),
-**hyper2kvm-hyperv**\(1),
-**hyper2kvm-azure**\(1),
-**hyper2kvm.conf**\(5),
+**h2kvm-local**\(1),
+**h2kvm-vsphere**\(1),
+**h2kvm-hyperv**\(1),
+**h2kvm-azure**\(1),
+**h2kvm.conf**\(5),
 **qemu-img**\(1),
 **virt-v2v**\(1),
 **guestfs**\(3)
@@ -283,9 +283,9 @@ SEE ALSO
 BUGS
 ====
 
-Report bugs to: https://github.com/ssahani/hyper2kvm/issues
+Report bugs to: https://github.com/ssahani/h2kvm/issues
 
-Project documentation: https://github.com/ssahani/hyper2kvm
+Project documentation: https://github.com/ssahani/h2kvm
 
 AUTHOR
 ======

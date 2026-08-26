@@ -8,7 +8,7 @@
 
 ## 🎯 Objective
 
-Reorganize the hyper2kvm documentation to improve:
+Reorganize the h2kvm documentation to improve:
 - Navigation and discoverability
 - Logical structure and hierarchy
 - Professional appearance

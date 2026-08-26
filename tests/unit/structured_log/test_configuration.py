@@ -6,8 +6,8 @@
 
 from __future__ import annotations
 
-import hyper2kvm.core.structured_log as sl
-from hyper2kvm.core.structured_log import (
+import h2kvm.core.structured_log as sl
+from h2kvm.core.structured_log import (
     AsyncLogWriter,
     BoundLogger,
     PrintLoggerFactory,

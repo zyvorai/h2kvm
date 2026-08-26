@@ -46,7 +46,7 @@ Create `migration.json`:
 ### 2. Run the Pipeline
 
 ```bash
-hyper2kvm --manifest migration.json
+h2kvm --manifest migration.json
 ```
 
 ### 3. Review Results
@@ -603,7 +603,7 @@ set -e
 
 for manifest in migrations/*.json; do
   echo "Processing: $manifest"
-  hyper2kvm --manifest "$manifest"
+  h2kvm --manifest "$manifest"
 
   # Check exit status
   if [ $? -eq 0 ]; then
@@ -626,7 +626,7 @@ echo "🎉 All migrations completed"
 vm-migration:
   stage: deploy
   script:
-    - hyper2kvm --manifest manifests/production.json
+    - h2kvm --manifest manifests/production.json
   artifacts:
     paths:
       - output/
@@ -726,7 +726,7 @@ Enable verbose output:
 Or use CLI override:
 
 ```bash
-hyper2kvm --manifest migration.json -vv
+h2kvm --manifest migration.json -vv
 ```
 
 ## Migration from CLI Workflow
@@ -734,7 +734,7 @@ hyper2kvm --manifest migration.json -vv
 ### Old CLI Approach
 
 ```bash
-hyper2kvm \
+h2kvm \
   --config config.yaml \
   --vmdk /data/source/disk.vmdk \
   --output-dir /data/output \
@@ -777,7 +777,7 @@ hyper2kvm \
 
 **Run:**
 ```bash
-hyper2kvm --manifest manifest.json
+h2kvm --manifest manifest.json
 ```
 
 ## Best Practices

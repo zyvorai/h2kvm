@@ -19,8 +19,8 @@
 #
 #   3. Install pyvmomi (vSphere Python SDK):
 #      pip install pyvmomi
-#      # Or install hyper2kvm with vSphere support:
-#      pip install hyper2kvm[vsphere]
+#      # Or install h2kvm with vSphere support:
+#      pip install h2kvm[vsphere]
 #
 #   4. Install qemu-img (for VMDK → qcow2 conversion):
 #      # Fedora/RHEL

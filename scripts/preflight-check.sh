@@ -2,7 +2,7 @@
 # =============================================================================
 # Pre-flight cluster readiness check
 # =============================================================================
-# Validates all prerequisites before deploying hyper2kvm components.
+# Validates all prerequisites before deploying h2kvm components.
 #
 # Usage:
 #   ./scripts/preflight-check.sh [--fix]
@@ -23,7 +23,7 @@ fail()  { echo -e "  [FAIL] $1"; ERRORS=$((ERRORS+1)); }
 warn()  { echo -e "  [WARN] $1"; WARNINGS=$((WARNINGS+1)); }
 info()  { echo -e "  [INFO] $1"; }
 
-echo "=== hyper2kvm Pre-flight Check ==="
+echo "=== h2kvm Pre-flight Check ==="
 echo ""
 
 # --- Tools ---
@@ -146,11 +146,11 @@ fi
 # --- CRDs ---
 echo ""
 echo "Checking CRDs..."
-if kubectl get crd hyperconversions.hyper2kvm.io >/dev/null 2>&1; then
+if kubectl get crd hyperconversions.h2kvm.io >/dev/null 2>&1; then
     pass "HyperConversion CRD installed"
 else
     warn "HyperConversion CRD not installed"
-    info "Install: kubectl apply -f operator/config/crd/bases/hyper2kvm.io_hyperconversions.yaml"
+    info "Install: kubectl apply -f operator/config/crd/bases/h2kvm.io_hyperconversions.yaml"
 fi
 
 # --- NBD module ---
