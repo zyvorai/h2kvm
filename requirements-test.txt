@@ -13,7 +13,7 @@ types-PyYAML>=6.0.12
 
 # Test utilities
 coverage[toml]>=7.3.0
-faker>=20.0.0
+faker>=20.1.0
 
 # Profiling
 memory-profiler>=0.61.0
