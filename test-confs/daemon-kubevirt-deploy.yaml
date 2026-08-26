@@ -1,0 +1,28 @@
+# Daemon config: auto-deploy every converted VM to KubeVirt
+#
+# Usage:
+#   1. sudo cp test-confs/daemon-kubevirt-deploy.yaml /etc/hyper2kvm/daemon.yaml
+#   2. sudo systemctl start hyper2kvm.service
+#   3. Drop migration YAMLs into /var/lib/hyper2kvm/daemon/to_be_processed/
+#
+# Prerequisites:
+#   - Kubernetes cluster with KubeVirt installed
+#   - kubeconfig file accessible by the daemon
+#   - CDI (Containerized Data Importer) for disk upload
+#
+command: daemon
+manifest_workflow_mode: true
+manifest_workflow_dir: /var/lib/hyper2kvm/daemon
+output_dir: /var/lib/hyper2kvm/output
+
+# Conversion defaults
+out_format: qcow2
+flatten: true
+compress: false
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Auto-deploy to KubeVirt
+deploy_k8s: true
+kubeconfig: /etc/kubernetes/admin.conf
+k8s_namespace: default

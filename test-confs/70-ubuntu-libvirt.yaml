@@ -1,0 +1,161 @@
+# hyper2kvm.yaml
+# Offline VMware → KVM conversion (openSUSE Leap 15.4 example)
+#
+# Run with:
+#   sudo ./hyper2kvm.py --config hyper2kvm.yaml
+#
+# What this does:
+# - Opens the VMDK offline with guestfs
+# - NEVER mounts using /dev/disk/by-path
+# - Rewrites ALL fstab entries to stable UUID= (fallback PARTUUID=/LABEL=)
+# - Fixes GRUB root=
+# - Regenerates initramfs safely (dracut on SUSE)
+# - Converts final image to qcow2 (optionally compressed)
+# - Prints fstab before + after
+# - Optionally runs a libvirt smoke test
+# - Optionally emits libvirt domain XML (and can virsh define it)
+
+# -----------------------------------------------------------------------------
+# Operation
+# -----------------------------------------------------------------------------
+cmd: local
+
+# -----------------------------------------------------------------------------
+# Input
+# -----------------------------------------------------------------------------
+vmdk: /home/ssahani/tt/hyper2kvm/Ubuntu-64-bit.vmdk
+
+# -----------------------------------------------------------------------------
+# Output layout
+# -----------------------------------------------------------------------------
+output_dir: /home/ssahani/by-path/out
+
+# Flatten snapshot chain first (recommended)
+flatten: true
+flatten_format: qcow2
+
+# Final output image (relative to output_dir unless absolute)
+to_output: ubuntu.qcow2
+out_format: qcow2
+compress: false
+compress_level: null
+checksum: true
+
+# -----------------------------------------------------------------------------
+# Filesystem + boot fixes
+# -----------------------------------------------------------------------------
+print_fstab: true
+
+# Rewrite *everything* to stable identifiers:
+#   UUID= → PARTUUID= → LABEL=
+fstab_mode: stabilize-all
+
+# Update GRUB root=
+no_grub: false
+
+# Regenerate initramfs (openSUSE uses dracut)
+regen_initramfs: true
+
+# Keep backups inside the guest
+no_backup: false
+
+# Optional: remove VMware tools (Linux only)
+remove_vmware_tools: false
+
+# Optional: cloud-init injection from YAML/JSON file
+cloud_init_config: null
+
+# Optional: resize root FS (enlarge only; examples: "+10G" or "50G")
+resize: null
+
+# Optional Markdown report (relative to output_dir unless absolute)
+report: /home/ssahani/by-path/out/hyper2kvm-report.md
+
+# -----------------------------------------------------------------------------
+# Safety / visibility
+# -----------------------------------------------------------------------------
+dry_run: false
+verbose: 2
+log_file: /home/ssahani/by-path/out/hyper2kvm.log
+enable_recovery: false
+parallel_processing: false
+
+# -----------------------------------------------------------------------------
+# Batch export (optional)
+# -----------------------------------------------------------------------------
+use_export: false
+export_parallel: false
+export_concurrency: 2
+post_export: false
+
+# -----------------------------------------------------------------------------
+# LUKS knobs (optional)
+# -----------------------------------------------------------------------------
+luks_enable: false
+luks_passphrase: null
+luks_passphrase_env: null
+luks_keyfile: null
+luks_mapper_prefix: hyper2kvm-crypt
+
+# -----------------------------------------------------------------------------
+# Optional smoke tests
+# -----------------------------------------------------------------------------
+libvirt_test: true
+qemu_test: false
+
+vm_name: photon
+memory: 2048
+vcpus: 2
+uefi: false
+timeout: 30
+keep_domain: false
+headless: true
+
+# -----------------------------------------------------------------------------
+# Libvirt domain XML emission (after pipeline)
+# -----------------------------------------------------------------------------
+emit_domain_xml: true
+virsh_define: true
+
+# Help the emitter choose the right template
+guest_os: linux        # linux | windows
+# windows: false       # optional alias hint if you prefer
+
+# Domain knobs used by emitter (and mostly match your test knobs above)
+machine: q35
+
+# Disk/NIC model knobs (Linux emitter)
+disk_bus: virtio
+disk_dev: vda
+disk_cache: none
+net_model: virtio
+libvirt_network: default
+
+# Graphics knobs (ignored if headless:true => graphics=none)
+graphics: spice
+graphics_listen: 127.0.0.1
+video: virtio
+usb_tablet: true
+
+# Linux clock policy (Linux emitter)
+clock: utc
+
+# Firmware/NVRAM knobs (used only if uefi:true)
+ovmf_code: /usr/share/edk2/ovmf/OVMF_CODE.fd
+nvram_vars: null
+ovmf_vars_template: null
+
+# Optional: attach cloud-init seed ISO in the emitted XML (Linux emitter)
+cloudinit_iso: null
+cloudinit_seed_iso: null
+
+# -----------------------------------------------------------------------------
+# Windows-only emission knobs (safe to keep here; ignored unless guest_os=windows)
+# -----------------------------------------------------------------------------
+win_stage: bootstrap          # bootstrap | final
+win_driver_iso: null          # path to virtio-win.iso (or dir if your emitter expects ISO)
+virtio_win_iso: null          # alias
+driver_iso: null              # alias
+win_localtime_clock: true
+win_hyperv: true
+

@@ -1,0 +1,527 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "hyper2kvm.io/v1alpha1",
+          "kind": "HyperConversion",
+          "metadata": {
+            "name": "example-migration",
+            "namespace": "default"
+          },
+          "spec": {
+            "source": {
+              "url": "http://example.com/disk.vmdk",
+              "format": "vmdk"
+            },
+            "storage": {
+              "size": "20Gi",
+              "storageClass": "local-path"
+            },
+            "vm": {
+              "name": "migrated-vm",
+              "cpu": {
+                "cores": 2
+              },
+              "memory": "4Gi",
+              "firmware": "bios"
+            }
+          }
+        }
+      ]
+    capabilities: Full Lifecycle
+    categories: "Virtualization,Modernization,Integration & Delivery"
+    certified: "false"
+    containerImage: ghcr.io/ssahani/hyper2kvm-operator:v1.2.0
+    createdAt: "2026-02-17T00:00:00Z"
+    description: Automated VM-to-KubeVirt migration operator with multi-disk support and cloud-init integration
+    repository: https://github.com/ssahani/hyper2kvm
+    support: Community
+    operators.operatorframework.io/builder: operator-sdk-v1.34.1
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+  name: hyperconversion-operator.v1.2.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: HyperConversion manages the conversion and migration of VM disks to KubeVirt VirtualMachines
+      displayName: HyperConversion
+      kind: HyperConversion
+      name: hyperconversions.hyper2kvm.io
+      version: v1alpha1
+      specDescriptors:
+      - description: Source disk image location and format
+        displayName: Source
+        path: source
+      - description: Source disk URL (HTTP/HTTPS/S3)
+        displayName: URL
+        path: source.url
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Disk image format (vmdk, vdi, vhd, qcow2, raw)
+        displayName: Format
+        path: source.format
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:select:vmdk
+        - urn:alm:descriptor:com.tectonic.ui:select:vdi
+        - urn:alm:descriptor:com.tectonic.ui:select:vhd
+        - urn:alm:descriptor:com.tectonic.ui:select:vhdx
+        - urn:alm:descriptor:com.tectonic.ui:select:qcow2
+        - urn:alm:descriptor:com.tectonic.ui:select:raw
+      - description: Target storage configuration
+        displayName: Storage
+        path: storage
+      - description: Storage size
+        displayName: Size
+        path: storage.size
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: StorageClass name
+        displayName: Storage Class
+        path: storage.storageClass
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:StorageClass
+      - description: VirtualMachine specification
+        displayName: VM Configuration
+        path: vm
+      - description: VM name
+        displayName: Name
+        path: vm.name
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: CPU configuration
+        displayName: CPU
+        path: vm.cpu
+      - description: Number of CPU cores
+        displayName: Cores
+        path: vm.cpu.cores
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - description: Memory allocation
+        displayName: Memory
+        path: vm.memory
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Firmware type (bios, uefi, uefi-secure)
+        displayName: Firmware
+        path: vm.firmware
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:select:bios
+        - urn:alm:descriptor:com.tectonic.ui:select:uefi
+        - urn:alm:descriptor:com.tectonic.ui:select:uefi-secure
+      - description: Additional disks
+        displayName: Additional Disks
+        path: vm.additionalDisks
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      statusDescriptors:
+      - description: Current conversion phase
+        displayName: Phase
+        path: phase
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.phase
+      - description: Progress percentage (0-100)
+        displayName: Progress
+        path: progress
+        x-descriptors:
+        - urn:alm:descriptor:text
+      - description: Created DataVolume name
+        displayName: DataVolume
+        path: dataVolumeName
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:DataVolume
+      - description: Created VirtualMachine name
+        displayName: VirtualMachine
+        path: virtualMachineName
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:VirtualMachine
+      - description: Status conditions
+        displayName: Conditions
+        path: conditions
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.conditions
+  description: |
+    ## HyperConversion Operator
+
+    The HyperConversion Operator automates the migration of VM disk images to KubeVirt VirtualMachines.
+    It provides a declarative API for converting disks from various formats (VMDK, VDI, VHD, QCOW2)
+    and automatically creating ready-to-run VirtualMachines in your Kubernetes cluster.
+
+    ### Key Features
+
+    - **Automated Disk Conversion**: Convert VM disks from VMDK, VDI, VHD, VHDX, QCOW2, or RAW formats
+    - **Multi-Disk Support**: Create VMs with multiple storage volumes (data, logs, backups)
+    - **Multi-Architecture**: AMD64, ARM64, s390x, ppc64le support
+    - **Cloud-Init Integration**: Pre-built templates for Ubuntu, CentOS, Debian, Kubernetes, Docker
+    - **Storage Flexibility**: Support for HTTP/HTTPS, S3, and direct PVC sources
+    - **Boot Order Control**: Configure boot sequence for multi-disk VMs
+    - **CLI Tool (h2kctl)**: Command-line interface for easy management
+    - **Production Ready**: Webhooks, metrics, RBAC, event logging
+
+    ### Supported Disk Sources
+
+    - **HTTP/HTTPS**: Direct URL to disk image
+    - **S3**: AWS S3 or compatible storage (MinIO, Ceph RGW)
+    - **Existing PVC**: Clone from existing PersistentVolumeClaim
+    - **Blank Disks**: Create empty disks for formatting
+
+    ### Quick Start
+
+    1. Install the operator (requires KubeVirt and CDI):
+       ```
+       kubectl create -f https://operatorhub.io/install/hyperconversion-operator.yaml
+       ```
+
+    2. Create a HyperConversion resource:
+       ```yaml
+       apiVersion: hyper2kvm.io/v1alpha1
+       kind: HyperConversion
+       metadata:
+         name: my-vm-migration
+       spec:
+         source:
+           url: "http://example.com/disk.vmdk"
+           format: vmdk
+         storage:
+           size: 20Gi
+         vm:
+           name: my-vm
+           cpu:
+             cores: 4
+           memory: 8Gi
+       ```
+
+    3. Monitor progress:
+       ```
+       kubectl get hyperconversion my-vm-migration -w
+       ```
+
+    ### Prerequisites
+
+    - **KubeVirt** v1.0.0+: VM virtualization for Kubernetes
+    - **CDI** v1.58.0+: Containerized Data Importer for disk provisioning
+    - **StorageClass**: Dynamic storage provisioning capability
+
+    ### Use Cases
+
+    - **VM Migration**: Migrate existing VMs to Kubernetes
+    - **Development Environments**: Quickly spin up development VMs
+    - **Testing**: Create disposable VM environments
+    - **Disaster Recovery**: Convert backup images to running VMs
+    - **Modernization**: Lift-and-shift workloads to Kubernetes
+
+    ### Multi-Disk VMs
+
+    Create VMs with separate volumes for OS, data, and backups:
+
+    ```yaml
+    spec:
+      vm:
+        additionalDisks:
+          - name: data-disk
+            source:
+              blank: true
+            size: 50Gi
+            bus: virtio
+          - name: database-disk
+            source:
+              url: "http://example.com/db.qcow2"
+            size: 100Gi
+            storageClass: fast-ssd
+    ```
+
+    ### Documentation
+
+    - [Getting Started Guide](https://github.com/ssahani/hyper2kvm/blob/main/operator/README.md)
+    - [Cloud-Init Templates](https://github.com/ssahani/hyper2kvm/blob/main/operator/templates/cloud-init/README.md)
+    - [Multi-Disk Configuration](https://github.com/ssahani/hyper2kvm/blob/main/operator/docs/MULTI_DISK.md)
+    - [Multi-Architecture Support](https://github.com/ssahani/hyper2kvm/blob/main/operator/docs/MULTI_ARCH.md)
+
+    ### Support
+
+    - GitHub Issues: [https://github.com/ssahani/hyper2kvm/issues](https://github.com/ssahani/hyper2kvm/issues)
+    - Documentation: [https://github.com/ssahani/hyper2kvm](https://github.com/ssahani/hyper2kvm)
+
+  displayName: HyperConversion Operator
+  icon:
+  - base64data: PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0iIzMyNmNlNSIvPgogIDxwYXRoIGQ9Ik02NCw4MGgyMHY5Nkg2NFY4MHogTTk2LDgwaDIwdjk2SDk2Vjgwem0zMiwwaDIwdjk2aC0yMFY4MHptMzIsMGgyMHY5NmgtMjBWODB6IiBmaWxsPSIjZmZmIi8+Cjwvc3ZnPgo=
+    mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - secrets
+          - services
+          - events
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - persistentvolumeclaims
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - batch
+          resources:
+          - jobs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - hyper2kvm.io
+          resources:
+          - hyperconversions
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - hyper2kvm.io
+          resources:
+          - hyperconversions/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - hyper2kvm.io
+          resources:
+          - hyperconversions/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - cdi.kubevirt.io
+          resources:
+          - datavolumes
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - kubevirt.io
+          resources:
+          - virtualmachines
+          - virtualmachineinstances
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods/log
+          verbs:
+          - get
+        serviceAccountName: hyperconversion-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/component: manager
+          app.kubernetes.io/name: hyperconversion-operator
+          control-plane: controller-manager
+        name: hyperconversion-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: hyperconversion-operator
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                app.kubernetes.io/name: hyperconversion-operator
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                command:
+                - /manager
+                image: ghcr.io/ssahani/hyper2kvm-operator:v1.2.0
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 100m
+                    memory: 128Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  readOnlyRootFilesystem: true
+                  runAsNonRoot: true
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.15.0
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 5m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  readOnlyRootFilesystem: true
+                  runAsNonRoot: true
+              securityContext:
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+              serviceAccountName: hyperconversion-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: hyperconversion-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - virtualization
+  - kubevirt
+  - vm
+  - migration
+  - vmware
+  - vmdk
+  - qcow2
+  - kvm
+  - hypervisor
+  links:
+  - name: Documentation
+    url: https://github.com/ssahani/hyper2kvm
+  - name: Source Repository
+    url: https://github.com/ssahani/hyper2kvm
+  - name: Issue Tracker
+    url: https://github.com/ssahani/hyper2kvm/issues
+  maintainers:
+  - email: susant@visioncodex.com
+    name: ZyvorAI Labs Private Limited
+  maturity: alpha
+  minKubeVersion: 1.24.0
+  provider:
+    name: Community
+    url: https://github.com/ssahani/hyper2kvm
+  relatedImages:
+  - image: ghcr.io/ssahani/hyper2kvm-operator:v1.2.0
+    name: manager
+  - image: gcr.io/kubebuilder/kube-rbac-proxy:v0.15.0
+    name: kube-rbac-proxy
+  replaces: hyperconversion-operator.v1.1.0
+  version: 1.2.0

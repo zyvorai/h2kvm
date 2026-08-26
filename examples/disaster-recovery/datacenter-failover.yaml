@@ -1,0 +1,261 @@
+# Datacenter Disaster Failover Scenario
+#
+# Situation: Primary datacenter experiencing catastrophic failure
+# - Power outage (UPS exhausted, generators failed)
+# - Estimated restore time: 48+ hours
+# - Need to failover critical workloads to DR site immediately
+#
+# DR Site Configuration:
+# - Secondary datacenter 500 miles away
+# - KVM/OpenStack infrastructure (pre-provisioned)
+# - WAN link: 10 Gbps dark fiber
+# - Last replication: 15 minutes ago (CBT sync)
+#
+# Recovery Objectives:
+# - RTO: 2 hours (critical systems)
+# - RPO: 15 minutes (last CBT sync)
+# - Priority: Customer-facing applications first
+#
+# This configuration handles emergency activation of DR VMs
+
+# ============================================================================
+# EMERGENCY FAILOVER - TIER 1 CRITICAL SYSTEMS
+# ============================================================================
+
+# Migration mode: Use pre-synced CBT replicas
+cmd: local  # VMs already replicated to DR site
+
+# Source: Last CBT sync from primary datacenter
+vmdk: /dr-replica/tier1/webserver-prod-01/disk1-latest.vmdk
+
+# Output: Activate in DR KVM environment
+output_dir: /var/lib/libvirt/images/tier1
+out_format: qcow2
+compress: false  # Speed over size in emergency
+
+# Logging for disaster recovery audit trail
+verbose: 2
+log_file: /var/log/dr-failover/webserver-prod-01-{timestamp}.log
+report: /dr-failover/reports/webserver-prod-01-activation.md
+
+# Guest OS fixes (last-minute fixes if needed)
+regen_initramfs: true
+fstab_mode: stabilize-all
+# grub is auto-handled
+
+# Libvirt domain configuration (DR site)
+domain_name: webserver-prod-01-dr
+domain_memory: 8192
+domain_vcpus: 4
+domain_cpu_mode: host-passthrough
+
+# Storage
+disk_bus: virtio
+disk_cache: writeback
+
+# Network: DR site configuration
+nic_model: virtio
+libvirt_network: br-dr-public  # DR site public network
+
+# DNS/Load Balancer updates required post-activation:
+# 1. Update DNS A records:
+#    webserver.company.com: 203.0.113.10 → 198.51.100.50 (DR IP)
+#    TTL: 60 seconds (pre-lowered for DR)
+#
+# 2. Update load balancer:
+#    HAProxy: Remove primary site pool, activate DR site pool
+#    Health checks: Enable for DR servers
+#
+# 3. Update firewall rules:
+#    Allow traffic to DR IP ranges
+#    Block access to primary datacenter (prevent split-brain)
+
+# Validation before production traffic
+test_boot: true
+test_timeout: 300
+
+# ============================================================================
+# DISASTER RECOVERY ACTIVATION CHECKLIST
+# ============================================================================
+#
+# BEFORE ACTIVATION (Incident Commander approval required):
+#
+# ✓ Confirm primary datacenter is unrecoverable (within RTO window)
+# ✓ Verify last replication timestamp (< RPO)
+# ✓ Check DR site infrastructure health:
+#   - Power: UPS + generator operational
+#   - Network: WAN links operational
+#   - Storage: Sufficient capacity (> 30% free)
+#   - Compute: Sufficient CPU/RAM (> 20% headroom)
+# ✓ Verify DR runbooks accessible
+# ✓ Notify stakeholders (CEO, CTO, customers if B2C)
+# ✓ Alert on-call teams (NOC, SRE, DevOps)
+#
+# DURING ACTIVATION:
+#
+# 1. Database Tier (activate first)
+#    Priority: 1 (highest)
+#    Systems:
+#      - mysql-prod-01-dr
+#      - postgres-prod-01-dr
+#      - redis-cluster-dr (3 nodes)
+#    Validation:
+#      - Database starts successfully
+#      - Replication lag: NONE (promoted to primary)
+#      - Data integrity check (row counts vs last known)
+#
+# 2. Application Tier
+#    Priority: 2
+#    Systems:
+#      - app-erp-prod-01-dr (this config)
+#      - app-crm-prod-01-dr
+#      - app-api-prod-01-dr
+#    Validation:
+#      - Application starts
+#      - Database connectivity OK
+#      - Health check endpoints return 200
+#
+# 3. Web Tier
+#    Priority: 3
+#    Systems:
+#      - webserver-prod-01-dr (this config)
+#      - webserver-prod-02-dr
+#    Validation:
+#      - NGINX starts
+#      - Upstream pools healthy
+#      - TLS certificates valid
+#
+# 4. Supporting Services
+#    Priority: 4
+#    Systems:
+#      - monitoring-dr (Prometheus/Grafana)
+#      - logging-dr (ELK stack)
+#      - backup-dr (Bacula/Veeam)
+#
+# NETWORK CUTOVER:
+#
+# 1. Update DNS (managed DNS provider - API call):
+#    curl -X PATCH https://dns.provider.com/api/v1/zones/company.com/records \
+#      -H "Authorization: Bearer ${DNS_API_TOKEN}" \
+#      -d '{"name": "webserver", "type": "A", "value": "198.51.100.50", "ttl": 60}'
+#
+# 2. Update load balancer (HAProxy/F5):
+#    # Disable primary datacenter backend
+#    echo "disable server webservers/primary-pool" | \
+#      socat stdio /var/run/haproxy.sock
+#
+#    # Enable DR datacenter backend
+#    echo "enable server webservers/dr-pool" | \
+#      socat stdio /var/run/haproxy.sock
+#
+# 3. Firewall updates:
+#    # Block traffic to primary (prevent partial connectivity issues)
+#    iptables -A OUTPUT -d 203.0.113.0/24 -j REJECT
+#
+# POST-ACTIVATION VALIDATION:
+#
+# 1. Smoke tests (automated test suite):
+#    - User login flow
+#    - Order processing (e-commerce)
+#    - Payment gateway integration
+#    - Email delivery
+#    - API endpoints (Postman collection)
+#
+# 2. Performance baseline:
+#    - Response time: within 20% of normal (DR has slightly less capacity)
+#    - Error rate: < 0.5%
+#    - Concurrent users: Support 80% of normal capacity
+#
+# 3. Monitoring dashboards:
+#    - Grafana: DR environment dashboard
+#    - PagerDuty: Acknowledge primary site alerts
+#    - StatusPage: Update customers (if applicable)
+#
+# COMMUNICATION PLAN:
+#
+# Internal:
+#   - Slack #incident-response channel
+#   - Email to all-hands@company.com
+#   - Conference bridge: Join via Google Meet
+#
+# External:
+#   - Status page update: "Performing emergency maintenance"
+#   - Customer notification email (if B2B)
+#   - Social media update (if B2C)
+#   - Press release (if publicly traded)
+#
+# ROLLBACK PLAN:
+#
+# If DR activation fails:
+#   1. Assess if partial primary datacenter recovery possible
+#   2. Evaluate cloud burst option (AWS/Azure emergency instances)
+#   3. Extended outage communication to customers
+#   4. Activate business continuity plan (manual processes)
+#
+# ============================================================================
+# POST-DISASTER RECOVERY (Primary Datacenter Restored)
+# ============================================================================
+#
+# When primary datacenter is repaired (estimated: 48-72 hours):
+#
+# STEP 1: Verify primary datacenter health
+# - Power: Stable for 24+ hours
+# - Cooling: All HVAC operational
+# - Network: All links operational
+# - Storage: All arrays online, no data corruption
+# - Hypervisor: All ESXi/KVM hosts online
+#
+# STEP 2: Reverse replication (DR → Primary)
+# - Use CBT to sync changes made during DR operation
+# - Estimated sync time: 4-8 hours (depends on change rate)
+#
+# STEP 3: Planned failback (scheduled maintenance window)
+# - Weekend preferred (low traffic)
+# - Gradual traffic shift: 10% → 50% → 100%
+# - Monitor for issues during shift
+#
+# STEP 4: Deactivate DR site
+# - Keep VMs running but not serving traffic
+# - Resume normal DR replication schedule
+# - Return to steady-state DR readiness
+#
+# ============================================================================
+# LESSONS LEARNED SESSION (Required within 7 days)
+# ============================================================================
+#
+# Participants:
+# - Incident Commander
+# - SRE team
+# - Development team
+# - Management (CTO/VP Eng)
+#
+# Topics:
+# 1. What went well?
+# 2. What could be improved?
+# 3. Were RTOs/RPOs met?
+# 4. Communication effectiveness
+# 5. Runbook accuracy
+# 6. Action items for next quarter
+#
+# Deliverable: Post-Incident Review (PIR) document
+
+# ============================================================================
+# DR SITE CAPACITY PLANNING
+# ============================================================================
+#
+# Current DR capacity: 80% of production
+# - Supports critical services only
+# - Non-critical services remain offline during DR
+# - Acceptable performance degradation: 20%
+#
+# Future DR upgrades (FY2026 budget):
+# - Increase DR capacity to 100% of production
+# - Implement active-active (both sites serve traffic)
+# - Reduce RPO to 5 minutes (continuous replication)
+# - Reduce RTO to 30 minutes (automated failover)
+#
+# Annual DR testing:
+# - Q1: Tabletop exercise
+# - Q2: Partial failover test (non-production systems)
+# - Q3: Full failover test (during planned maintenance)
+# - Q4: Chaos engineering (random component failures)

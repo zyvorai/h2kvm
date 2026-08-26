@@ -1,0 +1,30 @@
+{
+  "_comment_file": "See 91-hyper2kvm-full-config.md for detailed field documentation",
+  "_comment_yaml": "For configuration with inline comments, use 90-hyper2kvm-full-config.yaml",
+
+  "command": "local",
+
+  "vmdk": "/home/ssahani/by-path/openSUSE_Leap_15.4_VM_LinuxVMImages.COM.vmdk",
+  "output_dir": "/home/ssahani/by-path/out",
+  "workdir": "/home/ssahani/by-path/work",
+
+  "flatten": true,
+  "flatten_format": "qcow2",
+
+  "to_output": "opensuse-leap-15.4-fixed.qcow2",
+  "out_format": "qcow2",
+  "compress": true,
+  "checksum": true,
+
+  "print_fstab": true,
+  "fstab_mode": "stabilize-all",
+  "no_grub": false,
+  "regen_initramfs": true,
+  "no_backup": false,
+
+  "dry_run": false,
+
+  "verbose": 2,
+  "log_file": "/home/ssahani/by-path/out/hyper2kvm.log",
+  "report": "/home/ssahani/by-path/out/hyper2kvm-report.md"
+}

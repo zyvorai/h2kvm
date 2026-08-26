@@ -1,0 +1,34 @@
+# LVM-Focused Inspection Pipeline
+# Detailed analysis of LVM structures
+
+# Source disk with LVM
+image: /path/to/disk-with-lvm.vmdk
+
+# Inspection settings
+inspection:
+  # LVM detection and activation
+  check_lvm: true              # Detect all LVM structures
+  activate_lvm: true           # Activate to see full topology
+
+  # Filesystem checks
+  run_fsck: false              # Skip fsck for faster LVM analysis
+
+# Output
+output:
+  report: lvm-inspection-report.json
+  format: json
+  verbose: true
+  include_lvm_details: true
+
+# Use case: Analyzing complex LVM setups before migration
+#
+# This inspects:
+# - Physical volumes (pvs)
+# - Volume groups (vgs) with PV/LV counts
+# - Logical volumes (lvs) with paths and sizes
+# - Filesystems on logical volumes
+#
+# Perfect for:
+# - Planning LVM migrations
+# - Understanding LVM topology
+# - Validating LVM structure before conversion

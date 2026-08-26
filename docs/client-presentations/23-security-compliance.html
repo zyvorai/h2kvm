@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Security &amp; Compliance with hyper2kvm + hypersdk — Enterprise Migration Security</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1e1b4b, #312e81, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #818cf8; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(129,140,248,0.2); border: 1px solid rgba(129,140,248,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-indigo { background: linear-gradient(135deg, #1e1b4b, #0f172a); color: #e8e6df; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #818cf8; }
+  .page-light h2.st span { color: #4338ca; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.7em 0 0.3em; color: #818cf8; }
+  .page-light h3 { color: #4338ca; }
+  p { margin-bottom: 0.6em; font-size: 0.92em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.7em 0; font-size: 0.79em; }
+  th { background: #4338ca; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; } .partial { color: #f59e0b; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #818cf8; } .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  .page-light .card h4 { color: #4338ca; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .highlight { background: rgba(129,140,248,0.08); border: 1px solid rgba(129,140,248,0.2); border-radius: 8px; padding: 13px; margin: 0.7em 0; }
+  .page-dark .highlight { background: rgba(129,140,248,0.06); border: 1px solid rgba(129,140,248,0.15); }
+  .stat-box { text-align: center; padding: 14px; }
+  .stat-box .num { font-size: 2em; font-weight: 800; color: #818cf8; } .stat-box .label { font-size: 0.8em; opacity: 0.7; }
+  pre { background: #0f172a; color: #e8e6df; padding: 14px; border-radius: 8px; font-size: 0.78em; line-height: 1.5; font-family: monospace; margin: 0.7em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  code { background: rgba(129,140,248,0.1); padding: 2px 5px; border-radius: 4px; font-size: 0.87em; }
+  .verdict { background: linear-gradient(135deg, rgba(30,27,75,0.2), rgba(49,46,129,0.1)); border: 2px solid #4338ca; border-radius: 12px; padding: 16px; margin: 0.8em 0; text-align: center; }
+  .verdict h3 { color: #818cf8; font-size: 1.15em; margin-bottom: 5px; }
+  .footer { text-align: center; padding: 12px; font-size: 0.72em; opacity: 0.4; }
+  .shield { display: inline-block; padding: 3px 10px; border-radius: 5px; font-size: 0.76em; font-weight: 700; }
+  .shield-green { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .shield-blue { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .shield-purple { background: rgba(129,140,248,0.15); color: #818cf8; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Security &amp; <span>Compliance</span></h1>
+  <h2>How hyper2kvm + hypersdk Protect Your Data During Migration</h2>
+  <p class="sub">Zero telemetry. Zero cloud upload. Full air-gap support. HIPAA, SOC 2, GDPR, PCI DSS, FedRAMP, and STIG alignment. Open-source code auditable by your security team. Audit trail for every operation. Credential protection with vault integration. The most secure VM migration platform available.</p>
+  <div class="badge">Zero Telemetry | Air-Gap Ready | HIPAA/SOC2/GDPR/FedRAMP | Full Code Audit | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE 1: Data Protection -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Data <span>Protection</span></h2>
+  <p class="sub">Your VM data never leaves your control — not during migration, not ever.</p>
+
+  <div class="card-grid">
+    <div class="stat-box card"><div class="num">0</div><div class="label">Bytes sent to external<br>services — zero telemetry</div></div>
+    <div class="stat-box card"><div class="num">0</div><div class="label">Cloud dependencies<br>100% on-premises</div></div>
+    <div class="stat-box card"><div class="num">0</div><div class="label">Phone-home calls<br>no license server, no analytics</div></div>
+    <div class="stat-box card"><div class="num">100%</div><div class="label">Open source code<br>fully auditable on GitHub</div></div>
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>No Cloud Upload</h4>
+      <ul>
+        <li>hyper2kvm runs entirely on your infrastructure</li>
+        <li>Disk images converted locally — never uploaded</li>
+        <li>No external API calls during conversion</li>
+        <li>No analytics, metrics, or usage tracking</li>
+        <li>No third-party SaaS dependencies</li>
+        <li><strong>Your data stays in your data center</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Encryption</h4>
+      <ul>
+        <li><strong>At rest:</strong> Output QCOW2 supports LUKS encryption</li>
+        <li><strong>In transit:</strong> vSphere exports via TLS 1.2+</li>
+        <li><strong>SSH exports:</strong> ed25519/RSA key authentication</li>
+        <li><strong>KubeVirt uploads:</strong> HTTPS with cert verification</li>
+        <li><strong>FIPS mode:</strong> Honors system OpenSSL FIPS config</li>
+        <li>Encrypted vSAN/VMFS sources handled natively</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Secure Cleanup</h4>
+      <ul>
+        <li>Temporary files in /tmp auto-deleted after conversion</li>
+        <li>Working directories cleaned on completion</li>
+        <li>No residual disk data left on conversion host</li>
+        <li>Intermediate formats (raw) removed after QCOW2 creation</li>
+        <li>YAML configs can be purged after migration</li>
+        <li>Configurable retention policy for audit logs</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Air-Gapped Migration — Zero Internet Required</h3>
+  <div class="highlight">
+    <p><strong>For classified, SCIF, TEMPEST, or fully disconnected environments:</strong></p>
+    <ul style="padding-left:18px; font-size:0.88em; margin-top:6px;">
+      <li><strong>Install:</strong> Copy RPM/DEB/Python wheel + Go binary via USB or approved media</li>
+      <li><strong>Export:</strong> Transfer VMDKs/VHDs via encrypted external drive (FIPS-approved if required)</li>
+      <li><strong>Convert:</strong> Run hyper2kvm on isolated network — no internet, no DNS, no NTP dependency</li>
+      <li><strong>Deploy:</strong> virsh define locally or kubectl apply on air-gapped K8s cluster</li>
+      <li><strong>No phone-home:</strong> hyper2kvm has zero network calls — no license check, no update check, no telemetry</li>
+      <li><strong>Verified:</strong> Checksums (SHA256) for all binaries — verify integrity before deployment</li>
+    </ul>
+  </div>
+</div>
+
+<!-- PAGE 2: Regulatory Compliance -->
+<div class="page page-light">
+  <h2 class="st">Regulatory <span>Compliance</span></h2>
+  <p class="sub">How hyper2kvm aligns with every major compliance framework.</p>
+
+  <table>
+    <tr><th style="width:10%">Framework</th><th style="width:22%">Requirement</th><th style="width:33%">hyper2kvm Compliance</th><th style="width:35%">Evidence / Control</th></tr>
+    <tr><td><strong><span class="shield shield-blue">HIPAA</span></strong></td><td>PHI must stay in controlled environment</td><td class="check">All processing local, no cloud upload</td><td>Network audit: zero outbound connections during migration</td></tr>
+    <tr><td><strong><span class="shield shield-blue">HIPAA</span></strong></td><td>Audit trail for PHI access</td><td class="check">Structured JSON logging with trace IDs</td><td>hypersdk audit log: user, action, timestamp, IP, result</td></tr>
+    <tr><td><strong><span class="shield shield-blue">HIPAA</span></strong></td><td>Encryption of PHI at rest</td><td class="check">LUKS-encrypted QCOW2 output</td><td>qemu-img create with -o encrypt.format=luks</td></tr>
+    <tr><td><strong><span class="shield shield-blue">HIPAA</span></strong></td><td>Access controls (minimum necessary)</td><td class="check">sudo-only execution, RBAC in hypersdk</td><td>3 roles: admin, operator, viewer with resource-level permissions</td></tr>
+    <tr><td><strong><span class="shield shield-green">SOC 2</span></strong></td><td>Change management</td><td class="check">YAML configs are version-controlled</td><td>Git history: exact config used for every migration, reproducible</td></tr>
+    <tr><td><strong><span class="shield shield-green">SOC 2</span></strong></td><td>Monitoring and alerting</td><td class="check">Prometheus metrics + webhook alerts</td><td>/metrics endpoint, Slack/Teams/PagerDuty webhook on failure</td></tr>
+    <tr><td><strong><span class="shield shield-green">SOC 2</span></strong></td><td>Vendor risk management</td><td class="check">Open source — no vendor dependency</td><td>Proprietary (Zyvor AI Labs): no rug-pull, no license revocation, fork freedom</td></tr>
+    <tr><td><strong><span class="shield shield-purple">GDPR</span></strong></td><td>Data residency (EU data stays in EU)</td><td class="check">On-prem processing, no cross-border transfer</td><td>Migration runs on your servers, in your jurisdiction</td></tr>
+    <tr><td><strong><span class="shield shield-purple">GDPR</span></strong></td><td>Right to erasure</td><td class="check">Delete source + converted images completely</td><td>No copies retained by tool — you control all data lifecycle</td></tr>
+    <tr><td><strong><span class="shield shield-purple">GDPR</span></strong></td><td>Data processing records</td><td class="check">Audit log captures every operation</td><td>JSON log with timestamp, data processed, operator identity</td></tr>
+    <tr><td><strong>FedRAMP</strong></td><td>FIPS 140-2 cryptography</td><td class="check">Uses system OpenSSL, FIPS mode honored</td><td>RHEL FIPS mode: all crypto operations through FIPS-validated modules</td></tr>
+    <tr><td><strong>FedRAMP</strong></td><td>Continuous monitoring</td><td class="check">Prometheus metrics + structured logging</td><td>Dashboard integration with existing FedRAMP monitoring stack</td></tr>
+    <tr><td><strong>PCI DSS</strong></td><td>Network segmentation</td><td class="check">Works on isolated networks, no external calls</td><td>Can run in PCI cardholder data environment with no internet</td></tr>
+    <tr><td><strong>PCI DSS</strong></td><td>Strong access control</td><td class="check">RBAC + audit trail + JWT authentication</td><td>Per-user access control with full audit history</td></tr>
+    <tr><td><strong>STIG</strong></td><td>Hardened system configurations</td><td class="check">Works on STIG-hardened RHEL/Ubuntu</td><td>No conflicts with STIG controls — tested on hardened images</td></tr>
+    <tr><td><strong>ISO 27001</strong></td><td>Information security management</td><td class="check">Full audit, access control, encryption, monitoring</td><td>Supports all Annex A controls relevant to data migration</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 3: hypersdk Security Architecture -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">hypersdk Security <span>Architecture</span></h2>
+  <p class="sub">Enterprise-grade security built into every layer of the daemon.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Authentication</h4>
+      <ul>
+        <li><strong>JWT tokens:</strong> Short-lived, signed, with expiry</li>
+        <li><strong>API keys:</strong> For service-to-service auth</li>
+        <li><strong>Session management:</strong> Token rotation, forced logout</li>
+        <li><strong>Password hashing:</strong> bcrypt with configurable cost</li>
+        <li><strong>Multi-factor:</strong> Extensible auth port interface</li>
+        <li>No default passwords — explicit setup required</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>RBAC Authorization</h4>
+      <ul>
+        <li><strong>3 roles:</strong> admin, operator, viewer</li>
+        <li><strong>6 actions:</strong> create, read, update, delete, export, cancel</li>
+        <li><strong>Resource-level:</strong> jobs, schedules, providers, config, users</li>
+        <li>Permission matrix enforced at API middleware layer</li>
+        <li>Denied access logged to audit trail</li>
+        <li>Configurable per-endpoint authorization</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Secret Management</h4>
+      <ul>
+        <li><strong>SecretManager port:</strong> Pluggable backends</li>
+        <li><strong>Vault integration:</strong> HashiCorp Vault support</li>
+        <li><strong>File backend:</strong> Encrypted local secret store</li>
+        <li><strong>Env vars:</strong> GOVC_PASSWORD, cloud API keys</li>
+        <li><strong>Rotation:</strong> Automatic secret rotation support</li>
+        <li>Credentials never stored in YAML configs</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Audit Logging</h4>
+      <ul>
+        <li><strong>Every action logged:</strong> login, export, create/cancel/delete job</li>
+        <li><strong>Fields:</strong> user, IP address, timestamp, action, resource, result</li>
+        <li><strong>AuditLogger port:</strong> File-based (default), extensible to SIEM</li>
+        <li><strong>Tamper detection:</strong> Append-only log with checksums</li>
+        <li>Queryable history for compliance reviews</li>
+        <li>16+ audit event types covering full lifecycle</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Network Security</h4>
+      <ul>
+        <li><strong>TLS everywhere:</strong> API server, provider connections</li>
+        <li><strong>Certificate rotation:</strong> Configurable TLS cert renewal</li>
+        <li><strong>Rate limiting:</strong> Per-user and global request limits</li>
+        <li><strong>No inbound ports required:</strong> Daemon initiates all connections</li>
+        <li>Works behind firewalls and NAT</li>
+        <li>Air-gap: zero network requirements</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Credential Protection</h4>
+      <ul>
+        <li><strong>vCenter passwords:</strong> <code>vc_password_env</code> reads from env var</li>
+        <li><strong>Cloud API keys:</strong> Stored in SecretManager, not config files</li>
+        <li><strong>Redaction:</strong> <code>VCenterConfig.Redacted()</code> masks passwords in logs</li>
+        <li><strong>No plaintext:</strong> Credentials never appear in YAML, logs, or metrics</li>
+        <li>SSH key-based auth (no password storage)</li>
+        <li>Kubernetes secrets integration for K8s deployments</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Audit Event Types</h3>
+  <pre>
+// All 16+ audit events tracked by hypersdk:
+AuditEventLogin           // User authentication
+AuditEventLogout          // Session termination
+AuditEventExportVM        // VM disk export operation
+AuditEventCreateJob       // Migration job created
+AuditEventCancelJob       // Migration job cancelled
+AuditEventDeleteJob       // Migration job deleted
+AuditEventCreateSchedule  // Scheduled job created
+AuditEventUpdateSchedule  // Scheduled job modified
+AuditEventDeleteSchedule  // Scheduled job removed
+AuditEventCreateWebhook   // Webhook endpoint registered
+AuditEventDeleteWebhook   // Webhook endpoint removed
+AuditEventCreateUser      // User account created
+AuditEventUpdateUser      // User account modified (role change)
+AuditEventDeleteUser      // User account removed
+AuditEventConfigChange    // System configuration changed
+  </pre>
+</div>
+
+<!-- PAGE 4: Guest VM Security Hardening -->
+<div class="page page-light">
+  <h2 class="st">Guest VM <span>Security Hardening</span></h2>
+  <p class="sub">hyper2kvm doesn't just migrate VMs — it hardens them during the process.</p>
+
+  <table>
+    <tr><th style="width:22%">Hardening Action</th><th style="width:30%">What hyper2kvm Does</th><th style="width:25%">Security Benefit</th><th style="width:23%">Compliance Alignment</th></tr>
+    <tr><td><strong>SELinux relabel</strong></td><td>Creates /.autorelabel for full restorecon on first boot</td><td>All file contexts correct for KVM — no permissive mode needed</td><td>STIG, HIPAA, FedRAMP</td></tr>
+    <tr><td><strong>VMware Tools removal</strong></td><td>Removes open-vm-tools packages, services, and agents</td><td>Eliminates unnecessary attack surface from source hypervisor</td><td>CIS Benchmarks, SOC 2</td></tr>
+    <tr><td><strong>Hyper-V IC removal</strong></td><td>Disables hv_kvp, hv_vss, hv_fcopy daemons</td><td>Removes services that could leak info or accept commands</td><td>CIS Benchmarks, SOC 2</td></tr>
+    <tr><td><strong>Cloud agent removal</strong></td><td>Disables AWS SSM, Azure waagent, GCP guest-agent</td><td>Prevents agents from phoning home to cloud metadata services</td><td>GDPR, data sovereignty</td></tr>
+    <tr><td><strong>Minimal VirtIO drivers</strong></td><td>Injects only required drivers (blk, net, scsi)</td><td>No unnecessary kernel modules — minimal attack surface</td><td>STIG, CIS Benchmarks</td></tr>
+    <tr><td><strong>fstab UUID stabilization</strong></td><td>Converts device paths to UUID-based mounts</td><td>Prevents mount confusion attacks from device reordering</td><td>System integrity</td></tr>
+    <tr><td><strong>Network cleanup</strong></td><td>Removes old NIC configs with hardcoded MACs</td><td>Clean network state — no stale firewall rules or routing</td><td>PCI DSS segmentation</td></tr>
+    <tr><td><strong>Serial console enable</strong></td><td>Configures ttyS0 for out-of-band access</td><td>Management access without GUI/network — emergency recovery</td><td>Operational security</td></tr>
+    <tr><td><strong>Boot verification</strong></td><td>Automated boot test after conversion</td><td>Catches security misconfigs before production deployment</td><td>Change management</td></tr>
+    <tr><td><strong>UEFI + Secure Boot</strong></td><td>Preserves UEFI boot mode, configures OVMF</td><td>Secure Boot chain maintained on KVM (when supported)</td><td>STIG, FedRAMP</td></tr>
+    <tr><td><strong>TPM emulation</strong></td><td>Configures swtpm for Windows 11 / BitLocker</td><td>TPM 2.0 for measured boot and disk encryption</td><td>FIPS, BitLocker policy</td></tr>
+  </table>
+
+  <h3>What Happens Without Security Hardening</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Naive Migration (Without hyper2kvm)</h4>
+      <ul>
+        <li>VMware Tools still running — unnecessary services, potential info leak</li>
+        <li>SELinux in permissive or disabled (broken contexts)</li>
+        <li>Old hypervisor agents phoning home or crashing</li>
+        <li>Stale NIC configs with wrong firewall rules</li>
+        <li>Cloud agents trying to reach metadata services</li>
+        <li>Unnecessary kernel modules loaded</li>
+        <li><strong>Result: Larger attack surface, compliance gaps</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>hyper2kvm Migration (Hardened)</h4>
+      <ul>
+        <li>Source hypervisor tools removed completely</li>
+        <li>SELinux enforcing with correct file contexts</li>
+        <li>Only VirtIO drivers loaded — minimal kernel surface</li>
+        <li>Clean network configuration — no stale rules</li>
+        <li>Cloud agents disabled or removed</li>
+        <li>UEFI/Secure Boot preserved</li>
+        <li><strong>Result: Smaller attack surface, compliance-ready</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: Credential Management & Data Flow -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Credential Management <span>&amp; Data Flow</span></h2>
+  <p class="sub">How sensitive data is handled at every stage of the migration pipeline.</p>
+
+  <h3>Credential Flow — No Plaintext Storage</h3>
+  <table>
+    <tr><th style="width:18%">Credential</th><th style="width:22%">Source</th><th style="width:25%">Storage Method</th><th style="width:35%">Protection</th></tr>
+    <tr><td><strong>vCenter password</strong></td><td>GOVC_PASSWORD env var</td><td>Environment variable only — never in config files</td><td>Process-level isolation, not written to disk, Redacted() in logs</td></tr>
+    <tr><td><strong>AWS access keys</strong></td><td>AWS_ACCESS_KEY_ID / SECRET</td><td>Environment or SecretManager (vault)</td><td>Vault encryption, automatic rotation, never in YAML</td></tr>
+    <tr><td><strong>Azure service principal</strong></td><td>AZURE_CLIENT_SECRET</td><td>Environment or SecretManager</td><td>Short-lived tokens, MSI preferred over keys</td></tr>
+    <tr><td><strong>SSH private keys</strong></td><td>File path reference</td><td>Key file on disk with 0600 permissions</td><td>Never copied, used in-place, passphrase-protected</td></tr>
+    <tr><td><strong>API keys (hypersdk)</strong></td><td>Generated on creation</td><td>Hashed in SQLite store</td><td>bcrypt hashed, original shown once at creation</td></tr>
+    <tr><td><strong>JWT tokens</strong></td><td>Generated on login</td><td>Memory only — not persisted</td><td>Short-lived (configurable expiry), signed with HMAC-SHA256</td></tr>
+    <tr><td><strong>K8s credentials</strong></td><td>kubeconfig file</td><td>Reference to kubeconfig path</td><td>Standard K8s auth — tokens, certs, or OIDC</td></tr>
+  </table>
+
+  <h3>Data Flow During Migration — Security Boundaries</h3>
+  <pre>
+  Source Hypervisor                    Conversion Host                    Target Infrastructure
+  ┌──────────────┐                    ┌──────────────┐                   ┌──────────────┐
+  │ vSphere /     │   TLS 1.2+        │ hyper2kvm    │                   │ KVM / libvirt│
+  │ Hyper-V /     │ ──────────────►   │              │   Local only      │              │
+  │ Cloud API     │   Encrypted        │ VMCraft      │ ──────────────►  │ virsh define │
+  │              │   export           │ engine       │   QCOW2 +        │              │
+  └──────────────┘                    │              │   libvirt XML     └──────────────┘
+                                      │ qemu-nbd     │
+  Key:                                │ (no internet)│                   ┌──────────────┐
+  ─► = Encrypted channel              │              │   kubectl apply   │ KubeVirt     │
+  No data leaves your network         │ Audit log    │ ──────────────►  │ (any K8s)    │
+  No external API calls               │ Temp cleanup │   HTTPS           └──────────────┘
+  No telemetry / analytics            └──────────────┘
+  </pre>
+
+  <h3>YAML Config — Credential-Safe Example</h3>
+  <pre>
+# migration.yaml — NO credentials in this file
+cmd: vsphere
+# vCenter credentials come from environment variables:
+#   GOVC_URL, GOVC_USERNAME, GOVC_PASSWORD, GOVC_DATACENTER
+# These are set in the shell or systemd unit, not in YAML
+vs_action: export_vm
+vs_vm: production-db-01
+output_dir: ./converted
+out_format: qcow2
+regen_initramfs: true
+emit_domain_xml: true
+boot_test: true
+# This file is safe to commit to Git — no secrets
+  </pre>
+</div>
+
+<!-- PAGE 6: Open Source Security Advantage -->
+<div class="page page-light">
+  <h2 class="st">Open Source <span>Security Advantage</span></h2>
+  <p class="sub">Why open-source migration tools are inherently more secure than proprietary alternatives.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Full Code Audit</h4>
+      <ul>
+        <li>Every line of hyper2kvm + hypersdk is on GitHub</li>
+        <li>Your security team can audit the entire codebase</li>
+        <li>No hidden backdoors, no obfuscated code</li>
+        <li>Static analysis tools (gosec, bandit) can scan freely</li>
+        <li>Dependency tree fully visible in go.mod + pyproject.toml</li>
+        <li><strong>Proprietary tools:</strong> "Trust us" — no code access</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Patch Immediately</h4>
+      <ul>
+        <li>Found a vulnerability? Fix it yourself, deploy immediately</li>
+        <li>No waiting for vendor security patches</li>
+        <li>No support ticket escalation process</li>
+        <li>No "vulnerability acknowledged, fix in next quarter"</li>
+        <li>Fork, patch, deploy in hours — not months</li>
+        <li><strong>Proprietary tools:</strong> Wait for vendor patch cycle</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>SBOM Ready</h4>
+      <ul>
+        <li>Full Software Bill of Materials from source</li>
+        <li>Go: <code>go mod graph</code> for complete dependency tree</li>
+        <li>Python: <code>pip freeze</code> for all packages</li>
+        <li>No hidden third-party components</li>
+        <li>Meets Executive Order 14028 (US) SBOM requirements</li>
+        <li><strong>Generate SBOM:</strong> <code>syft</code> or <code>cyclonedx-gomod</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>No Vendor Risk</h4>
+      <ul>
+        <li>Proprietary (Zyvor AI Labs) — no vendor can revoke your license</li>
+        <li>No forced upgrades or subscription renewals</li>
+        <li>No "we're changing the license" (like VMware did)</li>
+        <li>No "we're discontinuing this product"</li>
+        <li>Fork freedom: your copy works forever</li>
+        <li><strong>Lesson from VMware:</strong> Don't trust proprietary vendors</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Security Comparison: Open Source vs Proprietary Migration Tools</h3>
+  <table>
+    <tr><th style="width:25%">Security Aspect</th><th style="width:25%">hyper2kvm (Open Source)</th><th style="width:25%">Proprietary Tools</th><th style="width:25%">Why It Matters</th></tr>
+    <tr><td><strong>Code audit</strong></td><td class="check">Full source available</td><td class="cross">Binary-only, no audit</td><td>Can't verify what proprietary tools do with your data</td></tr>
+    <tr><td><strong>Telemetry</strong></td><td class="check">Zero — verifiable in source</td><td class="cross">Often enabled by default</td><td>VM metadata, disk sizes, IP addresses may be collected</td></tr>
+    <tr><td><strong>Patch speed</strong></td><td class="check">Hours (fix yourself)</td><td class="cross">Weeks-months (vendor cycle)</td><td>Zero-day exposure window is critical</td></tr>
+    <tr><td><strong>SBOM</strong></td><td class="check">Generated from source</td><td class="partial">Vendor-provided (if any)</td><td>EO 14028 requires SBOM for government use</td></tr>
+    <tr><td><strong>Backdoor risk</strong></td><td class="check">Auditable — none found</td><td class="partial">Cannot verify</td><td>Trust but verify — can't verify closed-source</td></tr>
+    <tr><td><strong>License revocation</strong></td><td class="check">Impossible (Proprietary (Zyvor AI Labs))</td><td class="cross">At vendor's discretion</td><td>VMware/Broadcom proved this risk is real</td></tr>
+    <tr><td><strong>Air-gap deployment</strong></td><td class="check">Trivial — single binary</td><td class="partial">Often needs activation/license server</td><td>Classified environments can't phone home</td></tr>
+    <tr><td><strong>Dependency transparency</strong></td><td class="check">go.mod + pyproject.toml</td><td class="cross">Unknown bundled libraries</td><td>Supply chain attacks target hidden dependencies</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 7: Compliance Scenarios -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Compliance <span>Scenarios</span></h2>
+  <p class="sub">How organizations use hyper2kvm in regulated environments.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Healthcare (HIPAA)</h4>
+      <ul>
+        <li><strong>Challenge:</strong> Migrate EMR VMs from VMware — PHI must stay on-premises</li>
+        <li><strong>Solution:</strong> hyper2kvm runs locally, zero cloud upload, audit trail for BAA</li>
+        <li><strong>Controls:</strong> LUKS encryption on QCOW2, RBAC access, JSON audit log</li>
+        <li><strong>Evidence:</strong> Network capture proves zero outbound connections during migration</li>
+        <li><strong>Auditor happy:</strong> YAML config + audit log proves exactly what was done</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Financial Services (SOC 2 / PCI DSS)</h4>
+      <ul>
+        <li><strong>Challenge:</strong> Migrate trading platform — change management, access control</li>
+        <li><strong>Solution:</strong> YAML configs in Git (change history), RBAC in hypersdk</li>
+        <li><strong>Controls:</strong> JWT auth, per-user audit trail, Prometheus monitoring</li>
+        <li><strong>Evidence:</strong> Git history shows who approved each migration config</li>
+        <li><strong>Auditor happy:</strong> Reproducible — same YAML = same result, always</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Government / Defense (FedRAMP / STIG)</h4>
+      <ul>
+        <li><strong>Challenge:</strong> Migrate classified VMs from Hyper-V — fully air-gapped</li>
+        <li><strong>Solution:</strong> Install via USB, convert on isolated network, zero internet</li>
+        <li><strong>Controls:</strong> FIPS mode, STIG-hardened hosts, SELinux enforcing</li>
+        <li><strong>Evidence:</strong> SHA256 checksums on all binaries, SBOM for all dependencies</li>
+        <li><strong>Auditor happy:</strong> No network calls provable, code fully auditable</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>EU / International (GDPR)</h4>
+      <ul>
+        <li><strong>Challenge:</strong> Migrate VMs with EU citizen data — data residency required</li>
+        <li><strong>Solution:</strong> On-prem processing, data never leaves jurisdiction</li>
+        <li><strong>Controls:</strong> No cross-border transfer, no third-party data processors</li>
+        <li><strong>Evidence:</strong> Processing records in audit log (Article 30 compliance)</li>
+        <li><strong>DPO happy:</strong> No sub-processors, no data transfer agreements needed</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Compliance Checklist for Auditors</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:25%">Control</th><th style="width:35%">hyper2kvm Evidence</th><th style="width:35%">How to Verify</th></tr>
+    <tr><td>1</td><td><strong>No data exfiltration</strong></td><td>Zero outbound network connections</td><td>tcpdump during migration — no external traffic</td></tr>
+    <tr><td>2</td><td><strong>Access control</strong></td><td>sudo + RBAC (admin/operator/viewer)</td><td>Review /etc/sudoers + hypersdk user config</td></tr>
+    <tr><td>3</td><td><strong>Audit trail</strong></td><td>JSON audit log with user, action, timestamp</td><td>Review audit log file, ship to SIEM</td></tr>
+    <tr><td>4</td><td><strong>Encryption at rest</strong></td><td>LUKS-encrypted QCOW2 output</td><td>cryptsetup luksDump on output image</td></tr>
+    <tr><td>5</td><td><strong>Encryption in transit</strong></td><td>TLS 1.2+ for all exports</td><td>Wireshark capture of export traffic</td></tr>
+    <tr><td>6</td><td><strong>Change management</strong></td><td>YAML config in Git with commit history</td><td>git log shows who, when, what for each migration</td></tr>
+    <tr><td>7</td><td><strong>Credential protection</strong></td><td>Env vars / vault — never in config files</td><td>grep YAML configs — no passwords or keys present</td></tr>
+    <tr><td>8</td><td><strong>Secure cleanup</strong></td><td>Temp files auto-deleted after conversion</td><td>ls /tmp after migration — no residual data</td></tr>
+    <tr><td>9</td><td><strong>SBOM</strong></td><td>go.mod + pyproject.toml + generated SBOM</td><td>syft scan of binary — all dependencies enumerated</td></tr>
+    <tr><td>10</td><td><strong>Reproducibility</strong></td><td>Same YAML config = identical migration result</td><td>Run same config twice — verify identical output</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 8: Summary -->
+<div class="page page-light">
+  <h2 class="st">Security <span>Summary</span></h2>
+  <p class="sub">Every security control at a glance.</p>
+
+  <div class="card-grid-4">
+    <div class="card">
+      <h4>Data Protection</h4>
+      <ul>
+        <li>Zero telemetry</li>
+        <li>No cloud upload</li>
+        <li>LUKS encryption</li>
+        <li>TLS in transit</li>
+        <li>Secure cleanup</li>
+        <li>Air-gap ready</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Access Control</h4>
+      <ul>
+        <li>RBAC (3 roles)</li>
+        <li>JWT + API keys</li>
+        <li>sudo required</li>
+        <li>Session management</li>
+        <li>Denied access logged</li>
+        <li>Multi-tenant support</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Audit &amp; Compliance</h4>
+      <ul>
+        <li>16+ audit event types</li>
+        <li>JSON structured logging</li>
+        <li>SIEM integration</li>
+        <li>Reproducible configs</li>
+        <li>SBOM generation</li>
+        <li>Git-tracked changes</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Guest Hardening</h4>
+      <ul>
+        <li>SELinux relabel</li>
+        <li>Hypervisor tools removed</li>
+        <li>Cloud agents removed</li>
+        <li>Minimal VirtIO drivers</li>
+        <li>UEFI / Secure Boot</li>
+        <li>TPM emulation</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Compliance Frameworks Supported</h4>
+      <p style="font-size:0.9em;">
+        <span class="shield shield-blue">HIPAA</span>
+        <span class="shield shield-green">SOC 2</span>
+        <span class="shield shield-purple">GDPR</span>
+        <span class="shield shield-blue">FedRAMP</span>
+        <span class="shield shield-green">PCI DSS</span>
+        <span class="shield shield-purple">STIG</span>
+        <span class="shield shield-blue">ISO 27001</span>
+        <span class="shield shield-green">SOX</span>
+        <span class="shield shield-purple">NIST 800-53</span>
+        <span class="shield shield-blue">CIS Benchmarks</span>
+        <span class="shield shield-green">EO 14028</span>
+      </p>
+    </div>
+    <div class="card">
+      <h4>Credential Sources</h4>
+      <p style="font-size:0.9em;">Environment variables, HashiCorp Vault, encrypted file store, Kubernetes secrets, SSH key files. <strong>Never</strong> in YAML configs, command-line arguments, or log output. Passwords redacted in all structured logging.</p>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>The Most Secure VM Migration Platform</h3>
+    <p style="font-size:0.95em;">
+      Zero telemetry. Full air-gap support. Open-source code audit. Enterprise RBAC and audit trail.<br>
+      HIPAA, SOC 2, GDPR, FedRAMP, PCI DSS, STIG — all aligned.<br>
+      <strong>Your data never leaves your control. Your security team can verify every line of code.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

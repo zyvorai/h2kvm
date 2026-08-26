@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hyper2kvm — Enterprise Storage: LVM + LUKS Auto-Detection</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0d1b2a, #1b4332, #2d6a4f); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.6em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #52b788; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 0.95em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(82,183,136,0.2); border: 1px solid rgba(82,183,136,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .cover .badge2 { display: inline-block; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 16px; font-size: 0.82em; margin-top: 0.8em; }
+  .page { min-height: 100vh; padding: 34px 44px; page-break-after: always; }
+  .page-dark { background: #0d1b2a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.65em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #52b788; }
+  .page-light h2.st span { color: #1b4332; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.6em 0 0.25em; color: #52b788; }
+  .page-light h3 { color: #1b4332; }
+  p { margin-bottom: 0.5em; font-size: 0.86em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  pre { background: #0f172a; color: #e8e6df; padding: 11px; border-radius: 8px; font-size: 0.7em; line-height: 1.4; font-family: 'JetBrains Mono', 'Fira Code', monospace; margin: 0.5em 0; overflow-x: auto; white-space: pre-wrap; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .page-light pre { background: #1e293b; color: #e8e6df; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 11px; margin: 0.5em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0.5em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.85em; font-weight: 600; margin-bottom: 4px; color: #52b788; }
+  .page-light .card h4 { color: #1b4332; }
+  .card p, .card li { font-size: 0.76em; margin-bottom: 0; }
+  .card ul { padding-left: 1.2em; margin-top: 4px; }
+  .highlight { background: rgba(82,183,136,0.08); border: 1px solid rgba(82,183,136,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .verdict { background: linear-gradient(135deg, rgba(27,67,50,0.3), rgba(82,183,136,0.15)); border: 2px solid #2d6a4f; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #52b788; font-size: 1.1em; margin-bottom: 4px; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .check { color: #22c55e; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; margin: 0.5em 0; font-size: 0.74em; }
+  th { background: #2d6a4f; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Cover -->
+<div class="cover">
+  <h1><span>hyper2kvm</span></h1>
+  <h2>Enterprise Storage: LVM &amp; LUKS Auto-Detection</h2>
+  <p class="sub">Automatic detection and handling of LVM, LUKS encryption, and complex storage stacks. Supermin appliance boots for full device visibility. Zero configuration needed.</p>
+  <div class="badge">Verified: RHEL 8.8 + CentOS 9 + Ubuntu 22.04 LUKS</div>
+  <div class="badge2">March 2026 &bull; Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- SLIDE 2: The Problem -->
+<div class="page page-dark">
+  <h2 class="st">The <span>Problem</span></h2>
+  <p class="sub">Enterprise VMs use complex storage stacks that break during migration</p>
+  <div class="card-grid">
+    <div class="card">
+      <h4>LVM Volumes</h4>
+      <ul>
+        <li>Root filesystem on /dev/mapper/vg-root</li>
+        <li>VG activation requires device-mapper inside appliance</li>
+        <li>UUID regeneration for cloned VMs</li>
+        <li>dracut needs --add lvm dm for boot</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>LUKS Encryption</h4>
+      <ul>
+        <li>Root on LUKS+LVM (/dev/sda3 &rarr; crypt &rarr; /dev/vg/root)</li>
+        <li>cryptsetup needs full device visibility</li>
+        <li>initramfs must NOT be rebuilt (breaks UUID refs)</li>
+        <li>TPM-sealed keys don't transfer between hypervisors</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Standard Approach Limitations</h4>
+      <ul>
+        <li>Host-based qemu-nbd + mount works for simple disks</li>
+        <li>LVM via container isolation &mdash; works but complex</li>
+        <li>LUKS via host cryptsetup &mdash; device paths differ</li>
+        <li>No isolated appliance = limited device visibility</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>hyper2kvm Solution</h4>
+      <ul>
+        <li>Auto-detect LVM/LUKS before opening disk</li>
+        <li>Boot supermin appliance for full isolation</li>
+        <li>cryptsetup + LVM activation inside appliance</li>
+        <li>Zero user configuration needed</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: How It Works -->
+<div class="page page-light">
+  <h2 class="st">How It <span>Works</span></h2>
+  <p class="sub">Automatic backend selection based on disk content</p>
+  <pre>
+Disk arrives
+    |
+Quick probe: qemu-nbd --read-only + blkid scan
+    |
+LVM/LUKS found? --yes--> Supermin appliance boots
+                          cryptsetup_open()  --> LUKS unlock
+                          lvm_scan()         --> LVM activation
+                          mount()            --> mount decrypted root
+                          command(dracut)    --> rebuild initramfs (non-LUKS only)
+
+                --no---> VMCraft (fast path, no appliance)
+                         qemu-nbd --> host mount --> chroot dracut
+  </pre>
+  <div class="highlight">
+    <h3>Key Design Decision</h3>
+    <p>For LUKS disks: <strong>skip initramfs rebuild</strong>. The guest's existing initramfs already has cryptsetup support. Rebuilding inside the appliance breaks LUKS UUID references because device mapper paths differ from what the guest expects.</p>
+  </div>
+</div>
+
+<!-- SLIDE 4: LUKS Pipeline -->
+<div class="page page-dark">
+  <h2 class="st">LUKS <span>Migration Pipeline</span></h2>
+  <p class="sub">Ubuntu 22.04 with LUKS2 + LVM + UEFI &mdash; fully automated</p>
+  <pre>
+$ sudo h2kvmctl --cmd local \
+    --vmdk ~/vmware/ubuntu-encrypted.vmdk \
+    --luks-enable --luks-passphrase "redhat123" \
+    --flatten --regen-initramfs \
+    --emit-domain-xml --virsh-define --vm-name ubuntu-luks
+
+Quick probe: detected LUKS on disk
+Auto-switched to supermin appliance backend
+LUKS: opened /dev/sda3 -> /dev/mapper/hyper2kvm-crypt1
+LVM after LUKS open: ['/dev/ubuntu-vg/ubuntu-lv']
+Detected guest: Ubuntu 22.04.5 LTS
+LUKS detected (crypttab exists) -- preserving existing boot config
+Skipping initramfs rebuild (LUKS disk)
+Virtio driver configs written to /etc/dracut.conf.d/
+Offline fixes complete
+EFI System Partition detected -- auto-enabling UEFI
+Domain 'ubuntu-luks' defined + started
+
+# VM boots --> "Please unlock disk dm_crypt-0:" --> enter passphrase --> login
+  </pre>
+</div>
+
+<!-- SLIDE 5: LVM Pipeline -->
+<div class="page page-light">
+  <h2 class="st">LVM <span>Migration Pipeline</span></h2>
+  <p class="sub">RHEL 8.8 with LVM thin provisioning &mdash; fully automated</p>
+  <pre>
+$ sudo h2kvmctl --config test-confs/test-config.yaml
+
+Quick probe: detected LVM on disk
+Auto-switched to supermin appliance backend
+LVM detected: VGs=['rhel'], LVs=['/dev/rhel/root', '/dev/rhel/swap']
+Running dracut -f --kver 4.18.0-432.el8.x86_64 \
+    --add-drivers virtio_blk virtio_scsi virtio_net nvme ahci sd_mod xts \
+    --add lvm dm
+Offline fixes complete
+Domain 'rhel8.8-migrated' defined + started
+# VM boots to GDM login screen
+  </pre>
+  <div class="highlight">
+    <p>For non-LUKS LVM disks, initramfs IS rebuilt with virtio + LVM modules. dracut runs inside the supermin appliance with full device-mapper visibility.</p>
+  </div>
+</div>
+
+<!-- SLIDE 6: Test Results -->
+<div class="page page-dark">
+  <h2 class="st">Verified <span>Configurations</span></h2>
+  <p class="sub">All tested end-to-end: VMDK &rarr; flatten &rarr; fix &rarr; compress &rarr; libvirt &rarr; boot</p>
+  <table>
+    <tr><th>Guest OS</th><th>Storage</th><th>Detection</th><th>initramfs</th><th>Boot</th><th>Result</th></tr>
+    <tr><td>RHEL 8.8 Beta</td><td>LVM thin (VG: rhel)</td><td>Auto (LVM)</td><td>dracut rebuilt</td><td>BIOS</td><td class="check">GDM login</td></tr>
+    <tr><td>CentOS Stream 9</td><td>LVM (VG: cs)</td><td>Auto (LVM)</td><td>dracut rebuilt</td><td>BIOS</td><td class="check">Console login</td></tr>
+    <tr><td>Ubuntu 22.04.5</td><td>LUKS2 + LVM</td><td>Auto (LUKS)</td><td>Preserved</td><td>UEFI</td><td class="check">Passphrase prompt</td></tr>
+  </table>
+  <h3>Storage Operations</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>LUKS Unlock</h4>
+      <ul>
+        <li>cryptsetup_open(device, key, name)</li>
+        <li>clevis_luks_unlock (TPM)</li>
+        <li>Passphrase, keyfile, or env var</li>
+        <li>LVM rescan after unlock</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>LVM Activation</h4>
+      <ul>
+        <li>pvscan --cache --activate ay</li>
+        <li>vgscan + vg_activate_all</li>
+        <li>UUID regeneration for clones</li>
+        <li>Thin provisioning support</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Guest Fix Operations</h4>
+      <ul>
+        <li>Mount decrypted root filesystem</li>
+        <li>Fix fstab, network, grub</li>
+        <li>dracut with virtio+LVM modules</li>
+        <li>SELinux autorelabel</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: Architecture -->
+<div class="page page-light">
+  <h2 class="st">Architecture: <span>Supermin Appliance</span></h2>
+  <p class="sub">Isolated VM boots for full device visibility &mdash; same proven technique used in enterprise migration tools</p>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Supermin Appliance</h4>
+      <ul>
+        <li>Boots host kernel + minimal rootfs (~30MB)</li>
+        <li>Full udevd for device discovery</li>
+        <li>LVM: pvscan --cache --activate ay</li>
+        <li>cryptsetup for LUKS unlock</li>
+        <li>Communicates via virtio-serial</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Auto-Detection Flow</h4>
+      <ul>
+        <li>Quick probe: qemu-nbd + blkid</li>
+        <li>Scans partitions for LVM2_member / crypto_LUKS</li>
+        <li>Auto-switches backend before opening disk</li>
+        <li>Falls back to VMCraft for simple disks</li>
+        <li>Zero user configuration needed</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>LUKS: What We Preserve</h4>
+      <ul>
+        <li>/etc/crypttab &mdash; preserved as-is</li>
+        <li>initramfs &mdash; NOT rebuilt (UUID integrity)</li>
+        <li>GRUB cryptdevice= &mdash; preserved</li>
+        <li>Virtio configs written for post-boot rebuild</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>TPM-Sealed LUKS</h4>
+      <ul>
+        <li>VMware vTPM &ne; KVM vTPM (different seeds)</li>
+        <li>Pre-migration: add passphrase keyslot</li>
+        <li>clevis luks unbind to remove TPM binding</li>
+        <li>Post-migration: re-bind to KVM vTPM</li>
+        <li>Script: v2v-luks-tpm-prepare.sh</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8: CLI Reference -->
+<div class="page page-dark">
+  <h2 class="st"><span>CLI</span> Reference</h2>
+  <p class="sub">LUKS migration commands</p>
+  <pre>
+# Passphrase-based LUKS
+sudo h2kvmctl --cmd local --vmdk disk.vmdk \
+  --luks-enable --luks-passphrase "password" \
+  --flatten --regen-initramfs \
+  --emit-domain-xml --virsh-define -o /output
+
+# Passphrase from environment
+export HYPER2KVM_LUKS_PASSPHRASE="password"
+sudo h2kvmctl --cmd local --vmdk disk.vmdk --luks-enable ...
+
+# Keyfile
+sudo h2kvmctl --cmd local --vmdk disk.vmdk \
+  --luks-enable --luks-keyfile /path/to/keyfile ...
+
+# YAML config
+cat &lt;&lt; EOF &gt; migration.yaml
+cmd: local
+vmdk: /path/to/encrypted.vmdk
+luks_enable: true
+luks_passphrase: "password"
+flatten: true
+regen_initramfs: true
+emit_domain_xml: true
+virsh_define: true
+vm_name: my-luks-vm
+EOF
+sudo h2kvmctl --config migration.yaml
+  </pre>
+</div>
+
+<!-- SLIDE 9: Summary -->
+<div class="page page-light">
+  <h2 class="st"><span>Summary</span></h2>
+  <div class="verdict">
+    <h3>Enterprise Storage Support: Complete</h3>
+    <p>LVM, LUKS, LUKS+LVM, UEFI, thin provisioning &mdash; all verified end-to-end</p>
+  </div>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>What's New</h4>
+      <ul>
+        <li>Auto-detect LVM/LUKS via quick probe</li>
+        <li>Auto-switch to supermin appliance</li>
+        <li>LUKS unlock + LVM-inside-LUKS</li>
+        <li>Preserve initramfs for LUKS disks</li>
+        <li>TPM preparation script included</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Tested</h4>
+      <ul>
+        <li>RHEL 8.8 LVM thin &rarr; GDM</li>
+        <li>CentOS 9 LVM &rarr; console</li>
+        <li>Ubuntu 22.04 LUKS+LVM+UEFI</li>
+        <li>Split VMDK (8 extents)</li>
+        <li>1271 unit tests passing</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Production Ready</h4>
+      <ul>
+        <li>Supermin appliance (proven 15+ years)</li>
+        <li>Zero configuration for users</li>
+        <li>Automatic fallback for simple disks</li>
+        <li>RPM + DEB packages updated</li>
+        <li>Full documentation + guides</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer">hyper2kvm &bull; Proprietary (Zyvor AI Labs) &bull; github.com/ssahani/hyper2kvm &bull; March 2026</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+# RHEL 9.4 EFI - ESX 8.0 Test
+# Convert and deploy to libvirt
+
+cmd: local
+
+# Source VMDK (descriptor file, not -flat)
+vmdk: ~/esx8.0-rhel9.4-efi-mxie-test.vmdk
+
+# Output Configuration
+output_dir: out/rhel94-efi-test
+to_output: rhel94-efi.qcow2
+out_format: qcow2
+compress: true
+
+# Core Linux Fixes
+fstab_fixes_enable: true
+fstab_mode: stabilize-all
+fstab_prefer_partuuid: false
+fstab_optimize_options: true
+
+grub_fixes_enable: true
+initramfs_regen_enable: true
+initramfs_regen_force: true
+
+# VirtIO modules for initramfs
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+
+# Network fixes
+network_fixes_enable: true
+
+# Libvirt XML generation and import
+libvirt_xml_generate: true
+libvirt_vm_name: rhel94-efi-test
+libvirt_memory_mb: 4096
+libvirt_vcpus: 2
+libvirt_disk_bus: virtio
+libvirt_import: true
+
+# Reporting
+report: out/rhel94-efi-test/migration-report.md
+log_file: out/rhel94-efi-test/migration.log
+verbose: 2
+dry_run: false

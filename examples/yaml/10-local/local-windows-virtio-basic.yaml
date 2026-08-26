@@ -1,0 +1,15 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 10-local/local-windows-virtio-basic.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 10-local/local-windows-virtio-basic.yaml
+
+command: local
+vmdk: /path/to/windows.vmdk
+# optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+virtio_drivers_dir: /path/to/virtio-win
+to_output: windows-kvm.qcow2
+compress: true
+checksum: true
+report: local-windows-report.md
+verbose: 2

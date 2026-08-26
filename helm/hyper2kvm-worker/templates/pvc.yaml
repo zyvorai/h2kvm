@@ -1,0 +1,99 @@
+{{- if .Values.storage.state.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "hyper2kvm-worker.fullname" . }}-state
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "hyper2kvm-worker.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.storage.state.accessMode }}
+  {{- if .Values.storage.state.storageClass }}
+  storageClassName: {{ .Values.storage.state.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.state.size }}
+{{- end }}
+
+{{- if .Values.storage.events.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "hyper2kvm-worker.fullname" . }}-events
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "hyper2kvm-worker.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.storage.events.accessMode }}
+  {{- if .Values.storage.events.storageClass }}
+  storageClassName: {{ .Values.storage.events.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.events.size }}
+{{- end }}
+
+{{- if .Values.storage.input.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "hyper2kvm-worker.fullname" . }}-input
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "hyper2kvm-worker.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.storage.input.accessMode }}
+  {{- if .Values.storage.input.storageClass }}
+  storageClassName: {{ .Values.storage.input.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.input.size }}
+{{- end }}
+
+{{- if .Values.storage.output.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "hyper2kvm-worker.fullname" . }}-output
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "hyper2kvm-worker.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.storage.output.accessMode }}
+  {{- if .Values.storage.output.storageClass }}
+  storageClassName: {{ .Values.storage.output.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.output.size }}
+{{- end }}
+
+{{- if .Values.storage.temp.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "hyper2kvm-worker.fullname" . }}-temp
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "hyper2kvm-worker.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.storage.temp.accessMode }}
+  {{- if .Values.storage.temp.storageClass }}
+  storageClassName: {{ .Values.storage.temp.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.temp.size }}
+{{- end }}

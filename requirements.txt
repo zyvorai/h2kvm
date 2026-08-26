@@ -1,0 +1,11 @@
+# Core dependencies
+click>=8.0.0
+PyYAML>=6.0
+argcomplete>=2.0.0
+
+# Optional: VMware/vSphere integration
+# pyvmomi>=7.0.0
+# requests>=2.25.0
+
+# Optional: daemon mode file watching
+# watchdog>=3.0.0

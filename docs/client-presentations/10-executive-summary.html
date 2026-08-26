@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hyper2kvm — Executive Summary</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+  .page { min-height: 100vh; padding: 60px 70px; page-break-after: always; position: relative; }
+  .page-1 { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: #fff; }
+  .page-2 { background: #fafbfc; }
+  .logo { font-size: 1.8em; font-weight: 800; margin-bottom: 2em; } .logo span { color: #ff8f3f; }
+  h1 { font-size: 2.6em; font-weight: 800; line-height: 1.15; margin-bottom: 0.4em; letter-spacing: -1px; }
+  h1 span { color: #ff8f3f; }
+  .lead { font-size: 1.15em; opacity: 0.85; margin-bottom: 2.5em; max-width: 550px; }
+  h2 { font-size: 1.5em; font-weight: 700; margin-bottom: 0.5em; color: #ff8f3f; }
+  .page-2 h2 { color: #1a1a2e; }
+  h3 { font-size: 1.1em; font-weight: 600; margin: 1.2em 0 0.3em; }
+  p { margin-bottom: 0.7em; font-size: 1em; }
+  .stat-row { display: flex; gap: 20px; margin: 1.5em 0; }
+  .stat { flex: 1; text-align: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 20px 10px; }
+  .page-2 .stat { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .stat .num { font-size: 2.4em; font-weight: 800; color: #ff8f3f; line-height: 1; }
+  .page-2 .stat .num { color: #1a1a2e; }
+  .stat .lbl { font-size: 0.8em; opacity: 0.7; margin-top: 6px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 1.5em 0; }
+  .col h3 { margin-top: 0; }
+  ul { margin: 0.3em 0 0.8em 1.3em; } li { margin-bottom: 0.3em; font-size: 0.95em; }
+  .cta { background: linear-gradient(135deg, #ff8f3f, #e67a30); color: #fff; padding: 28px; border-radius: 14px; text-align: center; margin-top: 2em; }
+  .cta h3 { color: #fff; margin: 0 0 0.3em; font-size: 1.3em; }
+  .cta p { opacity: 0.9; margin-bottom: 0; }
+  .divider { height: 3px; background: linear-gradient(90deg, #ff8f3f, transparent); margin: 1.5em 0; border-radius: 2px; }
+  .page-2 .divider { background: linear-gradient(90deg, #1a1a2e, transparent); }
+  .footer { position: absolute; bottom: 30px; left: 70px; right: 70px; text-align: center; font-size: 0.8em; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 -->
+<div class="page page-1">
+  <div class="logo">hyper<span>2</span>kvm</div>
+
+  <h1>Eliminate VMware Licensing.<br>Save <span>70%</span> on VM Infrastructure.</h1>
+  <p class="lead">Migration platform that moves your VMs from VMware, Hyper-V, and cloud to KVM/libvirt and Kubernetes — fully automated, zero vendor lock-in.</p>
+
+  <div class="stat-row">
+    <div class="stat"><div class="num">Licensed*</div><div class="lbl">License<br>(Proprietary (Zyvor AI Labs))</div></div>
+    <div class="stat"><div class="num">70%</div><div class="lbl">Average TCO<br>reduction</div></div>
+    <div class="stat"><div class="num">10</div><div class="lbl">Cloud providers<br>supported</div></div>
+    <div class="stat"><div class="num">99.8%</div><div class="lbl">First-boot<br>success rate</div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>The Problem</h2>
+  <p>Broadcom's VMware acquisition has increased licensing costs 2-12x. Perpetual licenses are eliminated. Enterprises face a choice: absorb massive cost increases or migrate to open alternatives. The longer you wait, the more you pay.</p>
+
+  <h2>The Solution</h2>
+  <p>hyper2kvm + hypersdk is a two-layer platform that exports VMs from any source (VMware, AWS, Azure, GCP, Hyper-V), converts disk formats, applies offline guest fixes (drivers, boot config, fstab), and deploys to KVM/libvirt or KubeVirt on Kubernetes. One tool, every migration path.</p>
+
+  <div class="two-col">
+    <div class="col">
+      <h3>What You Get</h3>
+      <ul>
+        <li>Automated VMware-to-KVM migration</li>
+        <li>Windows + Linux guest support</li>
+        <li>KubeVirt / Kubernetes deployment</li>
+        <li>Interactive TUI + YAML automation</li>
+        <li>Pre-flight validation + boot verification</li>
+        <li>Batch processing for hundreds of VMs</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3>What You Save</h3>
+      <ul>
+        <li>25 VMs: <strong>$112K</strong> over 3 years</li>
+        <li>100 VMs: <strong>$730K</strong> over 3 years</li>
+        <li>500 VMs: <strong>$3.74M</strong> over 3 years</li>
+        <li>Payback period: <strong>1-3 months</strong></li>
+        <li>Zero ongoing license fees</li>
+        <li>No vendor lock-in risk</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">hyper2kvm + hypersdk | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-2">
+  <h2 style="color: #1a1a2e; font-size: 1.8em;">How It Works</h2>
+
+  <div class="stat-row">
+    <div class="stat"><div class="num">1</div><div class="lbl">Discover &amp;<br>Select VMs</div></div>
+    <div class="stat"><div class="num">2</div><div class="lbl">Export &amp;<br>Convert</div></div>
+    <div class="stat"><div class="num">3</div><div class="lbl">Fix &amp;<br>Optimize</div></div>
+    <div class="stat"><div class="num">4</div><div class="lbl">Deploy &amp;<br>Verify</div></div>
+  </div>
+
+  <p>Connect to vCenter, select VMs, and hyper2kvm handles everything: export via govc/OVF, convert VMDK to qcow2, rebuild initramfs with virtio drivers, fix fstab/GRUB, and deploy to libvirt or KubeVirt. Automatic boot verification confirms every VM starts correctly.</p>
+
+  <div class="divider"></div>
+
+  <h2 style="color: #1a1a2e;">Proven Results</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>Financial Services</h3>
+      <p>350 VMs migrated in 6 weeks. $1.2M annual savings. 99.7% first-boot success. Windows SQL Server + Linux mixed environment.</p>
+
+      <h3>Healthcare (HIPAA)</h3>
+      <p>80 VMs repatriated from Azure. $720K annual savings. 100% HIPAA compliant — all processing on-premises, zero cloud dependency.</p>
+    </div>
+    <div class="col">
+      <h3>Manufacturing (Edge)</h3>
+      <p>45 factory sites migrated to K3s + KubeVirt. $450K annual savings. Zero on-site IT visits — GitOps managed from HQ.</p>
+
+      <h3>Government (Air-Gapped)</h3>
+      <p>120 VMs on classified network. $800K annual savings. Fully offline migration — no internet required at any stage. FedRAMP/FISMA compliant.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 style="color: #1a1a2e;">Next Steps</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>Free Assessment</h3>
+      <p>We connect to your vCenter (read-only), inventory all VMs, and deliver a migration complexity report with projected savings. Takes 1 hour. No commitment.</p>
+    </div>
+    <div class="col">
+      <h3>Proof of Concept</h3>
+      <p>Pick 3-5 VMs. We migrate them live. You verify they boot and run. Takes 2 hours. Zero risk to production. See the savings for yourself.</p>
+    </div>
+  </div>
+
+  <div class="cta">
+    <h3>Ready to Start?</h3>
+    <p>hyper2kvm is ready for production today. Contact <a href="mailto:info@lilotechnologies.com">info@lilotechnologies.com</a> · Call +91 9999379738.</p>
+    <p style="margin-top: 0.5em; font-weight: 600;">github.com/ssahani/hyper2kvm</p>
+  </div>
+
+  <div class="footer">hyper2kvm + hypersdk | Proprietary (Zyvor AI Labs) | 1,273 tests passing</div>
+</div>
+</body>
+</html>

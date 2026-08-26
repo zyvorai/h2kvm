@@ -1,0 +1,10 @@
+{
+  "command": "local",
+  "vmdk": "/path/to/windows.vmdk",
+  "virtio_drivers_dir": "/path/to/virtio-win",
+  "to_output": "windows-kvm.qcow2",
+  "compress": true,
+  "checksum": true,
+  "report": "local-windows-report.md",
+  "verbose": 2
+}

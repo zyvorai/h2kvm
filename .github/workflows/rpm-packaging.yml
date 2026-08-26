@@ -1,0 +1,244 @@
+name: RPM Packaging
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build-rpm:
+    name: Build and Test RPM on Fedora ${{ matrix.fedora-version }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        fedora-version: ["41", "42", "43"]
+
+    container:
+      image: fedora:${{ matrix.fedora-version }}
+
+    steps:
+    - name: Install build dependencies
+      run: |
+        dnf install -y \
+          git \
+          rpm-build \
+          rpmdevtools \
+          python3-devel \
+          python3-setuptools \
+          python3-pip \
+          python3-wheel \
+          python3-build \
+          python3-sphinx \
+          python3-sphinx_rtd_theme \
+          make
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: Mark workspace as safe for git
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+    - name: Set up RPM build tree
+      run: |
+        rpmdev-setuptree
+        echo "RPM build tree created at ~/rpmbuild"
+
+    - name: Get version from package
+      id: get_version
+      run: |
+        VERSION=$(python3 -c "import sys; sys.path.insert(0, '.'); from hyper2kvm import __version__; print(__version__)")
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Package version: $VERSION"
+
+    - name: Create source tarball
+      run: |
+        VERSION="${{ steps.get_version.outputs.version }}"
+        TARBALL_NAME="hyper2kvm-${VERSION}"
+
+        # Create tarball from git repository using git archive
+        # This is the standard way for RPM packaging - clean source from VCS
+        git archive --format=tar.gz \
+          --prefix="${TARBALL_NAME}/" \
+          -o ~/rpmbuild/SOURCES/${TARBALL_NAME}.tar.gz \
+          HEAD
+
+        echo "Source tarball created from git repository"
+        echo "Tarball: ~/rpmbuild/SOURCES/${TARBALL_NAME}.tar.gz"
+        ls -lh ~/rpmbuild/SOURCES/
+
+        # Verify tarball contents
+        echo ""
+        echo "Tarball contents (first 20 files):"
+        tar tzf ~/rpmbuild/SOURCES/${TARBALL_NAME}.tar.gz | head -20
+
+    - name: Copy spec file to rpmbuild SPECS
+      run: |
+        cp hyper2kvm.spec ~/rpmbuild/SPECS/
+        echo "Spec file copied to ~/rpmbuild/SPECS/"
+
+    - name: Validate spec file
+      run: |
+        cd ~/rpmbuild/SPECS
+        rpmspec -P hyper2kvm.spec > /dev/null
+        echo "✓ Spec file syntax is valid"
+
+    - name: Install runtime dependencies
+      run: |
+        dnf install -y \
+          python3-click \
+          python3-pyyaml \
+          python3-argcomplete \
+          python3-requests \
+          python3-pyvmomi \
+          qemu-img \
+          libguestfs-tools
+
+    - name: Build RPM package
+      run: |
+        cd ~/rpmbuild/SPECS
+        rpmbuild -ba hyper2kvm.spec
+
+        echo "RPM build completed!"
+        echo "Binary RPMs:"
+        ls -lh ~/rpmbuild/RPMS/noarch/
+        echo "Source RPMs:"
+        ls -lh ~/rpmbuild/SRPMS/
+
+    - name: Install RPM package
+      run: |
+        dnf install -y ~/rpmbuild/RPMS/noarch/hyper2kvm-*.rpm
+        echo "✓ RPM installed successfully"
+
+    - name: Test installed package
+      run: |
+        # Test 1: Check command is available
+        echo "Test 1: Checking if h2kvmctl command is available..."
+        which h2kvmctl
+        echo "✓ Command found"
+
+        # Test 2: Check version
+        echo "Test 2: Checking version..."
+        h2kvmctl --version
+        echo "✓ Version check passed"
+
+        # Test 3: Check help
+        echo "Test 3: Checking help output..."
+        h2kvmctl --help
+        echo "✓ Help output passed"
+
+        # Test 4: Check Python import
+        echo "Test 4: Checking Python import..."
+        python3 -c "import hyper2kvm; print(f'hyper2kvm version: {hyper2kvm.__version__}')"
+        echo "✓ Python import passed"
+
+        # Test 5: Check man pages
+        echo "Test 5: Checking man pages..."
+        man -w hyper2kvm
+        man -w hyper2kvm-local
+        man -w hyper2kvm-vsphere
+        man -w hyper2kvm-hyperv
+        man -w hyper2kvm-azure
+        man -w hyper2kvm.conf
+        echo "✓ All man pages installed"
+
+        # Test 6: Verify man page content
+        echo "Test 6: Verifying man page content..."
+        man hyper2kvm | head -20
+        echo "✓ Man page content verified"
+
+        # Test 7: Check documentation files
+        echo "Test 7: Checking documentation..."
+        ls -la /usr/share/doc/hyper2kvm/
+        echo "✓ Documentation files installed"
+
+        # Test 8: Check examples
+        echo "Test 8: Checking example configurations..."
+        ls -la /usr/share/doc/hyper2kvm/examples/
+        echo "✓ Example configurations installed"
+
+        echo ""
+        echo "========================================="
+        echo "All tests passed! ✓"
+        echo "========================================="
+
+    - name: Upload RPM artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: rpm-packages-fedora-${{ matrix.fedora-version }}
+        path: |
+          ~/rpmbuild/RPMS/noarch/*.rpm
+          ~/rpmbuild/SRPMS/*.rpm
+        retention-days: 30
+
+    - name: Display package info
+      run: |
+        echo "========================================="
+        echo "Package Information"
+        echo "========================================="
+        rpm -qip ~/rpmbuild/RPMS/noarch/hyper2kvm-*.rpm
+        echo ""
+        echo "========================================="
+        echo "Package Contents"
+        echo "========================================="
+        rpm -qlp ~/rpmbuild/RPMS/noarch/hyper2kvm-*.rpm
+
+  test-installation-methods:
+    name: Test Different Installation Methods
+    runs-on: ubuntu-latest
+    needs: build-rpm
+
+    container:
+      image: fedora:43
+
+    steps:
+    - name: Install dependencies
+      run: |
+        dnf install -y \
+          python3-click \
+          python3-pyyaml \
+          python3-argcomplete \
+          python3-requests \
+          python3-pyvmomi \
+          qemu-img \
+          libguestfs-tools
+
+    - name: Download RPM artifact
+      uses: actions/download-artifact@v8
+      with:
+        name: rpm-packages-fedora-43
+
+    - name: Test RPM installation
+      run: |
+        echo "Installing RPM package..."
+        dnf install -y ./noarch/hyper2kvm-*.rpm
+
+        echo "Verifying installation..."
+        h2kvmctl --version
+
+        echo "✓ RPM installation test passed"
+
+    - name: Test RPM upgrade
+      run: |
+        echo "Testing RPM upgrade (reinstall)..."
+        dnf reinstall -y ./noarch/hyper2kvm-*.rpm
+
+        echo "Verifying after upgrade..."
+        h2kvmctl --version
+
+        echo "✓ RPM upgrade test passed"
+
+    - name: Test RPM removal
+      run: |
+        echo "Testing RPM removal..."
+        dnf remove -y hyper2kvm
+
+        echo "Verifying removal..."
+        ! which h2kvmctl || (echo "✗ Command still exists after removal" && exit 1)
+
+        echo "✓ RPM removal test passed"

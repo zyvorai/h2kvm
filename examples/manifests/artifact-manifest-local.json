@@ -1,0 +1,44 @@
+{
+  "manifest_version": "1.0",
+  "source": {
+    "provider": "local",
+    "vm_name": "local-disk-conversion"
+  },
+  "disks": [
+    {
+      "id": "disk-0",
+      "source_format": "vmdk",
+      "bytes": 10737418240,
+      "local_path": "/data/disks/source.vmdk"
+    }
+  ],
+  "pipeline": {
+    "inspect": {
+      "enabled": true,
+      "collect_guest_info": false
+    },
+    "fix": {
+      "enabled": true,
+      "backup": true,
+      "update_grub": true,
+      "regen_initramfs": true,
+      "fstab_mode": "stabilize-all"
+    },
+    "convert": {
+      "enabled": true,
+      "compress": false
+    },
+    "validate": {
+      "enabled": true,
+      "check_image_integrity": true
+    }
+  },
+  "output": {
+    "format": "qcow2"
+  },
+  "options": {
+    "report": {
+      "enabled": true
+    }
+  }
+}

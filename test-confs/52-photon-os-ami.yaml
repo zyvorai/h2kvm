@@ -1,0 +1,88 @@
+# SPDX-License-Identifier: Apache-2.0
+# test-confs/photon-ami.yaml
+#
+# Run:
+#   sudo python hyper2kvm.py --config test-confs/photon-ami.yaml
+#
+# What this does:
+# - Safely extracts the Photon AMI tarball
+# - Discovers disk image(s) inside (raw/VHD/VMDK depending on bundle)
+# - Converts the root disk to qcow2
+# - Stabilizes fstab (UUID/PARTUUID)
+# - Fixes GRUB + initramfs if present
+# - Optionally smoke-boots via libvirt
+
+command: ami
+
+# --------------------------------------------------------------------
+# Input
+# --------------------------------------------------------------------
+ami: /home/ssahani/Downloads/photon-ami-5.0-dde71ec57.x86_64.tar.gz
+
+# --------------------------------------------------------------------
+# Output layout
+# --------------------------------------------------------------------
+output_dir: /home/ssahani/by-path/out-photon-ami
+
+# --------------------------------------------------------------------
+# Extraction safety (AMI bundles are tar.gz)
+# --------------------------------------------------------------------
+safe_extract: true
+skip_special: true
+max_members: 5000
+max_total_bytes: 50GiB
+
+# --------------------------------------------------------------------
+# Disk handling
+# --------------------------------------------------------------------
+# Most Photon AMIs contain exactly one root disk image.
+# If multiple are present, hyper2kvm should pick the largest.
+prefer_largest_disk: true
+
+# Optional explicit override (comment out unless needed)
+# disk_index: 0
+
+# --------------------------------------------------------------------
+# Conversion
+# --------------------------------------------------------------------
+to_output: photon-ami.qcow2
+out_format: qcow2
+compress: true
+checksum: true
+
+# AMI images are flat; no snapshot chain
+flatten: false
+
+# --------------------------------------------------------------------
+# Filesystem + boot fixes (Linux)
+# --------------------------------------------------------------------
+print_fstab: true
+fstab_mode: stabilize-all
+
+no_grub: false
+regen_initramfs: true
+no_backup: false
+
+# --------------------------------------------------------------------
+# Safety / visibility
+# --------------------------------------------------------------------
+dry_run: false
+verbose: 2
+log_file: /home/ssahani/by-path/out-photon-ami/hyper2kvm.log
+report: /home/ssahani/by-path/out-photon-ami/hyper2kvm-report.md
+
+# --------------------------------------------------------------------
+# Optional smoke test
+# --------------------------------------------------------------------
+libvirt_test: true
+vm_name: photon-ami
+memory: 2048
+vcpus: 2
+
+# Photon AMI is legacy BIOS
+uefi: false
+
+timeout: 45
+keep_domain: false
+headless: true
+

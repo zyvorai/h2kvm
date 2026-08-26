@@ -1,0 +1,41 @@
+[Unit]
+Description=hyper2kvm Web Dashboard
+Documentation=https://github.com/ssahani/hyper2kvm
+After=network-online.target libvirtd.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# Runs as root — h2kvmctl needs root for NBD, LVM, mount, chroot
+User=root
+Group=root
+
+EnvironmentFile=-/etc/default/h2kweb
+
+ExecStart=/usr/local/bin/h2kweb \
+    --addr ${H2KWEB_ADDR}
+
+Restart=on-failure
+RestartSec=10s
+TimeoutStopSec=30
+
+# Systemd-managed directories
+RuntimeDirectory=h2kweb
+StateDirectory=h2kweb
+LogsDirectory=h2kweb
+
+# Security
+PrivateTmp=true
+
+# Resources
+MemoryMax=2G
+TasksMax=256
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=h2kweb
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VMware Exit Strategy with hyper2kvm + hypersdk — Complete Technical Guide</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #7f1d1d, #991b1b, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #fbbf24; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(251,191,36,0.2); border: 1px solid rgba(251,191,36,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-warn { background: linear-gradient(135deg, #451a03, #78350f); color: #fef3c7; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #fbbf24; }
+  .page-light h2.st span { color: #b45309; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.7em 0 0.3em; color: #fbbf24; }
+  .page-light h3 { color: #b45309; }
+  p { margin-bottom: 0.6em; font-size: 0.92em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.7em 0; font-size: 0.79em; }
+  th { background: #b45309; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; } .warn { color: #f59e0b; font-weight: 700; } .danger { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #fbbf24; } .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  .page-light .card h4 { color: #b45309; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .highlight { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); border-radius: 8px; padding: 13px; margin: 0.7em 0; }
+  .page-dark .highlight { background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.15); }
+  .alert { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 13px; margin: 0.7em 0; }
+  .alert h4 { color: #ef4444; font-size: 0.95em; margin-bottom: 4px; }
+  .stat-box { text-align: center; padding: 14px; }
+  .stat-box .num { font-size: 2em; font-weight: 800; color: #fbbf24; } .stat-box .label { font-size: 0.8em; opacity: 0.7; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 0.7em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); padding: 9px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85em; }
+  .flow-arrow { font-size: 1.2em; color: #fbbf24; }
+  pre { background: #0f172a; color: #e8e6df; padding: 14px; border-radius: 8px; font-size: 0.78em; line-height: 1.5; font-family: monospace; margin: 0.7em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  code { background: rgba(251,191,36,0.1); padding: 2px 5px; border-radius: 4px; font-size: 0.87em; }
+  .verdict { background: linear-gradient(135deg, rgba(127,29,29,0.2), rgba(153,27,27,0.1)); border: 2px solid #b45309; border-radius: 12px; padding: 16px; margin: 0.8em 0; text-align: center; }
+  .verdict h3 { color: #fbbf24; font-size: 1.15em; margin-bottom: 5px; }
+  .footer { text-align: center; padding: 12px; font-size: 0.72em; opacity: 0.4; }
+  .timeline { margin: 0.7em 0; }
+  .tl-item { display: flex; gap: 14px; margin-bottom: 12px; }
+  .tl-dot { width: 36px; height: 36px; background: #fbbf24; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #1a1a2e; flex-shrink: 0; font-size: 0.95em; }
+  .tl-content h4 { margin-bottom: 3px; font-size: 0.93em; } .tl-content p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  .phase-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.73em; font-weight: 600; }
+  .phase-1 { background: rgba(56,189,248,0.2); color: #38bdf8; }
+  .phase-2 { background: rgba(34,197,94,0.2); color: #22c55e; }
+  .phase-3 { background: rgba(251,146,60,0.2); color: #fb923c; }
+  .phase-4 { background: rgba(244,114,182,0.2); color: #f472b6; }
+  .phase-5 { background: rgba(167,139,250,0.2); color: #a78bfa; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>VMware <span>Exit</span> Strategy</h1>
+  <h2>Complete Technical Guide with hyper2kvm + hypersdk</h2>
+  <p class="sub">Broadcom's VMware acquisition has made vSphere unsustainable — 2-12x license increases, perpetual licenses eliminated, partners dropped. This guide provides a complete 5-phase exit plan: discovery, pilot, staging, production migration, and decommission. Every technical step covered with the tools, YAML configs, and automation to execute it.</p>
+  <div class="badge">5-Phase Plan | $810K Savings/100 VMs | Zero Downtime | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE 1: The Broadcom Crisis -->
+<div class="page page-warn">
+  <h2 class="st">The Broadcom <span>Crisis</span></h2>
+  <p class="sub">Why every VMware customer needs an exit plan — now.</p>
+
+  <div class="alert" style="background:rgba(239,68,68,0.2);">
+    <h4>What Broadcom Changed (2024-2026)</h4>
+    <p>Perpetual licenses eliminated — subscription-only. Forced product bundles (pay for features you don't use). 60% of channel partners dropped. Support response times degraded. Customers locked into annual renewals at Broadcom's pricing. No negotiation leverage.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="stat-box card"><div class="num">2-12x</div><div class="label">License cost increase<br>reported by customers</div></div>
+    <div class="stat-box card"><div class="num">$0</div><div class="label">Perpetual licenses<br>available (eliminated)</div></div>
+    <div class="stat-box card"><div class="num">60%</div><div class="label">Channel partners<br>dropped from program</div></div>
+    <div class="stat-box card"><div class="num">$0</div><div class="label">KVM hypervisor cost<br>(built into Linux kernel)</div></div>
+  </div>
+
+  <h3>Risk Assessment: What Happens If You Stay</h3>
+  <table>
+    <tr><th style="width:22%">Risk</th><th style="width:22%">Impact</th><th style="width:18%">Timeline</th><th style="width:38%">Consequence</th></tr>
+    <tr><td><strong>License cost escalation</strong></td><td class="danger">Critical</td><td>Already happening</td><td>2-12x increase at renewal. Forced into VCF bundle ($200K+ minimum). Budget shock.</td></tr>
+    <tr><td><strong>Perpetual license end</strong></td><td class="danger">Critical</td><td>Done</td><td>No fallback to owned licenses. Annual renewal required or shutdown.</td></tr>
+    <tr><td><strong>vSphere 7.x end of support</strong></td><td class="danger">Critical</td><td>2025-2026</td><td>No security patches. Compliance violations. Audit findings.</td></tr>
+    <tr><td><strong>Partner ecosystem collapse</strong></td><td class="warn">High</td><td>Ongoing</td><td>Your VMware partner may no longer exist. Reduced support options.</td></tr>
+    <tr><td><strong>Forced bundle upgrades</strong></td><td class="warn">High</td><td>At renewal</td><td>Can't buy just vSphere — must buy full VCF at much higher price.</td></tr>
+    <tr><td><strong>VMware talent drain</strong></td><td class="warn">High</td><td>12-18 months</td><td>VMware admins are retraining on KVM/K8s. Harder to find vSphere staff.</td></tr>
+    <tr><td><strong>Compliance audit failures</strong></td><td class="danger">Critical</td><td>Next audit</td><td>Unsupported hypervisor = audit finding. SOX, HIPAA, PCI-DSS impact.</td></tr>
+  </table>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Bottom line:</strong> Every quarter you stay on VMware, Broadcom charges more and delivers less. KVM is free, in the Linux kernel, and isn't going anywhere. The migration tool (hyper2kvm) is also free. The only cost is your time — and the longer you wait, the more that costs too.</p>
+  </div>
+</div>
+
+<!-- PAGE 2: The 5-Phase Plan -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">The 5-Phase <span>Exit Plan</span></h2>
+  <p class="sub">A structured, risk-minimized approach. Each phase has clear gates before proceeding.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot">1</div>
+      <div class="tl-content">
+        <h4><span class="phase-tag phase-1">Phase 1</span> Discovery &amp; Assessment (Week 1-2)</h4>
+        <p>Connect to vCenter read-only. Discover all VMs with CPU, RAM, disk, OS, power state. Classify by tier (dev/staging/prod). Identify Windows VMs needing VirtIO. Map network dependencies. Run <code>h2kvmctl doctor</code> on target hosts. Estimate total migration time. <strong>Output:</strong> VM inventory spreadsheet + migration complexity report.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">2</div>
+      <div class="tl-content">
+        <h4><span class="phase-tag phase-2">Phase 2</span> Pilot (Week 3-4)</h4>
+        <p>Migrate 5-10 non-critical VMs (dev/test). Use zkvm TUI for guided migration. Validate: boot test passes, applications work, network reachable, performance acceptable. Document issues and fixes. Build team confidence. <strong>Gate:</strong> All pilot VMs boot and pass health checks.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">3</div>
+      <div class="tl-content">
+        <h4><span class="phase-tag phase-3">Phase 3</span> Staging &amp; Batch Testing (Week 5-8)</h4>
+        <p>Migrate staging/QA environments (20-50 VMs). Use YAML automation for batch processing. Test with real workloads. Set up Prometheus/Grafana monitoring on KVM hosts. Create runbooks for common issues. Validate Windows VMs (SQL Server, AD, Exchange). <strong>Gate:</strong> Staging passes full regression testing.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">4</div>
+      <div class="tl-content">
+        <h4><span class="phase-tag phase-4">Phase 4</span> Production Migration (Week 9-16)</h4>
+        <p>Migrate production VMs in planned maintenance windows. Batch 10-20 VMs per wave. Use job scheduling (hypersdk) for off-peak hours. Boot verification on every VM. Keep VMware running in parallel for 30 days. Webhook notifications to Slack/Teams. <strong>Gate:</strong> All production VMs running on KVM for 30 days with zero issues.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">5</div>
+      <div class="tl-content">
+        <h4><span class="phase-tag phase-5">Phase 5</span> Decommission VMware (Week 17-20)</h4>
+        <p>After 30-day parallel run, decommission vSphere. Cancel VMware/Broadcom licenses. Repurpose or retire ESXi hardware. Remove vCenter, vSAN, NSX. Document lessons learned. Report savings to leadership. <strong>Result:</strong> $0 VMware cost from this point forward.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>20 Weeks: From VMware Lock-In to Freedom</h3>
+    <p style="font-size:0.92em;">One engineer with hyper2kvm can migrate 200+ VMs in this timeframe.<br>Larger estates: add engineers linearly (2 engineers = 400 VMs).</p>
+  </div>
+</div>
+
+<!-- PAGE 3: Phase 1 — Discovery -->
+<div class="page page-light">
+  <h2 class="st"><span class="phase-tag phase-1">Phase 1</span> Discovery <span>&amp; Assessment</span></h2>
+  <p class="sub">Know what you have before you move it. hyper2kvm + hypersdk automates the entire discovery.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>zkvm TUI: vSphere Discovery</h4>
+      <ul>
+        <li>Open zkvm, switch to vSphere tab (Alt+2)</li>
+        <li>Auto-populates from GOVC_* environment variables</li>
+        <li>Connect to vCenter — read-only, zero changes</li>
+        <li>Discovers all VMs: name, CPU, RAM, disk, power state, guest OS</li>
+        <li>Streaming discovery — VMs appear as found</li>
+        <li>Filter and sort by any column</li>
+        <li>Export inventory to CSV/JSON for analysis</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Pre-Flight Validation</h4>
+      <ul>
+        <li><code>h2kvmctl doctor</code> checks 9 areas on target hosts:</li>
+        <li>Disk space (sufficient for conversion)</li>
+        <li>KVM support (cpu virtualization enabled)</li>
+        <li>qemu-img and qemu-nbd installed</li>
+        <li>libvirt running and accessible</li>
+        <li>virtio-win ISO available (for Windows VMs)</li>
+        <li>Network bridge configured</li>
+        <li>kubectl + KubeVirt (if deploying to K8s)</li>
+        <li>govc installed (for vSphere export)</li>
+        <li><strong>Run on every target host before migration day</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>VM Classification Matrix</h3>
+  <table>
+    <tr><th style="width:15%">Tier</th><th style="width:15%">Examples</th><th style="width:15%">Migration Order</th><th style="width:15%">Downtime Window</th><th style="width:20%">Special Handling</th><th style="width:20%">Risk Level</th></tr>
+    <tr><td><strong>Dev/Test</strong></td><td>CI runners, test DBs, sandboxes</td><td>Phase 2 (pilot)</td><td>Anytime</td><td>None — standard pipeline</td><td class="check">Low</td></tr>
+    <tr><td><strong>Staging/QA</strong></td><td>Pre-prod mirrors, load test</td><td>Phase 3</td><td>Business hours OK</td><td>Validate app functionality</td><td class="check">Low</td></tr>
+    <tr><td><strong>Internal Infra</strong></td><td>Monitoring, CI/CD, GitLab, DNS</td><td>Phase 3-4</td><td>Off-hours preferred</td><td>Migrate replicas first</td><td class="warn">Medium</td></tr>
+    <tr><td><strong>Web/App Servers</strong></td><td>Nginx, Apache, Node.js, Java</td><td>Phase 4 (early)</td><td>Maintenance window</td><td>Load balancer failover</td><td class="warn">Medium</td></tr>
+    <tr><td><strong>Database Servers</strong></td><td>PostgreSQL, MySQL, SQL Server</td><td>Phase 4 (middle)</td><td>Maintenance window</td><td>Stop DB, snapshot, migrate, verify replication</td><td class="danger">High</td></tr>
+    <tr><td><strong>Windows AD/Exchange</strong></td><td>Domain controllers, Exchange</td><td>Phase 4 (late)</td><td>Planned window</td><td>Secondary DCs first, VirtIO injection, boot test</td><td class="danger">High</td></tr>
+    <tr><td><strong>Cluster/HA</strong></td><td>Pacemaker, WSFC, RAC</td><td>Phase 4 (late)</td><td>Planned window</td><td>Migrate secondary nodes first, test failover</td><td class="danger">High</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4: Phase 2-3 — Pilot & Staging -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;"><span class="phase-tag phase-2">Phase 2-3</span> Pilot <span>&amp; Staging</span></h2>
+  <p class="sub">Prove it works. Build confidence. Establish runbooks.</p>
+
+  <h3>Pilot Migration: Step-by-Step with hyper2kvm</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:15%">Step</th><th style="width:15%">Tool</th><th style="width:35%">Command / Action</th><th style="width:30%">Expected Result</th></tr>
+    <tr><td>1</td><td><strong>Pre-flight</strong></td><td>h2kvmctl</td><td><code>h2kvmctl doctor</code></td><td>All 9 checks pass (green)</td></tr>
+    <tr><td>2</td><td><strong>Open TUI</strong></td><td>zkvm</td><td><code>./zkvm</code> or <code>zkvm</code></td><td>TUI launches, Migration tab active</td></tr>
+    <tr><td>3</td><td><strong>vSphere connect</strong></td><td>zkvm</td><td>Alt+2, connect to vCenter</td><td>VM list appears with metadata</td></tr>
+    <tr><td>4</td><td><strong>Select VMs</strong></td><td>zkvm</td><td>Space to select 5 dev VMs</td><td>Selected VMs highlighted</td></tr>
+    <tr><td>5</td><td><strong>Configure</strong></td><td>zkvm</td><td>Ctrl+R syncs to Migration tab, review settings</td><td>Form auto-populated, deploy targets set</td></tr>
+    <tr><td>6</td><td><strong>Run</strong></td><td>zkvm</td><td>Ctrl+R to execute</td><td>Progress bar in right panel, logs in tab 3</td></tr>
+    <tr><td>7</td><td><strong>Monitor</strong></td><td>zkvm</td><td>Alt+3 for logs, watch progress</td><td>Export → convert → fix → deploy → verify</td></tr>
+    <tr><td>8</td><td><strong>Verify</strong></td><td>zkvm</td><td>Alt+4 for Libvirt tab, check VMs</td><td>All VMs listed, state: running</td></tr>
+    <tr><td>9</td><td><strong>Test apps</strong></td><td>Manual</td><td>SSH/RDP into migrated VMs, test services</td><td>Applications working correctly</td></tr>
+    <tr><td>10</td><td><strong>Document</strong></td><td>Manual</td><td>Record issues, timings, fixes applied</td><td>Pilot report for Phase 3 planning</td></tr>
+  </table>
+
+  <h3>Or Use CLI Automation (for batch/staging)</h3>
+  <pre>
+# batch-staging.yaml — Migrate staging environment
+cmd: vsphere
+vcenter: vcenter.corp.com
+vs_action: export_vm
+vs_vm: staging-web-01        # Run for each VM (or use hypersdk batch queue)
+output_dir: ./converted
+out_format: qcow2
+flatten: true
+compress: true
+regen_initramfs: true         # Linux: rebuild with VirtIO
+emit_domain_xml: true         # Generate libvirt XML
+vm_name: staging-web-01
+memory: 4096
+vcpus: 2
+machine: q35
+boot_test: true               # Verify VM boots
+verbose: true
+
+# Run: sudo h2kvmctl --config batch-staging.yaml
+# Repeat for each VM, or use hypersdk job scheduler for batch queue
+  </pre>
+
+  <h3>Windows VMs in Staging</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Windows Migration Config</h4>
+      <pre style="font-size:0.76em; background:#1a1a2e; padding:10px; border-radius:6px;">
+# win-sql-staging.yaml
+cmd: vsphere
+vcenter: vcenter.corp.com
+vs_action: export_vm
+vs_vm: staging-sql-01
+output_dir: ./converted
+out_format: qcow2
+windows: true
+guest_os: windows
+virtio_win_iso: /usr/share/virtio-win/virtio-win.iso
+win_stage: bootstrap
+emit_domain_xml: true
+vm_name: staging-sql-01
+memory: 8192
+vcpus: 4
+machine: q35
+uefi: true
+boot_test: true</pre>
+    </div>
+    <div class="card">
+      <h4>What hyper2kvm Does Automatically</h4>
+      <ul>
+        <li>Exports VMDK from vCenter via govc</li>
+        <li>Converts VMDK &rarr; QCOW2 with compression</li>
+        <li><strong>Linux VMs:</strong> Rebuild initramfs (VirtIO), fix fstab (UUID), fix GRUB, remove VMware Tools, SELinux relabel</li>
+        <li><strong>Windows VMs:</strong> Inject VirtIO drivers (viostor, NetKVM, Balloon), fix registry, fix BCD, remove VMware Tools</li>
+        <li>Generates optimized libvirt domain XML</li>
+        <li>Runs virsh define to register VM</li>
+        <li>Starts VM and verifies boot (no BSOD/panic)</li>
+        <li>Reports pass/fail per VM</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: Phase 4 — Production Migration -->
+<div class="page page-light">
+  <h2 class="st"><span class="phase-tag phase-4">Phase 4</span> Production <span>Migration</span></h2>
+  <p class="sub">The main event. Planned maintenance windows. Batch processing. Zero data loss.</p>
+
+  <h3>Production Migration Waves</h3>
+  <table>
+    <tr><th style="width:8%">Wave</th><th style="width:12%">Week</th><th style="width:15%">VMs</th><th style="width:20%">Workload Types</th><th style="width:20%">Window</th><th style="width:25%">Rollback Plan</th></tr>
+    <tr><td><strong>Wave 1</strong></td><td>Week 9-10</td><td>10-20 VMs</td><td>Stateless web servers, proxies</td><td>Saturday 2AM-8AM</td><td>Revert to VMware (still running)</td></tr>
+    <tr><td><strong>Wave 2</strong></td><td>Week 11-12</td><td>20-30 VMs</td><td>App servers, internal tools</td><td>Saturday 2AM-8AM</td><td>Revert to VMware snapshot</td></tr>
+    <tr><td><strong>Wave 3</strong></td><td>Week 13-14</td><td>20-30 VMs</td><td>Database servers (secondary first)</td><td>Sunday 12AM-8AM</td><td>Promote replica, revert primary</td></tr>
+    <tr><td><strong>Wave 4</strong></td><td>Week 15-16</td><td>Remaining</td><td>AD DCs, Exchange, critical infra</td><td>Sunday 12AM-8AM</td><td>Secondary DCs on VMware until verified</td></tr>
+  </table>
+
+  <h3>Per-VM Production Migration Checklist</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:30%">Step</th><th style="width:35%">Action</th><th style="width:30%">Verification</th></tr>
+    <tr><td>1</td><td><strong>Pre-migration snapshot</strong></td><td>Take VMware snapshot (rollback point)</td><td>Snapshot visible in vCenter</td></tr>
+    <tr><td>2</td><td><strong>Application drain</strong></td><td>Remove from load balancer, drain connections</td><td>No active sessions/connections</td></tr>
+    <tr><td>3</td><td><strong>Database quiesce</strong></td><td>Stop DB or put in maintenance mode</td><td>No writes in progress</td></tr>
+    <tr><td>4</td><td><strong>Export from vSphere</strong></td><td>hyper2kvm exports via govc (streaming progress)</td><td>VMDK downloaded, checksum verified</td></tr>
+    <tr><td>5</td><td><strong>Convert + fix</strong></td><td>VMDK &rarr; QCOW2, initramfs/VirtIO/fstab/GRUB</td><td>Conversion completes without errors</td></tr>
+    <tr><td>6</td><td><strong>Deploy to KVM</strong></td><td>Generate XML, virsh define</td><td>VM registered in libvirt</td></tr>
+    <tr><td>7</td><td><strong>Boot verification</strong></td><td>Automated boot test — VM reaches login</td><td>No BSOD, no kernel panic, services up</td></tr>
+    <tr><td>8</td><td><strong>Application test</strong></td><td>Health check endpoints, smoke tests</td><td>HTTP 200, DB queries succeed</td></tr>
+    <tr><td>9</td><td><strong>DNS / LB cutover</strong></td><td>Update DNS records, add to load balancer</td><td>Traffic flowing to KVM VM</td></tr>
+    <tr><td>10</td><td><strong>Monitor 24h</strong></td><td>Watch metrics, logs, alerts</td><td>No anomalies in first 24 hours</td></tr>
+    <tr><td>11</td><td><strong>Keep VMware 30 days</strong></td><td>Don't delete VMware VM yet (rollback)</td><td>VMware snapshot preserved as safety net</td></tr>
+  </table>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Rollback is always safe:</strong> hyper2kvm creates a <em>copy</em> — it never modifies the source VMware VM. If anything goes wrong, the original VM is untouched. Revert DNS/LB and start the VMware VM. Total rollback time: 5 minutes.</p>
+  </div>
+</div>
+
+<!-- PAGE 6: Target Architecture Options -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Target <span>Architecture</span></h2>
+  <p class="sub">Four landing zones — choose based on your team's skills and workload requirements.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Option A: Pure KVM + libvirt</h4>
+      <ul>
+        <li><strong>Best for:</strong> Traditional IT, existing Linux teams</li>
+        <li>RHEL/Fedora/Ubuntu + KVM (in kernel)</li>
+        <li>libvirt for VM lifecycle management</li>
+        <li>Cockpit web UI for browser-based admin</li>
+        <li>virt-manager for desktop admin</li>
+        <li>Live migration between hosts (shared storage)</li>
+        <li><strong>Cost:</strong> $0 software</li>
+        <li><strong>Complexity:</strong> Lowest</li>
+        <li><strong>hyper2kvm:</strong> <code>emit_domain_xml: true</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Option B: K3s + KubeVirt</h4>
+      <ul>
+        <li><strong>Best for:</strong> Cloud-native teams, edge sites</li>
+        <li>K3s: single binary, 512MB RAM</li>
+        <li>KubeVirt: VMs as K8s pods</li>
+        <li>GitOps with ArgoCD/Flux</li>
+        <li>Same tooling for VMs + containers</li>
+        <li>Edge-ready (single-node deployable)</li>
+        <li><strong>Cost:</strong> $0 software</li>
+        <li><strong>Complexity:</strong> Medium</li>
+        <li><strong>hyper2kvm:</strong> <code>deploy_k8s: true</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Option C: OpenShift Virtualization</h4>
+      <ul>
+        <li><strong>Best for:</strong> Red Hat shops wanting vendor support</li>
+        <li>OpenShift + OpenShift Virtualization</li>
+        <li>Red Hat supported KubeVirt</li>
+        <li>MTV available (but hyper2kvm is more flexible)</li>
+        <li>Enterprise support contracts + SLAs</li>
+        <li>Certified, hardened, tested</li>
+        <li><strong>Cost:</strong> $50K+/yr (OpenShift subscription)</li>
+        <li><strong>Complexity:</strong> High</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Option D: Hybrid (Recommended)</h4>
+      <ul>
+        <li><strong>Best for:</strong> Large estates, mixed requirements</li>
+        <li>Critical/simple VMs &rarr; KVM/libvirt</li>
+        <li>Cloud-native workloads &rarr; K3s + KubeVirt</li>
+        <li>Edge sites &rarr; K3s (single-node)</li>
+        <li>hyper2kvm dual-target: same conversion, both outputs</li>
+        <li><code>emit_domain_xml: true</code> + <code>deploy_k8s: true</code></li>
+        <li><strong>Cost:</strong> $0 software</li>
+        <li><strong>Complexity:</strong> Medium</li>
+        <li><strong>Maximum flexibility</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Per-Workload Target Recommendation</h3>
+  <table>
+    <tr><th style="width:20%">Workload Type</th><th style="width:20%">Recommended Target</th><th style="width:30%">Why</th><th style="width:30%">hyper2kvm Config</th></tr>
+    <tr><td>Database (PostgreSQL, MySQL, SQL)</td><td>KVM/libvirt</td><td>Simplest, best I/O control, CPU pinning for SQL licensing</td><td><code>emit_domain_xml: true</code></td></tr>
+    <tr><td>Web servers (Nginx, Apache)</td><td>KVM or KubeVirt</td><td>Stateless — either target works, KubeVirt enables scaling</td><td>Either or both</td></tr>
+    <tr><td>Active Directory DCs</td><td>KVM/libvirt</td><td>AD prefers stable infrastructure, no K8s complexity</td><td><code>emit_domain_xml: true</code></td></tr>
+    <tr><td>Docker/container hosts</td><td>K3s + KubeVirt</td><td>Already container-native, natural fit for K8s</td><td><code>deploy_k8s: true</code></td></tr>
+    <tr><td>Edge site VMs</td><td>K3s + KubeVirt</td><td>Single-node K3s, GitOps fleet management</td><td><code>deploy_k8s: true</code></td></tr>
+    <tr><td>Windows workstations (VDI)</td><td>KVM/libvirt</td><td>GPU passthrough, SPICE/VNC, simple management</td><td><code>emit_domain_xml: true, uefi: true</code></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 7: Cost Savings -->
+<div class="page page-light">
+  <h2 class="st">Cost <span>Savings</span></h2>
+  <p class="sub">Real numbers: what you save by exiting VMware.</p>
+
+  <h3>100-VM Estate — 3-Year TCO Comparison</h3>
+  <table>
+    <tr><th style="width:28%">Cost Item</th><th style="width:24%">VMware vSphere (Stay)</th><th style="width:24%">KVM + hyper2kvm (Exit)</th><th style="width:24%">Savings</th></tr>
+    <tr><td><strong>Hypervisor licensing</strong></td><td>$450,000 (3 yr, post-Broadcom)</td><td class="check">$0</td><td class="check">$450,000</td></tr>
+    <tr><td><strong>vCenter / management</strong></td><td>$120,000 (3 yr)</td><td class="check">$0 (Cockpit/libvirt)</td><td class="check">$120,000</td></tr>
+    <tr><td><strong>vSAN licensing</strong></td><td>$180,000 (3 yr)</td><td class="check">$0 (Ceph/local storage)</td><td class="check">$180,000</td></tr>
+    <tr><td><strong>NSX licensing</strong></td><td>$90,000 (3 yr)</td><td class="check">$0 (Open vSwitch/Linux bridge)</td><td class="check">$90,000</td></tr>
+    <tr><td><strong>Support contracts</strong></td><td>$75,000 (3 yr)</td><td>$30,000 (optional RHEL support)</td><td class="check">$45,000</td></tr>
+    <tr><td><strong>Hardware (servers)</strong></td><td>$200,000</td><td>$200,000 (same hardware)</td><td>$0</td></tr>
+    <tr><td><strong>Migration cost (one-time)</strong></td><td>N/A</td><td>$25,000 (labor, 1 engineer, 20 weeks)</td><td>-$25,000</td></tr>
+    <tr><td><strong>Training</strong></td><td>$0 (existing skills)</td><td>$10,000 (KVM/libvirt training)</td><td>-$10,000</td></tr>
+    <tr><td><strong>Operations staff</strong></td><td>$450,000</td><td>$400,000 (KVM is simpler)</td><td class="check">$50,000</td></tr>
+    <tr><td style="font-weight:700; font-size:0.95em;">3-Year Total</td><td style="font-weight:700;">$1,565,000</td><td style="font-weight:700; color:#22c55e;">$665,000</td><td style="font-weight:800; color:#22c55e; font-size:0.95em;">$900,000</td></tr>
+  </table>
+
+  <div class="card-grid">
+    <div class="stat-box card"><div class="num">$900K</div><div class="label">Total savings over 3 years<br>for 100-VM estate</div></div>
+    <div class="stat-box card"><div class="num">$300K/yr</div><div class="label">Annual recurring savings<br>after migration complete</div></div>
+    <div class="stat-box card"><div class="num">3 months</div><div class="label">Payback period<br>on migration investment</div></div>
+    <div class="stat-box card"><div class="num">Licensed*</div><div class="label">hyper2kvm license cost<br>Proprietary (Zyvor AI Labs)</div></div>
+  </div>
+
+  <h3>SQL Server Additional Savings</h3>
+  <div class="highlight">
+    <p>If your VMware estate includes SQL Server, KVM's CPU pinning can reduce per-core licensing costs by <strong>20-40%</strong>. For 10 SQL Enterprise servers, that's an additional <strong>$600K+ saved</strong> over 3 years. Combined VMware exit + SQL right-sizing savings can exceed <strong>$1.5M</strong>.</p>
+  </div>
+</div>
+
+<!-- PAGE 8: Risk Mitigation & Per-Workload Strategy -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Risk <span>Mitigation</span></h2>
+  <p class="sub">How hyper2kvm eliminates every common migration failure.</p>
+
+  <table>
+    <tr><th style="width:22%">Risk</th><th style="width:25%">Without hyper2kvm</th><th style="width:25%">With hyper2kvm</th><th style="width:28%">How It Works</th></tr>
+    <tr><td><strong>Linux VM won't boot</strong></td><td class="danger">Common — missing VirtIO in initramfs</td><td class="check">Auto-fixed</td><td>Rebuilds initramfs with virtio_blk/scsi/net in chroot</td></tr>
+    <tr><td><strong>Windows BSOD</strong></td><td class="danger">Missing VirtIO storage driver</td><td class="check">Auto-fixed</td><td>Injects viostor + NetKVM from virtio-win ISO</td></tr>
+    <tr><td><strong>Wrong root device</strong></td><td class="danger">fstab uses /dev/sda, KVM has /dev/vda</td><td class="check">Auto-fixed</td><td>Converts all fstab entries to UUID-based mounts</td></tr>
+    <tr><td><strong>GRUB boot failure</strong></td><td class="warn">root= parameter wrong</td><td class="check">Auto-fixed</td><td>Updates GRUB config, regenerates grub.cfg</td></tr>
+    <tr><td><strong>SELinux denials</strong></td><td class="warn">Services fail with permission denied</td><td class="check">Auto-fixed</td><td>Creates /.autorelabel for full restorecon on boot</td></tr>
+    <tr><td><strong>VMware Tools errors</strong></td><td class="warn">Services crash looking for hypervisor</td><td class="check">Auto-removed</td><td>Removes open-vm-tools packages and services</td></tr>
+    <tr><td><strong>Network config breaks</strong></td><td class="warn">Old NIC names persist</td><td class="check">Auto-cleaned</td><td>Removes vmxnet3/Hyper-V NIC configs, udev rules</td></tr>
+    <tr><td><strong>Snapshot chain corruption</strong></td><td class="danger">Delta files depend on parent</td><td class="check">Auto-flattened</td><td>Flattens to single self-contained QCOW2</td></tr>
+    <tr><td><strong>Corrupt disk undetected</strong></td><td class="danger">Silent corruption, discovered late</td><td class="check">Pre-validated</td><td>VMDK descriptor parsing, extent verification</td></tr>
+    <tr><td><strong>Scale errors (VM #47 of 200)</strong></td><td class="danger">Human error under fatigue</td><td class="check">Automated</td><td>YAML config, batch queue, per-VM boot test</td></tr>
+  </table>
+
+  <h3>Workload-Specific Migration Strategies</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Database Servers</h4>
+      <ul>
+        <li>Stop DB before export (consistency)</li>
+        <li>Or take VMware snapshot (crash-consistent)</li>
+        <li>Migrate secondary/replica first</li>
+        <li>Verify replication on KVM</li>
+        <li>Promote KVM replica, then migrate primary</li>
+        <li>VirtIO SCSI for best I/O performance</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Active Directory DCs</h4>
+      <ul>
+        <li>Never migrate all DCs at once</li>
+        <li>Migrate secondary DCs first</li>
+        <li>Verify AD replication (<code>repadmin</code>)</li>
+        <li>Then migrate primary (FSMO holder)</li>
+        <li>Test: DNS, Kerberos, Group Policy</li>
+        <li>VirtIO injection handles boot</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Clustered / HA Workloads</h4>
+      <ul>
+        <li>Migrate passive/secondary node first</li>
+        <li>Test failover to KVM node</li>
+        <li>Then migrate active/primary node</li>
+        <li>Pacemaker: update resource config</li>
+        <li>WSFC: adjust quorum settings</li>
+        <li>Oracle RAC: use rolling migration</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Your VMware Exit Starts Today</h3>
+    <p style="font-size:0.95em;">
+      5 phases. 20 weeks. $900K saved per 100 VMs.<br>
+      Every guest fix automated. Every VM boot-verified. Every rollback safe.<br>
+      <strong>hyper2kvm + hypersdk: the complete VMware exit toolkit. Free forever.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hyper2kvm-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hyper2kvm-operator
+  namespace: hyper2kvm-system
+  labels:
+    app: hyper2kvm-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hyper2kvm-operator
+  template:
+    metadata:
+      labels:
+        app: hyper2kvm-operator
+    spec:
+      serviceAccountName: hyper2kvm-operator
+      containers:
+        - name: manager
+          image: hyper2kvm/operator:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - /manager
+          args:
+            - --leader-elect
+          env:
+            - name: VALIDATION_IMAGE
+              value: "hyper2kvm/validator:latest"
+            - name: FIXER_IMAGE
+              value: "hyper2kvm/fixer:latest"
+            - name: VALIDATION_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10

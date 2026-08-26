@@ -1,0 +1,34 @@
+command: daemon
+manifest_workflow_mode: true
+
+# Workflow directory (to_be_processed/, processing/, processed/, failed/)
+manifest_workflow_dir: /var/lib/hyper2kvm/daemon
+
+# Output directory for converted VMs
+output_dir: /var/lib/hyper2kvm/output
+
+# Output format and compression
+out_format: qcow2
+compress: true
+flatten: true
+
+# Guest OS fixes
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# --- Auto-deploy to libvirt ---
+# Uncomment to auto-generate domain XML and register with virsh
+# emit_domain_xml: true
+# virsh_define: true
+# memory: 2048
+# vcpus: 2
+# machine: q35
+
+# --- Auto-deploy to KubeVirt ---
+# Uncomment to auto-deploy converted VMs to Kubernetes/KubeVirt
+# deploy_k8s: true
+# kubeconfig: /etc/kubernetes/admin.conf
+# k8s_namespace: default
+
+# Logging
+log_file: /var/log/hyper2kvm/daemon.log

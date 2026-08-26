@@ -1,0 +1,30 @@
+apiVersion: v2
+name: hyperconversion-operator
+description: Kubernetes operator for automated VM migration to KubeVirt using CDI DataVolumes
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+kubeVersion: ">=1.24.0"
+keywords:
+  - kubevirt
+  - virtualization
+  - vm-migration
+  - cdi
+  - vmdk
+  - hyperconversion
+home: https://github.com/ssahani/hyper2kvm
+sources:
+  - https://github.com/ssahani/hyper2kvm
+maintainers:
+  - name: ZyvorAI Labs Private Limited
+    email: ssahani@vmware.com
+icon: https://kubevirt.io/assets/images/KubeVirt_icon.svg
+annotations:
+  category: Infrastructure
+  licenses: Apache-2.0
+dependencies:
+  - name: cert-manager
+    version: ">=1.13.0"
+    repository: https://charts.jetstack.io
+    condition: webhooks.enabled
+    optional: true

@@ -1,0 +1,26 @@
+# ==============================================================================
+# vSphere pyvmomi + VDDK Configuration
+# ==============================================================================
+#
+# Configuration snippet for forcing pyvmomi control-plane with VDDK data-plane
+#
+# Usage:
+#   Include this file or merge these settings into your main config
+#
+# Features:
+#   - Disables govc usage (forces pyvmomi)
+#   - Uses VDDK for fast disk downloads
+#   - Disables async HTTP (VDDK handles transport)
+# ==============================================================================
+
+# Control-Plane: Force pyvmomi (disable govc)
+no_govmomi: true
+vs_control_plane: pyvmomi
+
+# Data-Plane: Force VDDK transport
+vs_transport: vddk
+vs_use_async_http: false
+
+# VDDK Settings
+vs_vddk_libdir: /path/to/vmware-vix-disklib-distrib/lib64
+vs_vddk_thumbprint_env: VDDK_THUMBPRINT

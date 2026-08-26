@@ -1,0 +1,75 @@
+# Enterprise Parallel Manager Test Configuration
+# Tests process-based parallel conversion with persistent namespaces
+
+# Source VM image
+source_image: ./esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+
+# Output configuration
+output_image: ./output/rhel8.8-enterprise-test.qcow2
+output_format: qcow2
+compress: true
+
+# Backend selection - use namespace for enterprise parallel manager
+backend: namespace
+
+# Conversion options
+flatten: true
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Parallel conversion settings (NEW)
+parallel:
+  enabled: true
+  manager_type: enterprise  # enterprise or thread-based
+  max_workers: 4
+  max_nbd_devices: 8
+
+# Offline guest fixes
+offline_fixes:
+  enabled: true
+  regenerate_initramfs: true
+  update_grub: true
+  install_virtio_drivers: true
+  remove_vmware_tools: true
+  update_fstab: true
+
+# Virtio drivers to add
+virtio_drivers:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+  - ahci
+  - sd_mod
+
+# Libvirt integration
+emit_domain_xml: true
+virsh_define: false  # Don't auto-define for test
+vm_name: rhel8.8-enterprise-test
+memory: 4096
+vcpus: 2
+machine: q35
+libvirt_network: default
+copy_to_libvirt_images: false
+guest_os: linux
+
+# Quality validation
+quality:
+  enabled: true
+  inspect_vmdk: true
+  validate_result: true
+  check_boot_mode: true
+
+# Logging
+verbose: true
+debug: false
+log_file: ./output/enterprise-test.log
+
+# Migration metadata
+migration:
+  source_type: vmware-esx
+  source_version: "8.0"
+  target_platform: kvm
+  notes: |
+    Enterprise parallel manager test with RHEL 8.8
+    Testing persistent namespace and process-based parallelism

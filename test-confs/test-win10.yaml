@@ -1,0 +1,36 @@
+# Windows 10 VMware → KVM Migration
+# Multi-extent sparse VMDK (twoGbMaxExtentSparse)
+
+command: local
+vmdk: /home/ssahani/vmware/win10/win10.vmdk
+output_dir: /home/ssahani/tt/hyper2kvm/output-win10
+to_output: win10-converted.qcow2
+out_format: qcow2
+compress: true
+flatten: true
+backend: vmcraft
+
+# Windows-specific settings
+windows: true
+guest_os: windows
+remove_vmware_tools: true
+
+# VirtIO driver injection
+virtio_drivers_dir: /home/ssahani/Downloads/virtio-win-0.1.285.iso
+
+# Network fixes for Windows
+network_fixes_enable: true
+
+# Domain XML emission
+emit_domain_xml: true
+vm_name: win10-converted
+memory: 4096
+vcpus: 2
+uefi: true
+machine: q35
+headless: false
+force_replace: true
+
+# Testing
+libvirt_test: false
+health_check: false

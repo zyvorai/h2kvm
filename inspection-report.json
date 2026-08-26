@@ -1,0 +1,75 @@
+{
+  "image": "/home/ssahani/tt/hyper2kvm/esx8.0-rhel8.8-with-thin-provision-disk1.vmdk",
+  "format": "vmdk",
+  "virtual_size_gb": 16.0,
+  "actual_size_gb": 3.8777809143066406,
+  "partitions": [
+    {
+      "device": "nbd0p1",
+      "info": "\u251c\u2500nbd0p1 xfs 1G 6d4fdcb9-cb5e-4273-9af6-a8c57359aa7a"
+    },
+    {
+      "device": "nbd0p2",
+      "info": "\u2514\u2500nbd0p2 LVM2_member 15G 6VGoPi-aOOx-debr-8bTe-NSGk-DuLo-80ORpO"
+    },
+    {
+      "device": "rhel-swap",
+      "info": "\u251c\u2500rhel-swap swap 1.6G d5aea0ba-3baa-4005-9b1a-818cb985be14"
+    },
+    {
+      "device": "rhel-root",
+      "info": "\u2514\u2500rhel-root xfs 13.4G 3ca16ad6-27bc-49ff-99ab-d8c5049a02bf"
+    }
+  ],
+  "lvm": {
+    "physical_volumes": [
+      {
+        "pv": "/dev/nbd0p2",
+        "vg": "rhel",
+        "size": "<15.00g"
+      }
+    ],
+    "volume_groups": [
+      {
+        "vg": "rhel",
+        "pv_count": "1",
+        "lv_count": "2",
+        "size": "<15.00g"
+      }
+    ],
+    "logical_volumes": [
+      {
+        "lv": "root",
+        "path": "/dev/rhel/root",
+        "size": "13.39g",
+        "vg": "rhel"
+      },
+      {
+        "lv": "swap",
+        "path": "/dev/rhel/swap",
+        "size": "1.60g",
+        "vg": "rhel"
+      }
+    ]
+  },
+  "filesystems": [
+    {
+      "device": "/dev/mapper/luks-b438e410-9ab0-4bed-beec-5f512f54cba6",
+      "fstype": "btrfs"
+    },
+    {
+      "device": "/dev/mapper/rhel-swap",
+      "fstype": "swap"
+    },
+    {
+      "device": "/dev/mapper/rhel-root",
+      "fstype": "xfs"
+    },
+    {
+      "device": "/dev/nbd0p1",
+      "fstype": "xfs"
+    }
+  ],
+  "fsck_results": [],
+  "status": "inspected"
+}

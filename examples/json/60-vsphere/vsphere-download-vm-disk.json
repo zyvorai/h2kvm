@@ -1,0 +1,13 @@
+{
+  "command": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "vc_user": "administrator@vsphere.local",
+  "vc_password_env": "VC_PASSWORD",
+  "vc_insecure": true,
+  "vs_action": "download_vm_disk",
+  "vm_name": "myVM",
+  "disk": 0,
+  "local_path": "./downloads/myVM-disk0.vmdk",
+  "chunk_size": 1048576,
+  "json": true
+}

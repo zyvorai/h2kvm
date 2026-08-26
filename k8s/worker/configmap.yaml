@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hyper2kvm-worker-config
+  namespace: hyper2kvm-workers
+data:
+  worker.conf: |
+    # Worker Job Protocol Configuration
+    worker_id: "auto"  # Auto-generate from hostname
+    event_dir: "/var/lib/hyper2kvm/events"
+    state_dir: "/var/lib/hyper2kvm/jobs"
+    queue_dir: "/var/lib/hyper2kvm/queue"
+    
+    # Resource limits
+    max_concurrent_jobs: 2
+    max_disk_size_tb: 10
+    
+    # Timeouts
+    job_timeout_seconds: 7200
+    heartbeat_interval_seconds: 30
+    
+  daemon.yaml: |
+    # Daemon mode configuration (integrated with Worker Protocol)
+    command: daemon
+    daemon: true
+    workflow_mode: true
+    workflow_dir: /data/incoming
+    output_dir: /data/output
+    max_concurrent_jobs: 2
+    out_format: qcow2
+    compress: true
+    fstab_mode: stabilize-all
+    regen_initramfs: true
+    verbose: 1
+    
+    # Worker protocol integration
+    use_worker_protocol: true
+    worker_id: "auto"

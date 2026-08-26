@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Competitive Analysis — VM Migration Tools</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #701a75, #86198f, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 3em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #e879f9; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 700px; margin-top: 1em; }
+  .page { min-height: 100vh; padding: 40px 50px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #e879f9; }
+  h3 { font-size: 1.1em; font-weight: 600; margin: 0.8em 0 0.3em; color: #c026d3; }
+  p { margin-bottom: 0.6em; font-size: 0.95em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.2em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.8em 0; font-size: 0.82em; }
+  th { background: #86198f; color: #fff; padding: 8px 10px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; } .partial { color: #f59e0b; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 1em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 18px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 1em; font-weight: 600; margin-bottom: 5px; } .card p { font-size: 0.85em; opacity: 0.85; margin-bottom: 0; }
+  .highlight { background: rgba(232,121,249,0.08); border: 1px solid rgba(232,121,249,0.2); border-radius: 8px; padding: 14px; margin: 1em 0; }
+  .footer { text-align: center; padding: 15px; font-size: 0.75em; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Competitive <span>Analysis</span></h1>
+  <h2>VM Migration Tools Comparison</h2>
+  <p class="sub">hyper2kvm + hypersdk vs Red Hat MTV, AWS Application Migration Service, Azure Migrate, virt-v2v, and Carbonite Migrate. Feature-by-feature, cost-by-cost.</p>
+</div>
+
+<div class="page page-light">
+  <h2 class="st">Feature <span>Matrix</span></h2>
+  <p class="sub">Comprehensive comparison across all major migration tools.</p>
+  <table>
+    <tr><th style="width:22%">Capability</th><th style="width:13%">hyper2kvm + hypersdk</th><th style="width:13%">Red Hat MTV</th><th style="width:13%">virt-v2v</th><th style="width:13%">AWS SMS/MGN</th><th style="width:13%">Azure Migrate</th><th style="width:13%">Carbonite</th></tr>
+    <tr><td><strong>VMware vSphere export</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Hyper-V support</strong></td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>AWS/Azure/GCP export</strong></td><td class="check">&#10003; (10 clouds)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td>AWS only</td><td>Azure only</td><td class="partial">Limited</td></tr>
+    <tr><td><strong>Target: KVM/libvirt</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Target: KubeVirt/K8s</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Target: OpenShift</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Interactive TUI</strong></td><td class="check">&#10003; (zkvm)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>YAML automation</strong></td><td class="check">&#10003;</td><td class="check">&#10003; (CRDs)</td><td class="cross">&#10007;</td><td class="partial">JSON</td><td class="partial">ARM</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Offline guest fixes</strong></td><td class="check">&#10003; (VMCraft)</td><td class="partial">Limited</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Windows VirtIO injection</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Agent</td></tr>
+    <tr><td><strong>fstab/initramfs repair</strong></td><td class="check">&#10003;</td><td class="partial">Basic</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Boot verification</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Batch/queue migration</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Live progress streaming</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Console</td><td class="partial">Portal</td><td class="partial">GUI</td></tr>
+    <tr><td><strong>Air-gap / offline</strong></td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Job scheduling</strong></td><td class="check">&#10003; (hypersdk)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Carbon-aware scheduling</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Cost estimation</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td></tr>
+  </table>
+</div>
+
+<div class="page page-dark">
+  <h2 class="st">Cost <span>Comparison</span></h2>
+  <p class="sub">Total cost of the migration tool itself — not the target platform.</p>
+  <table>
+    <tr><th>Tool</th><th>License Cost</th><th>Requires</th><th>Lock-in Risk</th></tr>
+    <tr><td><strong>hyper2kvm + hypersdk</strong></td><td class="check">Contact for pricing* (Proprietary (Zyvor AI Labs))</td><td>Any Linux</td><td class="check">None — portable</td></tr>
+    <tr><td>Red Hat MTV</td><td>$0 (with OpenShift sub)</td><td>OpenShift ($50K+/yr)</td><td class="partial">Tied to OpenShift platform</td></tr>
+    <tr><td>virt-v2v</td><td class="check">$0 (GPL)</td><td>RHEL/Fedora</td><td class="check">None — but limited features</td></tr>
+    <tr><td>AWS MGN</td><td>Free for 90 days, then $$/VM</td><td>AWS account</td><td class="cross">Locked to AWS cloud</td></tr>
+    <tr><td>Azure Migrate</td><td>Free tool, pay for Azure VMs</td><td>Azure account</td><td class="cross">Locked to Azure cloud</td></tr>
+    <tr><td>Carbonite Migrate</td><td>$3,000-10,000/yr</td><td>Windows server</td><td class="cross">Proprietary, vendor-dependent</td></tr>
+  </table>
+
+  <h3>Key Differentiators</h3>
+  <div class="card-grid">
+    <div class="card"><h4>vs Red Hat MTV</h4><p>MTV requires OpenShift ($50K+/yr). hyper2kvm works on any Linux + any K8s (K3s, vanilla, EKS). MTV can't deploy to standalone KVM/libvirt. hyper2kvm does both.</p></div>
+    <div class="card"><h4>vs virt-v2v</h4><p>virt-v2v is CLI-only, no TUI, no batch queue, no KubeVirt deploy, no progress streaming, no pre-flight checks. hyper2kvm wraps virt-v2v capabilities and adds enterprise features.</p></div>
+    <div class="card"><h4>vs AWS MGN / Azure Migrate</h4><p>Cloud tools only migrate TO their cloud. hyper2kvm migrates FROM any cloud TO any target. Perfect for repatriation — the opposite direction cloud vendors want.</p></div>
+    <div class="card"><h4>vs Carbonite</h4><p>Carbonite costs $3-10K/yr, requires Windows, GUI-only. No YAML automation, no KubeVirt, no air-gap support. hyper2kvm is free, Linux-native, fully automatable.</p></div>
+  </div>
+</div>
+
+<div class="page page-light">
+  <h2 class="st">Why <span>hyper2kvm Wins</span></h2>
+  <p class="sub">The only tool that covers all migration paths with zero licensing cost.</p>
+  <div class="highlight">
+    <h3 style="margin-top: 0;">Unique Capabilities (No Competitor Has All of These)</h3>
+    <table>
+      <tr><th>Capability</th><th>Why It Matters</th></tr>
+      <tr><td>10 cloud providers in one tool</td><td>Single learning curve for any source platform</td></tr>
+      <tr><td>KVM + KubeVirt dual target</td><td>Traditional and cloud-native from same pipeline</td></tr>
+      <tr><td>Interactive TUI (zkvm)</td><td>Guided migration for operators who don't know CLI</td></tr>
+      <tr><td>VMCraft offline engine</td><td>Guest fixes without booting VM — faster, safer</td></tr>
+      <tr><td>Carbon-aware scheduling</td><td>ESG compliance, green IT migration</td></tr>
+      <tr><td>Hexagonal architecture</td><td>Easy to add new providers, maintainable long-term</td></tr>
+      <tr><td>Proprietary (Zyvor AI Labs) license</td><td>No vendor risk, no rug-pull, full code audit</td></tr>
+    </table>
+  </div>
+  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs)</p></div>
+</div>
+</body>
+</html>

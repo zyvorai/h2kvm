@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "job_id": "inspect-example-001",
+  "operation": "inspect",
+  "image": {
+    "path": "/data/input/test.qcow2",
+    "format": "qcow2"
+  },
+  "capability_requirements": {
+    "needs_nbd": false,
+    "needs_lvm": false,
+    "needs_mount": false,
+    "needs_selinux_tools": false,
+    "min_memory_gb": 2,
+    "min_disk_space_gb": 10
+  },
+  "execution_policy": {
+    "retry_count": 1,
+    "timeout_seconds": 600,
+    "idempotent": true,
+    "priority": 5
+  },
+  "artifacts": {
+    "log_upload": true,
+    "store_fixed_image": false,
+    "output_path": "/data/output",
+    "keep_intermediates": false
+  },
+  "audit": {
+    "requested_by": "kubernetes-example",
+    "ticket": "DOC-001",
+    "tags": {
+      "environment": "test",
+      "operation": "inspection"
+    }
+  },
+  "parameters": {}
+}

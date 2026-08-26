@@ -1,0 +1,63 @@
+# ============================================
+# OVA/OVF Import → libvirt
+# ============================================
+# Imports an OVA or OVF file (downloaded from vendor, exported
+# manually, etc.), extracts VMDK, converts to qcow2, applies
+# guest fixes, and generates libvirt domain XML.
+#
+# Common sources:
+#   - VMware Marketplace appliances (.ova)
+#   - govc export.ova output
+#   - ovftool export output
+#   - Vendor-provided virtual appliances
+#
+# Pipeline:
+#   OVA/OVF → extract VMDK → flatten → qcow2
+#   → guest fixes → libvirt XML → boot test
+#
+# Usage:
+#   sudo h2kvmctl --config examples/yaml/70-complete-workflows/ova-import-to-libvirt.yaml
+# ============================================
+
+# ── For OVA files (single archive) ──
+cmd: ova
+ova: /path/to/appliance.ova
+
+# ── For OVF files (directory with .ovf + .vmdk) ──
+# cmd: ovf
+# ovf: /path/to/appliance.ovf
+
+# ── Disk processing ──
+output_dir: ./output-ova
+to_output: imported-vm.qcow2
+out_format: qcow2
+flatten: true
+compress: true
+
+# ── Guest fixes ──
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+
+# ── libvirt domain XML ──
+emit_domain_xml: true
+virsh_define: true
+vm_name: imported-vm
+memory: 4096
+vcpus: 2
+uefi: true
+machine: q35
+disk_bus: virtio
+disk_cache: writeback
+net_model: virtio
+libvirt_network: default
+serial_console: true
+graphics: vnc
+guest_os: linux
+
+# ── Boot test ──
+libvirt_test: true
+keep_domain: true
+timeout: 120
+
+verbose: 1

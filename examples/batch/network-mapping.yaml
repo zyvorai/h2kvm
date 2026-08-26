@@ -1,0 +1,16 @@
+network_mapping:
+  source_networks:
+    "VM Network": "br0"
+    "DMZ Network": "br-dmz"
+    "Internal Network": "br-internal"
+  mac_address_policy: "preserve"  # preserve|regenerate|custom
+  default_bridge: "br0"
+
+# Example with custom MAC mappings
+# network_mapping:
+#   source_networks:
+#     "VM Network": "br0"
+#   mac_address_policy: "custom"
+#   mac_address_overrides:
+#     "00:50:56:ab:cd:ef": "52:54:00:12:34:56"
+#     "00:50:56:ab:cd:f0": "52:54:00:12:34:57"

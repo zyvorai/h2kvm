@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>zkvm TUI Architecture — Interactive Terminal UI for VM Migration</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #4c1d95, #6d28d9, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #a78bfa; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(167,139,250,0.2); border: 1px solid rgba(167,139,250,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-purple { background: linear-gradient(135deg, #4c1d95, #0f172a); color: #e8e6df; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #a78bfa; }
+  .page-light h2.st span { color: #7c3aed; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.7em 0 0.3em; color: #a78bfa; }
+  .page-light h3 { color: #7c3aed; }
+  p { margin-bottom: 0.6em; font-size: 0.92em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.7em 0; font-size: 0.79em; }
+  th { background: #7c3aed; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #a78bfa; } .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  .page-light .card h4 { color: #7c3aed; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .highlight { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2); border-radius: 8px; padding: 13px; margin: 0.7em 0; }
+  .page-dark .highlight { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.15); }
+  pre { background: #0f172a; color: #e8e6df; padding: 14px; border-radius: 8px; font-size: 0.78em; line-height: 1.5; font-family: 'JetBrains Mono', 'Fira Code', monospace; margin: 0.7em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  code { background: rgba(167,139,250,0.1); padding: 2px 5px; border-radius: 4px; font-size: 0.87em; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+  .arch-box { background: rgba(255,255,255,0.03); border: 2px solid rgba(167,139,250,0.3); border-radius: 12px; padding: 18px; margin: 0.7em 0; }
+  .stat-box { text-align: center; padding: 14px; }
+  .stat-box .num { font-size: 2em; font-weight: 800; color: #a78bfa; } .stat-box .label { font-size: 0.8em; opacity: 0.7; }
+  .footer { text-align: center; padding: 12px; font-size: 0.72em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(76,29,149,0.2), rgba(109,40,217,0.1)); border: 2px solid #7c3aed; border-radius: 12px; padding: 16px; margin: 0.8em 0; text-align: center; }
+  .verdict h3 { color: #a78bfa; font-size: 1.15em; margin-bottom: 5px; }
+  .kw { color: #c792ea; } .fn { color: #82aaff; } .tp { color: #ffcb6b; } .st { color: #c3e88d; } .cm { color: #546e7a; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 0.7em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(167,139,250,0.15); border: 1px solid rgba(167,139,250,0.3); padding: 9px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85em; }
+  .flow-arrow { font-size: 1.2em; color: #a78bfa; }
+  .tab-badge { display: inline-block; padding: 2px 10px; border-radius: 5px; font-size: 0.78em; font-weight: 700; }
+  .tab-1 { background: rgba(167,139,250,0.2); color: #a78bfa; }
+  .tab-2 { background: rgba(34,197,94,0.2); color: #22c55e; }
+  .tab-3 { background: rgba(56,189,248,0.2); color: #38bdf8; }
+  .tab-4 { background: rgba(251,146,60,0.2); color: #fb923c; }
+  .tab-5 { background: rgba(244,114,182,0.2); color: #f472b6; }
+  .tui-box { background: #1a1a2e; border: 1px solid rgba(167,139,250,0.3); border-radius: 8px; padding: 14px; margin: 0.7em 0; font-family: monospace; font-size: 0.78em; line-height: 1.4; color: #e8e6df; }
+  .tui-header { color: #a78bfa; font-weight: 700; } .tui-label { color: #ffcb6b; } .tui-value { color: #c3e88d; } .tui-border { color: #546e7a; } .tui-hint { color: #546e7a; font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1><span>zkvm</span> TUI Architecture</h1>
+  <h2>Interactive Terminal UI for VM Migration</h2>
+  <p class="sub">A Go + Bubble Tea terminal application with 5 tabs, guided form-based migration, vSphere discovery, live progress streaming, file browser with fuzzy search, libvirt VM management, and KubeVirt deployment. 10,382 lines of Go powering a zero-learning-curve migration experience.</p>
+  <div class="badge">Go + Bubble Tea | 5 Tabs | 22 Source Files | 10,382 Lines | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE 1: Overview -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">What Is <span>zkvm?</span></h2>
+  <p class="sub">A terminal-based interactive UI that guides operators through VM migration without memorizing CLI flags.</p>
+
+  <div class="card-grid">
+    <div class="stat-box card"><div class="num">5</div><div class="label">Tabs: Migration, vSphere,<br>Logs, Libvirt, Kubernetes</div></div>
+    <div class="stat-box card"><div class="num">10,382</div><div class="label">Lines of Go code<br>across 22 source files</div></div>
+    <div class="stat-box card"><div class="num">0</div><div class="label">CLI flags to memorize<br>guided form does everything</div></div>
+    <div class="stat-box card"><div class="num">116</div><div class="label">Go tests passing<br>across 4 packages</div></div>
+  </div>
+
+  <h3>The 5 Tabs</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:12%">Tab</th><th style="width:25%">Purpose</th><th style="width:30%">Key Features</th><th style="width:28%">Source File</th></tr>
+    <tr><td><span class="tab-badge tab-1">1</span></td><td><strong>Migration</strong></td><td>Main config form — guided step-by-step migration setup</td><td>Form fields, deploy toggles (1-4), execution plan, file browser, source auto-detect</td><td><code>standalone.go</code> + <code>form.go</code></td></tr>
+    <tr><td><span class="tab-badge tab-2">2</span></td><td><strong>vSphere</strong></td><td>vCenter connection, VM discovery, batch selection</td><td>Env var auto-populate, govc streaming, VM table with CPU/RAM/state, Ctrl+R migrate</td><td><code>vsphere_tab.go</code> + <code>vsphere_discover.go</code></td></tr>
+    <tr><td><span class="tab-badge tab-3">3</span></td><td><strong>Logs</strong></td><td>Full scrollable log viewer</td><td>Color-coded log levels, auto-scroll, viewport with PgUp/PgDn, search</td><td><code>standalone.go</code> (viewport)</td></tr>
+    <tr><td><span class="tab-badge tab-4">4</span></td><td><strong>Libvirt VMs</strong></td><td>List and manage local KVM virtual machines</td><td>Start/stop/delete VMs, console access (VNC), virsh integration, status refresh</td><td><code>libvirt.go</code> + <code>virsh.go</code></td></tr>
+    <tr><td><span class="tab-badge tab-5">5</span></td><td><strong>Kubernetes</strong></td><td>KubeVirt VM management on any K8s cluster</td><td>Namespace selection, VM list, PVC management, multi-context, kubectl/virtctl wrapper</td><td><code>kubernetes.go</code> + <code>kube_client.go</code> + <code>kubevirt.go</code></td></tr>
+  </table>
+
+  <h3>What It Looks Like</h3>
+  <div class="tui-box">
+<span class="tui-header"> Migration </span> | vSphere | Logs | Libvirt VMs | Kubernetes &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="tui-hint">Alt+1-5 switch tabs</span>
+<br><br>
+<span class="tui-header">  Step 1: Source</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="tui-header">Status</span>
+<span class="tui-border">  ╭───────────────────────────────╮</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Ready to configure
+<span class="tui-border">  │</span> <span class="tui-label">Source file:</span> <span class="tui-value">/vms/photon.vmdk</span> &nbsp;&nbsp;<span class="tui-border">│</span>
+<span class="tui-border">  ╰───────────────────────────────╯</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="tui-header">Deploy Targets</span>
+   <span class="tui-hint">Detected: VMDK (VMware)</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [<span class="tui-value">1</span>] Libvirt XML ......... ON
+<span class="tui-border">  ╭───────────────────────────────╮</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [<span class="tui-value">2</span>] virsh define ........ OFF
+<span class="tui-border">  │</span> <span class="tui-label">Command:</span> <span class="tui-value">local</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tui-border">│</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [<span class="tui-value">3</span>] Boot test ........... OFF
+<span class="tui-border">  ╰───────────────────────────────╯</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [<span class="tui-value">4</span>] Kubernetes .......... OFF
+<br>
+<span class="tui-header">  Step 2: Output</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="tui-header">Execution Plan</span>
+<span class="tui-border">  ╭───────────────────────────────╮</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Convert photon.vmdk
+<span class="tui-border">  │</span> <span class="tui-label">Output dir:</span> <span class="tui-value">./converted</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tui-border">│</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Format: qcow2
+<span class="tui-border">  ╰───────────────────────────────╯</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Generate libvirt XML
+<br>
+<span class="tui-hint"> j/k navigate | Enter edit/expand | 1-4 toggles | Ctrl+R run | ? help</span>
+  </div>
+</div>
+
+<!-- PAGE 2: Architecture -->
+<div class="page page-light">
+  <h2 class="st">Architecture — <span>Elm Architecture (TEA)</span></h2>
+  <p class="sub">zkvm uses Bubble Tea's Elm Architecture: Model holds state, Update handles events, View renders.</p>
+
+  <div class="arch-box" style="background:#fff; border-color:#e5e7eb;">
+    <pre style="background:#1a1a2e;">
+  <span class="cm">// The Elm Architecture (TEA) loop</span>
+
+  <span class="fn">Init()</span> → initial <span class="tp">Model</span> + initial <span class="tp">Cmd</span>
+       ↓
+  ┌────────────────────────────────────────┐
+  │  <span class="fn">Update(msg)</span> → new <span class="tp">Model</span> + new <span class="tp">Cmd</span>        │ ← <span class="cm">tea.KeyMsg, tea.WindowSizeMsg,</span>
+  │       ↓                                │    <span class="cm">custom Msgs (VMListMsg, LogMsg, ...)</span>
+  │  <span class="fn">View()</span> → <span class="tp">string</span> (rendered terminal)     │ → <span class="cm">lipgloss-styled output to terminal</span>
+  │       ↓                                │
+  │  Terminal displays rendered output      │
+  │       ↓                                │
+  │  User presses key → <span class="tp">tea.KeyMsg</span>         │
+  └────────────────────────────────────────┘
+       ↑                    ↓
+       └────────────────────┘  <span class="cm">// Loop forever</span>
+
+  <span class="cm">// Key files in the loop:</span>
+  <span class="cm">// standalone.go:  Model struct, Update(), View(), handleKey()</span>
+  <span class="cm">// form.go:        FormData, categories, fields, input box rendering</span>
+  <span class="cm">// runner.go:      h2kvmctl subprocess, progress streaming</span>
+  <span class="cm">// vsphere_tab.go: vSphere connection and discovery UI</span>
+    </pre>
+  </div>
+
+  <h3>Source File Map (22 files, 10,382 lines)</h3>
+  <table>
+    <tr><th style="width:22%">File</th><th style="width:8%">Lines</th><th style="width:35%">Responsibility</th><th style="width:35%">Key Types / Functions</th></tr>
+    <tr><td><strong>standalone.go</strong></td><td>1,781</td><td>Top-level Model, Update/View loop, tab routing, key handling, layout</td><td><code>Model</code>, <code>Update()</code>, <code>View()</code>, <code>handleKey()</code>, <code>handleMigrationKey()</code></td></tr>
+    <tr><td><strong>form.go</strong></td><td>1,155</td><td>Form data model, categories, fields, input box rendering, BuildYAML</td><td><code>FormData</code>, <code>Category</code>, <code>Field</code>, <code>BuildYAML()</code>, <code>detectSourceFormat()</code></td></tr>
+    <tr><td><strong>kubernetes.go</strong></td><td>1,193</td><td>Kubernetes tab: KubeVirt VM management, namespace, PVC</td><td><code>KubernetesTab</code>, <code>handleKubernetesKey()</code></td></tr>
+    <tr><td><strong>virsh.go</strong></td><td>839</td><td>virsh command wrapper for libvirt operations</td><td><code>virshList()</code>, <code>virshStart()</code>, <code>virshDefine()</code></td></tr>
+    <tr><td><strong>libvirt.go</strong></td><td>604</td><td>Libvirt VMs tab: list, start, stop, delete, console</td><td><code>LibvirtTab</code>, <code>handleLibvirtKey()</code></td></tr>
+    <tr><td><strong>kube_client.go</strong></td><td>494</td><td>kubectl/virtctl wrapper for K8s operations</td><td><code>KubeClient</code>, <code>getVMs()</code>, <code>getPVCs()</code></td></tr>
+    <tr><td><strong>filebrowser.go</strong></td><td>408</td><td>Modal file picker with fuzzy search</td><td><code>FileBrowser</code>, <code>fuzzyMatch()</code>, extension filtering</td></tr>
+    <tr><td><strong>runner.go</strong></td><td>367</td><td>h2kvmctl subprocess, progress streaming, auto-sudo</td><td><code>runMigration()</code>, <code>scanLinesOrCR()</code>, progress parsing</td></tr>
+    <tr><td><strong>vsphere_discover.go</strong></td><td>355</td><td>VSphereClient, govc wrapper, VM discovery</td><td><code>VSphereClient</code>, <code>discoverVMs()</code>, streaming output</td></tr>
+    <tr><td><strong>vsphere_tab.go</strong></td><td>308</td><td>vSphere tab UI, env var reading, connection fields</td><td><code>*VsphereTab</code> (pointer!), env auto-populate</td></tr>
+    <tr><td><strong>diagnosis.go</strong></td><td>231</td><td>Failure analysis and troubleshooting hints</td><td><code>diagnoseFailure()</code>, error pattern matching</td></tr>
+    <tr><td><strong>help.go</strong></td><td>206</td><td>Help overlay with keyboard shortcuts</td><td><code>helpView()</code>, key binding reference</td></tr>
+    <tr><td><strong>quick_migrate.go</strong></td><td>200</td><td>Auto-detect source format and run migration</td><td><code>quickMigrate()</code>, format detection</td></tr>
+    <tr><td><strong>console.go</strong></td><td>190</td><td>VNC/noVNC console access for VMs</td><td><code>openConsole()</code>, browser launch</td></tr>
+    <tr><td><strong>preflight.go</strong></td><td>175</td><td>Pre-migration system checks</td><td><code>preflightCheck()</code>, dependency validation</td></tr>
+    <tr><td><strong>profiles.go</strong></td><td>137</td><td>Save/load YAML migration profiles</td><td><code>saveProfile()</code>, <code>loadProfile()</code></td></tr>
+    <tr><td><strong>notifications.go</strong></td><td>96</td><td>Desktop notifications on completion</td><td><code>notify()</code>, libnotify integration</td></tr>
+    <tr><td><strong>kubevirt.go</strong></td><td>129</td><td>KubeVirt-specific VM operations</td><td><code>startVM()</code>, <code>stopVM()</code>, <code>deleteVM()</code></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 3: Form System Deep Dive -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Form System — <span>Guided Migration</span></h2>
+  <p class="sub">The Migration tab uses a category/field form model with input boxes, auto-detection, and YAML generation.</p>
+
+  <h3>Form Data Model</h3>
+  <pre>
+<span class="kw">type</span> <span class="tp">FormData</span> <span class="kw">struct</span> {
+    Categories  []<span class="tp">Category</span>     <span class="cm">// All categories (some hidden via ShowWhen)</span>
+    FocusCat    <span class="tp">int</span>            <span class="cm">// Index into visible categories (clamped)</span>
+    FocusField  <span class="tp">int</span>            <span class="cm">// Index into focused category's fields (reset on collapse)</span>
+    InCategory  <span class="tp">bool</span>           <span class="cm">// true = navigating fields, false = on category header</span>
+}
+
+<span class="kw">type</span> <span class="tp">Category</span> <span class="kw">struct</span> {
+    Name      <span class="tp">string</span>           <span class="cm">// "Step 1: Source", "Step 2: Output", etc.</span>
+    Expanded  <span class="tp">bool</span>             <span class="cm">// Whether fields are visible</span>
+    Fields    []<span class="tp">Field</span>          <span class="cm">// Form fields in this category</span>
+    ShowWhen  <span class="kw">func</span>() <span class="tp">bool</span>     <span class="cm">// Conditional visibility (e.g., vSphere only when cmd=vsphere)</span>
+}
+
+<span class="kw">type</span> <span class="tp">Field</span> <span class="kw">struct</span> {
+    Label        <span class="tp">string</span>         <span class="cm">// Display label</span>
+    Key          <span class="tp">string</span>         <span class="cm">// YAML key for BuildYAML()</span>
+    Value        <span class="tp">string</span>         <span class="cm">// Current value</span>
+    Editing      <span class="tp">bool</span>           <span class="cm">// Currently in text edit mode</span>
+    FieldType    <span class="tp">FieldType</span>      <span class="cm">// Text, Select, Toggle, PathComplete</span>
+    Options      []<span class="tp">string</span>       <span class="cm">// For Select type (e.g., ["local","vsphere","hyperv"])</span>
+    PathComplete <span class="tp">bool</span>           <span class="cm">// Opens file browser on Enter</span>
+    Extensions   []<span class="tp">string</span>       <span class="cm">// File browser filter (e.g., [".vmdk",".ova"])</span>
+}
+  </pre>
+
+  <h3>Form Categories (Guided Steps)</h3>
+  <table>
+    <tr><th style="width:22%">Category</th><th style="width:12%">Default</th><th style="width:30%">Fields</th><th style="width:36%">Behavior</th></tr>
+    <tr><td><strong>Step 1: Source</strong></td><td>Expanded</td><td>Source file path, Command select (local/vsphere/hyperv)</td><td>Source auto-detects format (.vmdk/.ova/.vhd/.raw). Sets cmd select to match. File browser with extension filter.</td></tr>
+    <tr><td><strong>Remote Access</strong></td><td>Collapsed</td><td>SSH host, SSH user, SSH key path</td><td>For remote VM disk access. Collapsed by default — most users use local.</td></tr>
+    <tr><td><strong>Step 2: Output</strong></td><td>Expanded</td><td>Output directory, Output format select</td><td>Format: qcow2 (default), raw. PathComplete for directory picker.</td></tr>
+    <tr><td><strong>Step 3: Fixes</strong></td><td>Collapsed</td><td>Rebuild initramfs toggle, fstab fix toggle</td><td>Guest OS fixes. Collapsed because defaults are usually correct.</td></tr>
+    <tr><td><strong>Step 4: Deploy</strong></td><td>Expanded</td><td>VM name, memory, vCPUs, machine type, UEFI toggle</td><td>Libvirt deployment config. All fields visible for easy customization.</td></tr>
+    <tr><td><strong>Advanced</strong></td><td>Collapsed</td><td>Compress, flatten, checksum, dry_run, verbose</td><td>Power-user options hidden by default.</td></tr>
+    <tr><td><strong>Windows</strong></td><td>Collapsed</td><td>Windows toggle, guest OS, VirtIO ISO path, win_stage</td><td>ShowWhen: only visible when Windows migration is detected/enabled.</td></tr>
+    <tr><td><strong>vSphere</strong></td><td>Collapsed</td><td>vCenter URL, vs_action, vs_vm name</td><td>ShowWhen: only visible when cmd=vsphere. Auto-populated from GOVC_* env vars.</td></tr>
+    <tr><td><strong>Kubernetes</strong></td><td>Collapsed</td><td>K8s namespace, deploy_k8s toggle</td><td>KubeVirt deployment config.</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4: Navigation & Key Handling -->
+<div class="page page-light">
+  <h2 class="st">Navigation <span>&amp; Key Handling</span></h2>
+  <p class="sub">Three-level navigation: tabs, categories, and fields — all keyboard-driven.</p>
+
+  <div class="arch-box" style="background:#fff; border-color:#e5e7eb;">
+    <pre style="background:#1a1a2e;">
+<span class="fn">Update()</span> → <span class="tp">tea.KeyMsg</span> → <span class="fn">handleKey()</span>
+  ├─ Help overlay active? → intercept all keys (Esc to close)
+  ├─ Global keys:
+  │   ├─ <span class="st">Ctrl+C / Ctrl+Q</span> → quit
+  │   ├─ <span class="st">?</span> → toggle help overlay
+  │   ├─ <span class="st">Alt+1-5</span> → switch tab directly
+  │   ├─ <span class="st">Esc+Tab</span> → next tab
+  │   └─ <span class="st">Shift+Tab</span> → previous tab
+  └─ Route by <span class="tp">activeTab</span>:
+      ├─ Tab 1 (Migration) → <span class="fn">handleMigrationKey()</span>
+      │   ├─ FileBrowser active? → route to browser (Enter/Esc/type)
+      │   ├─ Field <span class="tp">Editing</span> = true?
+      │   │   ├─ <span class="st">j / k</span> → EXIT edit mode + navigate (not insert text!)
+      │   │   ├─ <span class="st">Tab</span> → move to next field
+      │   │   ├─ <span class="st">Esc / Enter</span> → stop editing
+      │   │   └─ default → insert character into field value
+      │   └─ Form navigation (<span class="fn">handleFormKey()</span>):
+      │       ├─ <span class="st">1-4</span> → toggle deploy targets (Libvirt XML, virsh, boot, K8s)
+      │       ├─ <span class="st">j / k</span> → move down/up (categories or fields)
+      │       ├─ <span class="st">Enter</span> → expand/collapse category OR start editing OR open file browser
+      │       ├─ <span class="st">h / l</span> → cycle select options left/right
+      │       ├─ <span class="st">Esc</span> → exit field → collapse category
+      │       └─ <span class="st">Ctrl+R</span> → run migration
+      ├─ Tab 2 (vSphere) → <span class="fn">handleVSphereKey()</span>
+      ├─ Tab 3 (Logs) → <span class="fn">handleLogsKey()</span> (viewport scroll)
+      ├─ Tab 4 (Libvirt) → <span class="fn">handleLibvirtKey()</span>
+      └─ Tab 5 (Kubernetes) → <span class="fn">handleKubernetesKey()</span>
+    </pre>
+  </div>
+
+  <h3>Navigation State Machine</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Category Level (InCategory=false)</h4>
+      <ul>
+        <li><strong>j/k</strong> — move between category headers</li>
+        <li><strong>Enter</strong> — expand category, enter field level</li>
+        <li><strong>Esc</strong> — collapse current category</li>
+        <li>FocusCat is clamped to visible categories</li>
+        <li>Hidden categories (ShowWhen=false) are skipped</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Field Level (InCategory=true)</h4>
+      <ul>
+        <li><strong>j/k</strong> — move between fields within category</li>
+        <li><strong>Enter</strong> — start editing text field, or open file browser for PathComplete</li>
+        <li><strong>h/l</strong> — cycle Select field options</li>
+        <li><strong>Esc</strong> — exit to category level</li>
+        <li>FocusField is reset to 0 when category collapses</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Edit Mode (Editing=true)</h4>
+      <ul>
+        <li><strong>Type</strong> — inserts characters into field value</li>
+        <li><strong>Backspace</strong> — deletes last character</li>
+        <li><strong>j/k</strong> — EXIT edit mode and navigate (critical fix!)</li>
+        <li><strong>Tab</strong> — move to next field</li>
+        <li><strong>Esc/Enter</strong> — stop editing, preserve value</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Deploy Target Toggles (Right Panel)</h3>
+  <table>
+    <tr><th>Key</th><th>Toggle</th><th>YAML Key</th><th>Effect</th></tr>
+    <tr><td><strong>1</strong></td><td>Libvirt XML</td><td><code>emit_domain_xml: true</code></td><td>Generate libvirt domain XML file</td></tr>
+    <tr><td><strong>2</strong></td><td>virsh define</td><td><code>virsh_define: true</code></td><td>Auto-run virsh define after conversion</td></tr>
+    <tr><td><strong>3</strong></td><td>Boot test</td><td><code>boot_test: true</code></td><td>Start VM and verify it boots</td></tr>
+    <tr><td><strong>4</strong></td><td>Kubernetes</td><td><code>deploy_k8s: true</code></td><td>Generate KubeVirt manifest and apply</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 5: vSphere Integration -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">vSphere <span>Integration</span></h2>
+  <p class="sub">Discover, select, and migrate VMs from vCenter — all from the TUI.</p>
+
+  <div class="flow">
+    <div class="flow-step">Env Vars (GOVC_*)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Connect to vCenter</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Discover VMs</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Select Batch</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Ctrl+R Migrate</div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>VsphereTab (vsphere_tab.go)</h4>
+      <ul>
+        <li><strong>Pointer type (*VsphereTab)</strong> — survives Bubble Tea's value copies</li>
+        <li>Auto-populates from env vars: GOVC_URL, GOVC_USERNAME, GOVC_PASSWORD, GOVC_DATACENTER</li>
+        <li>Fields show <code>[env]</code> tag when populated from environment</li>
+        <li>Connection status indicator (connected/disconnected)</li>
+        <li>VM table with columns: Name, CPU, RAM, Power State, Guest OS</li>
+        <li>Multi-select: space to toggle, Ctrl+A select all</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>VSphereClient (vsphere_discover.go)</h4>
+      <ul>
+        <li>Wraps <code>govc</code> CLI (cached path lookup)</li>
+        <li><code>govc ls /datacenter/vm/</code> for VM inventory</li>
+        <li><code>govc vm.info -json</code> for detailed metadata (batch of 10)</li>
+        <li>30-second timeout per discovery operation</li>
+        <li>Streaming output: VMs appear as they're discovered</li>
+        <li>Error handling: connection failures, auth errors, timeout</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Migration Flow (Ctrl+R)</h4>
+      <ul>
+        <li>syncVSphereToForm() copies selected VMs to Migration tab</li>
+        <li>Auto-sets <code>cmd: vsphere</code> and <code>vs_action: export_vm</code></li>
+        <li>Auto-enables <code>emit_domain_xml</code> and <code>regen_initramfs</code></li>
+        <li>Generates YAML config via BuildYAML()</li>
+        <li>Launches h2kvmctl subprocess via runner.go</li>
+        <li>Progress streaming in Logs tab + progress bar in right panel</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Progress Streaming (runner.go)</h4>
+      <ul>
+        <li><code>scanLinesOrCR()</code> splits on both \n and \r for govc progress</li>
+        <li>Throttled: govc download lines shown once per 3 seconds</li>
+        <li>Dedup + rate limit prevents log flooding</li>
+        <li>Structured <code>[PROGRESS]</code> lines: pct|current|total|rate|eta</li>
+        <li>Progress bar: <code>████░░░░ 45% 2.3GB/5.1GB 120MB/s ETA 23s</code></li>
+        <li>5-sample moving average for smoothed speed display</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Auto-Sudo for vSphere Exports</h3>
+  <pre>
+<span class="cm">// runner.go: Auto-prepend sudo when not running as root</span>
+<span class="kw">func</span> <span class="fn">runMigration</span>(config <span class="tp">string</span>) *<span class="tp">exec.Cmd</span> {
+    args := []<span class="tp">string</span>{<span class="st">"--config"</span>, configPath}
+    <span class="kw">if</span> os.Getuid() != 0 {
+        <span class="cm">// Prepend sudo -E to preserve GOVC_* env vars</span>
+        args = append([]<span class="tp">string</span>{<span class="st">"-E"</span>, <span class="st">"h2kvmctl"</span>}, args...)
+        <span class="kw">return</span> exec.Command(<span class="st">"sudo"</span>, args...)
+    }
+    <span class="kw">return</span> exec.Command(<span class="st">"h2kvmctl"</span>, args...)
+}
+  </pre>
+</div>
+
+<!-- PAGE 6: File Browser & Special Features -->
+<div class="page page-light">
+  <h2 class="st">File Browser <span>&amp; Special Features</span></h2>
+  <p class="sub">Built-in fzf-style file picker, source auto-detection, and YAML generation.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>File Browser (filebrowser.go, 408 lines)</h4>
+      <ul>
+        <li>Opens on <strong>Enter</strong> for PathComplete fields</li>
+        <li><strong>Fuzzy search:</strong> <code>/</code> to activate, type to filter instantly</li>
+        <li><strong>Match highlighting:</strong> matched characters shown with underline</li>
+        <li><strong>Result count:</strong> "query (N results)" shown in search bar</li>
+        <li><strong>Ctrl+H</strong> toggles hidden files (.dotfiles)</li>
+        <li><strong>~</strong> jumps to home directory</li>
+        <li><strong>/</strong> jumps to filesystem root</li>
+        <li><strong>Backspace</strong> navigates up one directory</li>
+        <li><strong>Extension filtering</strong> per field (.vmdk, .ova, .ovf, .vhd, .raw, .iso)</li>
+        <li>Modal overlay at bottom of screen — doesn't replace the form</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Source Auto-Detection (form.go)</h4>
+      <ul>
+        <li><code>detectSourceFormat()</code> maps file extension to format</li>
+        <li><code>.vmdk</code> &rarr; "VMDK (VMware)" &rarr; YAML key: <code>vmdk:</code></li>
+        <li><code>.ova</code> &rarr; "OVA (VMware)" &rarr; YAML key: <code>ova:</code></li>
+        <li><code>.ovf</code> &rarr; "OVF (VMware)" &rarr; YAML key: <code>ovf:</code></li>
+        <li><code>.vhd/.vhdx</code> &rarr; "VHD (Hyper-V)" &rarr; YAML key: <code>vhd:</code></li>
+        <li><code>.raw/.img</code> &rarr; "RAW" &rarr; YAML key: <code>raw:</code></li>
+        <li>Hint shown below field: "Detected: VMDK (VMware)"</li>
+        <li>Also auto-sets <code>cmd</code> select to match source type</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>BuildYAML() — Config Generation</h4>
+      <ul>
+        <li>Reads all form fields and generates valid h2kvmctl YAML</li>
+        <li>Source field uses detected format key (vmdk/ova/vhd/raw)</li>
+        <li>Toggle fields emit <code>true</code>/<code>false</code></li>
+        <li>Empty fields omitted from YAML</li>
+        <li>vSphere category only emitted when <code>cmd: vsphere</code></li>
+        <li>Deploy toggles (1-4) add corresponding YAML keys</li>
+        <li>Written to temp file, passed to h2kvmctl --config</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Additional Features</h4>
+      <ul>
+        <li><strong>Profiles (profiles.go):</strong> Save/load YAML configs for reuse</li>
+        <li><strong>Quick Migrate (quick_migrate.go):</strong> Auto-detect source and run with defaults</li>
+        <li><strong>Pre-flight (preflight.go):</strong> Check dependencies before migration</li>
+        <li><strong>Diagnosis (diagnosis.go):</strong> Analyze failures with pattern matching</li>
+        <li><strong>Console (console.go):</strong> Open VNC/noVNC console in browser</li>
+        <li><strong>Notifications (notifications.go):</strong> Desktop notify on completion</li>
+        <li><strong>Help (help.go):</strong> <code>?</code> shows full keyboard shortcut reference</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Rendering — Input Box Layout</h3>
+  <pre>
+<span class="cm">// Each field renders as 4 lines (critical for FocusRow scroll calculation):</span>
+<span class="cm">// Line 1: Label</span>
+<span class="cm">// Line 2: ╭─────────────────────────╮  (top border)</span>
+<span class="cm">// Line 3: │ field value              │  (content)</span>
+<span class="cm">// Line 4: ╰─────────────────────────╯  (bottom border)</span>
+
+<span class="cm">// FocusRow() counts: (field_index * 4) + category headers above</span>
+<span class="cm">// This ensures viewport scrolls to keep the focused field visible</span>
+
+<span class="cm">// Right panel layout (status-only, no logs):</span>
+<span class="cm">// ┌─────────────────────┐</span>
+<span class="cm">// │ Status              │  Ready / Running / Complete</span>
+<span class="cm">// │ Deploy Targets      │  [1] XML [2] virsh [3] boot [4] K8s</span>
+<span class="cm">// │ Execution Plan      │  Dynamic based on current settings</span>
+<span class="cm">// │ Progress Bar        │  ████░░░ 45% 120MB/s ETA 23s</span>
+<span class="cm">// │ Shortcuts           │  Key bindings for current context</span>
+<span class="cm">// └─────────────────────┘</span>
+  </pre>
+</div>
+
+<!-- PAGE 7: Libvirt & Kubernetes Tabs -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Libvirt &amp; Kubernetes <span>Tabs</span></h2>
+  <p class="sub">Post-migration management: manage KVM VMs and KubeVirt deployments from the same TUI.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4><span class="tab-badge tab-4">Tab 4</span> Libvirt VMs (libvirt.go + virsh.go)</h4>
+      <ul>
+        <li><strong>VM List:</strong> Table with name, state (running/shut off), CPU, RAM, autostart</li>
+        <li><strong>virsh integration:</strong> Wraps virsh commands — list, start, shutdown, destroy, undefine, dominfo</li>
+        <li><strong>Start/Stop:</strong> <code>s</code> to start, <code>S</code> to shutdown, <code>D</code> to destroy (force stop)</li>
+        <li><strong>Delete:</strong> <code>x</code> to undefine + remove disk (with confirmation)</li>
+        <li><strong>Console:</strong> <code>c</code> opens VNC viewer or noVNC in browser</li>
+        <li><strong>Refresh:</strong> <code>r</code> refreshes VM list from libvirt</li>
+        <li><strong>Detail view:</strong> Enter shows full VM info (CPU, RAM, disks, NICs, XML path)</li>
+        <li>Auto-refresh after migration completes in Migration tab</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tab-badge tab-5">Tab 5</span> Kubernetes (kubernetes.go + kube_client.go + kubevirt.go)</h4>
+      <ul>
+        <li><strong>KubeVirt VMs:</strong> List VirtualMachines with status, CPU, RAM, node</li>
+        <li><strong>PVC management:</strong> List PersistentVolumeClaims with size, status, storage class</li>
+        <li><strong>Namespace selector:</strong> <code>n</code> to switch namespace</li>
+        <li><strong>Multi-context:</strong> <code>k</code> to switch kubeconfig context (multiple clusters)</li>
+        <li><strong>VM operations:</strong> Start, stop, restart, delete KubeVirt VMs</li>
+        <li><strong>Console:</strong> <code>c</code> opens virtctl console or VNC</li>
+        <li><strong>kubectl wrapper:</strong> Runs kubectl/virtctl commands, parses JSON output</li>
+        <li><strong>Auto-detection:</strong> Checks if KubeVirt is installed on the cluster</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Logs Tab</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4><span class="tab-badge tab-3">Tab 3</span> Full Log Viewer</h4>
+      <ul>
+        <li>Scrollable viewport with Bubble Tea viewport component</li>
+        <li>Color-coded log levels: ERROR (red), WARN (yellow), INFO (blue), DEBUG (gray)</li>
+        <li>Auto-scroll to bottom during active migration</li>
+        <li>PgUp/PgDn for page scrolling, Home/End for top/bottom</li>
+        <li>All h2kvmctl output streamed here in real-time</li>
+        <li>[PROGRESS] lines filtered out (shown as progress bar in right panel instead)</li>
+        <li>Logs persist across tab switches — switch to Logs tab anytime to check history</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Help Overlay</h4>
+      <ul>
+        <li>Press <code>?</code> anywhere to show/hide help overlay</li>
+        <li>Context-sensitive: shows keys relevant to current tab</li>
+        <li>Global shortcuts always shown (tab switching, quit, help)</li>
+        <li>Migration tab: form navigation, deploy toggles, run</li>
+        <li>vSphere tab: connect, discover, select, migrate</li>
+        <li>Libvirt/K8s tabs: VM operations, console, refresh</li>
+        <li>Press <code>Esc</code> or <code>?</code> again to dismiss</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Message Types (Bubble Tea Commands)</h3>
+  <table>
+    <tr><th style="width:25%">Message Type</th><th style="width:30%">Source</th><th style="width:45%">Triggers</th></tr>
+    <tr><td><code>tea.KeyMsg</code></td><td>User keyboard input</td><td>handleKey() routing to active tab handler</td></tr>
+    <tr><td><code>tea.WindowSizeMsg</code></td><td>Terminal resize</td><td>Recalculate layout, viewport, form width</td></tr>
+    <tr><td><code>VMListMsg</code></td><td>virsh list / kubectl get</td><td>Update Libvirt or Kubernetes tab VM table</td></tr>
+    <tr><td><code>LogMsg</code></td><td>runner.go stdout/stderr</td><td>Append to log viewport, parse [PROGRESS] lines</td></tr>
+    <tr><td><code>VSphereDiscoverMsg</code></td><td>govc vm.info</td><td>Add discovered VMs to vSphere tab table</td></tr>
+    <tr><td><code>MigrationDoneMsg</code></td><td>h2kvmctl exit</td><td>Update status, refresh Libvirt/K8s tabs, notify</td></tr>
+    <tr><td><code>FileBrowserMsg</code></td><td>File browser selection</td><td>Set field value to selected file path, close browser</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 8: Summary -->
+<div class="page page-light">
+  <h2 class="st">Why zkvm <span>Matters</span></h2>
+  <p class="sub">A TUI that makes VM migration accessible to any operator — not just CLI experts.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Zero Learning Curve</h4>
+      <p>Operators don't memorize <code>h2kvmctl --vmdk /path --out-format qcow2 --emit-domain-xml --vm-name foo --memory 4096 --vcpus 2</code>. They fill in a form, toggle deploy targets, press Ctrl+R. The TUI builds the YAML and runs the command.</p>
+    </div>
+    <div class="card">
+      <h4>Complete Workflow in One Screen</h4>
+      <p>Discover VMs on vSphere (tab 2), configure migration (tab 1), watch progress (tab 3), verify KVM VMs (tab 4), check KubeVirt (tab 5). No context switching between 5 different CLI tools.</p>
+    </div>
+    <div class="card">
+      <h4>No Other Migration Tool Has This</h4>
+      <p>virt-v2v: CLI only. MTV: web UI (requires OpenShift console). AWS MGN: web console. Carbonite: Windows GUI. <strong>zkvm is the only TUI for VM migration.</strong> Works over SSH, in tmux, in any terminal.</p>
+    </div>
+    <div class="card">
+      <h4>Production-Quality Code</h4>
+      <p>10,382 lines of Go. 116 passing tests. Elm Architecture via Bubble Tea. Lipgloss styling. Clean separation: form model, tab handlers, subprocess runner, file browser. All critical navigation bugs fixed and tested.</p>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="stat-box card"><div class="num">22</div><div class="label">Go source files in<br>standalone/ package</div></div>
+    <div class="stat-box card"><div class="num">5</div><div class="label">Tabs: Migration, vSphere,<br>Logs, Libvirt, Kubernetes</div></div>
+    <div class="stat-box card"><div class="num">9</div><div class="label">Form categories with<br>conditional visibility</div></div>
+    <div class="stat-box card"><div class="num">4</div><div class="label">Deploy toggles: XML,<br>virsh, boot, Kubernetes</div></div>
+  </div>
+
+  <div class="verdict">
+    <h3>zkvm: The Migration TUI</h3>
+    <p style="font-size:0.95em;">
+      Guided form-based configuration. vSphere discovery with batch selection.<br>
+      File browser with fuzzy search. Live progress streaming. Boot verification.<br>
+      Libvirt and KubeVirt management. All in a terminal. All keyboard-driven.<br>
+      <strong>The easiest way to migrate VMs — no CLI flags, no web browser, no learning curve.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>zkvm — Interactive TUI for hyper2kvm | Go + Bubble Tea | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

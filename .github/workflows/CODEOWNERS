@@ -1,0 +1,19 @@
+# Code owners for hyper2kvm project
+# These users will be automatically requested for review when PRs modify these files
+
+# Global owners
+* @ssahani
+
+# CI/CD workflows
+/.github/workflows/ @ssahani
+
+# Core conversion logic
+/hyper2kvm/converters/ @ssahani
+/hyper2kvm/fixers/ @ssahani
+
+# Tests
+/tests/ @ssahani
+
+# Documentation
+/docs/ @ssahani
+/*.md @ssahani

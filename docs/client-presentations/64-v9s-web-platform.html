@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>v9s — KubeVirt Web Management Platform</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; position: relative; overflow: hidden; }
+  .cover::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 50%, rgba(99,102,241,0.15) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(59,130,246,0.1) 0%, transparent 50%); }
+  .cover h1 { font-size: 3.5em; font-weight: 800; letter-spacing: -2px; margin-bottom: 0.2em; position: relative; }
+  .cover h1 span { color: #3b82f6; }
+  .cover h2 { font-size: 1.4em; font-weight: 300; opacity: 0.9; margin-bottom: 2em; position: relative; }
+  .cover .tagline { font-size: 1.1em; opacity: 0.7; max-width: 600px; position: relative; }
+  .cover .badge { display: inline-block; background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 2em; position: relative; }
+
+  .page { min-height: 100vh; padding: 60px 80px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; }
+  .page-light { background: #fafbfc; }
+  .page-accent { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #e8e6df; }
+
+  h2.section-title { font-size: 2.2em; font-weight: 700; margin-bottom: 0.8em; letter-spacing: -1px; }
+  h2.section-title span { color: #3b82f6; }
+  h3 { font-size: 1.3em; font-weight: 600; margin: 1.2em 0 0.5em; }
+  p { margin-bottom: 1em; font-size: 1.05em; }
+  .subtitle { font-size: 1.1em; opacity: 0.7; margin-bottom: 2em; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin: 1.5em 0; }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 28px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .card .icon { font-size: 2em; margin-bottom: 12px; }
+  .card h4 { font-size: 1.15em; font-weight: 600; margin-bottom: 8px; }
+  .card p { font-size: 0.95em; opacity: 0.85; margin-bottom: 0; }
+
+  .stat-row { display: flex; gap: 40px; margin: 2em 0; }
+  .stat { text-align: center; flex: 1; }
+  .stat .number { font-size: 3em; font-weight: 800; color: #3b82f6; line-height: 1; }
+  .stat .label { font-size: 0.95em; opacity: 0.7; margin-top: 8px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.95em; }
+  th { background: #3b82f6; color: #fff; padding: 14px 18px; text-align: left; font-weight: 600; }
+  td { padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+  .page-light tr:nth-child(even) td { background: #f9fafb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .cross { color: #ef4444; font-weight: 700; }
+
+  .flow { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 2em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 0.95em; }
+  .flow-arrow { font-size: 1.5em; color: #3b82f6; }
+
+  ul { margin: 0.5em 0 1em 1.5em; }
+  li { margin-bottom: 0.4em; font-size: 1em; }
+
+  .cta-box { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 40px; border-radius: 16px; text-align: center; margin: 2em 0; }
+  .cta-box h3 { font-size: 1.5em; margin-bottom: 0.5em; }
+  .cta-box p { opacity: 0.9; }
+
+  .footer { text-align: center; padding: 20px; font-size: 0.85em; opacity: 0.5; }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <h1>v<span>9</span>s</h1>
+  <h2>KubeVirt Web Management Platform</h2>
+  <p class="tagline">Modern, real-time web UI for managing KubeVirt virtual machines on Kubernetes &mdash; console access, monitoring, snapshots, and full host visibility.</p>
+  <div class="badge">Rust + React &mdash; Built for Production KubeVirt Clusters</div>
+</div>
+
+<!-- PAGE 2: WHY v9s -->
+<div class="page page-dark">
+  <h2 class="section-title">Why <span>v9s</span>?</h2>
+  <p class="subtitle">The management layer your KubeVirt cluster needs.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">🖥️</div>
+      <h4>Complete VM Lifecycle</h4>
+      <p>Start, stop, restart, delete, and live-migrate VMs from a single web interface. No kubectl required for day-to-day operations.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🎮</div>
+      <h4>In-Browser Console</h4>
+      <p>VNC graphical console with Ctrl+Alt+Delete sendkey support, serial terminal, and SSH access &mdash; all directly in the browser.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h4>Real-Time Metrics</h4>
+      <p>WebSocket-streamed CPU, memory, network I/O, and disk I/O metrics with live charts per VM. No Prometheus setup required.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔧</div>
+      <h4>Full Host Visibility</h4>
+      <p>Hardware inventory (PCI, RAM modules), disk partitions, network interfaces, and systemd services &mdash; everything in one dashboard.</p>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number">10</div>
+      <div class="label">Detail Tabs per VM</div>
+    </div>
+    <div class="stat">
+      <div class="number">3</div>
+      <div class="label">Console Types</div>
+    </div>
+    <div class="stat">
+      <div class="number">5</div>
+      <div class="label">Host Info Sections</div>
+    </div>
+    <div class="stat">
+      <div class="number">&lt;50MB</div>
+      <div class="label">Single Binary</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: TECHNOLOGY -->
+<div class="page page-light">
+  <h2 class="section-title">Technology <span>Stack</span></h2>
+  <p class="subtitle">High-performance Rust backend with a modern React frontend.</p>
+
+  <table>
+    <tr><th>Component</th><th>Technology</th><th>Why</th></tr>
+    <tr><td>Backend</td><td>Rust + Axum</td><td>Async, memory-safe, single binary deployment</td></tr>
+    <tr><td>Frontend</td><td>React + TypeScript + Vite</td><td>Fast builds, type safety, component-based UI</td></tr>
+    <tr><td>State Management</td><td>TanStack Query + Zustand</td><td>Cache-first data fetching, lightweight stores</td></tr>
+    <tr><td>Charts</td><td>Recharts</td><td>Real-time area/line charts for metrics</td></tr>
+    <tr><td>VNC Console</td><td>noVNC (react-vnc)</td><td>HTML5 VNC with RFB protocol sendkey</td></tr>
+    <tr><td>Serial Console</td><td>xterm.js</td><td>Full terminal emulation in browser</td></tr>
+    <tr><td>K8s Client</td><td>kube-rs</td><td>Native Rust K8s client with watch/stream</td></tr>
+    <tr><td>Auth</td><td>PAM + JWT</td><td>System-level login, token-based sessions</td></tr>
+    <tr><td>Proxy</td><td>Nginx</td><td>TLS termination, WebSocket upgrade</td></tr>
+  </table>
+
+  <h3>Deployment Architecture</h3>
+  <div class="flow">
+    <div class="flow-step">Browser</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Nginx (443)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">v9s-web (5050)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">K8s API</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">KubeVirt</div>
+  </div>
+  <p style="text-align:center; opacity:0.7;">Single binary + static assets. No database. No external dependencies beyond Kubernetes.</p>
+</div>
+
+<!-- PAGE 4: VM MANAGEMENT -->
+<div class="page page-dark">
+  <h2 class="section-title">VM <span>Management</span></h2>
+  <p class="subtitle">Complete lifecycle control with a 10-tab detail panel.</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">▶️</div>
+      <h4>Start / Stop / Restart</h4>
+      <p>One-click lifecycle actions with KubeVirt RunStrategy API. Toast notifications for success/failure.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🗑️</div>
+      <h4>Delete with Auto-Close</h4>
+      <p>Confirmation dialog. Details panel auto-closes after successful deletion via vmStore state management.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔀</div>
+      <h4>Live Migration</h4>
+      <p>Migrate running VMs between nodes. View migration history with source/target and completion status.</p>
+    </div>
+  </div>
+
+  <h3>VM Details Panel &mdash; 10 Tabs</h3>
+  <table>
+    <tr><th>Tab</th><th>Capabilities</th></tr>
+    <tr><td>Summary</td><td>Status, resources, tags, action buttons</td></tr>
+    <tr><td>Console</td><td>VNC (with sendkeys), serial terminal, SSH &mdash; console type selector</td></tr>
+    <tr><td>Metrics</td><td>Real-time CPU, memory, network I/O, disk I/O charts via WebSocket</td></tr>
+    <tr><td>Storage</td><td>Attached volumes, disk type/size, <strong>ISO mount</strong> with duplicate protection</td></tr>
+    <tr><td>Network</td><td>Interfaces with IP/MAC, guest OS info, <strong>add network</strong> (pod/multus, bridge/masquerade/SR-IOV)</td></tr>
+    <tr><td>Snapshots</td><td>Create, list, delete snapshots with ready/pending status badges</td></tr>
+    <tr><td>Migration</td><td>Live migrate to another node, migration history timeline</td></tr>
+    <tr><td>Events</td><td>Kubernetes events filtered by VM with type/reason/timestamp</td></tr>
+    <tr><td>Logs</td><td>Console and compute container logs from virt-launcher pod</td></tr>
+    <tr><td>YAML</td><td>Full VM YAML editor with copy-to-clipboard and live apply</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 5: CONSOLE -->
+<div class="page page-light">
+  <h2 class="section-title">Console <span>Access</span></h2>
+  <p class="subtitle">Three console types with full keyboard control.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">🖥️</div>
+      <h4>VNC Graphical Console</h4>
+      <p>Full desktop experience via noVNC. Scales to viewport. Fullscreen mode. Auto-reconnect on disconnect.</p>
+      <h4 style="margin-top:16px; color:#3b82f6;">Sendkey Toolbar</h4>
+      <ul>
+        <li><strong>Ctrl+Alt+Delete</strong> &mdash; Login screen / task manager</li>
+        <li><strong>Ctrl+Alt+F1</strong> &mdash; Switch to text console</li>
+        <li><strong>Ctrl+Alt+F2</strong> &mdash; Switch to TTY2</li>
+        <li><strong>Ctrl+Alt+F7</strong> &mdash; Switch to graphical desktop</li>
+      </ul>
+      <p style="font-size:0.9em; opacity:0.7;">Uses XK keysym codes via RFB protocol. Keys that browsers intercept are sent directly to the VM.</p>
+    </div>
+    <div class="card">
+      <div class="icon">⌨️</div>
+      <h4>Serial Console</h4>
+      <p>xterm.js terminal emulation via KubeVirt serial console WebSocket. Ideal for headless VMs, boot troubleshooting, GRUB access.</p>
+      <h4 style="margin-top:16px; color:#3b82f6;">SSH Console</h4>
+      <p>Web-based SSH terminal for VMs with network connectivity. Configurable port and credentials. Direct IP-based connection.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: STORAGE & NETWORK -->
+<div class="page page-dark">
+  <h2 class="section-title">Storage &amp; <span>Network</span></h2>
+  <p class="subtitle">Disk management, ISO mount, and network interface control.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">💽</div>
+      <h4>Storage Management</h4>
+      <ul>
+        <li>View attached volumes with type, size, and storage class</li>
+        <li><strong>Mount ISO</strong> &mdash; Attach container disk images as CDROM (SATA)</li>
+        <li>Duplicate protection &mdash; replaces existing CDROM entries</li>
+        <li>Modal dialog with loading state, error display, auto-close on success</li>
+        <li>Storage class listing for PVC provisioning</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="icon">🌐</div>
+      <h4>Network Management</h4>
+      <ul>
+        <li>View interfaces with IP, MAC, state from VMI guest agent</li>
+        <li><strong>Add Network</strong> &mdash; Pod or Multus network types</li>
+        <li>Binding models: Bridge, Masquerade (NAT), SR-IOV</li>
+        <li>Duplicate name prevention with inline error</li>
+        <li>Guest OS information (OS name, version, kernel)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Snapshot Management</h3>
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">📸</div>
+      <h4>Create</h4>
+      <p>One-click snapshot creation. Auto-generated name with timestamp. Loading state during K8s processing.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📋</div>
+      <h4>List &amp; Filter</h4>
+      <p>Filtered by VM name AND namespace. Ready/pending status badges. Dedicated page + VM details tab.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🗑️</div>
+      <h4>Delete</h4>
+      <p>Per-snapshot delete with confirmation. Loading indicator per item. Auto API version detection (v1beta1/v1alpha1).</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7: HOST INFO -->
+<div class="page page-light">
+  <h2 class="section-title">Host <span>Information</span></h2>
+  <p class="subtitle">Complete hardware and system inventory in 5 tabbed sections.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">🖥️</div>
+      <h4>Overview</h4>
+      <p>Hostname, OS, kernel, architecture, CPU model, vendor, BIOS. CPU/memory/disk usage gauges with gradient bars. Uptime and process count.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔩</div>
+      <h4>Hardware</h4>
+      <p><strong>RAM Modules:</strong> Locator, size (MB), speed (MHz), type (DDR4/5), manufacturer from dmidecode.<br><strong>PCI Devices:</strong> Slot, class, vendor, device from lspci. Scrollable table.</p>
+    </div>
+    <div class="card">
+      <div class="icon">💾</div>
+      <h4>Partitions</h4>
+      <p>All filesystems: device, mount point (/boot, /boot/efi, /), type, size, used, available. Color-coded usage bars (blue/yellow/red).</p>
+    </div>
+    <div class="card">
+      <div class="icon">🌐</div>
+      <h4>Network &amp; Services</h4>
+      <p><strong>Network:</strong> All interfaces with state, MAC, IPs, RX/TX, speed, MTU.<br><strong>Services:</strong> All systemd services with running/exited/failed badges and descriptions.</p>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number" style="color:#22c55e;">Real-Time</div>
+      <div class="label">10-second auto-refresh</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#22c55e;">55+</div>
+      <div class="label">System Services Tracked</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#22c55e;">15+</div>
+      <div class="label">PCI Devices Detected</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#22c55e;">DDR4</div>
+      <div class="label">RAM Module Details</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8: MONITORING -->
+<div class="page page-dark">
+  <h2 class="section-title">Monitoring &amp; <span>Metrics</span></h2>
+  <p class="subtitle">Real-time performance data via WebSocket streaming.</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">📈</div>
+      <h4>CPU Usage</h4>
+      <p>Real-time area chart with green gradient. Percentage display. 60-point history buffer.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h4>Memory Usage</h4>
+      <p>Blue gradient area chart. Absolute and percentage values. Tracks allocation vs usage.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔄</div>
+      <h4>Network I/O</h4>
+      <p>Dual-line chart: RX (purple) and TX (amber). KB/s throughput. Bidirectional traffic view.</p>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">💿</div>
+      <h4>Disk I/O</h4>
+      <p>Dual-line chart: Read (cyan) and Write (red). KB/s throughput. Identifies storage bottlenecks.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🏪</div>
+      <h4>Metrics Store</h4>
+      <p>Zustand-based client-side store. Per-VM history (60 data points per metric). No re-fetch on tab switch. WebSocket auto-reconnect.</p>
+    </div>
+  </div>
+
+  <h3>Events &amp; Logs</h3>
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">📋</div>
+      <h4>Kubernetes Events</h4>
+      <p>Filtered by VM. Normal/Warning type badges. Reason, message, timestamp. Tracks scheduling, lifecycle, and error events.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📜</div>
+      <h4>VM Logs</h4>
+      <p>Two sources: Console log (guest output) and Compute log (QEMU/libvirt). Terminal-style rendering. Refresh button and source selector.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 9: SECURITY -->
+<div class="page page-accent">
+  <h2 class="section-title">Security &amp; <span>Access</span></h2>
+  <p class="subtitle">Enterprise authentication and authorization.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">🔐</div>
+      <h4>PAM Authentication</h4>
+      <p>Login via Linux PAM. Supports local accounts, LDAP, SSSD, and any PAM-compatible backend. No separate user database.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🎫</div>
+      <h4>JWT Sessions</h4>
+      <p>Token-based sessions with configurable expiry. Bearer token on every API request. Secure cookie storage in browser.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔒</div>
+      <h4>HTTPS / TLS</h4>
+      <p>Nginx TLS termination with self-signed or CA certificates. All traffic encrypted. Security headers (X-Frame-Options, nosniff).</p>
+    </div>
+    <div class="card">
+      <div class="icon">🛡️</div>
+      <h4>Kubernetes RBAC</h4>
+      <p>VM operations respect K8s RBAC. Users only manage VMs in authorized namespaces. 403 on unauthorized actions.</p>
+    </div>
+  </div>
+
+  <h3>API Security</h3>
+  <ul>
+    <li>All endpoints require Bearer token authentication</li>
+    <li>Input validation &mdash; K8s name format enforcement on all user-supplied fields</li>
+    <li>CORS and security headers enforced</li>
+    <li>Request/response logging with tracing</li>
+    <li>WebSocket connections authenticated before upgrade</li>
+  </ul>
+</div>
+
+<!-- PAGE 10: hyper2kvm INTEGRATION + CTA -->
+<div class="page page-dark">
+  <h2 class="section-title">hyper2kvm <span>Integration</span></h2>
+  <p class="subtitle">Complete migration-to-management pipeline.</p>
+
+  <div class="flow">
+    <div class="flow-step">VMware VMDK</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">hyper2kvm</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Offline Fixes</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">CDI Upload</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">KubeVirt VM</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">v9s Management</div>
+  </div>
+
+  <p>hyper2kvm handles the migration pipeline: format conversion, bootloader repair, driver injection, and KubeVirt deployment. Once VMs are running, v9s provides the ongoing management layer &mdash; monitoring, console access, snapshots, and day-2 operations.</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">📦</div>
+      <h4>Migrate</h4>
+      <p>hyper2kvm converts VMDK/OVA/VHD to KubeVirt with first-boot success. 8 formats, 35+ OS versions.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🚀</div>
+      <h4>Deploy</h4>
+      <p>Automated CDI upload, PVC creation, VM manifest. One command from VMDK to running VM.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🖥️</div>
+      <h4>Manage</h4>
+      <p>v9s provides web console, metrics, snapshots, network, storage, and host monitoring for ongoing operations.</p>
+    </div>
+  </div>
+
+  <div class="cta-box">
+    <h3>Ready to modernize your VM infrastructure?</h3>
+    <p>From VMware to KubeVirt with hyper2kvm migration + v9s management.<br>Zero downtime. First-boot success. Complete visibility.</p>
+  </div>
+
+  <div class="footer">
+    <p>v9s &mdash; KubeVirt Web Management Platform<br>
+    Part of the hyper2kvm ecosystem<br>
+    github.com/ssahani/hyper2kvm</p>
+  </div>
+</div>
+
+</body>
+</html>

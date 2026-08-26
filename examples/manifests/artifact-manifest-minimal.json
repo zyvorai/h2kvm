@@ -1,0 +1,17 @@
+{
+  "manifest_version": "1.0",
+  "disks": [
+    {
+      "id": "disk-0",
+      "source_format": "vmdk",
+      "bytes": 10737418240,
+      "local_path": "/path/to/disk.vmdk"
+    }
+  ],
+  "pipeline": {
+    "inspect": {"enabled": true},
+    "fix": {"enabled": true},
+    "convert": {"enabled": true},
+    "validate": {"enabled": true}
+  }
+}

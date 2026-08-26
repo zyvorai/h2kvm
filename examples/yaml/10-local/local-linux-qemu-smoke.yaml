@@ -1,0 +1,14 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 10-local/local-linux-qemu-smoke.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 10-local/local-linux-qemu-smoke.yaml
+
+command: local
+vmdk: /path/to/linux.vmdk
+to_output: linux-qemu-test.qcow2
+qemu_test: true
+memory: 2048
+vcpus: 2
+uefi: false
+timeout: 60

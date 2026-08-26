@@ -1,0 +1,47 @@
+# Custom profile example
+# Save as: /etc/hyper2kvm/profiles/my_org.yaml
+
+description: "Organization-specific migration profile"
+extends: "production"
+
+pipeline:
+  fix:
+    enabled: true
+    backup: true
+    # grub is auto-handled
+    regen_initramfs: true
+    remove_vmware_tools: true  # Always remove VMware tools
+    fstab_mode: "stabilize-all"
+
+  convert:
+    enabled: true
+    compress: true
+    compress_level: 8  # Higher compression than production default
+
+  validate:
+    enabled: true
+    check_image_integrity: true
+
+network_mapping:
+  source_networks:
+    "VM Network": "br-corporate"
+    "DMZ Network": "br-dmz"
+    "Internal Network": "br-internal"
+  mac_address_policy: "preserve"
+  default_bridge: "br-corporate"
+
+storage_mapping:
+  default_pool: "corporate-vms"
+  disk_mappings:
+    boot: "/var/lib/libvirt/images/boot"
+    data: "/mnt/corporate-storage/data"
+  format_override: "qcow2"
+  preallocate: false
+
+output:
+  format: "qcow2"
+
+options:
+  report:
+    enabled: true
+    path: "corporate_report.json"

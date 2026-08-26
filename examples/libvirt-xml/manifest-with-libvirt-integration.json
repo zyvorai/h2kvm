@@ -1,0 +1,74 @@
+{
+  "manifest_version": "1.0",
+  "profile": "production",
+
+  "source": {
+    "provider": "libvirt",
+    "vm_id": "my-existing-vm",
+    "vm_name": "rhel9-server",
+    "libvirt_xml_path": "/etc/libvirt/qemu/rhel9-server.xml"
+  },
+
+  "disks": [
+    {
+      "id": "boot",
+      "source_format": "qcow2",
+      "local_path": "/var/lib/libvirt/images/rhel9-boot.qcow2",
+      "bytes": 32212254720,
+      "disk_type": "boot"
+    },
+    {
+      "id": "data",
+      "source_format": "qcow2",
+      "local_path": "/var/lib/libvirt/images/rhel9-data.qcow2",
+      "bytes": 107374182400,
+      "disk_type": "data"
+    }
+  ],
+
+  "firmware": {
+    "type": "uefi"
+  },
+
+  "os_hint": "rhel9",
+
+  "metadata": {
+    "networks": [
+      {
+        "type": "bridge",
+        "source": "br0",
+        "mac": "52:54:00:aa:bb:cc",
+        "model": "virtio"
+      }
+    ],
+    "memory_bytes": 8589934592,
+    "vcpus": 4
+  },
+
+  "pipeline": {
+    "inspect": {"enabled": true},
+    "fix": {"enabled": true, "backup": true},
+    "convert": {"enabled": true, "compress": true, "compress_level": 6},
+    "validate": {"enabled": true}
+  },
+
+  "output": {
+    "directory": "/converted/rhel9-server",
+    "format": "qcow2"
+  },
+
+  "libvirt_integration": {
+    "enabled": true,
+    "define_domain": true,
+    "overwrite_domain": false,
+    "import_to_pool": "vms",
+    "pool_path": "/var/lib/libvirt/images",
+    "copy_disks": true,
+    "overwrite_volumes": false,
+    "create_snapshot": true,
+    "snapshot_name": "pre-first-boot",
+    "autostart": false,
+    "auto_start": false,
+    "vm_name": "rhel9-server-converted"
+  }
+}

@@ -1,0 +1,62 @@
+---
+# Advanced VM with multiple networks and UEFI Secure Boot
+apiVersion: hyper2kvm.io/v1alpha1
+kind: HyperConversion
+metadata:
+  name: advanced-multi-network
+  namespace: production
+spec:
+  source:
+    url: "s3://my-bucket/windows-server-2022.vhdx"
+    format: vhdx
+    # S3 authentication via secret
+    secretRef:
+      name: s3-credentials  # Contains accessKeyID and secretAccessKey
+
+  storage:
+    storageClass: fast-ssd
+    size: 100Gi
+    accessMode: ReadWriteOnce
+    volumeMode: Filesystem
+
+  vm:
+    name: windows-server
+
+    cpu:
+      cores: 8
+      sockets: 2
+      threads: 1
+
+    memory: 16Gi
+
+    # UEFI Secure Boot for Windows
+    firmware: uefi-secure
+
+    runStrategy: Always
+    evictionStrategy: LiveMigrate
+
+    # Multiple network interfaces
+    networks:
+    - name: default
+      type: pod
+      model: e1000e  # Windows compatibility
+
+    - name: management
+      type: multus
+      networkName: management-network
+      model: virtio
+      # macAddress: "52:54:00:12:34:56"
+
+    - name: data-plane
+      type: bridge
+      networkName: data-bridge
+      model: virtio
+
+    # Cloud-init for Windows configuration
+    cloudInit:
+      userDataSecretRef:
+        name: windows-cloudinit
+
+  conversion:
+    compression: zlib  # Windows may prefer zlib
+    timeout: 120

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Monitoring &amp; Observability — Prometheus, Grafana &amp; Alerting for KVM Infrastructure</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #7c2d12, #c2410c, #ea580c); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #fed7aa; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(254,215,170,0.2); border: 1px solid rgba(254,215,170,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #1a0e05; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #fed7aa; }
+  .page-light h2.st span { color: #c2410c; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #fed7aa; }
+  .page-light h3 { color: #c2410c; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #c2410c; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #fed7aa; }
+  .page-light .card h4 { color: #c2410c; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  pre { background: #7c2d12; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(254,215,170,0.08); border: 1px solid rgba(254,215,170,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(124,45,18,0.15), rgba(194,65,12,0.08)); border: 2px solid #ea580c; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #fed7aa; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Monitoring &amp; <span>Observability</span></h1>
+  <h2>Prometheus, Grafana &amp; Alerting for KVM Infrastructure</h2>
+  <p class="sub">Replace vCenter monitoring with open-source observability. Prometheus + Grafana + Alertmanager provides deeper metrics, better dashboards, and flexible alerting — all at zero license cost. This guide covers exporter setup, dashboard templates, alerting rules, and vCenter-to-Grafana migration.</p>
+  <div class="badge">Prometheus | Grafana | node_exporter | libvirt_exporter | Alertmanager | Loki | $0 License</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Monitoring Stack <span>Architecture</span></h2>
+  <p class="sub">vCenter replacement with Prometheus + Grafana + Loki — open-source, production-proven.</p>
+
+  <h3>VMware vCenter vs Open-Source Monitoring</h3>
+  <table>
+    <tr><th style="width:20%">Feature</th><th style="width:20%">vCenter / vROps</th><th style="width:20%">Prometheus + Grafana</th><th style="width:15%">Cost (vCenter)</th><th style="width:15%">Cost (Prometheus)</th><th style="width:10%">Winner</th></tr>
+    <tr><td>Host metrics</td><td class="check">Built-in</td><td class="check">node_exporter</td><td>Included in vSphere</td><td>$0</td><td class="check">Tie</td></tr>
+    <tr><td>VM metrics</td><td class="check">Built-in</td><td class="check">libvirt_exporter</td><td>Included</td><td>$0</td><td class="check">Tie</td></tr>
+    <tr><td>Custom dashboards</td><td>Limited</td><td class="check">Unlimited (Grafana)</td><td>vROps: $70K+</td><td>$0</td><td class="check">Grafana</td></tr>
+    <tr><td>Alerting</td><td>vROps alerts</td><td class="check">Alertmanager (Slack, PagerDuty, email)</td><td>vROps required</td><td>$0</td><td class="check">Alertmanager</td></tr>
+    <tr><td>Log aggregation</td><td>vRealize Log Insight</td><td class="check">Loki + Promtail</td><td>$50K+</td><td>$0</td><td class="check">Loki</td></tr>
+    <tr><td>Retention</td><td>30 days (default)</td><td class="check">Years (configurable)</td><td>Storage adds cost</td><td>Local disk</td><td class="check">Prometheus</td></tr>
+    <tr><td>API/Query</td><td>SOAP API (complex)</td><td class="check">PromQL (powerful)</td><td>—</td><td>—</td><td class="check">PromQL</td></tr>
+    <tr><td><strong>Annual Cost</strong></td><td></td><td></td><td><strong>$120K+ (vROps+Log)</strong></td><td><strong>$0</strong></td><td></td></tr>
+  </table>
+
+  <h3>Stack Components</h3>
+  <pre>
+# Install monitoring stack on dedicated host (or use containers)
+# 1. Prometheus (metrics collection + storage)
+dnf install prometheus2 && systemctl enable --now prometheus
+
+# 2. Grafana (dashboards + visualization)
+dnf install grafana && systemctl enable --now grafana-server
+
+# 3. node_exporter (host metrics — install on EVERY KVM host)
+dnf install node_exporter && systemctl enable --now node_exporter
+
+# 4. libvirt_exporter (VM metrics — install on EVERY KVM host)
+# github.com/Tinkoff/libvirt-exporter
+./libvirt_exporter --libvirt.uri="qemu:///system" &amp;
+
+# 5. Alertmanager (alerting — Slack, PagerDuty, email)
+dnf install alertmanager && systemctl enable --now alertmanager
+
+# 6. Loki + Promtail (log aggregation — optional)
+# Install via Docker or Helm for simplicity</pre>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Prometheus <span>Configuration</span></h2>
+  <p class="sub">Scrape configuration for KVM hosts and VM metrics.</p>
+
+  <h3>prometheus.yml</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Scrape Configuration</h4>
+      <pre>
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'kvm-hosts'
+    static_configs:
+      - targets:
+          - 'kvm-host-01:9100'
+          - 'kvm-host-02:9100'
+          - 'kvm-host-03:9100'
+        labels:
+          cluster: production
+
+  - job_name: 'libvirt'
+    static_configs:
+      - targets:
+          - 'kvm-host-01:9177'
+          - 'kvm-host-02:9177'
+          - 'kvm-host-03:9177'
+
+  - job_name: 'ceph'
+    static_configs:
+      - targets:
+          - 'ceph-mon-01:9283'
+
+rule_files:
+  - 'rules/kvm-alerts.yml'
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['localhost:9093']</pre>
+    </div>
+    <div class="card">
+      <h4>Key Metrics Available</h4>
+      <table>
+        <tr><th>Exporter</th><th>Metric</th><th>What It Measures</th></tr>
+        <tr><td>node</td><td><code>node_cpu_seconds_total</code></td><td>Host CPU usage per core</td></tr>
+        <tr><td>node</td><td><code>node_memory_MemAvailable_bytes</code></td><td>Available host memory</td></tr>
+        <tr><td>node</td><td><code>node_disk_io_time_seconds_total</code></td><td>Disk I/O utilization</td></tr>
+        <tr><td>node</td><td><code>node_network_receive_bytes_total</code></td><td>Network traffic</td></tr>
+        <tr><td>libvirt</td><td><code>libvirt_domain_info_cpu_time_seconds</code></td><td>Per-VM CPU usage</td></tr>
+        <tr><td>libvirt</td><td><code>libvirt_domain_info_memory_usage_bytes</code></td><td>Per-VM memory usage</td></tr>
+        <tr><td>libvirt</td><td><code>libvirt_domain_block_stats_read_bytes</code></td><td>Per-VM disk read</td></tr>
+        <tr><td>libvirt</td><td><code>libvirt_domain_interface_stats_receive_bytes</code></td><td>Per-VM network rx</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Grafana <span>Dashboards</span></h2>
+  <p class="sub">Pre-built dashboard templates for KVM host and VM monitoring.</p>
+
+  <h3>Dashboard Templates</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>KVM Host Overview Dashboard</h4>
+      <ul>
+        <li><strong>Row 1:</strong> Host CPU usage (per core), load average, uptime</li>
+        <li><strong>Row 2:</strong> Memory usage (used/cached/free), swap usage</li>
+        <li><strong>Row 3:</strong> Disk I/O (IOPS, throughput, latency), space usage</li>
+        <li><strong>Row 4:</strong> Network traffic (rx/tx per interface), errors</li>
+        <li><strong>Row 5:</strong> VM count, total vCPUs, total VM memory</li>
+        <li><strong>Variables:</strong> host selector, time range</li>
+        <li>Grafana ID: 1860 (Node Exporter Full)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>VM Performance Dashboard</h4>
+      <ul>
+        <li><strong>Row 1:</strong> VM list table (name, state, CPU, memory, disk)</li>
+        <li><strong>Row 2:</strong> Selected VM CPU usage over time</li>
+        <li><strong>Row 3:</strong> Selected VM memory usage + balloon status</li>
+        <li><strong>Row 4:</strong> Disk IOPS + throughput + latency per disk</li>
+        <li><strong>Row 5:</strong> Network rx/tx per interface</li>
+        <li><strong>Variables:</strong> host selector, VM name selector</li>
+        <li>Custom dashboard using libvirt_exporter metrics</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Capacity Planning Dashboard</h4>
+      <ul>
+        <li><strong>Gauge:</strong> Overall cluster CPU utilization %</li>
+        <li><strong>Gauge:</strong> Overall cluster memory utilization %</li>
+        <li><strong>Gauge:</strong> Storage pool utilization %</li>
+        <li><strong>Trend:</strong> 30-day CPU/memory/storage growth rate</li>
+        <li><strong>Forecast:</strong> Days until 80% capacity (predict_linear)</li>
+        <li><strong>Table:</strong> Top 10 resource-consuming VMs</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>PromQL Examples</h4>
+      <pre>
+# Host CPU usage percentage
+100 - (avg by (instance) (
+  rate(node_cpu_seconds_total{mode="idle"}[5m])
+) * 100)
+
+# VM CPU usage percentage
+rate(libvirt_domain_info_cpu_time_seconds[5m])
+  / on(domain) libvirt_domain_info_vcpus * 100
+
+# Disk space forecast (days until full)
+predict_linear(
+  node_filesystem_avail_bytes{
+    mountpoint="/var/lib/libvirt"
+  }[7d], 86400 * 30
+) / 1e9
+
+# Memory pressure
+1 - (node_memory_MemAvailable_bytes
+  / node_memory_MemTotal_bytes)</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">Alerting <span>Rules</span></h2>
+  <p class="sub">Production-ready alerting rules for KVM infrastructure.</p>
+
+  <h3>Critical Alert Rules (kvm-alerts.yml)</h3>
+  <pre>
+groups:
+  - name: kvm-host-alerts
+    rules:
+      - alert: HostHighCPU
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: "Host {{ $labels.instance }} CPU > 85% for 10min" }
+
+      - alert: HostMemoryLow
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) < 0.10
+        for: 5m
+        labels: { severity: critical }
+        annotations: { summary: "Host {{ $labels.instance }} memory < 10% available" }
+
+      - alert: HostDiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/var/lib/libvirt"} / node_filesystem_size_bytes) < 0.15
+        for: 5m
+        labels: { severity: critical }
+        annotations: { summary: "Libvirt storage < 15% free on {{ $labels.instance }}" }
+
+      - alert: HostDown
+        expr: up{job="kvm-hosts"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations: { summary: "KVM host {{ $labels.instance }} is unreachable" }
+
+  - name: kvm-vm-alerts
+    rules:
+      - alert: VMDown
+        expr: libvirt_domain_info_state != 1
+        for: 5m
+        labels: { severity: warning }
+        annotations: { summary: "VM {{ $labels.domain }} is not running" }
+
+      - alert: VMHighCPU
+        expr: rate(libvirt_domain_info_cpu_time_seconds[5m]) / on(domain) libvirt_domain_info_vcpus > 0.90
+        for: 15m
+        labels: { severity: warning }
+        annotations: { summary: "VM {{ $labels.domain }} CPU > 90% for 15min" }</pre>
+
+  <h3>Alertmanager Routing</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>alertmanager.yml</h4>
+      <pre>
+route:
+  receiver: 'default'
+  group_by: [alertname, instance]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    - match: { severity: critical }
+      receiver: 'pagerduty-critical'
+    - match: { severity: warning }
+      receiver: 'slack-warnings'
+
+receivers:
+  - name: 'slack-warnings'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/...'
+        channel: '#kvm-alerts'
+        title: '{{ .GroupLabels.alertname }}'
+        text: '{{ .CommonAnnotations.summary }}'
+
+  - name: 'pagerduty-critical'
+    pagerduty_configs:
+      - service_key: 'xxx-xxx-xxx'
+
+  - name: 'default'
+    email_configs:
+      - to: 'ops@company.com'</pre>
+    </div>
+    <div class="card">
+      <h4>Alert Priority Matrix</h4>
+      <table>
+        <tr><th>Alert</th><th>Severity</th><th>Channel</th></tr>
+        <tr><td>Host down</td><td class="cross">Critical</td><td>PagerDuty + Slack</td></tr>
+        <tr><td>Memory &lt; 10%</td><td class="cross">Critical</td><td>PagerDuty + Slack</td></tr>
+        <tr><td>Disk &lt; 15%</td><td class="cross">Critical</td><td>PagerDuty + Slack</td></tr>
+        <tr><td>VM not running</td><td>Warning</td><td>Slack only</td></tr>
+        <tr><td>CPU &gt; 85%</td><td>Warning</td><td>Slack only</td></tr>
+        <tr><td>VM high CPU</td><td>Warning</td><td>Slack only</td></tr>
+        <tr><td>Disk forecast &lt; 30d</td><td>Info</td><td>Email weekly</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Log Aggregation <span>with Loki</span></h2>
+  <p class="sub">Centralized logging for KVM hosts and VMs — replaces vRealize Log Insight.</p>
+
+  <h3>Loki + Promtail Setup</h3>
+  <pre>
+# promtail config on each KVM host — /etc/promtail/config.yml
+server:
+  http_listen_port: 9080
+
+positions:
+  filename: /var/lib/promtail/positions.yaml
+
+clients:
+  - url: http://loki-server:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: syslog
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: syslog
+          host: kvm-host-01
+          __path__: /var/log/messages
+
+  - job_name: libvirt
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: libvirt
+          host: kvm-host-01
+          __path__: /var/log/libvirt/qemu/*.log
+
+  - job_name: h2kvmctl
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: h2kvmctl
+          host: kvm-host-01
+          __path__: /var/log/hyper2kvm/*.log</pre>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>LogQL Query Examples</h4>
+      <pre>
+# VM start/stop events
+{job="libvirt"} |= "starting"
+
+# Migration errors
+{job="h2kvmctl"} |= "error"
+  | json | status="failed"
+
+# OOM events on host
+{job="syslog"} |= "Out of memory"
+
+# All logs for specific VM
+{job="libvirt", host="kvm-host-01"}
+  |= "db-server"
+
+# Error rate over time
+sum(rate({job="h2kvmctl"}
+  |= "error" [5m])) by (host)</pre>
+    </div>
+    <div class="card">
+      <h4>Log Retention &amp; Cost</h4>
+      <ul>
+        <li><strong>vRealize Log Insight:</strong> $4,870/CPU/yr ($50K+ total)</li>
+        <li><strong>Loki:</strong> $0 (open-source, local storage)</li>
+        <li>Retention: 30 days hot, 1 year cold (S3/MinIO)</li>
+        <li>Storage: ~1-5 GB/day for 5 KVM hosts</li>
+        <li>Compressed: Loki chunks are 10-20x smaller than raw</li>
+        <li>Grafana: unified view of metrics + logs in one UI</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">Migration <span>from vCenter Monitoring</span></h2>
+  <p class="sub">Map your existing vCenter monitoring to Prometheus/Grafana equivalents.</p>
+
+  <h3>vCenter Metric → PromQL Mapping</h3>
+  <table>
+    <tr><th style="width:25%">vCenter Metric</th><th style="width:40%">PromQL Equivalent</th><th style="width:35%">Grafana Panel Type</th></tr>
+    <tr><td>cpu.usage.average (%)</td><td><code>100 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100</code></td><td>Time series, gauge</td></tr>
+    <tr><td>mem.active.average (KB)</td><td><code>node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes</code></td><td>Time series, stat</td></tr>
+    <tr><td>disk.usage.average (KBps)</td><td><code>rate(node_disk_read_bytes_total[5m]) + rate(node_disk_written_bytes_total[5m])</code></td><td>Time series</td></tr>
+    <tr><td>net.usage.average (KBps)</td><td><code>rate(node_network_receive_bytes_total[5m]) + rate(node_network_transmit_bytes_total[5m])</code></td><td>Time series</td></tr>
+    <tr><td>VM CPU Ready (%)</td><td><code>rate(libvirt_domain_info_cpu_time_seconds[5m]) / libvirt_domain_info_vcpus</code></td><td>Time series</td></tr>
+    <tr><td>Datastore Free Space</td><td><code>node_filesystem_avail_bytes{mountpoint="/var/lib/libvirt"}</code></td><td>Gauge, bar chart</td></tr>
+    <tr><td>VM Power State</td><td><code>libvirt_domain_info_state</code></td><td>Status table</td></tr>
+    <tr><td>Host Uptime</td><td><code>node_boot_time_seconds</code></td><td>Stat panel</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>Open-Source Monitoring: Better Dashboards, Better Alerting, $0 License</h3>
+    <p>Prometheus + Grafana + Loki replaces vCenter monitoring, vROps, and vRealize Log Insight — saving $120K+/yr in licensing. PromQL is more powerful than vCenter's query language. Grafana dashboards are unlimited and shareable. Alertmanager routes to Slack, PagerDuty, email, and webhooks. The open-source monitoring ecosystem has 3,000+ community dashboards and integrates with every tool in your stack.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Monitoring &amp; Observability Guide</div>
+</div>
+
+</body>
+</html>

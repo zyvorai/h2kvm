@@ -1,0 +1,199 @@
+---
+# ============================================
+# Ansible Playbook: Deploy hyper2kvm Fleet
+# ============================================
+# Installs hyper2kvm on multiple migration hosts
+# and optionally runs a test migration.
+#
+# Usage:
+#   ansible-playbook -i inventory.ini examples/ansible/hyper2kvm-deploy.yaml
+#   ansible-playbook -i inventory.ini examples/ansible/hyper2kvm-deploy.yaml --tags test
+# ============================================
+
+- name: Deploy hyper2kvm on migration hosts
+  hosts: migration_hosts
+  become: yes
+  vars:
+    hyper2kvm_repo: https://github.com/ssahani/hyper2kvm.git
+    hyper2kvm_dir: /opt/hyper2kvm
+    hyper2kvm_user: "{{ ansible_user }}"
+    run_demo: false
+
+  tasks:
+    # ── Install system deps ──
+    - name: Install system packages (Fedora/RHEL)
+      dnf:
+        name:
+          - python3
+          - python3-pip
+          - qemu-img
+          - qemu-system-x86-core
+          - libvirt-daemon-kvm
+          - libvirt-client
+          - virt-install
+          - edk2-ovmf
+          - openssh-clients
+          - sshpass
+          - curl
+          - git
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Install system packages (Ubuntu/Debian)
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - qemu-utils
+          - qemu-system-x86
+          - libvirt-daemon-system
+          - libvirt-clients
+          - virtinst
+          - ovmf
+          - openssh-client
+          - sshpass
+          - curl
+          - git
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    # ── Clone repo ──
+    - name: Clone hyper2kvm repo
+      git:
+        repo: "{{ hyper2kvm_repo }}"
+        dest: "{{ hyper2kvm_dir }}"
+        version: main
+        force: yes
+
+    # ── Install hyper2kvm ──
+    - name: Install hyper2kvm from source
+      pip:
+        name: "{{ hyper2kvm_dir }}"
+        editable: yes
+        state: present
+
+    # ── Install govc ──
+    - name: Check govc
+      command: govc version
+      register: govc_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Install govc
+      get_url:
+        url: https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x86_64.tar.gz
+        dest: /tmp/govc.tar.gz
+      when: govc_check.rc != 0
+
+    - name: Extract govc
+      unarchive:
+        src: /tmp/govc.tar.gz
+        dest: /usr/local/bin/
+        remote_src: yes
+        include: govc
+      when: govc_check.rc != 0
+
+    # ── Install pyvmomi ──
+    - name: Install pyvmomi
+      pip:
+        name: pyvmomi
+        state: present
+
+    # ── Enable services ──
+    - name: Enable libvirtd
+      systemd:
+        name: libvirtd
+        state: started
+        enabled: yes
+
+    - name: Start default network
+      command: virsh net-start default
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Autostart default network
+      command: virsh net-autostart default
+      ignore_errors: yes
+      changed_when: false
+
+    # ── Load kernel modules ──
+    - name: Load nbd module
+      modprobe:
+        name: nbd
+        params: max_part=16
+        state: present
+
+    - name: Load kvm module
+      modprobe:
+        name: kvm
+        state: present
+
+    - name: Load vhost_net module
+      modprobe:
+        name: vhost_net
+        state: present
+
+    - name: Persist kernel modules
+      copy:
+        dest: /etc/modules-load.d/hyper2kvm.conf
+        content: |
+          nbd
+          kvm
+          vhost_net
+
+    - name: Set nbd options
+      copy:
+        dest: /etc/modprobe.d/hyper2kvm-nbd.conf
+        content: |
+          options nbd nbds_max=128 max_part=16
+
+    # ── Setup user permissions ──
+    - name: Add user to groups
+      user:
+        name: "{{ hyper2kvm_user }}"
+        groups: libvirt,kvm,qemu,disk
+        append: yes
+      when: hyper2kvm_user != "root"
+
+    # ── Open firewall ──
+    - name: Open firewall ports (firewalld)
+      firewalld:
+        service: "{{ item }}"
+        permanent: yes
+        state: enabled
+      loop:
+        - ssh
+        - libvirt
+      when: ansible_os_family == "RedHat"
+      ignore_errors: yes
+
+    - name: Open VNC ports (firewalld)
+      firewalld:
+        port: 5900-5999/tcp
+        permanent: yes
+        state: enabled
+      when: ansible_os_family == "RedHat"
+      ignore_errors: yes
+
+    - name: Reload firewall
+      command: firewall-cmd --reload
+      when: ansible_os_family == "RedHat"
+      ignore_errors: yes
+      changed_when: false
+
+    # ── Verify ──
+    - name: Verify h2kvmctl
+      command: h2kvmctl --version
+      register: h2kvmctl_version
+      changed_when: false
+
+    - name: Show version
+      debug:
+        msg: "hyper2kvm {{ h2kvmctl_version.stdout }} installed on {{ inventory_hostname }}"
+
+    # ── Optional: Run demo ──
+    - name: Run demo migration
+      command: "{{ hyper2kvm_dir }}/scripts/run-demo.sh --photon"
+      when: run_demo
+      tags: test

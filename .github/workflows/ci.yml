@@ -1,0 +1,292 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  PYTHON_VERSION: "3.11"
+  GO_VERSION: "1.23"
+
+jobs:
+  # Python tests for CLI and vmspawn SDK
+  python-tests:
+    name: Python Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt', '**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,test]"
+
+      - name: Lint with ruff
+        run: |
+          pip install ruff
+          ruff check hyper2kvm/
+
+      - name: Type check with mypy
+        run: |
+          pip install mypy types-PyYAML
+          mypy hyper2kvm/ --ignore-missing-imports
+
+      - name: Run unit tests
+        run: |
+          pytest hyper2kvm/vmspawn/tests/ -v --cov=hyper2kvm.vmspawn --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v6
+        with:
+          files: ./coverage.xml
+          flags: python
+          name: python-coverage
+
+  # Operator tests
+  operator-tests:
+    name: Operator Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Download dependencies
+        working-directory: operator
+        run: go mod download
+
+      - name: Run go fmt
+        working-directory: operator
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+            echo "Code is not formatted. Run 'go fmt ./...'"
+            gofmt -s -l .
+            exit 1
+          fi
+
+      - name: Run go vet
+        working-directory: operator
+        run: go vet ./...
+
+      - name: Install envtest
+        working-directory: operator
+        run: |
+          go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+          setup-envtest use -p path
+
+      - name: Run tests
+        working-directory: operator
+        run: |
+          export KUBEBUILDER_ASSETS=$(setup-envtest use -p path)
+          go test ./... -v -coverprofile=coverage.out -covermode=atomic
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v6
+        with:
+          files: ./operator/coverage.out
+          flags: operator
+          name: operator-coverage
+
+  # Build operator image
+  operator-build:
+    name: Build Operator Image
+    runs-on: ubuntu-latest
+    needs: operator-tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build operator image
+        working-directory: operator
+        run: |
+          docker build -t ghcr.io/hyper2kvm/operator:test .
+
+      - name: Save image
+        run: |
+          docker save ghcr.io/hyper2kvm/operator:test | gzip > operator-image.tar.gz
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: operator-image
+          path: operator-image.tar.gz
+          retention-days: 1
+
+  # Package build and validation
+  package-build:
+    name: Build Packages
+    runs-on: ubuntu-latest
+    needs: python-tests
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            package: deb
+          - os: ubuntu-latest
+            package: rpm
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install build dependencies
+        run: |
+          pip install build wheel
+
+      - name: Build Python wheel
+        run: |
+          python -m build
+
+      - name: Build DEB package
+        if: matrix.package == 'deb'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y debhelper dh-python
+          dpkg-buildpackage -us -uc
+
+      - name: Build RPM package
+        if: matrix.package == 'rpm'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm
+          python -m build --wheel
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages-${{ matrix.package }}
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+            ../*.deb
+            dist/*.rpm
+          retention-days: 7
+
+  # Go web server tests
+  go-web:
+    name: Go Web Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build web server
+        working-directory: web
+        run: go build ./...
+
+      - name: Run web tests
+        working-directory: web
+        run: go test ./...
+
+  # Frontend build and type check
+  frontend:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: web/dashboard
+        run: npm ci
+
+      - name: Type check
+        working-directory: web/dashboard
+        run: npx tsc --noEmit
+
+      - name: Build
+        working-directory: web/dashboard
+        run: npm run build
+
+  # Security scanning
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Final status check
+  ci-success:
+    name: CI Success
+    runs-on: ubuntu-latest
+    needs:
+      - python-tests
+      - operator-tests
+      - operator-build
+      - package-build
+      - go-web
+      - frontend
+      - security-scan
+
+    steps:
+      - name: Success
+        run: echo "All CI checks passed!"

@@ -1,0 +1,172 @@
+/* Machina login — macOS Tahoe liquid glass (wallpaper blur, frosted panel, SF typography) */
+
+.login-page-macos {
+  --macos-login-bg: #0b0f18;
+  --macos-login-wall: linear-gradient(
+    145deg,
+    #0f172a 0%,
+    #1e293b 35%,
+    #312e81 55%,
+    #0f172a 100%
+  );
+  --macos-login-card: rgba(28, 31, 40, 0.72);
+  --macos-login-card-border: rgba(255, 255, 255, 0.12);
+  --macos-login-radius: 22px;
+}
+
+.login-page-macos.login-page {
+  background: var(--macos-login-bg);
+}
+
+.login-page-macos .login-hero {
+  background: var(--macos-login-wall);
+  background-size: 200% 200%;
+  animation: login-gradient-shift 24s ease infinite;
+}
+
+.login-page-macos .login-hero::before {
+  opacity: 0.2;
+}
+
+.login-page-macos .login-hero-mesh {
+  opacity: 0.35;
+}
+
+.login-page-macos .login-spotlight {
+  opacity: 0.45;
+  background: radial-gradient(ellipse at 30% 20%, rgba(147, 197, 253, 0.18) 0%, transparent 60%);
+}
+
+.login-page-macos .login-aurora {
+  opacity: 0.7;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(59, 130, 246, 0.18), transparent 55%),
+    radial-gradient(ellipse 50% 45% at 80% 70%, rgba(139, 92, 246, 0.14), transparent 50%),
+    radial-gradient(ellipse 40% 40% at 60% 10%, rgba(34, 211, 238, 0.08), transparent 45%);
+}
+
+.login-page-macos .login-scanline,
+.login-page-macos .login-particles {
+  display: none;
+}
+
+.login-page-macos .login-orb {
+  opacity: 0.55;
+  filter: blur(1px);
+}
+
+.login-page-macos .login-panel {
+  background: transparent;
+  background-image:
+    radial-gradient(ellipse 90% 70% at 50% 50%, rgba(15, 23, 42, 0.85), rgba(11, 15, 24, 0.95));
+}
+
+.login-page-macos .login-panel-grid {
+  opacity: 0.03;
+}
+
+.login-page-macos .login-panel-glow {
+  width: min(92vw, 440px);
+  height: 360px;
+  background: radial-gradient(ellipse, rgba(59, 130, 246, 0.08) 0%, transparent 68%);
+}
+
+.login-page-macos .login-glass {
+  background: var(--macos-login-card);
+  border: 1px solid var(--macos-login-card-border);
+  border-radius: var(--macos-login-radius);
+  backdrop-filter: blur(28px) saturate(1.35);
+  -webkit-backdrop-filter: blur(28px) saturate(1.35);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  animation: none;
+}
+
+.login-page-macos .login-glass-border::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.04)
+  );
+  opacity: 0.9;
+}
+
+.login-page-macos .login-logo-ring {
+  animation: none;
+  border-radius: 18px;
+  box-shadow:
+    0 12px 32px rgba(37, 99, 235, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.15) inset;
+}
+
+.login-page-macos .login-input {
+  border-radius: 10px;
+  background: rgba(10, 14, 22, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.login-page-macos .login-input:focus {
+  border-color: rgba(96, 165, 250, 0.65);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.login-page-macos .login-btn-primary {
+  border-radius: 10px;
+  margin-top: 1.25rem;
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  border: 1px solid rgba(147, 197, 253, 0.35);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}
+
+.login-page-macos .login-btn-primary::after {
+  animation: none;
+  display: none;
+}
+
+.login-page-macos .login-btn-secondary {
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+}
+
+.login-page-macos .login-feature-card {
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.login-page-macos .login-feature-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.login-page-macos .login-beam {
+  opacity: 0.35;
+}
+
+.login-page-macos .login-stat-pill {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+.login-page-macos .login-text-gradient {
+  background: linear-gradient(135deg, #e0f2fe 0%, #c7d2fe 45%, #93c5fd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-page-macos .login-hero {
+    animation: none !important;
+  }
+  .login-page-macos .login-orb {
+    display: none;
+  }
+}

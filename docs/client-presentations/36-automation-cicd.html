@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Automation &amp; CI/CD Integration — Pipeline-Driven Migration at Scale</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #78350f, #92400e, #d97706); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #fbbf24; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(251,191,36,0.2); border: 1px solid rgba(251,191,36,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #1a1008; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #fbbf24; }
+  .page-light h2.st span { color: #92400e; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #fbbf24; }
+  .page-light h3 { color: #92400e; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #92400e; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #fbbf24; }
+  .page-light .card h4 { color: #92400e; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #78350f; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(251,191,36,0.06); }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(120,53,15,0.15), rgba(146,64,14,0.08)); border: 2px solid #d97706; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #fbbf24; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Automation &amp; <span>CI/CD</span> Integration</h1>
+  <h2>Pipeline-Driven Migration at Scale</h2>
+  <p class="sub">Manual VM migration doesn't scale beyond 20 VMs. hyper2kvm's YAML-driven approach integrates with Ansible, Terraform, Jenkins, GitLab CI, and GitHub Actions for fully automated, repeatable, auditable migration pipelines. Migrate 500+ VMs with approval gates, rollback, and observability.</p>
+  <div class="badge">YAML Config | Ansible | Terraform | GitLab CI | Jenkins | Batch Orchestration | Prometheus</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">YAML-Driven <span>Migration</span></h2>
+  <p class="sub">Declarative configuration for reproducible, version-controlled migrations.</p>
+
+  <h3>Single VM Configuration</h3>
+  <pre>
+# migration.yaml — single VM conversion
+source:
+  vmdk: /data/exports/db-server.vmdk
+  # Or: ova: /data/exports/db-server.ova
+  # Or: vhd: /data/exports/db-server.vhdx
+
+output:
+  directory: /var/lib/libvirt/images/
+  format: qcow2
+  compress: true
+
+fixes:
+  fstab: true
+  initramfs: true
+  network: true
+
+deploy:
+  emit_domain_xml: true
+  deploy_libvirt: true
+  boot_test: true
+  memory: 8192
+  vcpus: 4
+  network_bridge: br0</pre>
+
+  <h3>Batch Migration Configuration</h3>
+  <pre>
+# batch-migration.yaml — multiple VMs in dependency order
+global:
+  output_directory: /var/lib/libvirt/images/
+  format: qcow2
+  compress: true
+  fixes: { fstab: true, initramfs: true }
+  deploy: { emit_domain_xml: true, deploy_libvirt: true }
+
+vms:
+  - name: postgres-primary
+    source: { vmdk: /data/exports/postgres-primary.vmdk }
+    deploy: { memory: 16384, vcpus: 8, network_bridge: br-db }
+    priority: 1    # Migrated first (database)
+
+  - name: app-server-1
+    source: { vmdk: /data/exports/app-server-1.vmdk }
+    deploy: { memory: 8192, vcpus: 4, network_bridge: br-app }
+    depends_on: [postgres-primary]
+    priority: 2
+
+  - name: app-server-2
+    source: { vmdk: /data/exports/app-server-2.vmdk }
+    deploy: { memory: 8192, vcpus: 4, network_bridge: br-app }
+    depends_on: [postgres-primary]
+    priority: 2
+
+  - name: nginx-lb
+    source: { vmdk: /data/exports/nginx-lb.vmdk }
+    deploy: { memory: 4096, vcpus: 2, network_bridge: br0 }
+    depends_on: [app-server-1, app-server-2]
+    priority: 3    # Migrated last (load balancer)</pre>
+
+  <div class="highlight">
+    <h3>Dry Run &amp; Validation</h3>
+    <p><code>h2kvmctl convert --config batch-migration.yaml --dry-run</code> — validates YAML syntax, checks source files exist, verifies disk space, validates network bridges, reports dependency order, and estimates total conversion time. Always dry-run before production migration.</p>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Ansible Playbook <span>Integration</span></h2>
+  <p class="sub">Inventory-driven migration across multiple hosts with idempotent operations.</p>
+
+  <h3>Ansible Inventory</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Inventory (hosts.yml)</h4>
+      <pre>
+all:
+  children:
+    kvm_hosts:
+      hosts:
+        kvm-host-01:
+          ansible_host: 10.0.1.11
+          migration_vms:
+            - name: db-server
+              source: /nfs/exports/db-server.vmdk
+              memory: 16384
+              vcpus: 8
+              bridge: br-db
+            - name: app-server
+              source: /nfs/exports/app-server.vmdk
+              memory: 8192
+              vcpus: 4
+              bridge: br-app
+        kvm-host-02:
+          ansible_host: 10.0.1.12
+          migration_vms:
+            - name: web-server
+              source: /nfs/exports/web.vmdk
+              memory: 4096
+              vcpus: 2
+              bridge: br0</pre>
+    </div>
+    <div class="card">
+      <h4>Playbook (migrate.yml)</h4>
+      <pre>
+---
+- name: Migrate VMs to KVM
+  hosts: kvm_hosts
+  become: true
+  tasks:
+    - name: Install hyper2kvm
+      pip:
+        name: hyper2kvm
+        state: present
+
+    - name: Run doctor check
+      command: h2kvmctl doctor
+      register: doctor_result
+      changed_when: false
+
+    - name: Convert each VM
+      command: >
+        h2kvmctl convert
+          --source {{ item.source }}
+          --output /var/lib/libvirt/images/
+          --format qcow2 --compress
+          --fix-fstab --fix-initramfs
+          --emit-domain-xml
+          --deploy-libvirt
+          --memory {{ item.memory }}
+          --vcpus {{ item.vcpus }}
+          --network-bridge {{ item.bridge }}
+      loop: "{{ migration_vms }}"
+      register: conversion_results
+
+    - name: Verify VMs are running
+      command: virsh domstate {{ item.name }}
+      loop: "{{ migration_vms }}"
+      register: vm_states
+      failed_when: >
+        vm_states.stdout != "running"</pre>
+    </div>
+  </div>
+
+  <h3>Rolling Migration with Ansible</h3>
+  <pre>
+# Run migration in waves with serial execution
+- name: Wave 1 - Database tier
+  hosts: kvm_hosts
+  serial: 1                    # One host at a time
+  max_fail_percentage: 0       # Stop on any failure
+  tasks:
+    - include_tasks: migrate-vm.yml
+      loop: "{{ migration_vms | selectattr('tier', 'equalto', 'database') }}"
+
+- name: Wave 2 - Application tier
+  hosts: kvm_hosts
+  serial: 2                    # Two hosts in parallel
+  tasks:
+    - include_tasks: migrate-vm.yml
+      loop: "{{ migration_vms | selectattr('tier', 'equalto', 'application') }}"
+
+# Execute: ansible-playbook -i hosts.yml migrate.yml --check  (dry run)
+#          ansible-playbook -i hosts.yml migrate.yml           (real run)</pre>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Terraform Provider <span>Concepts</span></h2>
+  <p class="sub">Infrastructure-as-code for migration state tracking and post-migration provisioning.</p>
+
+  <h3>Migration + Libvirt Terraform Workflow</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Pre-Migration: Convert with h2kvmctl</h4>
+      <pre>
+# Terraform null_resource for conversion
+resource "null_resource" "migrate_vm" {
+  for_each = var.vms_to_migrate
+
+  provisioner "local-exec" {
+    command = &lt;&lt;-EOT
+      h2kvmctl convert \
+        --source ${each.value.source} \
+        --output /var/lib/libvirt/images/ \
+        --format qcow2 --compress \
+        --fix-fstab --fix-initramfs \
+        --json > /tmp/${each.key}.json
+    EOT
+  }
+
+  triggers = {
+    source_checksum = filesha256(
+      each.value.source
+    )
+  }
+}</pre>
+    </div>
+    <div class="card">
+      <h4>Post-Migration: Libvirt Provider</h4>
+      <pre>
+# Deploy converted VMs with libvirt provider
+terraform {
+  required_providers {
+    libvirt = {
+      source = "dmacvicar/libvirt"
+    }
+  }
+}
+
+resource "libvirt_volume" "vm_disk" {
+  for_each = var.vms_to_migrate
+  name   = "${each.key}.qcow2"
+  pool   = "default"
+  source = "/var/lib/libvirt/images/${each.key}.qcow2"
+  format = "qcow2"
+  depends_on = [null_resource.migrate_vm]
+}
+
+resource "libvirt_domain" "vm" {
+  for_each = var.vms_to_migrate
+  name   = each.key
+  memory = each.value.memory
+  vcpu   = each.value.vcpus
+  disk { volume_id = libvirt_volume.vm_disk[each.key].id }
+  network_interface { bridge = each.value.bridge }
+}</pre>
+    </div>
+  </div>
+
+  <h3>Terraform State Benefits</h3>
+  <table>
+    <tr><th>Feature</th><th>Manual Migration</th><th>Ansible</th><th>Terraform</th></tr>
+    <tr><td>State tracking</td><td class="cross">Spreadsheet</td><td>Partial (facts)</td><td class="check">Full state file</td></tr>
+    <tr><td>Drift detection</td><td class="cross">Manual audit</td><td class="cross">Re-run detects</td><td class="check">terraform plan</td></tr>
+    <tr><td>Rollback</td><td class="cross">Manual</td><td>Playbook needed</td><td class="check">terraform destroy</td></tr>
+    <tr><td>Dependency graph</td><td class="cross">Manual ordering</td><td>Serial/handlers</td><td class="check">Automatic DAG</td></tr>
+    <tr><td>Idempotent</td><td class="cross">No</td><td class="check">Yes</td><td class="check">Yes</td></tr>
+    <tr><td>Multi-provider</td><td class="cross">No</td><td>Modules</td><td class="check">Native (DNS, LB, K8s)</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">CI/CD Pipeline <span>Templates</span></h2>
+  <p class="sub">Ready-to-use pipeline configs for GitLab CI, Jenkins, and GitHub Actions.</p>
+
+  <h3>GitLab CI Pipeline</h3>
+  <pre>
+# .gitlab-ci.yml — VM Migration Pipeline
+stages: [validate, export, convert, test, deploy]
+
+variables:
+  VCENTER_HOST: vcenter.corp.com
+  OUTPUT_DIR: /var/lib/libvirt/images
+
+validate:
+  stage: validate
+  script:
+    - h2kvmctl doctor
+    - h2kvmctl convert --config migration.yaml --dry-run
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+export:
+  stage: export
+  script:
+    - h2kvmctl export --server $VCENTER_HOST --vm "$VM_LIST" --output /data/exports/
+  artifacts:
+    paths: [/data/exports/*.vmdk]
+    expire_in: 7 days
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual  # Approval gate
+
+convert:
+  stage: convert
+  script:
+    - h2kvmctl convert --config migration.yaml --json > results.json
+  artifacts:
+    paths: [results.json]
+    reports:
+      dotenv: results.env
+
+test:
+  stage: test
+  script:
+    - h2kvmctl boot-test --config migration.yaml --timeout 120
+    - ./scripts/smoke-test.sh  # Application-level tests
+  allow_failure: false
+
+deploy:
+  stage: deploy
+  script:
+    - h2kvmctl deploy --config migration.yaml --deploy-libvirt
+    - virsh list --all
+  environment:
+    name: production
+  when: manual  # Final approval gate</pre>
+
+  <h3>GitHub Actions Workflow</h3>
+  <pre>
+# .github/workflows/migrate.yml
+name: VM Migration
+on:
+  workflow_dispatch:
+    inputs:
+      vm_list: { description: 'VMs to migrate', required: true }
+      dry_run: { description: 'Dry run only', type: boolean, default: true }
+jobs:
+  migrate:
+    runs-on: self-hosted  # Must run on KVM host
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate
+        run: h2kvmctl convert --config migration.yaml --dry-run
+      - name: Convert
+        if: ${{ !inputs.dry_run }}
+        run: h2kvmctl convert --config migration.yaml --json | tee results.json
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with: { name: migration-results, path: results.json }</pre>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Batch Migration <span>Orchestration</span></h2>
+  <p class="sub">Migrating 100-500+ VMs in waves with dependency ordering and parallel execution.</p>
+
+  <h3>Migration Wave Planning</h3>
+  <table>
+    <tr><th>Wave</th><th>VMs</th><th>Tier</th><th>Parallel</th><th>Duration</th><th>Dependencies</th><th>Rollback Window</th></tr>
+    <tr><td><strong>Wave 0</strong></td><td>5</td><td>Dev/Test</td><td>5 parallel</td><td>2 hours</td><td>None</td><td>Immediate (no impact)</td></tr>
+    <tr><td><strong>Wave 1</strong></td><td>10</td><td>Infrastructure (DNS, DHCP, AD)</td><td>2 serial</td><td>4 hours</td><td>None</td><td>4 hours</td></tr>
+    <tr><td><strong>Wave 2</strong></td><td>20</td><td>Database servers</td><td>4 parallel</td><td>6 hours</td><td>Wave 1</td><td>2 hours</td></tr>
+    <tr><td><strong>Wave 3</strong></td><td>50</td><td>Application servers</td><td>10 parallel</td><td>8 hours</td><td>Wave 2</td><td>2 hours</td></tr>
+    <tr><td><strong>Wave 4</strong></td><td>30</td><td>Web / Load Balancer</td><td>10 parallel</td><td>4 hours</td><td>Wave 3</td><td>1 hour</td></tr>
+    <tr><td><strong>Wave 5</strong></td><td>15</td><td>Monitoring / Backup</td><td>5 parallel</td><td>3 hours</td><td>Wave 4</td><td>4 hours</td></tr>
+  </table>
+  <p><strong>Total: 130 VMs in 5 waves over 2 weekends</strong></p>
+
+  <h3>Parallel Execution with GNU Parallel</h3>
+  <pre>
+# Convert 10 VMs in parallel (limited by I/O bandwidth)
+cat vm-list.txt | parallel -j 10 \
+  h2kvmctl convert --source /data/exports/{}.vmdk \
+    --output /var/lib/libvirt/images/ \
+    --format qcow2 --compress \
+    --fix-fstab --fix-initramfs \
+    --emit-domain-xml \
+    --json '>' /tmp/results/{}.json
+
+# Monitor progress
+watch -n 5 'ls /tmp/results/*.json | wc -l; echo "of $(wc -l < vm-list.txt) total"'
+
+# Aggregate results
+jq -s '[.[] | {name: .vm_name, status: .status, duration: .duration_seconds}]' \
+  /tmp/results/*.json > migration-report.json</pre>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Rollback Procedure</h4>
+      <ul>
+        <li>Keep VMware VMs powered off (not deleted) for 48 hours</li>
+        <li>Rollback = power on VMware VM, power off KVM VM</li>
+        <li>DNS/MAC: preserved, so no network changes needed</li>
+        <li>Data: use VM snapshot before cutover for point-in-time</li>
+        <li>Automation: <code>h2kvmctl rollback --wave 3</code></li>
+        <li>Decision deadline: 2 hours after go-live per wave</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Progress Dashboard</h4>
+      <ul>
+        <li>Real-time: <code>h2kvmctl status --config batch.yaml</code></li>
+        <li>JSON output for custom dashboards</li>
+        <li>Fields: VM name, status, progress %, ETA, errors</li>
+        <li>Webhook: POST to Slack/Teams on completion or failure</li>
+        <li>Email: summary report per wave</li>
+        <li>Grafana: Prometheus metrics for visual tracking</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">API &amp; Scripting <span>Interface</span></h2>
+  <p class="sub">Python API and JSON output for custom automation scripts.</p>
+
+  <h3>Python Scripting</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Subprocess Integration</h4>
+      <pre>
+import subprocess
+import json
+
+def migrate_vm(source, output_dir,
+               memory=4096, vcpus=2):
+    """Migrate a single VM with h2kvmctl."""
+    cmd = [
+        "h2kvmctl", "convert",
+        "--source", source,
+        "--output", output_dir,
+        "--format", "qcow2",
+        "--compress",
+        "--fix-fstab",
+        "--fix-initramfs",
+        "--emit-domain-xml",
+        "--deploy-libvirt",
+        "--memory", str(memory),
+        "--vcpus", str(vcpus),
+        "--json"
+    ]
+    result = subprocess.run(
+        cmd, capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr)
+    return json.loads(result.stdout)
+
+# Usage
+result = migrate_vm(
+    "/data/exports/web-server.vmdk",
+    "/var/lib/libvirt/images/",
+    memory=8192, vcpus=4
+)
+print(f"Migrated {result['vm_name']} "
+      f"in {result['duration_seconds']}s")</pre>
+    </div>
+    <div class="card">
+      <h4>Batch Script with Error Handling</h4>
+      <pre>
+import concurrent.futures
+import json
+from pathlib import Path
+
+VMS = [
+    {"name": "db-server",
+     "source": "/data/db-server.vmdk",
+     "memory": 16384, "vcpus": 8},
+    {"name": "app-server",
+     "source": "/data/app-server.vmdk",
+     "memory": 8192, "vcpus": 4},
+    {"name": "web-server",
+     "source": "/data/web-server.vmdk",
+     "memory": 4096, "vcpus": 2},
+]
+
+results = {"success": [], "failed": []}
+
+with concurrent.futures.ThreadPoolExecutor(
+    max_workers=4
+) as executor:
+    futures = {
+        executor.submit(
+            migrate_vm,
+            vm["source"],
+            "/var/lib/libvirt/images/",
+            vm["memory"], vm["vcpus"]
+        ): vm["name"]
+        for vm in VMS
+    }
+    for future in concurrent.futures.as_completed(
+        futures
+    ):
+        name = futures[future]
+        try:
+            r = future.result()
+            results["success"].append(name)
+            print(f"OK: {name}")
+        except Exception as e:
+            results["failed"].append(
+                {"name": name, "error": str(e)}
+            )
+            print(f"FAIL: {name}: {e}")
+
+# Summary
+print(json.dumps(results, indent=2))</pre>
+    </div>
+  </div>
+
+  <h3>Exit Codes &amp; JSON Output</h3>
+  <table>
+    <tr><th>Exit Code</th><th>Meaning</th><th>JSON Field</th><th>Action</th></tr>
+    <tr><td><strong>0</strong></td><td>Success</td><td><code>"status": "success"</code></td><td>Proceed to next VM</td></tr>
+    <tr><td><strong>1</strong></td><td>General error</td><td><code>"status": "error", "error": "..."</code></td><td>Check error message, retry or skip</td></tr>
+    <tr><td><strong>2</strong></td><td>Source not found</td><td><code>"error": "source_not_found"</code></td><td>Verify file path, check NFS mount</td></tr>
+    <tr><td><strong>3</strong></td><td>Insufficient disk space</td><td><code>"error": "disk_space"</code></td><td>Free space or change output dir</td></tr>
+    <tr><td><strong>4</strong></td><td>Conversion failed</td><td><code>"error": "conversion_failed"</code></td><td>Check source image integrity</td></tr>
+    <tr><td><strong>5</strong></td><td>Deploy failed</td><td><code>"error": "deploy_failed"</code></td><td>Check libvirt, verify XML</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Monitoring &amp; <span>Observability</span></h2>
+  <p class="sub">Prometheus metrics, Grafana dashboards, and structured logging for migration runs.</p>
+
+  <h3>Prometheus Metrics</h3>
+  <pre>
+# h2kvmctl exposes metrics on port 9090 during batch runs
+# h2kvmctl convert --config batch.yaml --metrics-port 9090
+
+# Metrics endpoint: http://localhost:9090/metrics
+# Prometheus scrape config:
+# scrape_configs:
+#   - job_name: 'h2kvmctl'
+#     static_configs:
+#       - targets: ['kvm-host-01:9090']
+
+# Available metrics:
+h2kvmctl_migrations_total{status="success"}        42
+h2kvmctl_migrations_total{status="failed"}          2
+h2kvmctl_migration_duration_seconds_bucket{le="60"} 10
+h2kvmctl_migration_duration_seconds_bucket{le="300"} 35
+h2kvmctl_migration_duration_seconds_bucket{le="900"} 42
+h2kvmctl_disk_bytes_converted_total                  2.1e+12
+h2kvmctl_disk_conversion_rate_bytes_per_second       150e+6
+h2kvmctl_active_conversions                          4
+h2kvmctl_queue_depth                                 8</pre>
+
+  <h3>Structured Logging</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>JSON Log Format</h4>
+      <pre>
+{
+  "timestamp": "2026-03-23T10:15:30Z",
+  "level": "info",
+  "event": "conversion_complete",
+  "vm_name": "db-server",
+  "source_format": "vmdk",
+  "source_size_gb": 120,
+  "output_size_gb": 45,
+  "compression_ratio": 0.375,
+  "duration_seconds": 340,
+  "fixes_applied": [
+    "fstab", "initramfs", "network"
+  ],
+  "deploy_status": "running",
+  "host": "kvm-host-01"
+}</pre>
+    </div>
+    <div class="card">
+      <h4>Alerting Rules</h4>
+      <pre>
+# Prometheus alerting rules
+groups:
+  - name: h2kvmctl
+    rules:
+      - alert: MigrationFailed
+        expr: >
+          increase(
+            h2kvmctl_migrations_total
+            {status="failed"}[5m]
+          ) > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "VM migration failed"
+
+      - alert: SlowConversion
+        expr: >
+          h2kvmctl_migration_duration_seconds
+          > 1800
+        labels:
+          severity: warning
+        annotations:
+          summary: "Migration taking >30min"
+
+      - alert: DiskSpaceLow
+        expr: >
+          node_filesystem_avail_bytes
+          {mountpoint="/var/lib/libvirt"}
+          < 50e9
+        labels:
+          severity: critical</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page page-light">
+  <h2 class="st">Enterprise Workflow <span>Examples</span></h2>
+  <p class="sub">Three real-world automation scenarios with cost and time comparisons.</p>
+
+  <h3>Scenario Comparison</h3>
+  <table>
+    <tr><th style="width:15%">Scenario</th><th style="width:10%">VMs</th><th style="width:15%">Manual Time</th><th style="width:15%">Automated Time</th><th style="width:15%">Manual Cost</th><th style="width:15%">Automated Cost</th><th style="width:15%">Savings</th></tr>
+    <tr><td><strong>Nightly Sync</strong></td><td>20</td><td>N/A (impossible)</td><td>2 hrs/night</td><td>N/A</td><td>$0/night</td><td>Enables DR</td></tr>
+    <tr><td><strong>DC Migration</strong></td><td>200</td><td>6 months / 3 FTEs</td><td>3 weekends</td><td>$450,000</td><td>$45,000</td><td>$405,000 (90%)</td></tr>
+    <tr><td><strong>Multi-Site</strong></td><td>500</td><td>12 months / 5 FTEs</td><td>6 weekends</td><td>$1,200,000</td><td>$90,000</td><td>$1,110,000 (92%)</td></tr>
+  </table>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Scenario 1: Nightly VMware→KVM Sync</h4>
+      <ul>
+        <li><strong>Goal:</strong> DR copy of 20 critical VMs on KVM</li>
+        <li>Cron job exports changed VMDKs nightly via govc</li>
+        <li>h2kvmctl converts incremental changes</li>
+        <li>KVM VMs updated, ready for instant failover</li>
+        <li>RPO: 24 hours (nightly), RTO: 5 minutes (boot KVM)</li>
+        <li>Pipeline: GitLab CI scheduled pipeline, Slack alerts</li>
+        <li>Ansible verifies boot + connectivity after each sync</li>
+        <li><strong>Zero manual effort after initial setup</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Scenario 2: 200-VM Data Center Migration</h4>
+      <ul>
+        <li><strong>Goal:</strong> Complete VMware exit in 3 weekends</li>
+        <li>Week 1: Export all 200 VMs (automated, govc batch)</li>
+        <li>Weekend 1: Wave 0-1, dev/test + infrastructure (35 VMs)</li>
+        <li>Weekday: Validate, fix issues, prep Wave 2-3</li>
+        <li>Weekend 2: Wave 2-3, databases + apps (100 VMs)</li>
+        <li>Weekend 3: Wave 4-5, web + monitoring (65 VMs)</li>
+        <li>Jenkins pipeline with manual approval gates per wave</li>
+        <li><strong>3 weekends vs 6 months manual</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Scenario 3: Multi-DC Rolling Migration</h4>
+      <ul>
+        <li><strong>Goal:</strong> 500 VMs across 5 data centers</li>
+        <li>Terraform manages cross-DC state and dependencies</li>
+        <li>Each DC migrated independently in 1 weekend</li>
+        <li>Ansible handles per-host configuration</li>
+        <li>GitHub Actions with environment-specific approvals</li>
+        <li>Grafana dashboard: global migration progress</li>
+        <li>Prometheus alerts: failure rate, conversion speed</li>
+        <li><strong>6 weekends vs 12 months manual</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Automation Stack Recommendations</h4>
+      <ul>
+        <li><strong>&lt;20 VMs:</strong> Shell script + h2kvmctl YAML</li>
+        <li><strong>20-100 VMs:</strong> Ansible playbook + h2kvmctl</li>
+        <li><strong>100-300 VMs:</strong> GitLab CI + Ansible + Prometheus</li>
+        <li><strong>300+ VMs:</strong> Terraform + Ansible + CI/CD + Grafana</li>
+        <li><strong>Air-gapped:</strong> Ansible (runs offline) + local Gitea</li>
+        <li><strong>Always:</strong> --dry-run first, approval gates, rollback plan</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Automation Reduces Migration Cost by 90% at Scale</h3>
+    <p>Manual migration at 2 hours/VM means 200 VMs = 400 hours = 50 person-days. Automated pipeline at 6 minutes/VM means 200 VMs = 20 hours unattended. The pipeline pays for itself after 10 VMs. Start with YAML + dry-run, add CI/CD for anything over 20 VMs.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Automation &amp; CI/CD Integration Guide</div>
+</div>
+
+</body>
+</html>

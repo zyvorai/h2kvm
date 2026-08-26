@@ -1,0 +1,420 @@
+# GitLab CI/CD Pipeline for hyper2kvm VM Migrations
+#
+# Features:
+# - Automated VM migration on commit
+# - Multi-stage pipeline (validate, migrate, test, deploy)
+# - Parallel processing with job dependencies
+# - Automatic rollback on failure
+# - Integration with GitLab environments
+#
+# Prerequisites:
+# - GitLab Runner with KVM support
+# - hyper2kvm installed on runner
+# - CI/CD variables configured (vCenter credentials)
+
+variables:
+  MIGRATION_BASE: "/data/migrations/${CI_PIPELINE_ID}"
+  VCENTER_HOST: "vcenter.example.com"
+  # Credentials stored in GitLab CI/CD Settings → Variables
+  # VCENTER_USER (protected, masked)
+  # VCENTER_PASSWORD (protected, masked)
+
+# Pipeline stages
+stages:
+  - validate
+  - backup
+  - migrate
+  - test
+  - deploy
+  - cleanup
+
+# Global before script
+before_script:
+  - echo "Pipeline ID ${CI_PIPELINE_ID}"
+  - echo "Job ${CI_JOB_NAME} started at $(date)"
+  - mkdir -p ${MIGRATION_BASE}/{configs,logs,reports}
+
+# ============================================================================
+# STAGE 1: VALIDATE
+# ============================================================================
+
+validate:preflight:
+  stage: validate
+  tags:
+    - kvm-migration
+  script:
+    - echo "=== Pre-flight Checks ==="
+    - python -m hyper2kvm --version
+    - virsh version
+    - free -h
+    - df -h /data
+    - govc about -u "${VCENTER_USER}:${VCENTER_PASSWORD}@${VCENTER_HOST}"
+  artifacts:
+    paths:
+      - ${MIGRATION_BASE}/logs/
+    expire_in: 7 days
+
+validate:configs:
+  stage: validate
+  tags:
+    - kvm-migration
+  script:
+    - echo "=== Validating Migration Configs ==="
+    - |
+      for config in configs/migrations/*.yaml; do
+        echo "Validating: $config"
+        # Dry-run validation
+        python -m hyper2kvm --config "$config" --dry-run || exit 1
+      done
+  only:
+    changes:
+      - configs/migrations/**/*.yaml
+
+# ============================================================================
+# STAGE 2: BACKUP
+# ============================================================================
+
+backup:snapshots:
+  stage: backup
+  tags:
+    - kvm-migration
+  when: manual  # Require manual approval before production snapshots
+  only:
+    - main
+    - production
+  script:
+    - echo "=== Creating VMware Snapshots ==="
+    - |
+      # Read VM list from config
+      for vm in $(yq e '.vms[].name' configs/vm-list.yaml); do
+        echo "Creating snapshot for: $vm"
+        govc snapshot.create \
+          -u "${VCENTER_USER}:${VCENTER_PASSWORD}@${VCENTER_HOST}" \
+          -vm "$vm" \
+          -m "GitLab Pipeline ${CI_PIPELINE_ID} - Branch ${CI_COMMIT_BRANCH}" \
+          "gitlab-backup-${CI_PIPELINE_ID}"
+
+        echo "$vm|${CI_PIPELINE_ID}|$(date +%Y-%m-%d-%H%M%S)" >> \
+          ${MIGRATION_BASE}/logs/snapshots.csv
+      done
+  artifacts:
+    paths:
+      - ${MIGRATION_BASE}/logs/snapshots.csv
+    expire_in: 30 days
+
+# ============================================================================
+# STAGE 3: MIGRATE
+# ============================================================================
+
+.migrate_template: &migrate_template
+  stage: migrate
+  tags:
+    - kvm-migration
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+  artifacts:
+    when: always
+    paths:
+      - ${MIGRATION_BASE}/vms/
+      - ${MIGRATION_BASE}/logs/
+      - ${MIGRATION_BASE}/reports/
+    expire_in: 30 days
+
+migrate:web_servers:
+  <<: *migrate_template
+  script:
+    - echo "=== Migrating Web Servers ==="
+    - |
+      for vm in $(yq e '.web_servers[].name' configs/vm-list.yaml); do
+        echo "Migrating: $vm"
+
+        python -m hyper2kvm vsphere \
+          --vcenter ${VCENTER_HOST} \
+          --username ${VCENTER_USER} \
+          --password ${VCENTER_PASSWORD} \
+          --vs-action export-vm \
+          --vs-vm-name "$vm" \
+          --output-dir ${MIGRATION_BASE}/vms/$vm \
+          --out-format qcow2 \
+          --compress \
+          --regen-initramfs \
+          --fstab-mode stabilize-all \
+          --fix-grub \
+          --verbose 2 \
+          --log-file ${MIGRATION_BASE}/logs/${vm}.log \
+          --report ${MIGRATION_BASE}/reports/${vm}.md
+
+        if [ $? -eq 0 ]; then
+          echo "✓ $vm migrated successfully"
+        else
+          echo "✗ $vm migration failed"
+          exit 1
+        fi
+      done
+  parallel:
+    matrix:
+      - WORKER: [1, 2, 3]  # Run 3 parallel jobs
+
+migrate:database_servers:
+  <<: *migrate_template
+  script:
+    - echo "=== Migrating Database Servers ==="
+    - |
+      # Databases migrate sequentially (not parallel)
+      for vm in $(yq e '.database_servers[].name' configs/vm-list.yaml); do
+        echo "Migrating: $vm (sequential for data integrity)"
+
+        python -m hyper2kvm vsphere \
+          --vcenter ${VCENTER_HOST} \
+          --username ${VCENTER_USER} \
+          --password ${VCENTER_PASSWORD} \
+          --vs-action export-vm \
+          --vs-vm-name "$vm" \
+          --output-dir ${MIGRATION_BASE}/vms/$vm \
+          --out-format qcow2 \
+          --compress \
+          --regen-initramfs \
+          --fstab-mode stabilize-all \
+          --fix-grub \
+          --disk-cache none \
+          --verbose 2 \
+          --log-file ${MIGRATION_BASE}/logs/${vm}.log \
+          --report ${MIGRATION_BASE}/reports/${vm}.md
+      done
+  dependencies:
+    - backup:snapshots
+
+# ============================================================================
+# STAGE 4: TEST
+# ============================================================================
+
+test:boot_validation:
+  stage: test
+  tags:
+    - kvm-migration
+  script:
+    - echo "=== Boot Validation Tests ==="
+    - |
+      for vm_dir in ${MIGRATION_BASE}/vms/*/; do
+        vm=$(basename "$vm_dir")
+        qcow2="${vm_dir}/${vm}.qcow2"
+
+        if [ ! -f "$qcow2" ]; then
+          echo "⚠ Skipping $vm (qcow2 not found)"
+          continue
+        fi
+
+        echo "Testing boot: $vm"
+
+        # Create test domain
+        virt-install \
+          --name "${vm}-test-${CI_JOB_ID}" \
+          --memory 2048 \
+          --vcpus 1 \
+          --disk path="$qcow2",bus=virtio \
+          --network bridge=br-test,model=virtio \
+          --import \
+          --noautoconsole
+
+        # Wait for boot (60 seconds)
+        sleep 60
+
+        # Check status
+        if virsh domstate "${vm}-test-${CI_JOB_ID}" | grep -q "running"; then
+          echo "✓ $vm boot successful"
+        else
+          echo "✗ $vm boot failed"
+          virsh dominfo "${vm}-test-${CI_JOB_ID}"
+          exit 1
+        fi
+
+        # Cleanup
+        virsh destroy "${vm}-test-${CI_JOB_ID}"
+        virsh undefine "${vm}-test-${CI_JOB_ID}"
+      done
+  dependencies:
+    - migrate:web_servers
+    - migrate:database_servers
+
+test:smoke_tests:
+  stage: test
+  tags:
+    - kvm-migration
+  script:
+    - echo "=== Smoke Tests ==="
+    - pytest tests/smoke/ --junitxml=${MIGRATION_BASE}/test-results/smoke.xml
+  artifacts:
+    reports:
+      junit: ${MIGRATION_BASE}/test-results/smoke.xml
+  dependencies:
+    - test:boot_validation
+
+# ============================================================================
+# STAGE 5: DEPLOY
+# ============================================================================
+
+deploy:staging:
+  stage: deploy
+  tags:
+    - kvm-migration
+  environment:
+    name: staging
+    url: https://staging.example.com
+  when: manual  # Require manual approval
+  only:
+    - develop
+  script:
+    - echo "=== Deploying to Staging ==="
+    - |
+      for vm_dir in ${MIGRATION_BASE}/vms/*/; do
+        vm=$(basename "$vm_dir")
+        qcow2="${vm_dir}/${vm}.qcow2"
+
+        # Copy to staging storage
+        cp "$qcow2" /var/lib/libvirt/images/staging/
+
+        # Define libvirt domain
+        virt-install \
+          --name "${vm}-staging" \
+          --memory 4096 \
+          --vcpus 2 \
+          --disk path="/var/lib/libvirt/images/staging/${vm}.qcow2",bus=virtio \
+          --network bridge=br-staging,model=virtio \
+          --graphics vnc \
+          --import \
+          --autostart
+      done
+  dependencies:
+    - test:smoke_tests
+
+deploy:production:
+  stage: deploy
+  tags:
+    - kvm-migration
+  environment:
+    name: production
+    url: https://example.com
+  when: manual  # Require manual approval + approvers
+  only:
+    - main
+    - production
+  script:
+    - echo "=== Deploying to Production ==="
+    - echo "⚠ PRODUCTION DEPLOYMENT - Requires Change Control Approval"
+    - |
+      # Verify change control ticket
+      if [ -z "$CHANGE_TICKET" ]; then
+        echo "ERROR: CHANGE_TICKET environment variable required for production"
+        exit 1
+      fi
+
+      echo "Change Ticket: $CHANGE_TICKET"
+
+      # Production deployment
+      for vm_dir in ${MIGRATION_BASE}/vms/*/; do
+        vm=$(basename "$vm_dir")
+        qcow2="${vm_dir}/${vm}.qcow2"
+
+        # Copy to production storage
+        cp "$qcow2" /var/lib/libvirt/images/production/
+
+        # Define libvirt domain (but don't start yet - manual cutover)
+        virt-install \
+          --name "${vm}-production" \
+          --memory 8192 \
+          --vcpus 4 \
+          --disk path="/var/lib/libvirt/images/production/${vm}.qcow2",bus=virtio \
+          --network bridge=br-production,model=virtio \
+          --graphics vnc \
+          --import \
+          --noautostart
+
+        echo "✓ $vm ready for production cutover (not started)"
+      done
+
+      echo ""
+      echo "Production VMs deployed but NOT started"
+      echo "Manual cutover required:"
+      echo "  virsh start {vm}-production"
+  dependencies:
+    - deploy:staging
+  # Require approval from senior engineers
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "production"'
+      when: manual
+      allow_failure: false
+
+# ============================================================================
+# STAGE 6: CLEANUP
+# ============================================================================
+
+cleanup:artifacts:
+  stage: cleanup
+  tags:
+    - kvm-migration
+  when: on_success
+  script:
+    - echo "=== Cleanup Old Migrations ==="
+    - |
+      # Keep only last 30 days of migrations
+      find /data/migrations -maxdepth 1 -type d -mtime +30 -exec rm -rf {} \;
+
+      # Keep only last 10 pipeline artifacts
+      ls -1dt /data/migrations/* | tail -n +11 | xargs rm -rf || true
+
+# ============================================================================
+# NOTIFICATIONS
+# ============================================================================
+
+# Success notification
+notify:success:
+  stage: .post
+  when: on_success
+  script:
+    - |
+      curl -X POST ${SLACK_WEBHOOK_URL} -d @- <<EOF
+      {
+        "channel": "#infrastructure",
+        "username": "GitLab CI",
+        "icon_emoji": ":white_check_mark:",
+        "text": "Migration Pipeline Successful",
+        "attachments": [
+          {
+            "color": "good",
+            "fields": [
+              {"title": "Pipeline", "value": "${CI_PIPELINE_URL}", "short": false},
+              {"title": "Branch", "value": "${CI_COMMIT_BRANCH}", "short": true},
+              {"title": "Commit", "value": "${CI_COMMIT_SHORT_SHA}", "short": true}
+            ]
+          }
+        ]
+      }
+      EOF
+
+# Failure notification
+notify:failure:
+  stage: .post
+  when: on_failure
+  script:
+    - |
+      curl -X POST ${SLACK_WEBHOOK_URL} -d @- <<EOF
+      {
+        "channel": "#infrastructure",
+        "username": "GitLab CI",
+        "icon_emoji": ":x:",
+        "text": "@channel Migration Pipeline FAILED",
+        "attachments": [
+          {
+            "color": "danger",
+            "fields": [
+              {"title": "Pipeline", "value": "${CI_PIPELINE_URL}", "short": false},
+              {"title": "Branch", "value": "${CI_COMMIT_BRANCH}", "short": true},
+              {"title": "Failed Job", "value": "${CI_JOB_NAME}", "short": true}
+            ]
+          }
+        ]
+      }
+      EOF

@@ -1,0 +1,1077 @@
+#!/bin/bash
+# =============================================================================
+# h2k — unified hyper2kvm Kubernetes CLI
+# =============================================================================
+# Single entry point for all Kubernetes migration operations.
+#
+# Usage:
+#   h2k setup                    # Full setup: k3d + KubeVirt + CDI + operator
+#   h2k migrate <vmdk>           # Migrate a VMDK (in-cluster)
+#   h2k migrate --operator <url> # Migrate via operator (CRD-driven)
+#   h2k status                   # Show everything
+#   h2k teardown                 # Remove everything
+#   h2k help                     # This help
+# =============================================================================
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+CLUSTER="${K3D_CLUSTER:-hyper2kvm-test}"
+KUBEVIRT_VERSION="${KUBEVIRT_VERSION:-v1.7.0}"
+CDI_VERSION="${CDI_VERSION:-v1.64.0}"
+NS_MIGRATION="hyper2kvm-migration"
+NS_OPERATOR="hyper2kvm-system"
+
+# Colors
+R='\033[0;31m'; G='\033[0;32m'; Y='\033[1;33m'; B='\033[0;34m'; C='\033[0;36m'; N='\033[0m'
+
+banner() {
+    echo -e "${C}"
+    echo "  ╦ ╦╦ ╦╔═╗╔═╗╦═╗┌─┐╦╔═╦  ╦╔╦╗"
+    echo "  ╠═╣╚╦╝╠═╝║╣ ╠╦╝│  ╠╩╗╚╗╔╝║║║"
+    echo "  ╩ ╩ ╩ ╩  ╚═╝╩╚═└─┘╩ ╩ ╚╝ ╩╩ ╩"
+    echo -e "${N}  Hypervisor → KVM Migration Toolkit"
+    echo ""
+}
+
+log()  { echo -e "${B}[h2k]${N} $1"; }
+ok()   { echo -e "${G}[h2k] ✓${N} $1"; }
+warn() { echo -e "${Y}[h2k] !${N} $1"; }
+err()  { echo -e "${R}[h2k] ✗${N} $1"; }
+die()  { err "$1"; exit 1; }
+
+# ─── SETUP ────────────────────────────────────────────────────────────────────
+
+cmd_setup() {
+    banner
+    log "Setting up complete environment..."
+    echo ""
+
+    # 1. Check tools
+    log "Step 1/6: Checking tools..."
+    for cmd in k3d kubectl docker; do
+        command -v "$cmd" >/dev/null || die "$cmd not found — install it first"
+    done
+    ok "Tools ready"
+
+    # 2. Create k3d cluster
+    log "Step 2/6: Creating k3d cluster '$CLUSTER'..."
+    if k3d cluster list 2>/dev/null | grep -q "$CLUSTER"; then
+        ok "Cluster '$CLUSTER' already exists"
+    else
+        k3d cluster create "$CLUSTER" \
+            --agents 1 \
+            --api-port 6550 \
+            --k3s-arg "--disable=traefik@server:0" \
+            --volume /lib/modules:/lib/modules@server:0:ro \
+            --volume /lib/modules:/lib/modules@agent:0:ro 2>&1 | tail -1
+        kubectl wait --for=condition=Ready nodes --all --timeout=120s >/dev/null 2>&1
+        ok "Cluster created"
+    fi
+
+    # 3. Install KubeVirt
+    log "Step 3/6: Installing KubeVirt $KUBEVIRT_VERSION..."
+    if kubectl get kubevirts -n kubevirt >/dev/null 2>&1; then
+        ok "KubeVirt already installed"
+    else
+        kubectl apply -f "https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml" >/dev/null 2>&1
+        kubectl apply -f "https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml" >/dev/null 2>&1
+        log "  Waiting for KubeVirt (may take 2-3 min)..."
+        kubectl wait --for=condition=Available kubevirt kubevirt -n kubevirt --timeout=600s >/dev/null 2>&1
+        ok "KubeVirt ready"
+    fi
+
+    # 4. Install CDI
+    log "Step 4/6: Installing CDI $CDI_VERSION..."
+    if kubectl get cdis >/dev/null 2>&1; then
+        ok "CDI already installed"
+    else
+        kubectl apply -f "https://github.com/kubevirt/containerized-data-importer/releases/download/${CDI_VERSION}/cdi-operator.yaml" >/dev/null 2>&1
+        kubectl apply -f "https://github.com/kubevirt/containerized-data-importer/releases/download/${CDI_VERSION}/cdi-cr.yaml" >/dev/null 2>&1
+        log "  Waiting for CDI..."
+        kubectl wait --for=condition=Available cdi cdi --timeout=300s >/dev/null 2>&1
+        ok "CDI ready"
+    fi
+
+    # 5. Immediate storage class
+    log "Step 5/6: Creating Immediate-binding StorageClass..."
+    if kubectl get sc local-path-immediate >/dev/null 2>&1; then
+        ok "StorageClass exists"
+    else
+        kubectl apply -f - <<EOF >/dev/null
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-path-immediate
+provisioner: rancher.io/local-path
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+EOF
+        ok "StorageClass created"
+    fi
+
+    # 6. Build and load worker image
+    log "Step 6/6: Building and loading worker image..."
+    if docker images hyper2kvm:worker --format "{{.ID}}" 2>/dev/null | head -1 | grep -q .; then
+        ok "Worker image exists"
+    else
+        docker build --target worker -t hyper2kvm:worker -f "$PROJECT_DIR/Dockerfile" "$PROJECT_DIR" 2>&1 | tail -1
+        ok "Worker image built"
+    fi
+    k3d image import hyper2kvm:worker -c "$CLUSTER" 2>&1 | tail -1
+    ok "Image loaded into k3d"
+
+    echo ""
+    echo -e "${G}Setup complete!${N}"
+    echo ""
+    echo "  Next steps:"
+    echo "    h2k migrate <path-to-vmdk>           # Run a migration"
+    echo "    h2k status                            # Check cluster status"
+    echo "    h2k deploy-operator                   # Deploy the operator"
+    echo ""
+}
+
+# ─── MIGRATE ──────────────────────────────────────────────────────────────────
+
+cmd_migrate() {
+    local VMDK="${1:-}"
+    local MODE="job"
+
+    if [ "$VMDK" = "--operator" ]; then
+        MODE="operator"
+        VMDK="${2:-}"
+    fi
+
+    if [ -z "$VMDK" ]; then
+        echo "Usage:"
+        echo "  h2k migrate <vmdk-path>           # In-cluster Job migration"
+        echo "  h2k migrate --operator <http-url>  # Operator-driven (HyperConversion CR)"
+        exit 1
+    fi
+
+    banner
+
+    if [ "$MODE" = "operator" ]; then
+        cmd_migrate_operator "$VMDK"
+    else
+        cmd_migrate_job "$VMDK"
+    fi
+}
+
+cmd_migrate_job() {
+    local VMDK="$1"
+    local VMDK_NAME=$(basename "$VMDK")
+
+    [ -f "$VMDK" ] || die "File not found: $VMDK"
+
+    log "In-cluster migration: $VMDK_NAME"
+    echo ""
+
+    # Copy VMDK into k3d node
+    log "Step 1/4: Copying VMDK into k3d node..."
+    docker exec "k3d-${CLUSTER}-agent-0" mkdir -p /tmp/hyper2kvm-input 2>/dev/null
+    docker cp "$VMDK" "k3d-${CLUSTER}-agent-0:/tmp/hyper2kvm-input/" 2>&1
+    ok "VMDK copied ($(du -h "$VMDK" | cut -f1))"
+
+    # Create migration config
+    log "Step 2/4: Creating migration resources..."
+    local VM_NAME="migrated-$(date +%s)"
+
+    kubectl create namespace $NS_MIGRATION 2>/dev/null || true
+
+    kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: migration-config
+  namespace: $NS_MIGRATION
+data:
+  migration.yaml: |
+    command: local
+    vmdk: /input/$VMDK_NAME
+    output_dir: /output
+    to_output: converted.qcow2
+    out_format: qcow2
+    compress: true
+    flatten: true
+    backend: vmcraft
+    fstab_mode: stabilize-all
+    regen_initramfs: true
+    serial_console: true
+    emit_domain_xml: true
+    vm_name: $VM_NAME
+    memory: 4096
+    vcpus: 2
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vmdk-input
+  namespace: $NS_MIGRATION
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: $(( $(stat -c%s "$VMDK" 2>/dev/null || echo "5368709120") / 1073741824 + 5 ))Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qcow2-output
+  namespace: $NS_MIGRATION
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 25Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: copy-vmdk
+  namespace: $NS_MIGRATION
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: copy
+        image: fedora:43
+        command: ["/bin/bash", "-c", "cp /host-input/$VMDK_NAME /input/ && echo Done"]
+        volumeMounts:
+        - {name: host, mountPath: /host-input, readOnly: true}
+        - {name: input, mountPath: /input}
+      volumes:
+      - {name: host, hostPath: {path: /tmp/hyper2kvm-input}}
+      - {name: input, persistentVolumeClaim: {claimName: vmdk-input}}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migration
+  namespace: $NS_MIGRATION
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+      - name: nbd
+        image: fedora:43
+        command: ["/bin/bash", "-c", "modprobe nbd max_part=16 2>/dev/null; echo ready"]
+        securityContext: {privileged: true}
+        volumeMounts:
+        - {name: modules, mountPath: /lib/modules, readOnly: true}
+      containers:
+      - name: migrate
+        image: hyper2kvm:worker
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/bash
+        - -c
+        - |
+          # Bind-mount host /dev into container for NBD/LVM device access
+          mount --bind /host-dev /dev 2>/dev/null || true
+          h2kvmctl --config /config/migration.yaml -v
+        terminationMessagePath: /tmp/termination-log
+        terminationMessagePolicy: FallbackToLogsOnError
+        securityContext: {runAsUser: 0, privileged: true}
+        resources:
+          requests: {cpu: "2", memory: "4Gi"}
+          limits:   {cpu: "8", memory: "16Gi"}
+        volumeMounts:
+        - {name: config, mountPath: /config, readOnly: true}
+        - {name: input, mountPath: /input, readOnly: true}
+        - {name: output, mountPath: /output}
+        - {name: modules, mountPath: /lib/modules, readOnly: true}
+        - {name: dev, mountPath: /host-dev, mountPropagation: HostToContainer}
+      volumes:
+      - {name: config, configMap: {name: migration-config}}
+      - {name: input, persistentVolumeClaim: {claimName: vmdk-input}}
+      - {name: output, persistentVolumeClaim: {claimName: qcow2-output}}
+      - {name: modules, hostPath: {path: /lib/modules}}
+      - {name: dev, hostPath: {path: /dev}}
+EOF
+    ok "Resources created"
+
+    # Wait
+    log "Step 3/4: Running migration..."
+    kubectl wait --for=condition=complete job/copy-vmdk -n $NS_MIGRATION --timeout=600s >/dev/null 2>&1
+    ok "VMDK copied to PVC"
+
+    log "  Waiting for h2kvmctl (follow with: kubectl logs -n $NS_MIGRATION -l job-name=migration -f)"
+    kubectl wait --for=condition=complete job/migration -n $NS_MIGRATION --timeout=1800s 2>&1 || {
+        err "Migration failed"
+        kubectl logs -n $NS_MIGRATION -l job-name=migration --tail=20
+        exit 1
+    }
+    ok "Migration complete"
+
+    # Show result
+    log "Step 4/4: Result"
+    kubectl logs -n $NS_MIGRATION -l job-name=migration --tail=5
+
+    echo ""
+    echo -e "${G}Migration complete!${N}"
+    echo "  Output PVC: qcow2-output (ns: $NS_MIGRATION)"
+    echo "  Create VM:  h2k create-vm $VM_NAME"
+    echo ""
+}
+
+cmd_migrate_operator() {
+    local URL="$1"
+
+    log "Operator-driven migration from: $URL"
+    echo ""
+
+    # Ensure operator is deployed
+    if ! kubectl get deployment hyperconversion-operator -n $NS_OPERATOR >/dev/null 2>&1; then
+        log "Deploying operator first..."
+        cmd_deploy_operator
+    fi
+
+    kubectl create namespace $NS_MIGRATION 2>/dev/null || true
+
+    local HC_NAME="migration-$(date +%s)"
+
+    kubectl apply -f - <<EOF
+apiVersion: hyper2kvm.io/v1alpha1
+kind: HyperConversion
+metadata:
+  name: $HC_NAME
+  namespace: $NS_MIGRATION
+spec:
+  source:
+    url: "$URL"
+  storage:
+    storageClass: local-path-immediate
+    size: 20Gi
+    accessMode: ReadWriteOnce
+  vm:
+    name: ${HC_NAME}-vm
+    cpu:
+      cores: 2
+    memory: "4Gi"
+    firmware: bios
+    runStrategy: Always
+    networks:
+    - name: default
+      type: pod
+  conversion:
+    compression: zstd
+    timeout: 30
+EOF
+
+    ok "HyperConversion CR created: $HC_NAME"
+    log "Watch progress: kubectl get hc $HC_NAME -n $NS_MIGRATION -w"
+    echo ""
+
+    # Wait for Ready
+    log "Waiting for operator to complete..."
+    for i in $(seq 1 180); do
+        PHASE=$(kubectl get hc "$HC_NAME" -n $NS_MIGRATION -o jsonpath='{.status.phase}' 2>/dev/null || echo "")
+        case "$PHASE" in
+            Ready)
+                ok "Migration complete! Phase: Ready"
+                VM=$(kubectl get hc "$HC_NAME" -n $NS_MIGRATION -o jsonpath='{.status.virtualMachineName}' 2>/dev/null)
+                echo ""
+                echo -e "${G}VM created: $VM${N}"
+                kubectl get vmi "$VM" -n $NS_MIGRATION -o wide 2>/dev/null || true
+                return 0
+                ;;
+            Failed)
+                err "Migration failed"
+                kubectl get hc "$HC_NAME" -n $NS_MIGRATION -o jsonpath='{.status.message}' 2>/dev/null
+                return 1
+                ;;
+        esac
+        sleep 10
+    done
+    warn "Timed out waiting — check: kubectl get hc $HC_NAME -n $NS_MIGRATION"
+}
+
+# ─── DEPLOY OPERATOR ─────────────────────────────────────────────────────────
+
+cmd_deploy_operator() {
+    log "Deploying operator..."
+
+    # Build operator image
+    if ! docker images hyper2kvm-operator --format "{{.ID}}" 2>/dev/null | head -1 | grep -q .; then
+        log "Building operator image..."
+        docker build -t hyper2kvm-operator:latest -f "$PROJECT_DIR/operator/Dockerfile" "$PROJECT_DIR/operator/" 2>&1 | tail -1
+    fi
+    k3d image import hyper2kvm-operator:latest -c "$CLUSTER" 2>&1 | tail -1
+
+    # Install CRDs
+    kubectl apply -f "$PROJECT_DIR/operator/config/crd/bases/hyper2kvm.io_hyperconversions.yaml" >/dev/null 2>&1
+    kubectl apply -f "$PROJECT_DIR/operator/config/crd/hyper2kvm.io_validations.yaml" >/dev/null 2>&1
+
+    # Deploy
+    kubectl apply -f "$PROJECT_DIR/k8s/operator-deploy/deploy-operator-migrate.yaml" 2>&1 | grep -v unchanged || true
+
+    sleep 5
+    kubectl wait --for=condition=available deployment/hyperconversion-operator -n $NS_OPERATOR --timeout=60s >/dev/null 2>&1
+    ok "Operator running"
+}
+
+# ─── STATUS ───────────────────────────────────────────────────────────────────
+
+cmd_status() {
+    banner
+    echo -e "${B}Cluster:${N}  $(kubectl config current-context 2>/dev/null)"
+    echo -e "${B}Nodes:${N}    $(kubectl get nodes --no-headers 2>/dev/null | wc -l) ($(kubectl get nodes --no-headers 2>/dev/null | grep -c Ready) Ready)"
+    echo ""
+
+    # KubeVirt
+    KV=$(kubectl get kubevirt kubevirt -n kubevirt -o jsonpath='{.status.phase} {.status.observedKubeVirtVersion}' 2>/dev/null || echo "not installed")
+    echo -e "${B}KubeVirt:${N} $KV"
+
+    # CDI
+    CDI=$(kubectl get cdi cdi -o jsonpath='{.status.phase} {.status.observedVersion}' 2>/dev/null || echo "not installed")
+    echo -e "${B}CDI:${N}      $CDI"
+
+    # Operator
+    OP=$(kubectl get deployment hyperconversion-operator -n $NS_OPERATOR -o jsonpath='{.status.readyReplicas}/{.status.replicas}' 2>/dev/null || echo "not deployed")
+    echo -e "${B}Operator:${N} $OP"
+    echo ""
+
+    # VMs
+    echo -e "${B}VMs:${N}"
+    kubectl get vm -A --no-headers 2>/dev/null | awk '{printf "  %-40s %-12s %s\n", $1"/"$2, $4, $5}' || echo "  none"
+    echo ""
+
+    # HyperConversions
+    HC_COUNT=$(kubectl get hc -A --no-headers 2>/dev/null | wc -l)
+    if [ "$HC_COUNT" -gt 0 ]; then
+        echo -e "${B}HyperConversions:${N}"
+        kubectl get hc -A --no-headers 2>/dev/null | awk '{printf "  %-40s %-12s %s%%\n", $1"/"$2, $3, $4}'
+        echo ""
+    fi
+
+    # Jobs
+    JOBS=$(kubectl get jobs -n $NS_MIGRATION --no-headers 2>/dev/null | wc -l)
+    if [ "$JOBS" -gt 0 ]; then
+        echo -e "${B}Migration Jobs:${N}"
+        kubectl get jobs -n $NS_MIGRATION --no-headers 2>/dev/null | awk '{printf "  %-30s %s\n", $1, $2}'
+        echo ""
+    fi
+}
+
+# ─── TEARDOWN ─────────────────────────────────────────────────────────────────
+
+cmd_teardown() {
+    banner
+    local SCOPE="${1:---hyper2kvm}"
+
+    case "$SCOPE" in
+        --all)
+            log "Removing EVERYTHING (hyper2kvm + KubeVirt + CDI + k3d cluster)..."
+            read -p "Are you sure? This deletes the entire cluster. (yes/no): " CONFIRM
+            [ "$CONFIRM" = "yes" ] || { warn "Aborted"; exit 0; }
+            "$SCRIPT_DIR/uninstall.sh" --all
+            k3d cluster delete "$CLUSTER" 2>/dev/null || true
+            ok "Everything removed"
+            ;;
+        --operator)
+            "$SCRIPT_DIR/uninstall.sh" --operator
+            ;;
+        --migrations)
+            "$SCRIPT_DIR/uninstall.sh" --migrations
+            ;;
+        *)
+            "$SCRIPT_DIR/uninstall.sh"
+            ;;
+    esac
+}
+
+# ─── CREATE-VM ─────────────────────────────────────────────────────────────────
+
+cmd_create_vm() {
+    local VM_NAME="${1:-}"
+    if [ -z "$VM_NAME" ]; then
+        echo "Usage: h2k create-vm <vm-name> [options]"
+        echo ""
+        echo "Options:"
+        echo "  -n, --namespace <ns>    Namespace (default: $NS_MIGRATION)"
+        echo "  -c, --cpu <cores>       CPU cores (default: 2)"
+        echo "  -m, --memory <mem>      Memory with unit (default: 4Gi)"
+        echo "  -p, --pvc <pvc-name>    Source PVC name (default: qcow2-output)"
+        echo "  -w, --wait <seconds>    Wait timeout for Running (default: 300)"
+        exit 1
+    fi
+    shift
+
+    local NS="$NS_MIGRATION"
+    local CPU=2
+    local MEMORY="4Gi"
+    local PVC="qcow2-output"
+    local WAIT_TIMEOUT=300
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -n|--namespace) NS="$2"; shift 2 ;;
+            -c|--cpu)       CPU="$2"; shift 2 ;;
+            -m|--memory)    MEMORY="$2"; shift 2 ;;
+            -p|--pvc)       PVC="$2"; shift 2 ;;
+            -w|--wait)      WAIT_TIMEOUT="$2"; shift 2 ;;
+            *) warn "Unknown option: $1"; shift ;;
+        esac
+    done
+
+    banner
+    log "Creating KubeVirt VM: $VM_NAME"
+    echo ""
+
+    # Verify the source PVC exists
+    if ! kubectl get pvc "$PVC" -n "$NS" >/dev/null 2>&1; then
+        die "Source PVC '$PVC' not found in namespace '$NS'. Run 'h2k migrate' first."
+    fi
+
+    log "Step 1/3: Creating VirtualMachine manifest..."
+
+    kubectl apply -f - <<EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: $VM_NAME
+  namespace: $NS
+  labels:
+    app: hyper2kvm
+    hyper2kvm.io/migrated: "true"
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: $VM_NAME
+        app: hyper2kvm
+    spec:
+      domain:
+        cpu:
+          cores: $CPU
+        resources:
+          requests:
+            memory: "$MEMORY"
+        devices:
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: rootdisk
+        persistentVolumeClaim:
+          claimName: $PVC
+EOF
+
+    ok "VirtualMachine '$VM_NAME' created (runStrategy: Always)"
+
+    # Wait for the VM to start
+    log "Step 2/3: Waiting for VM to reach Running state (timeout: ${WAIT_TIMEOUT}s)..."
+    local ELAPSED=0
+    local STATUS=""
+    while [ "$ELAPSED" -lt "$WAIT_TIMEOUT" ]; do
+        STATUS=$(kubectl get vmi "$VM_NAME" -n "$NS" -o jsonpath='{.status.phase}' 2>/dev/null || echo "")
+        if [ "$STATUS" = "Running" ]; then
+            ok "VM is Running"
+            break
+        fi
+        if [ "$STATUS" = "Failed" ] || [ "$STATUS" = "Unknown" ]; then
+            err "VM entered $STATUS state"
+            kubectl get vmi "$VM_NAME" -n "$NS" -o yaml 2>/dev/null | grep -A5 "conditions:" || true
+            exit 1
+        fi
+        sleep 5
+        ELAPSED=$((ELAPSED + 5))
+        if [ $((ELAPSED % 30)) -eq 0 ]; then
+            log "  Still waiting... (${ELAPSED}s, status: ${STATUS:-Pending})"
+        fi
+    done
+
+    if [ "$STATUS" != "Running" ]; then
+        warn "Timed out waiting for VM to reach Running (current: ${STATUS:-unknown})"
+        echo "  Check with: kubectl get vmi $VM_NAME -n $NS"
+        exit 1
+    fi
+
+    # Show VM IP
+    log "Step 3/3: Retrieving VM network info..."
+    sleep 3  # brief pause for IP assignment
+    local VM_IP=""
+    VM_IP=$(kubectl get vmi "$VM_NAME" -n "$NS" -o jsonpath='{.status.interfaces[0].ipAddress}' 2>/dev/null || echo "")
+
+    echo ""
+    echo -e "${G}VM '$VM_NAME' is running!${N}"
+    echo ""
+    echo "  Namespace:  $NS"
+    echo "  CPU:        $CPU cores"
+    echo "  Memory:     $MEMORY"
+    echo "  Source PVC: $PVC"
+    if [ -n "$VM_IP" ]; then
+        echo -e "  IP Address: ${C}$VM_IP${N}"
+    else
+        echo "  IP Address: (pending — check: kubectl get vmi $VM_NAME -n $NS)"
+    fi
+    echo ""
+    echo "  Useful commands:"
+    echo "    kubectl get vmi $VM_NAME -n $NS              # VM instance status"
+    echo "    virtctl console $VM_NAME -n $NS              # Serial console"
+    echo "    virtctl ssh $VM_NAME -n $NS                  # SSH access"
+    echo "    kubectl delete vm $VM_NAME -n $NS            # Delete VM"
+    echo ""
+}
+
+# ─── EXPORT ──────────────────────────────────────────────────────────────────
+
+cmd_export() {
+    local OUTPUT_FILE=""
+    local NS="$NS_MIGRATION"
+    local PVC="qcow2-output"
+    local DEFINE=false
+    local VM_NAME="hyper2kvm-exported"
+    local MEMORY=4096
+    local VCPUS=2
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -o|--output)    OUTPUT_FILE="$2"; shift 2 ;;
+            -n|--namespace) NS="$2"; shift 2 ;;
+            -p|--pvc)       PVC="$2"; shift 2 ;;
+            -d|--define)    DEFINE=true; shift ;;
+            --vm-name)      VM_NAME="$2"; shift 2 ;;
+            --memory)       MEMORY="$2"; shift 2 ;;
+            --vcpus)        VCPUS="$2"; shift 2 ;;
+            -h|--help)
+                echo "Usage: h2k export [options]"
+                echo ""
+                echo "Extract converted QCOW2 from output PVC and generate libvirt domain XML."
+                echo ""
+                echo "Options:"
+                echo "  -o, --output <path>     Output QCOW2 file path (default: ./<pvc-name>.qcow2)"
+                echo "  -n, --namespace <ns>    Namespace (default: $NS_MIGRATION)"
+                echo "  -p, --pvc <name>        Source PVC name (default: qcow2-output)"
+                echo "  -d, --define            Define the domain in libvirt after export"
+                echo "  --vm-name <name>        VM name for libvirt XML (default: hyper2kvm-exported)"
+                echo "  --memory <MiB>          Memory in MiB (default: 4096)"
+                echo "  --vcpus <n>             vCPUs (default: 2)"
+                exit 0
+                ;;
+            *) warn "Unknown option: $1"; shift ;;
+        esac
+    done
+
+    [ -z "$OUTPUT_FILE" ] && OUTPUT_FILE="./${PVC}.qcow2"
+
+    banner
+    log "Exporting converted image from PVC '$PVC' (ns: $NS)"
+    echo ""
+
+    # Verify the PVC exists
+    if ! kubectl get pvc "$PVC" -n "$NS" >/dev/null 2>&1; then
+        die "PVC '$PVC' not found in namespace '$NS'. Run 'h2k migrate' first."
+    fi
+
+    # Step 1: Extract QCOW2 from PVC via a temporary pod
+    log "Step 1/3: Extracting QCOW2 from PVC..."
+
+    local EXPORT_POD="h2k-export-$(date +%s)"
+
+    kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: $EXPORT_POD
+  namespace: $NS
+  labels:
+    app: hyper2kvm-export
+spec:
+  restartPolicy: Never
+  containers:
+  - name: export
+    image: fedora:43
+    command: ["sleep", "3600"]
+    volumeMounts:
+    - name: output
+      mountPath: /output
+      readOnly: true
+  volumes:
+  - name: output
+    persistentVolumeClaim:
+      claimName: $PVC
+EOF
+
+    log "  Waiting for export pod..."
+    kubectl wait --for=condition=Ready pod/"$EXPORT_POD" -n "$NS" --timeout=120s >/dev/null 2>&1 || {
+        err "Export pod failed to start"
+        kubectl delete pod "$EXPORT_POD" -n "$NS" 2>/dev/null
+        exit 1
+    }
+
+    # Find the QCOW2 file inside the PVC
+    local REMOTE_FILE=""
+    REMOTE_FILE=$(kubectl exec "$EXPORT_POD" -n "$NS" -- find /output -name "*.qcow2" -type f 2>/dev/null | head -1)
+
+    if [ -z "$REMOTE_FILE" ]; then
+        err "No QCOW2 file found in PVC '$PVC'"
+        kubectl delete pod "$EXPORT_POD" -n "$NS" 2>/dev/null
+        exit 1
+    fi
+
+    log "  Found: $REMOTE_FILE"
+    log "  Copying to: $OUTPUT_FILE"
+
+    kubectl cp "$NS/$EXPORT_POD:$REMOTE_FILE" "$OUTPUT_FILE" 2>&1 || {
+        err "Failed to copy QCOW2 from pod"
+        kubectl delete pod "$EXPORT_POD" -n "$NS" 2>/dev/null
+        exit 1
+    }
+
+    kubectl delete pod "$EXPORT_POD" -n "$NS" >/dev/null 2>&1
+    ok "QCOW2 exported: $OUTPUT_FILE ($(du -h "$OUTPUT_FILE" | cut -f1))"
+
+    # Step 2: Generate libvirt domain XML
+    log "Step 2/3: Generating libvirt domain XML..."
+
+    local ABS_QCOW2
+    ABS_QCOW2=$(realpath "$OUTPUT_FILE")
+    local XML_FILE="${OUTPUT_FILE%.qcow2}.xml"
+
+    cat > "$XML_FILE" <<XMLEOF
+<domain type='kvm'>
+  <name>$VM_NAME</name>
+  <memory unit='MiB'>$MEMORY</memory>
+  <vcpu placement='static'>$VCPUS</vcpu>
+  <os>
+    <type arch='x86_64' machine='q35'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <cpu mode='host-passthrough'/>
+  <clock offset='utc'>
+    <timer name='rtc' tickpolicy='catchup'/>
+    <timer name='pit' tickpolicy='delay'/>
+    <timer name='hpet' present='no'/>
+  </clock>
+  <devices>
+    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' discard='unmap'/>
+      <source file='$ABS_QCOW2'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <interface type='network'>
+      <source network='default'/>
+      <model type='virtio'/>
+    </interface>
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <channel type='unix'>
+      <target type='virtio' name='org.qemu.guest_agent.0'/>
+    </channel>
+    <input type='tablet' bus='usb'/>
+    <graphics type='vnc' port='-1' autoport='yes'/>
+    <video>
+      <model type='virtio' vram='32768'/>
+    </video>
+    <memballoon model='virtio'/>
+    <rng model='virtio'>
+      <backend model='random'>/dev/urandom</backend>
+    </rng>
+  </devices>
+</domain>
+XMLEOF
+
+    ok "Domain XML generated: $XML_FILE"
+
+    # Step 3: Optionally define in libvirt
+    if [ "$DEFINE" = true ]; then
+        log "Step 3/3: Defining domain in libvirt..."
+        if ! command -v virsh >/dev/null 2>&1; then
+            warn "virsh not found — skipping domain definition"
+            warn "Install libvirt-client and run: virsh define $XML_FILE"
+        else
+            virsh define "$XML_FILE" 2>&1 && ok "Domain '$VM_NAME' defined in libvirt" || {
+                err "virsh define failed"
+                warn "Try: sudo virsh define $XML_FILE"
+            }
+        fi
+    else
+        log "Step 3/3: Skipped (use --define to register with libvirt)"
+    fi
+
+    echo ""
+    echo -e "${G}Export complete!${N}"
+    echo ""
+    echo "  QCOW2 image: $ABS_QCOW2"
+    echo "  Domain XML:  $(realpath "$XML_FILE")"
+    echo ""
+    echo "  Useful commands:"
+    echo "    virsh define $(realpath "$XML_FILE")                  # Register VM"
+    echo "    virsh start $VM_NAME                                  # Start VM"
+    echo "    virsh console $VM_NAME                                # Serial console"
+    echo "    virt-viewer $VM_NAME                                  # Graphical console"
+    echo "    qemu-img info $ABS_QCOW2                             # Image info"
+    echo ""
+}
+
+# ─── LIST ────────────────────────────────────────────────────────────────────
+
+cmd_list() {
+    banner
+
+    # Color status indicators
+    _status_color() {
+        local status="${1:-}"
+        case "$status" in
+            Running|Ready|Succeeded|Complete|Available)
+                echo -e "${G}$status${N}" ;;
+            Pending|Scheduling|Provisioning|Converting|Importing|Creating*)
+                echo -e "${Y}$status${N}" ;;
+            Failed|Error|Unknown|CrashLoopBackOff)
+                echo -e "${R}$status${N}" ;;
+            *)
+                echo "$status" ;;
+        esac
+    }
+
+    # ─── VirtualMachines ─────────────────────────────
+    echo -e "${C}=== VirtualMachines ===${N}"
+    local VM_LINES
+    VM_LINES=$(kubectl get vm -A --no-headers 2>/dev/null)
+    if [ -n "$VM_LINES" ]; then
+        printf "  ${B}%-20s %-30s %-12s %-8s${N}\n" "NAMESPACE" "NAME" "STATUS" "READY"
+        printf "  %-20s %-30s %-12s %-8s\n" "─────────" "────" "──────" "─────"
+        while IFS= read -r line; do
+            local ns name age status ready
+            ns=$(echo "$line" | awk '{print $1}')
+            name=$(echo "$line" | awk '{print $2}')
+            status=$(echo "$line" | awk '{print $4}')
+            ready=$(echo "$line" | awk '{print $5}')
+            printf "  %-20s %-30s " "$ns" "$name"
+            _status_color "$status"
+            printf "%-8s\n" "$ready"
+        done <<< "$VM_LINES"
+    else
+        echo -e "  ${Y}(none)${N}"
+    fi
+    echo ""
+
+    # ─── VirtualMachineInstances ─────────────────────
+    echo -e "${C}=== VirtualMachineInstances ===${N}"
+    local VMI_LINES
+    VMI_LINES=$(kubectl get vmi -A --no-headers 2>/dev/null)
+    if [ -n "$VMI_LINES" ]; then
+        printf "  ${B}%-20s %-30s %-12s %-16s${N}\n" "NAMESPACE" "NAME" "PHASE" "IP"
+        printf "  %-20s %-30s %-12s %-16s\n" "─────────" "────" "─────" "──"
+        while IFS= read -r line; do
+            local ns name phase ip_addr node
+            ns=$(echo "$line" | awk '{print $1}')
+            name=$(echo "$line" | awk '{print $2}')
+            phase=$(echo "$line" | awk '{print $4}')
+            ip_addr=$(echo "$line" | awk '{print $5}')
+            [ "$ip_addr" = "<none>" ] && ip_addr="-"
+            printf "  %-20s %-30s " "$ns" "$name"
+            _status_color "$phase"
+            printf "%-16s\n" "$ip_addr"
+        done <<< "$VMI_LINES"
+    else
+        echo -e "  ${Y}(none)${N}"
+    fi
+    echo ""
+
+    # ─── HyperConversions ────────────────────────────
+    echo -e "${C}=== HyperConversions ===${N}"
+    local HC_LINES
+    HC_LINES=$(kubectl get hc -A --no-headers 2>/dev/null)
+    if [ -n "$HC_LINES" ]; then
+        printf "  ${B}%-20s %-30s %-12s %-8s${N}\n" "NAMESPACE" "NAME" "PHASE" "PROGRESS"
+        printf "  %-20s %-30s %-12s %-8s\n" "─────────" "────" "─────" "────────"
+        while IFS= read -r line; do
+            local ns name phase progress
+            ns=$(echo "$line" | awk '{print $1}')
+            name=$(echo "$line" | awk '{print $2}')
+            phase=$(echo "$line" | awk '{print $3}')
+            progress=$(echo "$line" | awk '{print $4}')
+            [ -z "$progress" ] && progress="-"
+            printf "  %-20s %-30s " "$ns" "$name"
+            _status_color "$phase"
+            printf "%-8s\n" "${progress}%"
+        done <<< "$HC_LINES"
+    else
+        echo -e "  ${Y}(none)${N}"
+    fi
+    echo ""
+
+    # ─── DataVolumes ─────────────────────────────────
+    echo -e "${C}=== DataVolumes ===${N}"
+    local DV_LINES
+    DV_LINES=$(kubectl get dv -A --no-headers 2>/dev/null)
+    if [ -n "$DV_LINES" ]; then
+        printf "  ${B}%-20s %-30s %-12s %-8s${N}\n" "NAMESPACE" "NAME" "PHASE" "PROGRESS"
+        printf "  %-20s %-30s %-12s %-8s\n" "─────────" "────" "─────" "────────"
+        while IFS= read -r line; do
+            local ns name phase progress
+            ns=$(echo "$line" | awk '{print $1}')
+            name=$(echo "$line" | awk '{print $2}')
+            phase=$(echo "$line" | awk '{print $3}')
+            progress=$(echo "$line" | awk '{print $4}')
+            [ -z "$progress" ] && progress="-"
+            printf "  %-20s %-30s " "$ns" "$name"
+            _status_color "$phase"
+            printf "%-8s\n" "$progress"
+        done <<< "$DV_LINES"
+    else
+        echo -e "  ${Y}(none)${N}"
+    fi
+    echo ""
+
+    # ─── Migration Jobs ──────────────────────────────
+    echo -e "${C}=== Migration Jobs ===${N}"
+    local JOB_LINES
+    JOB_LINES=$(kubectl get jobs -n "$NS_MIGRATION" --no-headers 2>/dev/null)
+    if [ -n "$JOB_LINES" ]; then
+        printf "  ${B}%-30s %-14s %-8s %-10s${N}\n" "NAME" "COMPLETIONS" "DURATION" "AGE"
+        printf "  %-30s %-14s %-8s %-10s\n" "────" "───────────" "────────" "───"
+        while IFS= read -r line; do
+            local name completions duration age
+            name=$(echo "$line" | awk '{print $1}')
+            completions=$(echo "$line" | awk '{print $2}')
+            duration=$(echo "$line" | awk '{print $3}')
+            age=$(echo "$line" | awk '{print $4}')
+
+            # Color based on completion
+            if echo "$completions" | grep -qE "^[0-9]+/[0-9]+$"; then
+                local done total
+                done=$(echo "$completions" | cut -d/ -f1)
+                total=$(echo "$completions" | cut -d/ -f2)
+                if [ "$done" -eq "$total" ] && [ "$total" -gt 0 ]; then
+                    printf "  %-30s ${G}%-14s${N} %-8s %-10s\n" "$name" "$completions" "$duration" "$age"
+                elif [ "$done" -eq 0 ]; then
+                    printf "  %-30s ${Y}%-14s${N} %-8s %-10s\n" "$name" "$completions" "$duration" "$age"
+                else
+                    printf "  %-30s ${B}%-14s${N} %-8s %-10s\n" "$name" "$completions" "$duration" "$age"
+                fi
+            else
+                printf "  %-30s %-14s %-8s %-10s\n" "$name" "$completions" "$duration" "$age"
+            fi
+        done <<< "$JOB_LINES"
+    else
+        echo -e "  ${Y}(none)${N}"
+    fi
+    echo ""
+
+    # ─── PVCs ────────────────────────────────────────
+    echo -e "${C}=== PersistentVolumeClaims (migration) ===${N}"
+    local PVC_LINES
+    PVC_LINES=$(kubectl get pvc -n "$NS_MIGRATION" --no-headers 2>/dev/null)
+    if [ -n "$PVC_LINES" ]; then
+        printf "  ${B}%-30s %-10s %-10s %-20s${N}\n" "NAME" "STATUS" "SIZE" "STORAGECLASS"
+        printf "  %-30s %-10s %-10s %-20s\n" "────" "──────" "────" "────────────"
+        while IFS= read -r line; do
+            local name status vol capacity sc
+            name=$(echo "$line" | awk '{print $1}')
+            status=$(echo "$line" | awk '{print $2}')
+            vol=$(echo "$line" | awk '{print $3}')
+            capacity=$(echo "$line" | awk '{print $4}')
+            sc=$(echo "$line" | awk '{print $6}')
+            printf "  %-30s " "$name"
+            if [ "$status" = "Bound" ]; then
+                printf "${G}%-10s${N} " "$status"
+            else
+                printf "${Y}%-10s${N} " "$status"
+            fi
+            printf "%-10s %-20s\n" "$capacity" "$sc"
+        done <<< "$PVC_LINES"
+    else
+        echo -e "  ${Y}(none)${N}"
+    fi
+    echo ""
+
+    # Summary
+    local VM_COUNT VMI_COUNT HC_COUNT JOB_COUNT
+    VM_COUNT=$(kubectl get vm -A --no-headers 2>/dev/null | wc -l)
+    VMI_COUNT=$(kubectl get vmi -A --no-headers 2>/dev/null | wc -l)
+    HC_COUNT=$(kubectl get hc -A --no-headers 2>/dev/null | wc -l)
+    JOB_COUNT=$(kubectl get jobs -n "$NS_MIGRATION" --no-headers 2>/dev/null | wc -l)
+
+    echo -e "${B}Summary:${N} ${VM_COUNT} VMs, ${VMI_COUNT} VMIs, ${HC_COUNT} HyperConversions, ${JOB_COUNT} Jobs"
+    echo ""
+}
+
+# ─── HELP ─────────────────────────────────────────────────────────────────────
+
+cmd_help() {
+    banner
+    echo "Usage: h2k <command> [options]"
+    echo ""
+    echo -e "${C}Setup & Teardown:${N}"
+    echo "  setup                          Create k3d cluster + KubeVirt + CDI + operator"
+    echo "  teardown                       Remove hyper2kvm components"
+    echo "  teardown --all                 Remove everything including k3d cluster"
+    echo "  teardown --operator            Remove operator only"
+    echo "  teardown --migrations          Remove migration resources only"
+    echo ""
+    echo -e "${C}Migration:${N}"
+    echo "  migrate <vmdk-path>            Run VMDK migration in-cluster (Job)"
+    echo "  migrate --operator <http-url>  Run migration via operator (HyperConversion CR)"
+    echo "  create-vm <name> [opts]        Create KubeVirt VM from migration output PVC"
+    echo "  export [opts]                  Export QCOW2 + libvirt XML from output PVC"
+    echo ""
+    echo -e "${C}Operator:${N}"
+    echo "  deploy-operator                Build + deploy operator to cluster"
+    echo ""
+    echo -e "${C}Monitoring:${N}"
+    echo "  status                         Show cluster, VMs, HyperConversions, jobs"
+    echo "  list                           Compact table of all resources with status"
+    echo "  health                         Full-stack health check"
+    echo "  logs                           Follow operator logs"
+    echo "  debug-bundle                   Collect debug info for troubleshooting"
+    echo ""
+    echo -e "${C}Maintenance:${N}"
+    echo "  preflight                      Pre-flight cluster readiness check"
+    echo "  backup                         Backup operator + worker state"
+    echo ""
+    echo -e "${C}Environment:${N}"
+    echo "  K3D_CLUSTER=name               Override k3d cluster name (default: hyper2kvm-test)"
+    echo "  KUBEVIRT_VERSION=v1.7.0        Override KubeVirt version"
+    echo "  CDI_VERSION=v1.64.0            Override CDI version"
+}
+
+# ─── DISPATCH ─────────────────────────────────────────────────────────────────
+
+CMD="${1:-help}"
+shift 2>/dev/null || true
+
+case "$CMD" in
+    setup)            cmd_setup "$@" ;;
+    migrate)          cmd_migrate "$@" ;;
+    create-vm)        cmd_create_vm "$@" ;;
+    export)           cmd_export "$@" ;;
+    list|ls)          cmd_list "$@" ;;
+    deploy-operator)  cmd_deploy_operator "$@" ;;
+    status)           cmd_status "$@" ;;
+    teardown|remove|uninstall) cmd_teardown "$@" ;;
+    health)           "$SCRIPT_DIR/health-check.sh" ;;
+    preflight)        "$SCRIPT_DIR/preflight-check.sh" "$@" ;;
+    logs)             kubectl logs -n $NS_OPERATOR -l control-plane=controller-manager -f --tail=50 ;;
+    debug-bundle)     "$SCRIPT_DIR/collect-debug-bundle.sh" "$@" ;;
+    backup)           "$SCRIPT_DIR/ops/backup-operator-state.sh" "$@" && "$SCRIPT_DIR/ops/backup-worker-state.sh" "$@" 2>/dev/null || true ;;
+    help|--help|-h)   cmd_help ;;
+    *)                err "Unknown command: $CMD"; echo ""; cmd_help; exit 1 ;;
+esac

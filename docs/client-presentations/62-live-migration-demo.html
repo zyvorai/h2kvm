@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hyper2kvm — Live Migration Demo Results</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #e2e8f0; background: #0f172a; line-height: 1.6; }
+
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; position: relative; overflow: hidden; }
+  .cover::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 40%, rgba(34,197,94,0.12) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(56,189,248,0.08) 0%, transparent 50%); }
+  .cover h1 { font-size: 3.5em; font-weight: 800; letter-spacing: -2px; position: relative; background: linear-gradient(135deg, #22c55e, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .cover h2 { font-size: 1.5em; font-weight: 300; color: #94a3b8; margin: 0.3em 0 1em; position: relative; }
+  .cover .tagline { font-size: 1em; opacity: 0.6; max-width: 700px; position: relative; }
+  .cover .badge { display: inline-block; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); padding: 8px 24px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; position: relative; color: #22c55e; }
+  .cover .date { color: #64748b; margin-top: 1em; position: relative; font-size: 0.9em; }
+
+  .page { min-height: 100vh; padding: 50px 70px; page-break-after: always; }
+  .page-dark { background: #0f172a; }
+  .page-slate { background: #1e293b; }
+
+  h2.section-title { font-size: 2em; font-weight: 700; margin-bottom: 0.3em; letter-spacing: -1px; }
+  h2.section-title span { color: #22c55e; }
+  h2.section-title .blue { color: #38bdf8; }
+  .subtitle { font-size: 1em; color: #64748b; margin-bottom: 2em; }
+  h3 { font-size: 1.15em; font-weight: 600; margin: 1em 0 0.5em; color: #e2e8f0; }
+  p { margin-bottom: 0.8em; font-size: 0.92em; color: #94a3b8; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 1.5em 0; }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card-grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .card { background: rgba(30,41,59,0.8); border: 1px solid rgba(51,65,85,0.5); border-radius: 12px; padding: 22px; }
+
+  .gradient-blue { background: linear-gradient(135deg, #1e3a5f, #1e293b); }
+  .gradient-green { background: linear-gradient(135deg, #1e5f3a, #1e293b); }
+  .gradient-purple { background: linear-gradient(135deg, #2d1f5e, #1e293b); }
+  .gradient-cyan { background: linear-gradient(135deg, #1e4f5f, #1e293b); }
+  .gradient-orange { background: linear-gradient(135deg, #5f3a1e, #1e293b); }
+
+  .stat-row { display: flex; gap: 20px; margin: 1.5em 0; }
+  .stat { text-align: center; flex: 1; background: rgba(30,41,59,0.6); border: 1px solid rgba(51,65,85,0.5); border-radius: 12px; padding: 18px; }
+  .stat .number { font-size: 2.2em; font-weight: 800; line-height: 1; }
+  .stat .label { font-size: 0.8em; color: #64748b; margin-top: 6px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 0.88em; }
+  th { background: #334155; color: #e2e8f0; padding: 10px 14px; text-align: left; font-weight: 600; }
+  td { padding: 9px 14px; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
+  tr:nth-child(even) td { background: rgba(30,41,59,0.4); }
+  .check { color: #22c55e; font-weight: 700; }
+  .ip { font-family: monospace; color: #86efac; font-weight: 600; }
+
+  .screenshot { background: #020617; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin: 1em 0; font-family: monospace; font-size: 0.75em; color: #94a3b8; line-height: 1.8; overflow: hidden; }
+  .screenshot .header { background: #1e293b; margin: -16px -16px 12px; padding: 8px 14px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 6px; }
+  .screenshot .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .screenshot .url { color: #64748b; font-size: 0.9em; margin-left: auto; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 16px; font-size: 0.78em; font-weight: 500; }
+  .badge-green { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+  .badge-blue { background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); }
+  .badge-purple { background: rgba(168,85,247,0.15); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
+  .badge-yellow { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); }
+
+  .progress-bar { height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin: 4px 0; }
+  .progress-fill { height: 100%; border-radius: 4px; background: #22c55e; }
+  .footer { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; font-size: 0.7em; color: #475569; }
+
+  .vm-card { background: rgba(30,41,59,0.6); border: 1px solid rgba(51,65,85,0.5); border-radius: 12px; padding: 20px; margin: 10px 0; }
+  .vm-card .name { font-size: 1.2em; font-weight: 700; color: #e2e8f0; }
+  .vm-card .detail { font-size: 0.85em; color: #64748b; margin-top: 4px; }
+  .vm-card .ip-box { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; padding: 8px 14px; margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+  .vm-card .ip-box .dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Live Migration Demo</h1>
+  <h2>VMware → KVM via h2kweb Web Dashboard</h2>
+  <p class="tagline">Real migration results from a production Worldstream bare-metal server running AlmaLinux 9.7. All migrations performed through the h2kweb browser UI with PAM authentication, live log streaming, and automatic libvirt deployment.</p>
+  <div class="badge">✓ 3 VMs migrated &amp; running — CentOS 10, Ubuntu 25.04, Ubuntu 24.04</div>
+  <div class="date">April 1, 2026 — Worldstream NL (185.165.240.5)</div>
+</div>
+
+<!-- PAGE 1: Server Overview -->
+<div class="page page-dark" style="position:relative;">
+  <h2 class="section-title"><span>Server</span> Overview</h2>
+  <p class="subtitle">Worldstream bare-metal server — production migration environment</p>
+
+  <div class="stat-row">
+    <div class="stat gradient-blue"><div class="number" style="color:#38bdf8;">8</div><div class="label">CPU Cores</div><div style="font-size:0.7em; color:#64748b; margin-top:4px;">Intel Xeon E3-1230 v6 @ 3.50GHz</div></div>
+    <div class="stat gradient-green"><div class="number" style="color:#22c55e;">15.6 GB</div><div class="label">Memory (47% used)</div></div>
+    <div class="stat gradient-orange"><div class="number" style="color:#eab308;">219 GB</div><div class="label">Disk (94% used)</div></div>
+    <div class="stat gradient-cyan"><div class="number" style="color:#06b6d4;">4</div><div class="label">Libvirt Domains</div></div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3>System Configuration</h3>
+      <table>
+        <tr><td style="color:#64748b; width:150px;">Hostname</td><td>NLDW3-4-31-12</td></tr>
+        <tr><td style="color:#64748b;">OS</td><td>AlmaLinux 9.7 (Moss Jungle Cat)</td></tr>
+        <tr><td style="color:#64748b;">Kernel</td><td>5.14.0-611.41.1.el9_7.x86_64</td></tr>
+        <tr><td style="color:#64748b;">QEMU</td><td>9.1.0</td></tr>
+        <tr><td style="color:#64748b;">KVM</td><td><span class="check">✓ Enabled</span></td></tr>
+        <tr><td style="color:#64748b;">Uptime</td><td>3d 5h 20m</td></tr>
+        <tr><td style="color:#64748b;">Load Average</td><td>4.59 / 4.53 / 4.44</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>Migrated VMs (all running)</h3>
+      <div class="vm-card">
+        <div class="name">🟢 centos10</div>
+        <div class="detail">CentOS Stream 10 (Coughlan) — LVM (cs-root/cs-home/cs-swap)</div>
+        <div class="ip-box"><div class="dot"></div><span class="ip">192.168.122.172</span></div>
+      </div>
+      <div class="vm-card">
+        <div class="name">🟢 ubuntu-server2504</div>
+        <div class="detail">Ubuntu Server 25.04 (Plucky) — LVM (ubuntu-vg/ubuntu-lv)</div>
+        <div class="ip-box"><div class="dot"></div><span class="ip">192.168.122.136</span></div>
+      </div>
+      <div class="vm-card">
+        <div class="name">🟢 ubuntu2404</div>
+        <div class="detail">Ubuntu 24.04 LTS — previously migrated</div>
+        <div class="ip-box"><div class="dot"></div><span class="ip">192.168.122.x</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">hyper2kvm Live Demo — Server Overview</div>
+</div>
+
+<!-- PAGE 2: Migration #1 — Ubuntu Server 25.04 -->
+<div class="page page-slate" style="position:relative;">
+  <h2 class="section-title"><span>Migration:</span> Ubuntu Server 25.04</h2>
+  <p class="subtitle">VMDK → KVM with LVM, initramfs rebuild, auto-deploy to libvirt — 2m 21s total</p>
+
+  <div class="stat-row">
+    <div class="stat gradient-blue"><div class="number" style="color:#38bdf8;">VMDK</div><div class="label">Source Format</div></div>
+    <div class="stat gradient-green"><div class="number" style="color:#22c55e;">QCOW2</div><div class="label">Output Format</div></div>
+    <div class="stat gradient-purple"><div class="number" style="color:#a855f7;">LVM</div><div class="label">ubuntu-vg</div></div>
+    <div class="stat gradient-cyan"><div class="number" style="color:#06b6d4;">2:21</div><div class="label">Total Duration</div></div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3>YAML Configuration (auto-generated by h2kweb)</h3>
+      <div class="screenshot" style="font-size:0.72em;">
+        <div class="header">
+          <div class="dot" style="background:#ef4444"></div>
+          <div class="dot" style="background:#eab308"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <div class="url">h2kweb → h2kvmctl</div>
+        </div>
+        command: local<br>
+        vmdk: /root/demo/ubuntu-server2504.vmdk<br>
+        output_dir: /var/lib/libvirt/images<br>
+        out_format: qcow2<br>
+        to_output: ubuntu-server2504.qcow2<br>
+        flatten: true<br>
+        compress: true<br>
+        fstab_mode: stabilize-all<br>
+        regen_initramfs: true<br>
+        update_grub: true<br>
+        remove_vmware_tools: true<br>
+        emit_domain_xml: true<br>
+        virsh_define: true<br>
+        libvirt_test: true<br>
+        keep_domain: true<br>
+        vm_name: ubuntu-server2504<br>
+        allowed_dirs:<br>
+        &nbsp;&nbsp;- /root/demo<br>
+        &nbsp;&nbsp;- /var/lib/libvirt/images
+      </div>
+    </div>
+    <div>
+      <h3>Pipeline Timeline</h3>
+      <table>
+        <tr><th>Phase</th><th>Duration</th><th>Details</th></tr>
+        <tr><td>Flatten (VMDK→QCOW2)</td><td>56s</td><td>qemu-img convert, monolithicSparse</td></tr>
+        <tr><td>NBD Connect</td><td>0.7s</td><td>/dev/nbd0, qcow2 format</td></tr>
+        <tr><td>LVM Activation</td><td>0.7s</td><td>ubuntu-vg: 1 LV (ubuntu-lv)</td></tr>
+        <tr><td>OS Detection</td><td>0.3s</td><td>Ubuntu 25.04 (Plucky) on ext4</td></tr>
+        <tr><td>fstab Stabilize</td><td><0.1s</td><td>UUID-based (already stable)</td></tr>
+        <tr><td>Network Fix</td><td><0.1s</td><td>NM connection fixed</td></tr>
+        <tr><td>initramfs Rebuild</td><td>11s</td><td>update-initramfs -u -k all</td></tr>
+        <tr><td>GRUB Update</td><td>3s</td><td>grub-mkconfig + grub-install</td></tr>
+        <tr><td>Final Convert</td><td>51s</td><td>Compressed QCOW2 output</td></tr>
+        <tr><td>Libvirt Deploy</td><td>1s</td><td>virsh define + start → <span class="check">RUNNING</span></td></tr>
+      </table>
+
+      <h3>Result</h3>
+      <div class="vm-card" style="background:rgba(34,197,94,0.08); border-color:rgba(34,197,94,0.3);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.5em;">🟢</span>
+          <div>
+            <div class="name">ubuntu-server2504</div>
+            <div class="detail">Defined, started, and running in libvirt</div>
+          </div>
+        </div>
+        <div class="ip-box"><div class="dot"></div><span class="ip">192.168.122.136</span><span style="color:#64748b; margin-left:auto; font-size:0.8em;">ssh root@192.168.122.136</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">hyper2kvm Live Demo — Ubuntu Server 25.04 Migration</div>
+</div>
+
+<!-- PAGE 3: Migration #2 — CentOS Stream 10 -->
+<div class="page page-dark" style="position:relative;">
+  <h2 class="section-title"><span>Migration:</span> CentOS Stream 10</h2>
+  <p class="subtitle">LVM-based CentOS 10 with dracut initramfs rebuild and virtio driver injection</p>
+
+  <div class="stat-row">
+    <div class="stat gradient-blue"><div class="number" style="color:#38bdf8;">VMDK</div><div class="label">Source</div></div>
+    <div class="stat gradient-green"><div class="number" style="color:#22c55e;">1.24 GB</div><div class="label">Compressed QCOW2</div></div>
+    <div class="stat gradient-purple"><div class="number" style="color:#a855f7;">3 LVs</div><div class="label">cs-root / cs-home / cs-swap</div></div>
+    <div class="stat gradient-cyan"><div class="number" style="color:#06b6d4;">1:45</div><div class="label">Total Duration</div></div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3>Key Pipeline Events</h3>
+      <div class="screenshot" style="font-size:0.7em;">
+        <div class="header">
+          <div class="dot" style="background:#ef4444"></div>
+          <div class="dot" style="background:#eab308"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <div class="url">h2kweb Live Output — 380 lines</div>
+        </div>
+        <span style="color:#22c55e;">✅</span> Quick probe: detected <span style="color:#a855f7;">LVM</span> on disk<br>
+        <span style="color:#22c55e;">✅</span> Container scan found 1 VG(s): <span style="color:#38bdf8;">cs</span><br>
+        <span style="color:#22c55e;">✅</span> Found 3 LVs: cs-root, cs-home, cs-swap<br>
+        <span style="color:#22c55e;">✅</span> Detected: <span style="color:#e2e8f0;">CentOS Stream 10 (Coughlan)</span><br>
+        <span style="color:#22c55e;">✅</span> Mounted root: /dev/mapper/cs-root (xfs, score=43)<br>
+        <span style="color:#22c55e;">✅</span> fstab: 4 entries, all UUID-stable<br>
+        <span style="color:#22c55e;">✅</span> Network: ens33.nmconnection fixed (2 fixes)<br>
+        <span style="color:#22c55e;">✅</span> Masked: vmtoolsd.service, vgauthd.service<br>
+        <span style="color:#38bdf8;">🔧</span> dracut -f --kver 6.12.0-43.el10.x86_64<br>
+        &nbsp;&nbsp;&nbsp;&nbsp; --add-drivers virtio_blk virtio_scsi virtio_net<br>
+        &nbsp;&nbsp;&nbsp;&nbsp; --add lvm dm<br>
+        <span style="color:#22c55e;">✅</span> Completed in <span style="color:#e2e8f0;">26.3s</span><br>
+        <span style="color:#22c55e;">✅</span> grub2-mkconfig: Succeeded<br>
+        <span style="color:#22c55e;">✅</span> Blacklisted VMware kernel modules<br>
+        <span style="color:#22c55e;">✅</span> Conversion complete: centos10.qcow2<br>
+        <span style="color:#22c55e;">✅</span> Domain <span style="color:#e2e8f0;">centos10</span> → <span style="color:#22c55e;">RUNNING</span><br>
+      </div>
+    </div>
+    <div>
+      <h3>Automated Fixes Applied</h3>
+      <table>
+        <tr><th>Fix</th><th>Status</th></tr>
+        <tr><td>LVM detection (cs VG)</td><td><span class="check">✓</span> 3 LVs activated</td></tr>
+        <tr><td>Root FS detection</td><td><span class="check">✓</span> /dev/mapper/cs-root (xfs)</td></tr>
+        <tr><td>fstab stabilization</td><td><span class="check">✓</span> UUID-based (4 entries)</td></tr>
+        <tr><td>Network fix</td><td><span class="check">✓</span> ens33 NM connection</td></tr>
+        <tr><td>VMware tools removal</td><td><span class="check">✓</span> vmtoolsd, vgauthd masked</td></tr>
+        <tr><td>fstab hardening</td><td><span class="check">✓</span> /boot, /home → nofail</td></tr>
+        <tr><td>initramfs rebuild (dracut)</td><td><span class="check">✓</span> 26.3s with virtio + lvm</td></tr>
+        <tr><td>GRUB regeneration</td><td><span class="check">✓</span> grub2-mkconfig</td></tr>
+        <tr><td>LVM filter fix</td><td><span class="check">✓</span> Removed restrictive filter</td></tr>
+        <tr><td>SELinux autorelabel</td><td><span class="check">✓</span> .autorelabel created</td></tr>
+        <tr><td>VMware module blacklist</td><td><span class="check">✓</span> Kernel modules blocked</td></tr>
+        <tr><td>Serial console</td><td><span class="check">✓</span> Injected in default/grub</td></tr>
+        <tr><td>Auto-grow root FS</td><td><span class="check">✓</span> Configured (xfs)</td></tr>
+        <tr><td>Machine-ID reset</td><td><span class="check">✓</span> Firstboot regeneration</td></tr>
+      </table>
+
+      <div class="vm-card" style="background:rgba(34,197,94,0.08); border-color:rgba(34,197,94,0.3); margin-top:15px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.5em;">🟢</span>
+          <div>
+            <div class="name">centos10</div>
+            <div class="detail">CentOS Stream 10 — LVM + virtio + BIOS</div>
+          </div>
+        </div>
+        <div class="ip-box"><div class="dot"></div><span class="ip">192.168.122.172</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">hyper2kvm Live Demo — CentOS Stream 10 Migration</div>
+</div>
+
+<!-- PAGE 4: Web Dashboard Screenshots -->
+<div class="page page-slate" style="position:relative;">
+  <h2 class="section-title"><span>Web Dashboard</span> — h2kweb</h2>
+  <p class="subtitle">Browser-based migration management at http://185.165.240.5:5070</p>
+
+  <div class="two-col">
+    <div>
+      <h3>Dashboard View</h3>
+      <div class="screenshot">
+        <div class="header">
+          <div class="dot" style="background:#ef4444"></div>
+          <div class="dot" style="background:#eab308"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <div class="url">Dashboard</div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:12px;">
+          <div style="flex:1; background:linear-gradient(135deg,#1e3a5f,#1e293b); border-radius:8px; padding:10px;">
+            <div style="color:#38bdf8; font-size:1.5em; font-weight:700;">4</div>
+            <div style="color:#64748b; font-size:0.8em;">Migrations</div>
+          </div>
+          <div style="flex:1; background:linear-gradient(135deg,#1e5f3a,#1e293b); border-radius:8px; padding:10px;">
+            <div style="color:#22c55e; font-size:1.5em; font-weight:700;">3</div>
+            <div style="color:#64748b; font-size:0.8em;">Completed</div>
+          </div>
+          <div style="flex:1; background:linear-gradient(135deg,#1e4f5f,#1e293b); border-radius:8px; padding:10px;">
+            <div style="color:#06b6d4; font-size:1.5em; font-weight:700;">3</div>
+            <div style="color:#64748b; font-size:0.8em;">VMs Running</div>
+          </div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <span style="color:#64748b; font-size:0.85em;">CPU</span> <span style="color:#38bdf8;">50%</span><br>
+          <div style="height:6px; background:#1e293b; border-radius:3px; margin:3px 0;"><div style="height:100%; width:50%; background:#38bdf8; border-radius:3px;"></div></div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <span style="color:#64748b; font-size:0.85em;">Memory</span> <span style="color:#22c55e;">47%</span><br>
+          <div style="height:6px; background:#1e293b; border-radius:3px; margin:3px 0;"><div style="height:100%; width:47%; background:#22c55e; border-radius:3px;"></div></div>
+        </div>
+        <div>
+          <span style="color:#64748b; font-size:0.85em;">Disk</span> <span style="color:#eab308;">94%</span><br>
+          <div style="height:6px; background:#1e293b; border-radius:3px; margin:3px 0;"><div style="height:100%; width:94%; background:#eab308; border-radius:3px;"></div></div>
+        </div>
+      </div>
+
+      <h3>Job Monitor — Live Logs</h3>
+      <div class="screenshot" style="font-size:0.7em;">
+        <div class="header">
+          <div class="dot" style="background:#ef4444"></div>
+          <div class="dot" style="background:#eab308"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <div class="url">Job c690a469 &nbsp; <span style="color:#22c55e;">● streaming</span></div>
+        </div>
+        <span style="color:#22c55e;">✅</span> Detected LVM on disk<br>
+        <span style="color:#22c55e;">✅</span> Ubuntu 25.04 (Plucky)<br>
+        <span style="color:#38bdf8;">🔧</span> update-initramfs -u -k all<br>
+        <span style="color:#22c55e;">✅</span> grub-mkconfig: Succeeded<br>
+        <span style="color:#22c55e;">✅</span> Conversion complete<br>
+        <span style="color:#22c55e;">✅</span> Domain → RUNNING<br>
+        <br>
+        <div style="background:rgba(34,197,94,0.05); padding:6px 10px; border-radius:6px; border:1px solid rgba(34,197,94,0.2); margin-top:8px;">
+          🟢 <span class="ip">192.168.122.136</span> &nbsp; 📋 SSH
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>Migration Wizard</h3>
+      <div class="screenshot">
+        <div class="header">
+          <div class="dot" style="background:#ef4444"></div>
+          <div class="dot" style="background:#eab308"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <div class="url">Migrate → Local File</div>
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <div style="flex:1; background:#334155; border-radius:6px; padding:8px; text-align:center; font-size:0.9em;">📁 Local</div>
+          <div style="flex:1; background:#1e3a5f; border-radius:6px; padding:8px; text-align:center; font-size:0.9em;">🖥️ vSphere</div>
+          <div style="flex:1; background:#1e4f5f; border-radius:6px; padding:8px; text-align:center; font-size:0.9em;">☁️ Azure</div>
+          <div style="flex:1; background:#5f3a1e; border-radius:6px; padding:8px; text-align:center; font-size:0.9em;">🌐 EC2</div>
+        </div>
+        <div style="color:#64748b; font-size:0.85em; margin-bottom:8px;">📁 / root / demo</div>
+        💿 <span style="color:#38bdf8;">centos10.vmdk</span> <span class="badge badge-blue" style="font-size:0.8em;">VMDK</span> <span style="color:#64748b;">2.2 GB</span><br>
+        💿 <span style="color:#38bdf8;">centos9.vmdk</span> <span class="badge badge-blue" style="font-size:0.8em;">VMDK</span> <span style="color:#64748b;">1.8 GB</span><br>
+        💿 <span style="color:#e2e8f0;">ubuntu-server2504.vmdk</span> <span class="badge badge-blue" style="font-size:0.8em;">VMDK</span> <span style="color:#38bdf8;">✓</span><br>
+        <br>
+        <div style="background:#1e3a5f; border-radius:6px; padding:6px 12px; text-align:center; color:#38bdf8; font-weight:600;">Next: Configure →</div>
+      </div>
+
+      <h3>Providers Page</h3>
+      <div class="screenshot" style="font-size:0.8em;">
+        <div class="header">
+          <div class="dot" style="background:#ef4444"></div>
+          <div class="dot" style="background:#eab308"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <div class="url">Providers</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <div style="flex:1; background:linear-gradient(135deg,#1e3a8f,#1e293b); border-radius:8px; padding:12px;">
+            <div style="font-size:1.2em;">🖥️</div>
+            <div style="color:#e2e8f0; font-weight:600; font-size:0.9em; margin-top:4px;">VMware vSphere</div>
+            <div style="color:#64748b; font-size:0.7em; margin-top:2px;">govmomi SDK</div>
+            <div style="color:#22c55e; font-size:0.7em; margin-top:6px;">▶ Sign in to connect</div>
+          </div>
+          <div style="flex:1; background:linear-gradient(135deg,#0e4f8f,#1e293b); border-radius:8px; padding:12px;">
+            <div style="font-size:1.2em;">☁️</div>
+            <div style="color:#e2e8f0; font-weight:600; font-size:0.9em; margin-top:4px;">Microsoft Azure</div>
+            <div style="color:#64748b; font-size:0.7em; margin-top:2px;">az CLI</div>
+            <div style="color:#22c55e; font-size:0.7em; margin-top:6px;">▶ Sign in to connect</div>
+          </div>
+          <div style="flex:1; background:linear-gradient(135deg,#5f3a0e,#1e293b); border-radius:8px; padding:12px;">
+            <div style="font-size:1.2em;">🌐</div>
+            <div style="color:#e2e8f0; font-weight:600; font-size:0.9em; margin-top:4px;">AWS EC2</div>
+            <div style="color:#64748b; font-size:0.7em; margin-top:2px;">aws CLI</div>
+            <div style="color:#22c55e; font-size:0.7em; margin-top:6px;">▶ Sign in to connect</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">hyper2kvm Live Demo — Web Dashboard</div>
+</div>
+
+<!-- PAGE 5: Summary -->
+<div class="page page-dark" style="position:relative;">
+  <h2 class="section-title"><span>Summary</span> &amp; Capabilities</h2>
+  <p class="subtitle">Production-validated VM migration with full automation</p>
+
+  <div class="two-col">
+    <div>
+      <h3>What Was Demonstrated</h3>
+      <table>
+        <tr><th>Capability</th><th>Result</th></tr>
+        <tr><td>VMware VMDK → KVM QCOW2</td><td><span class="check">✓ Automated</span></td></tr>
+        <tr><td>LVM detection &amp; activation</td><td><span class="check">✓ cs, ubuntu-vg</span></td></tr>
+        <tr><td>Root filesystem detection</td><td><span class="check">✓ xfs, ext4</span></td></tr>
+        <tr><td>initramfs rebuild (dracut/update-initramfs)</td><td><span class="check">✓ virtio drivers</span></td></tr>
+        <tr><td>GRUB bootloader repair</td><td><span class="check">✓ grub2-mkconfig</span></td></tr>
+        <tr><td>fstab stabilization (UUID)</td><td><span class="check">✓ All entries</span></td></tr>
+        <tr><td>Network config fix</td><td><span class="check">✓ NM connections</span></td></tr>
+        <tr><td>VMware tools removal</td><td><span class="check">✓ Services masked</span></td></tr>
+        <tr><td>Auto-deploy to libvirt</td><td><span class="check">✓ virsh define+start</span></td></tr>
+        <tr><td>VM boots with IP</td><td><span class="check">✓ DHCP assigned</span></td></tr>
+        <tr><td>Web UI (PAM auth)</td><td><span class="check">✓ h2kweb :5070</span></td></tr>
+        <tr><td>Live log streaming</td><td><span class="check">✓ WebSocket</span></td></tr>
+        <tr><td>Server file browser</td><td><span class="check">✓ Browse &amp; select</span></td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>Guest OS Support Validated</h3>
+      <div class="card-grid" style="gap:10px;">
+        <div class="card gradient-blue" style="padding:14px; text-align:center;">
+          <div style="font-size:1.3em; font-weight:700; color:#38bdf8;">CentOS 10</div>
+          <div style="font-size:0.8em; color:#64748b;">Stream • LVM • dracut</div>
+        </div>
+        <div class="card gradient-green" style="padding:14px; text-align:center;">
+          <div style="font-size:1.3em; font-weight:700; color:#22c55e;">Ubuntu 25.04</div>
+          <div style="font-size:0.8em; color:#64748b;">Server • LVM • update-initramfs</div>
+        </div>
+        <div class="card gradient-cyan" style="padding:14px; text-align:center;">
+          <div style="font-size:1.3em; font-weight:700; color:#06b6d4;">Ubuntu 24.04</div>
+          <div style="font-size:0.8em; color:#64748b;">LTS • ext4 • GRUB</div>
+        </div>
+        <div class="card gradient-purple" style="padding:14px; text-align:center;">
+          <div style="font-size:1.3em; font-weight:700; color:#a855f7;">CentOS 9</div>
+          <div style="font-size:0.8em; color:#64748b;">Stream • xfs • dracut</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.5em;">Deployment</h3>
+      <div class="screenshot" style="font-size:0.8em;">
+        <div class="header">
+          <div class="dot" style="background:#ef4444"></div>
+          <div class="dot" style="background:#eab308"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <div class="url">One-command deploy</div>
+        </div>
+        <span style="color:#22c55e;">$</span> ./scripts/deploy-remote.sh 185.165.240.5 root<br>
+        <br>
+        <span style="color:#64748b;"># Installs:</span><br>
+        &nbsp;&nbsp;h2kvmctl (Python CLI)<br>
+        &nbsp;&nbsp;h2kweb (Go web dashboard)<br>
+        &nbsp;&nbsp;systemd services<br>
+        &nbsp;&nbsp;libguestfs auto-linking<br>
+        &nbsp;&nbsp;augeas for config editing<br>
+        <br>
+        <span style="color:#22c55e;">✅</span> Dashboard: <span style="color:#86efac;">http://185.165.240.5:5070</span><br>
+        <span style="color:#22c55e;">✅</span> Login with system PAM credentials
+      </div>
+    </div>
+  </div>
+  <div class="footer">hyper2kvm Live Demo — Summary</div>
+</div>
+
+</body>
+</html>

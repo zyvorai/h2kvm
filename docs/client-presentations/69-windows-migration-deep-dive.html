@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Windows VM Migration Deep-Dive — hyper2kvm</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #e2e8f0; background: #0f172a; line-height: 1.5; }
+
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f172a, #1e293b); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .cover h2 { font-size: 1.3em; color: #94a3b8; margin: 0.3em 0 1.5em; }
+  .cover .badge { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); padding: 6px 20px; border-radius: 16px; font-size: 0.85em; color: #3b82f6; }
+  .cover .url { color: #06b6d4; font-family: monospace; font-size: 1.1em; margin-top: 1em; }
+  .cover .date { color: #475569; margin-top: 0.5em; font-size: 0.85em; }
+
+  .page { min-height: 100vh; padding: 36px 46px; page-break-after: always; position: relative; }
+  .page-dark { background: #0f172a; }
+  .page-slate { background: #1e293b; }
+
+  h2.title { font-size: 1.8em; font-weight: 700; margin-bottom: 0.2em; }
+  h2.title span { color: #3b82f6; }
+  .desc { font-size: 0.9em; color: #64748b; margin-bottom: 1.2em; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.8em 0 0.25em; color: #06b6d4; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px; }
+  .card h4 { font-size: 0.9em; font-weight: 600; margin-bottom: 4px; color: #3b82f6; }
+  .card ul { padding-left: 14px; font-size: 0.78em; margin: 0; } .card li { margin-bottom: 2px; }
+  .card p { font-size: 0.78em; opacity: 0.85; margin-bottom: 0; }
+
+  .flow { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 0.7em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: 0.8em; }
+  .flow-arrow { font-size: 1.1em; color: #3b82f6; }
+  .flow-fix { background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3); }
+  .flow-ok { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+
+  .features { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1em; }
+  .feat { background: rgba(51,65,85,0.5); border: 1px solid rgba(51,65,85,0.8); border-radius: 8px; padding: 6px 12px; font-size: 0.78em; color: #94a3b8; }
+  .feat-blue { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: #3b82f6; }
+  .feat-cyan { background: rgba(6,182,212,0.1); border-color: rgba(6,182,212,0.3); color: #06b6d4; }
+  .feat-green { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #22c55e; }
+
+  .highlight { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  pre { background: rgba(255,255,255,0.04); color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.74em; line-height: 1.45; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  code { background: rgba(59,130,246,0.1); padding: 2px 4px; border-radius: 4px; font-size: 0.85em; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.76em; }
+  th { background: #1d4ed8; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; font-size: 0.82em; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); vertical-align: top; }
+  .check { color: #22c55e; font-weight: 700; }
+
+  .verdict { background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(6,182,212,0.1)); border: 2px solid #3b82f6; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #3b82f6; font-size: 1.1em; margin-bottom: 4px; }
+
+  .footer { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-size: 0.65em; color: #334155; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Windows VM Migration<br>Deep Technical Guide</h1>
+  <h2>Win10 / Win11 / Server &mdash; Zero-Touch Driver Installation</h2>
+  <div class="badge">VirtIO Injection | Registry Editing | Firstboot Scripts | UEFI + BIOS | Proprietary (Zyvor AI Labs)</div>
+  <div class="url">github.com/ssahani/hyper2kvm</div>
+  <div class="date">April 2026 &mdash; v0.3.0</div>
+</div>
+
+<!-- PAGE 1: Migration Pipeline -->
+<div class="page page-dark">
+  <h2 class="title"><span>1.</span> Migration Pipeline</h2>
+  <p class="desc">End-to-end flow from VMware VMDK to a running KVM guest with full VirtIO drivers.</p>
+
+  <div class="flow">
+    <div class="flow-step">VMDK Source<br><small>VMware export / govc</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Flatten<br><small>qemu-img convert</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Offline Fixes<br><small>mount via qemu-nbd</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">VirtIO Inject<br><small>.sys + registry</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Domain XML<br><small>libvirt template</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">Boot &amp; Verify<br><small>guest-agent ping</small></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Conversion Stage</h4>
+      <ul>
+        <li>Accept VMDK, OVA, VHD, or raw disk images</li>
+        <li>Flatten snapshots into single QCOW2 file</li>
+        <li>Optional compression for storage savings</li>
+        <li>Checksum verification (SHA256) for integrity</li>
+        <li>Sparse file support preserves thin provisioning</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Offline Fix Stage</h4>
+      <ul>
+        <li>Mount NTFS partitions via qemu-nbd + ntfs-3g</li>
+        <li>Auto-detect Windows version from registry hive</li>
+        <li>Inject VirtIO storage, network, balloon drivers</li>
+        <li>Create firstboot service for PnP driver binding</li>
+        <li>Disable VMware Tools services in registry</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Deploy Stage</h4>
+      <ul>
+        <li>Generate libvirt domain XML (Q35 + PCIe)</li>
+        <li>Auto-detect UEFI vs BIOS firmware</li>
+        <li>VirtIO disk bus + VirtIO NIC model</li>
+        <li>SPICE or VNC graphics (auto-detected)</li>
+        <li><code>virsh define</code> + optional <code>virsh start</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Verification Stage</h4>
+      <ul>
+        <li>Boot test with SATA fallback disk for safety</li>
+        <li>Guest agent ping confirms driver installation</li>
+        <li>Offline NBD remount verifies .sys file presence</li>
+        <li>Production XML generated with VirtIO disk bus</li>
+        <li>Optional KubeVirt manifest for Kubernetes deploy</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Key principle:</strong> Every modification happens offline via qemu-nbd. The VM never needs to boot with broken drivers. VirtIO storage is registered as Start=0 (boot-start) so Windows loads it before any other disk driver.</p>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 1</div>
+</div>
+
+<!-- PAGE 2: VirtIO Driver Injection -->
+<div class="page page-slate">
+  <h2 class="title"><span>2.</span> VirtIO Driver <span>Injection</span></h2>
+  <p class="desc">Six drivers copied to System32\drivers with full registry service entries and PnP staging.</p>
+
+  <table>
+    <tr><th>Driver</th><th>File</th><th>Purpose</th><th>Start Type</th><th>PCI Hardware IDs</th></tr>
+    <tr><td><strong>viostor</strong></td><td>viostor.sys</td><td>Block storage (boot-critical)</td><td>0 (Boot)</td><td>VEN_1AF4&amp;DEV_1001, VEN_1AF4&amp;DEV_1042</td></tr>
+    <tr><td><strong>vioscsi</strong></td><td>vioscsi.sys</td><td>SCSI controller</td><td>0 (Boot)</td><td>VEN_1AF4&amp;DEV_1004, VEN_1AF4&amp;DEV_1048</td></tr>
+    <tr><td><strong>NetKVM</strong></td><td>netkvm.sys</td><td>Network adapter</td><td>2 (Auto)</td><td>VEN_1AF4&amp;DEV_1000, VEN_1AF4&amp;DEV_1041</td></tr>
+    <tr><td><strong>Balloon</strong></td><td>balloon.sys</td><td>Dynamic memory</td><td>3 (Demand)</td><td>VEN_1AF4&amp;DEV_1002, VEN_1AF4&amp;DEV_1045</td></tr>
+    <tr><td><strong>vioserial</strong></td><td>vioser.sys</td><td>Serial port / guest agent</td><td>3 (Demand)</td><td>VEN_1AF4&amp;DEV_1003, VEN_1AF4&amp;DEV_1043</td></tr>
+    <tr><td><strong>viorng</strong></td><td>viorng.sys</td><td>Hardware RNG</td><td>3 (Demand)</td><td>VEN_1AF4&amp;DEV_1005, VEN_1AF4&amp;DEV_1044</td></tr>
+  </table>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>CriticalDeviceDatabase</h4>
+      <ul>
+        <li>Maps PCI vendor/device IDs to driver service names</li>
+        <li>Windows checks this before loading any boot driver</li>
+        <li>Both transitional (DEV_1001) and modern (DEV_1042) IDs registered</li>
+        <li>ClassGUID set to SCSIAdapter for storage drivers</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Services Registration</h4>
+      <ul>
+        <li>ImagePath points to <code>system32\drivers\viostor.sys</code></li>
+        <li>Group = "SCSI miniport" for storage drivers</li>
+        <li>ErrorControl = 1 (normal) to prevent boot failure loops</li>
+        <li>Type = 1 (kernel driver) for all VirtIO services</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>INF/CAT Staging</h4>
+      <ul>
+        <li>INF files copied to <code>Windows\INF\</code> as OEM entries</li>
+        <li>SYS+INF staged in <code>DriverStore\FileRepository\</code></li>
+        <li>CAT catalog files staged for signature verification</li>
+        <li>PnP auto-discovers staged drivers on first boot</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="features">
+    <span class="feat feat-blue">viostor.sys (boot-critical)</span>
+    <span class="feat feat-cyan">netkvm.sys (network)</span>
+    <span class="feat">balloon.sys (memory)</span>
+    <span class="feat">vioser.sys (serial)</span>
+    <span class="feat">viorng.sys (entropy)</span>
+    <span class="feat feat-green">All registered offline via hivex</span>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 2</div>
+</div>
+
+<!-- PAGE 3: Firstboot Architecture -->
+<div class="page page-dark">
+  <h2 class="title"><span>3.</span> Firstboot <span>Architecture</span></h2>
+  <p class="desc">rhsrvany.exe service wrapper with multi-method fallback for reliable first-boot script execution.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>rhsrvany.exe Service Wrapper</h4>
+      <ul>
+        <li>Runs batch/PowerShell scripts as a Windows service</li>
+        <li>Compatible with virt-v2v rhsrvany.exe format</li>
+        <li>Service registered in SYSTEM hive: <code>Services\h2kfirstboot</code></li>
+        <li>Parameters\CommandLine points to staged script</li>
+        <li>Parameters\PWD sets working directory</li>
+        <li>Start=2 (auto-start) ensures execution at boot</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Run Key Fallback (Win11 Edge Builds)</h4>
+      <ul>
+        <li>Some Win11 edge builds delay service startup</li>
+        <li>RunOnce registry key as fallback mechanism</li>
+        <li><code>SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce</code></li>
+        <li>Batch file triggers pnputil driver installation</li>
+        <li>OOBE bypass keys set: BypassNRO, SkipMachineOOBE</li>
+        <li>Auto-login enabled to reach desktop without prompts</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Firstboot Script Pipeline</h3>
+  <div class="flow">
+    <div class="flow-step">Service Starts<br><small>rhsrvany.exe</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">VirtIO ISO pnputil<br><small>all driver folders</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Custom PNP<br><small>C:\hyper2kvm-drivers</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Network Apply<br><small>PowerShell script</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Guest Agent MSI<br><small>qemu-ga install</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">Self-Cleanup<br><small>remove service</small></div>
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Per-Service Scripts</h4>
+      <ul>
+        <li>Each script is independent (no overwrite)</li>
+        <li>VirtIO install script staged separately</li>
+        <li>Network apply script runs standalone</li>
+        <li>Custom driver script isolated from VirtIO</li>
+        <li>Failure in one does not block others</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Self-Cleanup</h4>
+      <ul>
+        <li>Service deletes itself after successful run</li>
+        <li>RunOnce key auto-removed by Windows</li>
+        <li>Staged scripts removed from guest</li>
+        <li>Auto-login reverted to normal behavior</li>
+        <li>No hyper2kvm artifacts remain post-migration</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Logging</h4>
+      <ul>
+        <li>All output to <code>C:\hyper2kvm\firstboot.log</code></li>
+        <li>pnputil results captured per driver</li>
+        <li>Network apply log at <code>apply-network.log</code></li>
+        <li>Exit codes recorded for troubleshooting</li>
+        <li>Serial console output on COM1</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Dual-method reliability:</strong> rhsrvany service executes before user login. RunOnce key provides a fallback at user login. Both methods are staged, so even if one path fails, the other completes driver installation.</p>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 3</div>
+</div>
+
+<!-- PAGE 4: Registry Editing -->
+<div class="page page-slate">
+  <h2 class="title"><span>4.</span> Registry <span>Editing</span></h2>
+  <p class="desc">Offline registry manipulation via hivex for SYSTEM and SOFTWARE hives.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>SYSTEM Hive Operations</h4>
+      <ul>
+        <li>Service creation: viostor, vioscsi, netkvm, balloon, vioserial, viorng</li>
+        <li>CriticalDeviceDatabase entries for PCI hardware IDs</li>
+        <li>VMware service disablement (VMTools, vm3dservice, etc.)</li>
+        <li>ControlSet001 targeted (CurrentControlSet not available offline)</li>
+        <li>Start type: 0=Boot, 2=Auto, 3=Demand, 4=Disabled</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>SOFTWARE Hive Operations</h4>
+      <ul>
+        <li>RunOnce key for firstboot batch script</li>
+        <li>Auto-login: DefaultUserName, DefaultPassword, AutoAdminLogon</li>
+        <li>OOBE bypass: BypassNRO, SkipMachineOOBE, SkipUserOOBE</li>
+        <li>DevicePath update to include VirtIO driver store path</li>
+        <li>VMware uninstall entries cleaned from registry</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>hivex Python API</h3>
+  <pre>
+import hivex
+
+# Open SYSTEM hive for read-write
+h = hivex.Hivex("/mnt/Windows/System32/config/SYSTEM", write=True)
+
+# Navigate to Services key
+root = h.root()
+ccs = h.node_get_child(root, "ControlSet001")
+services = h.node_get_child(ccs, "Services")
+
+# Create viostor service entry
+viostor = h.node_add_child(services, "viostor")
+h.node_set_value(viostor, {"key": "Type", "t": 4, "value": struct.pack("&lt;I", 1)})
+h.node_set_value(viostor, {"key": "Start", "t": 4, "value": struct.pack("&lt;I", 0)})
+h.node_set_value(viostor, {"key": "ImagePath", "t": 1,
+    "value": "system32\\drivers\\viostor.sys\0".encode("utf-16-le")})
+
+h.commit(None)  # Write changes back to hive file
+  </pre>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Path Conventions</h4>
+      <ul>
+        <li>ImagePath uses literal <code>system32\drivers\</code> (relative to SystemRoot)</li>
+        <li>No <code>$env:SystemRoot</code> expansion in registry values</li>
+        <li>Literal <code>C:\</code> paths only for staged files outside System32</li>
+        <li>DriverStore paths use full <code>C:\Windows\System32\DriverStore\</code></li>
+        <li>UTF-16LE encoding required for all REG_SZ values</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>VMware Cleanup</h4>
+      <ul>
+        <li>9 VMware services set to Start=4 (Disabled)</li>
+        <li>VMware Tools uninstall keys removed</li>
+        <li>vm3dservice, VGAuthService, vmvss disabled</li>
+        <li>vmci, vsock kernel drivers disabled</li>
+        <li>Prevents VMware driver conflicts with VirtIO</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 4</div>
+</div>
+
+<!-- PAGE 5: Auto-Detect & Compatibility -->
+<div class="page page-dark">
+  <h2 class="title"><span>5.</span> Auto-Detect &amp; <span>Compatibility</span></h2>
+  <p class="desc">Automatic detection of host capabilities and guest requirements for seamless deployment.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Video Model Detection</h4>
+      <ul>
+        <li>Default: QXL for SPICE, virtio-gpu for VNC</li>
+        <li>Auto-detect: SPICE if libspice-server.so present</li>
+        <li>Fallback: VNC with virtio-gpu (works everywhere)</li>
+        <li>RHEL/AlmaLinux: typically VNC (no SPICE)</li>
+        <li>Fedora: SPICE + QXL available</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>OVMF / Firmware Detection</h4>
+      <ul>
+        <li>Scan standard paths: <code>/usr/share/OVMF/</code></li>
+        <li>Fedora: <code>/usr/share/edk2/ovmf/</code></li>
+        <li>RHEL: <code>/usr/share/OVMF/OVMF_CODE.secboot.fd</code></li>
+        <li>Secure Boot firmware preferred when available</li>
+        <li>BIOS fallback for legacy MBR guests</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>VirtIO ISO Discovery</h4>
+      <ul>
+        <li>Check: <code>/usr/share/virtio-win/virtio-win.iso</code></li>
+        <li>Check: <code>/var/lib/hyper2kvm/virtio-win.iso</code></li>
+        <li>deploy-remote.sh auto-downloads if missing</li>
+        <li>Version matched to guest OS (w10, w11, 2k22)</li>
+        <li>Architecture: amd64 selected for 64-bit guests</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>virsh define Auto-Fix</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Domain XML Corrections</h4>
+      <ul>
+        <li>QEMU binary path: <code>/usr/bin/qemu-system-x86_64</code> (Fedora) vs <code>/usr/libexec/qemu-kvm</code> (RHEL)</li>
+        <li>Machine type: q35 with PCIe topology</li>
+        <li>CPU mode: host-passthrough for full KVM acceleration</li>
+        <li>Memory ballooning enabled with VirtIO balloon device</li>
+        <li>Serial console on pty for headless access</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Graphics Configuration</h4>
+      <ul>
+        <li>SPICE: listen on localhost, auto-port, agent channel</li>
+        <li>VNC: listen on localhost, auto-port, websocket</li>
+        <li>Tablet input device for proper mouse tracking</li>
+        <li>USB controller (qemu-xhci) for USB passthrough</li>
+        <li>Sound device (ich9) for Windows audio support</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="features">
+    <span class="feat feat-blue">QEMU binary auto-detect</span>
+    <span class="feat feat-cyan">SPICE/VNC auto-select</span>
+    <span class="feat feat-green">OVMF firmware scan</span>
+    <span class="feat">VirtIO ISO discovery</span>
+    <span class="feat">Q35 + PCIe topology</span>
+    <span class="feat">host-passthrough CPU</span>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 5</div>
+</div>
+
+<!-- PAGE 6: Tested Platforms -->
+<div class="page page-slate">
+  <h2 class="title"><span>6.</span> Tested <span>Platforms</span></h2>
+  <p class="desc">Verified Windows guest and Linux host combinations with production results.</p>
+
+  <table>
+    <tr><th style="width:20%">Guest OS</th><th style="width:15%">Firmware</th><th style="width:15%">Boot</th><th style="width:15%">Drivers</th><th style="width:15%">Network</th><th style="width:20%">Notes</th></tr>
+    <tr><td>Win10 Pro 20H2</td><td>BIOS + UEFI</td><td class="check">&#10003; Pass</td><td class="check">&#10003; All 6</td><td class="check">&#10003; DHCP/Static</td><td>Most common migration target</td></tr>
+    <tr><td>Win11 Pro 22H2</td><td>UEFI + SecureBoot</td><td class="check">&#10003; Pass</td><td class="check">&#10003; All 6</td><td class="check">&#10003; DHCP/Static</td><td>OOBE bypass required</td></tr>
+    <tr><td>Win11 Edge Build</td><td>UEFI + SecureBoot</td><td class="check">&#10003; Pass</td><td class="check">&#10003; All 6</td><td class="check">&#10003; DHCP</td><td>RunOnce fallback used</td></tr>
+    <tr><td>Server 2019</td><td>BIOS + UEFI</td><td class="check">&#10003; Pass</td><td class="check">&#10003; All 6</td><td class="check">&#10003; Static</td><td>Core + Desktop Experience</td></tr>
+    <tr><td>Server 2022</td><td>UEFI</td><td class="check">&#10003; Pass</td><td class="check">&#10003; All 6</td><td class="check">&#10003; Static</td><td>Azure Stack HCI source</td></tr>
+  </table>
+
+  <h3>Host Environments</h3>
+  <table>
+    <tr><th style="width:25%">Host OS</th><th style="width:20%">QEMU Path</th><th style="width:15%">Graphics</th><th style="width:15%">VirtIO ISO</th><th style="width:25%">Notes</th></tr>
+    <tr><td>AlmaLinux 9 (Worldstream)</td><td>/usr/libexec/qemu-kvm</td><td>VNC</td><td class="check">&#10003; Auto</td><td>Bare-metal production server</td></tr>
+    <tr><td>Fedora 43</td><td>/usr/bin/qemu-system-x86_64</td><td>SPICE</td><td class="check">&#10003; Auto</td><td>Development workstation</td></tr>
+    <tr><td>RHEL 8.8</td><td>/usr/libexec/qemu-kvm</td><td>VNC</td><td class="check">&#10003; Auto</td><td>Enterprise production</td></tr>
+    <tr><td>Ubuntu 24.04</td><td>/usr/bin/qemu-system-x86_64</td><td>SPICE</td><td class="check">&#10003; Manual</td><td>virtio-win from repo</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>Zero-Touch Windows Migration</h3>
+    <p style="font-size:0.9em;">
+      Offline VirtIO injection + registry editing + firstboot scripts + auto-detection = fully automated migration.<br>
+      <strong>No BSOD. No manual driver install. No IP reconfiguration. Works across Win10, Win11, and Server.</strong>
+    </p>
+  </div>
+
+  <div class="features">
+    <span class="feat feat-green">5 Windows versions tested</span>
+    <span class="feat feat-blue">4 host distros verified</span>
+    <span class="feat feat-cyan">UEFI + BIOS support</span>
+    <span class="feat">Secure Boot compatible</span>
+    <span class="feat feat-green">Zero BSOD incidents</span>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 6</div>
+</div>
+
+</body>
+</html>

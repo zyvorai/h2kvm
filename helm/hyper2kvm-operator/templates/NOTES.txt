@@ -1,0 +1,106 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named {{ .Release.Name }}.
+
+The hyper2kvm operator has been deployed to namespace: {{ include "hyper2kvm-operator.namespace" . }}
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }} -n {{ include "hyper2kvm-operator.namespace" . }}
+  $ helm get all {{ .Release.Name }} -n {{ include "hyper2kvm-operator.namespace" . }}
+
+=============================================================================
+
+OPERATOR STATUS:
+----------------
+
+Check operator status:
+  kubectl get pods -n {{ include "hyper2kvm-operator.namespace" . }} -l app.kubernetes.io/component=operator
+
+View operator logs:
+  kubectl logs -n {{ include "hyper2kvm-operator.namespace" . }} -l app.kubernetes.io/component=operator -f
+
+{{- if .Values.webhook.enabled }}
+
+WEBHOOK STATUS:
+---------------
+
+Check webhook status:
+  kubectl get pods -n {{ include "hyper2kvm-operator.namespace" . }} -l app.kubernetes.io/component=webhook
+
+View webhook logs:
+  kubectl logs -n {{ include "hyper2kvm-operator.namespace" . }} -l app.kubernetes.io/component=webhook -f
+
+Verify webhook configurations:
+  kubectl get validatingwebhookconfiguration {{ include "hyper2kvm-operator.fullname" . }}-validating
+  kubectl get mutatingwebhookconfiguration {{ include "hyper2kvm-operator.fullname" . }}-mutating
+{{- end }}
+
+CUSTOM RESOURCE DEFINITION:
+---------------------------
+
+Check CRD installation:
+  kubectl get crd migrationjobs.hyper2kvm.io
+
+View CRD details:
+  kubectl describe crd migrationjobs.hyper2kvm.io
+
+CREATING YOUR FIRST MIGRATION JOB:
+-----------------------------------
+
+Create a simple conversion job:
+
+cat <<EOF | kubectl apply -f -
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: example-conversion
+  namespace: default
+spec:
+  operation: convert
+  image:
+    path: /data/input/vm-disk.vmdk
+    format: vmdk
+  artifacts:
+    output_dir: /data/output
+    output_name: vm-disk.qcow2
+    output_format: qcow2
+EOF
+
+Monitor the job:
+  kubectl get migrationjob example-conversion -w
+  kubectl describe migrationjob example-conversion
+
+{{- if .Values.operator.metrics.enabled }}
+
+METRICS:
+--------
+
+Access operator metrics:
+  kubectl port-forward -n {{ include "hyper2kvm-operator.namespace" . }} svc/{{ include "hyper2kvm-operator.fullname" . }} 8080:8080
+  curl http://localhost:8080/metrics
+
+{{- if .Values.operator.metrics.serviceMonitor.enabled }}
+
+Metrics are automatically scraped by Prometheus via ServiceMonitor.
+{{- end }}
+{{- end }}
+
+DOCUMENTATION:
+--------------
+
+For more information:
+  - GitHub: {{ .Chart.Home }}
+  - Operator Guide: docs/deployment/v1.4.0-operator.md
+  - Webhook Guide: docs/deployment/v1.5.0-webhooks-metrics.md
+
+=============================================================================
+
+{{ if .Values.webhook.enabled -}}
+{{- if and (not .Values.webhook.tls.certManager.enabled) (not .Values.webhook.tls.existingSecret) }}
+⚠️  WARNING: Using self-signed certificates for webhooks.
+   For production, consider using cert-manager or providing your own certificates.
+{{- end }}
+{{- end }}
+
+Happy migrating! 🚀

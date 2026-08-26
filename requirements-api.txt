@@ -1,0 +1,24 @@
+# REST API Dependencies for hyper2kvm Worker Protocol
+# Install with: pip install -r requirements-api.txt
+
+# FastAPI framework
+fastapi>=0.136.1
+
+# ASGI server
+uvicorn[standard]>=0.24.0
+
+# Server-Sent Events support
+sse-starlette>=1.8.2
+
+# Production ASGI server (optional, for deployment)
+gunicorn>=21.2.0
+
+# Prometheus metrics (if not already in main requirements)
+prometheus-client>=0.25.0
+
+# CORS middleware (included in FastAPI but explicit for clarity)
+# starlette>=0.27.0  # Included with FastAPI
+
+# Testing dependencies (optional)
+httpx>=0.25.0  # For testing FastAPI apps
+pytest-asyncio>=0.21.0  # For async tests

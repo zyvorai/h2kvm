@@ -1,0 +1,57 @@
+# Production Kubernetes Deployment Example
+# Complete configuration for production VM migration to K8s
+
+# Migration settings
+cmd: local
+vmdk: /vms/production/web-server.vmdk
+output_dir: /migration/output/web-server
+to_output: web-server.qcow2
+out_format: qcow2
+compress: true
+
+# Comprehensive offline fixes
+fstab_mode: stabilize-all
+fstab_prefer_partuuid: false
+fstab_optimize_options: true
+
+grub_fixes_enable: true
+initramfs_regen_enable: true
+initramfs_regen_force: true
+
+# Ensure virtio drivers for optimal performance
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+  - virtio_balloon
+  - virtio_console
+
+# Network configuration
+network_fixes_enable: true
+
+# VMware tools cleanup
+remove_vmware_tools: true
+
+# Production Kubernetes deployment
+deploy_k8s: true
+k8s_namespace: production
+k8s_vm_name: web-server-01
+k8s_pvc_name: web-server-01-root-disk
+
+# Use production storage class with replication
+k8s_storage_class: longhorn  # or rook-ceph-block, nfs-client, etc.
+k8s_pvc_size: 100Gi
+
+# Production resources
+k8s_cpu: "8"
+k8s_memory: 16Gi
+
+# Auto-start and verify
+k8s_auto_start: true
+k8s_wait_ready: true
+
+# Comprehensive reporting
+report: /migration/output/web-server/migration-report.md
+log_file: /migration/output/web-server/migration.log
+verbose: 2

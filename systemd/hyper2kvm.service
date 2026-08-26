@@ -1,0 +1,59 @@
+[Unit]
+Description=hyper2kvm migration daemon
+Documentation=man:hyper2kvm(1) man:hyper2kvm.conf(5)
+After=network-online.target libvirtd.service
+Wants=network-online.target libvirtd.service
+
+[Service]
+Type=notify
+WatchdogSec=120
+
+# Runs as root — required for NBD device attachment, LVM activation,
+# container isolation (podman), and virsh define.
+User=root
+Group=root
+
+# Daemon configuration file
+# Should set: command: daemon, workflow_mode: true, workflow_dir: ...
+Environment="CONFIG_FILE=/etc/hyper2kvm/daemon.yaml"
+EnvironmentFile=-/etc/default/hyper2kvm
+# virt-filesystems (libguestfs-tools) and virsh helpers often live in /usr/sbin
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# systemd-managed directories (auto-created on start, /run cleaned on stop)
+RuntimeDirectory=hyper2kvm
+RuntimeDirectoryMode=0755
+StateDirectory=hyper2kvm
+StateDirectoryMode=0750
+LogsDirectory=hyper2kvm
+LogsDirectoryMode=0750
+
+# 3-directory workflow daemon: watches to_be_processed/ for incoming
+# VM disk files or job config YAMLs and converts them automatically.
+ExecStart=/usr/local/bin/h2kvmctl --config ${CONFIG_FILE}
+
+# Restart policy
+Restart=on-failure
+RestartSec=30s
+TimeoutStartSec=5min
+TimeoutStopSec=300
+
+# Security hardening
+# Note: ProtectSystem/NoNewPrivileges are intentionally relaxed —
+# the daemon performs low-level device operations (qemu-nbd fork,
+# device-mapper ioctls, podman containers, virsh define) that
+# require full root capabilities.
+PrivateTmp=true
+
+# Resource limits (adjust based on your workload)
+MemoryMax=8G
+CPUQuota=400%
+TasksMax=512
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=hyper2kvm
+
+[Install]
+WantedBy=multi-user.target

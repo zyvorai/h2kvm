@@ -1,0 +1,11 @@
+{
+  "command": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "vc_user": "administrator@vsphere.local",
+  "vc_password_env": "VC_PASSWORD",
+  "vc_insecure": true,
+  "vs_action": "select_disk",
+  "vm_name": "myVM",
+  "label_or_index": "Hard disk 1",
+  "json": true
+}

@@ -1,0 +1,57 @@
+# ==============================================================================
+# 🪟 Windows 11 Local VMDK Conversion
+# ==============================================================================
+#
+# Converts a local Windows 11 VMDK to QCOW2 format with VirtIO drivers
+#
+# Usage:
+#   hyper2kvm --config 01-local-windows-11-vmdk.yaml local
+#
+# Features:
+#   ✅ Offline VirtIO driver injection
+#   ✅ Registry modification for VirtIO storage
+#   ✅ QCOW2 compression
+#   ✅ Checksum generation
+#
+# Requirements:
+#   - VirtIO drivers extracted to a directory
+#   - guestfs-tools for offline manipulation
+# ==============================================================================
+
+cmd: local
+
+# Source VMDK
+vmdk: /home/ssahani/tt/hyper2kvm/win11/win11.vmdk
+
+# Output Configuration
+output_dir: /home/ssahani/tt/hyper2kvm/out
+to_output: /home/ssahani/tt/hyper2kvm/out/windows11-fixed.qcow2
+out_format: qcow2
+compress: true
+checksum: true
+
+# Working Directory (keeps intermediate files separate)
+workdir: /home/ssahani/tt/hyper2kvm/out/work
+
+# Filesystem Fixes (Windows-specific)
+fstab_mode: stabilize-all
+regen_initramfs: true
+no_grub: false
+print_fstab: false
+no_backup: false
+dry_run: false
+
+# VirtIO Driver Injection
+# IMPORTANT: Must be an extracted directory, NOT an ISO
+virtio_drivers_dir: /home/ssahani/tt/hyper2kvm/virtio-win-extracted
+
+# Validation Testing (disabled by default)
+libvirt_test: false
+qemu_test: false
+vm_name: windows-11-converted
+memory: 2048
+vcpus: 2
+uefi: false
+timeout: 60
+keep_domain: false
+headless: false

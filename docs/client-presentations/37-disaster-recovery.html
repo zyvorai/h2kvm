@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Disaster Recovery &amp; Business Continuity — KVM HA, Backup &amp; Failover</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #3b0764, #581c87, #7c3aed); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #c4b5fd; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(196,181,253,0.2); border: 1px solid rgba(196,181,253,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f0a1a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #c4b5fd; }
+  .page-light h2.st span { color: #581c87; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #c4b5fd; }
+  .page-light h3 { color: #581c87; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #581c87; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #c4b5fd; }
+  .page-light .card h4 { color: #581c87; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #3b0764; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(196,181,253,0.08); border: 1px solid rgba(196,181,253,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(196,181,253,0.06); }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .alert { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .alert h4 { color: #ef4444; font-size: 0.92em; margin-bottom: 3px; }
+  .verdict { background: linear-gradient(135deg, rgba(59,7,100,0.15), rgba(88,28,135,0.08)); border: 2px solid #7c3aed; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #c4b5fd; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Disaster Recovery &amp; <span>Business Continuity</span></h1>
+  <h2>KVM High Availability, Backup Strategies &amp; Automated Failover</h2>
+  <p class="sub">Moving from VMware SRM to open-source DR doesn't mean losing protection. KVM provides multiple HA and DR options — from QCOW2 snapshots to Ceph cross-site mirroring to Pacemaker automated failover. This guide covers backup strategies, RPO/RTO planning, and ready-to-use runbook templates.</p>
+  <div class="badge">RPO/RTO | QCOW2 Snapshots | Ceph Mirroring | Pacemaker HA | Velero | Live Migration | Runbooks</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">DR Architecture <span>Overview</span></h2>
+  <p class="sub">RPO/RTO tiers, VMware DR costs vs KVM, and hyper2kvm's role in DR strategy.</p>
+
+  <h3>DR Tier Definitions</h3>
+  <table>
+    <tr><th style="width:10%">Tier</th><th style="width:15%">Strategy</th><th style="width:10%">RPO</th><th style="width:10%">RTO</th><th style="width:15%">VMware Solution</th><th style="width:15%">KVM Solution</th><th style="width:10%">VMware Cost</th><th style="width:15%">KVM Cost</th></tr>
+    <tr><td><strong>Tier 1</strong></td><td>Cold Standby</td><td>24 hrs</td><td>24 hrs</td><td>Manual restore from backup</td><td>Restore QCOW2 from backup</td><td>$5K/yr</td><td>$0</td></tr>
+    <tr><td><strong>Tier 2</strong></td><td>Warm Standby</td><td>4 hrs</td><td>4 hrs</td><td>vSphere Replication</td><td>rsync + LVM snapshots</td><td>$25K/yr</td><td>$0</td></tr>
+    <tr><td><strong>Tier 3</strong></td><td>Hot Standby</td><td>15 min</td><td>15 min</td><td>SRM + vSphere Rep</td><td>Ceph RBD mirroring</td><td>$85K/yr</td><td>$0</td></tr>
+    <tr><td><strong>Tier 4</strong></td><td>Active-Active</td><td>~0</td><td>~0</td><td>SRM + Metro vSAN</td><td>Ceph stretch cluster</td><td>$200K+/yr</td><td>$0</td></tr>
+  </table>
+
+  <h3>VMware SRM vs KVM DR Cost Comparison (100 VMs)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>VMware SRM Stack (Annual)</h4>
+      <ul>
+        <li>vSphere Enterprise Plus: $49,400 (8 CPUs)</li>
+        <li>SRM Standard: $5,975/CPU x 8 = $47,800</li>
+        <li>vSphere Replication: $2,495/CPU x 8 = $19,960</li>
+        <li>vSAN (DR site): $44,600</li>
+        <li>DR site vCenter: $8,975 + $2,250 SnS</li>
+        <li>Support &amp; Maintenance: $32,000</li>
+        <li><strong>Annual Total: $205,985</strong></li>
+        <li><strong>3-Year Total: $617,955</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>KVM DR Stack (Annual)</h4>
+      <ul>
+        <li>RHEL subscriptions (optional): $13,000</li>
+        <li>Ceph (included in RHEL or free): $0</li>
+        <li>Pacemaker (included in RHEL): $0</li>
+        <li>Velero (open source): $0</li>
+        <li>BorgBackup / Restic (open source): $0</li>
+        <li>hyper2kvm for initial migration: included*</li>
+        <li><strong>Annual Total: $0-$13,000</strong></li>
+        <li><strong>3-Year Total: $0-$39,000</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <h3>hyper2kvm's Role in DR</h3>
+    <p><strong>Initial migration:</strong> Convert VMware VMs to KVM for the DR site. <strong>Ongoing:</strong> Nightly automated pipeline exports changed VMDKs and converts to QCOW2 on KVM DR hosts. <strong>Failover:</strong> KVM DR VMs are pre-converted and ready to boot — RTO drops from hours (re-converting) to minutes (just boot).</p>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Backup Strategies <span>for KVM</span></h2>
+  <p class="sub">QCOW2 snapshots, LVM snapshots, and dedicated backup tools — the 3-2-1 rule.</p>
+
+  <h3>Snapshot Comparison</h3>
+  <table>
+    <tr><th style="width:18%">Method</th><th style="width:12%">Speed</th><th style="width:12%">Space</th><th style="width:12%">Live VM</th><th style="width:12%">Consistent</th><th style="width:34%">Best For</th></tr>
+    <tr><td><strong>QCOW2 Internal</strong></td><td class="check">Instant</td><td>CoW delta</td><td class="check">Yes</td><td>Crash-consistent</td><td>Quick rollback, testing, dev environments</td></tr>
+    <tr><td><strong>QCOW2 External</strong></td><td class="check">Instant</td><td>New overlay</td><td class="check">Yes</td><td>Crash-consistent</td><td>Production snapshots, backup integration</td></tr>
+    <tr><td><strong>LVM Snapshot</strong></td><td class="check">Instant</td><td>CoW delta</td><td class="check">Yes</td><td>Crash-consistent</td><td>Block-level backup, LVM thin pools</td></tr>
+    <tr><td><strong>Ceph RBD Snapshot</strong></td><td class="check">Instant</td><td>CoW delta</td><td class="check">Yes</td><td>Crash-consistent</td><td>Distributed storage, cross-site replication</td></tr>
+    <tr><td><strong>QEMU Guest Agent</strong></td><td>Seconds</td><td>N/A (freeze)</td><td class="check">Yes</td><td class="check">App-consistent</td><td>Combined with any snapshot for consistency</td></tr>
+    <tr><td><strong>Full VM Export</strong></td><td>Minutes</td><td>Full copy</td><td class="cross">Offline</td><td class="check">Full</td><td>Archival, compliance, disaster recovery</td></tr>
+  </table>
+
+  <h3>Backup Commands</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>QCOW2 Snapshots with Guest Agent</h4>
+      <pre>
+# Freeze guest filesystem (app-consistent)
+virsh domfsfreeze db-server
+
+# Create external snapshot
+virsh snapshot-create-as db-server \
+  snap-$(date +%Y%m%d) \
+  --disk-only --atomic \
+  --quiesce
+
+# Backup the base image (snapshot active)
+cp /var/lib/libvirt/images/db-server.qcow2 \
+   /backup/db-server-$(date +%Y%m%d).qcow2
+
+# Commit snapshot back (merge overlay)
+virsh blockcommit db-server vda \
+  --active --pivot
+
+# Thaw guest filesystem
+virsh domfsthaw db-server</pre>
+    </div>
+    <div class="card">
+      <h4>BorgBackup (Deduplicated)</h4>
+      <pre>
+# Initialize backup repository
+borg init --encryption=repokey \
+  /backup/borg-repo
+
+# Backup VM disk with deduplication
+virsh domfsfreeze db-server
+borg create --progress --stats \
+  /backup/borg-repo::db-server-{now} \
+  /var/lib/libvirt/images/db-server.qcow2
+virsh domfsthaw db-server
+
+# Prune old backups (keep 7 daily, 4 weekly)
+borg prune /backup/borg-repo \
+  --keep-daily=7 --keep-weekly=4
+
+# Restore
+borg extract /backup/borg-repo::db-server-2026-03-23
+cp db-server.qcow2 /var/lib/libvirt/images/</pre>
+    </div>
+    <div class="card">
+      <h4>Restic (Cloud-Compatible)</h4>
+      <pre>
+# Initialize (local, S3, SFTP, etc.)
+restic init --repo /backup/restic-repo
+
+# Backup with progress
+restic backup \
+  /var/lib/libvirt/images/db-server.qcow2 \
+  --repo /backup/restic-repo
+
+# To S3 (air-gapped: use MinIO)
+export RESTIC_REPOSITORY=s3:minio:9000/backups
+restic backup /var/lib/libvirt/images/
+
+# Restore specific snapshot
+restic restore latest --target /restore/
+# Or specific: restic restore abc123</pre>
+    </div>
+    <div class="card">
+      <h4>3-2-1 Rule Implementation</h4>
+      <ul>
+        <li><strong>3 copies:</strong> Live disk + local backup + remote</li>
+        <li><strong>2 media types:</strong> NVMe (live) + HDD (backup) + tape/S3</li>
+        <li><strong>1 offsite:</strong> Restic to remote S3 or SFTP server</li>
+        <li><strong>Schedule:</strong> Hourly snapshots, nightly full backup</li>
+        <li><strong>Retention:</strong> 24 hourly, 7 daily, 4 weekly, 12 monthly</li>
+        <li><strong>Testing:</strong> Monthly restore drill (random VM)</li>
+        <li><strong>Monitoring:</strong> Alert if backup age &gt; 25 hours</li>
+        <li><strong>Encryption:</strong> All backups encrypted at rest</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Ceph RBD Mirroring <span>for DR</span></h2>
+  <p class="sub">Cross-site Ceph replication for near-zero RPO disaster recovery.</p>
+
+  <h3>Mirroring Modes</h3>
+  <table>
+    <tr><th style="width:15%">Mode</th><th style="width:12%">RPO</th><th style="width:15%">Bandwidth</th><th style="width:18%">How It Works</th><th style="width:20%">Pros</th><th style="width:20%">Cons</th></tr>
+    <tr><td><strong>Journal-based</strong></td><td class="check">Seconds</td><td>High (continuous)</td><td>Every write journaled and replayed at DR site</td><td>Near-zero RPO, point-in-time recovery</td><td>2x write latency, requires stable WAN link</td></tr>
+    <tr><td><strong>Snapshot-based</strong></td><td>5-15 min</td><td>Periodic bursts</td><td>Periodic snapshots synced as deltas</td><td>Lower bandwidth, tolerates WAN instability</td><td>RPO = snapshot interval</td></tr>
+  </table>
+
+  <h3>Setup Cross-Site Ceph Mirroring</h3>
+  <pre>
+# On PRIMARY site
+# Enable mirroring on the VM pool
+rbd mirror pool enable vm-pool image
+
+# Enable mirroring on specific image
+rbd mirror image enable vm-pool/db-server snapshot
+# Or journal mode: rbd mirror image enable vm-pool/db-server journal
+
+# Create snapshot schedule (every 15 minutes)
+rbd mirror snapshot schedule add --pool vm-pool --image db-server 15m
+
+# On SECONDARY (DR) site
+# Bootstrap peer connection
+rbd mirror pool peer bootstrap create --site-name primary vm-pool > token.txt
+# Copy token.txt to DR site
+rbd mirror pool peer bootstrap import --site-name secondary vm-pool token.txt
+
+# Start rbd-mirror daemon on DR site
+systemctl enable --now ceph-rbd-mirror@admin
+
+# Verify mirroring status
+rbd mirror pool status vm-pool
+# health: OK
+# images: 50 total
+#     50 replaying</pre>
+
+  <h3>Failover &amp; Failback</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>DR Failover Procedure</h4>
+      <ul>
+        <li><strong>Step 1:</strong> Verify primary is down (avoid split-brain)</li>
+        <li><strong>Step 2:</strong> Promote DR images: <code>rbd mirror image promote --force vm-pool/db-server</code></li>
+        <li><strong>Step 3:</strong> Map RBD to KVM: <code>rbd map vm-pool/db-server</code></li>
+        <li><strong>Step 4:</strong> Start VM: <code>virsh start db-server</code></li>
+        <li><strong>Step 5:</strong> Update DNS records to DR site IPs</li>
+        <li>Total failover time: 5-15 minutes (automated)</li>
+        <li>Script: <code>ceph-failover.sh --pool vm-pool --promote-all</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Failback to Primary</h4>
+      <ul>
+        <li><strong>Step 1:</strong> Repair primary site Ceph cluster</li>
+        <li><strong>Step 2:</strong> Demote DR images: <code>rbd mirror image demote vm-pool/db-server</code></li>
+        <li><strong>Step 3:</strong> Re-sync to primary (delta only)</li>
+        <li><strong>Step 4:</strong> Promote primary images</li>
+        <li><strong>Step 5:</strong> Shutdown DR VMs, start primary VMs</li>
+        <li><strong>Step 6:</strong> Update DNS back to primary IPs</li>
+        <li>Resync time: depends on delta size (typically 1-4 hours)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">KVM Live Migration <span>for HA</span></h2>
+  <p class="sub">Move running VMs between hosts with sub-100ms downtime.</p>
+
+  <h3>Live Migration Prerequisites</h3>
+  <table>
+    <tr><th style="width:20%">Requirement</th><th style="width:35%">Details</th><th style="width:20%">Check Command</th><th style="width:25%">Common Issue</th></tr>
+    <tr><td><strong>Shared Storage</strong></td><td>NFS, Ceph RBD, GlusterFS, or iSCSI</td><td><code>df -h /var/lib/libvirt/images</code></td><td>Local disk = no live migration</td></tr>
+    <tr><td><strong>Same CPU family</strong></td><td>Source and dest must have compatible CPU</td><td><code>virsh capabilities | grep model</code></td><td>AMD→Intel fails; use host-model</td></tr>
+    <tr><td><strong>Network connectivity</strong></td><td>Migration port (TCP 49152+) open between hosts</td><td><code>nc -zv dest-host 49152</code></td><td>Firewall blocking migration port</td></tr>
+    <tr><td><strong>libvirt version match</strong></td><td>Same major version on both hosts</td><td><code>virsh version</code></td><td>Version mismatch = XML incompatibility</td></tr>
+    <tr><td><strong>SELinux context</strong></td><td>VM disk labels must match on both hosts</td><td><code>ls -Z /var/lib/libvirt/images/</code></td><td>svirt_image_t mismatch</td></tr>
+  </table>
+
+  <h3>Live Migration Commands</h3>
+  <pre>
+# Basic live migration
+virsh migrate --live --verbose db-server qemu+ssh://kvm-host-02/system
+
+# With bandwidth limit (avoid saturating network)
+virsh migrate --live --bandwidth 500 db-server qemu+ssh://kvm-host-02/system
+# 500 MiB/s = leaves room for production traffic on 10GbE
+
+# Tunneled migration (encrypted, no extra ports)
+virsh migrate --live --tunnelled db-server qemu+ssh://kvm-host-02/system
+
+# With auto-convergence (for busy VMs that won't converge)
+virsh migrate --live --auto-converge db-server qemu+ssh://kvm-host-02/system
+# Throttles vCPU to reduce dirty page rate
+
+# Post-copy (for very large memory VMs)
+virsh migrate --live --postcopy db-server qemu+ssh://kvm-host-02/system
+# Moves VM first, fetches memory pages on demand
+
+# Monitor migration progress
+virsh domjobinfo db-server
+# Time elapsed:    45s
+# Data remaining:  128 MiB
+# Memory remaining: 64 MiB
+# Expected downtime: 50ms</pre>
+
+  <div class="highlight">
+    <h3>Performance: Live Migration Downtime</h3>
+    <p><strong>Typical:</strong> 50-200ms downtime (TCP connections survive). <strong>Large memory VMs (256GB+):</strong> Use auto-converge or post-copy to guarantee convergence. <strong>Best practice:</strong> Dedicated migration network (separate VLAN/NIC) with 10GbE minimum. Migration of a 64GB RAM VM over 10GbE takes ~30 seconds total with &lt;100ms downtime.</p>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Automated Failover <span>with Pacemaker</span></h2>
+  <p class="sub">Pacemaker/Corosync cluster provides automatic VM failover on host failure.</p>
+
+  <h3>Pacemaker HA Cluster Setup</h3>
+  <pre>
+# Install on all cluster nodes
+dnf install pacemaker corosync pcs fence-agents-all
+
+# Initialize cluster (2 or 3 nodes)
+pcs host auth kvm-host-01 kvm-host-02 kvm-host-03
+pcs cluster setup ha-cluster kvm-host-01 kvm-host-02 kvm-host-03
+pcs cluster start --all && pcs cluster enable --all
+
+# Configure fencing (STONITH) — REQUIRED for production
+# IPMI fencing
+pcs stonith create fence-host01 fence_ipmilan \
+  ipaddr=10.0.0.101 login=admin passwd=secret lanplus=1 \
+  pcmk_host_list=kvm-host-01
+
+# Add VM as cluster resource
+pcs resource create vm-db-server VirtualDomain \
+  hypervisor="qemu:///system" \
+  config="/etc/libvirt/qemu/db-server.xml" \
+  migration_transport="ssh" \
+  meta allow-migrate=true \
+  op start timeout=120 \
+  op stop timeout=120 \
+  op monitor timeout=30 interval=10
+
+# Prefer primary host, allow failover to others
+pcs constraint location vm-db-server prefers kvm-host-01=100
+pcs constraint location vm-db-server prefers kvm-host-02=50</pre>
+
+  <h3>Cluster Topology Options</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>2-Node Cluster</h4>
+      <ul>
+        <li>Simplest HA configuration</li>
+        <li>Requires quorum device (qdevice) to avoid split-brain</li>
+        <li><code>pcs quorum device add model net host=qdevice-host</code></li>
+        <li>Active-passive: VMs run on node 1, failover to node 2</li>
+        <li>Capacity: N+1 (node 2 must hold all VMs from node 1)</li>
+        <li>Cost: 2 servers + 1 lightweight qdevice (can be a VM)</li>
+        <li>Best for: small deployments, 10-30 VMs</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>3-Node Cluster</h4>
+      <ul>
+        <li>Native quorum (no external qdevice needed)</li>
+        <li>Survives 1 node failure with VMs redistributed</li>
+        <li>Active-active: VMs spread across all 3 nodes</li>
+        <li>Capacity: N+1 (each node holds ~33% of VMs normally)</li>
+        <li>On failure: 2 remaining nodes each take 50%</li>
+        <li>Aligns with Ceph minimum (3 nodes, replication factor 3)</li>
+        <li>Best for: production, 30-100 VMs</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="alert">
+    <h4>Critical: Always Configure Fencing (STONITH)</h4>
+    <p>Without STONITH, a node that appears down but is actually running causes split-brain — two nodes running the same VM simultaneously, leading to data corruption. Use IPMI, iLO, DRAC, or cloud fencing agents. <strong>Never run <code>pcs property set stonith-enabled=false</code> in production.</strong></p>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">KubeVirt DR <span>with Velero</span></h2>
+  <p class="sub">Backup and restore KubeVirt VMs across Kubernetes clusters.</p>
+
+  <h3>Velero Setup for KubeVirt</h3>
+  <pre>
+# Install Velero with CSI snapshot support
+velero install \
+  --provider aws \
+  --bucket kubevirt-backups \
+  --secret-file ./credentials-velero \
+  --use-volume-snapshots=true \
+  --features=EnableCSI \
+  --plugins velero/velero-plugin-for-aws:v1.8.0,velero/velero-plugin-for-csi:v0.6.0
+
+# Backup a KubeVirt VM (includes PVCs)
+velero backup create db-server-backup \
+  --include-namespaces production \
+  --selector kubevirt.io/vm=db-server \
+  --snapshot-volumes=true
+
+# Schedule periodic backups (every 6 hours)
+velero schedule create kubevirt-backup \
+  --schedule="0 */6 * * *" \
+  --include-namespaces production \
+  --selector app.kubernetes.io/part-of=kubevirt \
+  --snapshot-volumes=true \
+  --ttl 168h  # 7-day retention</pre>
+
+  <h3>DR Workflows</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Cross-Cluster Restore</h4>
+      <ul>
+        <li><strong>Step 1:</strong> Install Velero on DR cluster (same bucket)</li>
+        <li><strong>Step 2:</strong> List available backups: <code>velero backup get</code></li>
+        <li><strong>Step 3:</strong> Restore: <code>velero restore create --from-backup db-server-backup</code></li>
+        <li><strong>Step 4:</strong> VM + PVCs + ConfigMaps restored automatically</li>
+        <li><strong>Step 5:</strong> Start VM: <code>virtctl start db-server</code></li>
+        <li>RTO: 10-30 minutes (depends on PVC size)</li>
+        <li>Works across cloud providers (AWS→on-prem, etc.)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>DR Testing with Staging</h4>
+      <ul>
+        <li>Restore to staging namespace (non-destructive test)</li>
+        <li><code>velero restore create --from-backup prod-backup --namespace-mappings production:staging</code></li>
+        <li>Verify VM boots and applications respond</li>
+        <li>Run smoke tests against staging VMs</li>
+        <li>Delete staging restore when done</li>
+        <li>Schedule monthly: automated DR drill</li>
+        <li>Report: pass/fail, RTO measured, issues found</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>CSI Volume Snapshots</h4>
+      <ul>
+        <li>Ceph RBD: <code>VolumeSnapshotClass: rook-ceph-rbd</code></li>
+        <li>Longhorn: <code>VolumeSnapshotClass: longhorn</code></li>
+        <li>Snapshots are crash-consistent by default</li>
+        <li>For app-consistent: use pre-backup hooks</li>
+        <li><code>velero backup create --pre-hook="virtctl fsfreeze db-server"</code></li>
+        <li>Incremental: only changed blocks transferred</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Velero + KubeVirt RPO/RTO</h4>
+      <ul>
+        <li><strong>RPO:</strong> = backup schedule interval (6h default)</li>
+        <li><strong>RTO:</strong> = restore time (10-30 min for typical VM)</li>
+        <li>Smaller RPO: increase schedule frequency</li>
+        <li>Smaller RTO: pre-provision PVCs at DR site</li>
+        <li>Combine with Ceph mirroring for RPO &lt; 1 minute</li>
+        <li>Cost: S3 storage only ($0.023/GB/month)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">DR Runbook <span>Templates</span></h2>
+  <p class="sub">Step-by-step procedures for four DR scenarios.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Runbook 1: Single VM Recovery</h4>
+      <ul>
+        <li><strong>Trigger:</strong> VM disk corruption, accidental deletion</li>
+        <li><strong>RTO Target:</strong> 30 minutes</li>
+        <li>1. Identify affected VM and failure type</li>
+        <li>2. Stop corrupted VM: <code>virsh destroy &lt;vm&gt;</code></li>
+        <li>3. Restore from latest backup:<br><code>borg extract /backup/borg-repo::&lt;vm&gt;-latest</code></li>
+        <li>4. Copy restored disk to libvirt images directory</li>
+        <li>5. Start VM: <code>virsh start &lt;vm&gt;</code></li>
+        <li>6. Verify application health and connectivity</li>
+        <li>7. Document: timestamp, root cause, recovery time</li>
+        <li><strong>Escalation:</strong> If backup corrupt → restore from secondary</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Runbook 2: Full Site Failover</h4>
+      <ul>
+        <li><strong>Trigger:</strong> Primary site unreachable &gt; 15 minutes</li>
+        <li><strong>RTO Target:</strong> 30 minutes</li>
+        <li>1. Confirm primary is down (avoid false positive)</li>
+        <li>2. Notify stakeholders: "DR failover initiated"</li>
+        <li>3. Promote Ceph DR images:<br><code>for img in $(rbd ls vm-pool); do rbd mirror image promote --force vm-pool/$img; done</code></li>
+        <li>4. Start VMs in dependency order (DB → App → Web)</li>
+        <li>5. Update DNS to DR site IPs (TTL was pre-lowered)</li>
+        <li>6. Verify all services responding</li>
+        <li>7. Notify stakeholders: "Failover complete"</li>
+        <li><strong>Escalation:</strong> If Ceph images stale → restore from Velero</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Runbook 3: Ransomware Recovery</h4>
+      <ul>
+        <li><strong>Trigger:</strong> Ransomware detected on VMs</li>
+        <li><strong>RTO Target:</strong> 4 hours</li>
+        <li>1. Isolate affected VMs: disconnect network immediately</li>
+        <li>2. Snapshot affected VMs (evidence preservation)</li>
+        <li>3. Identify infection timestamp from logs</li>
+        <li>4. Restore from backup BEFORE infection:<br><code>borg extract /backup/borg-repo::&lt;vm&gt;-2026-03-20</code></li>
+        <li>5. Rebuild on clean host (re-image host OS if needed)</li>
+        <li>6. Restore VMs on clean host, isolated network</li>
+        <li>7. Scan restored VMs before reconnecting to network</li>
+        <li><strong>Critical:</strong> Do NOT boot infected snapshots on production</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Runbook 4: DC Evacuation</h4>
+      <ul>
+        <li><strong>Trigger:</strong> Physical threat (fire, flood, power failure)</li>
+        <li><strong>RTO Target:</strong> 1 hour</li>
+        <li>1. If time permits: graceful VM shutdown + final Ceph sync</li>
+        <li>2. If no time: failover immediately to DR site</li>
+        <li>3. Promote all Ceph DR images (automated script)</li>
+        <li>4. Start critical VMs first (Tier 1: DB, AD, DNS)</li>
+        <li>5. Start remaining VMs in priority order</li>
+        <li>6. Update external DNS to DR site</li>
+        <li>7. Notify customers of failover and any data loss</li>
+        <li><strong>Pre-staged:</strong> DR VMs pre-defined in Pacemaker cluster</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page page-light">
+  <h2 class="st">Cost Analysis &amp; <span>Implementation</span></h2>
+  <p class="sub">VMware SRM vs open-source KVM DR stack — 3-year TCO for 100 VMs.</p>
+
+  <h3>3-Year TCO Comparison</h3>
+  <table>
+    <tr><th style="width:30%">Cost Category</th><th style="width:20%">VMware SRM</th><th style="width:20%">KVM (Ceph + Pacemaker)</th><th style="width:30%">Notes</th></tr>
+    <tr><td>Software licenses (3 yr)</td><td>$617,955</td><td>$0-$39,000</td><td>KVM: optional RHEL subs</td></tr>
+    <tr><td>DR site hardware</td><td>$120,000</td><td>$120,000</td><td>Same hardware either way</td></tr>
+    <tr><td>Implementation labor</td><td>$80,000</td><td>$60,000</td><td>KVM: simpler architecture</td></tr>
+    <tr><td>Training</td><td>$15,000</td><td>$20,000</td><td>KVM: new skills for VMware team</td></tr>
+    <tr><td>Annual operations (3 yr)</td><td>$180,000</td><td>$150,000</td><td>KVM: fewer moving parts</td></tr>
+    <tr><td>Annual testing/drills (3 yr)</td><td>$30,000</td><td>$30,000</td><td>Same effort required</td></tr>
+    <tr><td><strong>3-Year Total</strong></td><td><strong>$1,042,955</strong></td><td><strong>$380,000-$419,000</strong></td><td><strong>60% savings with KVM</strong></td></tr>
+  </table>
+
+  <h3>Implementation Timeline</h3>
+  <table>
+    <tr><th>Week</th><th>Activity</th><th>Deliverable</th></tr>
+    <tr><td>1-2</td><td>Assessment: inventory VMs, classify RPO/RTO tiers, select DR strategy</td><td>DR plan document, VM classification matrix</td></tr>
+    <tr><td>3-4</td><td>Infrastructure: deploy DR site servers, install OS, configure Ceph cluster</td><td>3-node Ceph cluster operational, storage pools created</td></tr>
+    <tr><td>5-6</td><td>Migration: use hyper2kvm to convert VMware VMs to KVM on DR site</td><td>All VMs converted, boot-tested on DR hosts</td></tr>
+    <tr><td>7</td><td>HA setup: configure Pacemaker cluster, fencing, VM resources</td><td>Pacemaker cluster with automatic failover tested</td></tr>
+    <tr><td>8</td><td>Replication: enable Ceph mirroring, configure backup schedules</td><td>Ceph mirroring active, Borg/Restic backups running</td></tr>
+    <tr><td>9</td><td>Testing: full DR drill — simulate primary failure, measure RTO</td><td>DR drill report, measured RTO vs target</td></tr>
+    <tr><td>10</td><td>Documentation: finalize runbooks, train operations team</td><td>4 runbooks, trained team, monitoring dashboards</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>Open-Source DR Saves $623K Over 3 Years While Matching VMware SRM Capabilities</h3>
+    <p>Ceph RBD mirroring achieves the same RPO as vSphere Replication (seconds with journal mode). Pacemaker provides equivalent automatic failover to VMware HA. Live migration matches vMotion. The only difference: $0 in software licensing vs $618K for VMware SRM. hyper2kvm bridges the gap — convert once, protect forever.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Disaster Recovery &amp; Business Continuity Guide</div>
+</div>
+
+</body>
+</html>

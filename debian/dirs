@@ -1,0 +1,12 @@
+var/lib/hyper2kvm
+var/lib/hyper2kvm/conversions
+var/log/hyper2kvm
+etc/hyper2kvm
+etc/hyper2kvm/migrations
+etc/modprobe.d
+etc/sysctl.d
+etc/systemd/system.conf.d
+lib/systemd/system
+usr/share/doc/hyper2kvm
+usr/share/doc/hyper2kvm/examples
+usr/share/doc/hyper2kvm/systemd

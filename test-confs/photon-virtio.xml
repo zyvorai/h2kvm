@@ -1,0 +1,58 @@
+<!--
+  Photon OS Libvirt Domain XML - Virtio Configuration (Recommended)
+
+  This configuration uses virtio for optimal performance.
+  Photon OS is a cloud-native distribution that ships with virtio drivers.
+
+  Usage:
+    sudo virsh define test-confs/photon-virtio.xml
+    sudo virsh start photon-converted
+
+  Expected behavior:
+    - Boots successfully with virtio disk
+    - Acquires IP via DHCP
+    - SSH accessible on port 22
+    - VNC console available for graphical access
+
+  Related:
+    - Conversion config: test-confs/04-local-photon-os-vmdk.yaml
+    - Documentation: docs/os-support/photon-os.md
+    - SATA fallback: test-confs/photon-sata.xml (rarely needed)
+-->
+<domain type='kvm'>
+  <name>photon-converted</name>
+  <memory unit='MiB'>2048</memory>
+  <vcpu>2</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <cpu mode='host-passthrough'/>
+  <devices>
+    <!-- Disk using VirtIO for best performance -->
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/home/ssahani/by-path/out/photon-libvirt.qcow2'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <!-- Network -->
+    <interface type='network'>
+      <source network='default'/>
+      <model type='virtio'/>
+    </interface>
+    <!-- Graphics -->
+    <graphics type='vnc' autoport='yes' listen='127.0.0.1'/>
+    <!-- Video -->
+    <video>
+      <model type='vga' vram='65536'/>
+    </video>
+    <input type='tablet' bus='usb'/>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+  </devices>
+</domain>

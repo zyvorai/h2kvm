@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: Apache-2.0
+# test-confs/photon-ova.yaml
+#
+# Run:
+#   sudo python hyper2kvm.py --config test-confs/photon-ova.yaml
+#
+# What this does:
+# - Extracts the OVA into output_dir (safe extraction)
+# - Finds the disk(s) inside (usually VMDK)
+# - Optionally flattens snapshot chain
+# - Converts to qcow2
+# - Runs offline Linux fixers (fstab stabilize + grub + initramfs) if supported
+# - Optional libvirt smoke boot
+
+command: ova
+
+# --------------------------------------------------------------------
+# Input
+# --------------------------------------------------------------------
+ova: /home/ssahani/Downloads/photon-hw15-5.0-dde71ec57.x86_64.ova
+
+# --------------------------------------------------------------------
+# Output layout
+# --------------------------------------------------------------------
+output_dir: /home/ssahani/by-path/out-photon-ova
+
+# Some OVAs contain a descriptor + extent chain; flattening is usually safe.
+flatten: true
+flatten_format: qcow2
+
+# Final output image (relative to output_dir)
+to_output: photon.qcow2
+out_format: qcow2
+compress: true
+checksum: true
+
+# --------------------------------------------------------------------
+# Extraction safety (if your ova extractor supports these keys)
+# If your code doesn’t recognize them, comment them out.
+# --------------------------------------------------------------------
+safe_extract: true
+skip_special: true
+max_members: 5000
+max_total_bytes: 50GiB
+
+# --------------------------------------------------------------------
+# Filesystem + boot fixes (Linux)
+# --------------------------------------------------------------------
+print_fstab: true
+fstab_mode: stabilize-all
+
+no_grub: false
+regen_initramfs: true
+no_backup: false
+
+# --------------------------------------------------------------------
+# Safety / visibility
+# --------------------------------------------------------------------
+dry_run: false
+verbose: 2
+log_file: /home/ssahani/by-path/out-photon-ova/hyper2kvm.log
+report: /home/ssahani/by-path/out-photon-ova/hyper2kvm-report.md
+
+# --------------------------------------------------------------------
+# Optional smoke test
+# --------------------------------------------------------------------
+libvirt_test: true
+vm_name: photon-ova
+memory: 2048
+vcpus: 2
+uefi: false
+timeout: 45
+keep_domain: false
+headless: true

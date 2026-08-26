@@ -1,0 +1,77 @@
+name: Semantic Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  id-token: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'chore(release)')"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "python-semantic-release>=10,<11" hatch
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Semantic Release
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          next_tag="$(semantic-release version --print-tag)"
+          last_tag="$(semantic-release version --print-last-released-tag)"
+
+          if [ "${next_tag}" = "${last_tag}" ]; then
+            echo "No release needed (already at ${last_tag})"
+            echo "released=false" >> "$GITHUB_OUTPUT"
+          else
+            semantic-release version
+            echo "released=true" >> "$GITHUB_OUTPUT"
+            echo "tag=${next_tag}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build package
+        if: steps.release.outputs.released == 'true'
+        run: hatch build
+
+      - name: Attach package to GitHub Release
+        if: steps.release.outputs.released == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Attach assets even if PyPI publish fails later.
+          gh release upload "${{ steps.release.outputs.tag }}" dist/* --clobber
+
+      - name: Publish to PyPI
+        if: steps.release.outputs.released == 'true'
+        continue-on-error: true
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}

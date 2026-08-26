@@ -1,0 +1,37 @@
+# Basic Kubernetes Deployment Example
+# Migrates a VM and deploys it to Kubernetes/k3s cluster
+
+# Migration basics
+cmd: local
+vmdk: /path/to/your/vm.vmdk
+output_dir: out/my-vm
+to_output: my-vm.qcow2
+out_format: qcow2
+compress: true
+
+# Offline fixes for successful boot
+fstab_mode: stabilize-all
+grub_fixes_enable: true
+initramfs_regen_enable: true
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+network_fixes_enable: true
+
+# Enable Kubernetes deployment
+deploy_k8s: true
+k8s_namespace: default
+k8s_vm_name: my-vm
+k8s_storage_class: local-path  # or longhorn, nfs, etc.
+k8s_pvc_size: 20Gi
+k8s_cpu: "2"
+k8s_memory: 4Gi
+
+# Optional: Auto-start the VM
+k8s_auto_start: false  # Set to true to start automatically
+k8s_wait_ready: false
+
+# Reporting
+report: out/my-vm/migration-report.md
+verbose: 2

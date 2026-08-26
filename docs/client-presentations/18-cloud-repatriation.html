@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cloud Repatriation with hyper2kvm + hypersdk — Bring Your VMs Home</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1e3a5f, #0d47a1, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #60a5fa; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(96,165,250,0.2); border: 1px solid rgba(96,165,250,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-blue { background: linear-gradient(135deg, #1e3a5f, #0f172a); color: #e8e6df; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #60a5fa; }
+  .page-light h2.st span { color: #1d4ed8; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.7em 0 0.3em; color: #60a5fa; }
+  .page-light h3 { color: #1d4ed8; }
+  p { margin-bottom: 0.6em; font-size: 0.92em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.7em 0; font-size: 0.79em; }
+  th { background: #1d4ed8; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; } .partial { color: #f59e0b; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #60a5fa; } .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  .page-light .card h4 { color: #1d4ed8; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .highlight { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); border-radius: 8px; padding: 13px; margin: 0.7em 0; }
+  .page-dark .highlight { background: rgba(96,165,250,0.06); border: 1px solid rgba(96,165,250,0.15); }
+  .stat-box { text-align: center; padding: 14px; }
+  .stat-box .num { font-size: 2em; font-weight: 800; color: #60a5fa; } .stat-box .label { font-size: 0.8em; opacity: 0.7; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 0.7em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(96,165,250,0.15); border: 1px solid rgba(96,165,250,0.3); padding: 9px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85em; }
+  .flow-arrow { font-size: 1.2em; color: #60a5fa; }
+  .flow-cloud { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); }
+  .flow-tool { background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); }
+  .flow-onprem { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+  pre { background: #0f172a; color: #e8e6df; padding: 14px; border-radius: 8px; font-size: 0.8em; line-height: 1.5; font-family: monospace; margin: 0.7em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  code { background: rgba(96,165,250,0.1); padding: 2px 5px; border-radius: 4px; font-size: 0.87em; }
+  .verdict { background: linear-gradient(135deg, rgba(30,58,95,0.2), rgba(29,78,216,0.1)); border: 2px solid #1d4ed8; border-radius: 12px; padding: 16px; margin: 0.8em 0; text-align: center; }
+  .verdict h3 { color: #60a5fa; font-size: 1.15em; margin-bottom: 5px; }
+  .footer { text-align: center; padding: 12px; font-size: 0.72em; opacity: 0.4; }
+  .compare-box { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0.7em 0; }
+  .compare-left { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px 0 0 10px; padding: 15px; }
+  .compare-right { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 0 10px 10px 0; padding: 15px; }
+  .compare-left h4 { color: #ef4444; font-size: 0.93em; margin-bottom: 5px; }
+  .compare-right h4 { color: #22c55e; font-size: 0.93em; margin-bottom: 5px; }
+  .compare-left ul, .compare-right ul { padding-left: 15px; font-size: 0.82em; } .compare-left li, .compare-right li { margin-bottom: 3px; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.73em; font-weight: 600; }
+  .tag-aws { background: #ff9900; color: #000; } .tag-azure { background: #0078d4; color: #fff; }
+  .tag-gcp { background: #4285f4; color: #fff; } .tag-oci { background: #f80000; color: #fff; }
+  .tag-ali { background: #ff6a00; color: #fff; } .tag-os { background: #ed1944; color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Cloud <span>Repatriation</span></h1>
+  <h2>Bring Your VMs Home with hyper2kvm + hypersdk</h2>
+  <p class="sub">Export VMs from AWS, Azure, GCP, Oracle Cloud, Alibaba Cloud, and OpenStack. Convert to QCOW2 with full guest fixes. Deploy to on-premises KVM or KubeVirt. 10 cloud providers, one tool, zero cloud lock-in. Save 70-90% on compute costs by running workloads on infrastructure you own.</p>
+  <div class="badge">10 Cloud Providers | $0 Migration Tool | 70-90% Cost Savings | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE 1: Why Repatriate -->
+<div class="page page-dark">
+  <h2 class="st">Why <span>Repatriate?</span></h2>
+  <p class="sub">The cloud promise was cost savings and agility. The reality is vendor lock-in and runaway bills.</p>
+
+  <div class="card-grid">
+    <div class="stat-box card"><div class="num">$3.6M</div><div class="label">Average 3-year overspend<br>on cloud vs on-prem for 50 VMs</div></div>
+    <div class="stat-box card"><div class="num">72%</div><div class="label">Of enterprises report<br>cloud costs exceeded budget</div></div>
+    <div class="stat-box card"><div class="num">$0.09</div><div class="label">Per GB egress on AWS/Azure<br>— the hidden tax on your data</div></div>
+    <div class="stat-box card"><div class="num">94%</div><div class="label">Of organizations use<br>multi-cloud (complexity cost)</div></div>
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Runaway Costs</h4>
+      <ul>
+        <li>Cloud bills grow 20-30% annually</li>
+        <li>Reserved instances require 1-3 year commitment</li>
+        <li>Spot/preemptible instances get terminated</li>
+        <li>Egress fees on every data transfer</li>
+        <li>Hidden costs: NAT gateways, load balancers, DNS queries</li>
+        <li><strong>On-prem KVM: fixed, predictable, amortized</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Data Sovereignty</h4>
+      <ul>
+        <li>GDPR requires data stays in specific jurisdictions</li>
+        <li>HIPAA: patient data on infrastructure you control</li>
+        <li>Government: classified data cannot leave the building</li>
+        <li>Financial: PCI-DSS and SOX audit requirements</li>
+        <li>Cloud regions may not match your compliance needs</li>
+        <li><strong>On-prem: data never leaves your facility</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Vendor Lock-In</h4>
+      <ul>
+        <li>AWS AMIs don't run on Azure or GCP</li>
+        <li>Managed services (RDS, DynamoDB) are proprietary</li>
+        <li>Cloud-specific IAM, networking, storage APIs</li>
+        <li>Export tools are intentionally limited</li>
+        <li>Cloud vendors don't want you to leave</li>
+        <li><strong>KVM + QCOW2: open formats, no lock-in</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="compare-box">
+    <div class="compare-left">
+      <h4>Cloud (Before Repatriation)</h4>
+      <ul>
+        <li>$8,000-15,000/month per workload cluster</li>
+        <li>Egress fees on every API call and backup</li>
+        <li>Locked to one provider's formats and APIs</li>
+        <li>Unpredictable monthly bills (usage spikes)</li>
+        <li>Compliance risk (data location uncertainty)</li>
+        <li>Dependency on provider uptime and pricing</li>
+      </ul>
+    </div>
+    <div class="compare-right">
+      <h4>On-Prem KVM (After Repatriation)</h4>
+      <ul>
+        <li>$500-2,000/month (hardware amortized over 5 years)</li>
+        <li>Zero egress fees — data stays local</li>
+        <li>Open formats: QCOW2, libvirt XML, KubeVirt YAML</li>
+        <li>Fixed, predictable costs — no surprises</li>
+        <li>Full data sovereignty — physical control</li>
+        <li>You own the infrastructure, no vendor dependency</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: 10 Cloud Providers -->
+<div class="page page-light">
+  <h2 class="st">10 Cloud <span>Providers</span></h2>
+  <p class="sub">hypersdk exports VMs from every major cloud. One unified API. One tool to learn.</p>
+
+  <table>
+    <tr><th style="width:16%">Cloud Provider</th><th style="width:20%">Export Method</th><th style="width:14%">Auth</th><th style="width:14%">Disk Format</th><th style="width:18%">Guest Fixes Applied</th><th style="width:18%">Target</th></tr>
+    <tr><td><strong><span class="tag tag-aws">AWS</span> EC2</strong></td><td>EBS snapshot &rarr; S3 export &rarr; download</td><td>IAM / access keys</td><td>VMDK or RAW</td><td>Remove SSM/EC2Config, fix fstab (xvd&rarr;UUID), rebuild initramfs</td><td>KVM / KubeVirt</td></tr>
+    <tr><td><strong><span class="tag tag-azure">Azure</span> VMs</strong></td><td>Managed disk snapshot &rarr; SAS URL &rarr; download</td><td>Service principal</td><td>VHD</td><td>Remove waagent + Hyper-V IC, fix fstab, rebuild initramfs</td><td>KVM / KubeVirt</td></tr>
+    <tr><td><strong><span class="tag tag-gcp">GCP</span> Compute</strong></td><td>Persistent disk &rarr; GCS image export &rarr; download</td><td>Service account</td><td>RAW (tar.gz)</td><td>Remove guest-agent, fix fstab, rebuild initramfs, disable cloud-init</td><td>KVM / KubeVirt</td></tr>
+    <tr><td><strong><span class="tag tag-oci">OCI</span></strong></td><td>Boot volume &rarr; Object Storage &rarr; download</td><td>API key</td><td>QCOW2 or RAW</td><td>Remove OCI agent, fix fstab, rebuild initramfs</td><td>KVM / KubeVirt</td></tr>
+    <tr><td><strong><span class="tag tag-ali">Alibaba</span> ECS</strong></td><td>ECS disk snapshot &rarr; OSS &rarr; download</td><td>AccessKey</td><td>RAW or VHD</td><td>Remove Alibaba agent, fix fstab, rebuild initramfs</td><td>KVM / KubeVirt</td></tr>
+    <tr><td><strong><span class="tag tag-os">OpenStack</span></strong></td><td>Glance image or Cinder volume export</td><td>Keystone v3</td><td>QCOW2 or RAW</td><td>Disable cloud-init, fix fstab, rebuild initramfs</td><td>KVM / KubeVirt</td></tr>
+    <tr><td><strong>Proxmox VE</strong></td><td>API-based disk export</td><td>Token / PAM</td><td>QCOW2 or RAW</td><td>Standard KVM fixes (minimal — already KVM-based)</td><td>KVM / KubeVirt</td></tr>
+    <tr><td><strong>KubeVirt</strong></td><td>PVC / DataVolume export</td><td>kubeconfig</td><td>RAW</td><td>Minimal — already KVM-compatible</td><td>KVM / KubeVirt</td></tr>
+    <tr><td><strong>VMware vSphere</strong></td><td>govc OVA/OVF, VDDK, HTTPS</td><td>SSO / credentials</td><td>VMDK</td><td>Remove VMware Tools, fix fstab, rebuild initramfs, VirtIO</td><td>KVM / KubeVirt</td></tr>
+    <tr><td><strong>Hyper-V</strong></td><td>VHD/VHDX direct copy or WinRM</td><td>WinRM / SSH</td><td>VHD / VHDX</td><td>Remove Hyper-V IC, fix fstab, rebuild initramfs, VirtIO</td><td>KVM / KubeVirt</td></tr>
+  </table>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>No other migration tool supports all 10.</strong> AWS MGN only exports from AWS. Azure Migrate only from Azure. virt-v2v handles zero cloud sources. Red Hat MTV handles VMware only. hyper2kvm + hypersdk is the <em>only</em> unified cloud repatriation platform.</p>
+  </div>
+</div>
+
+<!-- PAGE 3: How It Works -->
+<div class="page page-dark">
+  <h2 class="st">How It <span>Works</span></h2>
+  <p class="sub">The complete repatriation pipeline — from cloud VM to running on-prem.</p>
+
+  <h3>AWS EC2 Repatriation</h3>
+  <div class="flow">
+    <div class="flow-step flow-cloud">AWS EC2 Instance</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">hypersdk: EBS snapshot &rarr; S3 export</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">hyper2kvm: convert + guest fix</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-onprem">On-Prem KVM / KubeVirt</div>
+  </div>
+
+  <h3>Azure VM Repatriation</h3>
+  <div class="flow">
+    <div class="flow-step flow-cloud">Azure VM</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">hypersdk: disk snapshot &rarr; SAS download</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">hyper2kvm: VHD &rarr; QCOW2 + fix</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-onprem">On-Prem KVM / KubeVirt</div>
+  </div>
+
+  <h3>GCP Compute Repatriation</h3>
+  <div class="flow">
+    <div class="flow-step flow-cloud">GCP Compute Engine</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">hypersdk: disk &rarr; GCS image export</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool">hyper2kvm: RAW &rarr; QCOW2 + fix</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-onprem">On-Prem KVM / KubeVirt</div>
+  </div>
+
+  <h3>Step-by-Step Pipeline</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:14%">Step</th><th style="width:14%">Component</th><th style="width:35%">What Happens</th><th style="width:32%">Output</th></tr>
+    <tr><td>1</td><td><strong>Authenticate</strong></td><td>hypersdk</td><td>Connect to cloud provider API (IAM, service principal, API key)</td><td>Authenticated session</td></tr>
+    <tr><td>2</td><td><strong>Discover VMs</strong></td><td>hypersdk</td><td>List VMs with CPU, RAM, disk, OS, tags — filter by name, tag, region</td><td>VM inventory with metadata</td></tr>
+    <tr><td>3</td><td><strong>Snapshot</strong></td><td>hypersdk</td><td>Create consistent disk snapshot (optional: stop VM first for DBs)</td><td>Point-in-time disk snapshot</td></tr>
+    <tr><td>4</td><td><strong>Export</strong></td><td>hypersdk</td><td>Export disk image to object storage (S3/Blob/GCS), download locally</td><td>VMDK, VHD, or RAW image file</td></tr>
+    <tr><td>5</td><td><strong>Convert</strong></td><td>hyper2kvm</td><td>Convert to QCOW2, flatten, optional compression</td><td>Optimized QCOW2 image</td></tr>
+    <tr><td>6</td><td><strong>Guest Fix</strong></td><td>hyper2kvm</td><td>fstab UUID repair, initramfs rebuild (VirtIO), GRUB fix, remove cloud agents, SELinux relabel, Windows VirtIO injection</td><td>Boot-ready for KVM</td></tr>
+    <tr><td>7</td><td><strong>Deploy</strong></td><td>hyper2kvm</td><td>Generate libvirt XML or KubeVirt manifest, virsh define or kubectl apply</td><td>VM running on-prem</td></tr>
+    <tr><td>8</td><td><strong>Verify</strong></td><td>hyper2kvm</td><td>Automated boot test, service health check, network validation</td><td>Confirmed working</td></tr>
+    <tr><td>9</td><td><strong>Notify</strong></td><td>hypersdk</td><td>Webhook to Slack/Teams/PagerDuty with pass/fail per VM</td><td>Team informed</td></tr>
+    <tr><td>10</td><td><strong>Decommission</strong></td><td>Manual</td><td>Terminate cloud VM after validation period (keep snapshot as backup)</td><td>Cloud bill drops to $0</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4: Cost Savings by Cloud Provider -->
+<div class="page page-light">
+  <h2 class="st">Cost Savings <span>by Provider</span></h2>
+  <p class="sub">Real numbers: what you spend in the cloud vs what you'd spend on-prem with KVM.</p>
+
+  <h3>AWS EC2 Repatriation — 20 VMs, 3-Year TCO</h3>
+  <table>
+    <tr><th style="width:25%">Cost Item</th><th style="width:25%">AWS EC2</th><th style="width:25%">On-Prem KVM</th><th style="width:25%">Savings</th></tr>
+    <tr><td>Compute (m5.2xlarge x 20)</td><td>$528,000</td><td>$40,000 (hardware)</td><td class="check">$488,000</td></tr>
+    <tr><td>EBS Storage (20TB)</td><td>$72,000</td><td>$8,000 (NVMe SSDs)</td><td class="check">$64,000</td></tr>
+    <tr><td>Data Transfer / Egress</td><td>$97,200</td><td>$0</td><td class="check">$97,200</td></tr>
+    <tr><td>NAT Gateway</td><td>$31,536</td><td>$0</td><td class="check">$31,536</td></tr>
+    <tr><td>Load Balancers</td><td>$15,768</td><td>$0 (HAProxy/Nginx)</td><td class="check">$15,768</td></tr>
+    <tr><td>Migration (one-time)</td><td>N/A</td><td>$5,000</td><td>-$5,000</td></tr>
+    <tr><td>Operations</td><td>$54,000</td><td>$45,000</td><td class="check">$9,000</td></tr>
+    <tr><td style="font-weight:700;">3-Year Total</td><td style="font-weight:700;">$798,504</td><td style="font-weight:700; color:#22c55e;">$98,000</td><td style="font-weight:800; color:#22c55e;">$700,504</td></tr>
+  </table>
+
+  <h3>Azure Repatriation — 20 VMs, 3-Year TCO</h3>
+  <table>
+    <tr><th style="width:25%">Cost Item</th><th style="width:25%">Azure</th><th style="width:25%">On-Prem KVM</th><th style="width:25%">Savings</th></tr>
+    <tr><td>Compute (D8s_v3 x 20)</td><td>$460,800</td><td>$40,000</td><td class="check">$420,800</td></tr>
+    <tr><td>Managed Disks (20TB)</td><td>$88,560</td><td>$8,000</td><td class="check">$80,560</td></tr>
+    <tr><td>Bandwidth / Egress</td><td>$77,760</td><td>$0</td><td class="check">$77,760</td></tr>
+    <tr><td>Azure Monitor + Log Analytics</td><td>$21,600</td><td>$0 (Prometheus)</td><td class="check">$21,600</td></tr>
+    <tr><td>Migration</td><td>N/A</td><td>$5,000</td><td>-$5,000</td></tr>
+    <tr><td>Operations</td><td>$54,000</td><td>$45,000</td><td class="check">$9,000</td></tr>
+    <tr><td style="font-weight:700;">3-Year Total</td><td style="font-weight:700;">$702,720</td><td style="font-weight:700; color:#22c55e;">$98,000</td><td style="font-weight:800; color:#22c55e;">$604,720</td></tr>
+  </table>
+
+  <h3>GCP Repatriation — 20 VMs, 3-Year TCO</h3>
+  <table>
+    <tr><th style="width:25%">Cost Item</th><th style="width:25%">GCP</th><th style="width:25%">On-Prem KVM</th><th style="width:25%">Savings</th></tr>
+    <tr><td>Compute (n2-standard-8 x 20)</td><td>$403,200</td><td>$40,000</td><td class="check">$363,200</td></tr>
+    <tr><td>Persistent Disk (20TB)</td><td>$58,320</td><td>$8,000</td><td class="check">$50,320</td></tr>
+    <tr><td>Egress</td><td>$69,984</td><td>$0</td><td class="check">$69,984</td></tr>
+    <tr><td>Cloud Logging + Monitoring</td><td>$18,000</td><td>$0 (Prometheus/Grafana)</td><td class="check">$18,000</td></tr>
+    <tr><td>Migration</td><td>N/A</td><td>$5,000</td><td>-$5,000</td></tr>
+    <tr><td>Operations</td><td>$54,000</td><td>$45,000</td><td class="check">$9,000</td></tr>
+    <tr><td style="font-weight:700;">3-Year Total</td><td style="font-weight:700;">$603,504</td><td style="font-weight:700; color:#22c55e;">$98,000</td><td style="font-weight:800; color:#22c55e;">$505,504</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>Average 3-Year Savings: $600K per 20 VMs</h3>
+    <p style="font-size:0.92em;">AWS: <strong>$700K</strong> | Azure: <strong>$605K</strong> | GCP: <strong>$506K</strong><br>Scale linearly — 100 VMs = <strong>$2.5M-$3.5M saved</strong> over 3 years.</p>
+  </div>
+</div>
+
+<!-- PAGE 5: Multi-Cloud Consolidation -->
+<div class="page page-dark">
+  <h2 class="st">Multi-Cloud <span>Consolidation</span></h2>
+  <p class="sub">VMs scattered across AWS, Azure, and GCP? Consolidate to one on-prem KVM cluster.</p>
+
+  <div class="flow">
+    <div class="flow-step flow-cloud"><span class="tag tag-aws">AWS</span> 30 VMs</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool" style="padding:9px 20px;">hypersdk<br>(unified export)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool" style="padding:9px 20px;">hyper2kvm<br>(convert + fix)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-onprem" style="padding:9px 20px;">On-Prem<br>KVM Cluster</div>
+  </div>
+  <div class="flow">
+    <div class="flow-step flow-cloud"><span class="tag tag-azure">Azure</span> 20 VMs</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-tool" style="visibility:hidden; padding:9px 20px;">hypersdk</div>
+    <div class="flow-arrow" style="visibility:hidden;">&rarr;</div>
+    <div class="flow-step flow-tool" style="visibility:hidden; padding:9px 20px;">hyper2kvm</div>
+    <div class="flow-arrow" style="visibility:hidden;">&rarr;</div>
+    <div class="flow-step flow-onprem" style="visibility:hidden; padding:9px 20px;">target</div>
+  </div>
+  <div class="flow" style="margin-top:-1em;">
+    <div class="flow-step flow-cloud"><span class="tag tag-gcp">GCP</span> 15 VMs</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step" style="visibility:hidden;">x</div>
+  </div>
+
+  <h3>The Multi-Cloud Problem</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Before: Multi-Cloud Sprawl</h4>
+      <ul>
+        <li>3 cloud consoles, 3 billing systems, 3 IAM models</li>
+        <li>Each cloud has different VM formats, networking, storage</li>
+        <li>3x the monitoring tools (CloudWatch + Azure Monitor + Cloud Logging)</li>
+        <li>3x the security audits, 3x the compliance reviews</li>
+        <li>Staff need expertise in all 3 platforms</li>
+        <li>Cross-cloud data transfer fees compound costs</li>
+        <li><strong>Total: $180K+/yr in cloud bills + $200K+/yr in multi-cloud ops</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>After: Consolidated On-Prem</h4>
+      <ul>
+        <li>One platform: KVM/libvirt or K3s + KubeVirt</li>
+        <li>One format: QCOW2 + libvirt XML (open standards)</li>
+        <li>One monitoring: Prometheus + Grafana (free)</li>
+        <li>One security audit, one compliance framework</li>
+        <li>Staff learn one platform, not three</li>
+        <li>Zero cross-cloud and egress fees</li>
+        <li><strong>Total: $30K/yr hardware + $80K/yr in ops = $110K/yr</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>hypersdk Unified Provider Interface</h3>
+  <pre>
+# Same API for every cloud — just change the provider config:
+
+# AWS export
+hypersdk export --provider aws --vm-id i-0abc123def456 --output ./exports/
+
+# Azure export
+hypersdk export --provider azure --vm-id /subscriptions/.../vm-name --output ./exports/
+
+# GCP export
+hypersdk export --provider gcp --vm-id projects/my-proj/zones/us-central1-a/instances/vm-1 --output ./exports/
+
+# Then convert ALL of them with one tool:
+h2kvmctl --config consolidate.yaml   # Processes all exports, applies per-source fixes
+  </pre>
+</div>
+
+<!-- PAGE 6: Cloud-Specific Technical Details -->
+<div class="page page-light">
+  <h2 class="st">Cloud-Specific <span>Technical Details</span></h2>
+  <p class="sub">What hyper2kvm fixes for each cloud provider — Linux and Windows.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4><span class="tag tag-aws">AWS</span> EC2 Specifics</h4>
+      <ul>
+        <li><strong>Export:</strong> EBS snapshot &rarr; CreateStoreImageTask or ec2 create-snapshot + export-image to S3</li>
+        <li><strong>Linux fixes:</strong> Remove AWS SSM agent, EC2 instance connect, CloudWatch agent. Fix fstab from /dev/xvda to UUID. Rebuild initramfs: replace xen-blkfront with virtio_blk</li>
+        <li><strong>Windows fixes:</strong> Remove EC2Config/EC2Launch, SSM agent, CloudWatch. Inject VirtIO drivers, fix BCD</li>
+        <li><strong>Networking:</strong> Remove ENI-specific configs, elastic IP associations. Clean /etc/sysconfig or netplan</li>
+        <li><strong>cloud-init:</strong> Disable EC2 datasource, preserve hostname and SSH keys</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag tag-azure">Azure</span> VM Specifics</h4>
+      <ul>
+        <li><strong>Export:</strong> Managed disk snapshot &rarr; grant access (SAS URL) &rarr; download VHD via azcopy or wget</li>
+        <li><strong>Linux fixes:</strong> Remove walinuxagent (waagent), Hyper-V IC daemons (hv_kvp, hv_vss). Fix fstab from /dev/sda to UUID. Rebuild initramfs: replace hv_storvsc with virtio_blk</li>
+        <li><strong>Windows fixes:</strong> Remove Azure VM agent, Hyper-V IC. Inject VirtIO, fix BCD. Remove Azure diagnostics extension</li>
+        <li><strong>Networking:</strong> Remove Azure-specific accelerated networking config. Clean udev rules for Mellanox/hv_netvsc</li>
+        <li><strong>cloud-init:</strong> Disable Azure datasource, remove CustomData provisioning</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag tag-gcp">GCP</span> Compute Specifics</h4>
+      <ul>
+        <li><strong>Export:</strong> gcloud compute images export &rarr; GCS bucket &rarr; download tar.gz containing disk.raw</li>
+        <li><strong>Linux fixes:</strong> Remove google-guest-agent, google-osconfig-agent, google-compute-engine packages. Fix fstab from /dev/sda to UUID. Rebuild initramfs with VirtIO</li>
+        <li><strong>Windows fixes:</strong> Remove GCP compute agent, metadata scripts. Inject VirtIO, fix BCD</li>
+        <li><strong>Networking:</strong> Remove google-guest-agent NIC management. Clean /etc/netplan or ifcfg with GCP metadata references</li>
+        <li><strong>cloud-init:</strong> Disable GCE datasource, remove startup-script hooks</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag tag-oci">OCI</span> / <span class="tag tag-ali">Alibaba</span> / <span class="tag tag-os">OpenStack</span></h4>
+      <ul>
+        <li><strong>OCI:</strong> Boot volume &rarr; Object Storage pre-authenticated request &rarr; download. Remove oracle-cloud-agent, fix fstab, rebuild initramfs</li>
+        <li><strong>Alibaba:</strong> ECS disk snapshot &rarr; OSS export &rarr; download. Remove aliyun-cli agent, fix fstab from /dev/vda (already virtio!) to UUID</li>
+        <li><strong>OpenStack:</strong> Glance image download or Cinder volume snapshot export. Disable cloud-init OpenStack datasource, fix fstab, minimal initramfs changes (often already QCOW2/VirtIO)</li>
+        <li><strong>Common:</strong> All cloud exports get fstab UUID repair, initramfs rebuild, GRUB fix, network cleanup, serial console enable</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>hyper2kvm auto-detects the source cloud</strong> based on installed agents, driver stack, and fstab patterns. It applies the correct set of fixes for each source — no manual configuration needed. Just point it at the exported disk image.</p>
+  </div>
+</div>
+
+<!-- PAGE 7: Repatriation Scenarios -->
+<div class="page page-dark">
+  <h2 class="st">Repatriation <span>Scenarios</span></h2>
+  <p class="sub">Real-world cloud exit projects powered by hyper2kvm + hypersdk.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Finance — AWS Exit, 40 VMs</h4>
+      <ul>
+        <li><strong>Source:</strong> AWS EC2 (m5/r5 instances), RDS &rarr; self-managed PostgreSQL</li>
+        <li><strong>Workloads:</strong> Trading platform, risk analytics, PostgreSQL, Redis</li>
+        <li><strong>Motivation:</strong> $1.2M/yr cloud bill, sub-ms latency needs, SOX audit complexity</li>
+        <li><strong>Target:</strong> On-prem KVM cluster (Dell PowerEdge + NVMe)</li>
+        <li><strong>Timeline:</strong> 4 weeks (10 VMs/week, off-hours cutover)</li>
+        <li><strong>Result:</strong> <strong>$960K/yr saved</strong>, latency dropped from 12ms to &lt;1ms</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Healthcare — Azure Exit, 25 VMs</h4>
+      <ul>
+        <li><strong>Source:</strong> Azure D-series VMs, managed disks</li>
+        <li><strong>Workloads:</strong> EMR system, PACS imaging, HL7 integration engine</li>
+        <li><strong>Motivation:</strong> HIPAA data residency, $480K/yr Azure spend, egress on imaging</li>
+        <li><strong>Target:</strong> On-prem KVM in hospital data center</li>
+        <li><strong>Timeline:</strong> 3 weeks</li>
+        <li><strong>Result:</strong> <strong>$420K/yr saved</strong>, patient data physically on-site, HIPAA simplified</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>SaaS — Multi-Cloud to Single Cluster, 80 VMs</h4>
+      <ul>
+        <li><strong>Source:</strong> 35 on AWS, 25 on Azure, 20 on GCP</li>
+        <li><strong>Workloads:</strong> Microservices (Docker), PostgreSQL, Elasticsearch, Redis, Kafka</li>
+        <li><strong>Motivation:</strong> $2.1M/yr combined cloud spend, 3x ops complexity, 3x security audits</li>
+        <li><strong>Target:</strong> On-prem K3s + KubeVirt (containers + VMs on one platform)</li>
+        <li><strong>Timeline:</strong> 6 weeks</li>
+        <li><strong>Result:</strong> <strong>$1.8M/yr saved</strong>, one platform to manage, one security framework</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Government — GCP Exit, 15 VMs (Classified)</h4>
+      <ul>
+        <li><strong>Source:</strong> GCP Compute Engine (commercial cloud)</li>
+        <li><strong>Workloads:</strong> Data processing, analytics, internal apps</li>
+        <li><strong>Motivation:</strong> New classification requirements — data must move to air-gapped facility</li>
+        <li><strong>Target:</strong> Air-gapped KVM cluster (no internet, ever)</li>
+        <li><strong>Timeline:</strong> 2 weeks</li>
+        <li><strong>Result:</strong> <strong>$200K/yr saved</strong>, full FedRAMP/STIG compliance, zero internet dependency</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Retail — AWS Repatriation to Edge, 30 VMs</h4>
+      <ul>
+        <li><strong>Source:</strong> AWS EC2 running POS backends for 30 store locations</li>
+        <li><strong>Workloads:</strong> Inventory management, POS processing, reporting</li>
+        <li><strong>Motivation:</strong> $540K/yr AWS + latency kills checkout speed + outages during connectivity loss</li>
+        <li><strong>Target:</strong> K3s + KubeVirt on mini PC at each store</li>
+        <li><strong>Timeline:</strong> 4 weeks (convert at HQ, ship hardware to stores)</li>
+        <li><strong>Result:</strong> <strong>$500K/yr saved</strong>, POS works offline, sub-ms transaction time</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Manufacturing — OCI + Azure to On-Prem, 20 VMs</h4>
+      <ul>
+        <li><strong>Source:</strong> 12 on OCI (SCADA analytics), 8 on Azure (MES dashboards)</li>
+        <li><strong>Workloads:</strong> Time-series DBs, Grafana, quality control, MES integration</li>
+        <li><strong>Motivation:</strong> Factory floor needs sub-10ms, egress on sensor data, OCI contract expiring</li>
+        <li><strong>Target:</strong> Ruggedized edge server + KVM at each plant</li>
+        <li><strong>Timeline:</strong> 3 weeks</li>
+        <li><strong>Result:</strong> <strong>$320K/yr saved</strong>, real-time factory analytics, no internet dependency</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8: Why No Other Tool Can Do This -->
+<div class="page page-light">
+  <h2 class="st">Why No Other Tool <span>Can Do This</span></h2>
+  <p class="sub">Cloud repatriation is the one migration direction that cloud vendors don't help with.</p>
+
+  <table>
+    <tr><th style="width:22%">Capability</th><th style="width:16%">hyper2kvm + hypersdk</th><th style="width:12%">virt-v2v</th><th style="width:12%">MTV</th><th style="width:12%">AWS MGN</th><th style="width:13%">Azure Migrate</th><th style="width:13%">Manual</th></tr>
+    <tr><td><strong>Export from AWS</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td>Inbound only</td><td class="cross">&#10007;</td><td class="partial">Complex</td></tr>
+    <tr><td><strong>Export from Azure</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td>Inbound only</td><td class="partial">Complex</td></tr>
+    <tr><td><strong>Export from GCP</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Complex</td></tr>
+    <tr><td><strong>Export from OCI</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Complex</td></tr>
+    <tr><td><strong>Multi-cloud in one tool</strong></td><td class="check">&#10003; (10 providers)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Remove cloud agents</strong></td><td class="check">&#10003; Auto</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">N/A</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Guest OS fixes</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="partial">Limited</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Deploy to KVM</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Deploy to KubeVirt</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">Complex</td></tr>
+    <tr><td><strong>Boot verification</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Batch / scheduling</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Cost</strong></td><td class="check">$0</td><td class="check">$0</td><td class="cross">$50K+</td><td>Free/90d</td><td>Free tool</td><td class="check">$0</td></tr>
+  </table>
+
+  <div class="highlight">
+    <h3 style="margin-top:0;">The Critical Insight</h3>
+    <p><strong>Cloud vendors build tools to migrate INTO their cloud, not OUT.</strong> AWS MGN migrates to AWS. Azure Migrate migrates to Azure. Neither helps you leave. virt-v2v doesn't support any cloud source. MTV only handles VMware.</p>
+    <p style="margin-bottom:0;">hyper2kvm + hypersdk is <strong>the only tool purpose-built for cloud repatriation</strong> — exporting FROM clouds TO on-premises infrastructure. It's the tool cloud vendors don't want to exist.</p>
+  </div>
+
+  <div class="verdict">
+    <h3>Cloud Repatriation Made Real</h3>
+    <p style="font-size:0.95em;">
+      10 cloud providers. Automated export + conversion + guest fixes + deployment.<br>
+      $600K-$1.8M saved per project. One tool. Zero lock-in. Free forever.<br>
+      <strong>hyper2kvm + hypersdk: the cloud exit platform.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

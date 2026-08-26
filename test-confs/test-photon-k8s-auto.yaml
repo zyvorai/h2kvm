@@ -1,0 +1,49 @@
+# Photon OS - Automated K8s Deployment Test
+# Tests end-to-end migration: VMDK → QCOW2 → K8s deployment
+
+cmd: local
+
+# Source VMDK
+vmdk: ./photon.vmdk
+
+# Output Configuration
+output_dir: out/photon-k8s
+to_output: photon.qcow2
+out_format: qcow2
+compress: true
+
+# Core Linux Fixes
+fstab_fixes_enable: true
+fstab_mode: stabilize-all
+fstab_prefer_partuuid: false
+
+grub_fixes_enable: true
+initramfs_regen_enable: true
+initramfs_regen_force: true
+
+# VirtIO modules for KubeVirt
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+  - virtio_balloon
+
+# Network fixes
+network_fixes_enable: true
+
+# ✨ Automated Kubernetes Deployment ✨
+deploy_k8s: true
+k8s_namespace: photon-test
+k8s_vm_name: photon-os
+k8s_storage_class: local-path
+k8s_pvc_size: 10Gi
+k8s_cpu: "2"
+k8s_memory: 2Gi
+k8s_auto_start: true
+k8s_wait_ready: true
+
+# Reporting
+report: out/photon-k8s/migration-report.md
+log_file: out/photon-k8s/migration.log
+verbose: 2

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VDI Migration — VMware Horizon to KVM + SPICE/RDP Desktop Virtualization</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #312e81, #4338ca, #6366f1); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #c7d2fe; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(199,210,254,0.2); border: 1px solid rgba(199,210,254,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f0d2e; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #c7d2fe; }
+  .page-light h2.st span { color: #312e81; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #c7d2fe; }
+  .page-light h3 { color: #312e81; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #312e81; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #c7d2fe; }
+  .page-light .card h4 { color: #312e81; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  pre { background: #312e81; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(199,210,254,0.08); border: 1px solid rgba(199,210,254,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(49,46,129,0.15), rgba(67,56,202,0.08)); border: 2px solid #6366f1; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #c7d2fe; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>VDI <span>Migration</span></h1>
+  <h2>VMware Horizon to KVM + SPICE/RDP Desktop Virtualization</h2>
+  <p class="sub">VMware Horizon VDI costs $200-$400/user/year. KVM with SPICE delivers the same experience at a fraction of the cost. This guide covers display protocol comparison (SPICE vs Blast vs RDP), GPU sharing for graphics desktops, connection broker options, and step-by-step migration from Horizon pools to KVM desktop VMs.</p>
+  <div class="badge">SPICE | RDP | NICE DCV | vGPU VDI | Connection Brokers | Thin Clients | $150/user Savings</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">VDI Cost <span>Comparison</span></h2>
+  <p class="sub">VMware Horizon licensing is the most expensive component of VDI — and the easiest to eliminate.</p>
+
+  <h3>Per-User VDI Cost (200 Users, 3 Years)</h3>
+  <table>
+    <tr><th style="width:25%">Component</th><th style="width:18%">VMware Horizon</th><th style="width:18%">KVM + SPICE</th><th style="width:18%">KVM + NICE DCV</th><th style="width:21%">Notes</th></tr>
+    <tr><td>VDI broker license</td><td>$250/user/yr</td><td>$0</td><td>$0</td><td>Apache Guacamole or oVirt (free)</td></tr>
+    <tr><td>Hypervisor license</td><td>$48/user/yr</td><td>$0</td><td>$0</td><td>KVM included in Linux kernel</td></tr>
+    <tr><td>Display protocol</td><td>Included (Blast)</td><td>$0 (SPICE)</td><td>$50/user/yr (DCV)</td><td>SPICE free; DCV for high-end graphics</td></tr>
+    <tr><td>GPU license (vGPU)</td><td>$150/user/yr</td><td>$150/user/yr</td><td>$150/user/yr</td><td>Same NVIDIA vGPU cost either way</td></tr>
+    <tr><td>Windows license (VDA)</td><td>$100/user/yr</td><td>$100/user/yr</td><td>$100/user/yr</td><td>Microsoft VDA required regardless</td></tr>
+    <tr><td>Server hardware (amortized)</td><td>$50/user/yr</td><td>$50/user/yr</td><td>$50/user/yr</td><td>Same hardware</td></tr>
+    <tr><td><strong>Per-User Annual</strong></td><td><strong>$598</strong></td><td><strong>$300</strong></td><td><strong>$350</strong></td><td></td></tr>
+    <tr><td><strong>200 Users, 3 Years</strong></td><td><strong>$358,800</strong></td><td><strong>$180,000</strong></td><td><strong>$210,000</strong></td><td></td></tr>
+    <tr><td><strong>3-Year Savings</strong></td><td>—</td><td><strong>$178,800 (50%)</strong></td><td><strong>$148,800 (41%)</strong></td><td></td></tr>
+  </table>
+
+  <div class="highlight">
+    <h3>Without GPU (Office Workers): Even Cheaper</h3>
+    <p>Remove vGPU for knowledge workers who don't need 3D graphics: VMware Horizon = $348/user/yr vs KVM + SPICE = $150/user/yr. <strong>200 users, 3 years: save $237,600 (57%).</strong> SPICE handles office apps, web browsing, and video playback smoothly without GPU acceleration.</p>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Display Protocol <span>Comparison</span></h2>
+  <p class="sub">SPICE, RDP, Blast, and NICE DCV — choosing the right protocol for your users.</p>
+
+  <table>
+    <tr><th style="width:15%">Protocol</th><th style="width:10%">License</th><th style="width:12%">Video Quality</th><th style="width:10%">Latency</th><th style="width:10%">Bandwidth</th><th style="width:10%">USB Redirect</th><th style="width:10%">Multi-Monitor</th><th style="width:23%">Best For</th></tr>
+    <tr><td><strong>SPICE</strong></td><td class="check">Free</td><td>Good</td><td>Good</td><td>Low-Med</td><td class="check">Yes</td><td class="check">Yes (4)</td><td>Office, web, general desktop</td></tr>
+    <tr><td><strong>RDP</strong></td><td class="check">Free*</td><td>Good</td><td class="check">Excellent</td><td class="check">Very Low</td><td class="check">Yes</td><td class="check">Yes (16)</td><td>Windows desktops (built-in)</td></tr>
+    <tr><td><strong>VMware Blast</strong></td><td>$250/user</td><td class="check">Excellent</td><td class="check">Excellent</td><td>Adaptive</td><td class="check">Yes</td><td class="check">Yes (4)</td><td>Horizon-only (vendor lock-in)</td></tr>
+    <tr><td><strong>NICE DCV</strong></td><td>$50/user</td><td class="check">Excellent</td><td class="check">Excellent</td><td>Adaptive</td><td class="check">Yes</td><td class="check">Yes (4)</td><td>CAD, 3D rendering, GPU desktops</td></tr>
+    <tr><td><strong>Apache Guacamole</strong></td><td class="check">Free</td><td>Good</td><td>Good</td><td>Med</td><td class="cross">No</td><td class="cross">No</td><td>Web-browser access (HTML5)</td></tr>
+    <tr><td><strong>Parsec</strong></td><td>$30/user</td><td class="check">Excellent</td><td class="check">Excellent</td><td>Adaptive</td><td class="cross">Limited</td><td class="check">Yes</td><td>Gaming, real-time graphics</td></tr>
+  </table>
+  <p style="font-size:0.8em;">* RDP included with Windows — no additional cost if using Windows VMs with RDP licenses.</p>
+
+  <h3>Recommended Protocol by Use Case</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Office Workers (No GPU)</h4>
+      <ul>
+        <li><strong>Protocol:</strong> RDP (Windows) or SPICE (Linux)</li>
+        <li><strong>Cost:</strong> $0 additional</li>
+        <li><strong>Quality:</strong> Full desktop, multi-monitor, USB</li>
+        <li><strong>Bandwidth:</strong> 1-5 Mbps per user</li>
+        <li><strong>Client:</strong> Windows RDP client, virt-viewer, Remmina</li>
+        <li><strong>Users:</strong> 200 office workers, call center, data entry</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>CAD/Engineering (GPU Required)</h4>
+      <ul>
+        <li><strong>Protocol:</strong> NICE DCV or SPICE + vGPU</li>
+        <li><strong>Cost:</strong> $50/user/yr (DCV) + $150/user/yr (vGPU)</li>
+        <li><strong>Quality:</strong> Full GPU acceleration, 4K support</li>
+        <li><strong>Bandwidth:</strong> 10-30 Mbps per user</li>
+        <li><strong>Client:</strong> NICE DCV client (Windows/Mac/Linux)</li>
+        <li><strong>Users:</strong> Engineers, architects, designers</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Connection Broker <span>Options</span></h2>
+  <p class="sub">Replacing VMware Horizon Connection Server with open-source alternatives.</p>
+
+  <h3>Broker Comparison</h3>
+  <table>
+    <tr><th style="width:15%">Broker</th><th style="width:10%">License</th><th style="width:12%">Protocol</th><th style="width:13%">Auth</th><th style="width:12%">Pool Mgmt</th><th style="width:10%">Web Client</th><th style="width:28%">Notes</th></tr>
+    <tr><td><strong>Apache Guacamole</strong></td><td class="check">Free</td><td>RDP, VNC, SSH</td><td>LDAP, TOTP, SSO</td><td>Manual</td><td class="check">HTML5</td><td>Clientless, web-only access, great for BYOD</td></tr>
+    <tr><td><strong>oVirt User Portal</strong></td><td class="check">Free</td><td>SPICE, VNC</td><td>LDAP, Kerberos</td><td class="check">Pools</td><td class="check">Yes</td><td>Full VDI features, VMware-like pool management</td></tr>
+    <tr><td><strong>Cockpit</strong></td><td class="check">Free</td><td>VNC, SPICE</td><td>PAM/LDAP</td><td>Manual</td><td class="check">Yes</td><td>Lightweight, per-host management</td></tr>
+    <tr><td><strong>Ravada VDI</strong></td><td class="check">Free</td><td>SPICE, HTML5</td><td>LDAP, SSO</td><td class="check">Pools</td><td class="check">Yes</td><td>Purpose-built VDI broker for KVM</td></tr>
+    <tr><td><strong>Flexiant</strong></td><td>$$</td><td>Multiple</td><td>LDAP, SAML</td><td class="check">Pools</td><td class="check">Yes</td><td>Commercial alternative with support</td></tr>
+  </table>
+
+  <h3>Apache Guacamole Setup</h3>
+  <pre>
+# Install Guacamole (Docker — easiest)
+docker run -d --name guacamole-db -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=guacamole mysql:8
+docker run -d --name guacd guacamole/guacd
+docker run -d --name guacamole --link guacd:guacd --link guacamole-db:mysql \
+  -e MYSQL_DATABASE=guacamole -e MYSQL_USER=guacamole -e MYSQL_PASSWORD=secret \
+  -p 8080:8080 guacamole/guacamole
+
+# Access: https://guacamole-host:8080/guacamole
+# Add RDP connections to each desktop VM
+# Users authenticate via LDAP → get assigned VM → RDP session in browser
+# No client software needed — works on any device with a web browser</pre>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">Migration <span>Workflow</span></h2>
+  <p class="sub">Step-by-step: Horizon desktop pool to KVM + SPICE/RDP desktops.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Step 1: Export Horizon Master Image</h4>
+      <ul>
+        <li>In Horizon Admin: identify master/golden image VM</li>
+        <li>Export as OVA: <code>govc export.ovf -vm /DC/vm/golden-win11</code></li>
+        <li>Or export VMDK from datastore directly</li>
+        <li>Includes: OS, apps, profile settings, GPOs</li>
+        <li>Note: linked clones won't export — use full clone or master</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Step 2: Convert with h2kvmctl</h4>
+      <pre>
+h2kvmctl convert \
+  --source golden-win11.vmdk \
+  --format qcow2 --compress \
+  --virtio-drivers /usr/share/virtio-win/virtio-win.iso \
+  --emit-domain-xml
+
+# Creates: golden-win11.qcow2 (template)</pre>
+    </div>
+    <div class="card">
+      <h4>Step 3: Create Desktop Pool</h4>
+      <pre>
+#!/bin/bash
+# create-vdi-pool.sh — create N desktop VMs
+TEMPLATE="golden-win11.qcow2"
+POOL_SIZE=50
+BRIDGE="br-vdi"
+
+for i in $(seq 1 $POOL_SIZE); do
+  NAME="desktop-$(printf '%03d' $i)"
+  # Linked clone (fast, space-efficient)
+  qemu-img create -f qcow2 \
+    -b $TEMPLATE -F qcow2 \
+    /var/lib/libvirt/images/${NAME}.qcow2
+  # Define VM
+  virt-install --name $NAME \
+    --ram 4096 --vcpus 2 \
+    --import --disk /var/lib/libvirt/images/${NAME}.qcow2 \
+    --network bridge=$BRIDGE,model=virtio \
+    --graphics spice --noautoconsole
+done
+echo "Created $POOL_SIZE desktop VMs"</pre>
+    </div>
+    <div class="card">
+      <h4>Step 4: Connect Users</h4>
+      <ul>
+        <li><strong>SPICE:</strong> <code>remote-viewer spice://kvm-host:5900</code></li>
+        <li><strong>RDP:</strong> <code>mstsc /v:desktop-001.corp.local</code></li>
+        <li><strong>Guacamole:</strong> Browser → login → click desktop name</li>
+        <li><strong>Thin clients:</strong> Configurable SPICE/RDP endpoints</li>
+        <li>LDAP auth maps user → assigned desktop VM</li>
+        <li>User profile stored on network share (roaming)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>VDI on KVM: Same Experience, 50% Less Cost</h3>
+    <p>VMware Horizon's value is the connection broker + display protocol — both replaceable with free alternatives. SPICE provides excellent desktop experience for office users. RDP is built into Windows and works everywhere. Apache Guacamole adds web-browser access without any client install. For GPU desktops, NICE DCV at $50/user beats Horizon at $250/user. hyper2kvm converts golden images and linked clones from Horizon to KVM in minutes.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | VDI Migration Guide</div>
+</div>
+
+</body>
+</html>

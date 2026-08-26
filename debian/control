@@ -1,0 +1,57 @@
+Source: hyper2kvm
+Section: admin
+Priority: optional
+Maintainer: ZyvorAI Labs Private Limited <ssahani@zyvor.dev>
+Build-Depends: debhelper-compat (= 13),
+               dh-python,
+               python3-all,
+               python3-setuptools,
+               python3-pip,
+               python3-build,
+               python3-sphinx,
+               python3-sphinx-rtd-theme
+Standards-Version: 4.6.2
+Homepage: https://github.com/ssahani/hyper2kvm
+Vcs-Browser: https://github.com/ssahani/hyper2kvm
+Vcs-Git: https://github.com/ssahani/hyper2kvm.git
+Rules-Requires-Root: no
+
+Package: hyper2kvm
+Architecture: all
+Depends: ${python3:Depends},
+         ${misc:Depends},
+         python3-yaml (>= 6.0),
+         python3-click (>= 8.0.0),
+         python3-argcomplete (>= 2.0.0),
+         qemu-utils
+Recommends: libguestfs-tools,
+            python3-guestfs,
+            python3-pyvmomi (>= 7.0.0),
+            python3-requests (>= 2.25.0),
+            libvirt-clients,
+            libvirt-daemon-system,
+            qemu-kvm,
+            ovmf,
+            virtinst,
+            systemd
+Suggests: podman | docker.io
+Description: Production-grade hypervisor to KVM/QEMU migration toolkit
+ hyper2kvm is a comprehensive toolkit for migrating virtual machines from
+ multiple hypervisors and disk ecosystems (VMware vSphere, Hyper-V, Azure,
+ AWS, local disks) into reliable, bootable KVM/QEMU systems.
+ .
+ The tool handles the complete migration pipeline:
+  - FETCH: Download or access source VM disks from various hypervisors
+  - FLATTEN: Consolidate snapshot chains and differencing disks
+  - INSPECT: Analyze guest OS, bootloader, and filesystem configuration
+  - FIX: Repair boot configuration, regenerate initramfs, stabilize device paths
+  - CONVERT: Transform disk formats (VMDK/VHD/VHDx to QCOW2/RAW)
+  - VALIDATE: Test boot and verify functionality
+ .
+ Features:
+  - VMware vSphere integration (govc, OVF Tool, pyvmomi, NFC export)
+  - Automated guest OS fixes (bootloader, initramfs, fstab)
+  - Windows VirtIO driver injection with two-phase boot
+  - libvirt domain XML generation and boot testing
+  - Zero-downtime migration support (live-fix via SSH)
+  - Batch processing and daemon mode

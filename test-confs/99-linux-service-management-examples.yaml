@@ -1,0 +1,233 @@
+# Systemd Service Management Examples
+
+cmd: local
+vmdk: /path/to/vm.vmdk
+output_dir: ./out
+
+# Example 1: Basic Service Management
+# Enable SSH, disable unnecessary services
+service_config_inject:
+  enable:
+    - sshd
+    - docker
+  disable:
+    - bluetooth
+    - cups
+  mask:
+    - avahi-daemon
+
+verbose: 2
+
+---
+
+# Example 2: Web Server Configuration
+# Enable web server and related services
+cmd: local
+vmdk: /path/to/webserver.vmdk
+output_dir: ./out
+
+service_config_inject:
+  enable:
+    - nginx
+    - php-fpm
+    - postgresql
+  disable:
+    - apache2  # Disable conflicting web server
+    - sendmail
+  mask:
+    - postfix  # Prevent mail service from starting
+
+---
+
+# Example 3: Minimal Server Setup
+# Disable all unnecessary services for minimal attack surface
+cmd: local
+vmdk: /path/to/minimal-server.vmdk
+output_dir: ./out
+
+service_config_inject:
+  enable:
+    - sshd
+    - firewalld
+  disable:
+    - bluetooth
+    - cups
+    - avahi-daemon
+    - ModemManager
+    - NetworkManager-wait-online
+  mask:
+    - snapd  # Completely prevent snap daemon
+    - multipathd
+
+---
+
+# Example 4: Docker Host Configuration
+# Optimize services for Docker workloads
+cmd: local
+vmdk: /path/to/docker-host.vmdk
+output_dir: ./out
+
+service_config_inject:
+  enable:
+    - docker
+    - containerd
+    - sshd
+  disable:
+    - firewalld  # Docker manages iptables
+    - cups
+    - bluetooth
+  mask:
+    - systemd-resolved  # Use custom DNS
+
+---
+
+# Example 5: Database Server Setup
+# Configure services for PostgreSQL server
+cmd: local
+vmdk: /path/to/db-server.vmdk
+output_dir: ./out
+
+service_config_inject:
+  enable:
+    - postgresql
+    - sshd
+    - firewalld
+    - chronyd  # Time synchronization is critical for databases
+  disable:
+    - cups
+    - bluetooth
+    - avahi-daemon
+  mask:
+    - snapd
+
+---
+
+# Example 6: Kubernetes Node
+# Services for Kubernetes worker node
+cmd: local
+vmdk: /path/to/k8s-worker.vmdk
+output_dir: ./out
+
+service_config_inject:
+  enable:
+    - kubelet
+    - containerd
+    - sshd
+  disable:
+    - firewalld  # CNI handles networking
+    - cups
+    - bluetooth
+    - postfix
+  mask:
+    - docker  # Using containerd directly
+    - snapd
+
+---
+
+# Example 7: Desktop to Server Conversion
+# Convert a desktop VM to server by disabling GUI services
+cmd: local
+vmdk: /path/to/desktop-to-server.vmdk
+output_dir: ./out
+
+service_config_inject:
+  enable:
+    - sshd
+  disable:
+    - gdm
+    - bluetooth
+    - cups
+    - avahi-daemon
+    - NetworkManager
+    - pulseaudio
+    - pipewire
+  mask:
+    - gdm  # Prevent GUI from starting
+    - snapd
+
+---
+
+# Example 8: Secure Server Hardening
+# Disable all non-essential services for security
+cmd: local
+vmdk: /path/to/secure-server.vmdk
+output_dir: ./out
+
+service_config_inject:
+  enable:
+    - sshd
+    - firewalld
+    - fail2ban
+    - auditd  # Security auditing
+  disable:
+    - bluetooth
+    - cups
+    - avahi-daemon
+    - ModemManager
+    - rpcbind
+    - nfs-client.target
+  mask:
+    - snapd
+    - telnet
+    - rsh
+    - rlogin
+
+---
+
+# Example 9: Development Server
+# Enable services for development environment
+cmd: local
+vmdk: /path/to/dev-server.vmdk
+output_dir: ./out
+
+service_config_inject:
+  enable:
+    - sshd
+    - docker
+    - postgresql
+    - redis
+    - nginx
+  disable:
+    - bluetooth
+    - cups
+    - postfix
+  mask:
+    - snapd
+
+---
+
+# Example 10: Combined with User and Hostname Configuration
+# Complete server setup with services, users, and hostname
+cmd: local
+vmdk: /path/to/complete-server.vmdk
+output_dir: ./out
+
+service_config_inject:
+  enable:
+    - sshd
+    - docker
+    - nginx
+  disable:
+    - bluetooth
+    - cups
+    - avahi-daemon
+  mask:
+    - snapd
+
+user_config_inject:
+  users:
+    - name: admin
+      uid: 1000
+      groups: [wheel, docker]
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... admin@workstation"
+      sudo: "ALL=(ALL) NOPASSWD:ALL"
+
+hostname_config_inject:
+  hostname: webserver01
+  domain: prod.example.com
+  hosts:
+    192.168.1.10: "db.prod.example.com db"
+    192.168.1.20: "cache.prod.example.com cache"
+
+verbose: 2

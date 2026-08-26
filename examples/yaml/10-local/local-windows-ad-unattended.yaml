@@ -1,0 +1,68 @@
+# Windows Migration with Offline Domain Join (Unattended Method)
+#
+# This example shows offline domain join using djoin.exe.
+# Most secure method - no live credentials needed during migration.
+#
+# Pre-Migration Steps:
+# 1. On domain controller, run as domain admin:
+#    djoin.exe /provision /domain corp.example.com /machine SERVER01 /savefile server01-join.txt
+#
+# 2. Copy server01-join.txt to migration workstation
+#
+# 3. Run migration with this config
+#
+# Post-Migration:
+# - First boot will apply offline domain join
+# - Computer joins domain without interactive credentials
+# - Automatic reboot completes the process
+#
+# Run with:
+#   h2kvmctl --config 10-local/local-windows-ad-unattended.yaml
+
+command: local
+vmdk: /path/to/windows-server.vmdk
+to_output: windows-server-kvm.qcow2
+verbose: 2
+
+windows:
+  license:
+    preserve: true
+    reactivate: true
+    # For enterprise deployments with KMS
+    kms_server: kms.corp.example.com
+    kms_port: 1688
+
+  active_directory:
+    enabled: true
+
+    rejoin:
+      # Offline domain join (most secure)
+      method: unattended
+
+    # Unattended join configuration
+    unattended_join:
+      enabled: true
+
+      # Path to djoin.exe output file
+      # This file was created by domain admin on the domain controller
+      file: /path/to/server01-join.txt
+
+# Advantages of offline domain join:
+# - No credentials stored during migration
+# - Pre-authorized by domain admin
+# - Auditable (domain admin must provision join file)
+# - Secure (join file is time-limited and one-time use)
+# - No credential exposure risk
+#
+# Process:
+# 1. Domain admin provisions computer object in AD
+# 2. djoin.exe creates encrypted join blob
+# 3. Migration stages join blob in guest
+# 4. First boot applies join using djoin.exe /RequestODJ
+# 5. Computer joins domain and reboots
+#
+# Best for:
+# - High-security environments
+# - Compliance requirements (SOC 2, PCI-DSS)
+# - Large-scale migrations (provision many join files in advance)
+# - Air-gapped migrations (no network access during migration)

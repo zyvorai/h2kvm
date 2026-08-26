@@ -1,0 +1,5163 @@
+{
+  "module_count": 519,
+  "edge_count": 818,
+  "modules": [
+    "hyper2kvm",
+    "hyper2kvm.__main__",
+    "hyper2kvm.audit_logger",
+    "hyper2kvm.azure",
+    "hyper2kvm.azure.cleanup",
+    "hyper2kvm.azure.cli",
+    "hyper2kvm.azure.download",
+    "hyper2kvm.azure.exceptions",
+    "hyper2kvm.azure.models",
+    "hyper2kvm.azure.source",
+    "hyper2kvm.backup_sources",
+    "hyper2kvm.backup_sources.base",
+    "hyper2kvm.backup_sources.generic",
+    "hyper2kvm.backup_sources.orchestrator",
+    "hyper2kvm.backup_sources.proxmox",
+    "hyper2kvm.backup_sources.veeam",
+    "hyper2kvm.base",
+    "hyper2kvm.capabilities",
+    "hyper2kvm.change_tracker",
+    "hyper2kvm.cis_benchmarks",
+    "hyper2kvm.cli",
+    "hyper2kvm.cli.args",
+    "hyper2kvm.cli.args.builder",
+    "hyper2kvm.cli.args.groups",
+    "hyper2kvm.cli.args.helpers",
+    "hyper2kvm.cli.args.parser",
+    "hyper2kvm.cli.args.validators",
+    "hyper2kvm.cli.argument_parser",
+    "hyper2kvm.cli.builder",
+    "hyper2kvm.cli.daemon_ctl",
+    "hyper2kvm.cli.groups",
+    "hyper2kvm.cli.help_texts",
+    "hyper2kvm.cli.helpers",
+    "hyper2kvm.cli.parser",
+    "hyper2kvm.cli.validators",
+    "hyper2kvm.cli_dashboard",
+    "hyper2kvm.clients.client",
+    "hyper2kvm.compliance",
+    "hyper2kvm.compliance.audit_logger",
+    "hyper2kvm.compliance.base",
+    "hyper2kvm.compliance.change_tracker",
+    "hyper2kvm.compliance.cis_benchmarks",
+    "hyper2kvm.compliance.orchestrator",
+    "hyper2kvm.compliance.report_generator",
+    "hyper2kvm.compliance.stig_validator",
+    "hyper2kvm.config",
+    "hyper2kvm.config.config_loader",
+    "hyper2kvm.config.mapping_config",
+    "hyper2kvm.config.systemd_template",
+    "hyper2kvm.config.validation",
+    "hyper2kvm.containers",
+    "hyper2kvm.containers.detector",
+    "hyper2kvm.containers.docker_extractor",
+    "hyper2kvm.containers.kubernetes_generator",
+    "hyper2kvm.containers.orchestrator",
+    "hyper2kvm.containers.podman_extractor",
+    "hyper2kvm.control",
+    "hyper2kvm.converters",
+    "hyper2kvm.converters.ami",
+    "hyper2kvm.converters.converter",
+    "hyper2kvm.converters.extractors",
+    "hyper2kvm.converters.extractors.ami",
+    "hyper2kvm.converters.extractors.libvirt_xml",
+    "hyper2kvm.converters.extractors.ovf",
+    "hyper2kvm.converters.extractors.raw",
+    "hyper2kvm.converters.extractors.vhd",
+    "hyper2kvm.converters.fetch",
+    "hyper2kvm.converters.flatten",
+    "hyper2kvm.converters.libvirt_xml",
+    "hyper2kvm.converters.ovf",
+    "hyper2kvm.converters.qemu",
+    "hyper2kvm.converters.qemu.converter",
+    "hyper2kvm.converters.raw",
+    "hyper2kvm.converters.vhd",
+    "hyper2kvm.core",
+    "hyper2kvm.core._utils",
+    "hyper2kvm.core.advanced_analysis",
+    "hyper2kvm.core.app_framework_detector",
+    "hyper2kvm.core.audit_trail",
+    "hyper2kvm.core.automated_remediation",
+    "hyper2kvm.core.backup_analysis",
+    "hyper2kvm.core.certificate_manager",
+    "hyper2kvm.core.cloud_detector",
+    "hyper2kvm.core.cloud_optimizer",
+    "hyper2kvm.core.compliance_checker",
+    "hyper2kvm.core.config_tracker",
+    "hyper2kvm.core.constants",
+    "hyper2kvm.core.container_analyzer",
+    "hyper2kvm.core.cred",
+    "hyper2kvm.core.creds",
+    "hyper2kvm.core.data_discovery",
+    "hyper2kvm.core.database_detector",
+    "hyper2kvm.core.dependency_mapper",
+    "hyper2kvm.core.disaster_recovery",
+    "hyper2kvm.core.exceptions",
+    "hyper2kvm.core.export",
+    "hyper2kvm.core.firewall_analyzer",
+    "hyper2kvm.core.forensic_analyzer",
+    "hyper2kvm.core.guest_identity",
+    "hyper2kvm.core.guest_inspector",
+    "hyper2kvm.core.guest_utils",
+    "hyper2kvm.core.guestfs_factory",
+    "hyper2kvm.core.hardware_detector",
+    "hyper2kvm.core.integration_hub",
+    "hyper2kvm.core.license_detector",
+    "hyper2kvm.core.linux_services",
+    "hyper2kvm.core.list_utils",
+    "hyper2kvm.core.log_analyzer",
+    "hyper2kvm.core.logger",
+    "hyper2kvm.core.logging_utils",
+    "hyper2kvm.core.main",
+    "hyper2kvm.core.metrics",
+    "hyper2kvm.core.migration_planner",
+    "hyper2kvm.core.ml_analyzer",
+    "hyper2kvm.core.monitoring_detector",
+    "hyper2kvm.core.network_config",
+    "hyper2kvm.core.network_topology",
+    "hyper2kvm.core.optional_imports",
+    "hyper2kvm.core.performance_analyzer",
+    "hyper2kvm.core.predictive_analytics",
+    "hyper2kvm.core.progress",
+    "hyper2kvm.core.realtime_monitoring",
+    "hyper2kvm.core.recovery_manager",
+    "hyper2kvm.core.resource_orchestrator",
+    "hyper2kvm.core.retry",
+    "hyper2kvm.core.retry_enhanced",
+    "hyper2kvm.core.sanity_checker",
+    "hyper2kvm.core.scheduled_tasks",
+    "hyper2kvm.core.ssh_analyzer",
+    "hyper2kvm.core.storage_analyzer",
+    "hyper2kvm.core.threat_intelligence",
+    "hyper2kvm.core.user_activity",
+    "hyper2kvm.core.utils",
+    "hyper2kvm.core.validation_suite",
+    "hyper2kvm.core.vmcraft",
+    "hyper2kvm.core.vmcraft._utils",
+    "hyper2kvm.core.vmcraft.advanced_analysis",
+    "hyper2kvm.core.vmcraft.analyze",
+    "hyper2kvm.core.vmcraft.app_framework_detector",
+    "hyper2kvm.core.vmcraft.audit_trail",
+    "hyper2kvm.core.vmcraft.augeas_mgr",
+    "hyper2kvm.core.vmcraft.automated_remediation",
+    "hyper2kvm.core.vmcraft.backup",
+    "hyper2kvm.core.vmcraft.backup_analysis",
+    "hyper2kvm.core.vmcraft.certificate_manager",
+    "hyper2kvm.core.vmcraft.cloud_detector",
+    "hyper2kvm.core.vmcraft.cloud_optimizer",
+    "hyper2kvm.core.vmcraft.compliance_checker",
+    "hyper2kvm.core.vmcraft.config_tracker",
+    "hyper2kvm.core.vmcraft.container_analyzer",
+    "hyper2kvm.core.vmcraft.data_discovery",
+    "hyper2kvm.core.vmcraft.database_detector",
+    "hyper2kvm.core.vmcraft.dependency_mapper",
+    "hyper2kvm.core.vmcraft.disaster_recovery",
+    "hyper2kvm.core.vmcraft.enhanced_inspection",
+    "hyper2kvm.core.vmcraft.export",
+    "hyper2kvm.core.vmcraft.file_ops",
+    "hyper2kvm.core.vmcraft.firewall_analyzer",
+    "hyper2kvm.core.vmcraft.forensic_analyzer",
+    "hyper2kvm.core.vmcraft.hardware_detector",
+    "hyper2kvm.core.vmcraft.inspection",
+    "hyper2kvm.core.vmcraft.integration_hub",
+    "hyper2kvm.core.vmcraft.journalctl",
+    "hyper2kvm.core.vmcraft.license_detector",
+    "hyper2kvm.core.vmcraft.linux_detection",
+    "hyper2kvm.core.vmcraft.linux_services",
+    "hyper2kvm.core.vmcraft.log_analyzer",
+    "hyper2kvm.core.vmcraft.main",
+    "hyper2kvm.core.vmcraft.migration_planner",
+    "hyper2kvm.core.vmcraft.ml_analyzer",
+    "hyper2kvm.core.vmcraft.monitoring_detector",
+    "hyper2kvm.core.vmcraft.mount",
+    "hyper2kvm.core.vmcraft.nbd",
+    "hyper2kvm.core.vmcraft.network_config",
+    "hyper2kvm.core.vmcraft.network_topology",
+    "hyper2kvm.core.vmcraft.optimization",
+    "hyper2kvm.core.vmcraft.performance_analyzer",
+    "hyper2kvm.core.vmcraft.predictive_analytics",
+    "hyper2kvm.core.vmcraft.realtime_monitoring",
+    "hyper2kvm.core.vmcraft.resource_orchestrator",
+    "hyper2kvm.core.vmcraft.scheduled_tasks",
+    "hyper2kvm.core.vmcraft.security",
+    "hyper2kvm.core.vmcraft.ssh_analyzer",
+    "hyper2kvm.core.vmcraft.storage",
+    "hyper2kvm.core.vmcraft.storage_analyzer",
+    "hyper2kvm.core.vmcraft.sysconfig",
+    "hyper2kvm.core.vmcraft.systemctl",
+    "hyper2kvm.core.vmcraft.systemd",
+    "hyper2kvm.core.vmcraft.systemd_journal",
+    "hyper2kvm.core.vmcraft.systemd_mgr",
+    "hyper2kvm.core.vmcraft.systemd_networkd",
+    "hyper2kvm.core.vmcraft.systemd_units",
+    "hyper2kvm.core.vmcraft.threat_intelligence",
+    "hyper2kvm.core.vmcraft.user_activity",
+    "hyper2kvm.core.vmcraft.vulnerability_scanner",
+    "hyper2kvm.core.vmcraft.webserver_analyzer",
+    "hyper2kvm.core.vmcraft.windows_applications",
+    "hyper2kvm.core.vmcraft.windows_detection",
+    "hyper2kvm.core.vmcraft.windows_drivers",
+    "hyper2kvm.core.vmcraft.windows_registry",
+    "hyper2kvm.core.vmcraft.windows_services",
+    "hyper2kvm.core.vmcraft.windows_users",
+    "hyper2kvm.core.vulnerability_scanner",
+    "hyper2kvm.core.webserver_analyzer",
+    "hyper2kvm.core.windows_applications",
+    "hyper2kvm.core.windows_services",
+    "hyper2kvm.core.windows_users",
+    "hyper2kvm.core.xml_utils",
+    "hyper2kvm.daemon",
+    "hyper2kvm.daemon.control",
+    "hyper2kvm.daemon.daemon_watcher",
+    "hyper2kvm.daemon.deduplicator",
+    "hyper2kvm.daemon.manifest_processor",
+    "hyper2kvm.daemon.manifest_watcher",
+    "hyper2kvm.daemon.manifest_workflow_daemon",
+    "hyper2kvm.daemon.metrics_server",
+    "hyper2kvm.daemon.nbd_prep",
+    "hyper2kvm.daemon.notifier",
+    "hyper2kvm.daemon.stats",
+    "hyper2kvm.daemon.workflow_daemon",
+    "hyper2kvm.daemon_watcher",
+    "hyper2kvm.dashboard",
+    "hyper2kvm.database_migration",
+    "hyper2kvm.database_migration.base",
+    "hyper2kvm.database_migration.detector",
+    "hyper2kvm.database_migration.generic",
+    "hyper2kvm.database_migration.mongodb",
+    "hyper2kvm.database_migration.mysql",
+    "hyper2kvm.database_migration.orchestrator",
+    "hyper2kvm.database_migration.postgresql",
+    "hyper2kvm.database_migration.redis",
+    "hyper2kvm.database_validator",
+    "hyper2kvm.deduplicator",
+    "hyper2kvm.deployers.kubernetes",
+    "hyper2kvm.detector",
+    "hyper2kvm.disk_discovery",
+    "hyper2kvm.disk_processor",
+    "hyper2kvm.docker_extractor",
+    "hyper2kvm.engine",
+    "hyper2kvm.events",
+    "hyper2kvm.extractors.ovf",
+    "hyper2kvm.fallback_dashboard",
+    "hyper2kvm.fixers",
+    "hyper2kvm.fixers.bootloader",
+    "hyper2kvm.fixers.bootloader.fixer",
+    "hyper2kvm.fixers.bootloader.grub",
+    "hyper2kvm.fixers.bootloader.post_conversion",
+    "hyper2kvm.fixers.cloud_init_injector",
+    "hyper2kvm.fixers.config_rewriter",
+    "hyper2kvm.fixers.core",
+    "hyper2kvm.fixers.filesystem",
+    "hyper2kvm.fixers.filesystem.fixer",
+    "hyper2kvm.fixers.filesystem.fstab",
+    "hyper2kvm.fixers.filesystem.fstab_stabilizer",
+    "hyper2kvm.fixers.filesystem.stable_mount",
+    "hyper2kvm.fixers.fix_fstab",
+    "hyper2kvm.fixers.fix_grub",
+    "hyper2kvm.fixers.fix_initramfs",
+    "hyper2kvm.fixers.fix_selinux",
+    "hyper2kvm.fixers.live.fixer",
+    "hyper2kvm.fixers.live.grub_fixer",
+    "hyper2kvm.fixers.model",
+    "hyper2kvm.fixers.network",
+    "hyper2kvm.fixers.network.backend",
+    "hyper2kvm.fixers.network.core",
+    "hyper2kvm.fixers.network.discovery",
+    "hyper2kvm.fixers.network.model",
+    "hyper2kvm.fixers.network.topology",
+    "hyper2kvm.fixers.network.validation",
+    "hyper2kvm.fixers.network_fixer",
+    "hyper2kvm.fixers.offline",
+    "hyper2kvm.fixers.offline.config_rewriter",
+    "hyper2kvm.fixers.offline.mount",
+    "hyper2kvm.fixers.offline.spec_converter",
+    "hyper2kvm.fixers.offline.validation",
+    "hyper2kvm.fixers.offline.vmware_tools_remover",
+    "hyper2kvm.fixers.offline_fixer",
+    "hyper2kvm.fixers.offline_vm",
+    "hyper2kvm.fixers.offline_vm.fix_fstab",
+    "hyper2kvm.fixers.offline_vm.fix_grub",
+    "hyper2kvm.fixers.offline_vm.fix_initramfs",
+    "hyper2kvm.fixers.offline_vm.fix_selinux",
+    "hyper2kvm.fixers.offline_vm.utils",
+    "hyper2kvm.fixers.report_writer",
+    "hyper2kvm.fixers.spec_converter",
+    "hyper2kvm.fixers.universal_rewriter",
+    "hyper2kvm.fixers.utils",
+    "hyper2kvm.fixers.validation",
+    "hyper2kvm.fixers.windows",
+    "hyper2kvm.fixers.windows.activedirectory",
+    "hyper2kvm.fixers.windows.activedirectory.cleanup",
+    "hyper2kvm.fixers.windows.activedirectory.extractor",
+    "hyper2kvm.fixers.windows.activedirectory.rejoin",
+    "hyper2kvm.fixers.windows.appcompat",
+    "hyper2kvm.fixers.windows.appcompat.detector",
+    "hyper2kvm.fixers.windows.appcompat.reporter",
+    "hyper2kvm.fixers.windows.appcompat.sqlserver",
+    "hyper2kvm.fixers.windows.balloon",
+    "hyper2kvm.fixers.windows.bitlocker",
+    "hyper2kvm.fixers.windows.detector",
+    "hyper2kvm.fixers.windows.extractor",
+    "hyper2kvm.fixers.windows.firewall",
+    "hyper2kvm.fixers.windows.fixer",
+    "hyper2kvm.fixers.windows.hyperv_cleanup",
+    "hyper2kvm.fixers.windows.license",
+    "hyper2kvm.fixers.windows.license.extractor",
+    "hyper2kvm.fixers.windows.license.reactivator",
+    "hyper2kvm.fixers.windows.msi",
+    "hyper2kvm.fixers.windows.network_fixer",
+    "hyper2kvm.fixers.windows.performance",
+    "hyper2kvm.fixers.windows.performance.balloon",
+    "hyper2kvm.fixers.windows.performance.hyperv_cleanup",
+    "hyper2kvm.fixers.windows.performance.msi",
+    "hyper2kvm.fixers.windows.performance.trim",
+    "hyper2kvm.fixers.windows.rdp",
+    "hyper2kvm.fixers.windows.registry.encoding",
+    "hyper2kvm.fixers.windows.registry.firstboot",
+    "hyper2kvm.fixers.windows.registry.io",
+    "hyper2kvm.fixers.windows.registry.mount",
+    "hyper2kvm.fixers.windows.registry.software",
+    "hyper2kvm.fixers.windows.registry.system",
+    "hyper2kvm.fixers.windows.registry_core",
+    "hyper2kvm.fixers.windows.rejoin",
+    "hyper2kvm.fixers.windows.reporter",
+    "hyper2kvm.fixers.windows.sqlserver",
+    "hyper2kvm.fixers.windows.trim",
+    "hyper2kvm.fixers.windows.virtio.core",
+    "hyper2kvm.fixers.windows.virtio.detection",
+    "hyper2kvm.fixers.windows.virtio.discovery",
+    "hyper2kvm.fixers.windows.virtio.install",
+    "hyper2kvm.fixers.windows.virtio.windows_virtio_config",
+    "hyper2kvm.fixers.windows.virtio.windows_virtio_paths",
+    "hyper2kvm.fixers.windows.virtio.windows_virtio_utils",
+    "hyper2kvm.fixers.windows.virtio_warning",
+    "hyper2kvm.flatten",
+    "hyper2kvm.formatter",
+    "hyper2kvm.generic",
+    "hyper2kvm.guest_identity",
+    "hyper2kvm.health_checker",
+    "hyper2kvm.hook_runner",
+    "hyper2kvm.hook_types",
+    "hyper2kvm.hooks",
+    "hyper2kvm.hooks.hook_runner",
+    "hyper2kvm.hooks.hook_types",
+    "hyper2kvm.hooks.template_engine",
+    "hyper2kvm.inspector",
+    "hyper2kvm.kubernetes_generator",
+    "hyper2kvm.libvirt",
+    "hyper2kvm.libvirt.domain_emitter",
+    "hyper2kvm.libvirt.libvirt_manager",
+    "hyper2kvm.libvirt.libvirt_utils",
+    "hyper2kvm.libvirt.linux_domain",
+    "hyper2kvm.libvirt.pool_manager",
+    "hyper2kvm.libvirt.windows_domain",
+    "hyper2kvm.libvirt_manager",
+    "hyper2kvm.libvirt_tester",
+    "hyper2kvm.libvirt_utils",
+    "hyper2kvm.live.fixer",
+    "hyper2kvm.live_migration",
+    "hyper2kvm.live_migration.analyzer",
+    "hyper2kvm.live_migration.hybrid_manager",
+    "hyper2kvm.live_migration.hypersdk_integration",
+    "hyper2kvm.live_migration.orchestrator",
+    "hyper2kvm.loader",
+    "hyper2kvm.manifest",
+    "hyper2kvm.manifest.batch_loader",
+    "hyper2kvm.manifest.batch_orchestrator",
+    "hyper2kvm.manifest.batch_progress",
+    "hyper2kvm.manifest.batch_reporter",
+    "hyper2kvm.manifest.checkpoint_manager",
+    "hyper2kvm.manifest.loader",
+    "hyper2kvm.manifest.mapping_applier",
+    "hyper2kvm.manifest.orchestrator",
+    "hyper2kvm.manifest.reporter",
+    "hyper2kvm.manifest_workflow_daemon",
+    "hyper2kvm.models",
+    "hyper2kvm.modes.inventory_mode",
+    "hyper2kvm.modes.plan_mode",
+    "hyper2kvm.mongodb",
+    "hyper2kvm.mysql",
+    "hyper2kvm.network_fixer",
+    "hyper2kvm.network_validator",
+    "hyper2kvm.notifier",
+    "hyper2kvm.offline_fixer",
+    "hyper2kvm.operator",
+    "hyper2kvm.operator.cli",
+    "hyper2kvm.operator.dag_validator",
+    "hyper2kvm.operator.dependency_manager",
+    "hyper2kvm.operator.job_assigner",
+    "hyper2kvm.operator.leader_aware_controller",
+    "hyper2kvm.operator.leader_election",
+    "hyper2kvm.operator.migrationjob_controller",
+    "hyper2kvm.operator.vm_factory",
+    "hyper2kvm.operator.webhook",
+    "hyper2kvm.operator.webhook_server",
+    "hyper2kvm.operator.worker_registry",
+    "hyper2kvm.orchestrator",
+    "hyper2kvm.orchestrator.azure_exporter",
+    "hyper2kvm.orchestrator.disk_discovery",
+    "hyper2kvm.orchestrator.disk_processor",
+    "hyper2kvm.orchestrator.orchestrator",
+    "hyper2kvm.orchestrator.vsphere_exporter",
+    "hyper2kvm.performance_validator",
+    "hyper2kvm.podman_extractor",
+    "hyper2kvm.pool_manager",
+    "hyper2kvm.postgresql",
+    "hyper2kvm.profile_cache",
+    "hyper2kvm.profile_loader",
+    "hyper2kvm.profiles",
+    "hyper2kvm.profiles.profile_cache",
+    "hyper2kvm.profiles.profile_loader",
+    "hyper2kvm.progress",
+    "hyper2kvm.proxmox",
+    "hyper2kvm.qemu.converter",
+    "hyper2kvm.qemu_tester",
+    "hyper2kvm.redis",
+    "hyper2kvm.report_generator",
+    "hyper2kvm.reporter",
+    "hyper2kvm.rollback",
+    "hyper2kvm.rollback.orchestrator",
+    "hyper2kvm.rollback.rollback_executor",
+    "hyper2kvm.rollback.rollback_validator",
+    "hyper2kvm.rollback.snapshot_manager",
+    "hyper2kvm.rollback.state_tracker",
+    "hyper2kvm.rollback_executor",
+    "hyper2kvm.rollback_validator",
+    "hyper2kvm.scheduler",
+    "hyper2kvm.schemas",
+    "hyper2kvm.service_validator",
+    "hyper2kvm.snapshot_manager",
+    "hyper2kvm.source",
+    "hyper2kvm.ssh.ssh_client",
+    "hyper2kvm.ssh.ssh_config",
+    "hyper2kvm.state_machine",
+    "hyper2kvm.state_tracker",
+    "hyper2kvm.stats",
+    "hyper2kvm.stig_validator",
+    "hyper2kvm.template_engine",
+    "hyper2kvm.testers",
+    "hyper2kvm.testers.libvirt_tester",
+    "hyper2kvm.testers.qemu_tester",
+    "hyper2kvm.tui",
+    "hyper2kvm.tui.batch_manager",
+    "hyper2kvm.tui.cli_dashboard",
+    "hyper2kvm.tui.dashboard",
+    "hyper2kvm.tui.fallback_dashboard",
+    "hyper2kvm.tui.help_dialog",
+    "hyper2kvm.tui.main_app",
+    "hyper2kvm.tui.migration_controller",
+    "hyper2kvm.tui.migration_tracker",
+    "hyper2kvm.tui.migrations_panel",
+    "hyper2kvm.tui.settings_panel",
+    "hyper2kvm.tui.tui_config",
+    "hyper2kvm.tui.types",
+    "hyper2kvm.tui.vm_browser",
+    "hyper2kvm.tui.widgets",
+    "hyper2kvm.tui.wizard",
+    "hyper2kvm.types",
+    "hyper2kvm.validation",
+    "hyper2kvm.validation.database_validator",
+    "hyper2kvm.validation.health_checker",
+    "hyper2kvm.validation.network_validator",
+    "hyper2kvm.validation.orchestrator",
+    "hyper2kvm.validation.performance_validator",
+    "hyper2kvm.validation.service_validator",
+    "hyper2kvm.validation.vmdk_inspector",
+    "hyper2kvm.validation_framework",
+    "hyper2kvm.veeam",
+    "hyper2kvm.vmdk_inspector",
+    "hyper2kvm.vmware",
+    "hyper2kvm.vmware.async_client",
+    "hyper2kvm.vmware.async_client.client",
+    "hyper2kvm.vmware.async_client.operations",
+    "hyper2kvm.vmware.async_client.semaphore",
+    "hyper2kvm.vmware.client",
+    "hyper2kvm.vmware.clients.client",
+    "hyper2kvm.vmware.clients.extensions",
+    "hyper2kvm.vmware.hyperctl_common",
+    "hyper2kvm.vmware.operations",
+    "hyper2kvm.vmware.semaphore",
+    "hyper2kvm.vmware.transports",
+    "hyper2kvm.vmware.transports.govc_common",
+    "hyper2kvm.vmware.transports.govc_export",
+    "hyper2kvm.vmware.transports.http_client",
+    "hyper2kvm.vmware.transports.http_progress",
+    "hyper2kvm.vmware.transports.hyperctl_common",
+    "hyper2kvm.vmware.transports.ovftool_client",
+    "hyper2kvm.vmware.transports.ovftool_loader",
+    "hyper2kvm.vmware.transports.vddk_client",
+    "hyper2kvm.vmware.transports.vddk_loader",
+    "hyper2kvm.vmware.utils.datastore",
+    "hyper2kvm.vmware.utils.utils",
+    "hyper2kvm.vmware.utils.vmdk_parser",
+    "hyper2kvm.vmware.vsphere.command",
+    "hyper2kvm.vmware.vsphere.errors",
+    "hyper2kvm.vmware.vsphere.govc",
+    "hyper2kvm.vmware.vsphere.mode",
+    "hyper2kvm.vsphere_exporter",
+    "hyper2kvm.widgets",
+    "hyper2kvm.windows",
+    "hyper2kvm.windows.active_directory",
+    "hyper2kvm.windows.license",
+    "hyper2kvm.windows.orchestrator",
+    "hyper2kvm.windows.sql_server",
+    "hyper2kvm.windows.windows_update",
+    "hyper2kvm.wizard",
+    "hyper2kvm.worker",
+    "hyper2kvm.worker.api",
+    "hyper2kvm.worker.capabilities",
+    "hyper2kvm.worker.cli",
+    "hyper2kvm.worker.engine",
+    "hyper2kvm.worker.events",
+    "hyper2kvm.worker.metrics",
+    "hyper2kvm.worker.offline_fix_contract",
+    "hyper2kvm.worker.offline_fix_mock",
+    "hyper2kvm.worker.scheduler",
+    "hyper2kvm.worker.schemas",
+    "hyper2kvm.worker.state_machine",
+    "hyper2kvm.workflow_daemon"
+  ],
+  "module_edges": [
+    {
+      "from": "hyper2kvm.__main__",
+      "to": "hyper2kvm.cli.argument_parser"
+    },
+    {
+      "from": "hyper2kvm.__main__",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.__main__",
+      "to": "hyper2kvm.manifest.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.__main__",
+      "to": "hyper2kvm.orchestrator.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.azure",
+      "to": "hyper2kvm.models"
+    },
+    {
+      "from": "hyper2kvm.azure",
+      "to": "hyper2kvm.source"
+    },
+    {
+      "from": "hyper2kvm.azure.cli",
+      "to": "hyper2kvm.azure.exceptions"
+    },
+    {
+      "from": "hyper2kvm.azure.download",
+      "to": "hyper2kvm.azure.exceptions"
+    },
+    {
+      "from": "hyper2kvm.azure.exceptions",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.azure.source",
+      "to": "hyper2kvm.azure"
+    },
+    {
+      "from": "hyper2kvm.azure.source",
+      "to": "hyper2kvm.azure.cleanup"
+    },
+    {
+      "from": "hyper2kvm.azure.source",
+      "to": "hyper2kvm.azure.download"
+    },
+    {
+      "from": "hyper2kvm.azure.source",
+      "to": "hyper2kvm.azure.exceptions"
+    },
+    {
+      "from": "hyper2kvm.azure.source",
+      "to": "hyper2kvm.azure.models"
+    },
+    {
+      "from": "hyper2kvm.backup_sources",
+      "to": "hyper2kvm.base"
+    },
+    {
+      "from": "hyper2kvm.backup_sources",
+      "to": "hyper2kvm.generic"
+    },
+    {
+      "from": "hyper2kvm.backup_sources",
+      "to": "hyper2kvm.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.backup_sources",
+      "to": "hyper2kvm.proxmox"
+    },
+    {
+      "from": "hyper2kvm.backup_sources",
+      "to": "hyper2kvm.veeam"
+    },
+    {
+      "from": "hyper2kvm.backup_sources.generic",
+      "to": "hyper2kvm.backup_sources.base"
+    },
+    {
+      "from": "hyper2kvm.backup_sources.orchestrator",
+      "to": "hyper2kvm.backup_sources.base"
+    },
+    {
+      "from": "hyper2kvm.backup_sources.orchestrator",
+      "to": "hyper2kvm.backup_sources.generic"
+    },
+    {
+      "from": "hyper2kvm.backup_sources.orchestrator",
+      "to": "hyper2kvm.backup_sources.proxmox"
+    },
+    {
+      "from": "hyper2kvm.backup_sources.orchestrator",
+      "to": "hyper2kvm.backup_sources.veeam"
+    },
+    {
+      "from": "hyper2kvm.backup_sources.proxmox",
+      "to": "hyper2kvm.backup_sources.base"
+    },
+    {
+      "from": "hyper2kvm.backup_sources.veeam",
+      "to": "hyper2kvm.backup_sources.base"
+    },
+    {
+      "from": "hyper2kvm.cli",
+      "to": "hyper2kvm.config"
+    },
+    {
+      "from": "hyper2kvm.cli",
+      "to": "hyper2kvm.formatter"
+    },
+    {
+      "from": "hyper2kvm.cli",
+      "to": "hyper2kvm.progress"
+    },
+    {
+      "from": "hyper2kvm.cli",
+      "to": "hyper2kvm.wizard"
+    },
+    {
+      "from": "hyper2kvm.cli.args",
+      "to": "hyper2kvm.cli.builder"
+    },
+    {
+      "from": "hyper2kvm.cli.args",
+      "to": "hyper2kvm.cli.groups"
+    },
+    {
+      "from": "hyper2kvm.cli.args",
+      "to": "hyper2kvm.cli.helpers"
+    },
+    {
+      "from": "hyper2kvm.cli.args",
+      "to": "hyper2kvm.cli.parser"
+    },
+    {
+      "from": "hyper2kvm.cli.args",
+      "to": "hyper2kvm.cli.validators"
+    },
+    {
+      "from": "hyper2kvm.cli.args.builder",
+      "to": "hyper2kvm.cli.help_texts"
+    },
+    {
+      "from": "hyper2kvm.cli.args.builder",
+      "to": "hyper2kvm.config.systemd_template"
+    },
+    {
+      "from": "hyper2kvm.cli.args.builder",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.cli.args.groups",
+      "to": "hyper2kvm"
+    },
+    {
+      "from": "hyper2kvm.cli.args.groups",
+      "to": "hyper2kvm.fixers.filesystem.fstab"
+    },
+    {
+      "from": "hyper2kvm.cli.args.parser",
+      "to": "hyper2kvm.cli.args.builder"
+    },
+    {
+      "from": "hyper2kvm.cli.args.parser",
+      "to": "hyper2kvm.cli.args.groups"
+    },
+    {
+      "from": "hyper2kvm.cli.args.parser",
+      "to": "hyper2kvm.cli.args.helpers"
+    },
+    {
+      "from": "hyper2kvm.cli.args.parser",
+      "to": "hyper2kvm.cli.args.validators"
+    },
+    {
+      "from": "hyper2kvm.cli.args.parser",
+      "to": "hyper2kvm.config.config_loader"
+    },
+    {
+      "from": "hyper2kvm.cli.args.parser",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.cli.args.parser",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.cli.args.validators",
+      "to": "hyper2kvm.cli.args.helpers"
+    },
+    {
+      "from": "hyper2kvm.cli.argument_parser",
+      "to": "hyper2kvm.cli.args"
+    },
+    {
+      "from": "hyper2kvm.cli.daemon_ctl",
+      "to": "hyper2kvm.daemon.control"
+    },
+    {
+      "from": "hyper2kvm.compliance",
+      "to": "hyper2kvm.audit_logger"
+    },
+    {
+      "from": "hyper2kvm.compliance",
+      "to": "hyper2kvm.base"
+    },
+    {
+      "from": "hyper2kvm.compliance",
+      "to": "hyper2kvm.change_tracker"
+    },
+    {
+      "from": "hyper2kvm.compliance",
+      "to": "hyper2kvm.cis_benchmarks"
+    },
+    {
+      "from": "hyper2kvm.compliance",
+      "to": "hyper2kvm.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.compliance",
+      "to": "hyper2kvm.report_generator"
+    },
+    {
+      "from": "hyper2kvm.compliance",
+      "to": "hyper2kvm.stig_validator"
+    },
+    {
+      "from": "hyper2kvm.compliance.cis_benchmarks",
+      "to": "hyper2kvm.compliance.base"
+    },
+    {
+      "from": "hyper2kvm.compliance.orchestrator",
+      "to": "hyper2kvm.compliance.audit_logger"
+    },
+    {
+      "from": "hyper2kvm.compliance.orchestrator",
+      "to": "hyper2kvm.compliance.base"
+    },
+    {
+      "from": "hyper2kvm.compliance.orchestrator",
+      "to": "hyper2kvm.compliance.change_tracker"
+    },
+    {
+      "from": "hyper2kvm.compliance.orchestrator",
+      "to": "hyper2kvm.compliance.cis_benchmarks"
+    },
+    {
+      "from": "hyper2kvm.compliance.orchestrator",
+      "to": "hyper2kvm.compliance.report_generator"
+    },
+    {
+      "from": "hyper2kvm.compliance.orchestrator",
+      "to": "hyper2kvm.compliance.stig_validator"
+    },
+    {
+      "from": "hyper2kvm.compliance.report_generator",
+      "to": "hyper2kvm.compliance.base"
+    },
+    {
+      "from": "hyper2kvm.compliance.stig_validator",
+      "to": "hyper2kvm.compliance.base"
+    },
+    {
+      "from": "hyper2kvm.config.config_loader",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.config.config_loader",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.config.systemd_template",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.config.validation",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.containers",
+      "to": "hyper2kvm.detector"
+    },
+    {
+      "from": "hyper2kvm.containers",
+      "to": "hyper2kvm.docker_extractor"
+    },
+    {
+      "from": "hyper2kvm.containers",
+      "to": "hyper2kvm.kubernetes_generator"
+    },
+    {
+      "from": "hyper2kvm.containers",
+      "to": "hyper2kvm.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.containers",
+      "to": "hyper2kvm.podman_extractor"
+    },
+    {
+      "from": "hyper2kvm.containers.docker_extractor",
+      "to": "hyper2kvm.containers.detector"
+    },
+    {
+      "from": "hyper2kvm.containers.kubernetes_generator",
+      "to": "hyper2kvm.containers.detector"
+    },
+    {
+      "from": "hyper2kvm.containers.orchestrator",
+      "to": "hyper2kvm.containers.detector"
+    },
+    {
+      "from": "hyper2kvm.containers.orchestrator",
+      "to": "hyper2kvm.containers.docker_extractor"
+    },
+    {
+      "from": "hyper2kvm.containers.orchestrator",
+      "to": "hyper2kvm.containers.kubernetes_generator"
+    },
+    {
+      "from": "hyper2kvm.containers.orchestrator",
+      "to": "hyper2kvm.containers.podman_extractor"
+    },
+    {
+      "from": "hyper2kvm.containers.podman_extractor",
+      "to": "hyper2kvm.containers.detector"
+    },
+    {
+      "from": "hyper2kvm.containers.podman_extractor",
+      "to": "hyper2kvm.containers.docker_extractor"
+    },
+    {
+      "from": "hyper2kvm.containers.podman_extractor",
+      "to": "hyper2kvm.containers.kubernetes_generator"
+    },
+    {
+      "from": "hyper2kvm.converters",
+      "to": "hyper2kvm.extractors.ovf"
+    },
+    {
+      "from": "hyper2kvm.converters",
+      "to": "hyper2kvm.flatten"
+    },
+    {
+      "from": "hyper2kvm.converters",
+      "to": "hyper2kvm.qemu.converter"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors",
+      "to": "hyper2kvm.converters.ami"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors",
+      "to": "hyper2kvm.converters.libvirt_xml"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors",
+      "to": "hyper2kvm.converters.ovf"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors",
+      "to": "hyper2kvm.converters.raw"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors",
+      "to": "hyper2kvm.converters.vhd"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors.ami",
+      "to": "hyper2kvm.converters.qemu.converter"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors.ami",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors.libvirt_xml",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors.ovf",
+      "to": "hyper2kvm.converters.qemu.converter"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors.ovf",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors.raw",
+      "to": "hyper2kvm.converters.qemu.converter"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors.raw",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors.vhd",
+      "to": "hyper2kvm.converters.qemu.converter"
+    },
+    {
+      "from": "hyper2kvm.converters.extractors.vhd",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.converters.fetch",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.converters.fetch",
+      "to": "hyper2kvm.ssh.ssh_client"
+    },
+    {
+      "from": "hyper2kvm.converters.fetch",
+      "to": "hyper2kvm.vmware.utils.vmdk_parser"
+    },
+    {
+      "from": "hyper2kvm.converters.flatten",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.converters.flatten",
+      "to": "hyper2kvm.ssh.ssh_client"
+    },
+    {
+      "from": "hyper2kvm.converters.flatten",
+      "to": "hyper2kvm.vmware.utils.vmdk_parser"
+    },
+    {
+      "from": "hyper2kvm.converters.qemu",
+      "to": "hyper2kvm.converters.converter"
+    },
+    {
+      "from": "hyper2kvm.converters.qemu.converter",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.core",
+      "to": "hyper2kvm.guest_identity"
+    },
+    {
+      "from": "hyper2kvm.core.guest_identity",
+      "to": "hyper2kvm.core.guestfs_factory"
+    },
+    {
+      "from": "hyper2kvm.core.guest_identity",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.core.guest_identity",
+      "to": "hyper2kvm.fixers.windows.virtio.core"
+    },
+    {
+      "from": "hyper2kvm.core.guest_inspector",
+      "to": "hyper2kvm.core.guest_identity"
+    },
+    {
+      "from": "hyper2kvm.core.guest_inspector",
+      "to": "hyper2kvm.core.guestfs_factory"
+    },
+    {
+      "from": "hyper2kvm.core.guest_inspector",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.core.guestfs_factory",
+      "to": "hyper2kvm.core.vmcraft"
+    },
+    {
+      "from": "hyper2kvm.core.logger",
+      "to": "hyper2kvm.vmware.utils.utils"
+    },
+    {
+      "from": "hyper2kvm.core.progress",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.core.recovery_manager",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.core.retry_enhanced",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.core.retry_enhanced",
+      "to": "hyper2kvm.core.retry"
+    },
+    {
+      "from": "hyper2kvm.core.sanity_checker",
+      "to": "hyper2kvm.core.guestfs_factory"
+    },
+    {
+      "from": "hyper2kvm.core.sanity_checker",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.core.utils",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.advanced_analysis"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.app_framework_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.audit_trail"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.automated_remediation"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.backup_analysis"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.certificate_manager"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.cloud_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.cloud_optimizer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.compliance_checker"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.config_tracker"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.container_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.data_discovery"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.database_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.dependency_mapper"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.disaster_recovery"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.export"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.firewall_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.forensic_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.hardware_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.integration_hub"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.license_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.linux_services"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.log_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.main"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.migration_planner"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.ml_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.monitoring_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.network_config"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.network_topology"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.performance_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.predictive_analytics"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.realtime_monitoring"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.resource_orchestrator"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.scheduled_tasks"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.ssh_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.storage_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.threat_intelligence"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.user_activity"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.vulnerability_scanner"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.webserver_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.windows_applications"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.windows_services"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft",
+      "to": "hyper2kvm.core.windows_users"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft._utils",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.advanced_analysis",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.app_framework_detector",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.backup_analysis",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.certificate_manager",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.cloud_detector",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.compliance_checker",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.config_tracker",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.container_analyzer",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.data_discovery",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.database_detector",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.dependency_mapper",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.firewall_analyzer",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.forensic_analyzer",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.hardware_detector",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.inspection",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.license_detector",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.linux_services",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.log_analyzer",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.advanced_analysis"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.app_framework_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.audit_trail"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.augeas_mgr"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.automated_remediation"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.backup"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.backup_analysis"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.certificate_manager"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.cloud_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.cloud_optimizer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.compliance_checker"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.config_tracker"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.container_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.data_discovery"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.database_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.dependency_mapper"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.disaster_recovery"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.enhanced_inspection"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.export"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.firewall_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.forensic_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.hardware_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.inspection"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.integration_hub"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.license_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.linux_detection"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.linux_services"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.log_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.migration_planner"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.ml_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.monitoring_detector"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.mount"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.nbd"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.network_config"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.network_topology"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.optimization"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.performance_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.predictive_analytics"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.realtime_monitoring"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.resource_orchestrator"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.scheduled_tasks"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.security"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.ssh_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.storage"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.storage_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.systemd"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.systemd_journal"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.systemd_mgr"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.systemd_networkd"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.systemd_units"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.threat_intelligence"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.user_activity"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.vulnerability_scanner"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.webserver_analyzer"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.windows_applications"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.windows_detection"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.windows_drivers"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.windows_registry"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.windows_services"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.main",
+      "to": "hyper2kvm.core.vmcraft.windows_users"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.migration_planner",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.monitoring_detector",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.mount",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.nbd",
+      "to": "hyper2kvm.core.retry"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.nbd",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.network_config",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.network_topology",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.performance_analyzer",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.scheduled_tasks",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.security",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.ssh_analyzer",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.storage",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.storage_analyzer",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.systemd",
+      "to": "hyper2kvm.core.vmcraft.analyze"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.systemd",
+      "to": "hyper2kvm.core.vmcraft.journalctl"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.systemd",
+      "to": "hyper2kvm.core.vmcraft.sysconfig"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.systemd",
+      "to": "hyper2kvm.core.vmcraft.systemctl"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.systemd_journal",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.systemd_mgr",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.systemd_networkd",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.systemd_units",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.user_activity",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.vulnerability_scanner",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.webserver_analyzer",
+      "to": "hyper2kvm.core.vmcraft.file_ops"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.windows_applications",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.windows_detection",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.windows_registry",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.windows_services",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.core.vmcraft.windows_users",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.daemon",
+      "to": "hyper2kvm.control"
+    },
+    {
+      "from": "hyper2kvm.daemon",
+      "to": "hyper2kvm.daemon_watcher"
+    },
+    {
+      "from": "hyper2kvm.daemon",
+      "to": "hyper2kvm.deduplicator"
+    },
+    {
+      "from": "hyper2kvm.daemon",
+      "to": "hyper2kvm.manifest_workflow_daemon"
+    },
+    {
+      "from": "hyper2kvm.daemon",
+      "to": "hyper2kvm.notifier"
+    },
+    {
+      "from": "hyper2kvm.daemon",
+      "to": "hyper2kvm.stats"
+    },
+    {
+      "from": "hyper2kvm.daemon",
+      "to": "hyper2kvm.workflow_daemon"
+    },
+    {
+      "from": "hyper2kvm.daemon.daemon_watcher",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.daemon.daemon_watcher",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.daemon.daemon_watcher",
+      "to": "hyper2kvm.daemon.control"
+    },
+    {
+      "from": "hyper2kvm.daemon.daemon_watcher",
+      "to": "hyper2kvm.daemon.deduplicator"
+    },
+    {
+      "from": "hyper2kvm.daemon.daemon_watcher",
+      "to": "hyper2kvm.daemon.notifier"
+    },
+    {
+      "from": "hyper2kvm.daemon.daemon_watcher",
+      "to": "hyper2kvm.daemon.stats"
+    },
+    {
+      "from": "hyper2kvm.daemon.daemon_watcher",
+      "to": "hyper2kvm.orchestrator.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.daemon.manifest_processor",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.daemon.manifest_processor",
+      "to": "hyper2kvm.core.metrics"
+    },
+    {
+      "from": "hyper2kvm.daemon.manifest_watcher",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.daemon.manifest_watcher",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.daemon.manifest_workflow_daemon",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.daemon.manifest_workflow_daemon",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.daemon.manifest_workflow_daemon",
+      "to": "hyper2kvm.daemon.stats"
+    },
+    {
+      "from": "hyper2kvm.daemon.manifest_workflow_daemon",
+      "to": "hyper2kvm.orchestrator.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.daemon.metrics_server",
+      "to": "hyper2kvm.core.metrics"
+    },
+    {
+      "from": "hyper2kvm.daemon.nbd_prep",
+      "to": "hyper2kvm.core.constants"
+    },
+    {
+      "from": "hyper2kvm.daemon.workflow_daemon",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.daemon.workflow_daemon",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.daemon.workflow_daemon",
+      "to": "hyper2kvm.daemon.stats"
+    },
+    {
+      "from": "hyper2kvm.daemon.workflow_daemon",
+      "to": "hyper2kvm.orchestrator.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.database_migration",
+      "to": "hyper2kvm.base"
+    },
+    {
+      "from": "hyper2kvm.database_migration",
+      "to": "hyper2kvm.detector"
+    },
+    {
+      "from": "hyper2kvm.database_migration",
+      "to": "hyper2kvm.generic"
+    },
+    {
+      "from": "hyper2kvm.database_migration",
+      "to": "hyper2kvm.mongodb"
+    },
+    {
+      "from": "hyper2kvm.database_migration",
+      "to": "hyper2kvm.mysql"
+    },
+    {
+      "from": "hyper2kvm.database_migration",
+      "to": "hyper2kvm.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.database_migration",
+      "to": "hyper2kvm.postgresql"
+    },
+    {
+      "from": "hyper2kvm.database_migration",
+      "to": "hyper2kvm.redis"
+    },
+    {
+      "from": "hyper2kvm.database_migration.detector",
+      "to": "hyper2kvm.database_migration.base"
+    },
+    {
+      "from": "hyper2kvm.database_migration.generic",
+      "to": "hyper2kvm.database_migration.base"
+    },
+    {
+      "from": "hyper2kvm.database_migration.mongodb",
+      "to": "hyper2kvm.database_migration.base"
+    },
+    {
+      "from": "hyper2kvm.database_migration.mysql",
+      "to": "hyper2kvm.database_migration.base"
+    },
+    {
+      "from": "hyper2kvm.database_migration.orchestrator",
+      "to": "hyper2kvm.database_migration.base"
+    },
+    {
+      "from": "hyper2kvm.database_migration.orchestrator",
+      "to": "hyper2kvm.database_migration.detector"
+    },
+    {
+      "from": "hyper2kvm.database_migration.orchestrator",
+      "to": "hyper2kvm.database_migration.generic"
+    },
+    {
+      "from": "hyper2kvm.database_migration.orchestrator",
+      "to": "hyper2kvm.database_migration.mongodb"
+    },
+    {
+      "from": "hyper2kvm.database_migration.orchestrator",
+      "to": "hyper2kvm.database_migration.mysql"
+    },
+    {
+      "from": "hyper2kvm.database_migration.orchestrator",
+      "to": "hyper2kvm.database_migration.postgresql"
+    },
+    {
+      "from": "hyper2kvm.database_migration.orchestrator",
+      "to": "hyper2kvm.database_migration.redis"
+    },
+    {
+      "from": "hyper2kvm.database_migration.postgresql",
+      "to": "hyper2kvm.database_migration.base"
+    },
+    {
+      "from": "hyper2kvm.database_migration.redis",
+      "to": "hyper2kvm.database_migration.base"
+    },
+    {
+      "from": "hyper2kvm.fixers",
+      "to": "hyper2kvm.live.fixer"
+    },
+    {
+      "from": "hyper2kvm.fixers",
+      "to": "hyper2kvm.network_fixer"
+    },
+    {
+      "from": "hyper2kvm.fixers",
+      "to": "hyper2kvm.offline_fixer"
+    },
+    {
+      "from": "hyper2kvm.fixers.bootloader.fixer",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.bootloader.grub",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.bootloader.grub",
+      "to": "hyper2kvm.fixers.filesystem.fstab"
+    },
+    {
+      "from": "hyper2kvm.fixers.bootloader.post_conversion",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.cloud_init_injector",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.fixers.filesystem",
+      "to": "hyper2kvm.fixers.universal_rewriter"
+    },
+    {
+      "from": "hyper2kvm.fixers.filesystem.fixer",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.filesystem.fstab_stabilizer",
+      "to": "hyper2kvm.fixers.filesystem.stable_mount"
+    },
+    {
+      "from": "hyper2kvm.fixers.live.fixer",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.live.fixer",
+      "to": "hyper2kvm.fixers.live.grub_fixer"
+    },
+    {
+      "from": "hyper2kvm.fixers.live.fixer",
+      "to": "hyper2kvm.ssh.ssh_client"
+    },
+    {
+      "from": "hyper2kvm.fixers.live.grub_fixer",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.live.grub_fixer",
+      "to": "hyper2kvm.ssh.ssh_client"
+    },
+    {
+      "from": "hyper2kvm.fixers.network",
+      "to": "hyper2kvm.fixers.core"
+    },
+    {
+      "from": "hyper2kvm.fixers.network",
+      "to": "hyper2kvm.fixers.model"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.backend",
+      "to": "hyper2kvm.config.config_loader"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.backend",
+      "to": "hyper2kvm.fixers.network.model"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.core",
+      "to": "hyper2kvm.fixers.network.backend"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.core",
+      "to": "hyper2kvm.fixers.network.discovery"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.core",
+      "to": "hyper2kvm.fixers.network.model"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.core",
+      "to": "hyper2kvm.fixers.network.topology"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.core",
+      "to": "hyper2kvm.fixers.network.validation"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.discovery",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.discovery",
+      "to": "hyper2kvm.fixers.network.model"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.topology",
+      "to": "hyper2kvm.config.config_loader"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.topology",
+      "to": "hyper2kvm.fixers.network.model"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.validation",
+      "to": "hyper2kvm.config.config_loader"
+    },
+    {
+      "from": "hyper2kvm.fixers.network.validation",
+      "to": "hyper2kvm.fixers.network.model"
+    },
+    {
+      "from": "hyper2kvm.fixers.network_fixer",
+      "to": "hyper2kvm.fixers.network.core"
+    },
+    {
+      "from": "hyper2kvm.fixers.network_fixer",
+      "to": "hyper2kvm.fixers.network.model"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline",
+      "to": "hyper2kvm.fixers.config_rewriter"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline",
+      "to": "hyper2kvm.fixers.spec_converter"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline",
+      "to": "hyper2kvm.fixers.validation"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline.config_rewriter",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline.config_rewriter",
+      "to": "hyper2kvm.fixers.filesystem.fstab"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline.config_rewriter",
+      "to": "hyper2kvm.fixers.offline.spec_converter"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline.mount",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline.mount",
+      "to": "hyper2kvm.fixers.filesystem"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline.mount",
+      "to": "hyper2kvm.fixers.filesystem.fstab"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline.spec_converter",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline.spec_converter",
+      "to": "hyper2kvm.fixers.filesystem.fstab"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline.validation",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline.validation",
+      "to": "hyper2kvm.core.validation_suite"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline.vmware_tools_remover",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.core.guestfs_factory"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.core.recovery_manager"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.core.validation_suite"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.core.vmcraft._utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.fixers"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.fixers.bootloader"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.fixers.bootloader.post_conversion"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.fixers.filesystem"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.fixers.filesystem.fstab"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.fixers.offline.config_rewriter"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.fixers.offline.spec_converter"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.fixers.offline.validation"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.fixers.offline.vmware_tools_remover"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.fixers.report_writer"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_fixer",
+      "to": "hyper2kvm.fixers.windows"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_vm",
+      "to": "hyper2kvm.fixers.fix_fstab"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_vm",
+      "to": "hyper2kvm.fixers.fix_grub"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_vm",
+      "to": "hyper2kvm.fixers.fix_initramfs"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_vm",
+      "to": "hyper2kvm.fixers.fix_selinux"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_vm",
+      "to": "hyper2kvm.fixers.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_vm.fix_fstab",
+      "to": "hyper2kvm.fixers.offline_vm.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_vm.fix_grub",
+      "to": "hyper2kvm.fixers.offline_vm.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_vm.fix_initramfs",
+      "to": "hyper2kvm.fixers.offline_vm.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.offline_vm.fix_selinux",
+      "to": "hyper2kvm.fixers.offline_vm.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.report_writer",
+      "to": "hyper2kvm"
+    },
+    {
+      "from": "hyper2kvm.fixers.report_writer",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.activedirectory",
+      "to": "hyper2kvm.fixers.windows.extractor"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.activedirectory",
+      "to": "hyper2kvm.fixers.windows.rejoin"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.activedirectory.extractor",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.activedirectory.extractor",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.activedirectory.rejoin",
+      "to": "hyper2kvm.fixers.windows.activedirectory.extractor"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.appcompat",
+      "to": "hyper2kvm.fixers.windows.detector"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.appcompat",
+      "to": "hyper2kvm.fixers.windows.reporter"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.appcompat",
+      "to": "hyper2kvm.fixers.windows.sqlserver"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.appcompat.detector",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.appcompat.detector",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.appcompat.reporter",
+      "to": "hyper2kvm.fixers.windows.appcompat.detector"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.appcompat.reporter",
+      "to": "hyper2kvm.fixers.windows.appcompat.sqlserver"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.appcompat.sqlserver",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.appcompat.sqlserver",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.core.logging_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.activedirectory.cleanup"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.activedirectory.extractor"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.activedirectory.rejoin"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.appcompat.detector"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.appcompat.reporter"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.appcompat.sqlserver"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.bitlocker"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.firewall"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.license.extractor"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.license.reactivator"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.network_fixer"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.performance.balloon"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.performance.hyperv_cleanup"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.performance.msi"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.performance.trim"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.rdp"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.virtio.core"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.fixer",
+      "to": "hyper2kvm.fixers.windows.virtio_warning"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.license",
+      "to": "hyper2kvm.fixers.windows.extractor"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.license.extractor",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.license.extractor",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.license.reactivator",
+      "to": "hyper2kvm.fixers.windows.license.extractor"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.network_fixer",
+      "to": "hyper2kvm.core.guest_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.network_fixer",
+      "to": "hyper2kvm.core.list_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.network_fixer",
+      "to": "hyper2kvm.core.logging_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.network_fixer",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.network_fixer",
+      "to": "hyper2kvm.fixers.windows.registry_core"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance",
+      "to": "hyper2kvm.fixers.windows.balloon"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance",
+      "to": "hyper2kvm.fixers.windows.hyperv_cleanup"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance",
+      "to": "hyper2kvm.fixers.windows.msi"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance",
+      "to": "hyper2kvm.fixers.windows.trim"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance.balloon",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance.balloon",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance.hyperv_cleanup",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance.hyperv_cleanup",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance.msi",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance.msi",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance.trim",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.performance.trim",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.encoding",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.firstboot",
+      "to": "hyper2kvm.core.logging_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.firstboot",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.firstboot",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.firstboot",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.firstboot",
+      "to": "hyper2kvm.fixers.windows.registry.mount"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.io",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.mount",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.software",
+      "to": "hyper2kvm.core.logging_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.software",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.software",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.software",
+      "to": "hyper2kvm.fixers.windows.registry.mount"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.software",
+      "to": "hyper2kvm.fixers.windows.registry.system"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.system",
+      "to": "hyper2kvm.core.logging_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.system",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.system",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.system",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry.system",
+      "to": "hyper2kvm.fixers.windows.registry.mount"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry_core",
+      "to": "hyper2kvm.core.logging_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry_core",
+      "to": "hyper2kvm.fixers.windows.registry.encoding"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry_core",
+      "to": "hyper2kvm.fixers.windows.registry.firstboot"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry_core",
+      "to": "hyper2kvm.fixers.windows.registry.io"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry_core",
+      "to": "hyper2kvm.fixers.windows.registry.mount"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry_core",
+      "to": "hyper2kvm.fixers.windows.registry.software"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.registry_core",
+      "to": "hyper2kvm.fixers.windows.registry.system"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.core",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.core",
+      "to": "hyper2kvm.fixers.windows.bitlocker"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.core",
+      "to": "hyper2kvm.fixers.windows.firewall"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.core",
+      "to": "hyper2kvm.fixers.windows.rdp"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.core",
+      "to": "hyper2kvm.fixers.windows.virtio.detection"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.core",
+      "to": "hyper2kvm.fixers.windows.virtio.discovery"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.core",
+      "to": "hyper2kvm.fixers.windows.virtio.install"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.core",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_config"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.core",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_paths"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.core",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.detection",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.detection",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_config"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.detection",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_paths"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.detection",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.discovery",
+      "to": "hyper2kvm.fixers.windows.virtio.core"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.discovery",
+      "to": "hyper2kvm.fixers.windows.virtio.detection"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.discovery",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_config"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.discovery",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.install",
+      "to": "hyper2kvm.fixers.windows.bitlocker"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.install",
+      "to": "hyper2kvm.fixers.windows.firewall"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.install",
+      "to": "hyper2kvm.fixers.windows.rdp"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.install",
+      "to": "hyper2kvm.fixers.windows.registry_core"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.install",
+      "to": "hyper2kvm.fixers.windows.virtio.core"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.install",
+      "to": "hyper2kvm.fixers.windows.virtio.detection"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.install",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_config"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.install",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_paths"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.install",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.install",
+      "to": "hyper2kvm.fixers.windows.virtio_warning"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.windows_virtio_config",
+      "to": "hyper2kvm.config.config_loader"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.windows_virtio_config",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.windows_virtio_paths",
+      "to": "hyper2kvm.fixers.windows.virtio.windows_virtio_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.windows_virtio_utils",
+      "to": "hyper2kvm.core.guest_utils"
+    },
+    {
+      "from": "hyper2kvm.fixers.windows.virtio.windows_virtio_utils",
+      "to": "hyper2kvm.core.logging_utils"
+    },
+    {
+      "from": "hyper2kvm.hooks",
+      "to": "hyper2kvm.hook_runner"
+    },
+    {
+      "from": "hyper2kvm.hooks",
+      "to": "hyper2kvm.hook_types"
+    },
+    {
+      "from": "hyper2kvm.hooks",
+      "to": "hyper2kvm.template_engine"
+    },
+    {
+      "from": "hyper2kvm.hooks.hook_runner",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.hooks.hook_runner",
+      "to": "hyper2kvm.hooks.hook_types"
+    },
+    {
+      "from": "hyper2kvm.hooks.hook_runner",
+      "to": "hyper2kvm.hooks.template_engine"
+    },
+    {
+      "from": "hyper2kvm.hooks.hook_types",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.hooks.hook_types",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.hooks.hook_types",
+      "to": "hyper2kvm.hooks.template_engine"
+    },
+    {
+      "from": "hyper2kvm.libvirt",
+      "to": "hyper2kvm.libvirt_manager"
+    },
+    {
+      "from": "hyper2kvm.libvirt",
+      "to": "hyper2kvm.libvirt_utils"
+    },
+    {
+      "from": "hyper2kvm.libvirt",
+      "to": "hyper2kvm.pool_manager"
+    },
+    {
+      "from": "hyper2kvm.libvirt.domain_emitter",
+      "to": "hyper2kvm.core.guest_identity"
+    },
+    {
+      "from": "hyper2kvm.libvirt.domain_emitter",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.libvirt.domain_emitter",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.libvirt.domain_emitter",
+      "to": "hyper2kvm.libvirt.linux_domain"
+    },
+    {
+      "from": "hyper2kvm.libvirt.domain_emitter",
+      "to": "hyper2kvm.libvirt.windows_domain"
+    },
+    {
+      "from": "hyper2kvm.libvirt.libvirt_manager",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.libvirt.linux_domain",
+      "to": "hyper2kvm.core.xml_utils"
+    },
+    {
+      "from": "hyper2kvm.libvirt.linux_domain",
+      "to": "hyper2kvm.libvirt.libvirt_utils"
+    },
+    {
+      "from": "hyper2kvm.libvirt.pool_manager",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.libvirt.pool_manager",
+      "to": "hyper2kvm.libvirt.libvirt_utils"
+    },
+    {
+      "from": "hyper2kvm.libvirt.windows_domain",
+      "to": "hyper2kvm.core.xml_utils"
+    },
+    {
+      "from": "hyper2kvm.libvirt.windows_domain",
+      "to": "hyper2kvm.libvirt.libvirt_utils"
+    },
+    {
+      "from": "hyper2kvm.live_migration",
+      "to": "hyper2kvm.live_migration.analyzer"
+    },
+    {
+      "from": "hyper2kvm.live_migration",
+      "to": "hyper2kvm.live_migration.hybrid_manager"
+    },
+    {
+      "from": "hyper2kvm.live_migration",
+      "to": "hyper2kvm.live_migration.hypersdk_integration"
+    },
+    {
+      "from": "hyper2kvm.live_migration",
+      "to": "hyper2kvm.live_migration.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.live_migration.hybrid_manager",
+      "to": "hyper2kvm.live_migration.hypersdk_integration"
+    },
+    {
+      "from": "hyper2kvm.live_migration.orchestrator",
+      "to": "hyper2kvm.live_migration.analyzer"
+    },
+    {
+      "from": "hyper2kvm.live_migration.orchestrator",
+      "to": "hyper2kvm.live_migration.hybrid_manager"
+    },
+    {
+      "from": "hyper2kvm.live_migration.orchestrator",
+      "to": "hyper2kvm.live_migration.hypersdk_integration"
+    },
+    {
+      "from": "hyper2kvm.manifest",
+      "to": "hyper2kvm.loader"
+    },
+    {
+      "from": "hyper2kvm.manifest",
+      "to": "hyper2kvm.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.manifest",
+      "to": "hyper2kvm.reporter"
+    },
+    {
+      "from": "hyper2kvm.manifest.batch_orchestrator",
+      "to": "hyper2kvm.config.config_loader"
+    },
+    {
+      "from": "hyper2kvm.manifest.batch_orchestrator",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.manifest.batch_orchestrator",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.manifest.batch_orchestrator",
+      "to": "hyper2kvm.manifest.batch_loader"
+    },
+    {
+      "from": "hyper2kvm.manifest.batch_orchestrator",
+      "to": "hyper2kvm.manifest.batch_progress"
+    },
+    {
+      "from": "hyper2kvm.manifest.batch_orchestrator",
+      "to": "hyper2kvm.manifest.batch_reporter"
+    },
+    {
+      "from": "hyper2kvm.manifest.batch_orchestrator",
+      "to": "hyper2kvm.manifest.checkpoint_manager"
+    },
+    {
+      "from": "hyper2kvm.manifest.batch_orchestrator",
+      "to": "hyper2kvm.manifest.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.manifest.checkpoint_manager",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.manifest.loader",
+      "to": "hyper2kvm.config.config_loader"
+    },
+    {
+      "from": "hyper2kvm.manifest.loader",
+      "to": "hyper2kvm.profiles"
+    },
+    {
+      "from": "hyper2kvm.manifest.mapping_applier",
+      "to": "hyper2kvm.config.mapping_config"
+    },
+    {
+      "from": "hyper2kvm.manifest.mapping_applier",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.manifest.orchestrator",
+      "to": "hyper2kvm.converters.qemu.converter"
+    },
+    {
+      "from": "hyper2kvm.manifest.orchestrator",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.manifest.orchestrator",
+      "to": "hyper2kvm.fixers.offline_fixer"
+    },
+    {
+      "from": "hyper2kvm.manifest.orchestrator",
+      "to": "hyper2kvm.hooks"
+    },
+    {
+      "from": "hyper2kvm.manifest.orchestrator",
+      "to": "hyper2kvm.libvirt"
+    },
+    {
+      "from": "hyper2kvm.manifest.orchestrator",
+      "to": "hyper2kvm.manifest.loader"
+    },
+    {
+      "from": "hyper2kvm.manifest.orchestrator",
+      "to": "hyper2kvm.manifest.reporter"
+    },
+    {
+      "from": "hyper2kvm.manifest.reporter",
+      "to": "hyper2kvm"
+    },
+    {
+      "from": "hyper2kvm.modes.inventory_mode",
+      "to": "hyper2kvm.converters.fetch"
+    },
+    {
+      "from": "hyper2kvm.modes.inventory_mode",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.modes.inventory_mode",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.modes.inventory_mode",
+      "to": "hyper2kvm.ssh.ssh_client"
+    },
+    {
+      "from": "hyper2kvm.modes.inventory_mode",
+      "to": "hyper2kvm.ssh.ssh_config"
+    },
+    {
+      "from": "hyper2kvm.modes.inventory_mode",
+      "to": "hyper2kvm.vmware.clients.client"
+    },
+    {
+      "from": "hyper2kvm.modes.inventory_mode",
+      "to": "hyper2kvm.vmware.utils.vmdk_parser"
+    },
+    {
+      "from": "hyper2kvm.modes.plan_mode",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.modes.plan_mode",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.operator",
+      "to": "hyper2kvm.operator"
+    },
+    {
+      "from": "hyper2kvm.operator",
+      "to": "hyper2kvm.operator.job_assigner"
+    },
+    {
+      "from": "hyper2kvm.operator",
+      "to": "hyper2kvm.operator.worker_registry"
+    },
+    {
+      "from": "hyper2kvm.operator.cli",
+      "to": "hyper2kvm.operator"
+    },
+    {
+      "from": "hyper2kvm.operator.dependency_manager",
+      "to": "hyper2kvm.operator.dag_validator"
+    },
+    {
+      "from": "hyper2kvm.operator.job_assigner",
+      "to": "hyper2kvm.operator.worker_registry"
+    },
+    {
+      "from": "hyper2kvm.operator.leader_aware_controller",
+      "to": "hyper2kvm.operator.leader_election"
+    },
+    {
+      "from": "hyper2kvm.operator.migrationjob_controller",
+      "to": "hyper2kvm.operator.vm_factory"
+    },
+    {
+      "from": "hyper2kvm.operator.webhook",
+      "to": "hyper2kvm.worker.schemas"
+    },
+    {
+      "from": "hyper2kvm.operator.webhook_server",
+      "to": "hyper2kvm.operator.webhook"
+    },
+    {
+      "from": "hyper2kvm.orchestrator",
+      "to": "hyper2kvm.disk_discovery"
+    },
+    {
+      "from": "hyper2kvm.orchestrator",
+      "to": "hyper2kvm.disk_processor"
+    },
+    {
+      "from": "hyper2kvm.orchestrator",
+      "to": "hyper2kvm.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.orchestrator",
+      "to": "hyper2kvm.vsphere_exporter"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.azure_exporter",
+      "to": "hyper2kvm.azure"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.azure_exporter",
+      "to": "hyper2kvm.azure.models"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.azure_exporter",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.azure_exporter",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.converters.extractors.ami"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.converters.extractors.libvirt_xml"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.converters.extractors.ovf"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.converters.extractors.raw"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.converters.extractors.vhd"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.converters.fetch"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.fixers.live.fixer"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.ssh.ssh_client"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_discovery",
+      "to": "hyper2kvm.ssh.ssh_config"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_processor",
+      "to": "hyper2kvm.config.config_loader"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_processor",
+      "to": "hyper2kvm.converters.flatten"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_processor",
+      "to": "hyper2kvm.converters.qemu.converter"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_processor",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_processor",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_processor",
+      "to": "hyper2kvm.core.recovery_manager"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_processor",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_processor",
+      "to": "hyper2kvm.fixers.offline_fixer"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_processor",
+      "to": "hyper2kvm.validation.vmdk_inspector"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.disk_processor",
+      "to": "hyper2kvm.vmware.utils.vmdk_parser"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.core.recovery_manager"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.core.sanity_checker"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.daemon.daemon_watcher"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.daemon.manifest_workflow_daemon"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.daemon.workflow_daemon"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.deployers.kubernetes"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.libvirt.domain_emitter"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.manifest.batch_orchestrator"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.orchestrator.azure_exporter"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.orchestrator.disk_discovery"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.orchestrator.disk_processor"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.orchestrator.vsphere_exporter"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.testers.libvirt_tester"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.testers.qemu_tester"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.vmware.clients.client"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.vmware.transports.http_client"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.orchestrator",
+      "to": "hyper2kvm.vmware.vsphere.mode"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.vsphere_exporter",
+      "to": "hyper2kvm.core.cred"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.vsphere_exporter",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.vsphere_exporter",
+      "to": "hyper2kvm.core.logger"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.vsphere_exporter",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.orchestrator.vsphere_exporter",
+      "to": "hyper2kvm.vmware.clients.client"
+    },
+    {
+      "from": "hyper2kvm.profiles",
+      "to": "hyper2kvm.profile_cache"
+    },
+    {
+      "from": "hyper2kvm.profiles",
+      "to": "hyper2kvm.profile_loader"
+    },
+    {
+      "from": "hyper2kvm.profiles.profile_loader",
+      "to": "hyper2kvm.config.config_loader"
+    },
+    {
+      "from": "hyper2kvm.profiles.profile_loader",
+      "to": "hyper2kvm.profiles.profile_cache"
+    },
+    {
+      "from": "hyper2kvm.rollback",
+      "to": "hyper2kvm.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.rollback",
+      "to": "hyper2kvm.rollback_executor"
+    },
+    {
+      "from": "hyper2kvm.rollback",
+      "to": "hyper2kvm.rollback_validator"
+    },
+    {
+      "from": "hyper2kvm.rollback",
+      "to": "hyper2kvm.snapshot_manager"
+    },
+    {
+      "from": "hyper2kvm.rollback",
+      "to": "hyper2kvm.state_tracker"
+    },
+    {
+      "from": "hyper2kvm.rollback.orchestrator",
+      "to": "hyper2kvm.rollback.rollback_executor"
+    },
+    {
+      "from": "hyper2kvm.rollback.orchestrator",
+      "to": "hyper2kvm.rollback.rollback_validator"
+    },
+    {
+      "from": "hyper2kvm.rollback.orchestrator",
+      "to": "hyper2kvm.rollback.snapshot_manager"
+    },
+    {
+      "from": "hyper2kvm.rollback.orchestrator",
+      "to": "hyper2kvm.rollback.state_tracker"
+    },
+    {
+      "from": "hyper2kvm.ssh.ssh_client",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.ssh.ssh_client",
+      "to": "hyper2kvm.ssh.ssh_config"
+    },
+    {
+      "from": "hyper2kvm.testers",
+      "to": "hyper2kvm.libvirt_tester"
+    },
+    {
+      "from": "hyper2kvm.testers",
+      "to": "hyper2kvm.qemu_tester"
+    },
+    {
+      "from": "hyper2kvm.testers.libvirt_tester",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.testers.qemu_tester",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.tui",
+      "to": "hyper2kvm.cli_dashboard"
+    },
+    {
+      "from": "hyper2kvm.tui",
+      "to": "hyper2kvm.dashboard"
+    },
+    {
+      "from": "hyper2kvm.tui",
+      "to": "hyper2kvm.fallback_dashboard"
+    },
+    {
+      "from": "hyper2kvm.tui",
+      "to": "hyper2kvm.types"
+    },
+    {
+      "from": "hyper2kvm.tui",
+      "to": "hyper2kvm.widgets"
+    },
+    {
+      "from": "hyper2kvm.tui.batch_manager",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.tui.batch_manager",
+      "to": "hyper2kvm.tui.migration_controller"
+    },
+    {
+      "from": "hyper2kvm.tui.batch_manager",
+      "to": "hyper2kvm.tui.migration_tracker"
+    },
+    {
+      "from": "hyper2kvm.tui.cli_dashboard",
+      "to": "hyper2kvm.tui.types"
+    },
+    {
+      "from": "hyper2kvm.tui.dashboard",
+      "to": "hyper2kvm.core.metrics"
+    },
+    {
+      "from": "hyper2kvm.tui.dashboard",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.tui.dashboard",
+      "to": "hyper2kvm.tui.widgets"
+    },
+    {
+      "from": "hyper2kvm.tui.fallback_dashboard",
+      "to": "hyper2kvm.tui.types"
+    },
+    {
+      "from": "hyper2kvm.tui.help_dialog",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.tui.main_app",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.tui.main_app",
+      "to": "hyper2kvm.tui.batch_manager"
+    },
+    {
+      "from": "hyper2kvm.tui.main_app",
+      "to": "hyper2kvm.tui.help_dialog"
+    },
+    {
+      "from": "hyper2kvm.tui.main_app",
+      "to": "hyper2kvm.tui.migration_tracker"
+    },
+    {
+      "from": "hyper2kvm.tui.main_app",
+      "to": "hyper2kvm.tui.migrations_panel"
+    },
+    {
+      "from": "hyper2kvm.tui.main_app",
+      "to": "hyper2kvm.tui.settings_panel"
+    },
+    {
+      "from": "hyper2kvm.tui.main_app",
+      "to": "hyper2kvm.tui.vm_browser"
+    },
+    {
+      "from": "hyper2kvm.tui.main_app",
+      "to": "hyper2kvm.tui.wizard"
+    },
+    {
+      "from": "hyper2kvm.tui.migration_controller",
+      "to": "hyper2kvm.tui.migration_tracker"
+    },
+    {
+      "from": "hyper2kvm.tui.migrations_panel",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.tui.migrations_panel",
+      "to": "hyper2kvm.tui.migration_controller"
+    },
+    {
+      "from": "hyper2kvm.tui.migrations_panel",
+      "to": "hyper2kvm.tui.migration_tracker"
+    },
+    {
+      "from": "hyper2kvm.tui.settings_panel",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.tui.settings_panel",
+      "to": "hyper2kvm.tui.tui_config"
+    },
+    {
+      "from": "hyper2kvm.tui.vm_browser",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.tui.widgets",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.tui.widgets",
+      "to": "hyper2kvm.tui.types"
+    },
+    {
+      "from": "hyper2kvm.tui.wizard",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.validation",
+      "to": "hyper2kvm.database_validator"
+    },
+    {
+      "from": "hyper2kvm.validation",
+      "to": "hyper2kvm.health_checker"
+    },
+    {
+      "from": "hyper2kvm.validation",
+      "to": "hyper2kvm.network_validator"
+    },
+    {
+      "from": "hyper2kvm.validation",
+      "to": "hyper2kvm.orchestrator"
+    },
+    {
+      "from": "hyper2kvm.validation",
+      "to": "hyper2kvm.performance_validator"
+    },
+    {
+      "from": "hyper2kvm.validation",
+      "to": "hyper2kvm.service_validator"
+    },
+    {
+      "from": "hyper2kvm.validation",
+      "to": "hyper2kvm.validation_framework"
+    },
+    {
+      "from": "hyper2kvm.validation",
+      "to": "hyper2kvm.vmdk_inspector"
+    },
+    {
+      "from": "hyper2kvm.validation.database_validator",
+      "to": "hyper2kvm.validation.health_checker"
+    },
+    {
+      "from": "hyper2kvm.validation.network_validator",
+      "to": "hyper2kvm.validation.health_checker"
+    },
+    {
+      "from": "hyper2kvm.validation.orchestrator",
+      "to": "hyper2kvm.validation.database_validator"
+    },
+    {
+      "from": "hyper2kvm.validation.orchestrator",
+      "to": "hyper2kvm.validation.health_checker"
+    },
+    {
+      "from": "hyper2kvm.validation.orchestrator",
+      "to": "hyper2kvm.validation.network_validator"
+    },
+    {
+      "from": "hyper2kvm.validation.orchestrator",
+      "to": "hyper2kvm.validation.performance_validator"
+    },
+    {
+      "from": "hyper2kvm.validation.orchestrator",
+      "to": "hyper2kvm.validation.service_validator"
+    },
+    {
+      "from": "hyper2kvm.validation.performance_validator",
+      "to": "hyper2kvm.validation.health_checker"
+    },
+    {
+      "from": "hyper2kvm.validation.service_validator",
+      "to": "hyper2kvm.validation.health_checker"
+    },
+    {
+      "from": "hyper2kvm.vmware",
+      "to": "hyper2kvm.clients.client"
+    },
+    {
+      "from": "hyper2kvm.vmware.async_client",
+      "to": "hyper2kvm.vmware.client"
+    },
+    {
+      "from": "hyper2kvm.vmware.async_client",
+      "to": "hyper2kvm.vmware.operations"
+    },
+    {
+      "from": "hyper2kvm.vmware.async_client",
+      "to": "hyper2kvm.vmware.semaphore"
+    },
+    {
+      "from": "hyper2kvm.vmware.async_client.client",
+      "to": "hyper2kvm.core.optional_imports"
+    },
+    {
+      "from": "hyper2kvm.vmware.async_client.client",
+      "to": "hyper2kvm.vmware.async_client.semaphore"
+    },
+    {
+      "from": "hyper2kvm.vmware.async_client.operations",
+      "to": "hyper2kvm.vmware.async_client.client"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.client",
+      "to": "hyper2kvm.core.cred"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.client",
+      "to": "hyper2kvm.core.creds"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.client",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.client",
+      "to": "hyper2kvm.vmware.transports.govc_common"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.client",
+      "to": "hyper2kvm.vmware.transports.http_client"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.client",
+      "to": "hyper2kvm.vmware.transports.ovftool_client"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.client",
+      "to": "hyper2kvm.vmware.transports.ovftool_loader"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.client",
+      "to": "hyper2kvm.vmware.transports.vddk_client"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.client",
+      "to": "hyper2kvm.vmware.transports.vddk_loader"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.client",
+      "to": "hyper2kvm.vmware.utils.datastore"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.client",
+      "to": "hyper2kvm.vmware.utils.utils"
+    },
+    {
+      "from": "hyper2kvm.vmware.clients.extensions",
+      "to": "hyper2kvm.vmware.clients.client"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports",
+      "to": "hyper2kvm.vmware.hyperctl_common"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.govc_common",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.govc_common",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.govc_common",
+      "to": "hyper2kvm.vmware.transports.govc_export"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.govc_export",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.govc_export",
+      "to": "hyper2kvm.vmware.utils.utils"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.http_client",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.http_client",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.http_client",
+      "to": "hyper2kvm.vmware.transports.http_progress"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.http_progress",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.http_progress",
+      "to": "hyper2kvm.vmware.utils.utils"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.hyperctl_common",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.ovftool_client",
+      "to": "hyper2kvm.vmware.utils.utils"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.ovftool_loader",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.ovftool_loader",
+      "to": "hyper2kvm.vmware.transports.govc_common"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.ovftool_loader",
+      "to": "hyper2kvm.vmware.transports.http_client"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.ovftool_loader",
+      "to": "hyper2kvm.vmware.transports.ovftool_client"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.ovftool_loader",
+      "to": "hyper2kvm.vmware.utils.utils"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.vddk_loader",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.vddk_loader",
+      "to": "hyper2kvm.vmware.clients.client"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.vddk_loader",
+      "to": "hyper2kvm.vmware.transports.http_client"
+    },
+    {
+      "from": "hyper2kvm.vmware.transports.vddk_loader",
+      "to": "hyper2kvm.vmware.transports.vddk_client"
+    },
+    {
+      "from": "hyper2kvm.vmware.utils.datastore",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.utils.datastore",
+      "to": "hyper2kvm.vmware.transports.govc_common"
+    },
+    {
+      "from": "hyper2kvm.vmware.utils.datastore",
+      "to": "hyper2kvm.vmware.transports.http_client"
+    },
+    {
+      "from": "hyper2kvm.vmware.utils.datastore",
+      "to": "hyper2kvm.vmware.utils.utils"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.command",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.command",
+      "to": "hyper2kvm.vmware.clients.client"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.command",
+      "to": "hyper2kvm.vmware.vsphere.errors"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.command",
+      "to": "hyper2kvm.vmware.vsphere.govc"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.errors",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.govc",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.govc",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.govc",
+      "to": "hyper2kvm.vmware.transports.govc_common"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.mode",
+      "to": "hyper2kvm.core.exceptions"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.mode",
+      "to": "hyper2kvm.core.utils"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.mode",
+      "to": "hyper2kvm.vmware.clients.client"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.mode",
+      "to": "hyper2kvm.vmware.transports.govc_common"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.mode",
+      "to": "hyper2kvm.vmware.transports.http_client"
+    },
+    {
+      "from": "hyper2kvm.vmware.vsphere.mode",
+      "to": "hyper2kvm.vmware.transports.ovftool_client"
+    },
+    {
+      "from": "hyper2kvm.windows",
+      "to": "hyper2kvm.windows.active_directory"
+    },
+    {
+      "from": "hyper2kvm.windows",
+      "to": "hyper2kvm.windows.license"
+    },
+    {
+      "from": "hyper2kvm.windows",
+      "to": "hyper2kvm.windows.sql_server"
+    },
+    {
+      "from": "hyper2kvm.windows",
+      "to": "hyper2kvm.windows.windows_update"
+    },
+    {
+      "from": "hyper2kvm.windows.active_directory",
+      "to": "hyper2kvm.core.vmcraft.main"
+    },
+    {
+      "from": "hyper2kvm.windows.license",
+      "to": "hyper2kvm.core.vmcraft.main"
+    },
+    {
+      "from": "hyper2kvm.windows.orchestrator",
+      "to": "hyper2kvm.core.vmcraft.main"
+    },
+    {
+      "from": "hyper2kvm.windows.orchestrator",
+      "to": "hyper2kvm.windows.active_directory"
+    },
+    {
+      "from": "hyper2kvm.windows.orchestrator",
+      "to": "hyper2kvm.windows.license"
+    },
+    {
+      "from": "hyper2kvm.windows.orchestrator",
+      "to": "hyper2kvm.windows.sql_server"
+    },
+    {
+      "from": "hyper2kvm.windows.orchestrator",
+      "to": "hyper2kvm.windows.windows_update"
+    },
+    {
+      "from": "hyper2kvm.windows.sql_server",
+      "to": "hyper2kvm.core.vmcraft.main"
+    },
+    {
+      "from": "hyper2kvm.windows.windows_update",
+      "to": "hyper2kvm.core.vmcraft.main"
+    },
+    {
+      "from": "hyper2kvm.worker",
+      "to": "hyper2kvm.capabilities"
+    },
+    {
+      "from": "hyper2kvm.worker",
+      "to": "hyper2kvm.engine"
+    },
+    {
+      "from": "hyper2kvm.worker",
+      "to": "hyper2kvm.events"
+    },
+    {
+      "from": "hyper2kvm.worker",
+      "to": "hyper2kvm.scheduler"
+    },
+    {
+      "from": "hyper2kvm.worker",
+      "to": "hyper2kvm.schemas"
+    },
+    {
+      "from": "hyper2kvm.worker",
+      "to": "hyper2kvm.state_machine"
+    },
+    {
+      "from": "hyper2kvm.worker.api",
+      "to": "hyper2kvm.worker.capabilities"
+    },
+    {
+      "from": "hyper2kvm.worker.api",
+      "to": "hyper2kvm.worker.engine"
+    },
+    {
+      "from": "hyper2kvm.worker.api",
+      "to": "hyper2kvm.worker.events"
+    },
+    {
+      "from": "hyper2kvm.worker.api",
+      "to": "hyper2kvm.worker.metrics"
+    },
+    {
+      "from": "hyper2kvm.worker.api",
+      "to": "hyper2kvm.worker.scheduler"
+    },
+    {
+      "from": "hyper2kvm.worker.api",
+      "to": "hyper2kvm.worker.schemas"
+    },
+    {
+      "from": "hyper2kvm.worker.api",
+      "to": "hyper2kvm.worker.state_machine"
+    },
+    {
+      "from": "hyper2kvm.worker.cli",
+      "to": "hyper2kvm.worker.capabilities"
+    },
+    {
+      "from": "hyper2kvm.worker.cli",
+      "to": "hyper2kvm.worker.engine"
+    },
+    {
+      "from": "hyper2kvm.worker.cli",
+      "to": "hyper2kvm.worker.events"
+    },
+    {
+      "from": "hyper2kvm.worker.cli",
+      "to": "hyper2kvm.worker.schemas"
+    },
+    {
+      "from": "hyper2kvm.worker.cli",
+      "to": "hyper2kvm.worker.state_machine"
+    },
+    {
+      "from": "hyper2kvm.worker.engine",
+      "to": "hyper2kvm.fixers.filesystem.fstab"
+    },
+    {
+      "from": "hyper2kvm.worker.engine",
+      "to": "hyper2kvm.fixers.offline_fixer"
+    },
+    {
+      "from": "hyper2kvm.worker.engine",
+      "to": "hyper2kvm.inspector"
+    },
+    {
+      "from": "hyper2kvm.worker.engine",
+      "to": "hyper2kvm.worker.capabilities"
+    },
+    {
+      "from": "hyper2kvm.worker.engine",
+      "to": "hyper2kvm.worker.metrics"
+    },
+    {
+      "from": "hyper2kvm.worker.engine",
+      "to": "hyper2kvm.worker.schemas"
+    },
+    {
+      "from": "hyper2kvm.worker.engine",
+      "to": "hyper2kvm.worker.state_machine"
+    },
+    {
+      "from": "hyper2kvm.worker.events",
+      "to": "hyper2kvm.worker.schemas"
+    },
+    {
+      "from": "hyper2kvm.worker.offline_fix_mock",
+      "to": "hyper2kvm.worker.offline_fix_contract"
+    },
+    {
+      "from": "hyper2kvm.worker.scheduler",
+      "to": "hyper2kvm.worker.capabilities"
+    },
+    {
+      "from": "hyper2kvm.worker.scheduler",
+      "to": "hyper2kvm.worker.schemas"
+    },
+    {
+      "from": "hyper2kvm.worker.scheduler",
+      "to": "hyper2kvm.worker.state_machine"
+    },
+    {
+      "from": "hyper2kvm.worker.state_machine",
+      "to": "hyper2kvm.worker.schemas"
+    }
+  ],
+  "package_edges": [
+    {
+      "from": "core",
+      "to": "core",
+      "count": 167
+    },
+    {
+      "from": "fixers",
+      "to": "fixers",
+      "count": 143
+    },
+    {
+      "from": "vmware",
+      "to": "vmware",
+      "count": 38
+    },
+    {
+      "from": "fixers",
+      "to": "core",
+      "count": 35
+    },
+    {
+      "from": "worker",
+      "to": "worker",
+      "count": 22
+    },
+    {
+      "from": "vmware",
+      "to": "core",
+      "count": 20
+    },
+    {
+      "from": "orchestrator",
+      "to": "core",
+      "count": 18
+    },
+    {
+      "from": "tui",
+      "to": "tui",
+      "count": 17
+    },
+    {
+      "from": "database_migration",
+      "to": "database_migration",
+      "count": 13
+    },
+    {
+      "from": "cli",
+      "to": "cli",
+      "count": 12
+    },
+    {
+      "from": "daemon",
+      "to": "core",
+      "count": 12
+    },
+    {
+      "from": "converters",
+      "to": "converters",
+      "count": 10
+    },
+    {
+      "from": "tui",
+      "to": "core",
+      "count": 10
+    },
+    {
+      "from": "compliance",
+      "to": "compliance",
+      "count": 9
+    },
+    {
+      "from": "containers",
+      "to": "containers",
+      "count": 9
+    },
+    {
+      "from": "operator",
+      "to": "operator",
+      "count": 9
+    },
+    {
+      "from": "validation",
+      "to": "validation",
+      "count": 9
+    },
+    {
+      "from": "converters",
+      "to": "core",
+      "count": 8
+    },
+    {
+      "from": "live_migration",
+      "to": "live_migration",
+      "count": 8
+    },
+    {
+      "from": "orchestrator",
+      "to": "converters",
+      "count": 8
+    },
+    {
+      "from": "windows",
+      "to": "windows",
+      "count": 8
+    },
+    {
+      "from": "azure",
+      "to": "azure",
+      "count": 7
+    },
+    {
+      "from": "backup_sources",
+      "to": "backup_sources",
+      "count": 7
+    },
+    {
+      "from": "libvirt",
+      "to": "core",
+      "count": 7
+    },
+    {
+      "from": "manifest",
+      "to": "manifest",
+      "count": 7
+    },
+    {
+      "from": "daemon",
+      "to": "daemon",
+      "count": 6
+    },
+    {
+      "from": "libvirt",
+      "to": "libvirt",
+      "count": 5
+    },
+    {
+      "from": "manifest",
+      "to": "core",
+      "count": 5
+    },
+    {
+      "from": "orchestrator",
+      "to": "orchestrator",
+      "count": 5
+    },
+    {
+      "from": "orchestrator",
+      "to": "vmware",
+      "count": 5
+    },
+    {
+      "from": "windows",
+      "to": "core",
+      "count": 5
+    },
+    {
+      "from": "config",
+      "to": "core",
+      "count": 4
+    },
+    {
+      "from": "fixers",
+      "to": "config",
+      "count": 4
+    },
+    {
+      "from": "modes",
+      "to": "core",
+      "count": 4
+    },
+    {
+      "from": "rollback",
+      "to": "rollback",
+      "count": 4
+    },
+    {
+      "from": "cli",
+      "to": "config",
+      "count": 3
+    },
+    {
+      "from": "cli",
+      "to": "core",
+      "count": 3
+    },
+    {
+      "from": "daemon",
+      "to": "orchestrator",
+      "count": 3
+    },
+    {
+      "from": "hooks",
+      "to": "core",
+      "count": 3
+    },
+    {
+      "from": "hooks",
+      "to": "hooks",
+      "count": 3
+    },
+    {
+      "from": "manifest",
+      "to": "config",
+      "count": 3
+    },
+    {
+      "from": "orchestrator",
+      "to": "daemon",
+      "count": 3
+    },
+    {
+      "from": "converters",
+      "to": "ssh",
+      "count": 2
+    },
+    {
+      "from": "converters",
+      "to": "vmware",
+      "count": 2
+    },
+    {
+      "from": "fixers",
+      "to": "<root>",
+      "count": 2
+    },
+    {
+      "from": "fixers",
+      "to": "ssh",
+      "count": 2
+    },
+    {
+      "from": "modes",
+      "to": "ssh",
+      "count": 2
+    },
+    {
+      "from": "modes",
+      "to": "vmware",
+      "count": 2
+    },
+    {
+      "from": "orchestrator",
+      "to": "azure",
+      "count": 2
+    },
+    {
+      "from": "orchestrator",
+      "to": "fixers",
+      "count": 2
+    },
+    {
+      "from": "orchestrator",
+      "to": "ssh",
+      "count": 2
+    },
+    {
+      "from": "orchestrator",
+      "to": "testers",
+      "count": 2
+    },
+    {
+      "from": "testers",
+      "to": "core",
+      "count": 2
+    },
+    {
+      "from": "worker",
+      "to": "fixers",
+      "count": 2
+    },
+    {
+      "from": "__main__",
+      "to": "cli",
+      "count": 1
+    },
+    {
+      "from": "__main__",
+      "to": "core",
+      "count": 1
+    },
+    {
+      "from": "__main__",
+      "to": "manifest",
+      "count": 1
+    },
+    {
+      "from": "__main__",
+      "to": "orchestrator",
+      "count": 1
+    },
+    {
+      "from": "azure",
+      "to": "core",
+      "count": 1
+    },
+    {
+      "from": "azure",
+      "to": "models",
+      "count": 1
+    },
+    {
+      "from": "azure",
+      "to": "source",
+      "count": 1
+    },
+    {
+      "from": "backup_sources",
+      "to": "base",
+      "count": 1
+    },
+    {
+      "from": "backup_sources",
+      "to": "generic",
+      "count": 1
+    },
+    {
+      "from": "backup_sources",
+      "to": "orchestrator",
+      "count": 1
+    },
+    {
+      "from": "backup_sources",
+      "to": "proxmox",
+      "count": 1
+    },
+    {
+      "from": "backup_sources",
+      "to": "veeam",
+      "count": 1
+    },
+    {
+      "from": "cli",
+      "to": "<root>",
+      "count": 1
+    },
+    {
+      "from": "cli",
+      "to": "daemon",
+      "count": 1
+    },
+    {
+      "from": "cli",
+      "to": "fixers",
+      "count": 1
+    },
+    {
+      "from": "cli",
+      "to": "formatter",
+      "count": 1
+    },
+    {
+      "from": "cli",
+      "to": "progress",
+      "count": 1
+    },
+    {
+      "from": "cli",
+      "to": "wizard",
+      "count": 1
+    },
+    {
+      "from": "compliance",
+      "to": "audit_logger",
+      "count": 1
+    },
+    {
+      "from": "compliance",
+      "to": "base",
+      "count": 1
+    },
+    {
+      "from": "compliance",
+      "to": "change_tracker",
+      "count": 1
+    },
+    {
+      "from": "compliance",
+      "to": "cis_benchmarks",
+      "count": 1
+    },
+    {
+      "from": "compliance",
+      "to": "orchestrator",
+      "count": 1
+    },
+    {
+      "from": "compliance",
+      "to": "report_generator",
+      "count": 1
+    },
+    {
+      "from": "compliance",
+      "to": "stig_validator",
+      "count": 1
+    },
+    {
+      "from": "containers",
+      "to": "detector",
+      "count": 1
+    },
+    {
+      "from": "containers",
+      "to": "docker_extractor",
+      "count": 1
+    },
+    {
+      "from": "containers",
+      "to": "kubernetes_generator",
+      "count": 1
+    },
+    {
+      "from": "containers",
+      "to": "orchestrator",
+      "count": 1
+    },
+    {
+      "from": "containers",
+      "to": "podman_extractor",
+      "count": 1
+    },
+    {
+      "from": "converters",
+      "to": "extractors",
+      "count": 1
+    },
+    {
+      "from": "converters",
+      "to": "flatten",
+      "count": 1
+    },
+    {
+      "from": "converters",
+      "to": "qemu",
+      "count": 1
+    },
+    {
+      "from": "core",
+      "to": "fixers",
+      "count": 1
+    },
+    {
+      "from": "core",
+      "to": "guest_identity",
+      "count": 1
+    },
+    {
+      "from": "core",
+      "to": "vmware",
+      "count": 1
+    },
+    {
+      "from": "daemon",
+      "to": "control",
+      "count": 1
+    },
+    {
+      "from": "daemon",
+      "to": "daemon_watcher",
+      "count": 1
+    },
+    {
+      "from": "daemon",
+      "to": "deduplicator",
+      "count": 1
+    },
+    {
+      "from": "daemon",
+      "to": "manifest_workflow_daemon",
+      "count": 1
+    },
+    {
+      "from": "daemon",
+      "to": "notifier",
+      "count": 1
+    },
+    {
+      "from": "daemon",
+      "to": "stats",
+      "count": 1
+    },
+    {
+      "from": "daemon",
+      "to": "workflow_daemon",
+      "count": 1
+    },
+    {
+      "from": "database_migration",
+      "to": "base",
+      "count": 1
+    },
+    {
+      "from": "database_migration",
+      "to": "detector",
+      "count": 1
+    },
+    {
+      "from": "database_migration",
+      "to": "generic",
+      "count": 1
+    },
+    {
+      "from": "database_migration",
+      "to": "mongodb",
+      "count": 1
+    },
+    {
+      "from": "database_migration",
+      "to": "mysql",
+      "count": 1
+    },
+    {
+      "from": "database_migration",
+      "to": "orchestrator",
+      "count": 1
+    },
+    {
+      "from": "database_migration",
+      "to": "postgresql",
+      "count": 1
+    },
+    {
+      "from": "database_migration",
+      "to": "redis",
+      "count": 1
+    },
+    {
+      "from": "fixers",
+      "to": "live",
+      "count": 1
+    },
+    {
+      "from": "fixers",
+      "to": "network_fixer",
+      "count": 1
+    },
+    {
+      "from": "fixers",
+      "to": "offline_fixer",
+      "count": 1
+    },
+    {
+      "from": "hooks",
+      "to": "hook_runner",
+      "count": 1
+    },
+    {
+      "from": "hooks",
+      "to": "hook_types",
+      "count": 1
+    },
+    {
+      "from": "hooks",
+      "to": "template_engine",
+      "count": 1
+    },
+    {
+      "from": "libvirt",
+      "to": "libvirt_manager",
+      "count": 1
+    },
+    {
+      "from": "libvirt",
+      "to": "libvirt_utils",
+      "count": 1
+    },
+    {
+      "from": "libvirt",
+      "to": "pool_manager",
+      "count": 1
+    },
+    {
+      "from": "manifest",
+      "to": "<root>",
+      "count": 1
+    },
+    {
+      "from": "manifest",
+      "to": "converters",
+      "count": 1
+    },
+    {
+      "from": "manifest",
+      "to": "fixers",
+      "count": 1
+    },
+    {
+      "from": "manifest",
+      "to": "hooks",
+      "count": 1
+    },
+    {
+      "from": "manifest",
+      "to": "libvirt",
+      "count": 1
+    },
+    {
+      "from": "manifest",
+      "to": "loader",
+      "count": 1
+    },
+    {
+      "from": "manifest",
+      "to": "orchestrator",
+      "count": 1
+    },
+    {
+      "from": "manifest",
+      "to": "profiles",
+      "count": 1
+    },
+    {
+      "from": "manifest",
+      "to": "reporter",
+      "count": 1
+    },
+    {
+      "from": "modes",
+      "to": "converters",
+      "count": 1
+    },
+    {
+      "from": "operator",
+      "to": "worker",
+      "count": 1
+    },
+    {
+      "from": "orchestrator",
+      "to": "config",
+      "count": 1
+    },
+    {
+      "from": "orchestrator",
+      "to": "deployers",
+      "count": 1
+    },
+    {
+      "from": "orchestrator",
+      "to": "disk_discovery",
+      "count": 1
+    },
+    {
+      "from": "orchestrator",
+      "to": "disk_processor",
+      "count": 1
+    },
+    {
+      "from": "orchestrator",
+      "to": "libvirt",
+      "count": 1
+    },
+    {
+      "from": "orchestrator",
+      "to": "manifest",
+      "count": 1
+    },
+    {
+      "from": "orchestrator",
+      "to": "validation",
+      "count": 1
+    },
+    {
+      "from": "orchestrator",
+      "to": "vsphere_exporter",
+      "count": 1
+    },
+    {
+      "from": "profiles",
+      "to": "config",
+      "count": 1
+    },
+    {
+      "from": "profiles",
+      "to": "profile_cache",
+      "count": 1
+    },
+    {
+      "from": "profiles",
+      "to": "profile_loader",
+      "count": 1
+    },
+    {
+      "from": "profiles",
+      "to": "profiles",
+      "count": 1
+    },
+    {
+      "from": "rollback",
+      "to": "orchestrator",
+      "count": 1
+    },
+    {
+      "from": "rollback",
+      "to": "rollback_executor",
+      "count": 1
+    },
+    {
+      "from": "rollback",
+      "to": "rollback_validator",
+      "count": 1
+    },
+    {
+      "from": "rollback",
+      "to": "snapshot_manager",
+      "count": 1
+    },
+    {
+      "from": "rollback",
+      "to": "state_tracker",
+      "count": 1
+    },
+    {
+      "from": "ssh",
+      "to": "core",
+      "count": 1
+    },
+    {
+      "from": "ssh",
+      "to": "ssh",
+      "count": 1
+    },
+    {
+      "from": "testers",
+      "to": "libvirt_tester",
+      "count": 1
+    },
+    {
+      "from": "testers",
+      "to": "qemu_tester",
+      "count": 1
+    },
+    {
+      "from": "tui",
+      "to": "cli_dashboard",
+      "count": 1
+    },
+    {
+      "from": "tui",
+      "to": "dashboard",
+      "count": 1
+    },
+    {
+      "from": "tui",
+      "to": "fallback_dashboard",
+      "count": 1
+    },
+    {
+      "from": "tui",
+      "to": "types",
+      "count": 1
+    },
+    {
+      "from": "tui",
+      "to": "widgets",
+      "count": 1
+    },
+    {
+      "from": "validation",
+      "to": "database_validator",
+      "count": 1
+    },
+    {
+      "from": "validation",
+      "to": "health_checker",
+      "count": 1
+    },
+    {
+      "from": "validation",
+      "to": "network_validator",
+      "count": 1
+    },
+    {
+      "from": "validation",
+      "to": "orchestrator",
+      "count": 1
+    },
+    {
+      "from": "validation",
+      "to": "performance_validator",
+      "count": 1
+    },
+    {
+      "from": "validation",
+      "to": "service_validator",
+      "count": 1
+    },
+    {
+      "from": "validation",
+      "to": "validation_framework",
+      "count": 1
+    },
+    {
+      "from": "validation",
+      "to": "vmdk_inspector",
+      "count": 1
+    },
+    {
+      "from": "vmware",
+      "to": "clients",
+      "count": 1
+    },
+    {
+      "from": "worker",
+      "to": "capabilities",
+      "count": 1
+    },
+    {
+      "from": "worker",
+      "to": "engine",
+      "count": 1
+    },
+    {
+      "from": "worker",
+      "to": "events",
+      "count": 1
+    },
+    {
+      "from": "worker",
+      "to": "inspector",
+      "count": 1
+    },
+    {
+      "from": "worker",
+      "to": "scheduler",
+      "count": 1
+    },
+    {
+      "from": "worker",
+      "to": "schemas",
+      "count": 1
+    },
+    {
+      "from": "worker",
+      "to": "state_machine",
+      "count": 1
+    }
+  ],
+  "package_stats": [
+    {
+      "package": "<root>",
+      "imports_out": 0,
+      "imports_in": 4
+    },
+    {
+      "package": "__main__",
+      "imports_out": 4,
+      "imports_in": 0
+    },
+    {
+      "package": "audit_logger",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "azure",
+      "imports_out": 10,
+      "imports_in": 9
+    },
+    {
+      "package": "backup_sources",
+      "imports_out": 12,
+      "imports_in": 7
+    },
+    {
+      "package": "base",
+      "imports_out": 0,
+      "imports_in": 3
+    },
+    {
+      "package": "capabilities",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "change_tracker",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "cis_benchmarks",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "cli",
+      "imports_out": 24,
+      "imports_in": 13
+    },
+    {
+      "package": "cli_dashboard",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "clients",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "compliance",
+      "imports_out": 16,
+      "imports_in": 9
+    },
+    {
+      "package": "config",
+      "imports_out": 4,
+      "imports_in": 12
+    },
+    {
+      "package": "containers",
+      "imports_out": 14,
+      "imports_in": 9
+    },
+    {
+      "package": "control",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "converters",
+      "imports_out": 25,
+      "imports_in": 20
+    },
+    {
+      "package": "core",
+      "imports_out": 170,
+      "imports_in": 306
+    },
+    {
+      "package": "daemon",
+      "imports_out": 28,
+      "imports_in": 10
+    },
+    {
+      "package": "daemon_watcher",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "dashboard",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "database_migration",
+      "imports_out": 21,
+      "imports_in": 13
+    },
+    {
+      "package": "database_validator",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "deduplicator",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "deployers",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "detector",
+      "imports_out": 0,
+      "imports_in": 2
+    },
+    {
+      "package": "disk_discovery",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "disk_processor",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "docker_extractor",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "engine",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "events",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "extractors",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "fallback_dashboard",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "fixers",
+      "imports_out": 189,
+      "imports_in": 150
+    },
+    {
+      "package": "flatten",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "formatter",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "generic",
+      "imports_out": 0,
+      "imports_in": 2
+    },
+    {
+      "package": "guest_identity",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "health_checker",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "hook_runner",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "hook_types",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "hooks",
+      "imports_out": 9,
+      "imports_in": 4
+    },
+    {
+      "package": "inspector",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "kubernetes_generator",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "libvirt",
+      "imports_out": 15,
+      "imports_in": 7
+    },
+    {
+      "package": "libvirt_manager",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "libvirt_tester",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "libvirt_utils",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "live",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "live_migration",
+      "imports_out": 8,
+      "imports_in": 8
+    },
+    {
+      "package": "loader",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "manifest",
+      "imports_out": 24,
+      "imports_in": 9
+    },
+    {
+      "package": "manifest_workflow_daemon",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "models",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "modes",
+      "imports_out": 9,
+      "imports_in": 0
+    },
+    {
+      "package": "mongodb",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "mysql",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "network_fixer",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "network_validator",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "notifier",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "offline_fixer",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "operator",
+      "imports_out": 10,
+      "imports_in": 9
+    },
+    {
+      "package": "orchestrator",
+      "imports_out": 55,
+      "imports_in": 16
+    },
+    {
+      "package": "performance_validator",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "podman_extractor",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "pool_manager",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "postgresql",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "profile_cache",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "profile_loader",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "profiles",
+      "imports_out": 4,
+      "imports_in": 2
+    },
+    {
+      "package": "progress",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "proxmox",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "qemu",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "qemu_tester",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "redis",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "report_generator",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "reporter",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "rollback",
+      "imports_out": 9,
+      "imports_in": 4
+    },
+    {
+      "package": "rollback_executor",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "rollback_validator",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "scheduler",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "schemas",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "service_validator",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "snapshot_manager",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "source",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "ssh",
+      "imports_out": 2,
+      "imports_in": 9
+    },
+    {
+      "package": "state_machine",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "state_tracker",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "stats",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "stig_validator",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "template_engine",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "testers",
+      "imports_out": 4,
+      "imports_in": 2
+    },
+    {
+      "package": "tui",
+      "imports_out": 32,
+      "imports_in": 17
+    },
+    {
+      "package": "types",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "validation",
+      "imports_out": 17,
+      "imports_in": 10
+    },
+    {
+      "package": "validation_framework",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "veeam",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "vmdk_inspector",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "vmware",
+      "imports_out": 59,
+      "imports_in": 48
+    },
+    {
+      "package": "vsphere_exporter",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "widgets",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "windows",
+      "imports_out": 13,
+      "imports_in": 8
+    },
+    {
+      "package": "wizard",
+      "imports_out": 0,
+      "imports_in": 1
+    },
+    {
+      "package": "worker",
+      "imports_out": 31,
+      "imports_in": 23
+    },
+    {
+      "package": "workflow_daemon",
+      "imports_out": 0,
+      "imports_in": 1
+    }
+  ]
+}

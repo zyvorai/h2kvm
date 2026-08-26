@@ -1,0 +1,101 @@
+# ============================================
+# Complete Workflow: vSphere → libvirt (Windows 10)
+# ============================================
+# Description: Export Windows 10 VM from vSphere and prepare for libvirt/KVM
+# Use Case: Windows 10 Professional/Enterprise migration with VirtIO drivers
+#
+# Prerequisites:
+#   - govc or ovftool installed
+#   - pyvmomi: pip install pyvmomi
+#   - qemu-img: dnf install qemu-img
+#   - libguestfs: dnf install libguestfs-tools
+#   - VirtIO driver ISO: dnf install virtio-win (or download virtio-win.iso)
+#
+# Environment variables:
+#   export VC_PASSWORD='your-vcenter-password'
+#
+# Run:
+#   sudo -E h2kvmctl --config examples/yaml/70-complete-workflows/vsphere-to-libvirt-windows-10.yaml
+# ============================================
+
+cmd: vsphere
+
+# vSphere Connection
+vcenter: vcenter.example.com
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+vc_insecure: true
+dc_name: Production-DC
+
+# VM Selection
+vm_name: windows-10-pro-workstation
+
+# vSphere Export
+vs_action: export_vm
+export_mode: ovf_export
+vs_control_plane: govc
+govc_url: "https://vcenter.example.com/sdk"
+govc_password_env: VC_PASSWORD
+govc_insecure: true
+govc_datacenter: Production-DC
+govc_export_remove_cdroms: true
+
+# Snapshot before export
+vs_create_snapshot: true
+snapshot_name: pre-kvm-migration
+snapshot_memory: false
+
+# Disk Processing
+flatten: true
+to_output: windows-10-pro.qcow2
+out_format: qcow2
+compress: true
+output_dir: /data/kvm
+
+# Windows Detection
+windows: true
+guest_os: windows
+
+# VirtIO Driver Injection
+virtio_win_iso: /usr/share/virtio-win/virtio-win.iso
+remove_vmware_tools: true
+
+# Two-phase boot: bootstrap with SATA, then switch to VirtIO
+# Phase 1 (bootstrap): boots with SATA so Windows can load VirtIO drivers
+win_stage: bootstrap
+
+# libvirt Domain XML
+emit_domain_xml: true
+uefi: true
+ovmf_code: /usr/share/OVMF/OVMF_CODE.fd
+ovmf_vars_template: /usr/share/OVMF/OVMF_VARS.fd
+memory: 8192
+vcpus: 4
+cpu_topology: "1:2:2"
+machine: q35
+disk_bus: virtio
+disk_cache: writeback
+disk_io: threads
+disk_discard: unmap
+net_model: virtio
+libvirt_network: bridge:br0
+graphics: spice
+graphics_listen: 127.0.0.1
+video: qxl
+usb_tablet: true
+clock: localtime
+
+# Validation
+libvirt_test: true
+timeout: 600
+
+# Reporting
+report: /var/log/migrations/windows-10.md
+enable_recovery: true
+verbose: 1
+
+# Post-migration notes:
+# 1. Phase 1 boots with SATA — Windows detects VirtIO drivers
+# 2. After drivers install, shutdown VM
+# 3. Run again with win_stage: final to switch to VirtIO boot
+# 4. Or manually: virsh edit windows-10-pro (change bus='sata' to bus='virtio')

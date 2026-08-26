@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hyper2kvm — Quick Start &amp; POC Guide</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+  .page { min-height: 100vh; padding: 50px 70px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; }
+  .page-light { background: #fafbfc; }
+  .page-green { background: linear-gradient(135deg, #064e3b, #0f172a); color: #e8e6df; }
+  .logo { font-size: 1.5em; font-weight: 800; margin-bottom: 0.5em; } .logo span { color: #10b981; }
+  h1 { font-size: 2.4em; font-weight: 800; margin-bottom: 0.3em; } h1 span { color: #10b981; }
+  h2 { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2 span { color: #10b981; }
+  h3 { font-size: 1.15em; font-weight: 600; margin: 1em 0 0.3em; color: #10b981; } .page-light h3 { color: #065f46; }
+  p { margin-bottom: 0.7em; font-size: 1em; } .sub { font-size: 1.05em; opacity: 0.7; margin-bottom: 1.5em; }
+  pre { background: #0f172a; color: #e8e6df; padding: 18px 22px; border-radius: 8px; font-size: 0.88em; line-height: 1.7; font-family: 'JetBrains Mono', monospace; margin: 0.8em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.05); }
+  .step { display: flex; gap: 16px; margin: 1.2em 0; align-items: flex-start; }
+  .step-num { width: 40px; height: 40px; background: #10b981; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; flex-shrink: 0; }
+  .step-content { flex: 1; } .step-content h4 { font-size: 1.05em; margin-bottom: 4px; } .step-content p { font-size: 0.93em; opacity: 0.85; margin-bottom: 0.3em; }
+  .time { display: inline-block; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); padding: 2px 10px; border-radius: 12px; font-size: 0.8em; font-weight: 600; color: #10b981; }
+  table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 0.9em; }
+  th { background: #059669; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); } .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  ul { margin: 0.3em 0 0.6em 1.3em; } li { margin-bottom: 0.2em; font-size: 0.93em; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 1em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 18px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 1em; font-weight: 600; margin-bottom: 4px; } .card p { font-size: 0.88em; opacity: 0.85; margin-bottom: 0; }
+  .alert { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); border-radius: 8px; padding: 14px 18px; margin: 1em 0; font-size: 0.95em; }
+  .footer { text-align: center; padding: 15px; font-size: 0.78em; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: INSTALL -->
+<div class="page page-dark">
+  <div class="logo">hyper<span>2</span>kvm</div>
+  <h1>Quick Start &amp; <span>POC Guide</span></h1>
+  <p class="sub">From zero to migrated VM in 30 minutes. Give this to your IT team.</p>
+
+  <h2><span>Part 1:</span> Install (5 minutes)</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Prerequisites</h4>
+      <p>Any Linux machine (Fedora, RHEL 9+, Ubuntu 22.04+). 4GB RAM, 20GB free disk. Root access.</p>
+      <pre>sudo dnf install -y qemu-img libguestfs-tools  # Fedora/RHEL
+# OR
+sudo apt install -y qemu-utils libguestfs-tools  # Ubuntu/Debian</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Install hyper2kvm</h4>
+      <pre>git clone https://github.com/ssahani/hyper2kvm.git
+cd hyper2kvm
+pip3 install -e .
+# OR use the quickstart script:
+sudo ./scripts/quickstart.sh</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h4>Install govc (for vSphere)</h4>
+      <pre>curl -L https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x86_64.tar.gz \
+  | sudo tar xzf - -C /usr/local/bin govc</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h4>Verify</h4>
+      <pre>h2kvmctl --version   # should print version
+govc version         # should print govc version</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: LOCAL TEST -->
+<div class="page page-light">
+  <h2><span>Part 2:</span> Local Test (10 minutes)</h2>
+  <p class="sub">Test with a local VMDK file — no vCenter needed.</p>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h4>Get a test VMDK <span class="time">2 min</span></h4>
+      <p>Use any existing VMDK, or download a small test image:</p>
+      <pre># Option A: Use an existing VMDK from your VMware datastore
+# Option B: Download Photon OS (small, fast)
+curl -LO https://packages.vmware.com/photon/5.0/Rev1/ova/photon-5.0-ova.ova
+tar xf photon-5.0-ova.ova  # extracts .vmdk</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <h4>Convert VMDK to qcow2 <span class="time">5 min</span></h4>
+      <pre>sudo h2kvmctl \
+  --cmd local \
+  --vmdk photon.vmdk \
+  --output-dir ./out \
+  --out-format qcow2 \
+  --flatten \
+  --fstab-mode stabilize-all \
+  --regen-initramfs \
+  --emit-domain-xml \
+  --vm-name photon-test \
+  --memory 1024 \
+  --vcpus 2</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">7</div>
+    <div class="step-content">
+      <h4>Verify output <span class="time">1 min</span></h4>
+      <pre>ls -lh out/                    # qcow2 file created
+qemu-img info out/*.qcow2      # verify format
+virsh list --all               # VM should be defined</pre>
+    </div>
+  </div>
+
+  <div class="alert">
+    <strong>Success criteria:</strong> qcow2 file created, VM defined in libvirt, <code>virsh start photon-test</code> boots successfully.
+  </div>
+</div>
+
+<!-- PAGE 3: VSPHERE TEST -->
+<div class="page page-dark">
+  <h2><span>Part 3:</span> vSphere Test (15 minutes)</h2>
+  <p class="sub">Connect to your vCenter and migrate a real VM.</p>
+
+  <div class="step">
+    <div class="step-num">8</div>
+    <div class="step-content">
+      <h4>Set vCenter credentials <span class="time">1 min</span></h4>
+      <pre>export GOVC_URL="https://vcenter.yourdomain.com/sdk"
+export GOVC_USERNAME="administrator@vsphere.local"
+export GOVC_PASSWORD="your-password"
+export GOVC_DATACENTER="your-datacenter"
+export GOVC_INSECURE=1   # if self-signed cert</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">9</div>
+    <div class="step-content">
+      <h4>Discover VMs <span class="time">1 min</span></h4>
+      <pre># Quick check:
+govc ls /your-datacenter/vm/
+
+# Or use the interactive TUI:
+./zkvm/zkvm
+# Press Tab to go to vSphere tab — VMs auto-discovered</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">10</div>
+    <div class="step-content">
+      <h4>Migrate a test VM <span class="time">10-30 min</span></h4>
+      <pre># Create migration config:
+cat > test-migration.yaml &lt;&lt;EOF
+cmd: vsphere
+vcenter: vcenter.yourdomain.com
+vc_user: administrator@vsphere.local
+vc_password_env: GOVC_PASSWORD
+dc_name: your-datacenter
+vs_action: export_vm
+vs_vm: your-test-vm
+output_dir: ./out
+out_format: qcow2
+flatten: true
+regen_initramfs: true
+emit_domain_xml: true
+vm_name: migrated-test-vm
+EOF
+
+sudo h2kvmctl --config test-migration.yaml</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">11</div>
+    <div class="step-content">
+      <h4>Verify migration <span class="time">2 min</span></h4>
+      <pre>virsh list --all                  # VM should appear
+virsh start migrated-test-vm     # Start it
+virsh console migrated-test-vm   # Check console</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: POC CHECKLIST -->
+<div class="page page-light">
+  <h2>POC <span>Checklist</span></h2>
+  <p class="sub">Validate these items to confirm migration readiness.</p>
+
+  <table>
+    <tr><th style="width:5%"></th><th style="width:35%">Test</th><th style="width:35%">How to Verify</th><th style="width:25%">Expected Result</th></tr>
+    <tr><td>&#9744;</td><td>VMDK converts to qcow2</td><td><code>qemu-img info out/*.qcow2</code></td><td>Format: qcow2, size correct</td></tr>
+    <tr><td>&#9744;</td><td>Linux VM boots on KVM</td><td><code>virsh start vm-name</code></td><td>Reaches login prompt</td></tr>
+    <tr><td>&#9744;</td><td>Windows VM boots (no BSOD)</td><td><code>virsh start win-vm</code></td><td>Reaches desktop/login</td></tr>
+    <tr><td>&#9744;</td><td>Network works post-migration</td><td><code>ping</code> from migrated VM</td><td>Connectivity OK</td></tr>
+    <tr><td>&#9744;</td><td>fstab is correct</td><td><code>cat /etc/fstab</code> inside VM</td><td>UUID-based entries</td></tr>
+    <tr><td>&#9744;</td><td>initramfs has virtio drivers</td><td><code>lsinitrd</code> inside VM</td><td>virtio_blk, virtio_net present</td></tr>
+    <tr><td>&#9744;</td><td>vSphere discovery works</td><td>TUI vSphere tab or govc ls</td><td>VMs listed with details</td></tr>
+    <tr><td>&#9744;</td><td>Batch queue works</td><td>Select 3+ VMs, Ctrl+R</td><td>Sequential processing, results</td></tr>
+    <tr><td>&#9744;</td><td>KubeVirt deploy works</td><td><code>kubectl get vm</code></td><td>VM created, PVC bound</td></tr>
+    <tr><td>&#9744;</td><td>YAML automation works</td><td><code>h2kvmctl --config test.yaml</code></td><td>Reproducible results</td></tr>
+  </table>
+
+  <h3>POC VM Selection Guide</h3>
+  <div class="card-grid">
+    <div class="card"><h4>Start With</h4><ul><li>Non-production Linux VM (CentOS/RHEL)</li><li>Small disk (&lt;20GB) for fast test</li><li>Standard config (no GPU passthrough)</li><li>Single disk, single NIC</li></ul></div>
+    <div class="card"><h4>Then Test</h4><ul><li>Windows Server VM (VirtIO injection)</li><li>Multi-disk VM (data disk preservation)</li><li>UEFI boot VM (firmware detection)</li><li>Production-like workload (DB, web server)</li></ul></div>
+  </div>
+
+  <h3>Common Issues &amp; Fixes</h3>
+  <table>
+    <tr><th>Issue</th><th>Solution</th></tr>
+    <tr><td>govc: certificate error</td><td>Set <code>GOVC_INSECURE=1</code> or import vCenter CA cert</td></tr>
+    <tr><td>Permission denied on qcow2</td><td>Run with <code>sudo</code> — KVM needs root for disk access</td></tr>
+    <tr><td>VM boots to GRUB rescue</td><td>Enable <code>--regen-initramfs</code> in config</td></tr>
+    <tr><td>No network after boot</td><td>Check bridge config: <code>virsh net-list</code></td></tr>
+    <tr><td>Windows BSOD</td><td>Add <code>--windows --virtio-win-iso /path/to/virtio-win.iso</code></td></tr>
+  </table>
+
+  <div class="footer">hyper2kvm Quick Start &amp; POC Guide | Total time: ~30 minutes | Proprietary (Zyvor AI Labs)</div>
+</div>
+</body>
+</html>

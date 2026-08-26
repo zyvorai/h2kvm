@@ -1,0 +1,48 @@
+# Ubuntu 22.04 LVM: vCenter → govc → libvirt (end-to-end)
+
+cmd: vsphere
+vs_action: export_vm
+export_mode: ovf_export
+vs_control_plane: govc
+
+vcenter: 10.73.213.134
+vc_user: administrator@vsphere.local
+vc_password: VCENTER@redhat2025
+vc_insecure: true
+dc_name: data
+govc_url: "https://10.73.213.134/sdk"
+govc_insecure: true
+govc_datacenter: data
+govc_export_remove_cdroms: true
+
+vm_name: esx8.0-ubuntu22.04.5-x64-with-lvm-partitions
+
+output_dir: ./output-ubuntu
+flatten: true
+to_output: ubuntu-2204.qcow2
+out_format: qcow2
+compress: true
+
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+
+emit_domain_xml: true
+virsh_define: true
+memory: 2048
+vcpus: 2
+uefi: true
+machine: q35
+disk_bus: virtio
+disk_cache: none
+net_model: virtio
+libvirt_network: default
+serial_console: true
+graphics: vnc
+guest_os: linux
+
+libvirt_test: true
+keep_domain: true
+timeout: 120
+
+verbose: 1

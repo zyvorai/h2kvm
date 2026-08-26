@@ -1,0 +1,84 @@
+# ==============================================================================
+# 🐧 Ubuntu 22.04 Local VMDK Conversion
+# ==============================================================================
+#
+# Converts a local Ubuntu 22.04 LTS VMDK to QCOW2 format
+#
+# Usage:
+#   hyper2kvm --config 03-local-ubuntu-22-vmdk.yaml local
+#
+# Features:
+#   ✅ UUID-based fstab stabilization
+#   ✅ GRUB root= fixing
+#   ✅ Initramfs regeneration (update-initramfs)
+#   ✅ QCOW2 compression
+#   ✅ Systemd/netplan compatibility
+#
+# Requirements:
+#   - guestfs-tools with Ubuntu support
+#   - Ubuntu/Debian guest OS
+# ==============================================================================
+
+cmd: local
+
+# Source VMDK
+vmdk: /home/ssahani/tt/hyper2kvm/mtv-ubuntu22-4.vmdk
+
+# Output Configuration
+output_dir: /home/ssahani/by-path/out
+
+# Flatten snapshot chain first
+flatten: true
+flatten_format: qcow2
+
+# Final output image
+to_output: mtv-ubuntu22-4-flat-fixed.qcow2
+out_format: qcow2
+compress: true
+checksum: true
+
+# Filesystem + Boot Fixes
+# Show fstab before and after conversion
+print_fstab: true
+
+# Rewrite all entries to stable identifiers
+# Priority: UUID → PARTUUID → LABEL
+fstab_mode: stabilize-all
+
+# Update GRUB root= parameter
+no_grub: false
+
+# Regenerate initramfs (Ubuntu uses update-initramfs)
+regen_initramfs: true
+
+# Optional: Add additional drivers to initramfs
+# Common for Ubuntu bare metal migrations:
+# initramfs_add_drivers: "e1000e ixgbe i40e"
+
+# Keep backups inside guest filesystem
+no_backup: false
+
+# Safety & Visibility
+dry_run: false
+
+# Verbosity levels:
+#   0 = INFO
+#   1 = verbose info
+#   2 = DEBUG (recommended for troubleshooting)
+verbose: 2
+
+# Optional logfile
+log_file: /home/ssahani/by-path/out/hyper2kvm.log
+
+# Optional Markdown report
+report: /home/ssahani/by-path/out/hyper2kvm-report.md
+
+# Optional Smoke Tests (disabled by default)
+# libvirt_test: true
+# vm_name: ubuntu22-fixed
+# memory: 2048
+# vcpus: 2
+# uefi: false
+# timeout: 30
+# keep_domain: false
+# headless: true

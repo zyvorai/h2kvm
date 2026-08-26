@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Network Architecture &amp; Migration — From vSwitch to Linux Bridge, OVS &amp; SR-IOV</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f766e, #0d9488, #14b8a6); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #5eead4; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(94,234,212,0.2); border: 1px solid rgba(94,234,212,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0a1514; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #5eead4; }
+  .page-light h2.st span { color: #0f766e; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #5eead4; }
+  .page-light h3 { color: #0f766e; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #0f766e; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #5eead4; }
+  .page-light .card h4 { color: #0f766e; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #0f766e; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(94,234,212,0.08); border: 1px solid rgba(94,234,212,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(94,234,212,0.06); }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(15,118,110,0.15), rgba(13,148,136,0.08)); border: 2px solid #14b8a6; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #5eead4; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Network <span>Architecture</span></h1>
+  <h2>From VMware vSwitch to Linux Bridge, OVS &amp; SR-IOV</h2>
+  <p class="sub">Network configuration is the most critical aspect of VM migration. This guide maps VMware virtual networking concepts to Linux equivalents — bridges, OVS, VLANs, bonds, SR-IOV, and firewall rules. hyper2kvm auto-generates network configs from OVF metadata.</p>
+  <div class="badge">Linux Bridge | OVS | SR-IOV | VLAN Mapping | Bond Modes | nftables | MAC Preservation</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Network Topology <span>Mapping</span></h2>
+  <p class="sub">VMware vSwitch/dvSwitch concepts map directly to Linux networking primitives.</p>
+
+  <h3>VMware → Linux Network Mapping</h3>
+  <table>
+    <tr><th style="width:20%">VMware Concept</th><th style="width:20%">Linux Equivalent</th><th style="width:30%">Configuration</th><th style="width:30%">Notes</th></tr>
+    <tr><td><strong>vSwitch</strong></td><td>Linux bridge (br0)</td><td><code>ip link add br0 type bridge</code></td><td>Layer 2 switch, same functionality</td></tr>
+    <tr><td><strong>dvSwitch</strong></td><td>Open vSwitch (OVS)</td><td><code>ovs-vsctl add-br ovsbr0</code></td><td>Distributed features: flow tables, QoS, mirroring</td></tr>
+    <tr><td><strong>Port Group</strong></td><td>VLAN sub-interface</td><td><code>ip link add link eth0 name eth0.100 type vlan id 100</code></td><td>Each port group becomes a VLAN interface on bridge</td></tr>
+    <tr><td><strong>vmnic (uplink)</strong></td><td>Physical NIC (eth0/ens192)</td><td><code>ip link set eth0 master br0</code></td><td>Physical NIC added as bridge port</td></tr>
+    <tr><td><strong>NIC Teaming</strong></td><td>Linux bonding</td><td><code>ip link add bond0 type bond mode 802.3ad</code></td><td>LACP, active-backup, balance-xor</td></tr>
+    <tr><td><strong>vMotion Network</strong></td><td>Dedicated bridge + VLAN</td><td>Separate bridge on dedicated NIC</td><td>Used for live migration traffic</td></tr>
+    <tr><td><strong>VMkernel Port</strong></td><td>Host IP on bridge</td><td><code>ip addr add 10.0.0.1/24 dev br0</code></td><td>Management, storage, vMotion IPs</td></tr>
+    <tr><td><strong>NSX Micro-segmentation</strong></td><td>nftables + OVS flows</td><td>Per-VM firewall rules or OVS ACLs</td><td>libvirt nwfilter for simple cases</td></tr>
+  </table>
+
+  <h3>Auto-Detection from OVF/OVA Metadata</h3>
+  <pre>
+# h2kvmctl reads network config from OVF and generates libvirt XML
+h2kvmctl convert --source vm-export.ova --emit-domain-xml
+
+# OVF NetworkSection extracted:
+#   Network "VM Network" → bridge=br0 (default)
+#   Network "VLAN100-Production" → bridge=br-vlan100
+#   Network "Storage" → bridge=br-storage
+
+# Generated libvirt XML network interfaces:
+# &lt;interface type='bridge'&gt;
+#   &lt;source bridge='br0'/&gt;
+#   &lt;model type='virtio'/&gt;
+#   &lt;mac address='52:54:00:ab:cd:01'/&gt;  &lt;!-- preserved from source --&gt;
+# &lt;/interface&gt;</pre>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Linux Bridge <span>Configuration</span></h2>
+  <p class="sub">The simplest and most reliable network backend for KVM virtual machines.</p>
+
+  <h3>Bridge Setup Methods</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>NetworkManager (RHEL 9 / Rocky 9)</h4>
+      <pre>
+# Create bridge
+nmcli con add type bridge \
+  con-name br0 ifname br0 \
+  ipv4.addresses 10.0.1.1/24 \
+  ipv4.gateway 10.0.1.254 \
+  ipv4.dns 10.0.1.10 \
+  ipv4.method manual
+
+# Add physical NIC as port
+nmcli con add type bridge-slave \
+  con-name br0-port1 \
+  ifname ens192 master br0
+
+# VLAN bridge
+nmcli con add type bridge \
+  con-name br-vlan100 ifname br100
+nmcli con add type vlan \
+  con-name ens192.100 \
+  ifname ens192.100 dev ens192 \
+  id 100 master br100</pre>
+    </div>
+    <div class="card">
+      <h4>systemd-networkd (Ubuntu / Minimal)</h4>
+      <pre>
+# /etc/systemd/network/10-br0.netdev
+[NetDev]
+Name=br0
+Kind=bridge
+
+# /etc/systemd/network/20-br0.network
+[Match]
+Name=br0
+[Network]
+Address=10.0.1.1/24
+Gateway=10.0.1.254
+DNS=10.0.1.10
+
+# /etc/systemd/network/30-ens192.network
+[Match]
+Name=ens192
+[Network]
+Bridge=br0
+
+# Apply
+systemctl restart systemd-networkd</pre>
+    </div>
+    <div class="card">
+      <h4>Libvirt Network XML</h4>
+      <pre>
+&lt;!-- Use existing bridge --&gt;
+&lt;network&gt;
+  &lt;name&gt;production&lt;/name&gt;
+  &lt;forward mode='bridge'/&gt;
+  &lt;bridge name='br0'/&gt;
+&lt;/network&gt;
+
+&lt;!-- NAT network (dev/test) --&gt;
+&lt;network&gt;
+  &lt;name&gt;isolated&lt;/name&gt;
+  &lt;forward mode='nat'/&gt;
+  &lt;bridge name='virbr1'/&gt;
+  &lt;ip address='192.168.122.1'
+     netmask='255.255.255.0'&gt;
+    &lt;dhcp&gt;
+      &lt;range start='192.168.122.100'
+             end='192.168.122.200'/&gt;
+    &lt;/dhcp&gt;
+  &lt;/ip&gt;
+&lt;/network&gt;</pre>
+    </div>
+    <div class="card">
+      <h4>Bridge Performance Tuning</h4>
+      <ul>
+        <li><strong>STP:</strong> Disable for VM-only bridges: <code>ip link set br0 type bridge stp_state 0</code></li>
+        <li><strong>Forward delay:</strong> <code>ip link set br0 type bridge forward_delay 0</code></li>
+        <li><strong>Multicast snooping:</strong> Disable if not needed: <code>echo 0 > /sys/class/net/br0/bridge/multicast_snooping</code></li>
+        <li><strong>TX queue:</strong> <code>ip link set br0 txqueuelen 10000</code></li>
+        <li><strong>GRO/GSO:</strong> <code>ethtool -K br0 gro on gso on</code></li>
+        <li><strong>Performance:</strong> ~8 Gbps on 10GbE with tuning</li>
+        <li><strong>Latency:</strong> ~20us additional vs direct passthrough</li>
+        <li>Recommended for: most production workloads</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Open vSwitch <span>for Production</span></h2>
+  <p class="sub">OVS provides advanced networking features matching VMware dvSwitch capabilities.</p>
+
+  <h3>OVS vs Linux Bridge Decision Matrix</h3>
+  <table>
+    <tr><th style="width:25%">Feature</th><th style="width:15%">Linux Bridge</th><th style="width:15%">OVS</th><th style="width:15%">OVS-DPDK</th><th style="width:30%">When to Choose</th></tr>
+    <tr><td>Setup complexity</td><td class="check">Simple</td><td>Medium</td><td>Complex</td><td>Bridge for &lt;20 VMs, OVS for enterprise</td></tr>
+    <tr><td>VLAN support</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td>Both handle VLANs; OVS has trunk/access port modes</td></tr>
+    <tr><td>Flow tables / OpenFlow</td><td class="cross">No</td><td class="check">Yes</td><td class="check">Yes</td><td>OVS for SDN, complex routing, ACLs</td></tr>
+    <tr><td>Port mirroring / SPAN</td><td class="cross">No</td><td class="check">Yes</td><td class="check">Yes</td><td>OVS for IDS/IPS traffic capture</td></tr>
+    <tr><td>QoS / rate limiting</td><td>Basic (tc)</td><td class="check">Built-in</td><td class="check">Built-in</td><td>OVS for per-VM bandwidth guarantees</td></tr>
+    <tr><td>LACP bond</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td>Both support LACP; OVS adds load-balancing modes</td></tr>
+    <tr><td>Performance (10GbE)</td><td>8 Gbps</td><td>9 Gbps</td><td class="check">Line rate</td><td>DPDK for telco/NFV workloads</td></tr>
+    <tr><td>Packets per second</td><td>2 Mpps</td><td>3 Mpps</td><td class="check">14 Mpps</td><td>DPDK for high-PPS workloads</td></tr>
+  </table>
+
+  <h3>OVS Configuration</h3>
+  <pre>
+# Install OVS
+dnf install openvswitch3.1 && systemctl enable --now openvswitch
+
+# Create OVS bridge with VLAN trunking
+ovs-vsctl add-br ovsbr0
+ovs-vsctl add-port ovsbr0 ens192 trunk=100,200,300
+ovs-vsctl add-port ovsbr0 vnet0 tag=100    # VM on VLAN 100
+ovs-vsctl add-port ovsbr0 vnet1 tag=200    # VM on VLAN 200
+
+# Port mirroring (send all traffic to IDS VM)
+ovs-vsctl -- set Bridge ovsbr0 mirrors=@m \
+  -- --id=@vnet0 get Port vnet0 \
+  -- --id=@vnet-ids get Port vnet-ids \
+  -- --id=@m create Mirror name=ids-mirror select-all=true output-port=@vnet-ids
+
+# QoS: limit VM to 1 Gbps
+ovs-vsctl set Interface vnet0 ingress_policing_rate=1000000
+ovs-vsctl set Interface vnet0 ingress_policing_burst=100000
+
+# Libvirt OVS integration
+# &lt;interface type='bridge'&gt;
+#   &lt;source bridge='ovsbr0'/&gt;
+#   &lt;virtualport type='openvswitch'/&gt;
+#   &lt;vlan&gt;&lt;tag id='100'/&gt;&lt;/vlan&gt;
+#   &lt;model type='virtio'/&gt;
+# &lt;/interface&gt;</pre>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">SR-IOV &amp; <span>Hardware Passthrough</span></h2>
+  <p class="sub">Line-rate network performance by bypassing the hypervisor entirely.</p>
+
+  <h3>Network Backend Performance Comparison</h3>
+  <table>
+    <tr><th>Backend</th><th>Throughput (10GbE)</th><th>Latency</th><th>PPS (64-byte)</th><th>CPU Overhead</th><th>Live Migration</th><th>Best For</th></tr>
+    <tr><td><strong>virtio-net</strong></td><td>9.4 Gbps</td><td>~50us</td><td>3.5 Mpps</td><td>Medium</td><td class="check">Yes</td><td>General workloads</td></tr>
+    <tr><td><strong>vhost-net</strong></td><td>9.8 Gbps</td><td>~30us</td><td>5 Mpps</td><td>Low</td><td class="check">Yes</td><td>Production (default)</td></tr>
+    <tr><td><strong>SR-IOV VF</strong></td><td class="check">10 Gbps (line)</td><td class="check">~5us</td><td class="check">14.8 Mpps</td><td class="check">Zero</td><td class="cross">No*</td><td>NFV, databases, latency-sensitive</td></tr>
+    <tr><td><strong>PCI Passthrough</strong></td><td class="check">10 Gbps (line)</td><td class="check">~5us</td><td class="check">14.8 Mpps</td><td class="check">Zero</td><td class="cross">No</td><td>Dedicated NIC per VM</td></tr>
+    <tr><td><strong>macvtap (bridge)</strong></td><td>9.2 Gbps</td><td>~25us</td><td>4 Mpps</td><td>Low</td><td class="check">Yes</td><td>Simple, no bridge config</td></tr>
+    <tr><td><strong>OVS-DPDK</strong></td><td class="check">10 Gbps (line)</td><td>~10us</td><td class="check">14 Mpps</td><td>Dedicated cores</td><td class="check">Yes</td><td>Telco NFV, virtual routers</td></tr>
+  </table>
+  <p style="font-size:0.8em;opacity:0.7;">* SR-IOV live migration possible with NVIDIA ConnectX-6+ bond failover mode</p>
+
+  <h3>SR-IOV Setup</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Enable SR-IOV Virtual Functions</h4>
+      <pre>
+# Enable IOMMU in kernel
+# /etc/default/grub:
+# GRUB_CMDLINE_LINUX="intel_iommu=on iommu=pt"
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+# Create 8 VFs on Intel X710
+echo 8 > /sys/class/net/ens3f0/device/sriov_numvfs
+
+# Persistent via udev rule
+cat > /etc/udev/rules.d/70-sriov.rules &lt;&lt;'EOF'
+ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_DRIVER}=="i40e", \
+  ATTR{device/sriov_numvfs}="8"
+EOF
+
+# Verify VFs created
+ip link show ens3f0
+# 8 VFs listed as ens3f0v0..ens3f0v7</pre>
+    </div>
+    <div class="card">
+      <h4>Libvirt SR-IOV XML</h4>
+      <pre>
+&lt;!-- Assign VF to VM --&gt;
+&lt;interface type='hostdev' managed='yes'&gt;
+  &lt;source&gt;
+    &lt;address type='pci'
+      domain='0x0000' bus='0x03'
+      slot='0x10' function='0x0'/&gt;
+  &lt;/source&gt;
+  &lt;mac address='52:54:00:ab:cd:ef'/&gt;
+  &lt;vlan&gt;&lt;tag id='100'/&gt;&lt;/vlan&gt;
+&lt;/interface&gt;
+
+&lt;!-- Check IOMMU groups --&gt;
+# find /sys/kernel/iommu_groups/ \
+#   -type l | sort -V
+# Ensure VF is in its own group</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Bond Modes &amp; <span>NIC Teaming Migration</span></h2>
+  <p class="sub">VMware NIC teaming policies map to Linux bond modes for failover and load balancing.</p>
+
+  <h3>VMware NIC Teaming → Linux Bond Mode Mapping</h3>
+  <table>
+    <tr><th style="width:20%">VMware Policy</th><th style="width:15%">Linux Bond Mode</th><th style="width:15%">Mode #</th><th style="width:25%">How It Works</th><th style="width:25%">Switch Requirement</th></tr>
+    <tr><td><strong>Active/Standby</strong></td><td>active-backup</td><td>mode=1</td><td>One active NIC, failover on link down</td><td>None (any switch)</td></tr>
+    <tr><td><strong>IP Hash</strong></td><td>balance-xor</td><td>mode=2</td><td>XOR of src/dst IP selects NIC</td><td>Static EtherChannel</td></tr>
+    <tr><td><strong>LACP (dvSwitch)</strong></td><td>802.3ad</td><td>mode=4</td><td>LACP negotiation, dynamic aggregation</td><td>LACP-capable switch</td></tr>
+    <tr><td><strong>Source Port ID</strong></td><td>balance-rr</td><td>mode=0</td><td>Round-robin across NICs</td><td>Static EtherChannel</td></tr>
+    <tr><td><strong>Source MAC</strong></td><td>balance-xor (layer2)</td><td>mode=2</td><td>XOR hash of MAC address</td><td>Static EtherChannel</td></tr>
+    <tr><td><strong>Load Based (dvSwitch)</strong></td><td>balance-alb</td><td>mode=6</td><td>Adaptive TX/RX load balancing</td><td>None (any switch)</td></tr>
+  </table>
+
+  <h3>Bond Configuration</h3>
+  <pre>
+# LACP bond with NetworkManager (most common enterprise config)
+nmcli con add type bond con-name bond0 ifname bond0 \
+  bond.options "mode=802.3ad,miimon=100,lacp_rate=fast,xmit_hash_policy=layer3+4"
+
+# Add slave interfaces
+nmcli con add type ethernet con-name bond0-port1 ifname ens192 master bond0
+nmcli con add type ethernet con-name bond0-port2 ifname ens224 master bond0
+
+# Create bridge on top of bond (for VMs)
+nmcli con add type bridge con-name br0 ifname br0 \
+  ipv4.addresses 10.0.1.1/24 ipv4.method manual
+nmcli con add type bridge-slave con-name br0-bond0 ifname bond0 master br0
+
+# Verify LACP negotiation
+cat /proc/net/bonding/bond0
+# Partner Mac Address: 00:1c:73:xx:xx:xx (switch side)
+# Aggregator ID: 1 (both ports in same aggregation)</pre>
+
+  <div class="highlight">
+    <h3>Migration Tip: Bond Mode Selection</h3>
+    <p><strong>Active-backup (mode=1)</strong> is the safest migration choice — works with any switch, no switch-side config needed. Start with mode=1, then upgrade to LACP (mode=4) after validating switch compatibility. h2kvmctl auto-detects VMware NIC teaming policy from OVF and suggests the matching Linux bond mode in the migration report.</p>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">Firewall &amp; Security <span>Group Migration</span></h2>
+  <p class="sub">Mapping VMware NSX distributed firewall rules to Linux nftables and libvirt nwfilter.</p>
+
+  <h3>NSX → nftables Rule Translation</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>VMware NSX Rules (Source)</h4>
+      <pre>
+# NSX Distributed Firewall
+Rule 1: Web-Tier → App-Tier
+  Source: web-sg (10.0.1.0/24)
+  Dest:   app-sg (10.0.2.0/24)
+  Port:   TCP 8080, 8443
+  Action: Allow
+
+Rule 2: App-Tier → DB-Tier
+  Source: app-sg (10.0.2.0/24)
+  Dest:   db-sg  (10.0.3.0/24)
+  Port:   TCP 5432 (PostgreSQL)
+  Action: Allow
+
+Rule 3: Default
+  Source: Any
+  Dest:   Any
+  Action: Drop</pre>
+    </div>
+    <div class="card">
+      <h4>Linux nftables (Target)</h4>
+      <pre>
+#!/usr/sbin/nft -f
+table inet vm-firewall {
+  chain forward {
+    type filter hook forward
+      priority 0; policy drop;
+
+    # Web → App (TCP 8080, 8443)
+    ip saddr 10.0.1.0/24
+      ip daddr 10.0.2.0/24
+      tcp dport { 8080, 8443 } accept
+
+    # App → DB (TCP 5432)
+    ip saddr 10.0.2.0/24
+      ip daddr 10.0.3.0/24
+      tcp dport 5432 accept
+
+    # Established connections
+    ct state established,related accept
+
+    # Log + drop everything else
+    log prefix "VM-FW-DROP: " drop
+  }
+}</pre>
+    </div>
+    <div class="card">
+      <h4>Libvirt nwfilter (Per-VM)</h4>
+      <pre>
+&lt;!-- Simple per-VM filter --&gt;
+&lt;filter name='web-server'
+        chain='root'&gt;
+  &lt;rule action='accept' direction='in'&gt;
+    &lt;tcp dstportstart='80'/&gt;
+  &lt;/rule&gt;
+  &lt;rule action='accept' direction='in'&gt;
+    &lt;tcp dstportstart='443'/&gt;
+  &lt;/rule&gt;
+  &lt;rule action='accept' direction='in'&gt;
+    &lt;tcp dstportstart='22'/&gt;
+  &lt;/rule&gt;
+  &lt;rule action='drop' direction='inout'&gt;
+    &lt;all/&gt;
+  &lt;/rule&gt;
+&lt;/filter&gt;
+
+&lt;!-- Apply to VM interface --&gt;
+&lt;interface type='bridge'&gt;
+  &lt;filterref filter='web-server'/&gt;
+&lt;/interface&gt;</pre>
+    </div>
+    <div class="card">
+      <h4>OVS Flow-Based ACLs</h4>
+      <pre>
+# Micro-segmentation with OVS flows
+# Allow web→app on port 8080
+ovs-ofctl add-flow ovsbr0 \
+  "priority=100,ip,\
+   nw_src=10.0.1.0/24,\
+   nw_dst=10.0.2.0/24,\
+   tp_dst=8080,\
+   actions=normal"
+
+# Drop all other inter-tier traffic
+ovs-ofctl add-flow ovsbr0 \
+  "priority=50,ip,\
+   nw_src=10.0.1.0/24,\
+   nw_dst=10.0.3.0/24,\
+   actions=drop"
+
+# Default: allow same-subnet
+ovs-ofctl add-flow ovsbr0 \
+  "priority=10,actions=normal"</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">DNS/DHCP &amp; <span>IP Preservation</span></h2>
+  <p class="sub">Zero-downtime network cutover with MAC and IP address preservation.</p>
+
+  <h3>MAC Address Preservation</h3>
+  <pre>
+# h2kvmctl preserves MAC addresses from source VM automatically
+h2kvmctl convert --source vm.ova --emit-domain-xml
+# Reads OVF: &lt;rasd:Address&gt;00:50:56:ab:12:34&lt;/rasd:Address&gt;
+# Writes XML: &lt;mac address='00:50:56:ab:12:34'/&gt;
+
+# Why MAC preservation matters:
+# 1. DHCP reservations continue to work (MAC → IP mapping)
+# 2. License servers tied to MAC (e.g., FlexLM, Sentinel)
+# 3. Network monitoring tools track by MAC
+# 4. ARP tables update automatically — no manual changes
+
+# Override MAC if needed (e.g., VMware MAC prefix conflict)
+h2kvmctl convert --source vm.ova --emit-domain-xml --mac-prefix 52:54:00
+# Changes 00:50:56:ab:12:34 → 52:54:00:ab:12:34</pre>
+
+  <h3>Zero-Downtime Network Cutover Strategy</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Pre-Migration (T-1 week)</h4>
+      <ul>
+        <li>Inventory all VM IPs, MACs, VLANs, DNS records</li>
+        <li>Document DHCP reservations and static assignments</li>
+        <li>Lower DNS TTL to 60 seconds (from default 3600)</li>
+        <li>Configure KVM host bridges to match VLAN topology</li>
+        <li>Test network connectivity from KVM host to all VLANs</li>
+        <li>Verify routing tables and gateway accessibility</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>During Migration (T-0)</h4>
+      <ul>
+        <li>Shutdown VMware VM (clean shutdown, not force-off)</li>
+        <li>Start KVM VM with preserved MAC on same VLAN</li>
+        <li>DHCP: lease transfers automatically (same MAC = same IP)</li>
+        <li>Static IP: no change needed (same IP on same subnet)</li>
+        <li>ARP: gratuitous ARP sent on VM boot (updates switches)</li>
+        <li>Typical downtime: 2-5 minutes per VM</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>DNS Record Updates</h4>
+      <ul>
+        <li>If IP changes: update A/AAAA records</li>
+        <li><code>nsupdate -k /etc/rndc.key &lt;&lt;EOF</code></li>
+        <li><code>update delete vm1.example.com A</code></li>
+        <li><code>update add vm1.example.com 60 A 10.0.1.50</code></li>
+        <li><code>send</code></li>
+        <li>Reverse DNS (PTR): update if IP changed</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Post-Migration Verification</h4>
+      <ul>
+        <li><code>ping -c 3 &lt;vm-ip&gt;</code> — basic connectivity</li>
+        <li><code>arping -I br0 &lt;vm-ip&gt;</code> — verify MAC on network</li>
+        <li><code>traceroute &lt;vm-ip&gt;</code> — verify routing path</li>
+        <li><code>nmap -sV &lt;vm-ip&gt;</code> — verify services responding</li>
+        <li>Restore DNS TTL to original value after 24 hours</li>
+        <li>Monitor for 48 hours before decommissioning VMware VM</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page page-light">
+  <h2 class="st">Network Validation <span>&amp; Troubleshooting</span></h2>
+  <p class="sub">Post-migration verification checklist and common pitfalls.</p>
+
+  <h3>Verification Checklist</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:25%">Check</th><th style="width:30%">Command</th><th style="width:15%">Expected Result</th><th style="width:25%">Common Issue</th></tr>
+    <tr><td>1</td><td>VM has network interface</td><td><code>virsh domiflist &lt;vm&gt;</code></td><td>Interface on correct bridge</td><td>Wrong bridge name in XML</td></tr>
+    <tr><td>2</td><td>Bridge has physical port</td><td><code>bridge link show</code></td><td>Physical NIC in bridge</td><td>NIC not added as bridge slave</td></tr>
+    <tr><td>3</td><td>VLAN tagging correct</td><td><code>tcpdump -e -i br0 vlan</code></td><td>Correct VLAN tags on frames</td><td>Trunk port not configured on switch</td></tr>
+    <tr><td>4</td><td>MTU matches</td><td><code>ip link show br0</code></td><td>MTU 1500 (or 9000 for jumbo)</td><td>MTU mismatch causes fragmentation</td></tr>
+    <tr><td>5</td><td>VM can reach gateway</td><td><code>ping -c 3 &lt;gateway&gt;</code></td><td>0% packet loss</td><td>IP forwarding disabled on host</td></tr>
+    <tr><td>6</td><td>DNS resolution works</td><td><code>nslookup example.com</code></td><td>Valid response</td><td>resolv.conf not configured in guest</td></tr>
+    <tr><td>7</td><td>TCP throughput</td><td><code>iperf3 -c &lt;target&gt; -t 30</code></td><td>&gt;8 Gbps on 10GbE</td><td>Checksum offload disabled</td></tr>
+    <tr><td>8</td><td>No packet loss under load</td><td><code>iperf3 -c &lt;target&gt; -u -b 10G</code></td><td>&lt;0.1% loss</td><td>Ring buffer too small</td></tr>
+  </table>
+
+  <h3>Common Pitfalls &amp; Fixes</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>MTU Mismatch (Most Common)</h4>
+      <ul>
+        <li><strong>Symptom:</strong> SSH works but large transfers stall</li>
+        <li><strong>Cause:</strong> VMware used jumbo frames (MTU 9000), KVM bridge defaults to 1500</li>
+        <li><strong>Fix:</strong> Match MTU across path: <code>ip link set br0 mtu 9000</code></li>
+        <li>Also set on physical NIC: <code>ip link set ens192 mtu 9000</code></li>
+        <li>And in guest: <code>ip link set eth0 mtu 9000</code></li>
+        <li>Verify: <code>ping -M do -s 8972 &lt;target&gt;</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>IP Forwarding Disabled</h4>
+      <ul>
+        <li><strong>Symptom:</strong> VMs can't reach outside subnet</li>
+        <li><strong>Cause:</strong> Linux kernel drops forwarded packets by default</li>
+        <li><strong>Fix:</strong> <code>sysctl -w net.ipv4.ip_forward=1</code></li>
+        <li>Persistent: <code>echo "net.ipv4.ip_forward=1" >> /etc/sysctl.d/99-kvm.conf</code></li>
+        <li>For IPv6: <code>net.ipv6.conf.all.forwarding=1</code></li>
+        <li>Also check nftables isn't blocking FORWARD chain</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Checksum Offload Issues</h4>
+      <ul>
+        <li><strong>Symptom:</strong> tcpdump shows bad checksums, intermittent drops</li>
+        <li><strong>Cause:</strong> Hardware offload mismatch between host and guest</li>
+        <li><strong>Fix in guest:</strong> <code>ethtool -K eth0 tx off rx off</code></li>
+        <li>Better fix: ensure virtio NIC has csum enabled</li>
+        <li>libvirt XML: <code>&lt;driver name='vhost' csum='on' gso='on'/&gt;</code></li>
+        <li>Verify: <code>ethtool -k eth0 | grep checksum</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Bridge Filtering (iptables/nftables)</h4>
+      <ul>
+        <li><strong>Symptom:</strong> Bridged traffic silently dropped</li>
+        <li><strong>Cause:</strong> bridge-nf-call-iptables sends L2 traffic through L3 filter</li>
+        <li><strong>Fix:</strong> Disable bridge filtering:</li>
+        <li><code>sysctl -w net.bridge.bridge-nf-call-iptables=0</code></li>
+        <li><code>sysctl -w net.bridge.bridge-nf-call-ip6tables=0</code></li>
+        <li>Or add explicit ACCEPT rules in FORWARD chain</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Network Migration Success: Match Topology, Preserve MACs, Verify Path</h3>
+    <p>90% of post-migration network issues are caused by three things: MTU mismatch, missing IP forwarding, or wrong bridge assignment. h2kvmctl auto-maps VMware network topology to Linux equivalents, preserves MAC addresses, and generates ready-to-use libvirt network XML. Run the 8-point verification checklist after each VM migration.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Network Architecture &amp; Migration Guide</div>
+</div>
+
+</body>
+</html>

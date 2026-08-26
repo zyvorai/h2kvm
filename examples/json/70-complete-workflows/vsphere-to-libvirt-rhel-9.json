@@ -1,0 +1,126 @@
+# ============================================
+# Complete Workflow: vSphere → libvirt (RHEL 9)
+# ============================================
+# Description: Export RHEL 9 VM from vSphere and prepare for libvirt/KVM
+# Use Case: Enterprise RHEL 9 migration with subscription preservation
+# Prerequisites:
+#   - govc installed
+#   - vCenter credentials
+#   - RHEL subscription or satellite server
+# ============================================
+{
+  "cmd": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "username": "administrator@vsphere.local",
+  "password_file": "~/.vcenter_password",
+  "datacenter": "Production-DC",
+  "cluster": "RHEL-Cluster",
+  "vm_name": "rhel9-database-server",
+  "vs_action": "export",
+  "export_method": "govc",
+  "export_format": "ova",
+  "create_snapshot": true,
+  "snapshot_name": "pre-kvm-migration",
+  "snapshot_description": "Snapshot before KVM migration - $(date +%Y-%m-%d)",
+  "snapshot_memory": false,
+  "snapshot_quiesce": true,
+  "delete_snapshot_after": true,
+  "flatten": true,
+  "compress": true,
+  "disk_format": "qcow2",
+  "fix_fstab": true,
+  "fix_grub": true,
+  "fix_initramfs": true,
+  "fix_network": true,
+  "remove_vmware_tools": true,
+  "network_config_type": "networkmanager",
+  "network_fix_level": "full",
+  "remove_mac_binding": true,
+  "setup_dhcp": true,
+  "preserve_static_ip": false,
+  "remove_vmware_network_files": true,
+  "network_config_format": "keyfile",
+  "bootloader_type": "grub2",
+  "firmware_type": "uefi",
+  "regenerate_grub": true,
+  "update_grub_config": true,
+  "grub_cmdline_add": [
+    "net.ifnames=0",
+    "biosdevname=0"
+  ],
+  "update_initramfs": true,
+  "dracut_force_rebuild": true,
+  "install_virtio_modules": true,
+  "dracut_add_drivers": [
+    "virtio",
+    "virtio_blk",
+    "virtio_scsi",
+    "virtio_net",
+    "virtio_pci"
+  ],
+  "selinux_relabel": true,
+  "selinux_mode": "enforcing",
+  "preserve_rhsm_config": true,
+  "rhsm_server": "satellite.example.com",
+  "clean_ssh_keys": false,
+  "clean_machine_id": true,
+  "preserve_hostname": true,
+  "timezone": "America/New_York",
+  "to_output": "/data/kvm/rhel9-database-server.qcow2",
+  "output_format": "qcow2",
+  "output_dir": "/data/kvm/",
+  "generate_libvirt_xml": true,
+  "libvirt_xml_path": "/data/kvm/rhel9-database-server.xml",
+  "libvirt_domain_name": "rhel9-database-server",
+  "memory_mb": 16384,
+  "memory_backing": "hugepages",
+  "vcpus": 16,
+  "cpu_mode": "host-passthrough",
+  "cpu_features": [
+    {
+      "name": "pdpe1gb",
+      "policy": "require"
+    }
+  ],
+  "numa_nodes": 2,
+  "uefi_loader": "/usr/share/edk2/ovmf/OVMF_CODE.fd",
+  "uefi_nvram_template": "/usr/share/edk2/ovmf/OVMF_VARS.fd",
+  "secure_boot": true,
+  "disk_bus": "virtio",
+  "disk_cache": "none",
+  "disk_io": "native",
+  "disk_discard": "unmap",
+  "disk_detect_zeroes": "unmap",
+  "additional_disks": [
+    {
+      "path": "/data/kvm/rhel9-database-data.qcow2",
+      "size": "500G",
+      "bus": "virtio",
+      "cache": "none"
+    }
+  ],
+  "network_type": "bridge",
+  "network_bridge": "br0",
+  "network_model": "virtio",
+  "network_mtu": 9000,
+  "enable_iothreads": true,
+  "iothread_count": 4,
+  "enable_serial_console": true,
+  "enable_vnc": true,
+  "vnc_listen": "0.0.0.0",
+  "vnc_password_required": true,
+  "qemu_guest_agent": true,
+  "libvirt_test": true,
+  "boot_timeout": 600,
+  "validate_network": true,
+  "validate_services": [
+    "postgresql",
+    "firewalld"
+  ],
+  "report": "/var/log/migrations/rhel9-db-$(date +%Y%m%d-%H%M%S).md",
+  "log_level": "INFO",
+  "verbose": true,
+  "enable_recovery": true,
+  "recovery_checkpoint_dir": "/tmp/hyper2kvm-checkpoints",
+  "post_migration_script": "#!/bin/bash\nset -e\n\n# Import domain\nvirsh define /data/kvm/rhel9-database-server.xml\n\n# Set autostart\nvirsh autostart rhel9-database-server\n\n# Start VM\nvirsh start rhel9-database-server\n\n# Wait for VM to boot\necho \"Waiting for VM to boot...\"\nsleep 60\n\n# Check VM status\nvirsh list | grep rhel9-database-server\n\n# Relabel SELinux contexts if needed\n# virsh domid rhel9-database-server | xargs -I {} ssh root@{} \"restorecon -R /\"\n\necho \"RHEL 9 database server migration complete\"\necho \"Next steps:\"\necho \"1. Verify database service: ssh root@<vm-ip> systemctl status postgresql\"\necho \"2. Test database connectivity\"\necho \"3. Update DNS records if needed\"\necho \"4. Update monitoring systems\"\n"
+}

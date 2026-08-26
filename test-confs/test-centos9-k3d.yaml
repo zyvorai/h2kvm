@@ -1,0 +1,41 @@
+# CentOS 9 - Convert VMDK and deploy to k3d (KubeVirt)
+# Usage: sudo ./h2kvmctl --config test-confs/test-centos9-k3d.yaml
+
+command: local
+
+# Source VMDK
+vmdk: /home/ssahani/Downloads/centos/CentOS_Stream_9_VMM_LinuxVMImages.COM.vmdk
+
+# Output Configuration
+output_dir: ./output
+to_output: centos9-k3d.qcow2
+out_format: qcow2
+compress: true
+
+# Core Linux Fixes
+fstab_mode: stabilize-all
+regen_initramfs: true
+serial_console: true
+
+# VirtIO modules for initramfs (required for KubeVirt)
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+  - virtio_balloon
+  - virtio_console
+
+# Network fixes
+network_fixes_enable: true
+
+# Automated k3d/KubeVirt deployment
+deploy_k8s: true
+k8s_namespace: centos9-k3d
+k8s_vm_name: centos9-k3d
+k8s_storage_class: local-path
+k8s_pvc_size: 10Gi
+k8s_cpu: "2"
+k8s_memory: 4Gi
+k8s_auto_start: true
+k8s_wait_ready: true

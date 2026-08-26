@@ -1,0 +1,13 @@
+{
+  "command": "local",
+  "vmdk": "/path/to/linux.vmdk",
+  "to_output": "linux-test.qcow2",
+  "libvirt_test": true,
+  "vm_name": "linux-test-uefi",
+  "memory": 4096,
+  "vcpus": 4,
+  "uefi": true,
+  "timeout": 120,
+  "keep_domain": false,
+  "headless": true
+}

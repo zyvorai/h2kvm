@@ -1,0 +1,162 @@
+# Default values for hyperconversion-operator
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Operator image configuration
+image:
+  repository: hyper2kvm-operator
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+# Fixer image for offline disk fixes (LVM, initramfs, fstab)
+fixerImage:
+  repository: hyper2kvm/fixer
+  tag: "0.3.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Number of operator replicas
+replicaCount: 1
+
+# Operator container resources
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 10m
+    memory: 64Mi
+
+# Node selector for operator pod
+nodeSelector: {}
+
+# Tolerations for operator pod
+tolerations: []
+
+# Affinity for operator pod
+affinity: {}
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+# Service account
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# RBAC configuration
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+
+# Leader election configuration
+leaderElection:
+  enabled: true
+
+# Webhook configuration
+webhooks:
+  enabled: true
+  port: 9443
+  # Certificate configuration
+  certificate:
+    # Use cert-manager for certificate generation
+    certManager:
+      enabled: true
+      # Issuer configuration
+      issuer:
+        # Create a self-signed issuer
+        selfSigned: true
+        # Or use an existing issuer
+        # name: "my-issuer"
+        # kind: "ClusterIssuer"
+
+# Metrics configuration
+metrics:
+  enabled: true
+  port: 8443
+  # ServiceMonitor for Prometheus Operator
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    # Additional labels for ServiceMonitor
+    labels: {}
+    # Namespace where Prometheus is running (if different)
+    # namespace: monitoring
+
+# Health check configuration
+healthCheck:
+  port: 8081
+  livenessProbe:
+    initialDelaySeconds: 15
+    periodSeconds: 20
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+# PodDisruptionBudget configuration
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# NetworkPolicy configuration
+networkPolicy:
+  enabled: true
+  # Additional ingress rules
+  additionalIngressRules: []
+  # Additional egress rules
+  additionalEgressRules: []
+
+# CRD installation
+crd:
+  # Install CRDs as part of Helm release
+  install: true
+  # Keep CRDs on chart uninstall
+  keep: true
+
+# Prometheus alert rules
+prometheusRules:
+  enabled: true
+  # Additional custom rules
+  additionalRules: []
+
+# Grafana dashboards
+grafanaDashboards:
+  enabled: true
+
+# Additional environment variables for operator
+env: []
+  # - name: LOG_LEVEL
+  #   value: "debug"
+
+# Additional volumes
+extraVolumes: []
+
+# Additional volume mounts
+extraVolumeMounts: []
+
+# Priority class name for operator pod
+priorityClassName: ""
+
+# Termination grace period
+terminationGracePeriodSeconds: 10

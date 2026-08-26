@@ -1,0 +1,10 @@
+docs/* usr/share/doc/hyper2kvm/
+systemd/README.md usr/share/doc/hyper2kvm/systemd/
+etc/hyper2kvm/daemon.yaml.sample etc/hyper2kvm/
+etc/modprobe.d/nbd.conf etc/modprobe.d/
+etc/sysctl.d/99-hyper2kvm-nbd.conf etc/sysctl.d/
+etc/systemd/system.conf.d/hyper2kvm-limits.conf etc/systemd/system.conf.d/
+systemd/hyper2kvm.service lib/systemd/system/
+systemd/hyper2kvm@.service lib/systemd/system/
+etc/tmpfiles.d/hyper2kvm.conf usr/lib/tmpfiles.d/
+etc/logrotate.d/hyper2kvm etc/logrotate.d/

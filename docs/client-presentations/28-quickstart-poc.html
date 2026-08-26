@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quick Start &amp; POC Guide — hyper2kvm + hypersdk</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #064e3b, #065f46, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #34d399; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(52,211,153,0.2); border: 1px solid rgba(52,211,153,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-green { background: linear-gradient(135deg, #064e3b, #0f172a); color: #e8e6df; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #34d399; }
+  .page-light h2.st span { color: #059669; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.7em 0 0.25em; color: #34d399; }
+  .page-light h3 { color: #059669; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #059669; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  pre { background: #0f172a; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: 'JetBrains Mono', monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .step { display: flex; gap: 14px; margin: 0.7em 0; align-items: flex-start; }
+  .step-num { width: 34px; height: 34px; background: #10b981; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1em; flex-shrink: 0; }
+  .step-content { flex: 1; } .step-content h4 { font-size: 0.95em; margin-bottom: 3px; } .step-content p { font-size: 0.85em; opacity: 0.85; margin-bottom: 0.3em; }
+  .time { display: inline-block; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); padding: 1px 8px; border-radius: 12px; font-size: 0.75em; font-weight: 600; color: #10b981; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 14px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.92em; font-weight: 600; margin-bottom: 4px; color: #34d399; } .card p { font-size: 0.8em; opacity: 0.85; margin-bottom: 0; }
+  .page-light .card h4 { color: #059669; }
+  .card ul { padding-left: 14px; font-size: 0.8em; margin: 0; } .card li { margin-bottom: 2px; }
+  .alert { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); border-radius: 8px; padding: 10px 14px; margin: 0.5em 0; font-size: 0.88em; }
+  .page-dark .alert { background: rgba(52,211,153,0.06); }
+  .verdict { background: linear-gradient(135deg, rgba(6,78,59,0.2), rgba(5,150,105,0.1)); border: 2px solid #059669; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #34d399; font-size: 1.1em; margin-bottom: 4px; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  code { background: rgba(52,211,153,0.1); padding: 2px 5px; border-radius: 4px; font-size: 0.87em; }
+  .highlight { background: rgba(52,211,153,0.1); border-radius: 8px; padding: 12px; margin: 0.5em 0; }
+  .page-dark .highlight { background: rgba(52,211,153,0.06); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Quick Start &amp; <span>POC Guide</span></h1>
+  <h2>From Zero to Migrated VM in 30 Minutes</h2>
+  <p class="sub">Step-by-step hands-on guide for IT teams. Install hyper2kvm, run system checks, convert a local VMDK, migrate from vSphere, test Windows VMs, deploy to KubeVirt, and validate with the POC checklist. Everything you need to prove the migration works before committing to a full project.</p>
+  <div class="badge">30 Minutes | 6 Labs | POC Checklist | Copy-Paste Commands | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE 1: Install & System Check -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Lab 1: Install &amp; <span>System Check</span> <span class="time">5 min</span></h2>
+  <p class="sub">Get hyper2kvm running on any Linux machine.</p>
+
+  <h3>Prerequisites</h3>
+  <p>Any Linux machine: Fedora 38+, RHEL 9+, Ubuntu 22.04+, Debian 12+. 4GB RAM minimum. 20GB free disk. Root or sudo access.</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Install dependencies + hyper2kvm</h4>
+      <pre># Option A: One-command quickstart (recommended)
+sudo ./scripts/quickstart.sh
+
+# Option B: Manual install
+# Fedora / RHEL:
+sudo dnf install -y qemu-img qemu-system-x86 libvirt virt-install python3-pip
+# Ubuntu / Debian:
+sudo apt install -y qemu-utils qemu-system-x86 libvirt-daemon-system python3-pip
+
+# Install hyper2kvm
+git clone https://github.com/ssahani/hyper2kvm.git && cd hyper2kvm
+pip3 install -e .
+
+# Install govc (for vSphere exports)
+curl -L https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x86_64.tar.gz \
+  | sudo tar xzf - -C /usr/local/bin govc
+
+# Build zkvm TUI
+cd zkvm && go build -o zkvm . && sudo cp zkvm /usr/bin/zkvm && cd ..</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Run system check</h4>
+      <pre># Validates 9 areas: KVM support, disk space, qemu-img, libvirt, govc, etc.
+h2kvmctl doctor
+
+# Expected output: all checks GREEN
+# If any check fails, fix it before proceeding</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h4>Verify installation</h4>
+      <pre>h2kvmctl --version          # hyper2kvm version
+govc version                # govc version
+zkvm --help 2>&1 | head -1  # zkvm TUI available
+virsh list --all            # libvirt running
+kvm-ok 2>/dev/null || grep -c vmx /proc/cpuinfo  # KVM support</pre>
+    </div>
+  </div>
+
+  <div class="alert">
+    <strong>Checkpoint:</strong> All 5 commands above should succeed. If <code>h2kvmctl doctor</code> shows all green, you're ready for Lab 2.
+  </div>
+</div>
+
+<!-- PAGE 2: Local VMDK Conversion -->
+<div class="page page-light">
+  <h2 class="st">Lab 2: Local VMDK <span>Conversion</span> <span class="time">10 min</span></h2>
+  <p class="sub">Convert a VMDK to QCOW2 and boot it on KVM — no vCenter needed.</p>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h4>Get a test VMDK</h4>
+      <pre># Option A: Use any existing VMDK from your VMware environment
+# Copy it to the local machine via SCP, USB, or datastore mount
+
+# Option B: Download Photon OS (small, fast, perfect for testing)
+curl -LO https://packages.vmware.com/photon/5.0/Rev1/ova/photon-5.0-ova.ova
+tar xf photon-5.0-ova.ova   # Extracts .vmdk + .ovf</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h4>Create migration config</h4>
+      <pre>cat > local-test.yaml &lt;&lt;'EOF'
+cmd: local
+vmdk: ./photon-disk1.vmdk        # Path to your VMDK
+output_dir: ./converted
+out_format: qcow2
+flatten: true
+regen_initramfs: true             # Rebuild with VirtIO drivers
+emit_domain_xml: true             # Generate libvirt XML
+vm_name: photon-poc
+memory: 1024
+vcpus: 2
+machine: q35
+EOF</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <h4>Run conversion</h4>
+      <pre>sudo h2kvmctl --config local-test.yaml</pre>
+      <p>Watch the output: validate → flatten → convert → guest fix → generate XML → define VM.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">7</div>
+    <div class="step-content">
+      <h4>Verify and boot</h4>
+      <pre>ls -lh converted/                    # QCOW2 file + domain XML created
+qemu-img info converted/*.qcow2     # Confirm format: qcow2
+virsh list --all                     # photon-poc should appear
+virsh start photon-poc               # Boot the VM
+virsh console photon-poc             # Connect to console (Ctrl+] to exit)</pre>
+    </div>
+  </div>
+
+  <div class="alert">
+    <strong>Success criteria:</strong> QCOW2 created, VM defined in libvirt, <code>virsh start</code> boots to login prompt. If you see the login screen, Lab 2 is complete.
+  </div>
+
+  <h3>Or Use the zkvm TUI (Interactive)</h3>
+  <pre># Instead of YAML, use the guided TUI:
+zkvm
+# Tab 1 (Migration): set source file, output dir, deploy targets
+# Press 1 to enable "Libvirt XML", then Ctrl+R to run
+# Alt+4 (Libvirt tab): see your new VM, press 's' to start it</pre>
+</div>
+
+<!-- PAGE 3: vSphere Migration -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Lab 3: vSphere <span>Migration</span> <span class="time">15 min</span></h2>
+  <p class="sub">Connect to your vCenter and migrate a real VM.</p>
+
+  <div class="step">
+    <div class="step-num">8</div>
+    <div class="step-content">
+      <h4>Set vCenter credentials</h4>
+      <pre>export GOVC_URL="https://vcenter.yourdomain.com/sdk"
+export GOVC_USERNAME="administrator@vsphere.local"
+export GOVC_PASSWORD="your-password"
+export GOVC_DATACENTER="your-datacenter"
+export GOVC_INSECURE=1   # If using self-signed certificate</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">9</div>
+    <div class="step-content">
+      <h4>Discover VMs (read-only)</h4>
+      <pre># CLI:
+govc ls /$GOVC_DATACENTER/vm/
+govc vm.info -json your-test-vm | jq '.virtualMachines[0].config.hardware'
+
+# Or TUI (recommended):
+zkvm
+# Alt+2 → vSphere tab → VMs auto-discovered with CPU/RAM/disk/state</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">10</div>
+    <div class="step-content">
+      <h4>Migrate a test VM</h4>
+      <pre>cat > vsphere-test.yaml &lt;&lt;'EOF'
+cmd: vsphere
+vs_action: export_vm
+vs_vm: your-test-vm               # Pick a non-production VM
+output_dir: ./converted
+out_format: qcow2
+flatten: true
+compress: true
+regen_initramfs: true
+emit_domain_xml: true
+vm_name: migrated-test-vm
+memory: 2048
+vcpus: 2
+machine: q35
+boot_test: true                    # Auto-verify boot
+EOF
+
+sudo -E h2kvmctl --config vsphere-test.yaml
+# -E preserves GOVC_* environment variables</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">11</div>
+    <div class="step-content">
+      <h4>Or use the TUI (zero YAML)</h4>
+      <pre>sudo -E zkvm
+# Alt+2 → vSphere tab → connect → discover VMs
+# Space to select your test VM → Ctrl+R to sync to Migration tab
+# Review settings → Ctrl+R to run migration
+# Alt+3 → Logs tab: watch progress in real-time
+# Alt+4 → Libvirt tab: see your migrated VM, press 's' to start</pre>
+    </div>
+  </div>
+
+  <div class="alert">
+    <strong>Success criteria:</strong> VM exported from vSphere, converted, guest fixes applied, defined in libvirt, boot test passed. You should see "migrated-test-vm" in <code>virsh list --all</code>.
+  </div>
+</div>
+
+<!-- PAGE 4: Windows VM & KubeVirt -->
+<div class="page page-light">
+  <h2 class="st">Lab 4: Windows VM <span>Migration</span> <span class="time">15 min</span></h2>
+  <p class="sub">Migrate a Windows Server VM with automatic VirtIO driver injection.</p>
+
+  <div class="step">
+    <div class="step-num">12</div>
+    <div class="step-content">
+      <h4>Get the VirtIO drivers ISO</h4>
+      <pre># Fedora/RHEL:
+sudo dnf install -y virtio-win
+# ISO located at: /usr/share/virtio-win/virtio-win.iso
+
+# Or download directly:
+curl -LO https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">13</div>
+    <div class="step-content">
+      <h4>Migrate Windows VM</h4>
+      <pre>cat > windows-test.yaml &lt;&lt;'EOF'
+cmd: vsphere                      # Or: cmd: local + vhd: /path/to/disk.vhdx
+vs_action: export_vm
+vs_vm: your-windows-test-vm
+output_dir: ./converted
+out_format: qcow2
+windows: true
+guest_os: windows
+virtio_win_iso: /usr/share/virtio-win/virtio-win.iso
+win_stage: bootstrap
+emit_domain_xml: true
+vm_name: win-migrated
+memory: 4096
+vcpus: 4
+machine: q35
+uefi: true                         # Most Windows VMs use UEFI
+boot_test: true
+EOF
+
+sudo -E h2kvmctl --config windows-test.yaml</pre>
+    </div>
+  </div>
+
+  <div class="alert">
+    <strong>What happens automatically:</strong> VirtIO storage driver injected (prevents BSOD), VirtIO network driver injected, VMware/Hyper-V tools removed, BCD updated, serial console enabled, boot verified (no BSOD).
+  </div>
+
+  <h2 class="st" style="margin-top:0.8em;">Lab 5: KubeVirt <span>Deployment</span> <span class="time">10 min</span></h2>
+  <p class="sub">Deploy a migrated VM to Kubernetes via KubeVirt.</p>
+
+  <div class="step">
+    <div class="step-num">14</div>
+    <div class="step-content">
+      <h4>Deploy to KubeVirt</h4>
+      <pre># If you have K3s / K8s + KubeVirt installed:
+cat > kubevirt-test.yaml &lt;&lt;'EOF'
+cmd: local
+vmdk: ./photon-disk1.vmdk
+output_dir: ./converted
+out_format: qcow2
+regen_initramfs: true
+deploy_k8s: true                   # Generate KubeVirt manifest + apply
+k8s_namespace: default
+vm_name: photon-kubevirt
+memory: 1024
+vcpus: 2
+EOF
+
+sudo h2kvmctl --config kubevirt-test.yaml
+
+# Verify:
+kubectl get vm                     # VirtualMachine should appear
+kubectl get vmi                    # VirtualMachineInstance running
+virtctl console photon-kubevirt    # Connect to console</pre>
+    </div>
+  </div>
+
+  <div class="alert">
+    <strong>Don't have KubeVirt?</strong> Install K3s + KubeVirt in 5 minutes:
+    <code>curl -sfL https://get.k3s.io | sh -</code> then install KubeVirt operator.
+    Or skip Lab 5 — KVM deployment (Labs 2-4) proves the core migration works.
+  </div>
+</div>
+
+<!-- PAGE 5: Hyper-V & Cloud Labs -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Lab 6: Hyper-V &amp; <span>Cloud Migration</span> <span class="time">10 min</span></h2>
+  <p class="sub">Test VHD/VHDX conversion and cloud VM repatriation.</p>
+
+  <h3>Hyper-V VHD/VHDX Conversion</h3>
+  <div class="step">
+    <div class="step-num">15</div>
+    <div class="step-content">
+      <h4>Migrate from Hyper-V</h4>
+      <pre># Copy VHD/VHDX from Hyper-V host to this machine
+# Default Hyper-V path: C:\Users\Public\Documents\Hyper-V\Virtual Hard Disks\
+
+cat > hyperv-test.yaml &lt;&lt;'EOF'
+cmd: local
+vhd: /exports/ubuntu-server.vhdx  # Your VHD/VHDX file
+output_dir: ./converted
+out_format: qcow2
+flatten: true
+regen_initramfs: true              # Swaps hv_storvsc for virtio_blk
+emit_domain_xml: true
+vm_name: from-hyperv
+memory: 2048
+vcpus: 2
+machine: q35
+boot_test: true
+EOF
+
+sudo h2kvmctl --config hyperv-test.yaml</pre>
+    </div>
+  </div>
+
+  <h3>Cloud VM Repatriation (AWS/Azure)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>From AWS EC2</h4>
+      <pre style="font-size:0.74em; background:#1a1a2e; padding:8px; border-radius:6px;">
+# 1. Create EBS snapshot
+aws ec2 create-snapshot \
+  --volume-id vol-xxx
+
+# 2. Export to S3
+aws ec2 export-image \
+  --disk-image-format RAW \
+  --s3-export-location ...
+
+# 3. Download and convert
+sudo h2kvmctl --cmd local \
+  --raw ./aws-export.raw \
+  --regen-initramfs \
+  --emit-domain-xml</pre>
+    </div>
+    <div class="card">
+      <h4>From Azure</h4>
+      <pre style="font-size:0.74em; background:#1a1a2e; padding:8px; border-radius:6px;">
+# 1. Snapshot managed disk
+az snapshot create \
+  --name snap01 --source disk01
+
+# 2. Generate SAS URL + download
+az snapshot grant-access \
+  --name snap01 --duration 3600
+wget "SAS_URL" -O azure.vhd
+
+# 3. Convert
+sudo h2kvmctl --cmd local \
+  --vhd ./azure.vhd \
+  --regen-initramfs \
+  --emit-domain-xml</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: POC Checklist -->
+<div class="page page-light">
+  <h2 class="st">POC <span>Validation Checklist</span></h2>
+  <p class="sub">Complete this checklist to confirm migration readiness. All items should pass before committing to a full project.</p>
+
+  <table>
+    <tr><th style="width:4%"></th><th style="width:22%">Test</th><th style="width:28%">How to Verify</th><th style="width:22%">Expected Result</th><th style="width:24%">Lab</th></tr>
+    <tr><td>&#9744;</td><td><strong>System check passes</strong></td><td><code>h2kvmctl doctor</code></td><td>All 9 checks green</td><td>Lab 1</td></tr>
+    <tr><td>&#9744;</td><td><strong>VMDK → QCOW2</strong></td><td><code>qemu-img info *.qcow2</code></td><td>Format: qcow2, correct size</td><td>Lab 2</td></tr>
+    <tr><td>&#9744;</td><td><strong>Linux VM boots on KVM</strong></td><td><code>virsh start vm-name</code></td><td>Reaches login prompt</td><td>Lab 2</td></tr>
+    <tr><td>&#9744;</td><td><strong>fstab uses UUIDs</strong></td><td><code>cat /etc/fstab</code> inside VM</td><td>UUID= entries, no /dev/sdX</td><td>Lab 2</td></tr>
+    <tr><td>&#9744;</td><td><strong>initramfs has VirtIO</strong></td><td><code>lsinitrd</code> inside VM</td><td>virtio_blk, virtio_net present</td><td>Lab 2</td></tr>
+    <tr><td>&#9744;</td><td><strong>vSphere discovery works</strong></td><td>zkvm vSphere tab or <code>govc ls</code></td><td>VMs listed with metadata</td><td>Lab 3</td></tr>
+    <tr><td>&#9744;</td><td><strong>vSphere export works</strong></td><td>Run vsphere-test.yaml</td><td>VMDK downloaded + converted</td><td>Lab 3</td></tr>
+    <tr><td>&#9744;</td><td><strong>Windows VM boots (no BSOD)</strong></td><td><code>virsh start win-vm</code></td><td>Reaches login screen</td><td>Lab 4</td></tr>
+    <tr><td>&#9744;</td><td><strong>VirtIO drivers loaded (Windows)</strong></td><td>Device Manager inside VM</td><td>VirtIO SCSI + NetKVM visible</td><td>Lab 4</td></tr>
+    <tr><td>&#9744;</td><td><strong>KubeVirt deploy works</strong></td><td><code>kubectl get vm</code></td><td>VM created, VirtualMachineInstance running</td><td>Lab 5</td></tr>
+    <tr><td>&#9744;</td><td><strong>VHD/VHDX converts</strong></td><td>Run hyperv-test.yaml</td><td>QCOW2 created, VM boots</td><td>Lab 6</td></tr>
+    <tr><td>&#9744;</td><td><strong>Network works post-migration</strong></td><td><code>ping</code> from migrated VM</td><td>Connectivity OK</td><td>All labs</td></tr>
+    <tr><td>&#9744;</td><td><strong>Boot test auto-verifies</strong></td><td><code>boot_test: true</code> in YAML</td><td>Automated pass/fail reported</td><td>Lab 3, 4</td></tr>
+    <tr><td>&#9744;</td><td><strong>YAML automation works</strong></td><td><code>h2kvmctl --config test.yaml</code></td><td>Reproducible — same config = same result</td><td>All labs</td></tr>
+    <tr><td>&#9744;</td><td><strong>zkvm TUI usable</strong></td><td>Run <code>zkvm</code>, complete a migration</td><td>Guided flow, no CLI memorization</td><td>Lab 2, 3</td></tr>
+  </table>
+
+  <h3>Common Issues &amp; Quick Fixes</h3>
+  <table>
+    <tr><th style="width:25%">Issue</th><th style="width:35%">Cause</th><th style="width:40%">Fix</th></tr>
+    <tr><td>govc: certificate error</td><td>vCenter uses self-signed cert</td><td><code>export GOVC_INSECURE=1</code></td></tr>
+    <tr><td>Permission denied on qcow2</td><td>KVM needs root for disk access</td><td>Run with <code>sudo</code> (or <code>sudo -E</code> for env vars)</td></tr>
+    <tr><td>VM boots to GRUB rescue</td><td>initramfs missing VirtIO drivers</td><td>Ensure <code>regen_initramfs: true</code> in config</td></tr>
+    <tr><td>No network after boot</td><td>libvirt default network not active</td><td><code>virsh net-start default</code></td></tr>
+    <tr><td>Windows BSOD (0x7B)</td><td>Missing VirtIO storage driver</td><td>Add <code>windows: true</code> + <code>virtio_win_iso</code> path</td></tr>
+    <tr><td>Disk space error</td><td>/tmp too small for conversion</td><td><code>export TMPDIR=/large/disk/tmp</code> before running</td></tr>
+    <tr><td>govc: access denied</td><td>Insufficient vCenter permissions</td><td>Need read access to datastore + VM inventory</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 7: What's Next -->
+<div class="page page-green">
+  <h2 class="st" style="color:#e8e6df;">POC Complete — <span>What's Next?</span></h2>
+  <p class="sub">You've proven hyper2kvm works. Here's how to move to production.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Step 1: Full Assessment</h4>
+      <ul>
+        <li>Connect to vCenter read-only</li>
+        <li>Inventory all VMs (CPU, RAM, disk, OS)</li>
+        <li>Classify by tier (dev/staging/prod)</li>
+        <li>Identify Windows VMs needing VirtIO</li>
+        <li>Map network dependencies</li>
+        <li>Estimate timeline and savings</li>
+        <li><strong>Deliverable:</strong> Migration plan + savings report</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Step 2: Phased Migration</h4>
+      <ul>
+        <li>Phase 1: Dev/test VMs (1 week)</li>
+        <li>Phase 2: Staging VMs (2 weeks)</li>
+        <li>Phase 3: Production waves (4-8 weeks)</li>
+        <li>Phase 4: Windows/AD/SQL (2-4 weeks)</li>
+        <li>Phase 5: Decommission VMware</li>
+        <li>YAML batch automation for scale</li>
+        <li><strong>Typical:</strong> 200 VMs in 12-20 weeks</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Step 3: Operate &amp; Optimize</h4>
+      <ul>
+        <li>Set up Prometheus + Grafana monitoring</li>
+        <li>Configure backup/DR (Ceph, Longhorn)</li>
+        <li>Train team on KVM/libvirt admin</li>
+        <li>Cancel VMware licenses</li>
+        <li>Document savings for leadership</li>
+        <li>Consider KubeVirt for cloud-native</li>
+        <li><strong>Result:</strong> 70-90% cost reduction</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>POC Results Summary (Fill In)</h3>
+  <table style="background:rgba(255,255,255,0.03);">
+    <tr><th style="width:40%">Metric</th><th style="width:30%">Your Result</th><th style="width:30%">Notes</th></tr>
+    <tr><td>VMs tested in POC</td><td style="border:2px dashed rgba(52,211,153,0.3); color:#34d399;">______</td><td></td></tr>
+    <tr><td>First-boot success rate</td><td style="border:2px dashed rgba(52,211,153,0.3); color:#34d399;">______%</td><td></td></tr>
+    <tr><td>Conversion time per VM</td><td style="border:2px dashed rgba(52,211,153,0.3); color:#34d399;">______ min</td><td></td></tr>
+    <tr><td>Total VMs in estate</td><td style="border:2px dashed rgba(52,211,153,0.3); color:#34d399;">______</td><td></td></tr>
+    <tr><td>Current annual VMware/cloud cost</td><td style="border:2px dashed rgba(52,211,153,0.3); color:#34d399;">$______</td><td></td></tr>
+    <tr><td>Estimated annual savings</td><td style="border:2px dashed rgba(52,211,153,0.3); color:#34d399;">$______</td><td>Typically 70-90% of current cost</td></tr>
+    <tr><td>Estimated migration timeline</td><td style="border:2px dashed rgba(52,211,153,0.3); color:#34d399;">______ weeks</td><td>~30-40 VMs/week/engineer</td></tr>
+    <tr><td>POC verdict</td><td style="border:2px dashed rgba(52,211,153,0.3); color:#34d399;">GO / NO-GO</td><td></td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>You've Proven It Works. Now Scale It.</h3>
+    <p style="font-size:0.92em;">
+      hyper2kvm converted your VMs. They booted on KVM. The pipeline is automated.<br>
+      The tool is licensed*. The savings start the day you cancel VMware licenses.<br>
+      <strong>Take the POC results to leadership. Build the business case. Start the migration.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm + hypersdk — Quick Start &amp; POC Guide | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

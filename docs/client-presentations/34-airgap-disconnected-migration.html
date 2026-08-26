@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Air-Gap &amp; Disconnected Migration — Secure Environments Without Internet</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #7f1d1d, #991b1b, #dc2626); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #fca5a5; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(252,165,165,0.2); border: 1px solid rgba(252,165,165,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #1a0a0a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #fca5a5; }
+  .page-light h2.st span { color: #991b1b; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #fca5a5; }
+  .page-light h3 { color: #991b1b; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #991b1b; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #fca5a5; }
+  .page-light .card h4 { color: #991b1b; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #7f1d1d; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(252,165,165,0.08); border: 1px solid rgba(252,165,165,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(252,165,165,0.06); }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .alert { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .alert h4 { color: #ef4444; font-size: 0.92em; margin-bottom: 3px; }
+  .verdict { background: linear-gradient(135deg, rgba(127,29,29,0.15), rgba(153,27,27,0.08)); border: 2px solid #dc2626; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #fca5a5; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Air-Gap &amp; <span>Disconnected</span> Migration</h1>
+  <h2>VMware to KVM in Secure Environments Without Internet</h2>
+  <p class="sub">Classified networks, SCIF facilities, OT/ICS environments, and air-gapped data centers face unique migration challenges. hyper2kvm provides a fully offline migration workflow with encrypted media transfer, chain-of-custody tracking, and FIPS-validated operations.</p>
+  <div class="badge">SCIF | OT/ICS | FIPS 140-2 | Sneakernet | Offline Repos | Two-Person Integrity</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Air-Gap Challenge <span>Overview</span></h2>
+  <p class="sub">Why disconnected environments exist and why VMware licensing makes migration urgent.</p>
+
+  <h3>Disconnected Environment Types</h3>
+  <table>
+    <tr><th style="width:15%">Environment</th><th style="width:15%">Classification</th><th style="width:20%">Network Policy</th><th style="width:20%">VMware Pain Point</th><th style="width:30%">Migration Challenge</th></tr>
+    <tr><td><strong>SCIF / SCI</strong></td><td>TS/SCI</td><td>Complete air-gap, no internet ever</td><td>License activation requires phone-home; $240K+/yr for 50 VMs</td><td>No package repos, no driver downloads, no online activation</td></tr>
+    <tr><td><strong>DoD / IL4-6</strong></td><td>CUI to Secret</td><td>NIPR/SIPR isolated segments</td><td>Broadcom audit compliance across classification boundaries</td><td>Cross-domain transfer requires data diode or manual review</td></tr>
+    <tr><td><strong>OT / ICS / SCADA</strong></td><td>Industrial</td><td>Purdue model L3.5 DMZ</td><td>ESXi patches delayed 6-12 months for stability testing</td><td>24/7 uptime requirement, no maintenance windows &gt; 4 hours</td></tr>
+    <tr><td><strong>Healthcare / HIPAA</strong></td><td>PHI</td><td>Network segmentation, no cloud</td><td>Per-VM licensing doubles cost for HA pairs</td><td>HIPAA audit trail must be maintained during migration</td></tr>
+    <tr><td><strong>Financial / PCI-DSS</strong></td><td>PCI Zone 1</td><td>Cardholder data environment isolated</td><td>Annual PCI re-certification with new Broadcom terms</td><td>Change control windows restricted to 2-hour slots</td></tr>
+    <tr><td><strong>Nuclear / NRC</strong></td><td>Safeguards</td><td>Complete air-gap, hardware tokens</td><td>10CFR73.54 cyber security plan requires approved software list</td><td>Every binary must be on approved software list before install</td></tr>
+  </table>
+
+  <h3>VMware Air-Gap Cost Problem</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Current VMware Air-Gap Costs (50 VMs)</h4>
+      <ul>
+        <li>vSphere Enterprise Plus: $6,175/CPU x 8 CPUs = $49,400/yr</li>
+        <li>vCenter Server: $8,975/instance + $2,250 SnS</li>
+        <li>vSAN: $5,575/CPU x 8 CPUs = $44,600/yr</li>
+        <li>NSX: $6,995/CPU x 8 CPUs = $55,960/yr</li>
+        <li>Offline license activation: manual key + phone support</li>
+        <li>Air-gap patch media: $15,000/yr custom ISO delivery</li>
+        <li><strong>Total: $176,185/yr for 50 VMs</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>KVM Air-Gap Costs (Same 50 VMs)</h4>
+      <ul>
+        <li>RHEL KVM (or AlmaLinux/Rocky): $0-$13,000/yr</li>
+        <li>libvirt + QEMU: $0 (included in OS)</li>
+        <li>No license activation needed</li>
+        <li>No phone-home, no telemetry, no audit surprises</li>
+        <li>Offline repos: createrepo from ISO media</li>
+        <li>hyper2kvm migration: Contact for pricing* (Proprietary (Zyvor AI Labs) license)</li>
+        <li><strong>Total: $0-$13,000/yr — savings up to $163K/yr</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Offline Media <span>Transfer Workflow</span></h2>
+  <p class="sub">USB/HDD sneakernet with encrypted disk images, checksums, and chain-of-custody.</p>
+
+  <h3>End-to-End Sneakernet Process</h3>
+  <pre>
+# STEP 1: Export VMs on source network (VMware side)
+h2kvmctl export --source vsphere --server vcenter.classified.mil \
+  --vm "db-server,app-server,web-frontend" \
+  --output /mnt/transfer-media/ \
+  --encrypt --passphrase-file /root/transfer-key.gpg \
+  --checksum sha256 --manifest
+
+# STEP 2: Verify checksums before physical transfer
+h2kvmctl verify --manifest /mnt/transfer-media/manifest.json
+# Output: 3 VMs verified, 47.2 GB total, SHA-256 checksums match
+
+# STEP 3: Physical transfer (write-blocker → encrypted USB → courier)
+# Chain-of-custody form signed by: exporter, courier, importer
+
+# STEP 4: Import on destination network (KVM side)
+h2kvmctl import --source /mnt/transfer-media/ \
+  --decrypt --passphrase-file /root/transfer-key.gpg \
+  --verify-checksums \
+  --output /var/lib/libvirt/images/ \
+  --convert qcow2 --compress \
+  --emit-domain-xml --deploy-libvirt</pre>
+
+  <h3>Transfer Media Options</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Encrypted USB 3.2 SSD (Recommended)</h4>
+      <ul>
+        <li>Hardware: IronKey D500S or Apricorn Aegis Padlock</li>
+        <li>Capacity: 1-8 TB, hardware AES-256 encryption</li>
+        <li>Transfer speed: 1 GB/s (USB 3.2 Gen 2)</li>
+        <li>FIPS 140-3 Level 3 certified (IronKey)</li>
+        <li>Tamper-evident: epoxy-filled, brute-force self-destruct</li>
+        <li>50 VMs at 50 GB avg = 2.5 TB → 1x 4TB drive, ~42 min transfer</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Data Diode Transfer (Highest Security)</h4>
+      <ul>
+        <li>Hardware: Owl Cyber Defense DualDiode or Waterfall Security</li>
+        <li>One-way transfer: physically impossible to exfiltrate</li>
+        <li>Throughput: 100 Mbps - 10 Gbps depending on model</li>
+        <li>h2kvmctl streams VM data through diode protocol</li>
+        <li>Receiving side reassembles and verifies checksums</li>
+        <li>Required for: cross-domain (e.g., UNCLASS → SECRET)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Manifest &amp; Chain of Custody</h4>
+      <ul>
+        <li>manifest.json: VM name, size, SHA-256, timestamp, exporter ID</li>
+        <li>GPG-signed manifest prevents tampering during transport</li>
+        <li>DD Form 1149 or equivalent for physical media tracking</li>
+        <li>Two-person integrity (TPI) for classified media handling</li>
+        <li>Media sanitization after transfer: DoD 5220.22-M or degauss</li>
+        <li>Audit log: who exported, who transported, who imported</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Encryption Options</h4>
+      <ul>
+        <li>LUKS2 full-disk: <code>cryptsetup luksFormat /dev/sdX</code></li>
+        <li>GPG per-file: <code>gpg --symmetric --cipher-algo AES256</code></li>
+        <li>h2kvmctl --encrypt: uses AES-256-GCM with PBKDF2</li>
+        <li>FIPS mode: <code>fips-mode-setup --enable</code> on RHEL/Rocky</li>
+        <li>Key management: HSM or split-knowledge passphrase</li>
+        <li>At-rest + in-transit encryption for complete chain</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">RPM/DEB Package <span>Bundling</span></h2>
+  <p class="sub">Pre-staging all dependencies for offline installation on target hosts.</p>
+
+  <h3>Building Offline RPM Repository</h3>
+  <pre>
+# On internet-connected staging machine (same OS version as target)
+# Download all KVM/libvirt packages and dependencies
+dnf download --resolve --destdir=/mnt/offline-repo/ \
+  qemu-kvm libvirt libvirt-client virt-install virt-viewer \
+  libguestfs-tools python3-libvirt bridge-utils \
+  edk2-ovmf swtpm swtpm-tools
+
+# Download hyper2kvm and its Python dependencies
+pip download -d /mnt/offline-repo/python/ \
+  pyyaml lxml requests tqdm paramiko
+
+# Create repository metadata
+createrepo_c /mnt/offline-repo/
+
+# Copy to transfer media
+cp -r /mnt/offline-repo/ /mnt/transfer-media/repo/</pre>
+
+  <h3>Target Host Installation (Offline)</h3>
+  <pre>
+# On air-gapped target host
+# Mount transfer media
+mount /dev/sdX1 /mnt/transfer-media
+
+# Add offline repo
+cat &gt; /etc/yum.repos.d/offline-kvm.repo &lt;&lt;'EOF'
+[offline-kvm]
+name=Offline KVM Repository
+baseurl=file:///mnt/transfer-media/repo
+enabled=1
+gpgcheck=0
+EOF
+
+# Install everything offline
+dnf install --disablerepo='*' --enablerepo=offline-kvm \
+  qemu-kvm libvirt libvirt-client virt-install
+
+# Install hyper2kvm
+pip install --no-index --find-links=/mnt/transfer-media/repo/python/ hyper2kvm
+
+# Verify installation
+h2kvmctl doctor --offline</pre>
+
+  <h3>Package Bundle Sizes</h3>
+  <table>
+    <tr><th>Component</th><th>RHEL 9 / Rocky 9</th><th>Ubuntu 22.04</th><th>Dependencies</th><th>Notes</th></tr>
+    <tr><td><strong>qemu-kvm</strong></td><td>18 MB</td><td>22 MB</td><td>~45 packages</td><td>Core hypervisor</td></tr>
+    <tr><td><strong>libvirt stack</strong></td><td>12 MB</td><td>15 MB</td><td>~30 packages</td><td>VM management daemon</td></tr>
+    <tr><td><strong>VirtIO drivers (Windows)</strong></td><td>580 MB</td><td>580 MB</td><td>ISO image</td><td>virtio-win.iso from Fedora</td></tr>
+    <tr><td><strong>EDK2/OVMF (UEFI)</strong></td><td>4 MB</td><td>5 MB</td><td>2 packages</td><td>UEFI firmware for VMs</td></tr>
+    <tr><td><strong>hyper2kvm + Python deps</strong></td><td>8 MB</td><td>8 MB</td><td>~15 packages</td><td>Migration toolkit</td></tr>
+    <tr><td><strong>swtpm (vTPM)</strong></td><td>2 MB</td><td>2 MB</td><td>~5 packages</td><td>For Windows 11 / BitLocker VMs</td></tr>
+    <tr><td><strong>Total offline bundle</strong></td><td colspan="2"><strong>~650 MB</strong></td><td>~100 packages</td><td>Fits on any USB stick</td></tr>
+  </table>
+
+  <div class="highlight">
+    <h3>Doctor Offline Mode</h3>
+    <p><code>h2kvmctl doctor --offline</code> verifies all required packages are installed, checks QEMU/KVM kernel module, validates libvirt socket, tests VirtIO driver availability, and confirms UEFI firmware — all without any network access. Reports pass/fail for 15 checks with remediation instructions referencing the offline repo.</p>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">Container Image <span>Pre-Staging for KubeVirt</span></h2>
+  <p class="sub">Air-gapped Kubernetes clusters need container images pre-loaded before KubeVirt deployment.</p>
+
+  <h3>Air-Gapped Container Registry Setup</h3>
+  <pre>
+# On internet-connected machine: pull all KubeVirt images
+KUBEVIRT_VERSION=v1.3.0
+IMAGES=(
+  "quay.io/kubevirt/virt-operator:${KUBEVIRT_VERSION}"
+  "quay.io/kubevirt/virt-api:${KUBEVIRT_VERSION}"
+  "quay.io/kubevirt/virt-controller:${KUBEVIRT_VERSION}"
+  "quay.io/kubevirt/virt-handler:${KUBEVIRT_VERSION}"
+  "quay.io/kubevirt/virt-launcher:${KUBEVIRT_VERSION}"
+  "quay.io/kubevirt/cdi-operator:${KUBEVIRT_VERSION}"
+  "quay.io/kubevirt/cdi-controller:${KUBEVIRT_VERSION}"
+  "quay.io/kubevirt/cdi-importer:${KUBEVIRT_VERSION}"
+  "quay.io/kubevirt/cdi-uploadproxy:${KUBEVIRT_VERSION}"
+)
+
+# Save all images to a tar archive
+for img in "${IMAGES[@]}"; do
+  skopeo copy "docker://${img}" "oci-archive:/mnt/transfer/kubevirt-images.tar:${img##*/}"
+done</pre>
+
+  <h3>Loading into Air-Gapped Registry</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Harbor Registry (Recommended)</h4>
+      <ul>
+        <li>Deploy Harbor offline installer (500 MB bundle)</li>
+        <li>Self-signed TLS certs (no external CA needed)</li>
+        <li>LDAP/AD integration for auth (air-gapped AD)</li>
+        <li>Vulnerability scanning with offline CVE DB</li>
+        <li>Load images: <code>skopeo copy oci-archive:kubevirt.tar docker://harbor.local/kubevirt/virt-operator:v1.3.0</code></li>
+        <li>Image replication between air-gapped sites</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>K3s Embedded Registry</h4>
+      <ul>
+        <li>K3s supports pre-loading from <code>/var/lib/rancher/k3s/agent/images/</code></li>
+        <li>Place tar files: <code>cp kubevirt-images.tar /var/lib/rancher/k3s/agent/images/</code></li>
+        <li>K3s auto-imports on restart (no registry needed)</li>
+        <li>Simplest option for single-node or small clusters</li>
+        <li>No registry infrastructure to maintain</li>
+        <li>Add <code>--private-registry</code> for multi-node with local registry</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>CDI Offline Import for VM Disks</h4>
+      <ul>
+        <li>CDI (Containerized Data Importer) needs local source</li>
+        <li>Upload via <code>virtctl image-upload</code> from local file</li>
+        <li><code>virtctl image-upload pvc vm-disk --size=50Gi --image-path=disk.qcow2</code></li>
+        <li>Or use DataVolume with registry source pointing to Harbor</li>
+        <li>Pre-convert with h2kvmctl, then upload converted QCOW2</li>
+        <li>Supports QCOW2, raw, VMDK formats</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Image Bundle Sizes</h4>
+      <ul>
+        <li>KubeVirt operator stack: ~2.1 GB (9 images)</li>
+        <li>K3s binary + images: ~450 MB</li>
+        <li>Harbor offline installer: ~500 MB</li>
+        <li>Longhorn (storage): ~800 MB</li>
+        <li>MetalLB + Multus (networking): ~200 MB</li>
+        <li><strong>Total K8s+KubeVirt bundle: ~4 GB</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Conversion in <span>Disconnected Mode</span></h2>
+  <p class="sub">h2kvmctl performs all conversion operations locally without any network access.</p>
+
+  <h3>Offline Conversion Pipeline</h3>
+  <pre>
+# Full offline conversion — no network calls at any stage
+h2kvmctl convert \
+  --source /mnt/transfer-media/exported-vms/db-server.vmdk \
+  --output /var/lib/libvirt/images/ \
+  --format qcow2 \
+  --compress \
+  --offline \
+  --virtio-drivers /mnt/transfer-media/drivers/virtio-win.iso \
+  --fix-fstab \
+  --fix-initramfs \
+  --emit-domain-xml \
+  --deploy-libvirt
+
+# What --offline does:
+# 1. Disables all network checks (DNS, NTP, package repos)
+# 2. Uses local VirtIO drivers instead of downloading
+# 3. Rebuilds initramfs using only installed kernel modules
+# 4. Skips online activation checks for Windows VMs
+# 5. Uses local timezone data instead of NTP sync</pre>
+
+  <h3>Offline Capabilities by Source Format</h3>
+  <table>
+    <tr><th>Source Format</th><th>Conversion</th><th>VirtIO Inject</th><th>initramfs Fix</th><th>fstab Fix</th><th>Domain XML</th><th>Boot Test</th></tr>
+    <tr><td><strong>VMDK (VMware)</strong></td><td class="check">Full</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td></tr>
+    <tr><td><strong>OVA (VMware)</strong></td><td class="check">Full</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td></tr>
+    <tr><td><strong>OVF + VMDK</strong></td><td class="check">Full</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td></tr>
+    <tr><td><strong>VHD/VHDX (Hyper-V)</strong></td><td class="check">Full</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td></tr>
+    <tr><td><strong>RAW disk image</strong></td><td class="check">Full</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td></tr>
+    <tr><td><strong>vSphere export</strong></td><td class="check">Full</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td></tr>
+  </table>
+
+  <h3>Windows VM Offline Workflow</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>VirtIO Driver Injection (No Internet)</h4>
+      <ul>
+        <li>Pre-download virtio-win.iso on connected network</li>
+        <li>Contains: viostor, vioscsi, NetKVM, balloon, qxldod</li>
+        <li>h2kvmctl mounts guest disk, injects drivers into Windows registry</li>
+        <li>Creates boot-critical driver entries for VirtIO SCSI/block</li>
+        <li>No Windows Update or online activation required</li>
+        <li>Supports: Windows Server 2012R2 through 2025, Win 10/11</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Linux VM Offline Workflow</h4>
+      <ul>
+        <li>initramfs rebuild uses only locally installed kernel modules</li>
+        <li><code>dracut --force --add-drivers "virtio_blk virtio_scsi virtio_net"</code></li>
+        <li>fstab: convert device names to UUID or LVM paths</li>
+        <li>GRUB: update boot parameters for virtio console</li>
+        <li>Network: regenerate interface configs for virtio-net</li>
+        <li>No dnf/apt calls — pure local operations</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">Security &amp; Compliance <span>for Air-Gap</span></h2>
+  <p class="sub">FIPS 140-2, STIG hardening, and audit controls for classified migration operations.</p>
+
+  <h3>Compliance Framework Mapping</h3>
+  <table>
+    <tr><th style="width:15%">Framework</th><th style="width:20%">Requirement</th><th style="width:30%">hyper2kvm Implementation</th><th style="width:35%">Evidence / Artifact</th></tr>
+    <tr><td><strong>FIPS 140-2</strong></td><td>Validated cryptographic modules</td><td>Uses OpenSSL FIPS provider; AES-256-GCM for encryption</td><td>FIPS mode: <code>fips-mode-setup --check</code> returns enabled</td></tr>
+    <tr><td><strong>DISA STIG</strong></td><td>Hardened OS configuration</td><td>Runs on STIG-compliant RHEL 9; no additional ports opened</td><td>STIG Viewer checklist export, SCAP scan results</td></tr>
+    <tr><td><strong>NIST 800-53</strong></td><td>Access control, audit logging</td><td>All operations logged to syslog; requires root or libvirt group</td><td>Audit log: /var/log/hyper2kvm/migration.log</td></tr>
+    <tr><td><strong>CNSSI 1253</strong></td><td>Classified system controls</td><td>No network egress; all operations local; media encryption</td><td>Network capture shows zero outbound connections</td></tr>
+    <tr><td><strong>ICD 503</strong></td><td>IC information systems</td><td>Two-person integrity for media handling; GPG-signed manifests</td><td>Signed manifest + DD Form 1149 chain-of-custody</td></tr>
+    <tr><td><strong>HIPAA</strong></td><td>PHI protection during transfer</td><td>Encrypted at rest + in transit; audit trail; access controls</td><td>BAA-compatible; encryption verification in manifest</td></tr>
+  </table>
+
+  <h3>Security Controls</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Two-Person Integrity (TPI)</h4>
+      <ul>
+        <li>Media export requires two authorized personnel</li>
+        <li>Split-knowledge passphrase: each person holds half</li>
+        <li>Manifest signed by both exporter and verifier</li>
+        <li>Chain-of-custody log with timestamps and signatures</li>
+        <li>Media sealed in tamper-evident bags for transport</li>
+        <li>Import verification by two different personnel</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Audit Trail Without SIEM</h4>
+      <ul>
+        <li>Local syslog: all h2kvmctl operations logged</li>
+        <li>JSON-structured logs for post-migration analysis</li>
+        <li>Log rotation with integrity checksums (SHA-256)</li>
+        <li>Export logs to removable media for offline SIEM ingest</li>
+        <li>Timestamp source: local hardware clock or GPS receiver</li>
+        <li>Log fields: user, action, source, target, checksum, status</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>USB Device Policy Enforcement</h4>
+      <ul>
+        <li>USBGuard: whitelist only approved transfer devices</li>
+        <li><code>usbguard allow-device &lt;device-id&gt;</code></li>
+        <li>Block all USB storage by default on target hosts</li>
+        <li>Approved devices: IronKey D500S, Apricorn Aegis only</li>
+        <li>Audit: all USB insert/remove events logged</li>
+        <li>Auto-lock: device auto-locks after transfer completes</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Write-Blocker Integration</h4>
+      <ul>
+        <li>Forensic write-blockers for source media verification</li>
+        <li>Tableau T356789iu or CRU WiebeTech models</li>
+        <li>Ensures source VMware disks are not modified during export</li>
+        <li>Required for: evidence preservation, classified data handling</li>
+        <li>h2kvmctl reads source in read-only mode by default</li>
+        <li>Verification: compare source checksums pre/post export</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Deployment Architecture <span>Patterns</span></h2>
+  <p class="sub">Four proven patterns for air-gapped KVM/KubeVirt deployment.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Pattern 1: Single-Host Portable Lab</h4>
+      <ul>
+        <li><strong>Use case:</strong> Field deployments, mobile command, SCIF</li>
+        <li>Hardware: ruggedized server (Dell R660xs or HPE DL360)</li>
+        <li>OS: Rocky 9 STIG-hardened, FIPS enabled</li>
+        <li>Storage: 2x NVMe in RAID 1, LUKS encrypted</li>
+        <li>VMs: 5-15 per host, all local storage</li>
+        <li>Migration: USB transfer, single h2kvmctl run</li>
+        <li>Recovery: full host image on encrypted USB backup</li>
+        <li><strong>Cost: $8K hardware + $0 software</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Pattern 2: Multi-Host Sneakernet Sync</h4>
+      <ul>
+        <li><strong>Use case:</strong> Air-gapped data center, 50-200 VMs</li>
+        <li>3-5 hosts with shared NFS or local LVM storage</li>
+        <li>Sneakernet sync: export VM changes to USB weekly</li>
+        <li>Pacemaker HA cluster (no network to external)</li>
+        <li>Local DNS/DHCP/NTP within air-gapped network</li>
+        <li>Migration waves: 10-20 VMs per transfer cycle</li>
+        <li>Dedicated migration host processes imports</li>
+        <li><strong>Cost: $40K hardware + $13K RHEL</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Pattern 3: Air-Gapped K3s + KubeVirt</h4>
+      <ul>
+        <li><strong>Use case:</strong> Modern workloads, containers + VMs</li>
+        <li>K3s lightweight Kubernetes (single binary, 50MB)</li>
+        <li>KubeVirt for VM workloads alongside containers</li>
+        <li>Longhorn for replicated storage (no Ceph complexity)</li>
+        <li>Harbor registry for air-gapped container images</li>
+        <li>All images pre-loaded via USB transfer</li>
+        <li>GitOps with local Gitea (no GitHub/GitLab cloud)</li>
+        <li><strong>Cost: $50K hardware + $0 software</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Pattern 4: Cross-Domain with Data Diode</h4>
+      <ul>
+        <li><strong>Use case:</strong> UNCLASS → SECRET transfer, IC networks</li>
+        <li>Data diode: Owl DualDiode or Waterfall Unidirectional</li>
+        <li>Export side: h2kvmctl streams to diode sender</li>
+        <li>Receive side: h2kvmctl reassembles from diode receiver</li>
+        <li>One-way: physically impossible to reverse data flow</li>
+        <li>Automated: scheduled transfers without manual USB</li>
+        <li>Bandwidth: 1-10 Gbps depending on diode model</li>
+        <li><strong>Cost: $80K-$200K diode + infrastructure</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Recommended: Pattern 2 for Most Air-Gapped Environments</h3>
+    <p>Multi-host with sneakernet sync provides the best balance of capability, cost, and security. Start with Pattern 1 for POC, graduate to Pattern 2 for production. Pattern 3 for organizations with container strategy. Pattern 4 only when continuous cross-domain transfer is mandated.</p>
+  </div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page page-light">
+  <h2 class="st">Implementation Checklist <span>&amp; Timeline</span></h2>
+  <p class="sub">Phase-by-phase plan for 50-VM air-gapped migration.</p>
+
+  <h3>50-VM Air-Gap Migration Timeline</h3>
+  <table>
+    <tr><th style="width:8%">Phase</th><th style="width:18%">Activity</th><th style="width:8%">Duration</th><th style="width:8%">Personnel</th><th style="width:28%">Key Tasks</th><th style="width:30%">Deliverables</th></tr>
+    <tr><td><strong>1</strong></td><td>Preparation (Connected)</td><td>1 week</td><td>2 engineers</td><td>Build offline repos, download VirtIO drivers, bundle container images, prepare encrypted transfer media</td><td>Offline bundle (~4 GB), encrypted USB drives, chain-of-custody forms</td></tr>
+    <tr><td><strong>2</strong></td><td>Source Export</td><td>3 days</td><td>2 engineers (TPI)</td><td>Export VMs from VMware, create manifests, encrypt, verify checksums, seal media</td><td>50 VM images on encrypted media, signed manifests</td></tr>
+    <tr><td><strong>3</strong></td><td>Physical Transfer</td><td>1 day</td><td>Courier + 2</td><td>Chain-of-custody handoff, secure transport, receiving verification</td><td>Verified media at destination, custody log</td></tr>
+    <tr><td><strong>4</strong></td><td>Target Setup</td><td>2 days</td><td>2 engineers</td><td>Install OS from offline repos, configure KVM/libvirt, setup networking, STIG harden</td><td>Production-ready KVM hosts, SCAP scan reports</td></tr>
+    <tr><td><strong>5</strong></td><td>Conversion</td><td>3 days</td><td>1 engineer</td><td>Run h2kvmctl for all 50 VMs, fix initramfs/fstab, inject VirtIO, generate XML</td><td>50 converted QCOW2 images + libvirt domain XMLs</td></tr>
+    <tr><td><strong>6</strong></td><td>Validation</td><td>2 days</td><td>2 engineers</td><td>Boot test each VM, verify networking, application smoke tests, performance baseline</td><td>Test results, performance benchmarks, sign-off</td></tr>
+    <tr><td><strong>7</strong></td><td>Cutover</td><td>1 day</td><td>3 engineers</td><td>Shutdown VMware VMs, final delta sync if applicable, go-live on KVM</td><td>Production VMs running on KVM, VMware powered off</td></tr>
+  </table>
+  <p><strong>Total elapsed: ~2 weeks | Total effort: ~80 person-hours</strong></p>
+
+  <h3>Cost Comparison: Air-Gapped VMware vs KVM</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>3-Year Air-Gapped VMware (50 VMs)</h4>
+      <ul>
+        <li>Year 1 licensing: $176,185</li>
+        <li>Year 2 licensing: $176,185 (no discount for air-gap)</li>
+        <li>Year 3 licensing: $176,185</li>
+        <li>Offline patch media: $15,000/yr x 3 = $45,000</li>
+        <li>VMware admin (air-gap specialist): $140,000/yr x 3</li>
+        <li><strong>3-Year Total: $993,555</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>3-Year Air-Gapped KVM (50 VMs)</h4>
+      <ul>
+        <li>hyper2kvm migration (one-time): included*</li>
+        <li>Migration labor (80 hours): $12,000</li>
+        <li>RHEL subscriptions (optional): $13,000/yr x 3 = $39,000</li>
+        <li>OS patches from ISO (quarterly): $0</li>
+        <li>Linux admin: $120,000/yr x 3 = $360,000</li>
+        <li><strong>3-Year Total: $411,000</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>3-Year Savings: $582,555 (59% reduction)</h3>
+    <p>Air-gapped environments benefit most from open-source KVM — no license activation, no phone-home telemetry, no per-VM fees, no annual audit surprises. hyper2kvm's fully offline workflow eliminates the #1 barrier to migration in disconnected environments.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Secure Migration for Disconnected Environments</div>
+</div>
+
+</body>
+</html>

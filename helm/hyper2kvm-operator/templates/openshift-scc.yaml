@@ -1,0 +1,72 @@
+{{- if and .Values.openshift.enabled .Values.openshift.scc.create -}}
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: {{ .Values.openshift.scc.name }}
+  labels:
+    {{- include "hyper2kvm-operator.labels" . | nindent 4 }}
+    {{- with .Values.openshift.templateMetadata.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with .Values.openshift.templateMetadata.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    kubernetes.io/description: "SecurityContextConstraints for hyper2kvm worker pods that require privileged access for NBD, mount, and LVM operations"
+# Allow privileged containers (required for NBD kernel module, mount, LVM)
+allowPrivilegedContainer: {{ .Values.openshift.scc.allowPrivilegedContainer }}
+
+# Host access (generally disabled for security)
+allowHostNetwork: {{ .Values.openshift.scc.allowHostNetwork }}
+allowHostPorts: {{ .Values.openshift.scc.allowHostPorts }}
+allowHostPID: {{ .Values.openshift.scc.allowHostPID }}
+allowHostIPC: {{ .Values.openshift.scc.allowHostIPC }}
+allowHostDirVolumePlugin: true
+
+# Capabilities
+requiredDropCapabilities:
+{{- range .Values.openshift.scc.requiredDropCapabilities }}
+  - {{ . }}
+{{- end }}
+
+allowedCapabilities:
+{{- range .Values.openshift.scc.allowedCapabilities }}
+  - {{ . }}
+{{- end }}
+
+# Default add capabilities (empty for flexibility)
+defaultAddCapabilities: []
+
+# SELinux context
+seLinuxContext:
+  type: {{ .Values.openshift.scc.seLinuxContext.type }}
+
+# Run as user
+runAsUser:
+  type: {{ .Values.openshift.scc.runAsUser.type }}
+
+# FS Group
+fsGroup:
+  type: {{ .Values.openshift.scc.fsGroup.type }}
+
+# Supplemental groups
+supplementalGroups:
+  type: {{ .Values.openshift.scc.supplementalGroups.type }}
+
+# Allowed volume types
+volumes:
+{{- range .Values.openshift.scc.volumes }}
+  - {{ . }}
+{{- end }}
+
+# Read-only root filesystem (disabled for workers that need write access)
+readOnlyRootFilesystem: false
+
+# Users and groups allowed to use this SCC
+# Note: Service accounts must be explicitly granted access via RoleBinding
+users: []
+groups: []
+
+# Priority (higher priority SCCs are preferred)
+priority: 10
+{{- end }}

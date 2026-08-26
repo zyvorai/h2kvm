@@ -1,0 +1,29 @@
+# Windows 11 full pipeline test: VMDK → QCOW2 → VirtIO staged boot
+cmd: local
+
+# Source VMDK (split format)
+vmdk: /home/ssahani/vmware/win11/win11.vmdk
+
+# Output Configuration
+output_dir: /home/ssahani/tt/hyper2kvm/output-win11-pipeline
+to_output: /home/ssahani/tt/hyper2kvm/output-win11-pipeline/win11-pipeline.qcow2
+out_format: qcow2
+
+# Windows Configuration
+windows: true
+guest_os: windows
+vm_name: win11-pipeline
+
+# VirtIO Driver ISO
+virtio_drivers_dir: /home/ssahani/Downloads/virtio-win-0.1.285.iso
+
+# Multi-stage VirtIO boot deployment
+virtio_deploy_boot: true
+virtio_deploy_timeout: 300
+
+# UEFI
+uefi: true
+
+# Testing
+dry_run: false
+verbose: 2

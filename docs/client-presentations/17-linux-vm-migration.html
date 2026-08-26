@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Linux VM Migration with hyper2kvm — Complete Guide</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #7c2d12, #9a3412, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #fb923c; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 780px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(251,146,60,0.2); border: 1px solid rgba(251,146,60,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-orange { background: linear-gradient(135deg, #7c2d12, #0f172a); color: #e8e6df; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #fb923c; }
+  .page-light h2.st span { color: #c2410c; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.7em 0 0.3em; color: #fb923c; }
+  .page-light h3 { color: #c2410c; }
+  p { margin-bottom: 0.6em; font-size: 0.92em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.7em 0; font-size: 0.79em; }
+  th { background: #c2410c; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; } .partial { color: #f59e0b; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #fb923c; } .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  .page-light .card h4 { color: #c2410c; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .highlight { background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.2); border-radius: 8px; padding: 13px; margin: 0.7em 0; }
+  .page-dark .highlight { background: rgba(251,146,60,0.06); border: 1px solid rgba(251,146,60,0.15); }
+  .alert { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 13px; margin: 0.7em 0; }
+  .alert h4 { color: #ef4444; font-size: 0.95em; margin-bottom: 4px; }
+  .stat-box { text-align: center; padding: 14px; }
+  .stat-box .num { font-size: 2em; font-weight: 800; color: #fb923c; } .stat-box .label { font-size: 0.8em; opacity: 0.7; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 0.7em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(251,146,60,0.15); border: 1px solid rgba(251,146,60,0.3); padding: 9px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85em; }
+  .flow-arrow { font-size: 1.2em; color: #fb923c; }
+  .flow-src { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); }
+  .flow-fix { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); }
+  .flow-ok { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+  pre { background: #0f172a; color: #e8e6df; padding: 14px; border-radius: 8px; font-size: 0.8em; line-height: 1.5; font-family: monospace; margin: 0.7em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  code { background: rgba(251,146,60,0.1); padding: 2px 5px; border-radius: 4px; font-size: 0.87em; }
+  .verdict { background: linear-gradient(135deg, rgba(124,45,18,0.2), rgba(154,52,18,0.1)); border: 2px solid #c2410c; border-radius: 12px; padding: 16px; margin: 0.8em 0; text-align: center; }
+  .verdict h3 { color: #fb923c; font-size: 1.15em; margin-bottom: 5px; }
+  .footer { text-align: center; padding: 12px; font-size: 0.72em; opacity: 0.4; }
+  .distro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0.7em 0; }
+  .distro { text-align: center; padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; }
+  .page-light .distro { background: #fff; border: 1px solid #e5e7eb; }
+  .distro .name { font-weight: 700; font-size: 0.88em; margin-bottom: 2px; } .distro .ver { font-size: 0.78em; opacity: 0.6; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1><span>Linux</span> VM Migration</h1>
+  <h2>How hyper2kvm Migrates Linux from VMware, Hyper-V, AWS, Azure &amp; GCP to KVM</h2>
+  <p class="sub">Automated initramfs rebuild with VirtIO drivers, fstab UUID repair, GRUB reconfiguration, SELinux relabeling, network cleanup, and boot verification. Supports RHEL, Ubuntu, Debian, SUSE, Fedora, CentOS, Rocky, Alma, Oracle Linux, Photon OS, and more — across BIOS, UEFI, LVM, XFS, ext4, and Btrfs.</p>
+  <div class="badge">Auto initramfs | fstab Fix | GRUB Repair | SELinux Safe | 15+ Distros | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE 1: The Linux Boot Problem -->
+<div class="page page-dark">
+  <h2 class="st">The Linux <span>Boot Problem</span></h2>
+  <p class="sub">Why Linux VMs fail to boot after migration — and how hyper2kvm prevents every failure.</p>
+
+  <div class="alert">
+    <h4>Without initramfs rebuild and fstab repair, most Linux VMs fail to boot on KVM</h4>
+    <p>Linux loads storage drivers from the initramfs at boot time. VMware VMs use <code>vmw_pvscsi</code> or <code>mptscsi</code>. Hyper-V uses <code>hv_storvsc</code>. AWS uses <code>xen-blkfront</code> or <code>nvme</code>. KVM needs <code>virtio_blk</code> / <code>virtio_scsi</code>. If VirtIO drivers aren't in the initramfs, the kernel can't mount the root filesystem and drops to an emergency shell — or panics. Meanwhile, fstab entries referencing <code>/dev/sda</code> or <code>/dev/xvda</code> break because KVM presents disks as <code>/dev/vda</code>.</p>
+  </div>
+
+  <h3>Every Failure Mode — Automatically Fixed</h3>
+  <table>
+    <tr><th style="width:20%">Failure</th><th style="width:18%">Symptom</th><th style="width:24%">Root Cause</th><th style="width:38%">hyper2kvm Automatic Fix</th></tr>
+    <tr><td><strong>Kernel panic</strong></td><td>VFS: Unable to mount root fs</td><td>Missing virtio_blk/virtio_scsi in initramfs</td><td class="check">Rebuilds initramfs with all VirtIO modules injected</td></tr>
+    <tr><td><strong>Root mount failure</strong></td><td>Dropped to emergency shell</td><td>fstab uses /dev/sda1 — KVM has /dev/vda1</td><td class="check">Converts all fstab entries to UUID-based mounts</td></tr>
+    <tr><td><strong>GRUB boot failure</strong></td><td>grub rescue> prompt</td><td>root= parameter points to wrong device</td><td class="check">Updates GRUB config with correct root= device/UUID</td></tr>
+    <tr><td><strong>No network</strong></td><td>No interfaces up</td><td>VMware vmxnet3/Hyper-V hv_netvsc config gone</td><td class="check">Removes old NIC configs, ensures virtio_net loads</td></tr>
+    <tr><td><strong>SELinux denial storm</strong></td><td>Services fail, permission denied</td><td>File contexts wrong after disk migration</td><td class="check">Triggers full SELinux autorelabel on first boot</td></tr>
+    <tr><td><strong>VMware Tools errors</strong></td><td>Service failures in journal</td><td>open-vm-tools can't find hypervisor</td><td class="check">Removes open-vm-tools packages and services</td></tr>
+    <tr><td><strong>Hyper-V daemons crash</strong></td><td>hv_kvp_daemon errors</td><td>Hyper-V IC daemons without Hyper-V</td><td class="check">Removes hv_utils, hv_kvp_daemon, hv_vss_daemon</td></tr>
+    <tr><td><strong>Cloud-init re-provision</strong></td><td>Hostname/network reset</td><td>cloud-init runs on new "instance"</td><td class="check">Disables or reconfigures cloud-init for KVM</td></tr>
+    <tr><td><strong>LVM not found</strong></td><td>Volume group missing</td><td>initramfs lacks dm-mod or LVM tools</td><td class="check">Ensures LVM modules + tools included in initramfs</td></tr>
+    <tr><td><strong>Swap mount failure</strong></td><td>Boot delayed or fails</td><td>Swap partition device name changed</td><td class="check">Updates swap entry in fstab to UUID</td></tr>
+  </table>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>All fixes applied offline</strong> — hyper2kvm mounts the disk via qemu-nbd, modifies the filesystem directly (fstab, GRUB, initramfs, network configs), then unmounts. The VM boots clean on KVM the first time.</p>
+  </div>
+</div>
+
+<!-- PAGE 2: Supported Distributions -->
+<div class="page page-light">
+  <h2 class="st">Supported <span>Distributions</span></h2>
+  <p class="sub">Every major enterprise and community Linux distribution — tested and verified.</p>
+
+  <table>
+    <tr><th style="width:20%">Distribution</th><th style="width:20%">Versions</th><th style="width:12%">Init System</th><th style="width:12%">Boot Mode</th><th style="width:12%">Filesystems</th><th style="width:12%">Status</th><th style="width:12%">initramfs Tool</th></tr>
+    <tr><td><strong>RHEL</strong></td><td>7, 8, 9, 10</td><td>systemd</td><td>UEFI, BIOS</td><td>XFS, ext4, LVM</td><td class="check">Tested</td><td>dracut</td></tr>
+    <tr><td><strong>Rocky Linux</strong></td><td>8, 9</td><td>systemd</td><td>UEFI, BIOS</td><td>XFS, ext4, LVM</td><td class="check">Tested</td><td>dracut</td></tr>
+    <tr><td><strong>AlmaLinux</strong></td><td>8, 9</td><td>systemd</td><td>UEFI, BIOS</td><td>XFS, ext4, LVM</td><td class="check">Tested</td><td>dracut</td></tr>
+    <tr><td><strong>CentOS Stream</strong></td><td>8, 9</td><td>systemd</td><td>UEFI, BIOS</td><td>XFS, ext4, LVM</td><td class="check">Tested</td><td>dracut</td></tr>
+    <tr><td><strong>Oracle Linux</strong></td><td>7, 8, 9</td><td>systemd</td><td>UEFI, BIOS</td><td>XFS, ext4, LVM</td><td class="check">Tested</td><td>dracut</td></tr>
+    <tr><td><strong>Fedora</strong></td><td>38, 39, 40, 41</td><td>systemd</td><td>UEFI, BIOS</td><td>XFS, Btrfs, ext4</td><td class="check">Tested</td><td>dracut</td></tr>
+    <tr><td><strong>Ubuntu</strong></td><td>20.04, 22.04, 24.04</td><td>systemd</td><td>UEFI, BIOS</td><td>ext4, ZFS, LVM</td><td class="check">Tested</td><td>update-initramfs</td></tr>
+    <tr><td><strong>Debian</strong></td><td>11, 12</td><td>systemd</td><td>UEFI, BIOS</td><td>ext4, XFS, LVM</td><td class="check">Tested</td><td>update-initramfs</td></tr>
+    <tr><td><strong>SUSE SLES</strong></td><td>12 SP5, 15 SP5/SP6</td><td>systemd</td><td>UEFI, BIOS</td><td>Btrfs, XFS, ext4</td><td class="check">Tested</td><td>dracut</td></tr>
+    <tr><td><strong>openSUSE</strong></td><td>Leap 15.5/15.6, TW</td><td>systemd</td><td>UEFI, BIOS</td><td>Btrfs, XFS</td><td class="check">Tested</td><td>dracut</td></tr>
+    <tr><td><strong>VMware Photon OS</strong></td><td>3, 4, 5</td><td>systemd</td><td>UEFI, BIOS</td><td>ext4</td><td class="check">Tested</td><td>dracut</td></tr>
+    <tr><td><strong>Amazon Linux</strong></td><td>2, 2023</td><td>systemd</td><td>UEFI, BIOS</td><td>XFS, ext4</td><td class="check">Tested</td><td>dracut</td></tr>
+    <tr><td><strong>CentOS</strong></td><td>7 (legacy)</td><td>systemd</td><td>BIOS</td><td>XFS, ext4, LVM</td><td class="check">Tested</td><td>dracut</td></tr>
+  </table>
+
+  <h3>Filesystem &amp; Volume Manager Support</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Filesystems</h4>
+      <ul>
+        <li><strong>ext4</strong> — most common, full support</li>
+        <li><strong>XFS</strong> — RHEL default, UUID-based mount</li>
+        <li><strong>Btrfs</strong> — SUSE/Fedora, subvolume-aware</li>
+        <li><strong>ZFS</strong> — Ubuntu, pool import handled</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Volume Management</h4>
+      <ul>
+        <li><strong>LVM2</strong> — VG/LV detection, module injection</li>
+        <li><strong>mdadm RAID</strong> — software RAID arrays</li>
+        <li><strong>Plain partitions</strong> — GPT and MBR</li>
+        <li><strong>LUKS encryption</strong> — encrypted root support</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Boot Loaders</h4>
+      <ul>
+        <li><strong>GRUB2</strong> — primary, config regeneration</li>
+        <li><strong>GRUB Legacy</strong> — CentOS 6/RHEL 6</li>
+        <li><strong>systemd-boot</strong> — modern UEFI systems</li>
+        <li><strong>UEFI + BIOS</strong> — both modes supported</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: The Fix Pipeline -->
+<div class="page page-dark">
+  <h2 class="st">The Fix <span>Pipeline</span></h2>
+  <p class="sub">What hyper2kvm does to every Linux VM — automatically, offline, before first boot.</p>
+
+  <div class="flow">
+    <div class="flow-step flow-src">Source Disk (VMDK/VHD/RAW)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Detect OS &amp; Layout</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Fix fstab</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Rebuild initramfs</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Fix GRUB</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Clean Network</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">Boot on KVM</div>
+  </div>
+
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:18%">Fix</th><th style="width:37%">What It Does</th><th style="width:40%">Technical Detail</th></tr>
+    <tr><td>1</td><td><strong>OS Detection</strong></td><td>Identifies distro, version, init system, boot mode, partitions</td><td>Parses /etc/os-release, EFI partition presence, partition table (GPT/MBR), LVM VGs</td></tr>
+    <tr><td>2</td><td><strong>fstab UUID Repair</strong></td><td>Converts device-name mounts (/dev/sda1) to UUID-based</td><td>Reads blkid for each partition, replaces /dev/sdX, /dev/xvdX, /dev/hdX with UUID=xxxx in /etc/fstab</td></tr>
+    <tr><td>3</td><td><strong>initramfs Rebuild</strong></td><td>Injects VirtIO drivers: virtio_blk, virtio_scsi, virtio_net, virtio_pci</td><td>Chroot into guest, run dracut (RHEL/Fedora/SUSE) or update-initramfs (Debian/Ubuntu) with --add-drivers</td></tr>
+    <tr><td>4</td><td><strong>GRUB Update</strong></td><td>Fixes root= kernel parameter for KVM disk device</td><td>Updates /etc/default/grub GRUB_CMDLINE_LINUX, regenerates grub.cfg via grub2-mkconfig</td></tr>
+    <tr><td>5</td><td><strong>Network Cleanup</strong></td><td>Removes old NIC configs (vmxnet3/hv_netvsc device names)</td><td>Deletes /etc/sysconfig/network-scripts/ifcfg-*, /etc/netplan/*.yaml with hardware-specific MACs, udev rules in 70-persistent-net.rules</td></tr>
+    <tr><td>6</td><td><strong>VMware Tools Removal</strong></td><td>Removes open-vm-tools packages and services</td><td>Chroot: rpm -e open-vm-tools or apt remove open-vm-tools, disable vmtoolsd.service</td></tr>
+    <tr><td>7</td><td><strong>Hyper-V IC Removal</strong></td><td>Removes Hyper-V integration daemons</td><td>Disable hv_kvp_daemon, hv_vss_daemon, hv_fcopy_daemon services</td></tr>
+    <tr><td>8</td><td><strong>Cloud Agent Cleanup</strong></td><td>Disables AWS/Azure/GCP agents that fail without cloud metadata</td><td>Disable cloud-init reprovisioning, waagent, SSM agent; preserve hostname</td></tr>
+    <tr><td>9</td><td><strong>SELinux Relabel</strong></td><td>Triggers full filesystem relabel on next boot</td><td>Creates /.autorelabel — SELinux restorecon runs on all files at first boot</td></tr>
+    <tr><td>10</td><td><strong>Serial Console</strong></td><td>Enables ttyS0 console for headless access</td><td>Adds console=ttyS0,115200n8 to GRUB_CMDLINE_LINUX, enables serial-getty@ttyS0</td></tr>
+  </table>
+
+  <h3>initramfs Rebuild — Distro-Specific Commands</h3>
+  <pre>
+# RHEL / Rocky / Alma / Fedora / CentOS / Oracle Linux / Photon / SUSE (dracut-based):
+chroot /mnt/guest dracut --force --add-drivers "virtio_blk virtio_scsi virtio_net virtio_pci" /boot/initramfs-$(uname -r).img $(uname -r)
+
+# Ubuntu / Debian (initramfs-tools-based):
+echo -e "virtio_blk\nvirtio_scsi\nvirtio_net\nvirtio_pci" >> /mnt/guest/etc/initramfs-tools/modules
+chroot /mnt/guest update-initramfs -u -k all
+
+# hyper2kvm handles all of this automatically — detects distro, selects correct method, runs in chroot
+  </pre>
+</div>
+
+<!-- PAGE 4: Multi-Source Migration Paths -->
+<div class="page page-light">
+  <h2 class="st">Every Source <span>Platform</span></h2>
+  <p class="sub">hyper2kvm migrates Linux VMs from any hypervisor or cloud with source-specific fixes.</p>
+
+  <h3>VMware vSphere &rarr; KVM</h3>
+  <div class="flow">
+    <div class="flow-step flow-src">VMware VMDK (vmw_pvscsi / vmxnet3)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Remove open-vm-tools + rebuild initramfs (VirtIO)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">KVM (virtio_blk + virtio_net)</div>
+  </div>
+
+  <h3>Hyper-V &rarr; KVM</h3>
+  <div class="flow">
+    <div class="flow-step flow-src">Hyper-V VHD/VHDX (hv_storvsc / hv_netvsc)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Remove Hyper-V IC + rebuild initramfs (VirtIO)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">KVM (virtio_blk + virtio_net)</div>
+  </div>
+
+  <h3>AWS EC2 &rarr; KVM</h3>
+  <div class="flow">
+    <div class="flow-step flow-src">AWS EBS (xen-blkfront / nvme / ena)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Disable cloud-init + fix fstab (/dev/xvda&rarr;UUID) + initramfs</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">KVM (virtio_blk + virtio_net)</div>
+  </div>
+
+  <h3>Azure &rarr; KVM</h3>
+  <div class="flow">
+    <div class="flow-step flow-src">Azure VHD (hv_storvsc / hv_netvsc / waagent)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Remove waagent + Hyper-V IC + rebuild initramfs</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">KVM (virtio_blk + virtio_net)</div>
+  </div>
+
+  <h3>Source-Specific Fix Matrix</h3>
+  <table>
+    <tr><th style="width:22%">Fix Applied</th><th style="width:13%">VMware</th><th style="width:13%">Hyper-V</th><th style="width:13%">AWS EC2</th><th style="width:13%">Azure</th><th style="width:13%">GCP</th><th style="width:13%">OpenStack</th></tr>
+    <tr><td><strong>initramfs + VirtIO</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>fstab UUID repair</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>GRUB config fix</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Network cleanup</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>SELinux relabel</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Remove VMware Tools</strong></td><td class="check">&#10003;</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+    <tr><td><strong>Remove Hyper-V IC</strong></td><td>N/A</td><td class="check">&#10003;</td><td>N/A</td><td class="check">&#10003;</td><td>N/A</td><td>N/A</td></tr>
+    <tr><td><strong>Disable cloud-init</strong></td><td>N/A</td><td>N/A</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Remove cloud agents</strong></td><td>N/A</td><td>N/A</td><td class="check">&#10003; (SSM)</td><td class="check">&#10003; (waagent)</td><td class="check">&#10003; (guest-agent)</td><td>N/A</td></tr>
+    <tr><td><strong>Serial console</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 5: Enterprise Linux Workloads -->
+<div class="page page-dark">
+  <h2 class="st">Enterprise Linux <span>Workloads</span></h2>
+  <p class="sub">Critical applications migrated safely with hyper2kvm.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>PostgreSQL / MySQL / MariaDB</h4>
+      <ul>
+        <li>Data directories migrate with disk — no dump/restore</li>
+        <li>InnoDB/WAL files intact on target</li>
+        <li>VirtIO SCSI provides comparable I/O to PVSCSI</li>
+        <li>Tablespaces on separate partitions handled via fstab fix</li>
+        <li>Replication resumes after boot (update source IP)</li>
+        <li><strong>Tip:</strong> Stop DB before export for consistency, or use snapshot</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Docker / Podman Hosts</h4>
+      <ul>
+        <li>Container images in /var/lib/docker migrate with disk</li>
+        <li>Overlay2/fuse-overlayfs storage intact</li>
+        <li>Docker daemon starts on boot, containers resume</li>
+        <li>Podman rootless containers preserved</li>
+        <li>Container registry data (Harbor, GitLab) migrates with volume</li>
+        <li><strong>Tip:</strong> docker-compose stacks auto-restart via systemd</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Kubernetes Nodes</h4>
+      <ul>
+        <li>kubelet, containerd, etcd data migrates with disk</li>
+        <li>K8s control plane: migrate workers first, then masters</li>
+        <li>etcd snapshot recommended before control plane migration</li>
+        <li>CNI plugins (Calico, Cilium) need network reconfiguration</li>
+        <li>PersistentVolumes on local disks travel with the VM</li>
+        <li><strong>Tip:</strong> Cordon + drain node before migration</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Web Servers (Apache / Nginx)</h4>
+      <ul>
+        <li>Simplest migration — standard pipeline, no special handling</li>
+        <li>Virtual hosts, SSL certs, .htaccess all preserved</li>
+        <li>Let's Encrypt certs in /etc/letsencrypt intact</li>
+        <li>PHP-FPM, Python WSGI, Node.js apps unchanged</li>
+        <li>Load balancer health checks resume automatically</li>
+        <li><strong>Tip:</strong> Verify DNS and IP bindings post-migration</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>NFS / Samba File Servers</h4>
+      <ul>
+        <li>Exported filesystems migrate with disk</li>
+        <li>NFS exports in /etc/exports preserved</li>
+        <li>Samba shares in smb.conf intact</li>
+        <li>POSIX ACLs and extended attributes preserved on ext4/XFS</li>
+        <li>Clients reconnect after DNS/IP update</li>
+        <li><strong>Tip:</strong> Update /etc/exports for new network if IP changes</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Monitoring (Prometheus / Grafana / ELK)</h4>
+      <ul>
+        <li>Prometheus TSDB data in /var/lib/prometheus intact</li>
+        <li>Grafana dashboards in SQLite/PostgreSQL preserved</li>
+        <li>Elasticsearch indices on data volumes travel with disk</li>
+        <li>Alertmanager configs and templates preserved</li>
+        <li>Large data volumes: ensure target has sufficient I/O</li>
+        <li><strong>Tip:</strong> VirtIO SCSI + NVMe backend for heavy I/O</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>GitLab / Jenkins CI</h4>
+      <ul>
+        <li>Git repositories, CI data, artifacts migrate with disk</li>
+        <li>GitLab PostgreSQL + Redis data intact</li>
+        <li>Jenkins workspace and job history preserved</li>
+        <li>SSH keys and deploy keys in /home/*/.ssh intact</li>
+        <li>Runner registrations: re-register with new IP</li>
+        <li><strong>Tip:</strong> GitLab backup before migration as safety net</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>FreeIPA / LDAP / Kerberos</h4>
+      <ul>
+        <li>LDAP directory (389-ds) data migrates with disk</li>
+        <li>Kerberos keytabs and principal database preserved</li>
+        <li>CA certificates in /etc/pki intact</li>
+        <li>DNS zones (if integrated) travel with LDAP</li>
+        <li>Replication: migrate replicas first, verify sync</li>
+        <li><strong>Tip:</strong> Test kinit + ldapsearch post-migration</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: YAML Config & Deployment -->
+<div class="page page-light">
+  <h2 class="st">Configuration <span>&amp; Deployment</span></h2>
+  <p class="sub">YAML-driven migration with dual deployment targets.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>VMware Linux VM &rarr; KVM</h4>
+      <pre style="background:#1e1e2e; color:#e8e6df; padding:12px; border-radius:6px; font-size:0.78em;">
+# rhel9-webserver.yaml
+cmd: vsphere
+vcenter: vcenter.corp.com
+vs_action: export_vm
+vs_vm: rhel9-web-01
+output_dir: ./converted
+out_format: qcow2
+flatten: true
+compress: true
+regen_initramfs: true
+emit_domain_xml: true
+vm_name: rhel9-web-01
+memory: 4096
+vcpus: 2
+machine: q35
+uefi: true
+boot_test: true</pre>
+    </div>
+    <div class="card">
+      <h4>AWS Linux VM &rarr; KubeVirt</h4>
+      <pre style="background:#1e1e2e; color:#e8e6df; padding:12px; border-radius:6px; font-size:0.78em;">
+# aws-postgres.yaml
+cmd: local
+raw: ./aws-export/postgres-db.raw
+output_dir: ./converted
+out_format: qcow2
+regen_initramfs: true
+deploy_k8s: true
+k8s_namespace: databases
+vm_name: postgres-primary
+memory: 16384
+vcpus: 8
+boot_test: true
+# hypersdk exported the RAW from
+# AWS EBS snapshot earlier</pre>
+    </div>
+  </div>
+
+  <h3>Deployment Targets</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>KVM / libvirt</h4>
+      <ul>
+        <li><code>emit_domain_xml: true</code></li>
+        <li>Generates optimized libvirt domain XML</li>
+        <li>Q35 machine type with PCIe for modern guests</li>
+        <li>VirtIO disk, network, balloon, RNG</li>
+        <li>UEFI (OVMF) or BIOS boot</li>
+        <li>Auto virsh define + optional boot test</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>KubeVirt / Kubernetes</h4>
+      <ul>
+        <li><code>deploy_k8s: true</code></li>
+        <li>Generates VirtualMachine manifest</li>
+        <li>PVC with disk image upload via CDI</li>
+        <li>Works on K3s, vanilla K8s, OpenShift</li>
+        <li>GitOps-ready YAML for fleet deploy</li>
+        <li>kubectl apply to any cluster</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Dual Target</h4>
+      <ul>
+        <li><code>emit_domain_xml: true</code></li>
+        <li><code>deploy_k8s: true</code></li>
+        <li>Both outputs from one conversion</li>
+        <li>KVM for traditional hosts</li>
+        <li>KubeVirt for K8s clusters</li>
+        <li>Choose per-site at deploy time</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Batch Migration — 100 Linux VMs</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:18%">Step</th><th style="width:40%">What hyper2kvm Does</th><th style="width:37%">Result</th></tr>
+    <tr><td>1</td><td><strong>Pre-flight</strong></td><td><code>h2kvmctl doctor</code> — checks disk space, qemu-nbd, libvirt, KubeVirt</td><td>Green light before starting</td></tr>
+    <tr><td>2</td><td><strong>Discover</strong></td><td>zkvm TUI: browse vCenter, see OS, CPU, RAM, disk per VM</td><td>Select VMs, batch queue</td></tr>
+    <tr><td>3</td><td><strong>Export</strong></td><td>govc export with streaming progress + ETA</td><td>VMDK/OVA files downloaded</td></tr>
+    <tr><td>4</td><td><strong>Convert</strong></td><td>VMDK &rarr; QCOW2, flatten snapshots, compress</td><td>Optimized QCOW2 images</td></tr>
+    <tr><td>5</td><td><strong>Fix</strong></td><td>fstab, initramfs, GRUB, network, SELinux — per distro</td><td>Boot-ready on KVM</td></tr>
+    <tr><td>6</td><td><strong>Deploy</strong></td><td>Generate XML/YAML, virsh define or kubectl apply</td><td>VMs defined on target</td></tr>
+    <tr><td>7</td><td><strong>Verify</strong></td><td>Automated boot test, service health check</td><td>Confirmed working</td></tr>
+    <tr><td>8</td><td><strong>Notify</strong></td><td>Webhook to Slack/Teams with pass/fail per VM</td><td>Team informed</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 7: Tool Comparison -->
+<div class="page page-dark">
+  <h2 class="st">Linux Migration <span>Tool Comparison</span></h2>
+  <p class="sub">How hyper2kvm compares to other tools for Linux VM migration.</p>
+
+  <table>
+    <tr><th style="width:24%">Capability</th><th style="width:15%">hyper2kvm</th><th style="width:15%">virt-v2v</th><th style="width:15%">Red Hat MTV</th><th style="width:15%">AWS MGN</th><th style="width:16%">Manual</th></tr>
+    <tr><td><strong>initramfs rebuild + VirtIO</strong></td><td class="check">&#10003; Auto (all distros)</td><td class="check">&#10003; Auto</td><td class="partial">Limited</td><td class="cross">N/A</td><td class="partial">Manual chroot</td></tr>
+    <tr><td><strong>fstab UUID repair</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="partial">Basic</td><td class="cross">N/A</td><td class="partial">Manual edit</td></tr>
+    <tr><td><strong>GRUB config fix</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="partial">Basic</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>SELinux relabel</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Network cleanup</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="partial">Basic</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Cloud agent removal</strong></td><td class="check">&#10003; (AWS/Azure/GCP)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Boot verification</strong></td><td class="check">&#10003; Auto</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Deploy to KVM/libvirt</strong></td><td class="check">&#10003; Auto XML</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Deploy to KubeVirt</strong></td><td class="check">&#10003; Auto YAML</td><td class="cross">&#10007;</td><td class="check">&#10003; (OCP only)</td><td class="cross">&#10007;</td><td class="cross">Complex</td></tr>
+    <tr><td><strong>Interactive TUI</strong></td><td class="check">&#10003; zkvm</td><td class="cross">&#10007;</td><td class="cross">Web UI</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Batch migration</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Source: VMware</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Source: Hyper-V</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="check">&#10003;</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Source: AWS/Azure/GCP</strong></td><td class="check">&#10003; (10 clouds)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td>AWS only</td><td class="cross">Complex</td></tr>
+    <tr><td><strong>No libguestfs needed</strong></td><td class="check">&#10003; VMCraft</td><td class="cross">Required</td><td class="cross">Required</td><td>N/A</td><td>N/A</td></tr>
+    <tr><td><strong>15+ distros supported</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">RHEL-focused</td><td class="partial">Amazon Linux</td><td>Varies</td></tr>
+    <tr><td><strong>Cost</strong></td><td class="check">$0</td><td class="check">$0</td><td class="cross">$50K+ (OCP)</td><td class="partial">Free/90d</td><td class="check">$0</td></tr>
+  </table>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>hyper2kvm advantage:</strong> The only tool that migrates Linux from VMware + Hyper-V + 10 clouds, supports 15+ distros, deploys to both KVM and KubeVirt, includes automated boot verification, needs no libguestfs, and is licensed*.</p>
+  </div>
+</div>
+
+<!-- PAGE 8: Real-World Scenarios & Summary -->
+<div class="page page-light">
+  <h2 class="st">Real-World <span>Scenarios</span></h2>
+  <p class="sub">Enterprise Linux migration projects powered by hyper2kvm.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>VMware Exit — 200 RHEL/Ubuntu Servers</h4>
+      <ul>
+        <li><strong>Source:</strong> vSphere 7, mix of RHEL 8/9, Ubuntu 22.04</li>
+        <li><strong>Workloads:</strong> Web, DB, middleware, monitoring, CI/CD</li>
+        <li><strong>Target:</strong> KVM on bare-metal RHEL 9 hosts</li>
+        <li><strong>Process:</strong> zkvm TUI batch export, auto initramfs + fstab + GRUB fix per distro, boot verification</li>
+        <li><strong>Timeline:</strong> 6 weeks (30-40 VMs/week)</li>
+        <li><strong>Savings:</strong> $450K/yr VMware licensing eliminated</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>AWS Repatriation — 50 Linux VMs</h4>
+      <ul>
+        <li><strong>Source:</strong> AWS EC2 (Amazon Linux 2, Ubuntu, RHEL)</li>
+        <li><strong>Workloads:</strong> PostgreSQL, Django apps, Elasticsearch</li>
+        <li><strong>Target:</strong> On-prem KVM (data sovereignty)</li>
+        <li><strong>Process:</strong> hypersdk exports EBS snapshots, hyper2kvm converts RAW &rarr; QCOW2, removes cloud-init/SSM, rebuilds initramfs, deploys to libvirt</li>
+        <li><strong>Timeline:</strong> 3 weeks</li>
+        <li><strong>Savings:</strong> $600K/yr in AWS compute + egress</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Hyper-V to KubeVirt — 30 Linux VMs</h4>
+      <ul>
+        <li><strong>Source:</strong> Hyper-V 2019, Debian 11/12, Ubuntu 20.04</li>
+        <li><strong>Workloads:</strong> Docker hosts, GitLab, Jenkins, Nginx</li>
+        <li><strong>Target:</strong> K3s + KubeVirt (modernization)</li>
+        <li><strong>Process:</strong> VHD export, remove Hyper-V IC, rebuild initramfs, generate KubeVirt manifests</li>
+        <li><strong>Timeline:</strong> 2 weeks</li>
+        <li><strong>Savings:</strong> $80K/yr Hyper-V + Windows Server licensing</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Multi-Cloud Consolidation — 80 VMs</h4>
+      <ul>
+        <li><strong>Source:</strong> 30 on AWS, 20 on Azure, 15 on GCP, 15 on VMware</li>
+        <li><strong>Workloads:</strong> RHEL, Ubuntu, SUSE, Photon OS — everything</li>
+        <li><strong>Target:</strong> Centralized KVM cluster + edge K3s sites</li>
+        <li><strong>Process:</strong> hypersdk exports from all 4 sources, hyper2kvm applies source-specific fixes per distro, dual-target deploy</li>
+        <li><strong>Timeline:</strong> 5 weeks</li>
+        <li><strong>Savings:</strong> $1.2M/yr consolidated infrastructure</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Linux Migration Made Automatic</h3>
+    <p style="font-size:0.95em;">
+      15+ distributions. 10 source platforms. Every guest fix automated.<br>
+      initramfs rebuilt. fstab repaired. GRUB fixed. SELinux relabeled. Boot verified.<br>
+      <strong>hyper2kvm: every Linux VM boots clean on KVM, first time, every time.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,131 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: jobtemplates.hyper2kvm.io
+spec:
+  group: hyper2kvm.io
+  names:
+    kind: JobTemplate
+    listKind: JobTemplateList
+    plural: jobtemplates
+    singular: jobtemplate
+    shortNames:
+    - jt
+    - jtemplate
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required:
+            - operation
+            - parameters
+            properties:
+              description:
+                type: string
+                description: "Template description"
+
+              operation:
+                type: string
+                enum:
+                - inspect
+                - convert
+                - offline_fix
+                description: "Migration operation type"
+
+              parameters:
+                type: array
+                description: "Template parameters"
+                items:
+                  type: object
+                  required:
+                  - name
+                  - type
+                  properties:
+                    name:
+                      type: string
+                      description: "Parameter name"
+                    type:
+                      type: string
+                      enum:
+                      - string
+                      - integer
+                      - boolean
+                      - path
+                      description: "Parameter type"
+                    description:
+                      type: string
+                      description: "Parameter description"
+                    default:
+                      type: string
+                      description: "Default value"
+                    required:
+                      type: boolean
+                      default: true
+                    validation:
+                      type: object
+                      description: "Validation rules"
+                      properties:
+                        pattern:
+                          type: string
+                        min:
+                          type: integer
+                        max:
+                          type: integer
+
+              template:
+                type: object
+                description: "MigrationJob template with parameter placeholders"
+                x-kubernetes-preserve-unknown-fields: true
+
+              defaults:
+                type: object
+                description: "Default values for job spec"
+                properties:
+                  priority:
+                    type: integer
+                    minimum: 0
+                    maximum: 100
+                  retryPolicy:
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  artifacts:
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+
+          status:
+            type: object
+            properties:
+              usageCount:
+                type: integer
+                description: "Number of times template was used"
+              lastUsed:
+                type: string
+                format: date-time
+              validated:
+                type: boolean
+                description: "Whether template is validated"
+
+    subresources:
+      status: {}
+
+    additionalPrinterColumns:
+    - name: Operation
+      type: string
+      jsonPath: .spec.operation
+    - name: Parameters
+      type: integer
+      jsonPath: .spec.parameters
+      description: "Number of parameters"
+    - name: Usage
+      type: integer
+      jsonPath: .status.usageCount
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp

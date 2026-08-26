@@ -1,0 +1,40 @@
+# Multi-Namespace Deployment Example
+# This shows how to configure VMs for different namespaces
+
+# For deploying multiple VMs, you would run this command multiple times
+# with different VM names and namespaces, or use batch processing
+
+# Web Server in Production Namespace
+cmd: local
+vmdk: /vms/web-server.vmdk
+output_dir: out/web-server
+to_output: web-server.qcow2
+compress: true
+
+# Offline fixes
+fstab_mode: stabilize-all
+initramfs_regen_enable: true
+initramfs_modules:
+  - virtio_blk
+  - virtio_net
+
+# Deploy to production namespace
+deploy_k8s: true
+k8s_namespace: production
+k8s_vm_name: web-server-frontend
+k8s_storage_class: longhorn
+k8s_pvc_size: 20Gi
+k8s_cpu: "4"
+k8s_memory: 8Gi
+k8s_auto_start: true
+
+# Note: To deploy to a different namespace, create another config file
+# or use CLI overrides:
+#   sudo h2kvmctl --config this-file.yaml --k8s-namespace staging
+
+# Example for database in different namespace (separate run):
+# k8s_namespace: databases
+# k8s_vm_name: postgres-primary
+# k8s_cpu: "8"
+# k8s_memory: 32Gi
+# k8s_storage_class: rook-ceph-block  # High-performance storage for DB

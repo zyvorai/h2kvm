@@ -1,0 +1,35 @@
+{
+  "batch_version": "1.0",
+  "batch_metadata": {
+    "batch_id": "migration-2026-01-22",
+    "parallel_limit": 4,
+    "continue_on_error": true
+  },
+  "vms": [
+    {
+      "id": "web-server-01",
+      "manifest": "/work/vm1/manifest.json",
+      "priority": 0
+    },
+    {
+      "id": "db-server-01",
+      "manifest": "/work/vm2/manifest.json",
+      "priority": 1
+    },
+    {
+      "id": "app-server-01",
+      "manifest": "/work/vm3/manifest.json",
+      "priority": 0
+    }
+  ],
+  "shared_config": {
+    "output_directory": "/converted",
+    "network_mapping": {
+      "source_networks": {
+        "VM Network": "br0",
+        "DMZ Network": "br-dmz"
+      },
+      "mac_address_policy": "preserve"
+    }
+  }
+}

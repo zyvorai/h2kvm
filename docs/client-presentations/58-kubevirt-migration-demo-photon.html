@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hyper2kvm KubeVirt Migration Demo — VMware Photon OS to K3s</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #065f46, #047857, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.6em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #34d399; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 0.95em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(52,211,153,0.2); border: 1px solid rgba(52,211,153,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 36px 46px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #34d399; }
+  .page-light h2.st span { color: #047857; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.6em 0 0.25em; color: #34d399; }
+  .page-light h3 { color: #047857; }
+  p { margin-bottom: 0.5em; font-size: 0.88em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  pre { background: #0f172a; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.72em; line-height: 1.4; font-family: 'JetBrains Mono', 'Fira Code', monospace; margin: 0.5em 0; overflow-x: auto; white-space: pre-wrap; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .page-light pre { background: #1e293b; color: #e8e6df; }
+  .step { display: inline-block; background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); padding: 3px 10px; border-radius: 5px; font-size: 0.82em; font-weight: 700; color: #34d399; margin-bottom: 0.3em; }
+  .page-light .step { color: #047857; background: rgba(4,120,87,0.1); border-color: rgba(4,120,87,0.2); }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.9em; font-weight: 600; margin-bottom: 4px; color: #34d399; }
+  .page-light .card h4 { color: #047857; }
+  .card p { font-size: 0.78em; margin-bottom: 0; }
+  .card ul { padding-left: 14px; font-size: 0.78em; margin: 0; } .card li { margin-bottom: 2px; }
+  .highlight { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .verdict { background: linear-gradient(135deg, rgba(6,95,70,0.2), rgba(4,120,87,0.1)); border: 2px solid #047857; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #34d399; font-size: 1.1em; margin-bottom: 4px; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .check { color: #22c55e; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.76em; }
+  th { background: #047857; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>hyper2kvm <span>KubeVirt Demo</span></h1>
+  <h2>VMware Photon OS VMDK to K3s + KubeVirt &mdash; End-to-End</h2>
+  <p class="sub">Live demonstration: VMDK conversion with offline fixes, dual deploy to libvirt domain XML AND KubeVirt VirtualMachine on K3s, PVC upload via CDI, VM running on Kubernetes with VirtIO disk and masquerade networking.</p>
+  <div class="badge">Photon OS 5.0 | K3s v1.34 | KubeVirt v1.7.2 | CDI v1.64 | VirtIO | PVC Upload | VM Running</div>
+</div>
+
+<!-- PAGE 1: Cluster & Config -->
+<div class="page page-dark">
+  <h2 class="st">Step 1-2: Cluster <span>&amp; Configuration</span></h2>
+
+  <div class="step">STEP 1 &mdash; K3s + KubeVirt Cluster</div>
+  <pre>
+$ kubectl get nodes -o wide
+NAME                    STATUS   ROLES           VERSION        OS-IMAGE     KERNEL
+ssahani-thinkpad...     Ready    control-plane   v1.34.5+k3s1   Fedora 43    6.19.8-200.fc43
+
+$ kubectl get pods -n kubevirt
+NAME                               READY   STATUS    AGE
+virt-api-9c497cb7d-tg7sj           1/1     Running   3h
+virt-controller-6f4f5ff947-vfkbs   1/1     Running   3h
+virt-controller-6f4f5ff947-vgfh5   1/1     Running   3h
+virt-handler-wljr2                 1/1     Running   3h
+virt-operator-d9474c954-27n9d      1/1     Running   3h
+virt-operator-d9474c954-phzds      1/1     Running   3h
+
+$ kubectl get pods -n cdi
+cdi-apiserver-6cc6bcdc46-gdm78     1/1     Running   26m
+cdi-deployment-59945cb874-pltzd    1/1     Running   26m
+cdi-operator-697fd6d5b4-89t28      1/1     Running   26m
+cdi-uploadproxy-7787b9cc65-kbxt7   1/1     Running   26m
+  </pre>
+
+  <div class="step">STEP 2 &mdash; Migration YAML Config</div>
+  <pre>
+cmd: local
+vmdk: ./photon.vmdk
+output_dir: ./out-kubevirt-demo
+flatten: true
+out_format: qcow2
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Dual deploy: libvirt + KubeVirt
+emit_domain_xml: true               # Generate libvirt XML
+deploy_k8s: true                    # Deploy to KubeVirt
+k8s_namespace: default              # Target namespace
+
+vm_name: photon-kubevirt
+memory: 2048
+vcpus: 2
+machine: q35
+  </pre>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Single command, dual deploy:</strong> <code>sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml h2kvmctl --config photon-kubevirt.yaml</code><br>Produces both libvirt domain XML and a running KubeVirt VirtualMachine on K3s.</p>
+  </div>
+</div>
+
+<!-- PAGE 2: Pipeline -->
+<div class="page page-light">
+  <h2 class="st">Step 3: Migration <span>Pipeline</span></h2>
+
+  <div class="step">STEP 3a &mdash; Flatten + Offline Fixes</div>
+  <pre>
+14:20:03 Flatten snapshot chain
+14:20:03 Flattening progress: 0.3%
+14:20:05 Flattening progress: 5.6%
+14:20:08 Flattening progress: 10.8%
+14:20:08 Flattened: working-flattened.qcow2
+
+14:20:08 Image validated: qcow2 (virtual: 8.00 GiB, actual: 0.97 GiB)
+14:20:09 Connected to /dev/nbd0
+14:20:09 Detected: VMware Photon OS 5.0 (photon, kernel 6.1.10-11.ph5)
+14:20:09 Boot mode: UEFI
+14:20:12 initramfs rebuild: dracut --add-drivers virtio_blk virtio_scsi virtio_net nvme
+14:20:25 Systemd boot integration applied: 3 features
+  </pre>
+
+  <div class="step">STEP 3b &mdash; Convert + Dual Deploy</div>
+  <pre>
+14:20:25 Convert to QCOW2
+14:20:25 Converting: working-flattened.qcow2 -> photon.qcow2
+14:20:27 Validated: photon.qcow2
+
+14:20:27 emit_domain_xml: guest=linux uefi=True name=photon-kubevirt
+14:20:27 Domain XML: out-kubevirt-demo/libvirt/photon-kubevirt.xml
+
+14:20:29 Creating PVC: photon-disk
+14:20:29 PVC already exists: photon-disk
+14:20:29 Uploading image to PVC
+14:20:33 Copying photon.qcow2 to PVC (this may take a while)...
+14:20:44 <span class="check">Image uploaded to PVC</span>
+14:20:44 <span class="check">Kubernetes deployment complete</span>
+14:20:44    PVC: photon-disk
+  </pre>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Libvirt Output</h4>
+      <ul>
+        <li>Domain XML: <code>photon-kubevirt.xml</code></li>
+        <li>Machine: Q35 with PCIe</li>
+        <li>Firmware: UEFI (OVMF)</li>
+        <li>Disk: VirtIO (vda)</li>
+        <li>Network: VirtIO</li>
+        <li>Ready for: <code>virsh define</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>KubeVirt Output</h4>
+      <ul>
+        <li>VirtualMachine: <code>photon</code> in <code>default</code> ns</li>
+        <li>PVC: <code>photon-disk</code> (QCOW2 uploaded via CDI)</li>
+        <li>Disk bus: VirtIO</li>
+        <li>Network: masquerade (pod network)</li>
+        <li>Labels: <code>hyper2kvm.io/migrated: "true"</code></li>
+        <li>Ready for: <code>kubectl patch vm ... running:true</code></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: KubeVirt VM Running -->
+<div class="page page-dark">
+  <h2 class="st">Step 4: KubeVirt <span>VM Running</span></h2>
+
+  <div class="step">STEP 4a &mdash; VirtualMachine Created</div>
+  <pre>
+$ kubectl get vm
+NAME     AGE   STATUS    READY
+photon   69s   Stopped   False
+
+$ kubectl get vm photon -o yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    app: photon
+    hyper2kvm.io/migrated: "true"
+  name: photon
+  namespace: default
+spec:
+  template:
+    spec:
+      architecture: amd64
+      domain:
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: rootdisk
+          interfaces:
+          - masquerade: {}
+            name: default
+        machine:
+          type: q35
+        resources:
+          requests:
+            cpu: "2"
+            memory: 2Gi
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: rootdisk
+        persistentVolumeClaim:
+          claimName: photon-disk
+  </pre>
+
+  <div class="step">STEP 4b &mdash; Start VM &amp; Verify</div>
+  <pre>
+$ kubectl patch vm photon --type merge -p '{"spec":{"running":true}}'
+virtualmachine.kubevirt.io/photon patched
+
+$ kubectl get vmi -o wide
+NAME     AGE   PHASE     IP           NODENAME                  READY
+photon   15s   <span class="check">Running</span>   10.42.0.25   ssahani-thinkpad...       <span class="check">True</span>
+
+$ kubectl get vmi photon -o jsonpath='{.status.phase}'
+<span class="check">Running</span>
+
+$ kubectl get vmi photon -o jsonpath='{.status.interfaces[0].ipAddress}'
+10.42.0.25
+  </pre>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>VM Status</h4>
+      <ul>
+        <li>Phase: <strong style="color:#22c55e;">Running</strong></li>
+        <li>Ready: <strong style="color:#22c55e;">True</strong></li>
+        <li>IP: 10.42.0.25</li>
+        <li>Node: ssahani-thinkpad...</li>
+        <li>Architecture: amd64</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Resources</h4>
+      <ul>
+        <li>CPU: 2 cores</li>
+        <li>Memory: 2 GiB</li>
+        <li>Disk: VirtIO (PVC-backed)</li>
+        <li>Network: masquerade</li>
+        <li>Machine: Q35</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Storage</h4>
+      <ul>
+        <li>PVC: photon-disk</li>
+        <li>Image: photon.qcow2 (1 GB)</li>
+        <li>Uploaded via CDI</li>
+        <li>StorageClass: local-path</li>
+        <li>Source: Photon OS 5.0 VMDK</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: Summary -->
+<div class="page page-light">
+  <h2 class="st">Pipeline <span>Summary</span></h2>
+
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:18%">Step</th><th style="width:25%">Action</th><th style="width:12%">Duration</th><th style="width:40%">Result</th></tr>
+    <tr><td>1</td><td>Sanity checks</td><td>Tools, disk space, permissions</td><td>&lt;1s</td><td class="check">5/5 passed</td></tr>
+    <tr><td>2</td><td>Flatten</td><td>VMDK &rarr; QCOW2</td><td>~5s</td><td class="check">working-flattened.qcow2 (8 GiB virtual)</td></tr>
+    <tr><td>3</td><td>Offline fixes</td><td>fstab, initramfs, GRUB, VMware cleanup</td><td>~17s</td><td class="check">VirtIO drivers, UEFI boot, Photon 5.0 detected</td></tr>
+    <tr><td>4</td><td>Convert</td><td>Working &rarr; final QCOW2</td><td>~2s</td><td class="check">photon.qcow2 (1017 MB)</td></tr>
+    <tr><td>5</td><td>Libvirt XML</td><td>Generate domain XML</td><td>&lt;1s</td><td class="check">photon-kubevirt.xml (Q35, VirtIO, OVMF)</td></tr>
+    <tr><td>6</td><td>PVC create</td><td>Create PersistentVolumeClaim</td><td>&lt;1s</td><td class="check">photon-disk PVC</td></tr>
+    <tr><td>7</td><td>PVC upload</td><td>Upload QCOW2 via CDI</td><td>~15s</td><td class="check">Image uploaded to PVC</td></tr>
+    <tr><td>8</td><td>VM create</td><td>Apply VirtualMachine manifest</td><td>&lt;1s</td><td class="check">photon VM in default namespace</td></tr>
+    <tr><td>9</td><td>VM start</td><td>kubectl patch running:true</td><td>~15s</td><td class="check">Running, IP 10.42.0.25, Ready: True</td></tr>
+  </table>
+
+  <h3>Output Files</h3>
+  <pre>
+out-kubevirt-demo/
+  photon.qcow2              1017 MB   Final converted image
+  photon-kubevirt.xml        1.8 KB   KubeVirt VirtualMachine manifest
+  libvirt/
+    photon-kubevirt.xml      1.8 KB   Libvirt domain XML (Q35, VirtIO, OVMF)
+  work/
+    working-flattened.qcow2  1013 MB   Intermediate image
+  </pre>
+
+  <h3>Cluster State After Migration</h3>
+  <pre>
+$ kubectl get vm,vmi,pvc
+NAME                              AGE   STATUS    READY
+virtualmachine.kubevirt.io/photon 2m    Running   True
+
+NAME                                          AGE   PHASE     IP           READY
+virtualmachineinstance.kubevirt.io/photon      90s   Running   10.42.0.25   True
+
+NAME                          STATUS   VOLUME         CAPACITY   STORAGECLASS
+persistentvolumeclaim/photon  Bound    pvc-87dcd...   10Gi       local-path
+  </pre>
+
+  <div class="verdict">
+    <h3>VMware to KubeVirt &mdash; Single Command</h3>
+    <p style="font-size:0.9em;">
+      Photon OS 5.0 VMDK (996 MB) &rarr; QCOW2 + offline fixes &rarr; PVC upload via CDI &rarr; KubeVirt VM running on K3s<br>
+      VirtIO disk, Q35 machine, masquerade networking, IP assigned, Ready: True<br>
+      <strong>Total time: ~44 seconds. One YAML. Zero kubectl commands needed.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.3.0 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+---
+# Ubuntu VM with cloud-init configuration
+apiVersion: hyper2kvm.io/v1alpha1
+kind: HyperConversion
+metadata:
+  name: ubuntu-with-cloudinit
+  namespace: default
+spec:
+  source:
+    url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+    format: qcow2
+
+  storage:
+    storageClass: local-path
+    size: 20Gi
+    accessMode: ReadWriteOnce
+
+  vm:
+    name: ubuntu-cloudinit
+
+    cpu:
+      cores: 4
+
+    memory: 8Gi
+
+    firmware: uefi
+
+    networks:
+    - name: default
+      type: pod
+
+    # Inline cloud-init configuration
+    cloudInit:
+      userData: |
+        #cloud-config
+        hostname: ubuntu-vm
+        users:
+          - name: ubuntu
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... user@example.com
+        package_update: true
+        packages:
+          - vim
+          - git
+          - htop
+        runcmd:
+          - echo "VM initialized via cloud-init" > /tmp/init.txt
+
+  conversion:
+    compression: zstd
+    timeout: 45

@@ -1,0 +1,29 @@
+command: local
+vmdk: ./esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+output_dir: ./output
+backend: vmcraft
+flatten: true
+to_output: rhel8.8-fixed.qcow2
+out_format: qcow2
+compress: true
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Serial console for virsh console access
+serial_console: true
+
+# Libvirt: copy image, define domain, and start
+emit_domain_xml: true
+virsh_define: true
+copy_to_libvirt_images: true
+vm_name: rhel88-converted
+memory: 4096
+vcpus: 2
+headless: false
+force_replace: true
+
+# Smoke test + health check
+libvirt_test: true
+keep_domain: true
+health_check: true
+health_check_timeout: 120

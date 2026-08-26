@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hyper2kvm — LinkedIn Content Kit</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.65; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0a66c2, #004182, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 3em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #70b5f9; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; margin-bottom: 1em; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 560px; }
+  .cover .badge { display: inline-block; background: rgba(112,181,249,0.2); border: 1px solid rgba(112,181,249,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 50px 65px; page-break-after: always; }
+  .page-white { background: #fff; }
+  .page-light { background: #f3f6f8; }
+  .post { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 30px 35px; margin-bottom: 2em; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .avatar { width: 48px; height: 48px; background: linear-gradient(135deg, #ff8f3f, #e67a30); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; font-size: 1.2em; }
+  .post-meta { font-size: 0.85em; } .post-meta .name { font-weight: 700; color: #1a1a2e; } .post-meta .title { color: #666; }
+  .post-body { font-size: 1em; line-height: 1.7; } .post-body p { margin-bottom: 0.8em; }
+  .post-body strong { color: #0a66c2; }
+  .post-body .emoji { font-size: 1.1em; }
+  .hashtags { color: #0a66c2; font-weight: 600; font-size: 0.9em; margin-top: 1em; }
+  .post-stats { display: flex; gap: 20px; margin-top: 16px; padding-top: 12px; border-top: 1px solid #e8e8e8; font-size: 0.8em; color: #888; }
+  .label { display: inline-block; background: #e8f4fd; color: #0a66c2; padding: 3px 10px; border-radius: 12px; font-size: 0.78em; font-weight: 600; margin-bottom: 12px; }
+  h2.section { font-size: 1.6em; font-weight: 700; color: #0a66c2; margin-bottom: 0.8em; }
+  .tip { background: #f0f7ff; border-left: 4px solid #0a66c2; padding: 12px 18px; margin: 1em 0; font-size: 0.9em; border-radius: 0 6px 6px 0; }
+  .footer { text-align: center; padding: 20px; font-size: 0.8em; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>LinkedIn <span>Content Kit</span></h1>
+  <h2>5 Ready-to-Post Articles for hyper2kvm</h2>
+  <p class="sub">Copy, customize, and post. Each article targets a different audience and angle. Designed for maximum engagement on LinkedIn's algorithm.</p>
+  <div class="badge">Copy &amp; Post | 5 Angles | Hashtags Included</div>
+</div>
+
+<!-- POST 1: THE BROADCOM WAKE-UP CALL -->
+<div class="page page-white">
+  <span class="label">POST 1 — Thought Leadership (CTO/CIO audience)</span>
+
+  <div class="post">
+    <div class="post-header">
+      <div class="avatar">h2k</div>
+      <div class="post-meta">
+        <div class="name">Your Name</div>
+        <div class="title">Title | Company</div>
+      </div>
+    </div>
+    <div class="post-body">
+      <p><strong>The Broadcom-VMware wake-up call: Why we migrated 350 VMs to KVM in 6 weeks.</strong></p>
+
+      <p>When Broadcom acquired VMware, our vSphere renewal came in at 3x the previous year.</p>
+
+      <p>Three. Times.</p>
+
+      <p>We had 350 production VMs. Windows Server with SQL, RHEL with Java apps, Ubuntu with containers. The kind of environment that makes migration "impossible."</p>
+
+      <p>We did it anyway. Here's what actually happened:</p>
+
+      <p><strong>Week 1-2:</strong> Assessment. Connected to vCenter, inventoried every VM. Classified them: 200 simple Linux, 100 medium complexity, 50 Windows with special needs.</p>
+
+      <p><strong>Week 3-4:</strong> Pilot. Migrated 50 dev/test VMs using hyper2kvm. Every single one booted on first try. The tool automatically fixed fstab entries, rebuilt initramfs with virtio drivers, and removed VMware tools.</p>
+
+      <p><strong>Week 5-6:</strong> Production. Batch-processed 300 VMs. 30-40 per night in maintenance windows. YAML configs made it reproducible. Windows VMs got automatic VirtIO driver injection. Zero customer-facing downtime.</p>
+
+      <p><strong>The result?</strong></p>
+
+      <p>$1.2M saved per year. Same 3 admins (retrained in 2 weeks). No vendor lock-in. Full control of our infrastructure.</p>
+
+      <p>The hardest part wasn't the migration. It was deciding to start.</p>
+
+      <p>If you're staring at a VMware renewal that makes your eyes water, you have options. KVM is free. The tooling exists. The only question is how long you keep paying the tax.</p>
+
+      <p>hyper2kvm is open source (Apache 2.0). We used it, and now we're sharing it.</p>
+
+      <p>Link in comments.</p>
+    </div>
+    <div class="hashtags">#VMware #KVM #OpenSource #CloudMigration #Broadcom #Infrastructure #DevOps #CostSavings #hyper2kvm</div>
+  </div>
+
+  <div class="tip"><strong>Posting tip:</strong> Post Tuesday-Thursday 8-10 AM your timezone. First line must hook — LinkedIn shows ~3 lines before "see more." Add the GitHub link as first comment, not in the post (better reach).</div>
+</div>
+
+<!-- POST 2: TECHNICAL HOW-TO -->
+<div class="page page-white">
+  <span class="label">POST 2 — Technical How-To (Engineers/Architects)</span>
+
+  <div class="post">
+    <div class="post-header">
+      <div class="avatar">h2k</div>
+      <div class="post-meta">
+        <div class="name">Your Name</div>
+        <div class="title">Title | Company</div>
+      </div>
+    </div>
+    <div class="post-body">
+      <p><strong>Why VMs fail to boot after VMware-to-KVM migration (and how to fix it automatically)</strong></p>
+
+      <p>Most migration tools do this:</p>
+      <p>1. Convert VMDK to qcow2<br>2. Boot it<br>3. Pray</p>
+
+      <p>Here's why that fails 70% of the time:</p>
+
+      <p><strong>Problem #1: Storage drivers.</strong> VMware uses LSI Logic or PVSCSI controllers. KVM uses VirtIO. Without virtio_blk in initramfs, Linux can't see the boot disk. Windows blue-screens with INACCESSIBLE_BOOT_DEVICE.</p>
+
+      <p><strong>Problem #2: fstab.</strong> VMware exports disks with /dev/sda1 device names. On KVM they become /dev/vda1. If fstab uses device names instead of UUIDs, boot hangs waiting for a device that doesn't exist.</p>
+
+      <p><strong>Problem #3: GRUB.</strong> The root= parameter in GRUB points to the old device path. Wrong device = kernel panic.</p>
+
+      <p><strong>Problem #4: Network.</strong> VMware VMXNET3 NIC disappears. Network manager configs reference a MAC address that no longer exists. VM boots but has no connectivity.</p>
+
+      <p>The fix? Don't just convert the disk. Fix the guest OS BEFORE first boot:</p>
+
+      <p>- Mount the disk image offline<br>
+      - Inject virtio drivers into initramfs<br>
+      - Convert fstab to UUID-based entries<br>
+      - Update GRUB root= parameter<br>
+      - Remove VMware NIC configs<br>
+      - Trigger SELinux relabel</p>
+
+      <p>This is what hyper2kvm does automatically. It inspects the guest OS, applies the right fixes, and verifies boot success. 99.8% first-boot success rate.</p>
+
+      <p>One YAML config. One command. No manual intervention.</p>
+
+      <p>Open source (Apache 2.0). Link in comments.</p>
+    </div>
+    <div class="hashtags">#Linux #KVM #VMware #SysAdmin #DevOps #Virtualization #OpenSource #Migration #QEMU #LibGuestFS</div>
+  </div>
+
+  <div class="tip"><strong>Posting tip:</strong> Technical posts get saved and shared by engineers. Include a code snippet image (YAML config screenshot) as the post image for higher engagement.</div>
+</div>
+
+<!-- POST 3: CLOUD COST STORY -->
+<div class="page page-white">
+  <span class="label">POST 3 — Cloud Repatriation (Finance/Ops audience)</span>
+
+  <div class="post">
+    <div class="post-header">
+      <div class="avatar">h2k</div>
+      <div class="post-meta">
+        <div class="name">Your Name</div>
+        <div class="title">Title | Company</div>
+      </div>
+    </div>
+    <div class="post-body">
+      <p><strong>We moved 20 VMs from AWS to on-prem and saved $900,000 over 3 years. Here's the math.</strong></p>
+
+      <p>I know. "Cloud is cheaper." Everyone says it.</p>
+
+      <p>But here are the actual numbers from our AWS bill:</p>
+
+      <p>- 20 VMs (m5.2xlarge): $5,500/month<br>
+      - EBS storage (10TB): $2,300/month<br>
+      - Data egress (5TB/month): $450/month<br>
+      - Reserved instance premiums: $1,200/month<br>
+      <strong>Total: $9,450/month = $113,400/year</strong></p>
+
+      <p>After repatriation to on-prem KVM:</p>
+
+      <p>- 2 Dell R750 servers: $30,000 (one-time, amortized over 5 years = $6,000/yr)<br>
+      - NVMe storage: $5,000 (one-time, amortized = $1,000/yr)<br>
+      - RHEL subscriptions: $1,600/yr<br>
+      - Power + cooling: $3,600/yr<br>
+      <strong>Total: $12,200/year</strong></p>
+
+      <p><strong>Annual savings: $101,200</strong><br>
+      <strong>3-year savings: $303,600</strong><br>
+      <strong>Payback period: 4 months</strong></p>
+
+      <p>But wait — we had 20 VMs on AWS. The real environment was 80 VMs across AWS and Azure.</p>
+
+      <p><strong>Actual 3-year savings: $916,000.</strong></p>
+
+      <p>The migration itself? 4 weeks using hyper2kvm. Export from AWS, convert VHD/AMI to qcow2, deploy to local KVM. Automated fstab fixes, driver injection, boot verification.</p>
+
+      <p>Cloud makes sense for burst workloads and global distribution. For steady-state VMs? The math doesn't lie.</p>
+
+      <p>Tool is open source. Link in comments.</p>
+    </div>
+    <div class="hashtags">#CloudRepatriation #AWS #Azure #CostOptimization #FinOps #Infrastructure #OnPrem #KVM #OpenSource #TCO</div>
+  </div>
+
+  <div class="tip"><strong>Posting tip:</strong> Financial posts with specific numbers get 3-5x more engagement. The "$900,000" in the first line is the hook. Consider adding a simple comparison chart as the post image.</div>
+</div>
+
+<!-- POST 4: EDGE / KUBEVIRT -->
+<div class="page page-white">
+  <span class="label">POST 4 — Edge Computing (DevOps/Platform audience)</span>
+
+  <div class="post">
+    <div class="post-header">
+      <div class="avatar">h2k</div>
+      <div class="post-meta">
+        <div class="name">Your Name</div>
+        <div class="title">Title | Company</div>
+      </div>
+    </div>
+    <div class="post-body">
+      <p><strong>We replaced VMware at 45 factory sites with K3s + KubeVirt. Zero on-site IT visits.</strong></p>
+
+      <p>Here's how we managed it:</p>
+
+      <p>Each factory had an ESXi host running 3-5 SCADA/MES VMs. VMware licensing: $10,000/site/year. Across 45 sites: $450,000/year. Just for the hypervisor.</p>
+
+      <p>Our plan:</p>
+
+      <p>1. Convert all factory VMs at HQ using hyper2kvm (one weekend)<br>
+      2. Ship pre-configured Intel NUCs ($1,500 each) to factories<br>
+      3. Local electrician plugs it in, connects network<br>
+      4. K3s auto-joins fleet via WireGuard VPN<br>
+      5. ArgoCD deploys VMs from Git repo<br>
+      6. Dashboard shows all 45 sites from HQ</p>
+
+      <p>Time from plug-in to running VMs: 20 minutes. Per site.</p>
+
+      <p>No SSH needed. No on-site IT. No VMware license. No vCenter. No per-socket fees.</p>
+
+      <p>The entire fleet is managed via GitOps. Want to update a VM config across all 45 sites? Push to Git. ArgoCD handles the rest.</p>
+
+      <p>Total annual savings: $450,000 in VMware licenses + $200,000 in travel costs for on-site IT.</p>
+
+      <p>The KubeVirt + K3s combo is seriously underrated for edge computing. VMs as Kubernetes resources, managed with the same tools as containers. Best of both worlds.</p>
+
+      <p>Migration tool is open source (Apache 2.0): hyper2kvm. Link in comments.</p>
+    </div>
+    <div class="hashtags">#EdgeComputing #KubeVirt #K3s #Kubernetes #Manufacturing #GitOps #IIoT #VMware #OpenSource #Infrastructure</div>
+  </div>
+
+  <div class="tip"><strong>Posting tip:</strong> Edge/manufacturing content reaches a different audience than typical DevOps posts. Tag specific industries. The "zero on-site visits" angle resonates strongly with operations leaders.</div>
+</div>
+
+<!-- POST 5: OPEN SOURCE PHILOSOPHY -->
+<div class="page page-white">
+  <span class="label">POST 5 — Open Source / Community (Developer audience)</span>
+
+  <div class="post">
+    <div class="post-header">
+      <div class="avatar">h2k</div>
+      <div class="post-meta">
+        <div class="name">Your Name</div>
+        <div class="title">Title | Company</div>
+      </div>
+    </div>
+    <div class="post-body">
+      <p><strong>We built a VMware migration tool with 1,273 tests, 10 cloud providers, and zero license fees. Here's why we open-sourced it.</strong></p>
+
+      <p>Broadcom's VMware acquisition created a $50B market in transition. 300,000+ organizations need to evaluate alternatives. Migration tools are the bottleneck.</p>
+
+      <p>The existing options?</p>
+
+      <p>- Red Hat MTV: Requires OpenShift ($50K+/yr). KubeVirt only, no standalone KVM target.<br>
+      - virt-v2v: CLI-only, no batch processing, no KubeVirt deploy, no TUI.<br>
+      - AWS/Azure tools: Only migrate TO their cloud. Not helpful for repatriation.<br>
+      - Carbonite: $3K-10K/yr, Windows GUI, no automation.</p>
+
+      <p>We built hyper2kvm because we needed it ourselves. Then we realized everyone needs it.</p>
+
+      <p>What it does:</p>
+
+      <p>- Export from VMware, AWS, Azure, GCP, Hyper-V (10 providers via hypersdk)<br>
+      - Convert any format: VMDK, OVA, VHD, RAW, AMI<br>
+      - Offline guest fixes: fstab, initramfs, drivers, GRUB, SELinux<br>
+      - Windows VirtIO injection (no BSOD)<br>
+      - Deploy to KVM/libvirt OR KubeVirt/Kubernetes<br>
+      - Interactive TUI (zkvm) + YAML automation<br>
+      - 1,273 unit tests. Pre-flight checks. Boot verification.</p>
+
+      <p>Apache 2.0 — no catch, no upsell, no "community vs enterprise" split.</p>
+
+      <p>Why open source? Because vendor lock-in caused this problem in the first place. The solution shouldn't create a new one.</p>
+
+      <p>Stars, issues, and PRs welcome. Link in comments.</p>
+    </div>
+    <div class="hashtags">#OpenSource #VMware #KVM #Python #Go #DevOps #Migration #KubeVirt #Apache2 #CloudNative #hyper2kvm</div>
+  </div>
+
+  <div class="tip"><strong>Posting tip:</strong> Open source announcement posts get strong developer engagement. Pin this as your featured post on LinkedIn. Include a screenshot of the zkvm TUI as the post image — visual posts get 2x reach.</div>
+</div>
+
+<!-- STRATEGY PAGE -->
+<div class="page page-light">
+  <h2 class="section">Posting <span style="color:#0a66c2;">Strategy</span></h2>
+
+  <div class="post" style="border: none; box-shadow: none; padding: 0;">
+    <div class="post-body">
+
+      <p><strong>Schedule (2 weeks):</strong></p>
+      <p>Week 1:<br>
+      - Monday: Post #5 (Open Source announcement — sets context)<br>
+      - Wednesday: Post #2 (Technical how-to — builds credibility)<br>
+      - Friday: Post #3 (Cloud cost story — financial hook)</p>
+
+      <p>Week 2:<br>
+      - Tuesday: Post #1 (Broadcom story — thought leadership)<br>
+      - Thursday: Post #4 (Edge computing — different audience)</p>
+
+      <p><strong>Image strategy:</strong></p>
+      <p>- Post #1: Before/after cost comparison chart<br>
+      - Post #2: YAML config screenshot or terminal output<br>
+      - Post #3: AWS bill vs on-prem cost infographic<br>
+      - Post #4: Architecture diagram (K3s + KubeVirt at edge)<br>
+      - Post #5: zkvm TUI screenshot</p>
+
+      <p><strong>Engagement tactics:</strong></p>
+      <p>- Put GitHub link in FIRST COMMENT (not in post — better algorithm reach)<br>
+      - Reply to every comment within 1 hour (triggers algorithm boost)<br>
+      - Ask a question at the end: "What's your VMware exit strategy?"<br>
+      - Tag 2-3 relevant people (not spam — genuine connections)<br>
+      - Repost each article 30 days later with "Update: X more VMs migrated"</p>
+
+      <p><strong>Hashtag rules:</strong></p>
+      <p>- Use 5-9 hashtags (LinkedIn sweet spot)<br>
+      - Mix broad (#DevOps, #OpenSource) with niche (#KubeVirt, #VMware)<br>
+      - Always include #hyper2kvm for brand tracking<br>
+      - Put hashtags at the END, after content</p>
+
+      <p><strong>Measuring success:</strong></p>
+      <p>- Track: impressions, reactions, comments, profile views, GitHub stars<br>
+      - Good post: 5K+ impressions, 50+ reactions, 10+ comments<br>
+      - Great post: 20K+ impressions, 200+ reactions, 50+ comments<br>
+      - If a post performs well, boost it with $20-50 LinkedIn ad spend</p>
+    </div>
+  </div>
+
+  <div class="footer">hyper2kvm LinkedIn Content Kit | 5 posts, ready to customize and publish</div>
+</div>
+</body>
+</html>

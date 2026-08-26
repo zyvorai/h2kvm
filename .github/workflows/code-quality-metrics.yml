@@ -1,0 +1,285 @@
+name: Code Quality Metrics
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run weekly on Mondays at 00:00 UTC
+    - cron: '0 0 * * 1'
+
+jobs:
+  complexity-analysis:
+    name: Cyclomatic Complexity Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
+    - name: Install radon
+      run: |
+        pip install radon
+
+    - name: Calculate complexity metrics
+      run: |
+        echo "# Cyclomatic Complexity Report" > complexity-report.md
+        echo "" >> complexity-report.md
+        echo "**Generated**: $(date -u +%Y-%m-%d)" >> complexity-report.md
+        echo "" >> complexity-report.md
+
+        # Overall average
+        python3 << 'EOF' >> complexity-report.md
+        from radon.complexity import cc_visit
+        from pathlib import Path
+
+        files = list(Path('hyper2kvm').rglob('*.py'))
+        total_cc = 0
+        total_funcs = 0
+        high_complexity = []
+        very_high = []
+
+        for f in files:
+            try:
+                with open(f) as src:
+                    results = cc_visit(src.read())
+                    for r in results:
+                        total_cc += r.complexity
+                        total_funcs += 1
+                        if r.complexity > 15:
+                            very_high.append((str(f.relative_to('hyper2kvm')), r.name, r.complexity))
+                        elif r.complexity > 10:
+                            high_complexity.append((str(f.relative_to('hyper2kvm')), r.name, r.complexity))
+            except:
+                pass
+
+        avg = total_cc / total_funcs if total_funcs else 0
+        print(f'## Summary\n')
+        print(f'- **Total functions analyzed**: {total_funcs}')
+        print(f'- **Average complexity**: {avg:.2f}')
+        print(f'- **Functions with CC 11-15**: {len(high_complexity)}')
+        print(f'- **Functions with CC >15**: {len(very_high)}')
+        print(f'\n## Baseline Thresholds\n')
+        print(f'- ✅ **Target average**: <5.0 (current: {avg:.2f})')
+        print(f'- ⚠️  **Warning threshold**: CC >10')
+        print(f'- 🚨 **Critical threshold**: CC >15')
+
+        if very_high:
+            print(f'\n## Critical Complexity (CC >15)\n')
+            for fname, func, cc in sorted(very_high, key=lambda x: -x[2])[:20]:
+                grade = '🚨' if cc > 20 else '⚠️'
+                print(f'{grade} CC **{cc}** - `{fname}::{func}`')
+
+        if high_complexity:
+            print(f'\n## High Complexity (CC 11-15)\n')
+            for fname, func, cc in sorted(high_complexity, key=lambda x: -x[2])[:20]:
+                print(f'⚠️  CC **{cc}** - `{fname}::{func}`')
+
+        # Check if average exceeds baseline
+        if avg > 5.0:
+            print(f'\n⚠️  **Warning**: Average complexity ({avg:.2f}) exceeds baseline (5.0)')
+        EOF
+
+    - name: Upload complexity report
+      uses: actions/upload-artifact@v7
+      with:
+        name: complexity-report
+        path: complexity-report.md
+        retention-days: 90
+
+    - name: Check complexity thresholds
+      run: |
+        python3 << 'EOF'
+        from radon.complexity import cc_visit
+        from pathlib import Path
+        import sys
+
+        files = list(Path('hyper2kvm').rglob('*.py'))
+        violations = []
+
+        for f in files:
+            try:
+                with open(f) as src:
+                    results = cc_visit(src.read())
+                    for r in results:
+                        if r.complexity > 20:
+                            violations.append((str(f.relative_to('hyper2kvm')), r.name, r.complexity))
+            except:
+                pass
+
+        if violations:
+            print("::warning::Found functions with critical complexity (CC >20):")
+            for fname, func, cc in sorted(violations, key=lambda x: -x[2]):
+                print(f"::warning file={fname}::Function {func} has complexity {cc} (threshold: 20)")
+
+        # Don't fail the build, just warn
+        sys.exit(0)
+        EOF
+
+  dead-code-detection:
+    name: Dead Code Detection
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
+    - name: Install vulture
+      run: |
+        pip install vulture
+
+    - name: Run vulture
+      continue-on-error: true
+      run: |
+        echo "# Dead Code Detection Report" > vulture-report.md
+        echo "" >> vulture-report.md
+        echo "**Generated**: $(date -u +%Y-%m-%d)" >> vulture-report.md
+        echo "" >> vulture-report.md
+
+        # Run vulture with reasonable confidence threshold
+        vulture hyper2kvm --min-confidence 80 --sort-by-size > vulture-output.txt 2>&1 || true
+
+        if [ -s vulture-output.txt ]; then
+          echo "## Detected Unused Code (Confidence ≥80%)" >> vulture-report.md
+          echo "" >> vulture-report.md
+          echo '```' >> vulture-report.md
+          cat vulture-output.txt >> vulture-report.md
+          echo '```' >> vulture-report.md
+        else
+          echo "✅ No dead code detected (confidence threshold: 80%)" >> vulture-report.md
+        fi
+
+    - name: Upload vulture report
+      uses: actions/upload-artifact@v7
+      with:
+        name: dead-code-report
+        path: vulture-report.md
+        retention-days: 90
+
+  maintainability-index:
+    name: Maintainability Index
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
+    - name: Install radon
+      run: |
+        pip install radon
+
+    - name: Calculate maintainability index
+      run: |
+        echo "# Maintainability Index Report" > maintainability-report.md
+        echo "" >> maintainability-report.md
+        echo "**Generated**: $(date -u +%Y-%m-%d)" >> maintainability-report.md
+        echo "" >> maintainability-report.md
+
+        python3 << 'EOF' >> maintainability-report.md
+        from radon.metrics import mi_visit
+        from pathlib import Path
+
+        files = list(Path('hyper2kvm').rglob('*.py'))
+        mi_scores = []
+
+        for f in files:
+            try:
+                with open(f) as src:
+                    mi = mi_visit(src.read(), True)
+                    if mi is not None:
+                        mi_scores.append((str(f.relative_to('hyper2kvm')), mi))
+            except:
+                pass
+
+        if mi_scores:
+            avg_mi = sum(score for _, score in mi_scores) / len(mi_scores)
+
+            print(f'## Summary\n')
+            print(f'- **Files analyzed**: {len(mi_scores)}')
+            print(f'- **Average MI**: {avg_mi:.2f}')
+            print(f'\n## Maintainability Index Scale\n')
+            print(f'- **A (100-20)**: ✅ Maintainable')
+            print(f'- **B (19-10)**: ⚠️  Needs attention')
+            print(f'- **C (<10)**: 🚨 Difficult to maintain')
+
+            low_mi = [(f, mi) for f, mi in mi_scores if mi < 20]
+            if low_mi:
+                print(f'\n## Files Needing Attention (MI <20)\n')
+                for fname, mi in sorted(low_mi, key=lambda x: x[1])[:20]:
+                    grade = '🚨' if mi < 10 else '⚠️'
+                    print(f'{grade} MI **{mi:.1f}** - `{fname}`')
+            else:
+                print(f'\n✅ All files have acceptable maintainability (MI ≥20)')
+        EOF
+
+    - name: Upload maintainability report
+      uses: actions/upload-artifact@v7
+      with:
+        name: maintainability-report
+        path: maintainability-report.md
+        retention-days: 90
+
+  metrics-summary:
+    name: Generate Metrics Summary
+    runs-on: ubuntu-latest
+    needs: [complexity-analysis, dead-code-detection, maintainability-index]
+
+    steps:
+    - name: Download all reports
+      uses: actions/download-artifact@v8
+      with:
+        path: reports
+
+    - name: Generate summary
+      run: |
+        echo "# Code Quality Metrics Summary" > metrics-summary.md
+        echo "" >> metrics-summary.md
+        echo "**Generated**: $(date -u +%Y-%m-%d)" >> metrics-summary.md
+        echo "**Branch**: ${{ github.ref_name }}" >> metrics-summary.md
+        echo "**Commit**: ${{ github.sha }}" >> metrics-summary.md
+        echo "" >> metrics-summary.md
+
+        # Combine all reports
+        for report in reports/*/; do
+          if [ -d "$report" ]; then
+            cat "$report"/*.md >> metrics-summary.md
+            echo "" >> metrics-summary.md
+            echo "---" >> metrics-summary.md
+            echo "" >> metrics-summary.md
+          fi
+        done
+
+    - name: Upload combined metrics
+      uses: actions/upload-artifact@v7
+      with:
+        name: code-quality-metrics-summary
+        path: metrics-summary.md
+        retention-days: 90
+
+    - name: Post metrics summary (PR only)
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v9
+      with:
+        script: |
+          const fs = require('fs');
+          const summary = fs.readFileSync('metrics-summary.md', 'utf8');
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: summary
+          });

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Edge Computing Migration — VMware &amp; Cloud to KVM/KubeVirt at the Edge</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #064e3b, #065f46, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; position: relative; }
+  .cover::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 60% 40%, rgba(52,211,153,0.12) 0%, transparent 50%), radial-gradient(circle at 30% 70%, rgba(99,102,241,0.08) 0%, transparent 50%); }
+  .cover h1 { font-size: 3em; font-weight: 800; letter-spacing: -2px; margin-bottom: 0.3em; position: relative; }
+  .cover h1 span { color: #34d399; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; margin-bottom: 1em; position: relative; }
+  .cover .sub { font-size: 1em; opacity: 0.65; max-width: 580px; position: relative; }
+  .cover .badge { display: inline-block; background: rgba(52,211,153,0.2); border: 1px solid rgba(52,211,153,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; position: relative; }
+  .page { min-height: 100vh; padding: 50px 70px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; }
+  .page-light { background: #fafbfc; }
+  .page-green { background: linear-gradient(135deg, #064e3b, #0f172a); color: #e8e6df; }
+  .page-navy { background: linear-gradient(135deg, #0c1222, #1e293b); color: #e8e6df; }
+  h2.st { font-size: 2em; font-weight: 700; margin-bottom: 0.6em; }
+  h2.st span { color: #34d399; }
+  h3 { font-size: 1.2em; font-weight: 600; margin: 1em 0 0.4em; color: #34d399; }
+  .page-light h3 { color: #065f46; }
+  p { margin-bottom: 0.8em; font-size: 1em; }
+  .sub { font-size: 1.05em; opacity: 0.7; margin-bottom: 1.5em; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 1.2em 0; }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 22px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card .icon { font-size: 1.8em; margin-bottom: 8px; }
+  .card h4 { font-size: 1.05em; font-weight: 600; margin-bottom: 6px; }
+  .card p { font-size: 0.9em; opacity: 0.85; margin-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 0.9em; }
+  th { background: #059669; color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .cross { color: #ef4444; font-weight: 700; }
+  .warn { color: #f59e0b; font-weight: 700; }
+  .stat-row { display: flex; gap: 30px; margin: 1.5em 0; }
+  .stat { text-align: center; flex: 1; }
+  .stat .number { font-size: 2.8em; font-weight: 800; color: #34d399; line-height: 1; }
+  .stat .label { font-size: 0.9em; opacity: 0.7; margin-top: 6px; }
+  .quote { border-left: 4px solid #34d399; padding: 16px 24px; margin: 1.5em 0; font-style: italic; opacity: 0.9; }
+  ul { margin: 0.4em 0 0.8em 1.5em; }
+  li { margin-bottom: 0.3em; font-size: 0.95em; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 1.5em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.9em; }
+  .flow-arrow { font-size: 1.3em; color: #34d399; }
+  .cta { background: linear-gradient(135deg, #059669, #047857); color: #fff; padding: 30px; border-radius: 14px; text-align: center; margin: 2em 0; }
+  .cta h3 { font-size: 1.4em; margin-bottom: 0.4em; color: #fff; }
+  .alert { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); border-radius: 10px; padding: 18px; margin: 1.2em 0; }
+  .alert-green { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.25); }
+  .highlight { background: rgba(52,211,153,0.1); border-radius: 8px; padding: 16px 20px; margin: 1em 0; }
+  pre { background: #0f172a; color: #e8e6df; padding: 18px; border-radius: 8px; font-size: 0.85em; line-height: 1.7; font-family: monospace; margin: 1em 0; }
+  .footer { text-align: center; padding: 20px; font-size: 0.8em; opacity: 0.4; }
+  .compare-box { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 1.2em 0; }
+  .compare-left { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px 0 0 10px; padding: 22px; }
+  .compare-right { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); border-radius: 0 10px 10px 0; padding: 22px; }
+  .compare-left h4 { color: #ef4444; }
+  .compare-right h4 { color: #22c55e; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1><span>Edge</span> Computing Migration</h1>
+  <h2>VMware &amp; Cloud to KVM/KubeVirt at the Edge</h2>
+  <p class="sub">How enterprises are eliminating VMware licensing at remote sites, repatriating cloud workloads, and deploying lightweight KVM + K3s infrastructure — saving 80%+ on edge compute costs.</p>
+  <div class="badge">hyper2kvm + hypersdk | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE: EDGE COMPUTING CHALLENGE -->
+<div class="page page-dark">
+  <h2 class="st">The Edge <span>Challenge</span></h2>
+  <p class="sub">Running VMware at the edge was expensive before Broadcom. Now it's unsustainable.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">💸</div>
+      <h4>VMware at Every Site = Multiplied Cost</h4>
+      <p>Each remote site needs vSphere licenses. 50 sites x $10K/year = $500K just for hypervisor licensing. Broadcom increases make this 2-5x worse.</p>
+    </div>
+    <div class="card">
+      <div class="icon">☁️</div>
+      <h4>Cloud Egress Costs Explode</h4>
+      <p>Edge workloads generate data locally but cloud-hosted VMs pay egress fees. $0.09/GB adds up to thousands monthly for video, IoT, and analytics workloads.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📡</div>
+      <h4>Latency Kills Cloud Edge</h4>
+      <p>Manufacturing, retail, and healthcare need sub-10ms response times. Cloud round-trip adds 20-100ms. Local KVM eliminates network dependency entirely.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔌</div>
+      <h4>Remote Sites = Limited Resources</h4>
+      <p>Edge locations have constrained hardware, unreliable networking, and no on-site IT. Heavy hypervisors like vSphere waste precious compute on management overhead.</p>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number">$500K+</div>
+      <div class="label">Annual VMware licensing<br>for 50 edge sites</div>
+    </div>
+    <div class="stat">
+      <div class="number">80%</div>
+      <div class="label">Cost reduction with<br>KVM + K3s at edge</div>
+    </div>
+    <div class="stat">
+      <div class="number">10x</div>
+      <div class="label">Less management<br>overhead per site</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: CLOUD REPATRIATION -->
+<div class="page page-light">
+  <h2 class="st">Cloud <span>Repatriation</span></h2>
+  <p class="sub">Why enterprises are bringing workloads back from AWS, Azure, and GCP — and how hyper2kvm makes it painless.</p>
+
+  <div class="compare-box">
+    <div class="compare-left">
+      <h4>Cloud (Before)</h4>
+      <ul>
+        <li>$8,000-15,000/month per workload</li>
+        <li>Egress fees on every data transfer</li>
+        <li>Vendor lock-in (AMI, managed services)</li>
+        <li>Compliance issues (data residency)</li>
+        <li>Latency for edge-adjacent workloads</li>
+        <li>Unpredictable monthly bills</li>
+      </ul>
+    </div>
+    <div class="compare-right">
+      <h4>On-Prem KVM (After)</h4>
+      <ul>
+        <li>$500-2,000/month (hardware amortized)</li>
+        <li>Zero egress fees — data stays local</li>
+        <li>Open formats (qcow2, libvirt XML)</li>
+        <li>Full data sovereignty</li>
+        <li>Sub-millisecond local access</li>
+        <li>Fixed, predictable costs</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Cost Comparison: 20 VMs Over 3 Years</h3>
+  <table>
+    <tr><th>Cost Item</th><th>AWS/Azure</th><th>On-Prem KVM</th><th>Savings</th></tr>
+    <tr><td>Compute (VMs)</td><td>$720,000</td><td>$60,000 (hardware)</td><td class="check">$660,000</td></tr>
+    <tr><td>Storage</td><td>$180,000</td><td>$15,000 (local SSD)</td><td class="check">$165,000</td></tr>
+    <tr><td>Network / Egress</td><td>$90,000</td><td>$0</td><td class="check">$90,000</td></tr>
+    <tr><td>Licensing</td><td>$0 (included)</td><td>$0 (KVM is free)</td><td>$0</td></tr>
+    <tr><td>Migration (one-time)</td><td>N/A</td><td>$5,000</td><td>-$5,000</td></tr>
+    <tr><td>Operations / Support</td><td>$36,000</td><td>$30,000</td><td class="check">$6,000</td></tr>
+    <tr><td><strong>3-Year Total</strong></td><td><strong>$1,026,000</strong></td><td><strong>$110,000</strong></td><td><strong class="check">$916,000</strong></td></tr>
+  </table>
+
+  <div class="quote">"We moved 20 VMs from AWS to on-prem KVM and saved $900K over 3 years. The migration took 2 weeks with hyper2kvm."</div>
+</div>
+
+<!-- PAGE: EDGE ARCHITECTURE -->
+<div class="page page-green">
+  <h2 class="st">Edge <span>Architecture</span></h2>
+  <p class="sub">Lightweight, zero-license infrastructure for every remote site.</p>
+
+  <div class="flow">
+    <div class="flow-step">VMware / Cloud VMs</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">hyper2kvm export</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">K3s + KubeVirt</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Edge Site</div>
+  </div>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">🪶</div>
+      <h4>K3s (Lightweight K8s)</h4>
+      <p>Single binary, 512MB RAM, runs on ARM or x86. Perfect for edge hardware. CNCF certified Kubernetes — same APIs as full clusters.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🖥️</div>
+      <h4>KubeVirt on K3s</h4>
+      <p>Run VMs as Kubernetes pods. Manage 50 edge sites from one central cluster. GitOps deployment with Flux/ArgoCD.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📦</div>
+      <h4>hyper2kvm Convert</h4>
+      <p>Export from vSphere/cloud, convert to qcow2, upload to PVC. One YAML config per site. Fully automated.</p>
+    </div>
+  </div>
+
+  <h3>Edge Stack (Per Site)</h3>
+  <table>
+    <tr><th>Layer</th><th>Technology</th><th>Cost</th></tr>
+    <tr><td>Hardware</td><td>Intel NUC / Dell Edge / HPE EL</td><td>$1,000-3,000 one-time</td></tr>
+    <tr><td>OS</td><td>Fedora / RHEL / Ubuntu</td><td>$0 (or $500/yr RHEL)</td></tr>
+    <tr><td>Kubernetes</td><td>K3s</td><td>$0</td></tr>
+    <tr><td>VM Runtime</td><td>KubeVirt + KVM</td><td>$0</td></tr>
+    <tr><td>Storage</td><td>local-path / Longhorn</td><td>$0</td></tr>
+    <tr><td>Migration Tool</td><td>hyper2kvm</td><td>Contact for pricing*</td></tr>
+    <tr><td><strong>Total per site</strong></td><td></td><td><strong>$1,000-3,500</strong></td></tr>
+  </table>
+
+  <div class="highlight">
+    <strong>Compare:</strong> VMware vSphere Essentials at one edge site = $6,000-15,000/year in licensing alone. K3s + KubeVirt = $0/year in software costs.
+  </div>
+</div>
+
+<!-- PAGE: INDUSTRY USE CASES -->
+<div class="page page-light">
+  <h2 class="st">Industry <span>Use Cases</span></h2>
+  <p class="sub">Edge migration scenarios across sectors.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">🏭</div>
+      <h4>Manufacturing / Factory Floor</h4>
+      <p><strong>Challenge:</strong> SCADA/MES VMs on VMware at 30 plants. $300K/yr in licenses.<br>
+      <strong>Solution:</strong> Migrate to K3s + KubeVirt on ruggedized edge servers. GitOps manages all plants from HQ.<br>
+      <strong>Savings:</strong> $280K/yr. Faster updates, zero license audits.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🏪</div>
+      <h4>Retail / Point of Sale</h4>
+      <p><strong>Challenge:</strong> POS and inventory VMs in 200 stores on aging ESXi hosts.<br>
+      <strong>Solution:</strong> Mini PC with K3s at each store. hyper2kvm converts VMDKs centrally, ship qcow2 images.<br>
+      <strong>Savings:</strong> $1.2M/yr. Standardized deployments, remote management.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🏥</div>
+      <h4>Healthcare / Clinics</h4>
+      <p><strong>Challenge:</strong> EMR and imaging VMs at 50 clinics. HIPAA requires local data. Cloud egress costs $40K/mo.<br>
+      <strong>Solution:</strong> Repatriate from Azure to local KVM. Data never leaves the clinic. HIPAA compliant by design.<br>
+      <strong>Savings:</strong> $480K/yr in cloud costs. Full data sovereignty.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🛢️</div>
+      <h4>Energy / Remote Sites</h4>
+      <p><strong>Challenge:</strong> Monitoring VMs at 100 substations. Unreliable WAN. VMware licenses at each site.<br>
+      <strong>Solution:</strong> K3s on ARM-based edge gateways. VMs run autonomously, sync when connected.<br>
+      <strong>Savings:</strong> $800K/yr. Works offline, self-healing with K8s.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🏗️</div>
+      <h4>Construction / Temporary Sites</h4>
+      <p><strong>Challenge:</strong> Project management VMs deployed per-site, 6-18 month lifecycle. VMware overkill.<br>
+      <strong>Solution:</strong> Portable edge box with K3s. Deploy in minutes via USB. Tear down when done. Reuse hardware.<br>
+      <strong>Savings:</strong> 90% vs cloud. Zero recurring license cost.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📡</div>
+      <h4>Telecom / Cell Towers</h4>
+      <p><strong>Challenge:</strong> vRAN and core network VMs at thousands of sites. NFV licensing spiral.<br>
+      <strong>Solution:</strong> Migrate VNFs to KubeVirt on bare-metal K8s. CNF-ready path forward.<br>
+      <strong>Savings:</strong> 60-80% on NFV licensing. Path to cloud-native network functions.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: MULTI-CLOUD EXIT -->
+<div class="page page-navy">
+  <h2 class="st">Multi-Cloud <span>Exit Strategy</span></h2>
+  <p class="sub">hypersdk supports 10 cloud providers. Export from anywhere, land on KVM.</p>
+
+  <div class="flow">
+    <div class="flow-step">AWS EC2</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step" style="background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.4);">hypersdk</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">On-Prem KVM</div>
+  </div>
+  <div class="flow">
+    <div class="flow-step">Azure VMs</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step" style="background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.4);">hypersdk</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Edge K3s</div>
+  </div>
+  <div class="flow">
+    <div class="flow-step">GCP / OCI</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step" style="background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.4);">hypersdk</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">KubeVirt</div>
+  </div>
+
+  <h3>Cloud Exit Cost Savings</h3>
+  <table>
+    <tr><th>Source</th><th>Typical Monthly Cost</th><th>On-Prem Equivalent</th><th>Monthly Savings</th></tr>
+    <tr><td>AWS EC2 (m5.2xlarge x 10)</td><td>$5,500</td><td>$800 (amortized)</td><td class="check">$4,700</td></tr>
+    <tr><td>Azure D8s_v3 x 10</td><td>$4,800</td><td>$800</td><td class="check">$4,000</td></tr>
+    <tr><td>GCP n2-standard-8 x 10</td><td>$4,200</td><td>$800</td><td class="check">$3,400</td></tr>
+    <tr><td>S3/Blob storage (10TB)</td><td>$2,300</td><td>$200 (local NVMe)</td><td class="check">$2,100</td></tr>
+    <tr><td>Data egress (5TB/mo)</td><td>$450</td><td>$0</td><td class="check">$450</td></tr>
+    <tr><td><strong>Total (10 VMs)</strong></td><td><strong>$17,250/mo</strong></td><td><strong>$2,600/mo</strong></td><td><strong class="check">$14,650/mo</strong></td></tr>
+  </table>
+
+  <div class="highlight">
+    <strong>Annual savings for 10 VMs:</strong> $175,800. Payback period on hardware: 2-4 months.
+  </div>
+</div>
+
+<!-- PAGE: GITOPS MANAGEMENT -->
+<div class="page page-light">
+  <h2 class="st">GitOps <span>Edge Management</span></h2>
+  <p class="sub">Manage 100+ edge sites from one Git repo. No SSH, no manual intervention.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">🔄</div>
+      <h4>Fleet Management</h4>
+      <p>ArgoCD or Flux watches a Git repo. Push a VM manifest change, it deploys to all 50 sites automatically. Rollback by reverting a commit.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📋</div>
+      <h4>Declarative VMs</h4>
+      <p>VMs defined as KubeVirt YAML in Git. Version controlled. Auditable. Reviewable. Same workflow as container deployments.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔒</div>
+      <h4>Zero-Touch Provisioning</h4>
+      <p>New edge site: plug in hardware, boot PXE, K3s auto-joins fleet. ArgoCD deploys VMs. No SSH needed. No on-site IT required.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h4>Central Observability</h4>
+      <p>Prometheus + Grafana federated across all sites. Single dashboard for CPU, memory, disk across entire fleet. Alerting on any anomaly.</p>
+    </div>
+  </div>
+
+  <h3>Example: Deploy VM to All Edge Sites</h3>
+  <pre>
+# git push this to deploy a VM to every edge site:
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: inventory-app
+  namespace: production
+spec:
+  running: true
+  template:
+    spec:
+      domain:
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: "2"
+        devices:
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+      volumes:
+      - name: rootdisk
+        persistentVolumeClaim:
+          claimName: inventory-app-disk
+  </pre>
+</div>
+
+<!-- PAGE: MIGRATION AUTOMATION -->
+<div class="page page-dark">
+  <h2 class="st">Edge Migration <span>Automation</span></h2>
+  <p class="sub">Convert once at HQ, deploy to every edge site automatically.</p>
+
+  <div class="flow">
+    <div class="flow-step">1. Export from vSphere</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">2. Convert (hyper2kvm)</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">3. Push to Registry</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">4. GitOps Deploy</div>
+  </div>
+
+  <h3>Centralized Conversion, Distributed Deployment</h3>
+  <pre>
+# Step 1: Export + Convert at HQ
+sudo h2kvmctl --config edge-vm.yaml
+
+# edge-vm.yaml
+cmd: vsphere
+vcenter: vcenter.hq.corp
+vs_action: export_vm
+vs_vm: factory-scada-01
+output_dir: ./edge-images
+out_format: qcow2
+flatten: true
+regen_initramfs: true
+
+# Step 2: Upload to container registry as DataVolume source
+virtctl image-upload dv factory-scada-disk \
+  --size=10Gi \
+  --image-path=./edge-images/factory-scada-01.qcow2 \
+  --uploadproxy-url=https://cdi-proxy.corp
+
+# Step 3: ArgoCD syncs KubeVirt VM manifest to all edge K3s clusters
+# (automatic — just push the YAML to Git)
+  </pre>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">⏱️</div>
+      <h4>Migration Time per VM</h4>
+      <ul>
+        <li>Export from vSphere: 5-30 min (depends on disk size)</li>
+        <li>Convert + fix: 2-10 min</li>
+        <li>Upload to registry: 5-15 min</li>
+        <li>GitOps deploy to all sites: &lt; 1 min</li>
+        <li><strong>Total: ~15-60 min per VM</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="icon">📈</div>
+      <h4>Scale</h4>
+      <ul>
+        <li>Convert 10-50 VMs per day at HQ</li>
+        <li>Deploy to 100+ sites simultaneously</li>
+        <li>Queue-based processing, no babysitting</li>
+        <li>Per-VM boot verification</li>
+        <li><strong>Full fleet migrated in 1-2 weeks</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: TCO SUMMARY -->
+<div class="page page-light">
+  <h2 class="st">Total Cost of <span>Ownership</span></h2>
+  <p class="sub">Side-by-side comparison across all approaches.</p>
+
+  <h3>50 Edge Sites, 5 VMs Each (250 VMs Total), 3-Year TCO</h3>
+  <table>
+    <tr><th>Cost Category</th><th>VMware vSphere</th><th>Cloud (AWS/Azure)</th><th>K3s + KubeVirt</th></tr>
+    <tr><td>Software Licensing</td><td>$1,500,000</td><td>$0 (included)</td><td class="check">$0</td></tr>
+    <tr><td>Compute</td><td>$300,000 (hw)</td><td>$4,500,000</td><td>$300,000 (hw)</td></tr>
+    <tr><td>Storage</td><td>$150,000</td><td>$900,000</td><td>$150,000</td></tr>
+    <tr><td>Network / Egress</td><td>$50,000</td><td>$540,000</td><td>$50,000</td></tr>
+    <tr><td>Management Platform</td><td>$200,000 (vCenter)</td><td>$0</td><td class="check">$0 (GitOps)</td></tr>
+    <tr><td>Operations Staff</td><td>$450,000</td><td>$300,000</td><td>$250,000</td></tr>
+    <tr><td>Migration (one-time)</td><td>N/A</td><td>$50,000</td><td>$30,000</td></tr>
+    <tr><td><strong>3-Year Total</strong></td><td><strong>$2,650,000</strong></td><td><strong>$6,290,000</strong></td><td><strong class="check">$780,000</strong></td></tr>
+    <tr><td><strong>Savings vs VMware</strong></td><td>—</td><td class="cross">-$3,640,000</td><td class="check"><strong>$1,870,000</strong></td></tr>
+    <tr><td><strong>Savings vs Cloud</strong></td><td>$3,640,000</td><td>—</td><td class="check"><strong>$5,510,000</strong></td></tr>
+  </table>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number">$1.87M</div>
+      <div class="label">Saved vs VMware<br>over 3 years</div>
+    </div>
+    <div class="stat">
+      <div class="number">$5.5M</div>
+      <div class="label">Saved vs Cloud<br>over 3 years</div>
+    </div>
+    <div class="stat">
+      <div class="number">70%</div>
+      <div class="label">TCO reduction<br>vs VMware</div>
+    </div>
+    <div class="stat">
+      <div class="number">88%</div>
+      <div class="label">TCO reduction<br>vs Cloud</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: NEXT STEPS -->
+<div class="page page-green">
+  <h2 class="st">Next <span>Steps</span></h2>
+  <p class="sub">Start your edge migration journey today.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">1️⃣</div>
+      <h4>Edge Site Assessment</h4>
+      <p>Inventory VMs at all edge sites. Classify by workload type (always-on, batch, seasonal). Map hardware capabilities. Identify quick wins.</p>
+    </div>
+    <div class="card">
+      <div class="icon">2️⃣</div>
+      <h4>Single-Site Pilot</h4>
+      <p>Pick one edge site. Deploy K3s + KubeVirt. Migrate 3-5 VMs with hyper2kvm. Validate: boot, network, application, performance.</p>
+    </div>
+    <div class="card">
+      <div class="icon">3️⃣</div>
+      <h4>Fleet Rollout Plan</h4>
+      <p>Based on pilot results, create phased rollout. Batch 1: 5 sites (low risk). Batch 2: 15 sites. Batch 3: remaining. 8-12 week timeline.</p>
+    </div>
+    <div class="card">
+      <div class="icon">4️⃣</div>
+      <h4>Decommission Legacy</h4>
+      <p>Cancel VMware licenses site-by-site as migration completes. Repurpose or retire old hardware. Document savings for leadership report.</p>
+    </div>
+  </div>
+
+  <div class="cta">
+    <h3>Save $1.87M Over 3 Years</h3>
+    <p>Replace VMware at the edge with open source KVM + KubeVirt.<br>
+    Zero license fees. GitOps management. Production-proven at scale.</p>
+    <p style="margin-top: 1em; font-weight: 600;">hyper2kvm + hypersdk — github.com/ssahani/hyper2kvm</p>
+  </div>
+
+  <div class="footer">
+    <p>hyper2kvm + hypersdk — Enterprise VM Migration Platform<br>Proprietary (Zyvor AI Labs)</p>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+# Single VM Migration Manifest Example
+# Place this file in the watch directory for automatic processing
+
+hypervisor: vmware
+
+vmware:
+  host: vcenter.example.com
+  vc_user: admin
+  password: secret  # Or use environment variable
+  vm_name: web-server-01
+  dc_name: DC1
+  datastore: datastore1
+
+output_dir: /var/lib/hyper2kvm/output
+output_format: qcow2
+
+# Optional: network fixes
+apply_network_fixes: true
+networks:
+  - interface_name: eth0
+    ip_address: 192.168.1.10
+    gateway: 192.168.1.1
+    dns_servers:
+      - 8.8.8.8
+      - 8.8.4.4
+
+# Optional: validation
+validate_after_conversion: true
+boot_test: false  # Set to true to boot-test the converted VM

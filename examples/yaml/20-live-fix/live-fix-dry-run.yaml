@@ -1,0 +1,22 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 20-live-fix/live-fix-dry-run.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 20-live-fix/live-fix-dry-run.yaml
+
+command: live-fix
+host: vm.example.com
+user: admin
+identity: ~/.ssh/custom_key
+port: 22
+sudo: true
+ssh_opt:
+- -o StrictHostKeyChecking=no
+- -o ConnectTimeout=30
+dry_run: true
+no_grub: true
+fstab_mode: bypath-only
+print_fstab: true
+regen_initramfs: false
+log_file: live-fix.log
+verbose: 2

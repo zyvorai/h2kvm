@@ -1,0 +1,27 @@
+# Fixer image: runs h2kvmctl offline fixes inside K8s
+# Requires privileged pod with /dev mounted and nbd kernel module on the host.
+#
+# Build from repo root:
+#   docker build -f operator/Dockerfile.fixer -t hyper2kvm/fixer:latest .
+FROM fedora:43
+
+RUN dnf install -y --setopt=install_weak_deps=False \
+    python3 python3-pip \
+    qemu-img qemu-system-x86-core \
+    lvm2 \
+    libguestfs libguestfs-tools-c \
+    e2fsprogs xfsprogs btrfs-progs \
+    dracut \
+    nbd \
+    && dnf clean all
+
+# Install hyper2kvm from the repo (only needed files)
+COPY hyper2kvm/ /src/hyper2kvm/
+COPY pyproject.toml /src/
+RUN pip3 install --no-cache-dir /src && rm -rf /src
+
+# The fixer script: runs h2kvmctl --offline-fix on the disk image
+COPY operator/scripts/run-fixer.sh /usr/local/bin/run-fixer.sh
+RUN chmod +x /usr/local/bin/run-fixer.sh
+
+ENTRYPOINT ["/usr/local/bin/run-fixer.sh"]

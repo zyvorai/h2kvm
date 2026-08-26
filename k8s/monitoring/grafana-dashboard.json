@@ -1,0 +1,243 @@
+{
+  "dashboard": {
+    "title": "hyper2kvm Migration Dashboard",
+    "tags": ["hyper2kvm", "migration", "kubevirt"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Migration Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(hyper2kvm_migrations_succeeded_total[5m])) / sum(rate(hyper2kvm_migrations_total[5m])) * 100",
+            "legendFormat": "Success Rate"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0},
+        "options": {
+          "unit": "percent",
+          "colorMode": "value",
+          "graphMode": "area",
+          "textMode": "value_and_name"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "red"},
+                {"value": 80, "color": "yellow"},
+                {"value": 95, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Active Migrations",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(hyper2kvm_migrations_active)",
+            "legendFormat": "Active"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Total Migrations (24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(hyper2kvm_migrations_total[24h]))",
+            "legendFormat": "Total"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "Average Migration Duration",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(rate(hyper2kvm_migration_duration_seconds_sum[5m]) / rate(hyper2kvm_migration_duration_seconds_count[5m]))",
+            "legendFormat": "Avg Duration"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0},
+        "options": {
+          "unit": "s"
+        }
+      },
+      {
+        "id": 5,
+        "title": "Migration Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(hyper2kvm_migrations_total[5m])) by (source_type)",
+            "legendFormat": "{{source_type}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Migration Success vs Failure",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(hyper2kvm_migrations_succeeded_total[5m]))",
+            "legendFormat": "Success"
+          },
+          {
+            "expr": "sum(rate(hyper2kvm_migrations_failed_total[5m]))",
+            "legendFormat": "Failure"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 7,
+        "title": "Migrations by Phase",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(hyper2kvm_migrations_active) by (phase)",
+            "legendFormat": "{{phase}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "stack": true
+      },
+      {
+        "id": 8,
+        "title": "Migration Duration Percentiles",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(hyper2kvm_migration_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p50"
+          },
+          {
+            "expr": "histogram_quantile(0.90, sum(rate(hyper2kvm_migration_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p90"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(hyper2kvm_migration_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p99"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      },
+      {
+        "id": 9,
+        "title": "Compression Ratio",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "avg(hyper2kvm_conversion_compression_ratio) by (format)",
+            "legendFormat": "{{format}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 10,
+        "title": "Multi-Disk Migrations",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(hyper2kvm_multi_disk_migrations_total[5m])) by (disk_count)",
+            "legendFormat": "{{disk_count}} disks"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      },
+      {
+        "id": 11,
+        "title": "Dry-Run Validations",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(hyper2kvm_dry_run_validations_total{result=\"success\"}[1h]))",
+            "legendFormat": "Success"
+          },
+          {
+            "expr": "sum(increase(hyper2kvm_dry_run_validations_total{result=\"failure\"}[1h]))",
+            "legendFormat": "Failure"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 32}
+      },
+      {
+        "id": 12,
+        "title": "Dry-Run Issues Found",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(hyper2kvm_dry_run_issues_found_total[5m])) by (issue_type)",
+            "legendFormat": "{{issue_type}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 18, "x": 6, "y": 32}
+      },
+      {
+        "id": 13,
+        "title": "VMs Created",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(hyper2kvm_vms_created_total[24h]))",
+            "legendFormat": "Created (24h)"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 40}
+      },
+      {
+        "id": 14,
+        "title": "VMs Running",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(hyper2kvm_vms_running)",
+            "legendFormat": "Running"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 40}
+      },
+      {
+        "id": 15,
+        "title": "Webhook Validations",
+        "type": "pie",
+        "targets": [
+          {
+            "expr": "sum(increase(hyper2kvm_operator_webhook_validations_total[1h])) by (result)",
+            "legendFormat": "{{result}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 40}
+      },
+      {
+        "id": 16,
+        "title": "Top Migration Failure Reasons",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "topk(10, sum(increase(hyper2kvm_migrations_failed_total[24h])) by (reason))",
+            "legendFormat": "{{reason}}",
+            "format": "table"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 48}
+      }
+    ]
+  }
+}

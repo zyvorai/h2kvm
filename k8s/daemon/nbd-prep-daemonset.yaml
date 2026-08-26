@@ -1,0 +1,151 @@
+# config/daemon/nbd-prep-daemonset.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nbd-prep
+  namespace: hyper2kvm-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nbd-prep
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+- apiGroups: ["hyper2kvm.io"]
+  resources: ["offlinefixjobs"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nbd-prep
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nbd-prep
+subjects:
+- kind: ServiceAccount
+  name: nbd-prep
+  namespace: hyper2kvm-system
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nbd-prep
+  namespace: hyper2kvm-system
+  labels:
+    app: nbd-prep
+    component: offline-fix
+spec:
+  selector:
+    matchLabels:
+      app: nbd-prep
+  template:
+    metadata:
+      labels:
+        app: nbd-prep
+    spec:
+      serviceAccountName: nbd-prep
+      hostPID: true
+      hostNetwork: true
+
+      # Only run on nodes labeled as NBD-capable
+      nodeSelector:
+        hyper2kvm.io/nbd-capable: "true"
+
+      # Tolerate control-plane taints if needed
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+
+      containers:
+      - name: nbd-prep
+        image: ghcr.io/ssahani/nbd-prep:v1.0.0
+        imagePullPolicy: IfNotPresent
+
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+
+        securityContext:
+          # NBD operations require privileged access to /dev/nbd* devices
+          # SYS_ADMIN alone is not sufficient - qemu-nbd needs full device access
+          privileged: true
+          # Alternative with capabilities (less preferred but documented):
+          # capabilities:
+          #   add:
+          #   - SYS_ADMIN    # For mount and NBD operations
+          #   - SYS_MODULE   # For modprobe
+          # allowPrivilegeEscalation: true
+
+        volumeMounts:
+        # Host /dev for NBD devices
+        - name: dev
+          mountPath: /dev
+
+        # Host /lib/modules for kernel modules
+        - name: lib-modules
+          mountPath: /lib/modules
+          readOnly: true
+
+        # Host root for chroot operations (if needed)
+        - name: host-root
+          mountPath: /host
+          readOnly: true
+
+        # Directory for NBD mounts
+        - name: kubevirt-offline
+          mountPath: /var/lib/kubevirt-offline
+
+        # Directory for disk images
+        # Note: qemu-nbd requires write access for file locking
+        - name: imports
+          mountPath: /var/lib/imports
+          readOnly: false
+
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "ps aux | grep -v grep | grep 'python.*nbd_prep'"
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          failureThreshold: 5
+
+      volumes:
+      - name: dev
+        hostPath:
+          path: /dev
+
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+          type: Directory
+
+      - name: host-root
+        hostPath:
+          path: /
+
+      - name: kubevirt-offline
+        hostPath:
+          path: /var/lib/kubevirt-offline
+          type: DirectoryOrCreate
+
+      - name: imports
+        hostPath:
+          path: /var/lib/imports
+          type: Directory

@@ -1,0 +1,53 @@
+---
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: ubuntu-uefi
+  namespace: default
+spec:
+  source:
+    type: vmdk-url
+    vmdk:
+      url: "https://example.com/ubuntu-22.04.vmdk"
+
+  destination:
+    pvcName: ubuntu-uefi-disk
+    storageClass: local-path
+    size: 30Gi
+
+  migration:
+    conversion:
+      format: qcow2
+      compress: true
+    offlineFixes:
+      enabled: true
+
+  createVM:
+    enabled: true
+    name: ubuntu-uefi
+    cpu: "4"
+    memory: 8Gi
+    autoStart: true
+    networkType: masquerade
+    evictionStrategy: LiveMigrate
+
+    # UEFI firmware configuration
+    firmware:
+      bootloader: uefi
+      secureBoot: false
+
+    # Advanced CPU configuration
+    cpuConfig:
+      cores: 2
+      sockets: 2
+      threads: 1
+      dedicatedCpuPlacement: false
+      features:
+        - "hyperv"
+        - "acpi"
+
+    # Multiple network interfaces
+    interfaces:
+      - name: eth1
+        type: bridge
+        networkName: br0

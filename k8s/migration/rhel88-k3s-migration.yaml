@@ -1,0 +1,317 @@
+---
+# One-shot RHEL 8.8 Migration on k3s
+# Runs the full migration pipeline inside a Kubernetes Job:
+#   VMDK → QCOW2 conversion → offline fixes → CDI upload → KubeVirt VM → libvirt export
+#
+# Usage:
+#   ./scripts/run-k8s-migration.sh
+#   OR: kubectl apply -f k8s/migration/rhel88-k3s-migration.yaml
+#
+
+# =============================================================================
+# 1. Namespace
+# =============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hyper2kvm-migration
+  labels:
+    app: hyper2kvm
+    purpose: migration
+
+---
+# =============================================================================
+# 2. ConfigMap: Migration config (YAML config for h2kvmctl)
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rhel88-migration-config
+  namespace: hyper2kvm-migration
+data:
+  migration.yaml: |
+    command: local
+    vmdk: /input/esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+    output_dir: /output
+    to_output: rhel8.8-fixed.qcow2
+    out_format: qcow2
+    compress: true
+    backend: vmcraft
+    flatten: true
+    fstab_mode: stabilize-all
+    regen_initramfs: true
+    serial_console: true
+    emit_domain_xml: true
+    vm_name: rhel88-migrated
+    memory: 4096
+    vcpus: 2
+    force_replace: true
+    health_check: false
+    libvirt_test: false
+    virsh_define: false
+
+---
+# =============================================================================
+# 3. PVC: Input storage (for VMDK source)
+# =============================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rhel88-vmdk-input
+  namespace: hyper2kvm-migration
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# =============================================================================
+# 4. PVC: Output storage (for converted QCOW2)
+# =============================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rhel88-qcow2-output
+  namespace: hyper2kvm-migration
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 25Gi
+
+---
+# =============================================================================
+# 5. Job: Copy VMDK into PVC (init step)
+# =============================================================================
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rhel88-copy-vmdk
+  namespace: hyper2kvm-migration
+  labels:
+    app: hyper2kvm
+    step: copy-input
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: hyper2kvm
+        step: copy-input
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: copy
+        image: fedora:43
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "Copying VMDK to PVC..."
+          cp /host-input/esx8.0-rhel8.8-with-thin-provision-disk1.vmdk /input/
+          ls -lh /input/
+          echo "Done"
+        volumeMounts:
+        - name: host-vmdk
+          mountPath: /host-input
+          readOnly: true
+        - name: vmdk-input
+          mountPath: /input
+      volumes:
+      - name: host-vmdk
+        hostPath:
+          path: /tmp/hyper2kvm-input
+          type: Directory
+      - name: vmdk-input
+        persistentVolumeClaim:
+          claimName: rhel88-vmdk-input
+
+---
+# =============================================================================
+# 6. Job: Run h2kvmctl migration inside pod
+# =============================================================================
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rhel88-migration
+  namespace: hyper2kvm-migration
+  labels:
+    app: hyper2kvm
+    step: migrate
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: hyper2kvm
+        step: migrate
+    spec:
+      restartPolicy: Never
+      # Init: load NBD module
+      initContainers:
+      - name: nbd-loader
+        image: fedora:43
+        command:
+        - /bin/bash
+        - -c
+        - |
+          modprobe nbd max_part=16 nbds_max=16 2>/dev/null || echo "NBD already loaded"
+          echo "NBD ready"
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: lib-modules
+          mountPath: /lib/modules
+          readOnly: true
+      containers:
+      - name: migrate
+        image: hyper2kvm:worker
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "=== Starting RHEL 8.8 Migration ==="
+          h2kvmctl --config /config/migration.yaml -v
+          echo "=== Migration Complete ==="
+          ls -lh /output/
+          echo "=== Generated QCOW2 ==="
+          ls -lh /output/rhel8.8-fixed.qcow2
+        securityContext:
+          runAsUser: 0
+          privileged: true
+          capabilities:
+            add:
+            - SYS_ADMIN
+            - MKNOD
+            - SYS_CHROOT
+        resources:
+          requests:
+            cpu: "2"
+            memory: "4Gi"
+          limits:
+            cpu: "8"
+            memory: "16Gi"
+        volumeMounts:
+        - name: migration-config
+          mountPath: /config
+          readOnly: true
+        - name: vmdk-input
+          mountPath: /input
+          readOnly: true
+        - name: qcow2-output
+          mountPath: /output
+        - name: lib-modules
+          mountPath: /lib/modules
+          readOnly: true
+      volumes:
+      - name: migration-config
+        configMap:
+          name: rhel88-migration-config
+      - name: vmdk-input
+        persistentVolumeClaim:
+          claimName: rhel88-vmdk-input
+      - name: qcow2-output
+        persistentVolumeClaim:
+          claimName: rhel88-qcow2-output
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+
+---
+# =============================================================================
+# 7. KubeVirt VM (created after migration completes)
+# =============================================================================
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: rhel88-migrated
+  namespace: hyper2kvm-migration
+  labels:
+    app: rhel88-vm
+    os: rhel
+    version: "8.8"
+    migrated-from: vmware
+    migration-tool: hyper2kvm
+  annotations:
+    description: "RHEL 8.8 migrated from VMware ESXi via in-cluster h2kvmctl Job"
+spec:
+  runStrategy: Manual
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: rhel88-migrated
+    spec:
+      domain:
+        cpu:
+          cores: 2
+          sockets: 1
+          threads: 1
+        resources:
+          requests:
+            memory: 4Gi
+          limits:
+            memory: 4Gi
+        devices:
+          disks:
+          - name: root-disk
+            disk:
+              bus: virtio
+          - name: cloudinit
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+            model: virtio
+          autoattachSerialConsole: true
+          autoattachGraphicsDevice: true
+        machine:
+          type: q35
+        firmware:
+          bootloader:
+            bios:
+              useSerial: true
+        features:
+          acpi:
+            enabled: true
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: root-disk
+        persistentVolumeClaim:
+          claimName: rhel88-qcow2-output
+      - name: cloudinit
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            hostname: rhel88-kubevirt
+            runcmd:
+              - echo "RHEL 8.8 migrated by hyper2kvm" > /etc/motd
+      terminationGracePeriodSeconds: 30
+
+---
+# =============================================================================
+# 8. Service for SSH access
+# =============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: rhel88-ssh
+  namespace: hyper2kvm-migration
+spec:
+  type: NodePort
+  selector:
+    kubevirt.io/vm: rhel88-migrated
+  ports:
+  - name: ssh
+    protocol: TCP
+    port: 22
+    targetPort: 22
+    nodePort: 30088

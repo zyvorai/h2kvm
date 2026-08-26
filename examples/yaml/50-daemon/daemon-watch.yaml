@@ -1,0 +1,39 @@
+# Daemon mode example configuration
+# This watches a directory for incoming disk files and processes them automatically
+# Supported file types: .vmdk, .ova, .ovf, .vhd, .vhdx, .raw, .img, .ami
+#
+# Run with primary command (recommended):
+#   h2kvmctl --config examples/yaml/50-daemon/daemon-watch.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config examples/yaml/50-daemon/daemon-watch.yaml
+#
+# Or with systemd:
+#   sudo cp examples/yaml/50-daemon/daemon-watch.yaml /etc/hyper2kvm/daemon.yaml
+#   sudo systemctl enable --now hyper2kvm@daemon.service
+
+command: daemon
+daemon: true
+
+# Directory to watch for incoming disk files
+watch_dir: /incoming
+
+# Output directory for converted VMs
+output_dir: /out
+
+# Working directory for temporary files
+workdir: /out/work
+
+# Logging
+verbose: 1
+log_file: /out/daemon.log
+
+# Conversion options
+flatten: true
+out_format: qcow2
+compress: true
+enable_recovery: true
+
+# Guest OS fixes
+fstab_mode: stabilize-all
+regen_initramfs: true

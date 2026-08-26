@@ -1,0 +1,14 @@
+{
+  "command": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "vc_user": "administrator@vsphere.local",
+  "vc_password_env": "VC_PASSWORD",
+  "vc_insecure": true,
+  "dc_name": "ha-datacenter",
+  "vs_action": "download_datastore_file",
+  "datastore": "datastore1",
+  "ds_path": "[datastore1] myVM/myVM.vmdk",
+  "local_path": "./downloads/myVM.vmdk",
+  "chunk_size": 1048576,
+  "json": true
+}

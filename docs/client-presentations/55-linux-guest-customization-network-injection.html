@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Linux Guest Customization &amp; Network Injection — hyper2kvm Deep Dive</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #7c2d12, #9a3412, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.6em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #fb923c; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 0.95em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(251,146,60,0.2); border: 1px solid rgba(251,146,60,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 36px 46px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #fb923c; }
+  .page-light h2.st span { color: #c2410c; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.6em 0 0.25em; color: #fb923c; }
+  .page-light h3 { color: #c2410c; }
+  p { margin-bottom: 0.5em; font-size: 0.88em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.76em; }
+  th { background: #c2410c; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; font-size: 0.82em; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.9em; font-weight: 600; margin-bottom: 4px; color: #fb923c; }
+  .page-light .card h4 { color: #c2410c; }
+  .card ul { padding-left: 14px; font-size: 0.78em; margin: 0; } .card li { margin-bottom: 2px; }
+  .card p { font-size: 0.78em; opacity: 0.85; margin-bottom: 0; }
+  .highlight { background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  pre { background: #0f172a; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.74em; line-height: 1.45; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  code { background: rgba(251,146,60,0.1); padding: 2px 4px; border-radius: 4px; font-size: 0.85em; }
+  .verdict { background: linear-gradient(135deg, rgba(124,45,18,0.2), rgba(154,52,18,0.1)); border: 2px solid #c2410c; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #fb923c; font-size: 1.1em; margin-bottom: 4px; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 0.5em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(251,146,60,0.15); border: 1px solid rgba(251,146,60,0.3); padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: 0.8em; }
+  .flow-arrow { font-size: 1.1em; color: #fb923c; }
+  .flow-fix { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); }
+  .flow-ok { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Linux <span>Guest Customization</span><br>&amp; Network Injection</h1>
+  <h2>Offline Pre-Boot Configuration for Every Linux Distribution</h2>
+  <p class="sub">Inject network configs (systemd-networkd, NetworkManager, netplan), user accounts, SSH keys, firstboot scripts, hostname, services, cloud-init seeds, custom initramfs drivers, and serial console &mdash; all applied offline before the VM ever boots on KVM. No guest agent required.</p>
+  <div class="badge">7 Injectors | systemd-networkd + NM | Users + SSH | Firstboot Scripts | cloud-init | 15+ Distros</div>
+</div>
+
+<!-- PAGE 1: Injection Architecture -->
+<div class="page page-dark">
+  <h2 class="st">Injection <span>Architecture</span></h2>
+  <p class="sub">Seven independent injectors applied offline in sequence &mdash; deterministic, pre-boot, no guest agent needed.</p>
+
+  <div class="flow">
+    <div class="flow-step">Mount Disk<br><small>qemu-nbd</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Detect OS<br><small>/etc/os-release</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">fstab + GRUB</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">initramfs</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Inject Config</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Bootloader</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">Boot Ready</div>
+  </div>
+
+  <h3>Injection Execution Order</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:22%">Injector</th><th style="width:25%">CLI Flag</th><th style="width:48%">What It Does</th></tr>
+    <tr><td>1</td><td><strong>Cloud-Init</strong></td><td><code>--cloud-init-config</code></td><td>Drop-in cloud config + NoCloud seed (user-data, meta-data, network-config)</td></tr>
+    <tr><td>2</td><td><strong>Firstboot Scripts</strong></td><td><code>--firstboot-scripts</code></td><td>Systemd oneshot service + ordered script execution on first boot</td></tr>
+    <tr><td>3</td><td><strong>Network Config</strong></td><td><code>--network-config-inject</code></td><td>systemd-networkd .network/.netdev files or NetworkManager .nmconnection profiles</td></tr>
+    <tr><td>4</td><td><strong>User Config</strong></td><td><code>--user-config-inject</code></td><td>User creation, passwords, SSH keys, sudo, group membership</td></tr>
+    <tr><td>5</td><td><strong>Service Config</strong></td><td><code>--service-config-inject</code></td><td>Enable/disable/mask systemd services before boot</td></tr>
+    <tr><td>6</td><td><strong>Hostname</strong></td><td><code>--hostname-config-inject</code></td><td>Set /etc/hostname + /etc/hosts entries with FQDN support</td></tr>
+    <tr><td>7</td><td><strong>initramfs Drivers</strong></td><td><code>--initramfs-add-drivers</code></td><td>Add custom kernel modules to initramfs (NVMe, iSCSI, etc.)</td></tr>
+  </table>
+
+  <h3>Convenience Shortcuts</h3>
+  <table>
+    <tr><th style="width:30%">Flag</th><th style="width:70%">Effect</th></tr>
+    <tr><td><code>--root-password 'pass'</code></td><td>Sets root password (SHA-512 hashed, written to /etc/shadow)</td></tr>
+    <tr><td><code>--ssh-authorized-key ~/.ssh/id.pub</code></td><td>Deploys SSH key to root's authorized_keys (0600 perms)</td></tr>
+    <tr><td><code>--serial-console</code></td><td>Injects <code>console=ttyS0,115200</code> into GRUB + enables serial-getty@ttyS0</td></tr>
+    <tr><td><code>--remove-vmware-tools</code></td><td>Removes open-vm-tools package and vmtoolsd.service</td></tr>
+  </table>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>All injections are offline</strong> &mdash; the disk is mounted via qemu-nbd, files are written directly, then unmounted. No guest boot, no SSH, no guest agent. Works on any Linux distro with any init system. Supports <code>--dry-run</code> for testing.</p>
+  </div>
+</div>
+
+<!-- PAGE 2: Network Configuration -->
+<div class="page page-light">
+  <h2 class="st">Network Configuration <span>Injection</span></h2>
+  <p class="sub">Pre-configure networking for KVM before the VM boots &mdash; systemd-networkd, NetworkManager, or both.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>systemd-networkd</h4>
+      <ul>
+        <li><strong>.network files:</strong> Interface config (static IP, DHCP, DNS, routes)</li>
+        <li><strong>.netdev files:</strong> Virtual devices (bonds, bridges, VLANs, VXLANs, tunnels, macvlan)</li>
+        <li>Configurable file priority (10-, 50-, 99-)</li>
+        <li>Written to <code>/etc/systemd/network/</code></li>
+        <li>Optional: enable systemd-networkd.service</li>
+        <li>Best for: RHEL 9+, Fedora, Photon OS, CoreOS</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>NetworkManager</h4>
+      <ul>
+        <li><strong>.nmconnection files:</strong> Full connection profiles</li>
+        <li>Written to <code>/etc/NetworkManager/system-connections/</code></li>
+        <li>Auto chmod 0600 (NM requirement)</li>
+        <li>Optional: enable NetworkManager.service</li>
+        <li>Best for: RHEL 8, Ubuntu Desktop, Fedora Workstation</li>
+        <li>Supports bonds, bridges, VLANs, WiFi</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Example: Static IP with Bond (systemd-networkd)</h3>
+  <pre>
+# network-config.yaml (passed via --network-config-inject)
+networkd_units:
+  - name: 10-bond0.netdev
+    content: |
+      [NetDev]
+      Name=bond0
+      Kind=bond
+      [Bond]
+      Mode=802.3ad
+      MIIMonitorSec=100ms
+
+  - name: 20-eth0.network
+    content: |
+      [Match]
+      Name=eth0
+      [Network]
+      Bond=bond0
+
+  - name: 20-eth1.network
+    content: |
+      [Match]
+      Name=eth1
+      [Network]
+      Bond=bond0
+
+  - name: 30-bond0.network
+    content: |
+      [Match]
+      Name=bond0
+      [Network]
+      Address=10.0.1.50/24
+      Gateway=10.0.1.1
+      DNS=10.0.1.53
+      DNS=1.1.1.1
+
+enable_networkd: true
+  </pre>
+
+  <h3>Example: VLAN + Bridge (NetworkManager)</h3>
+  <pre>
+# nm-config.yaml
+nm_connections:
+  - filename: eth0.nmconnection
+    content: |
+      [connection]
+      id=eth0
+      type=ethernet
+      interface-name=eth0
+      [ipv4]
+      method=auto
+
+  - filename: vlan100.nmconnection
+    content: |
+      [connection]
+      id=vlan100
+      type=vlan
+      [vlan]
+      parent=eth0
+      id=100
+      [ipv4]
+      method=manual
+      addresses=172.16.100.50/24
+      gateway=172.16.100.1
+      dns=172.16.100.53
+
+enable_network_manager: true
+  </pre>
+</div>
+
+<!-- PAGE 3: User & SSH Key Injection -->
+<div class="page page-dark">
+  <h2 class="st">User, SSH &amp; <span>Security Injection</span></h2>
+  <p class="sub">Create users, deploy SSH keys, set passwords, configure sudo &mdash; all offline before first boot.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>User Creation</h4>
+      <ul>
+        <li>Username, UID, GID specification</li>
+        <li>Group membership (multiple groups)</li>
+        <li>Shell selection (default /bin/bash)</li>
+        <li>Home directory with ownership</li>
+        <li>GECOS/comment field</li>
+        <li>Primary: useradd command</li>
+        <li>Fallback: direct /etc/passwd editing</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Password Management</h4>
+      <ul>
+        <li>Plaintext auto-hashed (SHA-512)</li>
+        <li>Pre-hashed password support</li>
+        <li>Direct /etc/shadow editing</li>
+        <li>Password age tracking</li>
+        <li>Account lock/disable (! prefix)</li>
+        <li>Root password shortcut flag</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>SSH Key Deployment</h4>
+      <ul>
+        <li>~/.ssh/authorized_keys creation</li>
+        <li>Auto dir creation (0700)</li>
+        <li>Auto file perms (0600)</li>
+        <li>Ownership correction</li>
+        <li>Multiple keys per user</li>
+        <li>Root key shortcut flag</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Example: Full User Configuration</h3>
+  <pre>
+# users.yaml (passed via --user-config-inject)
+users:
+  - username: admin
+    uid: 1001
+    groups: [wheel, docker]
+    shell: /bin/bash
+    password: "SecurePass123!"        # auto SHA-512 hashed
+    ssh_authorized_keys:
+      - "ssh-ed25519 AAAAC3... admin@corp"
+      - "ssh-rsa AAAAB3... admin-backup@corp"
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+
+  - username: deploy
+    uid: 1002
+    groups: [docker]
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - "ssh-ed25519 AAAAC3... deploy@ci"
+    sudo: "ALL=(ALL) NOPASSWD:/usr/bin/systemctl, /usr/bin/docker"
+
+  - username: monitoring
+    uid: 1003
+    groups: [adm]
+    password_hash: "$6$rounds=5000$salt$hash..."   # pre-hashed
+
+disable_users:
+  - games
+  - ftp
+
+# Files written offline:
+#   /etc/passwd, /etc/shadow, /etc/group
+#   /home/admin/.ssh/authorized_keys (0600)
+#   /etc/sudoers.d/admin (0440)
+  </pre>
+
+  <h3>Firstboot Script Injection</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>How It Works</h4>
+      <ul>
+        <li>Scripts staged in <code>/usr/local/lib/hyper2kvm-firstboot/</code></li>
+        <li>Systemd oneshot service created &amp; enabled</li>
+        <li>Runs after <code>network.target</code> by default</li>
+        <li>Ordered execution (lower order = earlier)</li>
+        <li>Logged to <code>/var/log/hyper2kvm-firstboot.log</code></li>
+        <li>Auto-disables after first run (unless keep_enabled)</li>
+        <li>Auto-adds shebang if missing</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Example</h4>
+      <pre style="font-size:0.72em; background:rgba(255,255,255,0.04); padding:10px; border-radius:6px;">
+# firstboot.yaml
+service:
+  description: "Post-migration setup"
+  after: network-online.target
+  environment:
+    MIGRATION_ID: "batch-2026-03"
+scripts:
+  - name: 01-register-dns.sh
+    order: 1
+    content: |
+      #!/bin/bash
+      nsupdate -k /etc/rndc.key <<EOF
+      update add $(hostname -f) 300 A $(ip -4 addr show eth0 | grep inet | awk '{print $2}' | cut -d/ -f1)
+      send
+      EOF
+  - name: 02-install-agent.sh
+    order: 2
+    content: |
+      #!/bin/bash
+      dnf install -y zabbix-agent
+      systemctl enable --now zabbix-agent</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: Service, Hostname, initramfs, Serial -->
+<div class="page page-light">
+  <h2 class="st">Service, Hostname <span>&amp; Boot Config</span></h2>
+  <p class="sub">Control systemd services, set identity, customize initramfs drivers, enable serial console.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Service Configuration</h4>
+      <pre style="font-size:0.72em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+# services.yaml
+enable:
+  - sshd
+  - firewalld
+  - chronyd
+  - zabbix-agent
+
+disable:
+  - bluetooth
+  - cups
+  - avahi-daemon
+
+mask:
+  - NetworkManager-wait-online
+  - kdump</pre>
+      <p style="font-size:0.78em; margin-top:6px;">Creates/removes symlinks in <code>/etc/systemd/system/multi-user.target.wants/</code>. Mask creates symlink to <code>/dev/null</code>.</p>
+    </div>
+    <div class="card">
+      <h4>Hostname Configuration</h4>
+      <pre style="font-size:0.72em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+# hostname.yaml
+hostname: web-prod-01
+domain: corp.example.com
+
+# Custom /etc/hosts entries
+hosts:
+  "10.0.1.10": "db-primary.corp.example.com db-primary"
+  "10.0.1.11": "db-replica.corp.example.com db-replica"
+  "10.0.1.20": "cache-01.corp.example.com cache-01"</pre>
+      <p style="font-size:0.78em; margin-top:6px;">Updates <code>/etc/hostname</code> + <code>/etc/hosts</code> with FQDN on 127.0.1.1. Preserves existing localhost entries.</p>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>initramfs Custom Drivers</h4>
+      <ul>
+        <li>Add hardware-specific kernel modules to initramfs</li>
+        <li>Written to <code>/etc/dracut.conf.d/hyper2kvm.conf</code></li>
+        <li>Deduplication (removes duplicates, preserves order)</li>
+        <li>Validates modules exist in kernel</li>
+        <li>Works with dracut (RHEL/Fedora/SUSE) and update-initramfs (Debian/Ubuntu)</li>
+      </ul>
+      <pre style="font-size:0.72em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+# Default VirtIO modules (always included):
+#   virtio virtio_ring virtio_blk virtio_scsi
+#   virtio_net virtio_pci nvme ahci sd_mod
+
+# Add custom drivers:
+initramfs_add_drivers: "nvme e1000e mlx5_core ixgbe dm_crypt xts"
+
+# CLI:
+h2kvmctl --initramfs-add-drivers "nvme e1000e mlx5_core"</pre>
+    </div>
+    <div class="card">
+      <h4>Serial Console</h4>
+      <ul>
+        <li>Injects <code>console=ttyS0,115200</code> + <code>console=tty0</code></li>
+        <li>Updates GRUB_CMDLINE_LINUX in /etc/default/grub</li>
+        <li>Regenerates grub.cfg</li>
+        <li>Enables serial-getty@ttyS0.service</li>
+        <li>Supports GRUB2, GRUB Legacy, LILO, extlinux</li>
+        <li>BLS (Boot Loader Specification) entries supported</li>
+        <li>Checks for existing entries (no duplicates)</li>
+        <li>Enabled by default (<code>--no-serial-console</code> to disable)</li>
+      </ul>
+      <pre style="font-size:0.72em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+# Enables: virsh console <vm-name>
+serial_console: true   # default
+
+# Result in /etc/default/grub:
+GRUB_CMDLINE_LINUX="... console=ttyS0,115200 console=tty0"</pre>
+    </div>
+  </div>
+
+  <h3>Cloud-Init Seed Injection</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Drop-in Config</h4>
+      <pre style="font-size:0.72em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+# cloud-init.yaml
+cloud_config:
+  hostname: web-prod-01
+  manage_etc_hosts: true
+  ssh_pwauth: true
+  users:
+    - name: admin
+      groups: [wheel]
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      ssh_authorized_keys:
+        - ssh-ed25519 AAAAC3...
+  packages:
+    - htop
+    - vim
+  runcmd:
+    - systemctl enable --now httpd</pre>
+      <p style="font-size:0.78em; margin-top:4px;">Written to <code>/etc/cloud/cloud.cfg.d/99-hyper2kvm.cfg</code></p>
+    </div>
+    <div class="card">
+      <h4>NoCloud Seed</h4>
+      <pre style="font-size:0.72em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+# cloud-init.yaml (with NoCloud seed)
+nocloud_seed:
+  user_data: |
+    #cloud-config
+    hostname: web-prod-01
+    users:
+      - name: admin
+        ssh_authorized_keys:
+          - ssh-ed25519 AAAAC3...
+  meta_data: |
+    instance-id: i-hyper2kvm-001
+    local-hostname: web-prod-01
+  network_config: |
+    version: 2
+    ethernets:
+      eth0:
+        dhcp4: true
+datasource_hint: NoCloud</pre>
+      <p style="font-size:0.78em; margin-top:4px;">Seed at <code>/var/lib/cloud/seed/nocloud-net/</code></p>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Complete Guest Customization &mdash; Before First Boot</h3>
+    <p style="font-size:0.9em;">
+      Network (systemd-networkd + NM) | Users + SSH Keys + Sudo | Firstboot Scripts | Services | Hostname | Cloud-Init | initramfs | Serial Console<br>
+      <strong>All offline. All deterministic. All 15+ distros. No guest agent. No cloud metadata.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

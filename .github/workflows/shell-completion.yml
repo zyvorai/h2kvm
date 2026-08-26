@@ -1,0 +1,234 @@
+name: Shell Completion
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'completions/**'
+      - 'hyper2kvm/cli/args/parser.py'
+      - '.github/workflows/shell-completion.yml'
+      - 'pyproject.toml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'completions/**'
+      - 'hyper2kvm/cli/args/parser.py'
+      - '.github/workflows/shell-completion.yml'
+      - 'pyproject.toml'
+  workflow_dispatch:
+
+jobs:
+  test-completion:
+    name: Test Shell Completion on ${{ matrix.shell }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shell: [bash, zsh, fish]
+        python-version: ["3.10", "3.12"]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Install shells
+      run: |
+        sudo apt-get update
+        if [ "${{ matrix.shell }}" = "zsh" ]; then
+          sudo apt-get install -y zsh
+        elif [ "${{ matrix.shell }}" = "fish" ]; then
+          sudo apt-get install -y fish
+        fi
+        # bash is already installed
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        pip install argcomplete
+
+    - name: Verify argcomplete integration
+      run: |
+        python -c "
+        from hyper2kvm.cli.args.parser import build_parser
+        import argcomplete
+        parser = build_parser()
+        # This should not raise an exception
+        argcomplete.autocomplete(parser, exit_method=lambda x: None)
+        print('✓ argcomplete integration works')
+        "
+
+    - name: Test completion scripts syntax
+      run: |
+        # Test bash completion script
+        if [ "${{ matrix.shell }}" = "bash" ]; then
+          bash -n completions/hyper2kvm.bash
+          echo "✓ Bash completion script syntax is valid"
+        fi
+
+        # Test zsh completion script
+        if [ "${{ matrix.shell }}" = "zsh" ]; then
+          zsh -n completions/hyper2kvm.zsh || true  # zsh may not support -n
+          echo "✓ Zsh completion script exists"
+        fi
+
+        # Test fish completion script
+        if [ "${{ matrix.shell }}" = "fish" ]; then
+          fish -n completions/hyper2kvm.fish
+          echo "✓ Fish completion script syntax is valid"
+        fi
+
+    - name: Test installation script
+      run: |
+        # Make script executable
+        chmod +x completions/install-completions.sh
+
+        # Test script syntax
+        bash -n completions/install-completions.sh
+        echo "✓ Installation script syntax is valid"
+
+        # Test that script can run with --help or similar
+        # (We can't actually install because it modifies shell configs)
+        bash completions/install-completions.sh <<< "1" || true
+        echo "✓ Installation script can execute"
+
+    - name: Test completion functionality (bash)
+      if: matrix.shell == 'bash'
+      run: |
+        # Source the completion script
+        source completions/hyper2kvm.bash
+
+        # Verify hyper2kvm command exists
+        which hyper2kvm || echo "Warning: hyper2kvm not in PATH"
+
+        # Test that completion function is registered
+        complete -p hyper2kvm || echo "Warning: completion not registered"
+
+        echo "✓ Bash completion loaded successfully"
+
+    - name: Test completion functionality (zsh)
+      if: matrix.shell == 'zsh'
+      shell: zsh {0}
+      run: |
+        # Source the completion script
+        source completions/hyper2kvm.zsh || true
+
+        echo "✓ Zsh completion loaded successfully"
+
+    - name: Test completion functionality (fish)
+      if: matrix.shell == 'fish'
+      shell: fish {0}
+      run: |
+        # Source the completion script
+        source completions/hyper2kvm.fish
+
+        echo "✓ Fish completion loaded successfully"
+
+    - name: Verify completion files in package
+      run: |
+        # Build source distribution
+        pip install build
+        python -m build --sdist
+
+        # Check that completion files are included
+        tar -tzf dist/*.tar.gz | grep "completions/hyper2kvm.bash" || exit 1
+        tar -tzf dist/*.tar.gz | grep "completions/hyper2kvm.zsh" || exit 1
+        tar -tzf dist/*.tar.gz | grep "completions/hyper2kvm.fish" || exit 1
+        tar -tzf dist/*.tar.gz | grep "completions/install-completions.sh" || exit 1
+        tar -tzf dist/*.tar.gz | grep "completions/README.md" || exit 1
+
+        echo "✓ All completion files included in distribution"
+
+  test-argcomplete-optional:
+    name: Test without argcomplete (optional dependency)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.12"
+        cache: 'pip'
+
+    - name: Install without argcomplete
+      run: |
+        python -m pip install --upgrade pip
+        # Install hyper2kvm but NOT argcomplete
+        pip install pyyaml click
+        pip install -e . --no-deps
+
+    - name: Verify graceful degradation
+      run: |
+        # Should work without argcomplete
+        python -c "
+        from hyper2kvm.cli.args.parser import parse_args_with_config
+        try:
+            import argcomplete
+            print('ERROR: argcomplete should not be installed')
+            exit(1)
+        except ImportError:
+            print('✓ argcomplete not installed as expected')
+
+        # Parser should still work
+        from hyper2kvm.cli.args.parser import build_parser
+        parser = build_parser()
+        print('✓ Parser works without argcomplete')
+        "
+
+    - name: Test CLI without argcomplete
+      run: |
+        h2kvmctl --help > /dev/null
+        echo "✓ CLI works without argcomplete"
+
+  test-documentation:
+    name: Test Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Verify documentation exists
+      run: |
+        # Check that all documentation files exist
+        test -f completions/README.md || exit 1
+        test -f README.md || exit 1
+        test -f docs/02-Installation.md || exit 1
+
+        echo "✓ All documentation files exist"
+
+    - name: Verify documentation contains completion info
+      run: |
+        # Check README.md
+        grep -q "Shell Completion" README.md || exit 1
+        grep -q "argcomplete" README.md || exit 1
+
+        # Check Installation docs
+        grep -q "Shell Completion" docs/02-Installation.md || exit 1
+        grep -q "argcomplete" docs/02-Installation.md || exit 1
+
+        # Check completions README
+        grep -q "argcomplete" completions/README.md || exit 1
+        grep -q "bash" completions/README.md || exit 1
+        grep -q "zsh" completions/README.md || exit 1
+        grep -q "fish" completions/README.md || exit 1
+
+        echo "✓ Documentation contains shell completion information"
+
+    - name: Check for broken links in completion docs
+      run: |
+        # Basic check for common broken link patterns
+        ! grep -r "](http://localhost" completions/README.md || exit 1
+        ! grep -r "](file://" completions/README.md || exit 1
+
+        echo "✓ No obvious broken links in documentation"

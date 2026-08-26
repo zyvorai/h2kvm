@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KubeVirt Deployment Guide — Deploy VMs to Any Kubernetes with hyper2kvm</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #7e22ce, #9333ea, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #c084fc; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(192,132,252,0.2); border: 1px solid rgba(192,132,252,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #c084fc; }
+  .page-light h2.st span { color: #7e22ce; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #c084fc; }
+  .page-light h3 { color: #7e22ce; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #7e22ce; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #c084fc; }
+  .page-light .card h4 { color: #7e22ce; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #0f172a; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  code { background: rgba(192,132,252,0.1); padding: 2px 5px; border-radius: 4px; font-size: 0.87em; }
+  .highlight { background: rgba(192,132,252,0.08); border: 1px solid rgba(192,132,252,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(192,132,252,0.06); }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(126,34,206,0.15), rgba(147,51,234,0.08)); border: 2px solid #7e22ce; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #c084fc; font-size: 1.1em; margin-bottom: 4px; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 0.6em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(192,132,252,0.15); border: 1px solid rgba(192,132,252,0.3); padding: 9px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85em; }
+  .flow-arrow { font-size: 1.2em; color: #c084fc; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1><span>KubeVirt</span> Deployment Guide</h1>
+  <h2>Deploy Migrated VMs to Any Kubernetes Cluster</h2>
+  <p class="sub">K3s, vanilla Kubernetes, EKS, GKE, AKS, OpenShift — hyper2kvm deploys to all of them. This guide covers KubeVirt installation, CDI setup, PVC upload, VirtualMachine manifests, GitOps fleet management, multi-cluster deployment, and storage options. Run VMs and containers side by side on one platform.</p>
+  <div class="badge">Any K8s | K3s Single-Node | GitOps Fleet | CDI Upload | Dual Target | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE 1: KubeVirt Overview -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">What Is <span>KubeVirt?</span></h2>
+  <p class="sub">Run virtual machines as Kubernetes resources — same APIs, same tooling, same cluster as your containers.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>VMs as K8s Resources</h4>
+      <ul>
+        <li>VirtualMachine CRD = VM definition</li>
+        <li>VirtualMachineInstance = running VM</li>
+        <li>Managed by kubectl, Helm, ArgoCD</li>
+        <li>Scheduled like pods — same node selector, affinity, tolerations</li>
+        <li>Lifecycle: start, stop, restart, migrate, snapshot</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Why KubeVirt?</h4>
+      <ul>
+        <li>Converge VMs + containers on one platform</li>
+        <li>GitOps: VM definitions in Git, ArgoCD deploys</li>
+        <li>Same monitoring (Prometheus) for VMs and pods</li>
+        <li>Same networking (Calico, Cilium, Multus)</li>
+        <li>Path to containerization — run VM while rebuilding as container</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Where It Runs</h4>
+      <ul>
+        <li><strong>K3s</strong> — single node, 512MB RAM, edge</li>
+        <li><strong>Vanilla K8s</strong> — kubeadm, kubespray</li>
+        <li><strong>EKS/GKE/AKS</strong> — managed K8s (bare-metal nodes)</li>
+        <li><strong>OpenShift</strong> — as OpenShift Virtualization</li>
+        <li><strong>Rancher/Harvester</strong> — HCI platforms</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>hyper2kvm KubeVirt Pipeline</h3>
+  <div class="flow">
+    <div class="flow-step">Source VM (VMware/Hyper-V/Cloud)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">hyper2kvm convert + fix</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">QCOW2 + KubeVirt YAML</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">CDI upload + kubectl apply</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">VM running on K8s</div>
+  </div>
+
+  <h3>Supported Kubernetes Distributions</h3>
+  <table>
+    <tr><th style="width:16%">Distribution</th><th style="width:14%">KubeVirt</th><th style="width:14%">CDI</th><th style="width:14%">Min Nodes</th><th style="width:22%">Best For</th><th style="width:20%">hyper2kvm Tested</th></tr>
+    <tr><td><strong>K3s</strong></td><td class="check">Yes</td><td class="check">Yes</td><td>1</td><td>Edge, dev, small sites</td><td class="check">Verified (Photon OS)</td></tr>
+    <tr><td><strong>Vanilla K8s</strong></td><td class="check">Yes</td><td class="check">Yes</td><td>1</td><td>General purpose</td><td class="check">Verified</td></tr>
+    <tr><td><strong>kubeadm</strong></td><td class="check">Yes</td><td class="check">Yes</td><td>1</td><td>Self-managed clusters</td><td class="check">Verified</td></tr>
+    <tr><td><strong>OpenShift</strong></td><td class="check">Yes (OCP Virt)</td><td class="check">Yes</td><td>3+3</td><td>Enterprise Red Hat shops</td><td class="check">Verified</td></tr>
+    <tr><td><strong>EKS (bare-metal)</strong></td><td class="check">Yes</td><td class="check">Yes</td><td>1+</td><td>AWS with bare-metal nodes</td><td class="check">Compatible</td></tr>
+    <tr><td><strong>Rancher/RKE2</strong></td><td class="check">Yes</td><td class="check">Yes</td><td>1</td><td>Multi-cluster management</td><td class="check">Compatible</td></tr>
+    <tr><td><strong>Harvester</strong></td><td class="check">Built-in</td><td class="check">Built-in</td><td>1</td><td>HCI (hyperconverged)</td><td class="check">Compatible</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 2: K3s + KubeVirt Quick Setup -->
+<div class="page page-light">
+  <h2 class="st">K3s + KubeVirt <span>Quick Setup</span></h2>
+  <p class="sub">From bare Linux to running KubeVirt VMs in 10 minutes.</p>
+
+  <h3>Step 1: Install K3s (2 minutes)</h3>
+  <pre>
+# Single-node K3s — one command
+curl -sfL https://get.k3s.io | sh -
+
+# Verify
+sudo kubectl get nodes    # Node should be Ready
+sudo kubectl get pods -A  # All system pods running
+  </pre>
+
+  <h3>Step 2: Install KubeVirt + CDI (3 minutes)</h3>
+  <pre>
+# Install KubeVirt operator
+export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | grep tag_name | cut -d'"' -f4)
+sudo kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/$KUBEVIRT_VERSION/kubevirt-operator.yaml
+sudo kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/$KUBEVIRT_VERSION/kubevirt-cr.yaml
+
+# Install CDI (Containerized Data Importer) for disk upload
+export CDI_VERSION=$(curl -s https://api.github.com/repos/kubevirt/containerized-data-importer/releases/latest | grep tag_name | cut -d'"' -f4)
+sudo kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-operator.yaml
+sudo kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-cr.yaml
+
+# Install virtctl CLI
+sudo curl -L -o /usr/local/bin/virtctl https://github.com/kubevirt/kubevirt/releases/download/$KUBEVIRT_VERSION/virtctl-$KUBEVIRT_VERSION-linux-amd64
+sudo chmod +x /usr/local/bin/virtctl
+
+# Wait for ready
+sudo kubectl wait -n kubevirt kv/kubevirt --for=condition=Available --timeout=300s
+  </pre>
+
+  <h3>Step 3: Deploy VM with hyper2kvm (5 minutes)</h3>
+  <pre>
+# Convert VMDK and deploy to KubeVirt in one command
+cat > kubevirt-deploy.yaml &lt;&lt;'EOF'
+cmd: local
+vmdk: ./photon-disk1.vmdk
+output_dir: ./converted
+out_format: qcow2
+regen_initramfs: true
+deploy_k8s: true              # Generate KubeVirt manifest + upload
+k8s_namespace: default
+vm_name: photon-kv
+memory: 1024
+vcpus: 2
+EOF
+
+sudo h2kvmctl --config kubevirt-deploy.yaml
+
+# Verify
+sudo kubectl get vm                  # VirtualMachine defined
+sudo kubectl get vmi                 # VirtualMachineInstance running
+sudo virtctl console photon-kv       # Connect to console
+  </pre>
+
+  <h3>Generated KubeVirt Manifest (auto-created by hyper2kvm)</h3>
+  <pre>
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: photon-kv
+  namespace: default
+spec:
+  running: true
+  template:
+    spec:
+      domain:
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: "2"
+        devices:
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: rootdisk
+        persistentVolumeClaim:
+          claimName: photon-kv-disk
+  </pre>
+</div>
+
+<!-- PAGE 3: GitOps Fleet Management -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">GitOps <span>Fleet Management</span></h2>
+  <p class="sub">Manage 100+ edge sites from one Git repo. Push a commit, deploy to every cluster.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>ArgoCD / Flux Workflow</h4>
+      <ul>
+        <li>Convert VMs at HQ with hyper2kvm</li>
+        <li>Upload disk images to container registry</li>
+        <li>Store KubeVirt manifests in Git repo</li>
+        <li>ArgoCD/Flux watches repo, syncs to all clusters</li>
+        <li>One git push = deploy to 100 edge K3s clusters</li>
+        <li>Rollback by reverting a commit</li>
+        <li>Full audit trail in Git history</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Multi-Cluster Architecture</h4>
+      <ul>
+        <li><strong>Hub cluster:</strong> ArgoCD + registry at HQ</li>
+        <li><strong>Spoke clusters:</strong> K3s at each edge site</li>
+        <li>WireGuard/Tailscale VPN between sites</li>
+        <li>Each site auto-joins fleet on boot</li>
+        <li>Namespace per site or per workload type</li>
+        <li>Prometheus federation for central monitoring</li>
+        <li>Zero SSH — all management via K8s API</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Git Repository Structure</h3>
+  <pre>
+fleet-vms/
+  base/                          # Shared VM templates
+    photon-vm.yaml               # Base VirtualMachine manifest
+    ubuntu-vm.yaml
+    windows-vm.yaml
+  overlays/
+    site-nyc/                    # Per-site customizations
+      kustomization.yaml
+      patch-resources.yaml       # Memory/CPU overrides for this site
+    site-london/
+      kustomization.yaml
+    site-tokyo/
+      kustomization.yaml
+  argocd/
+    applicationset.yaml          # Deploy to all clusters matching label
+  </pre>
+
+  <h3>Storage Options for KubeVirt Disks</h3>
+  <table>
+    <tr><th style="width:18%">Storage</th><th style="width:15%">Type</th><th style="width:25%">Best For</th><th style="width:22%">Performance</th><th style="width:20%">Cost</th></tr>
+    <tr><td><strong>local-path</strong></td><td>Local NVMe/SSD</td><td>Single-node K3s, edge</td><td class="check">Best (direct I/O)</td><td class="check">$0 (included)</td></tr>
+    <tr><td><strong>Longhorn</strong></td><td>Distributed block</td><td>Multi-node, HA, replication</td><td>Good</td><td class="check">$0 (CNCF)</td></tr>
+    <tr><td><strong>Ceph/Rook</strong></td><td>Distributed block/fs</td><td>Large clusters, enterprise HA</td><td>Good</td><td class="check">$0 (open source)</td></tr>
+    <tr><td><strong>OpenEBS</strong></td><td>Container-attached</td><td>Cloud-native storage</td><td>Good</td><td class="check">$0 (CNCF)</td></tr>
+    <tr><td><strong>NFS</strong></td><td>Network filesystem</td><td>Shared storage, simple</td><td>Moderate</td><td class="check">$0</td></tr>
+    <tr><td><strong>AWS EBS CSI</strong></td><td>Cloud block</td><td>EKS bare-metal nodes</td><td>Good</td><td>$$</td></tr>
+  </table>
+
+  <h3>Dual-Target: KVM + KubeVirt from Same Conversion</h3>
+  <pre>
+# One conversion, two deployment targets
+cmd: vsphere
+vs_action: export_vm
+vs_vm: production-app-01
+output_dir: ./converted
+out_format: qcow2
+regen_initramfs: true
+emit_domain_xml: true     # Target 1: libvirt XML for standalone KVM
+deploy_k8s: true           # Target 2: KubeVirt manifest for K8s
+k8s_namespace: production
+vm_name: app-01
+memory: 4096
+vcpus: 4
+  </pre>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Dual target:</strong> hyper2kvm generates both libvirt domain XML and KubeVirt VirtualMachine YAML from a single conversion. Deploy the right format per site — KVM for traditional hosts, KubeVirt for K8s clusters. No reconversion needed.</p>
+  </div>
+</div>
+
+<!-- PAGE 4: Advanced KubeVirt Features -->
+<div class="page page-light">
+  <h2 class="st">Advanced <span>KubeVirt Features</span></h2>
+  <p class="sub">Enterprise capabilities for production KubeVirt deployments.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Live Migration</h4>
+      <ul>
+        <li>Move running VMs between nodes — zero downtime</li>
+        <li>Automatic during node drain (kubectl drain)</li>
+        <li>Requires shared storage (Ceph, Longhorn, NFS)</li>
+        <li>Configurable bandwidth limits</li>
+        <li><code>virtctl migrate vm-name</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Snapshots &amp; Backup</h4>
+      <ul>
+        <li>VolumeSnapshot for point-in-time disk copies</li>
+        <li>Velero integration for cluster-level backup</li>
+        <li>Snapshot before migration for rollback safety</li>
+        <li>Clone VMs from snapshots for testing</li>
+        <li>CSI driver required (Ceph, Longhorn support it)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Networking</h4>
+      <ul>
+        <li><strong>Masquerade:</strong> Default, NAT through pod network</li>
+        <li><strong>Bridge:</strong> L2 connectivity, VLAN support</li>
+        <li><strong>SR-IOV:</strong> Near-native NIC performance</li>
+        <li><strong>Multus:</strong> Multiple NICs per VM</li>
+        <li>Same CNI as containers (Calico, Cilium)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>GPU &amp; Special Devices</h4>
+      <ul>
+        <li>GPU passthrough (NVIDIA, AMD) for AI/VDI</li>
+        <li>vGPU (NVIDIA GRID) for shared GPU</li>
+        <li>USB passthrough for hardware dongles</li>
+        <li>TPM emulation (swtpm) for Windows 11</li>
+        <li>Host device passthrough via VFIO</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Windows on KubeVirt</h4>
+      <ul>
+        <li>Windows Server 2016-2025 fully supported</li>
+        <li>Windows 11 with TPM emulation</li>
+        <li>VirtIO drivers auto-injected by hyper2kvm</li>
+        <li>UEFI + Secure Boot via OVMF</li>
+        <li>RDP access via NodePort or LoadBalancer service</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Monitoring &amp; Operations</h4>
+      <ul>
+        <li>Prometheus metrics for VM CPU/RAM/disk/network</li>
+        <li>Grafana dashboards (community templates)</li>
+        <li>kubectl top vm for resource usage</li>
+        <li>Alerting on VM health via Alertmanager</li>
+        <li>zkvm TUI tab 5: KubeVirt VM management</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>KubeVirt: The VM-Container Convergence Platform</h3>
+    <p style="font-size:0.92em;">
+      Run VMs and containers on the same cluster. Manage both with kubectl.<br>
+      GitOps deploys VMs like it deploys containers. Same monitoring, same networking.<br>
+      <strong>hyper2kvm converts any VM and deploys it to any Kubernetes — automatically.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm — KubeVirt Deployment Guide | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

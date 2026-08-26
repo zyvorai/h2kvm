@@ -1,0 +1,53 @@
+# Basic MigrationJob Example
+# Migrates a VMDK from URL to Kubernetes PVC
+
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: migrate-centos9
+  namespace: migrations
+spec:
+  # Source: VMDK from HTTP URL
+  source:
+    type: vmdk-url
+    vmdk:
+      url: "https://storage.example.com/centos9.vmdk"
+
+  # Migration options
+  migration:
+    offlineFixes:
+      enabled: true
+      fstabMode: stabilize-all
+      grubFixes: true
+      initramfsRegen: true
+      initramfsModules:
+        - virtio_blk
+        - virtio_scsi
+        - virtio_net
+        - virtio_pci
+      networkFixes: true
+    conversion:
+      format: qcow2
+      compress: true
+      compressionType: zstd
+
+  # Destination PVC
+  destination:
+    pvcName: centos9-disk
+    storageClass: local-path
+    size: 20Gi
+
+  # Auto-create VM after migration
+  createVM:
+    enabled: true
+    name: centos9
+    cpu: "4"
+    memory: 8Gi
+    autoStart: true
+    networkType: masquerade
+
+  # Cleanup temporary resources after success
+  cleanupPolicy: OnSuccess
+
+  # Migration timeout
+  timeout: 1h

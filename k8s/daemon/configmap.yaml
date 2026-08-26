@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hyper2kvm-daemon-config
+  namespace: vm-migration
+  labels:
+    app: hyper2kvm-daemon
+    app.kubernetes.io/name: hyper2kvm
+    app.kubernetes.io/component: daemon
+data:
+  daemon.yaml: |
+    # hyper2kvm Daemon Configuration for Kubernetes
+    command: daemon
+    daemon: true
+    workflow_mode: true
+
+    # Directory monitoring
+    workflow_dir: /data/incoming
+    output_dir: /data/output
+
+    # Processing configuration
+    max_concurrent_jobs: 3
+    out_format: qcow2
+    compress: true
+
+    # VM fixes
+    fstab_mode: stabilize-all
+    regen_initramfs: true
+    update_grub: true
+
+    # Logging
+    log_file: /var/log/hyper2kvm/daemon.log
+    verbose: 1
+
+    # Recovery
+    enable_recovery: false
+    auto_remove_source: false

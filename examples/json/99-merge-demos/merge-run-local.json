@@ -1,0 +1,6 @@
+{
+  "command": "local",
+  "vmdk": "/path/to/vm.vmdk",
+  "to_output": "merged-out.qcow2",
+  "report": "merged.md"
+}

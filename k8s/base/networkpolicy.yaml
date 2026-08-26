@@ -1,0 +1,60 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: hyper2kvm-isolation
+  namespace: vm-migration
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: hyper2kvm
+  policyTypes:
+    - Ingress
+    - Egress
+
+  # Allow ingress from monitoring
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8080  # Metrics endpoint (future)
+
+  # Allow egress to specific destinations
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+
+    # Allow NFS access
+    - to:
+        - podSelector:
+            matchLabels:
+              app: nfs-server
+      ports:
+        - protocol: TCP
+          port: 2049
+
+    # Allow SSH for remote fetch operations
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 22
+
+    # Allow access to Ceph monitors (adjust IPs as needed)
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - protocol: TCP
+          port: 6789
+        - protocol: TCP
+          port: 3300

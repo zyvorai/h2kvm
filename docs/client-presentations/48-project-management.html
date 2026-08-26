@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Migration Project Management — PMO Templates, RACI &amp; Stakeholder Communication</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1e293b, #334155, #475569); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #94a3b8; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(148,163,184,0.2); border: 1px solid rgba(148,163,184,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f172a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #94a3b8; }
+  .page-light h2.st span { color: #334155; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #94a3b8; }
+  .page-light h3 { color: #334155; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #334155; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #94a3b8; }
+  .page-light .card h4 { color: #334155; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  pre { background: #1e293b; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(148,163,184,0.08); border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(30,41,59,0.15), rgba(51,65,85,0.08)); border: 2px solid #475569; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #94a3b8; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Migration <span>Project Management</span></h1>
+  <h2>PMO Templates, RACI &amp; Stakeholder Communication</h2>
+  <p class="sub">A 200-VM migration is a $500K+ infrastructure project. It needs a PM, a plan, and communication. This guide provides PMO-ready templates: project charter, RACI matrix, risk register, communication plan, status report templates, and milestone tracking. Copy, customize, execute.</p>
+  <div class="badge">Project Charter | RACI Matrix | Risk Register | Communication Plan | Status Reports | Milestone Tracking</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Project <span>Charter</span></h2>
+  <p class="sub">Executive-approved document that authorizes the migration project.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Project Overview</h4>
+      <ul>
+        <li><strong>Project Name:</strong> VMware to KVM Infrastructure Migration</li>
+        <li><strong>Sponsor:</strong> CTO / VP Infrastructure</li>
+        <li><strong>PM:</strong> Migration Project Manager</li>
+        <li><strong>Start Date:</strong> [Date]</li>
+        <li><strong>Target Completion:</strong> [Date + 12 weeks]</li>
+        <li><strong>Budget:</strong> $[X] (hardware + labor + contingency)</li>
+      </ul>
+      <p><strong>Business Case:</strong> Eliminate $[X]/yr VMware licensing costs by migrating [N] VMs to open-source KVM. Broadcom acquisition has increased licensing costs by [X]% with [X]-year lock-in commitment required. Migration eliminates vendor dependency and reduces annual infrastructure costs by [X]%.</p>
+    </div>
+    <div class="card">
+      <h4>Scope &amp; Success Criteria</h4>
+      <ul>
+        <li><strong>In Scope:</strong></li>
+        <li>Migrate [N] VMs from VMware ESXi to KVM</li>
+        <li>Deploy [N] KVM hosts with HA clustering</li>
+        <li>Configure monitoring, backup, and DR</li>
+        <li>Decommission VMware infrastructure</li>
+        <li>&nbsp;</li>
+        <li><strong>Out of Scope:</strong></li>
+        <li>Application refactoring or containerization</li>
+        <li>Hardware refresh (using existing or planned servers)</li>
+        <li>&nbsp;</li>
+        <li><strong>Success Criteria:</strong></li>
+        <li>100% VMs migrated with &lt; 4 hours total downtime per VM</li>
+        <li>Performance within 10% of VMware baseline</li>
+        <li>All compliance requirements maintained</li>
+        <li>VMware licenses terminated by [date]</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Key Milestones</h3>
+  <table>
+    <tr><th style="width:8%">MS#</th><th style="width:25%">Milestone</th><th style="width:12%">Target Date</th><th style="width:25%">Deliverable</th><th style="width:15%">Owner</th><th style="width:15%">Status</th></tr>
+    <tr><td>MS1</td><td>Project kickoff &amp; assessment</td><td>Week 1</td><td>VM inventory, risk assessment</td><td>PM</td><td></td></tr>
+    <tr><td>MS2</td><td>Infrastructure ready</td><td>Week 3</td><td>KVM hosts deployed, tested</td><td>Infra Lead</td><td></td></tr>
+    <tr><td>MS3</td><td>POC complete (5 VMs)</td><td>Week 4</td><td>5 VMs migrated, validated</td><td>Migration Lead</td><td></td></tr>
+    <tr><td>MS4</td><td>Wave 1 complete (dev/test)</td><td>Week 6</td><td>Dev/test VMs migrated</td><td>Migration Lead</td><td></td></tr>
+    <tr><td>MS5</td><td>Wave 2 complete (production)</td><td>Week 9</td><td>Production VMs migrated</td><td>Migration Lead</td><td></td></tr>
+    <tr><td>MS6</td><td>VMware decommission</td><td>Week 11</td><td>ESXi hosts powered off</td><td>Infra Lead</td><td></td></tr>
+    <tr><td>MS7</td><td>Project close</td><td>Week 12</td><td>PIR, lessons learned, sign-off</td><td>PM</td><td></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">RACI <span>Matrix</span></h2>
+  <p class="sub">Who is Responsible, Accountable, Consulted, and Informed for each activity.</p>
+
+  <h3>Migration RACI</h3>
+  <table>
+    <tr><th style="width:25%">Activity</th><th style="width:10%">Executive Sponsor</th><th style="width:10%">PM</th><th style="width:10%">Infra Lead</th><th style="width:10%">Migration Eng</th><th style="width:10%">Network Eng</th><th style="width:10%">App Owner</th><th style="width:8%">DBA</th><th style="width:7%">Security</th></tr>
+    <tr><td>Approve project charter</td><td><strong>A</strong></td><td>R</td><td>C</td><td>I</td><td>I</td><td>I</td><td>I</td><td>C</td></tr>
+    <tr><td>VM inventory &amp; assessment</td><td>I</td><td><strong>A</strong></td><td>R</td><td>R</td><td>C</td><td>C</td><td>C</td><td>I</td></tr>
+    <tr><td>Risk assessment</td><td>I</td><td><strong>A</strong></td><td>R</td><td>C</td><td>C</td><td>C</td><td>C</td><td>R</td></tr>
+    <tr><td>Hardware procurement</td><td><strong>A</strong></td><td>R</td><td>R</td><td>I</td><td>C</td><td>I</td><td>I</td><td>I</td></tr>
+    <tr><td>KVM host deployment</td><td>I</td><td>I</td><td><strong>A</strong></td><td>R</td><td>C</td><td>I</td><td>I</td><td>C</td></tr>
+    <tr><td>Network configuration</td><td>I</td><td>I</td><td>C</td><td>C</td><td><strong>A/R</strong></td><td>I</td><td>I</td><td>C</td></tr>
+    <tr><td>VM conversion (h2kvmctl)</td><td>I</td><td>I</td><td>C</td><td><strong>A/R</strong></td><td>I</td><td>I</td><td>I</td><td>I</td></tr>
+    <tr><td>Application validation</td><td>I</td><td>I</td><td>I</td><td>C</td><td>I</td><td><strong>A/R</strong></td><td>R</td><td>I</td></tr>
+    <tr><td>Production cutover</td><td>I</td><td><strong>A</strong></td><td>R</td><td>R</td><td>R</td><td>R</td><td>R</td><td>C</td></tr>
+    <tr><td>Security compliance verify</td><td>I</td><td>I</td><td>C</td><td>I</td><td>I</td><td>I</td><td>I</td><td><strong>A/R</strong></td></tr>
+    <tr><td>VMware decommission</td><td>I</td><td><strong>A</strong></td><td>R</td><td>R</td><td>I</td><td>I</td><td>I</td><td>I</td></tr>
+    <tr><td>Post-migration review</td><td>C</td><td><strong>A/R</strong></td><td>C</td><td>C</td><td>C</td><td>C</td><td>C</td><td>C</td></tr>
+  </table>
+  <p style="font-size:0.8em;"><strong>R</strong> = Responsible (does the work) | <strong>A</strong> = Accountable (approves/owns) | <strong>C</strong> = Consulted (provides input) | <strong>I</strong> = Informed (kept updated)</p>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Risk <span>Register</span></h2>
+  <p class="sub">Identify, assess, and mitigate risks before they become issues.</p>
+
+  <table>
+    <tr><th style="width:5%">ID</th><th style="width:18%">Risk</th><th style="width:8%">Prob</th><th style="width:8%">Impact</th><th style="width:8%">Score</th><th style="width:25%">Mitigation</th><th style="width:18%">Contingency</th><th style="width:10%">Owner</th></tr>
+    <tr><td>R1</td><td>VM boot failure after conversion</td><td>Medium</td><td>High</td><td class="cross">12</td><td>h2kvmctl --fix-all; test in pre-prod first</td><td>Rollback to VMware VM</td><td>Migration Eng</td></tr>
+    <tr><td>R2</td><td>Application incompatibility</td><td>Low</td><td>High</td><td>8</td><td>App owner smoke tests; POC with each app type</td><td>Keep specific VMs on VMware</td><td>App Owner</td></tr>
+    <tr><td>R3</td><td>Performance degradation</td><td>Low</td><td>Medium</td><td>4</td><td>Performance baseline before/after; NUMA tuning</td><td>CPU pin, hugepages, VirtIO tuning</td><td>Infra Lead</td></tr>
+    <tr><td>R4</td><td>Extended downtime during cutover</td><td>Medium</td><td>High</td><td class="cross">12</td><td>Pre-convert VMs; cutover = shutdown+boot only</td><td>Rollback: power on VMware VM</td><td>PM</td></tr>
+    <tr><td>R5</td><td>Network connectivity issues</td><td>Medium</td><td>Medium</td><td>9</td><td>Map VLANs/bridges before; preserve MACs</td><td>Keep VMware running for 48hr</td><td>Network Eng</td></tr>
+    <tr><td>R6</td><td>Team skill gap (KVM)</td><td>High</td><td>Medium</td><td class="cross">12</td><td>Training in weeks 1-2; document all procedures</td><td>Engage KVM consultant</td><td>PM</td></tr>
+    <tr><td>R7</td><td>Storage capacity insufficient</td><td>Low</td><td>Medium</td><td>4</td><td>Right-size + QCOW2 compression; doctor checks space</td><td>Add NVMe drives (2-day lead)</td><td>Infra Lead</td></tr>
+    <tr><td>R8</td><td>Broadcom contract deadline</td><td>High</td><td>High</td><td class="cross">16</td><td>Aggressive timeline; prioritize by license expiry</td><td>Month-to-month extension</td><td>Sponsor</td></tr>
+    <tr><td>R9</td><td>Data loss during migration</td><td>Very Low</td><td>Critical</td><td>8</td><td>SHA-256 checksums; keep VMware VMs 48hr; backups</td><td>Restore from backup</td><td>Migration Eng</td></tr>
+    <tr><td>R10</td><td>Stakeholder resistance</td><td>Medium</td><td>Medium</td><td>9</td><td>Executive sponsorship; clear comms; demonstrate POC</td><td>Escalate to sponsor</td><td>PM</td></tr>
+  </table>
+
+  <p style="font-size:0.82em;"><strong>Scoring:</strong> Probability (1-4) × Impact (1-4). Red ≥ 12, Yellow 8-11, Green ≤ 7. Review weekly in project standup.</p>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">Communication <span>Plan</span></h2>
+  <p class="sub">Who gets told what, when, and how — critical for stakeholder alignment.</p>
+
+  <h3>Communication Matrix</h3>
+  <table>
+    <tr><th style="width:20%">Audience</th><th style="width:20%">Message</th><th style="width:12%">Frequency</th><th style="width:12%">Channel</th><th style="width:10%">Owner</th><th style="width:26%">Template</th></tr>
+    <tr><td>Executive Sponsor</td><td>Project status, budget, risks, decisions needed</td><td>Bi-weekly</td><td>Email + meeting</td><td>PM</td><td>Executive Status Report (1-pager)</td></tr>
+    <tr><td>Steering Committee</td><td>Milestone progress, major risks, scope changes</td><td>Monthly</td><td>Meeting (30 min)</td><td>PM</td><td>Steering Committee Deck (5 slides)</td></tr>
+    <tr><td>Project Team</td><td>Sprint tasks, blockers, daily coordination</td><td>Daily standup</td><td>Slack + standup</td><td>PM</td><td>Standup template (3 questions)</td></tr>
+    <tr><td>App Owners</td><td>Migration schedule for their VMs, testing windows</td><td>Per-wave</td><td>Email + calendar</td><td>Migration Lead</td><td>Migration Notice (per-wave email)</td></tr>
+    <tr><td>End Users</td><td>Planned maintenance windows, what to expect</td><td>Per-cutover</td><td>Email blast</td><td>PM</td><td>Maintenance Notification</td></tr>
+    <tr><td>Security Team</td><td>Compliance status, scan results, findings</td><td>Per-wave</td><td>ITSM ticket</td><td>Security</td><td>Compliance Checkpoint Report</td></tr>
+    <tr><td>Vendor (Broadcom)</td><td>License termination notice</td><td>Once</td><td>Formal letter</td><td>Procurement</td><td>Termination Notice Template</td></tr>
+  </table>
+
+  <h3>Status Report Template</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Weekly Status Report</h4>
+      <pre>
+PROJECT STATUS REPORT
+Week of: [Date]
+Overall Status: [GREEN/YELLOW/RED]
+
+PROGRESS:
+- VMs migrated: 45/200 (22.5%)
+- Current wave: Wave 2 (Production DBs)
+- On schedule: YES / NO
+
+ACCOMPLISHMENTS THIS WEEK:
+- Completed Wave 1 (35 dev/test VMs)
+- All boot tests passed (100%)
+- Performance baselines met
+
+PLANNED NEXT WEEK:
+- Wave 2 kickoff (25 database VMs)
+- Saturday cutover window 02:00-06:00
+- App owner sign-offs due Friday
+
+RISKS &amp; ISSUES:
+- [R6] Team training gap on Ceph — scheduling
+  workshop for Wednesday
+- [ISSUE] NFS mount slow — investigating
+
+DECISIONS NEEDED:
+- Approve Wave 2 cutover window
+- Budget approval for 4th KVM host</pre>
+    </div>
+    <div class="card">
+      <h4>Migration Wave Notice (Email Template)</h4>
+      <pre>
+Subject: [ACTION] VM Migration Wave 2 —
+  Saturday March 29, 02:00-06:00
+
+Dear [App Owner],
+
+Your VMs are scheduled for migration from
+VMware to KVM this Saturday.
+
+AFFECTED VMs:
+- db-primary (PostgreSQL)
+- db-replica (PostgreSQL)
+- app-server-01
+
+MAINTENANCE WINDOW:
+Saturday March 29, 02:00-06:00 UTC
+Expected downtime per VM: 5-15 minutes
+
+WHAT TO EXPECT:
+- VMs will be shut down, converted, and
+  restarted on new KVM infrastructure
+- IP addresses preserved (no DNS changes)
+- All data preserved (checksum verified)
+
+YOUR ACTION REQUIRED:
+- Verify application functionality by
+  Monday 12:00 (sign-off form attached)
+- Report issues to #migration-support Slack
+
+ROLLBACK:
+- If issues found, VMs can be reverted to
+  VMware within 48 hours
+
+Contact: [Migration Lead] | Slack: #migration</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Project <span>Timeline</span></h2>
+  <p class="sub">12-week migration project plan for 200 VMs.</p>
+
+  <h3>Gantt-Style Timeline</h3>
+  <table>
+    <tr><th style="width:22%">Phase / Task</th><th style="width:6%">W1</th><th style="width:6%">W2</th><th style="width:6%">W3</th><th style="width:6%">W4</th><th style="width:6%">W5</th><th style="width:6%">W6</th><th style="width:6%">W7</th><th style="width:6%">W8</th><th style="width:6%">W9</th><th style="width:6%">W10</th><th style="width:6%">W11</th><th style="width:6%">W12</th><th style="width:6%">Owner</th></tr>
+    <tr><td><strong>Phase 1: Plan</strong></td><td style="background:#334155">■</td><td style="background:#334155">■</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>PM</td></tr>
+    <tr><td>  VM inventory</td><td style="background:#475569">■</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Infra</td></tr>
+    <tr><td>  Risk assessment</td><td style="background:#475569">■</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>PM</td></tr>
+    <tr><td>  Team training</td><td></td><td style="background:#475569">■</td><td style="background:#475569">■</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>PM</td></tr>
+    <tr><td><strong>Phase 2: Build</strong></td><td></td><td></td><td style="background:#334155">■</td><td style="background:#334155">■</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Infra</td></tr>
+    <tr><td>  Deploy KVM hosts</td><td></td><td></td><td style="background:#475569">■</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Infra</td></tr>
+    <tr><td>  POC (5 VMs)</td><td></td><td></td><td></td><td style="background:#475569">■</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Migration</td></tr>
+    <tr><td><strong>Phase 3: Migrate</strong></td><td></td><td></td><td></td><td></td><td style="background:#334155">■</td><td style="background:#334155">■</td><td style="background:#334155">■</td><td style="background:#334155">■</td><td style="background:#334155">■</td><td></td><td></td><td></td><td>Migration</td></tr>
+    <tr><td>  Wave 1: Dev/Test (35)</td><td></td><td></td><td></td><td></td><td style="background:#475569">■</td><td style="background:#475569">■</td><td></td><td></td><td></td><td></td><td></td><td></td><td>Migration</td></tr>
+    <tr><td>  Wave 2: Databases (25)</td><td></td><td></td><td></td><td></td><td></td><td></td><td style="background:#475569">■</td><td></td><td></td><td></td><td></td><td></td><td>Migration</td></tr>
+    <tr><td>  Wave 3: Apps (80)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td style="background:#475569">■</td><td style="background:#475569">■</td><td></td><td></td><td></td><td>Migration</td></tr>
+    <tr><td>  Wave 4: Web/Other (60)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td style="background:#475569">■</td><td></td><td></td><td></td><td>Migration</td></tr>
+    <tr><td><strong>Phase 4: Close</strong></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td style="background:#334155">■</td><td style="background:#334155">■</td><td style="background:#334155">■</td><td>PM</td></tr>
+    <tr><td>  VMware decommission</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td style="background:#475569">■</td><td></td><td>Infra</td></tr>
+    <tr><td>  PIR &amp; close</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td style="background:#475569">■</td><td>PM</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">Budget <span>Template</span></h2>
+  <p class="sub">Migration project budget breakdown with ROI calculation.</p>
+
+  <h3>Project Budget (200 VMs)</h3>
+  <table>
+    <tr><th style="width:30%">Category</th><th style="width:15%">Estimated</th><th style="width:15%">Actual</th><th style="width:40%">Notes</th></tr>
+    <tr><td><strong>Hardware</strong></td><td></td><td></td><td></td></tr>
+    <tr><td>  KVM servers (5x Dell R760)</td><td>$125,000</td><td></td><td>64-core, 512GB, 30TB NVMe each</td></tr>
+    <tr><td>  Network switches (2x 25GbE)</td><td>$15,000</td><td></td><td>ToR switches with VLAN trunking</td></tr>
+    <tr><td>  Cabling &amp; rack accessories</td><td>$3,000</td><td></td><td>Fiber, patch panels, PDU</td></tr>
+    <tr><td><strong>Labor</strong></td><td></td><td></td><td></td></tr>
+    <tr><td>  Project manager (12 weeks)</td><td>$36,000</td><td></td><td>0.5 FTE @ $150K/yr</td></tr>
+    <tr><td>  Migration engineers (2x, 8 weeks)</td><td>$48,000</td><td></td><td>2 FTE @ $130K/yr for 8 weeks</td></tr>
+    <tr><td>  Network engineer (4 weeks)</td><td>$12,000</td><td></td><td>0.5 FTE @ $130K/yr for 4 weeks</td></tr>
+    <tr><td><strong>Training</strong></td><td></td><td></td><td></td></tr>
+    <tr><td>  KVM/Linux administration (3 staff)</td><td>$9,000</td><td></td><td>Red Hat RH318 or equivalent</td></tr>
+    <tr><td><strong>Software</strong></td><td></td><td></td><td></td></tr>
+    <tr><td>  hyper2kvm</td><td>Contact for pricing*</td><td>Contact for pricing*</td><td>Proprietary (Zyvor AI Labs)</td></tr>
+    <tr><td>  RHEL subscriptions (optional)</td><td>$13,000/yr</td><td></td><td>Or $0 with Rocky/Alma Linux</td></tr>
+    <tr><td><strong>Contingency (10%)</strong></td><td>$26,100</td><td></td><td>Reserve for unforeseen issues</td></tr>
+    <tr><td><strong>TOTAL PROJECT BUDGET</strong></td><td><strong>$287,100</strong></td><td></td><td></td></tr>
+    <tr><td><strong>Annual VMware savings</strong></td><td><strong>$381,000/yr</strong></td><td></td><td>vSphere + vSAN + NSX + vCenter</td></tr>
+    <tr><td><strong>ROI payback period</strong></td><td><strong>9 months</strong></td><td></td><td>Budget / annual savings</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>A Well-Managed Migration Project Pays for Itself in 9 Months</h3>
+    <p>Use these templates to run a professional migration project. The charter gets executive buy-in, RACI prevents confusion, risk register prevents surprises, and communication plan keeps everyone aligned. 200 VMs in 12 weeks is achievable with 2 migration engineers using h2kvmctl automation. The $287K investment saves $381K in Year 1 alone — a 133% ROI.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Migration Project Management Guide</div>
+</div>
+
+</body>
+</html>

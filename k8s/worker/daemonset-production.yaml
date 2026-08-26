@@ -1,0 +1,247 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: hyper2kvm-worker
+  namespace: hyper2kvm-workers
+  labels:
+    app: hyper2kvm-worker
+    component: worker-daemon
+    version: v1.0.0
+spec:
+  selector:
+    matchLabels:
+      app: hyper2kvm-worker
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: hyper2kvm-worker
+        component: worker-daemon
+        version: v1.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      # Node selection for worker-capable nodes
+      nodeSelector:
+        hyper2kvm.io/worker-enabled: "true"
+      
+      tolerations:
+      - key: hyper2kvm.io/privileged
+        operator: Exists
+        effect: NoSchedule
+      
+      # Service account for worker operations
+      serviceAccountName: hyper2kvm-worker
+      
+      # Init container: Load NBD kernel module
+      initContainers:
+      - name: nbd-module-loader
+        image: alpine:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          echo "Loading NBD kernel module..."
+          if command -v modprobe &> /dev/null; then
+            if lsmod | grep -q nbd; then
+              echo "NBD module already loaded"
+            else
+              modprobe nbd max_part=16 nbds_max=16 || echo "WARNING: modprobe not available or failed"
+              echo "NBD module loaded successfully"
+            fi
+            lsmod | grep nbd || echo "WARNING: NBD module not loaded"
+          else
+            echo "WARNING: modprobe not available (expected in k3d/kind)"
+          fi
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: lib-modules
+          mountPath: /lib/modules
+          readOnly: true
+        - name: sys
+          mountPath: /sys
+      
+      containers:
+      - name: worker
+        image: hyper2kvm:worker
+        imagePullPolicy: IfNotPresent
+        
+        env:
+        - name: HYPER2KVM_MODE
+          value: "worker"
+        - name: WORKER_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: HYPER2KVM_STATE_DIR
+          value: "/var/lib/hyper2kvm/jobs"
+        - name: HYPER2KVM_EVENT_DIR
+          value: "/var/lib/hyper2kvm/events"
+        - name: HYPER2KVM_QUEUE_DIR
+          value: "/var/lib/hyper2kvm/queue"
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: PROMETHEUS_PORT
+          value: "9090"
+        
+        command:
+        - /usr/local/bin/docker-entrypoint.sh
+        
+        # Privileged mode required for NBD, LVM, mount operations
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - SYS_ADMIN
+            - MKNOD
+            - SYS_CHROOT
+        
+        resources:
+          requests:
+            cpu: "2"
+            memory: "4Gi"
+          limits:
+            cpu: "8"
+            memory: "16Gi"
+        
+        volumeMounts:
+        # Configuration
+        - name: config
+          mountPath: /etc/hyper2kvm
+          readOnly: true
+        
+        # Persistent worker state (jobs, state machine)
+        - name: worker-state
+          mountPath: /var/lib/hyper2kvm/jobs
+          subPath: jobs
+        
+        # Persistent events (progress events, logs)
+        - name: worker-events
+          mountPath: /var/lib/hyper2kvm/events
+          subPath: events
+        
+        # Queue directory (could be ephemeral or persistent)
+        - name: worker-state
+          mountPath: /var/lib/hyper2kvm/queue
+          subPath: queue
+        
+        # Device access
+        - name: dev
+          mountPath: /dev
+          mountPropagation: Bidirectional
+        
+        # Input/output storage
+        - name: vmdk-input
+          mountPath: /data/input
+          readOnly: true
+        - name: qcow2-output
+          mountPath: /data/output
+        
+        # Conversion temp (fast local storage)
+        - name: conversion-temp
+          mountPath: /tmp/conversion
+        
+        # Kernel modules for NBD
+        - name: lib-modules
+          mountPath: /lib/modules
+          readOnly: true
+        
+        # Expose metrics port
+        ports:
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        
+        # Lifecycle hooks for graceful shutdown
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - "kill -TERM $(cat /var/lib/hyper2kvm/worker.pid 2>/dev/null) 2>/dev/null; sleep 30"
+
+        # Liveness probe: Check worker process
+        livenessProbe:
+          exec:
+            command:
+            - python3
+            - -c
+            - |
+              import sys
+              import os
+              pid_file = '/var/lib/hyper2kvm/jobs/../worker.pid'
+              if os.path.exists(pid_file):
+                sys.exit(0)
+              sys.exit(1)
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        # Readiness probe: Check capability detection
+        readinessProbe:
+          exec:
+            command:
+            - python3
+            - -m
+            - hyper2kvm.worker.cli
+            - capabilities
+            - --json-output
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+      
+      # Graceful shutdown with long grace period for in-progress migrations
+      terminationGracePeriodSeconds: 7200
+      
+      volumes:
+      - name: config
+        configMap:
+          name: hyper2kvm-worker-config
+      
+      # Persistent volumes for state and events
+      - name: worker-state
+        persistentVolumeClaim:
+          claimName: hyper2kvm-worker-state
+      
+      - name: worker-events
+        persistentVolumeClaim:
+          claimName: hyper2kvm-worker-events
+      
+      - name: vmdk-input
+        persistentVolumeClaim:
+          claimName: vmdk-input-storage
+      
+      - name: qcow2-output
+        persistentVolumeClaim:
+          claimName: qcow2-output-storage
+      
+      - name: conversion-temp
+        persistentVolumeClaim:
+          claimName: conversion-temp-storage
+      
+      # Host volumes
+      - name: dev
+        hostPath:
+          path: /dev
+          type: Directory
+      
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+          type: Directory
+      
+      - name: sys
+        hostPath:
+          path: /sys
+          type: Directory

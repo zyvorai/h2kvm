@@ -1,0 +1,129 @@
+{
+  "manifest_version": "1.0",
+  "source": {
+    "provider": "vsphere",
+    "vm_id": "vm-1234",
+    "vm_name": "production-webserver-01",
+    "datacenter": "DC1",
+    "export_timestamp": "2026-01-21T18:30:00Z",
+    "export_method": "govc-export"
+  },
+  "vm": {
+    "cpu": 4,
+    "mem_gb": 16,
+    "firmware": "uefi",
+    "secureboot": false,
+    "os_hint": "linux",
+    "os_version": "Ubuntu 22.04 LTS"
+  },
+  "disks": [
+    {
+      "id": "boot-disk",
+      "source_format": "vmdk",
+      "bytes": 107374182400,
+      "local_path": "/work/job123/artifacts/boot-disk.vmdk",
+      "checksum": "sha256:a1b2c3d4e5f67890123456789012345678901234567890123456789012345678",
+      "boot_order_hint": 0,
+      "label": "OS Boot Disk",
+      "disk_type": "boot"
+    }
+  ],
+  "nics": [
+    {
+      "id": "eth0",
+      "mac": "00:50:56:ab:cd:ef",
+      "network": "VM Network"
+    }
+  ],
+  "notes": [
+    "Exported from vSphere 7.0",
+    "VM was powered off during export"
+  ],
+  "metadata": {
+    "hypersdk_version": "0.1.0",
+    "job_id": "job-123",
+    "created_at": "2026-01-21T18:30:00Z",
+    "tags": {
+      "environment": "production",
+      "team": "ops",
+      "application": "webserver"
+    }
+  },
+  "pipeline": {
+    "inspect": {
+      "enabled": true,
+      "collect_guest_info": true
+    },
+    "fix": {
+      "enabled": true,
+      "backup": true,
+      "print_fstab": false,
+      "update_grub": true,
+      "regen_initramfs": true,
+      "fstab_mode": "stabilize-all",
+      "remove_vmware_tools": true
+    },
+    "convert": {
+      "enabled": true,
+      "compress": true,
+      "compress_level": 6
+    },
+    "validate": {
+      "enabled": true,
+      "check_image_integrity": true
+    }
+  },
+  "configuration": {
+    "users": {
+      "create": [
+        {
+          "name": "ansible",
+          "uid": 1001,
+          "password": "$6$rounds=656000$YourSaltHere$HashedPasswordGoesHere",
+          "groups": ["wheel", "docker"],
+          "shell": "/bin/bash",
+          "ssh_authorized_keys": [
+            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQ... ansible@controller"
+          ]
+        }
+      ]
+    },
+    "services": {
+      "enable": ["sshd", "nginx", "docker"],
+      "disable": ["vmware-tools", "open-vm-tools"]
+    },
+    "hostname": {
+      "hostname": "webserver01",
+      "domain": "prod.example.com",
+      "hosts": [
+        {
+          "ip": "127.0.0.1",
+          "hostname": "localhost"
+        },
+        {
+          "ip": "10.0.0.10",
+          "hostname": "webserver01.prod.example.com webserver01"
+        }
+      ]
+    },
+    "network": {
+      "systemd_networkd": [
+        {
+          "filename": "10-eth0.network",
+          "content": "[Match]\nName=eth0\n\n[Network]\nAddress=10.0.0.10/24\nGateway=10.0.0.1\nDNS=8.8.8.8\nDNS=8.8.4.4\n"
+        }
+      ]
+    }
+  },
+  "output": {
+    "format": "qcow2"
+  },
+  "options": {
+    "dry_run": false,
+    "verbose": 2,
+    "report": {
+      "enabled": true,
+      "path": "report.json"
+    }
+  }
+}

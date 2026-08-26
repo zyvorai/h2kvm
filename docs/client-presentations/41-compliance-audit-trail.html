@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Compliance Audit Trail — SOX, HIPAA, PCI-DSS Change Management</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1e1b4b, #312e81, #4f46e5); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #a5b4fc; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(165,180,252,0.2); border: 1px solid rgba(165,180,252,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f0d1a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #a5b4fc; }
+  .page-light h2.st span { color: #312e81; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #a5b4fc; }
+  .page-light h3 { color: #312e81; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #312e81; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #a5b4fc; }
+  .page-light .card h4 { color: #312e81; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #1e1b4b; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(165,180,252,0.08); border: 1px solid rgba(165,180,252,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(165,180,252,0.06); }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(30,27,75,0.15), rgba(49,46,129,0.08)); border: 2px solid #4f46e5; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #a5b4fc; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Compliance <span>Audit Trail</span></h1>
+  <h2>SOX, HIPAA &amp; PCI-DSS Change Management for VM Migration</h2>
+  <p class="sub">Regulated industries require complete audit trails for infrastructure changes. VM migration from VMware to KVM is a significant change event. This guide provides auditor-ready documentation templates, evidence packages, change management workflows, and compliance control mappings for SOX, HIPAA, PCI-DSS, and SOC 2.</p>
+  <div class="badge">SOX | HIPAA | PCI-DSS | SOC 2 | Change Management | Evidence Packages | Auditor-Ready</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Compliance Framework <span>Requirements</span></h2>
+  <p class="sub">What auditors expect to see for infrastructure migration changes.</p>
+
+  <table>
+    <tr><th style="width:10%">Framework</th><th style="width:15%">Key Control</th><th style="width:20%">Requirement for Migration</th><th style="width:25%">Evidence Required</th><th style="width:30%">h2kvmctl Provides</th></tr>
+    <tr><td><strong>SOX</strong></td><td>IT General Controls (ITGC)</td><td>Change management process for IT infrastructure changes</td><td>Change request, approval, test results, rollback plan</td><td>Migration logs, checksum verification, dry-run results</td></tr>
+    <tr><td><strong>HIPAA</strong></td><td>164.312(b) Audit Controls</td><td>Audit trail for systems containing ePHI</td><td>Who accessed what, when, from where, what changed</td><td>JSON audit log with user, action, timestamp, VM name</td></tr>
+    <tr><td><strong>PCI-DSS</strong></td><td>Req 6.4 Change Control</td><td>Documented change control for CDE systems</td><td>Impact analysis, approval, testing, separation of duties</td><td>Dry-run validation, boot test results, conversion report</td></tr>
+    <tr><td><strong>SOC 2</strong></td><td>CC8.1 Change Management</td><td>Changes tested, approved, and monitored</td><td>Change ticket, test evidence, production deployment log</td><td>Full migration log with status, timing, errors</td></tr>
+    <tr><td><strong>GDPR</strong></td><td>Article 32 Security</td><td>Maintain security during data processing changes</td><td>Data protection impact assessment, encryption evidence</td><td>Checksum verification, no data at rest in transit</td></tr>
+    <tr><td><strong>FedRAMP</strong></td><td>CM-3 Configuration Change</td><td>Documented change control process</td><td>CAB approval, security impact analysis, plan of action</td><td>Doctor report, conversion manifest, deployment log</td></tr>
+  </table>
+
+  <h3>Common Auditor Questions</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Questions About the Migration</h4>
+      <ul>
+        <li>"How do you ensure data integrity during conversion?"</li>
+        <li>"What change control process was followed?"</li>
+        <li>"How were VMs tested before production cutover?"</li>
+        <li>"What is the rollback procedure if migration fails?"</li>
+        <li>"Who approved the change and when?"</li>
+        <li>"Were duties separated (dev/test/deploy)?"</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Answers (with h2kvmctl evidence)</h4>
+      <ul>
+        <li>SHA-256 checksums pre/post conversion (manifest.json)</li>
+        <li>Change ticket + approval in ITSM (reference in migration log)</li>
+        <li>Boot test + smoke test results (automated, logged)</li>
+        <li>VMware VMs kept 48 hours; rollback = power on VMware VM</li>
+        <li>Approval signatures in change ticket (linked in config YAML)</li>
+        <li>CI/CD pipeline: validate→convert→test→deploy with approval gates</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Change Management <span>Workflow</span></h2>
+  <p class="sub">ITIL-aligned change management process for VM migration.</p>
+
+  <h3>Change Control Process</h3>
+  <table>
+    <tr><th style="width:8%">Phase</th><th style="width:15%">Activity</th><th style="width:12%">Role</th><th style="width:30%">Tasks</th><th style="width:20%">Artifacts</th><th style="width:15%">Duration</th></tr>
+    <tr><td><strong>1. Request</strong></td><td>RFC Submission</td><td>Migration Lead</td><td>Submit RFC with scope, timeline, risk assessment, rollback plan</td><td>Change Request Form</td><td>Day 1</td></tr>
+    <tr><td><strong>2. Assess</strong></td><td>Impact Analysis</td><td>Infra + Security</td><td>Review VM dependencies, data classification, compliance impact</td><td>Impact Assessment Doc</td><td>Days 2-3</td></tr>
+    <tr><td><strong>3. Approve</strong></td><td>CAB Review</td><td>CAB Members</td><td>Review RFC, assess risk, approve/reject/defer</td><td>CAB Minutes, Approval</td><td>Day 4</td></tr>
+    <tr><td><strong>4. Plan</strong></td><td>Implementation Plan</td><td>Migration Lead</td><td>Detailed steps, test cases, rollback procedure, comms plan</td><td>Implementation Plan</td><td>Days 5-7</td></tr>
+    <tr><td><strong>5. Test</strong></td><td>Pre-Production</td><td>QA / Migration</td><td>Dry-run conversion, boot test, application smoke test</td><td>Test Results Report</td><td>Days 8-10</td></tr>
+    <tr><td><strong>6. Execute</strong></td><td>Production Migration</td><td>Migration Team</td><td>Execute migration per plan, log all actions</td><td>Migration Log</td><td>Weekend</td></tr>
+    <tr><td><strong>7. Verify</strong></td><td>Post-Migration</td><td>App Owner + QA</td><td>Validate all services, performance baseline, sign-off</td><td>Verification Report</td><td>Day after</td></tr>
+    <tr><td><strong>8. Close</strong></td><td>PIR / Closure</td><td>Migration Lead</td><td>Post-implementation review, lessons learned, close ticket</td><td>PIR Document</td><td>Day +3</td></tr>
+  </table>
+
+  <div class="highlight">
+    <h3>Separation of Duties</h3>
+    <p><strong>Requester</strong> (Migration Lead) != <strong>Approver</strong> (CAB/Manager) != <strong>Implementer</strong> (Migration Engineer) != <strong>Verifier</strong> (QA/App Owner). For SOX compliance, no single person should request, approve, implement, and verify a change. h2kvmctl CI/CD pipelines enforce this with role-based approval gates.</p>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Migration Evidence <span>Package</span></h2>
+  <p class="sub">Complete evidence bundle for auditors — generated automatically by h2kvmctl.</p>
+
+  <h3>Evidence Package Contents</h3>
+  <pre>
+migration-evidence/
+├── 01-change-request/
+│   ├── RFC-2026-0042.pdf              # Change request form (from ITSM)
+│   ├── impact-assessment.pdf          # Risk and impact analysis
+│   └── cab-approval.pdf               # CAB meeting minutes + approval
+├── 02-pre-migration/
+│   ├── doctor-report.json             # h2kvmctl doctor output
+│   ├── vm-inventory.csv               # Source VM list with specs
+│   ├── dry-run-results.json           # h2kvmctl --dry-run output
+│   └── network-topology.yaml          # VLAN/bridge mapping
+├── 03-migration-execution/
+│   ├── migration-log.json             # Full h2kvmctl execution log
+│   ├── per-vm/
+│   │   ├── db-server.json             # Individual VM conversion report
+│   │   ├── app-server.json
+│   │   └── web-server.json
+│   ├── checksums.json                 # SHA-256 pre/post conversion
+│   └── timeline.json                  # Start/end time per VM
+├── 04-testing/
+│   ├── boot-test-results.json         # Automated boot verification
+│   ├── smoke-test-results.json        # Application-level tests
+│   ├── performance-baseline.json      # Before/after performance
+│   └── network-validation.json        # Connectivity verification
+├── 05-post-migration/
+│   ├── verification-signoff.pdf       # App owner sign-off
+│   ├── rollback-status.txt            # "VMware VMs retained for 48hr"
+│   └── pir-report.pdf                 # Post-implementation review
+└── manifest.json                      # Package index with SHA-256 of all files</pre>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Generating Evidence Package</h4>
+      <pre>
+# h2kvmctl generates evidence automatically
+h2kvmctl convert \
+  --config migration.yaml \
+  --evidence-dir /data/evidence/RFC-2026-0042/ \
+  --change-ticket RFC-2026-0042 \
+  --json
+
+# Creates all JSON artifacts above
+# Add manual documents (approval PDFs)
+# Generate manifest:
+h2kvmctl evidence-package \
+  --dir /data/evidence/RFC-2026-0042/ \
+  --sign --gpg-key auditor@company.com</pre>
+    </div>
+    <div class="card">
+      <h4>Per-VM Conversion Report</h4>
+      <pre>
+{
+  "vm_name": "db-server",
+  "change_ticket": "RFC-2026-0042",
+  "timestamp": "2026-03-23T02:15:30Z",
+  "operator": "jsmith",
+  "source": {
+    "format": "vmdk",
+    "path": "/data/exports/db-server.vmdk",
+    "size_bytes": 107374182400,
+    "sha256": "a1b2c3d4..."
+  },
+  "output": {
+    "format": "qcow2",
+    "path": "/var/lib/libvirt/images/db-server.qcow2",
+    "size_bytes": 42949672960,
+    "sha256": "e5f6a7b8..."
+  },
+  "fixes_applied": ["fstab", "initramfs"],
+  "boot_test": "pass",
+  "duration_seconds": 340,
+  "status": "success"
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">SOX Compliance <span>Controls</span></h2>
+  <p class="sub">IT General Controls (ITGC) mapping for Sarbanes-Oxley compliance.</p>
+
+  <h3>SOX ITGC Control Mapping</h3>
+  <table>
+    <tr><th style="width:12%">Control ID</th><th style="width:15%">Control Area</th><th style="width:25%">Control Description</th><th style="width:25%">Migration Evidence</th><th style="width:23%">Test Procedure</th></tr>
+    <tr><td>ITGC-CM-01</td><td>Change Mgmt</td><td>All changes follow documented process</td><td>RFC form, CAB approval, implementation plan</td><td>Verify RFC exists for each migration wave</td></tr>
+    <tr><td>ITGC-CM-02</td><td>Testing</td><td>Changes tested before production deployment</td><td>Dry-run results, boot test log, smoke test</td><td>Review test results match success criteria</td></tr>
+    <tr><td>ITGC-CM-03</td><td>Approval</td><td>Changes approved by authorized personnel</td><td>CAB minutes with approval signatures</td><td>Verify approver is authorized (not requester)</td></tr>
+    <tr><td>ITGC-CM-04</td><td>Rollback</td><td>Rollback procedure documented and tested</td><td>Rollback plan, VMware VMs retained for 48hr</td><td>Verify rollback was tested in pre-prod</td></tr>
+    <tr><td>ITGC-AC-01</td><td>Access Control</td><td>Migration access restricted to authorized</td><td>sudo logs, SSH key audit, user list</td><td>Verify only migration team has root access</td></tr>
+    <tr><td>ITGC-AC-02</td><td>Separation</td><td>Duties separated (request/approve/implement)</td><td>User logs showing different users for each</td><td>Verify no single user performed all roles</td></tr>
+    <tr><td>ITGC-LM-01</td><td>Logging</td><td>All changes logged with timestamp and user</td><td>h2kvmctl migration log (JSON), syslog</td><td>Review logs cover all migration activities</td></tr>
+    <tr><td>ITGC-LM-02</td><td>Integrity</td><td>Data integrity verified post-change</td><td>SHA-256 checksums, application validation</td><td>Verify checksums match expected values</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">HIPAA <span>Migration Controls</span></h2>
+  <p class="sub">Protecting electronic Protected Health Information (ePHI) during migration.</p>
+
+  <h3>HIPAA Safeguard Mapping</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Administrative Safeguards</h4>
+      <ul>
+        <li><strong>164.308(a)(1):</strong> Risk analysis — migration risk assessment completed before RFC</li>
+        <li><strong>164.308(a)(5):</strong> Security awareness — migration team briefed on ePHI handling</li>
+        <li><strong>164.308(a)(6):</strong> Incident response — plan for migration failure with ePHI exposure</li>
+        <li><strong>164.308(a)(8):</strong> Evaluation — post-migration security evaluation within 30 days</li>
+        <li><strong>Evidence:</strong> Risk assessment doc, training records, incident response plan, evaluation report</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Technical Safeguards</h4>
+      <ul>
+        <li><strong>164.312(a):</strong> Access control — only authorized personnel access ePHI VMs during migration</li>
+        <li><strong>164.312(b):</strong> Audit controls — all access to ePHI systems logged</li>
+        <li><strong>164.312(c):</strong> Integrity — SHA-256 checksums verify data not altered</li>
+        <li><strong>164.312(d):</strong> Authentication — SSH keys + sudo, no shared accounts</li>
+        <li><strong>164.312(e):</strong> Transmission security — encrypted transfer (TLS/SSH)</li>
+        <li><strong>Evidence:</strong> audit.log, checksums.json, SSH key list, encryption verification</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Physical Safeguards</h4>
+      <ul>
+        <li><strong>164.310(a):</strong> Facility access — data center access log during migration</li>
+        <li><strong>164.310(c):</strong> Workstation security — migration console in secured area</li>
+        <li><strong>164.310(d):</strong> Device controls — secure media handling for USB transfers</li>
+        <li><strong>Evidence:</strong> Badge access logs, workstation inventory, media disposal records</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>ePHI Data Classification</h4>
+      <pre>
+# VM classification for migration priority
+# migration-hipaa.yaml
+vms:
+  - name: ehr-database
+    data_class: ePHI
+    hipaa_controls: full
+    migration_window: "Sunday 02:00-06:00"
+    pre_migration:
+      - risk_assessment: RFC-2026-0042-RA
+      - baa_verified: true
+    post_migration:
+      - access_audit: required
+      - penetration_test: within_30_days
+
+  - name: billing-app
+    data_class: ePHI
+    hipaa_controls: full
+
+  - name: dev-server
+    data_class: non-ePHI
+    hipaa_controls: standard</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">PCI-DSS <span>Change Control</span></h2>
+  <p class="sub">Requirements 6.4 and 11.2 for cardholder data environment changes.</p>
+
+  <h3>PCI-DSS v4.0 Control Mapping</h3>
+  <table>
+    <tr><th style="width:10%">Req</th><th style="width:15%">Control</th><th style="width:30%">Migration Compliance</th><th style="width:45%">Evidence</th></tr>
+    <tr><td>6.4.1</td><td>Dev/test/prod separation</td><td>Migration tested in non-prod first; prod migration in separate wave</td><td>Wave 0 (dev/test) results → Wave 1 (prod) approval gated on Wave 0 success</td></tr>
+    <tr><td>6.4.2</td><td>Separation of duties</td><td>Different personnel for development, testing, production</td><td>CI/CD pipeline logs showing different approvers at each stage</td></tr>
+    <tr><td>6.4.5</td><td>Change control procedures</td><td>RFC, impact analysis, approval, test, rollback documented</td><td>Complete evidence package (see Page 3)</td></tr>
+    <tr><td>6.4.6</td><td>Security patches current</td><td>KVM hosts fully patched before receiving CDE VMs</td><td>SCAP scan results for target KVM hosts, patch compliance report</td></tr>
+    <tr><td>10.2</td><td>Audit trail</td><td>All actions on CDE systems logged with user, time, action</td><td>h2kvmctl migration.log + libvirt audit events + syslog</td></tr>
+    <tr><td>10.3</td><td>Log protection</td><td>Logs protected from tampering, retained 12 months</td><td>Log forwarding to SIEM, log rotation with integrity checks</td></tr>
+    <tr><td>11.2</td><td>Vulnerability scanning</td><td>Post-migration vulnerability scan of KVM hosts and VMs</td><td>OpenSCAP or Nessus scan results within 7 days of migration</td></tr>
+    <tr><td>12.5</td><td>Quarterly review</td><td>Quarterly review of migrated infrastructure security</td><td>Review meeting minutes, security posture assessment</td></tr>
+  </table>
+
+  <div class="highlight">
+    <h3>CDE Scope During Migration</h3>
+    <p>During migration, both VMware and KVM environments are in PCI scope until VMware VMs are fully decommissioned. Minimize this dual-scope period by migrating CDE VMs in a single wave with immediate VMware decommission. Document the scope reduction in your next PCI-DSS assessment.</p>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Audit-Ready <span>Log Format</span></h2>
+  <p class="sub">Structured logging that meets auditor expectations for every compliance framework.</p>
+
+  <h3>JSON Audit Log Schema</h3>
+  <pre>
+{
+  "event_id": "evt-2026-03-23-001542",
+  "timestamp": "2026-03-23T02:15:42.123Z",
+  "event_type": "vm_migration",
+  "action": "convert",
+  "status": "success",
+  "change_ticket": "RFC-2026-0042",
+  "operator": {
+    "username": "jsmith",
+    "uid": 1001,
+    "source_ip": "10.0.1.50",
+    "auth_method": "ssh_key"
+  },
+  "subject": {
+    "vm_name": "db-server",
+    "source_format": "vmdk",
+    "source_path": "/data/exports/db-server.vmdk",
+    "source_sha256": "a1b2c3d4e5f6...",
+    "target_format": "qcow2",
+    "target_path": "/var/lib/libvirt/images/db-server.qcow2",
+    "target_sha256": "f7e8d9c0b1a2...",
+    "data_classification": "PCI-CDE"
+  },
+  "details": {
+    "fixes_applied": ["fstab", "initramfs", "network"],
+    "boot_test": "pass",
+    "duration_seconds": 340,
+    "source_size_gb": 100,
+    "output_size_gb": 40
+  },
+  "host": {
+    "hostname": "kvm-host-01",
+    "ip": "10.0.1.11",
+    "os": "Rocky Linux 9.3"
+  }
+}</pre>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Log Integrity Protection</h4>
+      <ul>
+        <li>Forward to SIEM in real-time (rsyslog → Splunk/ELK)</li>
+        <li>Hash chain: each log entry includes hash of previous</li>
+        <li>Write-once: logs on append-only storage or WORM</li>
+        <li>Rotation: <code>logrotate</code> with SHA-256 checksums per file</li>
+        <li>Retention: 12 months (PCI-DSS), 6 years (SOX), 6 years (HIPAA)</li>
+        <li>Access: read-only for auditors, append-only for system</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>SIEM Integration</h4>
+      <pre>
+# rsyslog forward to SIEM
+# /etc/rsyslog.d/hyper2kvm.conf
+module(load="imfile")
+input(type="imfile"
+  File="/var/log/hyper2kvm/migration.log"
+  Tag="h2kvmctl"
+  Severity="info"
+  Facility="local6"
+)
+local6.* @@siem.company.com:514
+
+# Splunk HEC
+h2kvmctl convert --config migration.yaml \
+  --webhook https://splunk:8088/services/collector \
+  --webhook-token $HEC_TOKEN</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page page-light">
+  <h2 class="st">Auditor Checklist <span>&amp; Templates</span></h2>
+  <p class="sub">Ready-to-use checklists for internal audit and external assessor review.</p>
+
+  <h3>Pre-Audit Checklist (Internal)</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:30%">Check Item</th><th style="width:10%">Status</th><th style="width:25%">Evidence Location</th><th style="width:30%">Notes</th></tr>
+    <tr><td>1</td><td>Change request filed for each migration wave</td><td></td><td>ITSM: RFC-2026-0042</td><td>One RFC per wave or one master RFC</td></tr>
+    <tr><td>2</td><td>Risk assessment completed and signed</td><td></td><td>evidence/01-change-request/</td><td>Include data classification impact</td></tr>
+    <tr><td>3</td><td>CAB approval obtained before execution</td><td></td><td>evidence/01-change-request/cab-approval.pdf</td><td>Timestamp must precede migration start</td></tr>
+    <tr><td>4</td><td>Dry-run completed successfully</td><td></td><td>evidence/02-pre-migration/dry-run-results.json</td><td>Zero errors in dry-run output</td></tr>
+    <tr><td>5</td><td>Migration logs collected and complete</td><td></td><td>evidence/03-migration-execution/</td><td>Per-VM JSON with checksums</td></tr>
+    <tr><td>6</td><td>Boot tests passed for all VMs</td><td></td><td>evidence/04-testing/boot-test-results.json</td><td>100% pass rate required</td></tr>
+    <tr><td>7</td><td>Application smoke tests passed</td><td></td><td>evidence/04-testing/smoke-test-results.json</td><td>App owner verified functionality</td></tr>
+    <tr><td>8</td><td>SHA-256 checksums verified (pre/post)</td><td></td><td>evidence/03-migration-execution/checksums.json</td><td>Source integrity maintained</td></tr>
+    <tr><td>9</td><td>Post-migration verification signed by app owner</td><td></td><td>evidence/05-post-migration/verification-signoff.pdf</td><td>Signed within 48 hours</td></tr>
+    <tr><td>10</td><td>Vulnerability scan completed (post-migration)</td><td></td><td>evidence/05-post-migration/scan-results.pdf</td><td>Within 7 days for PCI, 30 days for HIPAA</td></tr>
+    <tr><td>11</td><td>VMware VMs decommissioned per plan</td><td></td><td>evidence/05-post-migration/decommission-log.json</td><td>After 48-hour rollback window</td></tr>
+    <tr><td>12</td><td>PIR completed and lessons documented</td><td></td><td>evidence/05-post-migration/pir-report.pdf</td><td>Within 5 business days</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>Compliance = Evidence. h2kvmctl Generates Evidence Automatically.</h3>
+    <p>Every h2kvmctl operation produces structured JSON logs with timestamps, operator identity, checksums, and action details. The evidence package template provides auditors with everything they need in one directory. Combine with your ITSM change tickets and CAB approvals for a complete audit trail. Migration from VMware to KVM can be the most well-documented infrastructure change your auditor has ever reviewed.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Compliance Audit Trail Guide</div>
+</div>
+
+</body>
+</html>

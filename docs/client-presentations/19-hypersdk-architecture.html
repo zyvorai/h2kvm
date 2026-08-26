@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hypersdk Architecture Deep Dive — Hexagonal Multi-Cloud VM Export Platform</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #ff8f3f; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(255,143,63,0.2); border: 1px solid rgba(255,143,63,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-accent { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #e8e6df; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #ff8f3f; }
+  .page-light h2.st span { color: #c2410c; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.7em 0 0.3em; color: #ff8f3f; }
+  .page-light h3 { color: #c2410c; }
+  p { margin-bottom: 0.6em; font-size: 0.92em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.7em 0; font-size: 0.79em; }
+  th { background: #c2410c; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #ff8f3f; } .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  .page-light .card h4 { color: #c2410c; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .highlight { background: rgba(255,143,63,0.08); border: 1px solid rgba(255,143,63,0.2); border-radius: 8px; padding: 13px; margin: 0.7em 0; }
+  .page-dark .highlight { background: rgba(255,143,63,0.06); border: 1px solid rgba(255,143,63,0.15); }
+  pre { background: #0f172a; color: #e8e6df; padding: 14px; border-radius: 8px; font-size: 0.78em; line-height: 1.5; font-family: 'JetBrains Mono', 'Fira Code', monospace; margin: 0.7em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .page-light pre { background: #1a1a2e; color: #e8e6df; }
+  code { background: rgba(255,143,63,0.1); padding: 2px 5px; border-radius: 4px; font-size: 0.87em; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+  .arch-box { background: rgba(255,255,255,0.03); border: 2px solid rgba(255,143,63,0.3); border-radius: 12px; padding: 18px; margin: 0.7em 0; }
+  .layer { display: inline-block; padding: 3px 10px; border-radius: 5px; font-size: 0.78em; font-weight: 600; }
+  .layer-domain { background: rgba(99,102,241,0.2); color: #818cf8; }
+  .layer-ports { background: rgba(34,197,94,0.2); color: #22c55e; }
+  .layer-adapt { background: rgba(255,143,63,0.2); color: #ff8f3f; }
+  .footer { text-align: center; padding: 12px; font-size: 0.72em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(26,26,46,0.3), rgba(22,33,62,0.2)); border: 2px solid #ff8f3f; border-radius: 12px; padding: 16px; margin: 0.8em 0; text-align: center; }
+  .verdict h3 { color: #ff8f3f; font-size: 1.15em; margin-bottom: 5px; }
+  .stat-box { text-align: center; padding: 14px; }
+  .stat-box .num { font-size: 2em; font-weight: 800; color: #ff8f3f; } .stat-box .label { font-size: 0.8em; opacity: 0.7; }
+  .kw { color: #c792ea; } .fn { color: #82aaff; } .tp { color: #ffcb6b; } .st { color: #c3e88d; } .cm { color: #546e7a; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>hyper<span>sdk</span> Architecture</h1>
+  <h2>Hexagonal Multi-Cloud VM Export Platform</h2>
+  <p class="sub">A Go daemon with clean hexagonal architecture: 70+ domain types, 17+ port interfaces, 10 cloud provider adapters, job scheduling, carbon-aware migration, cost estimation, RBAC, audit logging, and webhook notifications. Built for enterprise-scale VM export and orchestration.</p>
+  <div class="badge">Go | Hexagonal Architecture | 10 Providers | REST API | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE 1: Architecture Overview -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Hexagonal <span>Architecture</span></h2>
+  <p class="sub">Clean separation of business logic from infrastructure. Domain has zero external dependencies.</p>
+
+  <div class="arch-box">
+    <pre style="margin:0;">
+                         +--------------------------+
+                         |    <span class="cm">internal/domain</span>        |  <span class="cm">70+ canonical Go types</span>
+                         |    <span class="tp">Job</span>, <span class="tp">Schedule</span>, <span class="tp">VM</span>,     |  <span class="cm">Zero external dependencies</span>
+                         |    <span class="tp">Cost</span>, <span class="tp">Carbon</span>, <span class="tp">Webhook</span>, |  <span class="cm">Pure business entities</span>
+                         |    <span class="tp">Audit</span>, <span class="tp">RBAC</span>, <span class="tp">Secret</span>   |
+                         +-----------+--------------+
+                                     |
+                         +-----------v--------------+
+                         |    <span class="cm">internal/ports</span>         |  <span class="cm">17+ interface contracts</span>
+                         |    <span class="fn">ComputeProvider</span>        |  <span class="cm">Defines what adapters</span>
+                         |    <span class="fn">ExportProvider</span>         |  <span class="cm">must implement</span>
+                         |    <span class="fn">JobStore</span>, <span class="fn">AuthManager</span>  |
+                         |    <span class="fn">CarbonProvider</span>, ...    |
+                         +-----------+--------------+
+                              /      |       \
+              +--------------+  +----+-----+  +---------------+
+              |  <span class="cm">daemon/</span>     |  | <span class="cm">providers/</span>|  |  <span class="cm">cmd/</span>        |
+              |  api/        |  | vsphere/  |  |  hypervisord  |
+              |  jobs/       |  | aws/      |  |  hyperctl     |
+              |  scheduler/  |  | azure/    |  |  hyperexport  |
+              |  store/      |  | gcp/      |  |  hyperconvert |
+              |  auth/       |  | hyperv/   |  |  hypersdk-    |
+              |  webhooks/   |  | oci/      |  |    dashboard  |
+              |  metrics/    |  | openstack/|  |  hypersdk-    |
+              |  audit/      |  | alibaba/  |  |    operator   |
+              |  secrets/    |  | proxmox/  |  |  hypersdk-    |
+              |  cache/      |  | kubevirt/ |  |    agent      |
+              |  ratelimit/  |  | carbon/   |  |  hypersdk-    |
+              |  tracing/    |  | cost/     |  |    control    |
+              +--------------+  +----------+   +---------------+
+    </pre>
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4><span class="layer layer-domain">Domain</span> internal/domain</h4>
+      <p><strong>70+ canonical Go types</strong> — Job, ScheduledJob, VMInfo, ProviderConfig, CarbonIntensity, CostEstimate, Webhook, AuditEvent, Role, Secret. Depends only on Go stdlib (<code>time</code>, <code>encoding/json</code>). All other packages reference these types. This is the heart of the system.</p>
+    </div>
+    <div class="card">
+      <h4><span class="layer layer-ports">Ports</span> internal/ports</h4>
+      <p><strong>17+ interface contracts</strong> — ComputeProvider, ExportProvider, SnapshotProvider, JobStore, ScheduleManager, CarbonProvider, CostCalculator, AuthManager, SecretManager, WebhookSender, AuditLogger, Cache, and more. Defines what adapters must implement.</p>
+    </div>
+    <div class="card">
+      <h4><span class="layer layer-adapt">Adapters</span> daemon/ + providers/</h4>
+      <p><strong>Concrete implementations</strong> — REST API server, SQLite job store, 10 cloud provider clients, Prometheus metrics, webhook dispatcher, rate limiter, cron scheduler, carbon data fetcher, cost calculator. Swappable without touching business logic.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: Domain Layer -->
+<div class="page page-light">
+  <h2 class="st">Domain Layer — <span>Pure Business Types</span></h2>
+  <p class="sub">Zero dependencies. Every type in internal/domain is a plain Go struct — no imports beyond stdlib.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Job &amp; Scheduling</h4>
+      <pre style="font-size:0.75em; line-height:1.4;">
+<span class="kw">type</span> <span class="tp">Job</span> <span class="kw">struct</span> {
+    ID          <span class="tp">string</span>
+    Status      <span class="tp">JobStatus</span>  <span class="cm">// pending|running|completed|failed|cancelled</span>
+    VMName      <span class="tp">string</span>
+    Provider    <span class="tp">ProviderType</span>
+    ExportOpts  <span class="tp">ExportOptions</span>
+    Result      *<span class="tp">ExportResult</span>
+    CreatedAt   <span class="tp">time.Time</span>
+    StartedAt   *<span class="tp">time.Time</span>
+    CompletedAt *<span class="tp">time.Time</span>
+    Error       <span class="tp">string</span>
+}
+
+<span class="kw">type</span> <span class="tp">ScheduledJob</span> <span class="kw">struct</span> {
+    ID             <span class="tp">string</span>
+    Schedule       <span class="tp">string</span>          <span class="cm">// Cron format</span>
+    JobTemplate    <span class="tp">JobDefinition</span>
+    AdvancedConfig *<span class="tp">AdvancedScheduleConfig</span>
+    <span class="cm">// Dependencies, retry policy, time windows, priority</span>
+}</pre>
+    </div>
+    <div class="card">
+      <h4>Provider &amp; VM</h4>
+      <pre style="font-size:0.75em; line-height:1.4;">
+<span class="kw">type</span> <span class="tp">ProviderType</span> <span class="tp">string</span>
+<span class="kw">const</span> (
+    <span class="tp">ProviderVSphere</span>  = <span class="st">"vsphere"</span>
+    <span class="tp">ProviderAWS</span>      = <span class="st">"aws"</span>
+    <span class="tp">ProviderAzure</span>    = <span class="st">"azure"</span>
+    <span class="tp">ProviderGCP</span>      = <span class="st">"gcp"</span>
+    <span class="tp">ProviderHyperV</span>   = <span class="st">"hyperv"</span>
+    <span class="tp">ProviderProxmox</span>  = <span class="st">"proxmox"</span>
+    <span class="tp">ProviderKubeVirt</span> = <span class="st">"kubevirt"</span>
+)
+
+<span class="kw">type</span> <span class="tp">ProviderConfig</span> <span class="kw">struct</span> {
+    Type     <span class="tp">ProviderType</span>
+    Endpoint <span class="tp">string</span>
+    Username <span class="tp">string</span>
+    Password <span class="tp">string</span>
+    Region   <span class="tp">string</span>
+    Timeout  <span class="tp">time.Duration</span>
+    Metadata <span class="kw">map</span>[<span class="tp">string</span>]<span class="kw">interface</span>{}
+}</pre>
+    </div>
+    <div class="card">
+      <h4>Carbon &amp; Cost</h4>
+      <pre style="font-size:0.75em; line-height:1.4;">
+<span class="cm">// Carbon intensity zones</span>
+<span class="kw">const</span> (
+    <span class="tp">CarbonZoneUSEast</span>     = <span class="st">"US-CAL-CISO"</span>
+    <span class="tp">CarbonZoneEUCentral</span>  = <span class="st">"DE"</span>
+    <span class="tp">CarbonZoneAPACTokyo</span>  = <span class="st">"JP-TK"</span>
+)
+
+<span class="cm">// Carbon thresholds (gCO2/kWh)</span>
+<span class="kw">const</span> (
+    <span class="tp">CarbonThresholdExcellent</span> = 100.0
+    <span class="tp">CarbonThresholdGood</span>      = 200.0
+    <span class="tp">CarbonThresholdPoor</span>      = 600.0
+)
+
+<span class="cm">// Cloud storage providers for cost calculation</span>
+<span class="kw">const</span> (
+    <span class="tp">CloudProviderS3</span>        = <span class="st">"s3"</span>
+    <span class="tp">CloudProviderAzureBlob</span> = <span class="st">"azure_blob"</span>
+    <span class="tp">CloudProviderGCS</span>       = <span class="st">"gcs"</span>
+)</pre>
+    </div>
+    <div class="card">
+      <h4>Security &amp; Audit</h4>
+      <pre style="font-size:0.75em; line-height:1.4;">
+<span class="cm">// RBAC roles</span>
+<span class="kw">const</span> (
+    <span class="tp">RoleAdmin</span>    = <span class="st">"admin"</span>
+    <span class="tp">RoleOperator</span> = <span class="st">"operator"</span>
+    <span class="tp">RoleViewer</span>   = <span class="st">"viewer"</span>
+)
+
+<span class="cm">// Audit events</span>
+<span class="kw">const</span> (
+    <span class="tp">AuditEventLogin</span>     = <span class="st">"login"</span>
+    <span class="tp">AuditEventExportVM</span>  = <span class="st">"export_vm"</span>
+    <span class="tp">AuditEventCreateJob</span> = <span class="st">"create_job"</span>
+    <span class="tp">AuditEventCancelJob</span> = <span class="st">"cancel_job"</span>
+)
+
+<span class="kw">type</span> <span class="tp">Webhook</span> <span class="kw">struct</span> {
+    URL     <span class="tp">string</span>
+    Events  []<span class="tp">string</span>
+    Headers <span class="kw">map</span>[<span class="tp">string</span>]<span class="tp">string</span>
+    Retry   <span class="tp">int</span>
+    Enabled <span class="tp">bool</span>
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: Ports Layer -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Ports Layer — <span>Interface Contracts</span></h2>
+  <p class="sub">17+ Go interfaces that define the contracts between domain logic and infrastructure.</p>
+
+  <table>
+    <tr><th style="width:20%">Port Interface</th><th style="width:35%">Methods</th><th style="width:25%">Adapter Implementation</th><th style="width:20%">Purpose</th></tr>
+    <tr><td><strong>ComputeProvider</strong></td><td><code>Connect</code>, <code>ListVMs</code>, <code>GetVM</code>, <code>SearchVMs</code>, <code>Disconnect</code>, <code>ValidateCredentials</code></td><td>providers/vsphere, aws, azure, gcp, hyperv, oci, openstack, alibaba, proxmox, kubevirt</td><td>VM discovery</td></tr>
+    <tr><td><strong>ExportProvider</strong></td><td><code>ExportVM</code>, <code>GetExportCapabilities</code></td><td>Same 10 providers</td><td>VM disk export</td></tr>
+    <tr><td><strong>SnapshotProvider</strong></td><td><code>CreateSnapshot</code>, <code>DeleteSnapshot</code>, <code>ListSnapshots</code>, <code>RevertToSnapshot</code></td><td>Providers with snapshot support</td><td>VM snapshots</td></tr>
+    <tr><td><strong>JobStore</strong></td><td><code>SaveJob</code>, <code>UpdateJob</code>, <code>GetJob</code>, <code>ListJobs</code>, <code>DeleteJob</code></td><td>daemon/store (SQLite)</td><td>Job persistence</td></tr>
+    <tr><td><strong>ScheduleStore</strong></td><td><code>SaveSchedule</code>, <code>UpdateSchedule</code>, <code>GetSchedule</code>, <code>ListSchedules</code></td><td>daemon/store (SQLite)</td><td>Schedule persistence</td></tr>
+    <tr><td><strong>ScheduleManager</strong></td><td><code>Start</code>, <code>Stop</code>, <code>AddScheduledJob</code>, <code>TriggerNow</code>, <code>GetScheduleStats</code></td><td>daemon/scheduler</td><td>Cron scheduling</td></tr>
+    <tr><td><strong>CarbonProvider</strong></td><td><code>GetCurrentIntensity</code>, <code>GetForecast</code>, <code>GetGridStatus</code>, <code>ListZones</code></td><td>providers/carbon (electricitymap, watttime)</td><td>Carbon data</td></tr>
+    <tr><td><strong>CarbonScheduler</strong></td><td><code>GetCarbonStatus</code>, <code>GenerateCarbonReport</code>, <code>EstimateCarbonSavings</code></td><td>daemon/scheduler.CarbonAwareScheduler</td><td>Green scheduling</td></tr>
+    <tr><td><strong>CostCalculator</strong></td><td><code>EstimateCost</code>, <code>CompareProviders</code>, <code>ProjectYearlyCost</code>, <code>EstimateExportSize</code></td><td>providers/cost</td><td>Cost estimation</td></tr>
+    <tr><td><strong>AuthManager</strong></td><td><code>AuthenticateUser</code>, <code>ValidateSession</code>, <code>GetUserRole</code>, <code>Logout</code></td><td>daemon/auth (JWT + API key)</td><td>Authentication</td></tr>
+    <tr><td><strong>SecretManager</strong></td><td><code>Get</code>, <code>Set</code>, <code>Delete</code>, <code>List</code>, <code>Rotate</code>, <code>Health</code></td><td>daemon/secrets (vault, file, env)</td><td>Credential storage</td></tr>
+    <tr><td><strong>WebhookSender</strong></td><td><code>Send</code>, <code>SendConversionStarted</code>, <code>SendConversionCompleted</code>, <code>SendConversionFailed</code></td><td>daemon/webhooks</td><td>Event notifications</td></tr>
+    <tr><td><strong>AuditLogger</strong></td><td><code>Log</code>, <code>Query</code></td><td>daemon/audit.FileLogger</td><td>Audit trail</td></tr>
+    <tr><td><strong>CapabilityDetector</strong></td><td><code>GetCapabilities</code>, <code>GetDefaultMethod</code></td><td>daemon/capabilities</td><td>Export method detection</td></tr>
+    <tr><td><strong>Cache</strong></td><td><code>Get</code>, <code>Set</code>, <code>Delete</code>, <code>Exists</code>, <code>Clear</code></td><td>daemon/cache</td><td>Response caching</td></tr>
+    <tr><td><strong>SystemMetrics</strong></td><td>Prometheus counters, gauges, histograms</td><td>daemon/metrics</td><td>Observability</td></tr>
+    <tr><td><strong>HTTPMiddleware</strong></td><td>Rate limiting, request validation</td><td>daemon/ratelimit</td><td>API protection</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4: Provider Adapters -->
+<div class="page page-light">
+  <h2 class="st">Provider Adapters — <span>10 Cloud Platforms</span></h2>
+  <p class="sub">Each provider implements ComputeProvider + ExportProvider. Same interface, different clouds.</p>
+
+  <table>
+    <tr><th style="width:14%">Provider</th><th style="width:18%">Package</th><th style="width:18%">Export Method</th><th style="width:14%">Auth</th><th style="width:18%">Staging</th><th style="width:18%">Special Features</th></tr>
+    <tr><td><strong>VMware vSphere</strong></td><td><code>providers/vsphere</code></td><td>OVF/OVA, VDDK, HTTPS</td><td>SSO, user/pass</td><td>Direct download</td><td>CBT delta sync, snapshot export</td></tr>
+    <tr><td><strong>AWS EC2</strong></td><td><code>providers/aws</code></td><td>EBS snapshot, AMI export</td><td>IAM, access keys</td><td>S3 bucket</td><td>Cross-region, parallel download</td></tr>
+    <tr><td><strong>Azure</strong></td><td><code>providers/azure</code></td><td>Managed disk snapshot</td><td>Service principal, MSI</td><td>Blob storage (SAS)</td><td>Parallel download, snapshot-based</td></tr>
+    <tr><td><strong>GCP</strong></td><td><code>providers/gcp</code></td><td>Persistent disk export</td><td>Service account</td><td>GCS bucket</td><td>Image export, compressed tar.gz</td></tr>
+    <tr><td><strong>Hyper-V</strong></td><td><code>providers/hyperv</code></td><td>VHD/VHDX direct copy</td><td>WinRM, SSH</td><td>Direct copy</td><td>Checkpoint export</td></tr>
+    <tr><td><strong>OCI</strong></td><td><code>providers/oci</code></td><td>Boot volume export</td><td>API key</td><td>Object Storage</td><td>Pre-authenticated requests</td></tr>
+    <tr><td><strong>OpenStack</strong></td><td><code>providers/openstack</code></td><td>Glance image, Cinder</td><td>Keystone v3</td><td>Swift</td><td>Multi-format (qcow2, raw)</td></tr>
+    <tr><td><strong>Alibaba</strong></td><td><code>providers/alibabacloud</code></td><td>ECS disk snapshot</td><td>AccessKey</td><td>OSS</td><td>Regional export</td></tr>
+    <tr><td><strong>Proxmox</strong></td><td><code>providers/proxmox</code></td><td>API disk export</td><td>Token, PAM</td><td>Direct download</td><td>Already qcow2/raw</td></tr>
+    <tr><td><strong>KubeVirt</strong></td><td><code>providers/kubevirt</code></td><td>PVC/DataVolume export</td><td>kubeconfig</td><td>CDI</td><td>Live migration support</td></tr>
+  </table>
+
+  <h3>Provider Interface (Go Code)</h3>
+  <pre>
+<span class="cm">// ComputeProvider — VM discovery and management</span>
+<span class="kw">type</span> <span class="tp">ComputeProvider</span> <span class="kw">interface</span> {
+    <span class="fn">Name</span>() <span class="tp">string</span>
+    <span class="fn">Type</span>() <span class="tp">domain.ProviderType</span>
+    <span class="fn">Connect</span>(ctx <span class="tp">context.Context</span>, config <span class="tp">domain.ProviderConfig</span>) <span class="tp">error</span>
+    <span class="fn">Disconnect</span>(ctx <span class="tp">context.Context</span>) <span class="tp">error</span>
+    <span class="fn">ValidateCredentials</span>(ctx <span class="tp">context.Context</span>) <span class="tp">error</span>
+    <span class="fn">ListVMs</span>(ctx <span class="tp">context.Context</span>, filter <span class="tp">domain.VMFilter</span>) ([]*<span class="tp">domain.VMInfo</span>, <span class="tp">error</span>)
+    <span class="fn">GetVM</span>(ctx <span class="tp">context.Context</span>, identifier <span class="tp">string</span>) (*<span class="tp">domain.VMInfo</span>, <span class="tp">error</span>)
+    <span class="fn">SearchVMs</span>(ctx <span class="tp">context.Context</span>, query <span class="tp">string</span>) ([]*<span class="tp">domain.VMInfo</span>, <span class="tp">error</span>)
+}
+
+<span class="cm">// ExportProvider — VM disk export</span>
+<span class="kw">type</span> <span class="tp">ExportProvider</span> <span class="kw">interface</span> {
+    <span class="fn">ExportVM</span>(ctx <span class="tp">context.Context</span>, id <span class="tp">string</span>, opts <span class="tp">domain.ExportOptions</span>) (*<span class="tp">domain.ExportResult</span>, <span class="tp">error</span>)
+    <span class="fn">GetExportCapabilities</span>() <span class="tp">domain.ExportCapabilities</span>
+}
+
+<span class="cm">// FullProvider — providers that support both discovery and export</span>
+<span class="kw">type</span> <span class="tp">FullProvider</span> <span class="kw">interface</span> {
+    <span class="tp">ComputeProvider</span>
+    <span class="tp">ExportProvider</span>
+}
+  </pre>
+</div>
+
+<!-- PAGE 5: Daemon Services -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Daemon Services — <span>daemon/</span></h2>
+  <p class="sub">The daemon layer contains all infrastructure adapters: REST API, job engine, scheduler, storage, auth, and observability.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>daemon/api</h4>
+      <ul>
+        <li>REST API server (net/http)</li>
+        <li>OpenAPI 3.0 spec (openapi.yaml)</li>
+        <li>JSON request/response</li>
+        <li>Versioned routes (/api/v1/...)</li>
+        <li>CORS, compression, request ID</li>
+        <li>Health + readiness endpoints</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>daemon/jobs</h4>
+      <ul>
+        <li>Job lifecycle: create, run, cancel</li>
+        <li>Concurrent execution with limits</li>
+        <li>Progress tracking per job</li>
+        <li>Webhook notification on state change</li>
+        <li>Implements ports.JobManager</li>
+        <li>Automatic cleanup of old jobs</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>daemon/scheduler</h4>
+      <ul>
+        <li>Cron-based scheduling engine</li>
+        <li>Time window enforcement</li>
+        <li>Job dependencies (DAG)</li>
+        <li>Priority queues (0-100)</li>
+        <li>Retry with exponential backoff</li>
+        <li>Carbon-aware scheduling mode</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>daemon/store</h4>
+      <ul>
+        <li>SQLite persistent storage</li>
+        <li>Implements JobStore + ScheduleStore</li>
+        <li>Schema migrations</li>
+        <li>Transaction support</li>
+        <li>Query filtering (status, date, provider)</li>
+        <li>Backup/restore capability</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>daemon/auth</h4>
+      <ul>
+        <li>JWT token authentication</li>
+        <li>API key authentication</li>
+        <li>Session management</li>
+        <li>RBAC: admin, operator, viewer</li>
+        <li>Password hashing (bcrypt)</li>
+        <li>Token rotation and expiry</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>daemon/rbac</h4>
+      <ul>
+        <li>Role-based access control</li>
+        <li>Actions: create, read, update, delete, export, cancel</li>
+        <li>Resources: jobs, schedules, providers, config</li>
+        <li>Permission matrix per role</li>
+        <li>Middleware integration</li>
+        <li>Audit log on denied access</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>daemon/metrics</h4>
+      <ul>
+        <li>Prometheus /metrics endpoint</li>
+        <li>Job counters (created, completed, failed)</li>
+        <li>Export duration histograms</li>
+        <li>Provider latency gauges</li>
+        <li>Queue depth metrics</li>
+        <li>System resource metrics</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>daemon/webhooks</h4>
+      <ul>
+        <li>Event-driven notifications</li>
+        <li>Slack, Teams, PagerDuty, custom</li>
+        <li>Retry with backoff on failure</li>
+        <li>Event filtering per webhook</li>
+        <li>Conversion started/completed/failed</li>
+        <li>Job lifecycle events</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>daemon/secrets</h4>
+      <ul>
+        <li>Secret management with rotation</li>
+        <li>Backends: file, env vars, vault</li>
+        <li>Cached secret access</li>
+        <li>Automatic rotation support</li>
+        <li>Health check for secret backends</li>
+        <li>Provider credential storage</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>daemon/audit</h4>
+      <ul>
+        <li>Full audit trail</li>
+        <li>Events: login, export, create/cancel/delete job</li>
+        <li>User, IP, timestamp per event</li>
+        <li>File-based logger</li>
+        <li>Queryable history</li>
+        <li>Compliance-ready (SOX, HIPAA)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>daemon/cache</h4>
+      <ul>
+        <li>Generic key-value cache</li>
+        <li>TTL-based expiration</li>
+        <li>VM inventory caching</li>
+        <li>Provider response caching</li>
+        <li>Reduces cloud API calls</li>
+        <li>Configurable cache size</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>daemon/ratelimit</h4>
+      <ul>
+        <li>HTTP request rate limiting</li>
+        <li>Per-user and global limits</li>
+        <li>Token bucket algorithm</li>
+        <li>Protects cloud API quotas</li>
+        <li>429 Too Many Requests response</li>
+        <li>Configurable per endpoint</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: CLI Binaries -->
+<div class="page page-light">
+  <h2 class="st">CLI Binaries — <span>8 Commands</span></h2>
+  <p class="sub">hypersdk ships 8 purpose-built binaries, all built from cmd/.</p>
+
+  <table>
+    <tr><th style="width:18%">Binary</th><th style="width:12%">Package</th><th style="width:35%">Purpose</th><th style="width:35%">Key Features</th></tr>
+    <tr><td><strong>hypervisord</strong></td><td><code>cmd/hypervisord</code></td><td>Main daemon — runs as systemd service</td><td>REST API, job engine, scheduler, auth, metrics, webhooks</td></tr>
+    <tr><td><strong>hyperctl</strong></td><td><code>cmd/hyperctl</code></td><td>CLI client for the daemon</td><td>Job management, provider config, schedule CRUD, status</td></tr>
+    <tr><td><strong>hyperexport</strong></td><td><code>cmd/hyperexport</code></td><td>Standalone VM export (no daemon)</td><td>Direct export from any provider, progress streaming</td></tr>
+    <tr><td><strong>hyperconvert</strong></td><td><code>cmd/hyperconvert</code></td><td>Disk format conversion</td><td>VMDK/VHD/RAW &rarr; QCOW2, flatten, compress</td></tr>
+    <tr><td><strong>hypersdk-dashboard</strong></td><td><code>cmd/hypersdk-dashboard</code></td><td>Web dashboard server</td><td>React UI for job monitoring, provider status, metrics</td></tr>
+    <tr><td><strong>hypersdk-operator</strong></td><td><code>cmd/hypersdk-operator</code></td><td>Kubernetes operator</td><td>CRDs for migration jobs, GitOps-friendly, Helm chart</td></tr>
+    <tr><td><strong>hypersdk-agent</strong></td><td><code>cmd/hypersdk-agent</code></td><td>Remote agent for distributed export</td><td>Runs at edge/remote sites, reports to central daemon</td></tr>
+    <tr><td><strong>hypersdk-control</strong></td><td><code>cmd/hypersdk-control</code></td><td>Control plane management</td><td>Multi-node coordination, leader election, HA</td></tr>
+  </table>
+
+  <h3>How It Fits Together with hyper2kvm</h3>
+  <div class="arch-box">
+    <pre style="margin:0;">
+  <span class="cm">User Request (CLI / TUI / API / K8s CRD)</span>
+         |
+   +-----v-----------+
+   |   <span class="fn">hypervisord</span>    |   <span class="cm">hypersdk daemon — multi-cloud VM export</span>
+   |   (Go daemon)    |   <span class="cm">REST API, job queue, scheduler</span>
+   |                  |   <span class="cm">Auth, RBAC, audit, metrics</span>
+   |  10 providers    |   <span class="cm">Carbon, cost, webhooks, secrets</span>
+   +-----+------------+
+         |  <span class="cm">Exported VMDK / VHD / RAW disk image</span>
+   +-----v-----------+
+   |   <span class="fn">h2kvmctl</span>       |   <span class="cm">hyper2kvm — disk conversion + guest fixes</span>
+   |   (Python)       |   <span class="cm">VMCraft engine (qemu-nbd, no libguestfs)</span>
+   |                  |   <span class="cm">fstab, initramfs, VirtIO, GRUB, SELinux</span>
+   |   <span class="fn">zkvm</span> (Go TUI)  |   <span class="cm">Interactive terminal UI</span>
+   +-----+------------+
+         |  <span class="cm">QCOW2 + libvirt XML or KubeVirt YAML</span>
+   +-----v-----------+
+   |  Deploy Target   |   <span class="cm">KVM/libvirt or KubeVirt/Kubernetes</span>
+   +------------------+
+    </pre>
+  </div>
+</div>
+
+<!-- PAGE 7: Carbon, Cost & Scheduling -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Carbon, Cost <span>&amp; Scheduling</span></h2>
+  <p class="sub">Enterprise features no competitor offers.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Carbon-Aware Scheduling</h4>
+      <ul>
+        <li><strong>CarbonProvider port:</strong> Fetches real-time grid carbon intensity from ElectricityMap or WattTime APIs</li>
+        <li><strong>12 grid zones:</strong> US East/West/Central, EU Central/West/North, APAC Singapore/Tokyo/Sydney/India, China Beijing/Shanghai</li>
+        <li><strong>Thresholds:</strong> Excellent (&lt;100 gCO2/kWh), Good (&lt;200), Moderate (&lt;400), Poor (&lt;600)</li>
+        <li><strong>Scheduling:</strong> Delay migration jobs until carbon intensity drops below threshold</li>
+        <li><strong>Forecasting:</strong> GetForecast returns hourly predictions — schedule for greenest window</li>
+        <li><strong>Reporting:</strong> GenerateCarbonReport shows CO2 saved by scheduling optimally</li>
+        <li><strong>ESG compliance:</strong> Documented carbon savings for sustainability reporting</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Cost Estimation</h4>
+      <ul>
+        <li><strong>CostCalculator port:</strong> Estimates cloud storage and transfer costs per migration</li>
+        <li><strong>6 cloud providers:</strong> S3, Azure Blob, GCS, OCI, Backblaze, Wasabi</li>
+        <li><strong>Storage tiers:</strong> S3 Standard/IA/Glacier, Azure Hot/Cool/Archive, GCS Standard/Nearline/Coldline</li>
+        <li><strong>EstimateCost:</strong> Per-VM cost including storage, transfer, API calls</li>
+        <li><strong>CompareProviders:</strong> Side-by-side cost comparison across clouds</li>
+        <li><strong>ProjectYearlyCost:</strong> Annual cost projection for ongoing storage</li>
+        <li><strong>EstimateExportSize:</strong> Predicted export size based on disk, format, snapshots</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Advanced Scheduling</h4>
+      <ul>
+        <li><strong>Cron expressions:</strong> Standard 5-field cron for recurring jobs</li>
+        <li><strong>Time windows:</strong> Restrict execution to off-peak hours (e.g., 2AM-6AM)</li>
+        <li><strong>Job dependencies:</strong> DAG-based — job B runs only after job A succeeds</li>
+        <li><strong>Priority queues:</strong> 0 (lowest) to 100 (highest) — critical VMs first</li>
+        <li><strong>Retry policies:</strong> Max retries, exponential backoff, retry delay</li>
+        <li><strong>Concurrency limits:</strong> Max parallel exports per provider</li>
+        <li><strong>TriggerNow:</strong> Manual override to run scheduled job immediately</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Observability Stack</h4>
+      <ul>
+        <li><strong>Prometheus metrics:</strong> /metrics endpoint with job, export, provider metrics</li>
+        <li><strong>Structured logging:</strong> JSON format with trace IDs for request correlation</li>
+        <li><strong>Audit trail:</strong> Every action logged: who, what, when, from where</li>
+        <li><strong>OpenTelemetry:</strong> Distributed tracing via daemon/tracing</li>
+        <li><strong>Dashboard:</strong> React web UI (hypersdk-dashboard) for real-time monitoring</li>
+        <li><strong>Grafana-ready:</strong> Pre-built dashboard templates for common metrics</li>
+        <li><strong>Alerting:</strong> Webhook notifications integrate with PagerDuty/Slack/Teams</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Carbon-Aware Scheduling Interface</h3>
+  <pre>
+<span class="kw">type</span> <span class="tp">CarbonProvider</span> <span class="kw">interface</span> {
+    <span class="fn">GetCurrentIntensity</span>(zone <span class="tp">string</span>) (*<span class="tp">domain.CarbonIntensity</span>, <span class="tp">error</span>)
+    <span class="fn">GetForecast</span>(zone <span class="tp">string</span>, hours <span class="tp">int</span>) ([]<span class="tp">domain.CarbonForecast</span>, <span class="tp">error</span>)
+    <span class="fn">GetGridStatus</span>(zone <span class="tp">string</span>, threshold <span class="tp">float64</span>) (*<span class="tp">domain.GridStatus</span>, <span class="tp">error</span>)
+    <span class="fn">ListZones</span>() ([]<span class="tp">string</span>, <span class="tp">error</span>)
+}
+
+<span class="kw">type</span> <span class="tp">CarbonScheduler</span> <span class="kw">interface</span> {
+    <span class="fn">GetCarbonStatus</span>(zone <span class="tp">string</span>, threshold <span class="tp">float64</span>) (*<span class="tp">domain.GridStatus</span>, <span class="tp">error</span>)
+    <span class="fn">GenerateCarbonReport</span>(jobID <span class="tp">string</span>, start, end <span class="tp">time.Time</span>, dataSizeGB <span class="tp">float64</span>, zone <span class="tp">string</span>) (*<span class="tp">domain.CarbonReport</span>, <span class="tp">error</span>)
+    <span class="fn">EstimateCarbonSavings</span>(zone <span class="tp">string</span>, dataSizeGB <span class="tp">float64</span>, durationHours <span class="tp">float64</span>) (<span class="kw">map</span>[<span class="tp">string</span>]<span class="kw">interface</span>{}, <span class="tp">error</span>)
+}
+  </pre>
+</div>
+
+<!-- PAGE 8: Why This Architecture Matters -->
+<div class="page page-light">
+  <h2 class="st">Why This Architecture <span>Matters</span></h2>
+  <p class="sub">Technical advantages of hexagonal design for enterprise migration.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Add a New Provider in Hours, Not Weeks</h4>
+      <p>Implement <code>ComputeProvider</code> + <code>ExportProvider</code> (6-8 methods). Register in <code>providers/registry.go</code>. Done. No changes to daemon, scheduler, API, or any other code. The hexagonal boundary means new providers are isolated, testable, and independently deployable.</p>
+    </div>
+    <div class="card">
+      <h4>Swap Any Adapter Without Risk</h4>
+      <p>Replace SQLite with PostgreSQL? Implement <code>JobStore</code> interface. Switch from file-based secrets to HashiCorp Vault? Implement <code>SecretManager</code>. Replace Prometheus with Datadog? Implement <code>SystemMetrics</code>. Business logic never changes.</p>
+    </div>
+    <div class="card">
+      <h4>Domain Logic Is 100% Testable</h4>
+      <p><code>internal/domain</code> has zero external dependencies — it's pure Go structs with validation logic. Every port interface can be mocked trivially. Integration tests use real adapters. Unit tests use mocks. Full coverage without infrastructure.</p>
+    </div>
+    <div class="card">
+      <h4>Enterprise-Grade Security</h4>
+      <p>RBAC with 3 roles (admin/operator/viewer), 6 actions, resource-level permissions. JWT + API key auth. Secret rotation. Full audit trail (SOX/HIPAA-ready). TLS everywhere. Rate limiting per user and endpoint. All via clean port interfaces.</p>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="stat-box card"><div class="num">70+</div><div class="label">Domain types<br>(zero external deps)</div></div>
+    <div class="stat-box card"><div class="num">17+</div><div class="label">Port interfaces<br>(clean contracts)</div></div>
+    <div class="stat-box card"><div class="num">10</div><div class="label">Cloud provider<br>adapters</div></div>
+    <div class="stat-box card"><div class="num">8</div><div class="label">CLI binaries<br>(purpose-built)</div></div>
+  </div>
+
+  <div class="verdict">
+    <h3>Architecture Summary</h3>
+    <p style="font-size:0.95em;">
+      <strong>Domain:</strong> 70+ pure Go types — Job, Schedule, VM, Carbon, Cost, RBAC, Audit, Webhook, Secret<br>
+      <strong>Ports:</strong> 17+ interfaces — ComputeProvider, ExportProvider, JobStore, CarbonProvider, CostCalculator, AuthManager...<br>
+      <strong>Adapters:</strong> 10 cloud providers + daemon services (API, scheduler, store, auth, metrics, webhooks, secrets, audit)<br>
+      <strong>Result:</strong> Add providers in hours. Swap adapters without risk. Test everything. Scale to enterprise.
+    </p>
+  </div>
+
+  <div class="footer"><p>hypersdk — Multi-Cloud VM Export Platform | Hexagonal Architecture | Proprietary (Zyvor AI Labs) | github.com/ssahani/hypersdk</p></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+# Photon OS 5.0 AMI → KVM Migration
+#
+# Download:
+#   wget https://packages.vmware.com/photon/5.0/GA/ami/photon-ami-5.0-dde71ec57.x86_64.tar.gz
+#   tar xzf photon-ami-5.0-dde71ec57.x86_64.tar.gz
+#
+# Run:
+#   sudo h2kvmctl --config test-confs/photon-ami-test.yaml
+
+command: local
+vmdk: /home/ssahani/vmware/photon-ami/photon-ami-5.0-dde71ec57.x86_64.raw
+
+output_dir: ./out
+to_output: photon-ami.qcow2
+out_format: qcow2
+compress: true
+
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+emit_domain_xml: true
+vm_name: photon-ami
+memory: 2048
+vcpus: 2
+headless: true
+
+libvirt_test: true
+timeout: 45
+keep_domain: false

@@ -1,0 +1,48 @@
+# Arch Linux 64-bit - Universal Filesystem Test
+# Tests: Btrfs, systemd-boot, modern filesystem layout
+
+cmd: local
+
+# Source VMDK
+vmdk: /home/ssahani/Downloads/VMs/extracted/arch/64bit/arch-64.vmdk
+
+# Output Configuration
+output_dir: /home/ssahani/tt/hyper2kvm/out/arch-test
+to_output: /home/ssahani/tt/hyper2kvm/out/arch-test/arch-64.qcow2
+out_format: qcow2
+compress: true
+workdir: /home/ssahani/tt/hyper2kvm/out/arch-test/work
+
+# Core Linux Fixes
+fstab_fixes_enable: true
+fstab_mode: stabilize-all
+fstab_prefer_partuuid: true  # Arch often uses Btrfs with subvolumes
+fstab_optimize_options: true
+
+grub_fixes_enable: true
+initramfs_regen_enable: true
+initramfs_regen_force: true
+
+# VirtIO modules for initramfs
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+  - nvme
+
+# Network fixes
+network_fixes_enable: true
+
+# Libvirt XML generation
+libvirt_xml_generate: true
+libvirt_vm_name: arch-linux-64
+libvirt_memory_mb: 4096
+libvirt_vcpus: 2
+libvirt_disk_bus: virtio
+
+# Reporting
+report: /home/ssahani/tt/hyper2kvm/out/arch-test/migration-report.md
+log_file: /home/ssahani/tt/hyper2kvm/out/arch-test/migration.log
+verbose: 2
+dry_run: false

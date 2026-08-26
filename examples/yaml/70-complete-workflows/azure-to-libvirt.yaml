@@ -1,0 +1,77 @@
+# ============================================
+# End-to-End: Azure VM → libvirt
+# ============================================
+# Exports a VM from Azure (snapshot → managed disk → SAS download),
+# converts to qcow2, applies guest fixes, generates libvirt XML.
+#
+# Pipeline:
+#   Azure VM → snapshot → SAS URL download → qcow2
+#   → guest fixes → libvirt XML → boot test
+#
+# Prerequisites:
+#   pip install hyper2kvm[azure]
+#   # Or: pip install azure-identity azure-mgmt-compute azure-mgmt-network \
+#   #       azure-mgmt-resource azure-storage-blob
+#   az login   # Azure CLI login
+#
+# Usage:
+#   sudo -E h2kvmctl --config examples/yaml/70-complete-workflows/azure-to-libvirt.yaml
+# ============================================
+
+cmd: azure
+
+# ── Azure connection ──
+# Uses DefaultAzureCredential (az login, managed identity, or env vars)
+# Set these env vars if not using az login:
+#   export AZURE_SUBSCRIPTION_ID=your-subscription-id
+#   export AZURE_TENANT_ID=your-tenant-id
+#   export AZURE_CLIENT_ID=your-client-id
+#   export AZURE_CLIENT_SECRET=your-client-secret
+azure_subscription: your-subscription-id
+azure_resource_group: my-resource-group
+
+# ── VM to export ──
+azure_vm_names:
+  - my-azure-vm
+
+# ── Export settings ──
+azure_disks: all                   # all | os | data
+azure_consistency: crash_consistent  # crash_consistent | best_effort_quiesce
+azure_use_snapshots: true
+azure_keep_snapshots: false        # Delete snapshots after export
+azure_sas_duration: 3600           # SAS URL validity (seconds)
+
+# ── Disk processing ──
+output_dir: ./output-azure
+flatten: true
+to_output: azure-vm.qcow2
+out_format: qcow2
+compress: true
+
+# ── Guest fixes ──
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: false         # Not needed for Azure VMs
+
+# ── libvirt domain XML ──
+emit_domain_xml: true
+virsh_define: true
+vm_name: azure-vm
+memory: 4096
+vcpus: 2
+uefi: true
+machine: q35
+disk_bus: virtio
+disk_cache: none
+net_model: virtio
+libvirt_network: default
+serial_console: true
+graphics: vnc
+guest_os: linux
+
+# ── Boot test ──
+libvirt_test: true
+keep_domain: true
+timeout: 120
+
+verbose: 1

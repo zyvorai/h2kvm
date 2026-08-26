@@ -1,0 +1,248 @@
+# Government FedRAMP High Migration
+#
+# Scenario: Migrating federal government system to FedRAMP High authorized cloud
+# Industry: Government / Public Sector
+# Compliance: FedRAMP High, FISMA High, NIST 800-53 Rev 5
+#
+# Requirements:
+# - FIPS 140-2 validated cryptography
+# - Multi-factor authentication (PIV/CAC)
+# - Continuous monitoring (SIEM integration)
+# - Incident response procedures
+# - Boundary protection (firewall, IDS/IPS)
+# - Personnel security clearances (must be US citizens)
+# - Supply chain risk management
+# - Annual security assessments (3PAO)
+#
+# VM Profile:
+# - OS: RHEL 9.3 (DISA STIG-hardened)
+# - Application: Federal case management system
+# - Database: PostgreSQL 15 (FIPS mode)
+# - Classification: CUI (Controlled Unclassified Information)
+#
+
+# Migration mode
+cmd: vsphere
+
+# vCenter connection (on-premises federal data center)
+vcenter: vcenter.agency.gov
+vc_user: ${VCENTER_ADMIN}  # Must have SECRET clearance
+vc_password_env: VC_PASSWORD
+dc_name: FedDC-1
+cluster: IL4-Cluster  # Impact Level 4
+
+# Source VM
+vs_vm_name: casemgmt-prod-01
+vs_action: export-vm
+
+# Output (FIPS-encrypted storage)
+output_dir: /secure/fedramp-migrations/casemgmt
+out_format: raw  # For LUKS FIPS wrapper
+compress: false
+
+# Audit logging (required for FedRAMP)
+verbose: 2
+log_file: /var/log/fedramp-migrations/casemgmt-{timestamp}.log
+report: /secure/fedramp-migrations/casemgmt/migration-authority-to-operate.md
+
+# Guest OS fixes (RHEL 9 DISA STIG)
+regen_initramfs: true
+fstab_mode: stabilize-all
+# grub is auto-handled
+
+# Network configuration
+# CRITICAL: Government network segmentation
+network_mode: preserve
+
+# SELinux (NIST 800-53 AC-6 - Least Privilege)
+preserve_selinux: true  # Must be in enforcing mode
+
+# Libvirt domain configuration
+domain_name: casemgmt-prod-01-fedramp
+domain_memory: 32768  # 32GB
+domain_vcpus: 8
+domain_cpu_mode: host-passthrough
+
+# Storage (FIPS-compliant)
+disk_bus: virtio
+disk_cache: none  # NIST 800-53 requirement
+disk_io: native
+
+# Network (government segment)
+nic_model: virtio
+libvirt_network: br-gov-cui  # CUI network segment
+# Firewall: Only HTTPS 443 (TLS 1.3 + FIPS ciphers)
+
+# FedRAMP High Security Controls (NIST 800-53 Rev 5)
+#
+# AC (Access Control)
+# - AC-2: Account Management (Automated)
+# - AC-3: Access Enforcement (RBAC via SELinux)
+# - AC-6: Least Privilege (Capability-based)
+# - AC-17: Remote Access (VPN + PIV)
+#
+# AU (Audit and Accountability)
+# - AU-2: Audit Events (auditd comprehensive rules)
+# - AU-3: Content of Audit Records (syslog to SIEM)
+# - AU-6: Audit Review and Analysis (Splunk)
+# - AU-9: Protection of Audit Information (write-once storage)
+# - AU-11: Audit Record Retention (7 years)
+#
+# CM (Configuration Management)
+# - CM-2: Baseline Configuration (Ansible playbooks)
+# - CM-3: Configuration Change Control (CAB approval required)
+# - CM-6: Configuration Settings (DISA STIG)
+# - CM-7: Least Functionality (minimal install)
+#
+# IA (Identification and Authentication)
+# - IA-2: User Identification (PIV/CAC required)
+# - IA-2(1): Multi-Factor Authentication (mandatory)
+# - IA-2(12): PIV Credentials (FIPS 201-2)
+# - IA-5: Authenticator Management (15-char minimum)
+#
+# SC (System and Communications Protection)
+# - SC-7: Boundary Protection (dedicated firewalls)
+# - SC-8: Transmission Confidentiality (TLS 1.3 only)
+# - SC-12: Cryptographic Key Management (FIPS 140-2 Module)
+# - SC-13: Cryptographic Protection (FIPS-approved algorithms)
+# - SC-28: Protection of Information at Rest (LUKS FIPS)
+#
+# SI (System and Information Integrity)
+# - SI-2: Flaw Remediation (30-day patching SLA)
+# - SI-3: Malicious Code Protection (ClamAV + McAfee)
+# - SI-4: System Monitoring (IDS/IPS - Snort)
+# - SI-7: Software Integrity (AIDE + RPM signatures)
+
+# Post-migration FIPS configuration
+#
+# 1. Enable FIPS mode
+#    fips-mode-setup --enable
+#    reboot
+#
+# 2. Verify FIPS status
+#    fips-mode-setup --check
+#    # Output: "FIPS mode is enabled."
+#
+# 3. LUKS encryption with FIPS
+#    cryptsetup luksFormat --type luks2 \
+#      --pbkdf pbkdf2 \
+#      --cipher aes-xts-plain64 \
+#      --key-size 256 \
+#      --hash sha256 \
+#      /dev/vg-gov/casemgmt-prod-01
+#
+# 4. OpenSSL FIPS provider
+#    openssl fipsinstall -out /etc/pki/tls/fipsmodule.cnf \
+#      -module /usr/lib64/ossl-modules/fips.so
+#
+# 5. SSH FIPS configuration
+#    # /etc/ssh/sshd_config
+#    Ciphers aes128-gcm@openssh.com,aes256-gcm@openssh.com
+#    MACs hmac-sha2-256,hmac-sha2-512
+#    KexAlgorithms ecdh-sha2-nistp256,ecdh-sha2-nistp384
+#
+# 6. TLS FIPS ciphers (Apache/NGINX)
+#    SSLCipherSuite ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256
+#    SSLProtocol -all +TLSv1.3
+
+# Validation tests
+test_boot: true
+test_timeout: 600
+
+# Migration authorization
+#
+# Change Control: CCB-2026-0045
+# Authority to Operate (ATO): Pending migration completion
+# Authorized by:
+#   - CISO (Chief Information Security Officer)
+#   - Authorizing Official (AO)
+#   - 3PAO (Third-Party Assessment Organization)
+#
+# Migration window: Sunday 1 AM - 5 AM (4-hour window)
+# Notification: 30-day advance notice to:
+#   - FedRAMP PMO
+#   - Agency stakeholders
+#   - Continuous monitoring team
+
+# Post-migration validation (FedRAMP requirements)
+#
+# 1. Functional testing
+#    - Application startup
+#    - Database connectivity
+#    - Authentication (PIV/CAC)
+#    - Authorization (RBAC)
+#    - Data integrity
+#
+# 2. Security testing
+#    - Nessus vulnerability scan (SCAP-compliant)
+#    - Penetration testing (CISA approved testers)
+#    - Configuration verification (DISA STIG checklist)
+#    - FIPS validation (fips-mode-setup --check)
+#    - Audit log verification (auditd rules)
+#
+# 3. Compliance verification
+#    - NIST 800-53 control assessment
+#    - POA&M updates (Plan of Action & Milestones)
+#    - Security Assessment Report (SAR)
+#    - 3PAO attestation letter
+#    - Continuous monitoring dashboard
+#
+# 4. Performance baseline
+#    - Response time: < 3s
+#    - Concurrent users: 500
+#    - Database queries: < 100ms
+#
+# 5. Disaster recovery test
+#    - RTO: 4 hours
+#    - RPO: 1 hour
+#    - Failover to secondary site
+
+# Continuous monitoring
+#
+# SIEM integration: Splunk Enterprise Security
+# - Failed login attempts
+# - Privilege escalation
+# - File integrity changes (AIDE)
+# - Network connections (firewall logs)
+# - System calls (auditd)
+# - Malware detection (ClamAV/McAfee)
+#
+# Automated scanning:
+# - Nessus weekly scans
+# - OpenSCAP daily configuration checks
+# - AIDE hourly file integrity checks
+#
+# Incident response:
+# - 15-minute detection SLA
+# - 1-hour notification SLA
+# - US-CERT reporting (if applicable)
+
+# Documentation requirements
+#
+# Required artifacts for ATO package:
+# 1. System Security Plan (SSP)
+# 2. Privacy Impact Assessment (PIA)
+# 3. Security Assessment Report (SAR)
+# 4. Plan of Action & Milestones (POA&M)
+# 5. Incident Response Plan
+# 6. Configuration Management Plan
+# 7. Continuous Monitoring Strategy
+# 8. Contingency Plan (Disaster Recovery)
+# 9. Rules of Behavior
+# 10. Security Awareness Training records
+# 11. This migration configuration (evidence)
+# 12. Post-migration security scan results
+# 13. Penetration test report
+# 14. Change control ticket (CCB-2026-0045)
+
+# Supply chain security
+#
+# All software must be from approved sources:
+# - RHEL: Red Hat official repositories
+# - PostgreSQL: PGDG repositories (signed packages)
+# - OpenSSL: FIPS-validated module
+# - Kernel: Signed by Red Hat
+#
+# Package verification:
+#   rpm --checksig <package>
+#   rpm -qa --qf '%{NAME} %{SIGPGP:pgpsig}\n' | grep -v gpg

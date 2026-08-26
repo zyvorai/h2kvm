@@ -1,0 +1,154 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hyper2kvm-pvc-cleanup
+  namespace: hyper2kvm-workers
+  labels:
+    app: hyper2kvm-pvc-cleanup
+    component: maintenance
+spec:
+  schedule: "0 2 * * *"  # Daily at 2am
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          labels:
+            app: hyper2kvm-pvc-cleanup
+            component: maintenance
+        spec:
+          serviceAccountName: hyper2kvm-pvc-cleanup
+          restartPolicy: OnFailure
+          containers:
+          - name: pvc-cleanup
+            image: bitnami/kubectl:latest
+            env:
+            - name: MAX_AGE_DAYS
+              value: "7"
+            - name: DRY_RUN
+              value: "true"
+            - name: NAMESPACES
+              value: "hyper2kvm-workers,hyper2kvm-system"
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "=== Hyper2KVM PVC Cleanup ==="
+              echo "Mode: $([ \"$DRY_RUN\" = 'true' ] && echo 'DRY RUN (no deletions)' || echo 'LIVE (will delete)')"
+              echo "Max age: ${MAX_AGE_DAYS} days"
+              echo "Namespaces: ${NAMESPACES}"
+              echo ""
+
+              CUTOFF_EPOCH=$(date -d "-${MAX_AGE_DAYS} days" +%s 2>/dev/null || date -v-${MAX_AGE_DAYS}d +%s)
+              CANDIDATES=0
+              TOTAL_CHECKED=0
+
+              IFS=',' read -ra NS_LIST <<< "$NAMESPACES"
+              for NS in "${NS_LIST[@]}"; do
+                NS=$(echo "$NS" | tr -d ' ')
+                echo "--- Scanning namespace: ${NS} ---"
+
+                # Get all PVCs in the namespace
+                PVCS=$(kubectl get pvc -n "$NS" -o json 2>/dev/null || echo '{"items":[]}')
+
+                # Get pods with volume claims in this namespace
+                BOUND_PVCS=$(kubectl get pods -n "$NS" -o json 2>/dev/null | \
+                  python3 -c "
+              import json, sys
+              data = json.load(sys.stdin)
+              pvcs = set()
+              for pod in data.get('items', []):
+                for vol in pod.get('spec', {}).get('volumes', []):
+                  claim = vol.get('persistentVolumeClaim', {}).get('claimName')
+                  if claim:
+                    pvcs.add(claim)
+              for p in pvcs:
+                print(p)
+              " 2>/dev/null || true)
+
+                echo "$PVCS" | python3 -c "
+              import json, sys, datetime
+
+              cutoff_epoch = int(${CUTOFF_EPOCH})
+              dry_run = '${DRY_RUN}'
+              bound_pvcs_str = '''${BOUND_PVCS}'''
+              bound_pvcs = set(bound_pvcs_str.strip().split('\n')) if bound_pvcs_str.strip() else set()
+
+              data = json.load(sys.stdin)
+              candidates = 0
+              for pvc in data.get('items', []):
+                name = pvc['metadata']['name']
+                ns = pvc['metadata']['namespace']
+                creation = pvc['metadata'].get('creationTimestamp', '')
+                phase = pvc.get('status', {}).get('phase', 'Unknown')
+
+                # Parse creation timestamp
+                try:
+                  dt = datetime.datetime.strptime(creation, '%Y-%m-%dT%H:%M:%SZ')
+                  created_epoch = int(dt.timestamp())
+                except:
+                  continue
+
+                # Check if PVC is old enough and not bound to any pod
+                if created_epoch < cutoff_epoch and name not in bound_pvcs:
+                  candidates += 1
+                  age_days = (datetime.datetime.utcnow() - dt).days
+                  print(f'  CANDIDATE: {ns}/{name} (phase={phase}, age={age_days}d)')
+
+              if candidates == 0:
+                print('  No cleanup candidates found.')
+              else:
+                print(f'  Found {candidates} candidate(s) for cleanup.')
+                if dry_run == 'true':
+                  print('  DRY RUN: No PVCs were deleted. Set DRY_RUN=false to enable deletion.')
+              " 2>/dev/null || echo "  Error processing PVCs in namespace ${NS}"
+
+                echo ""
+              done
+
+              echo "=== PVC Cleanup Complete ==="
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hyper2kvm-pvc-cleanup
+  namespace: hyper2kvm-workers
+  labels:
+    app: hyper2kvm-pvc-cleanup
+    component: maintenance
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: hyper2kvm-pvc-cleanup
+  labels:
+    app: hyper2kvm-pvc-cleanup
+    component: maintenance
+rules:
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list", "delete"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: hyper2kvm-pvc-cleanup
+  labels:
+    app: hyper2kvm-pvc-cleanup
+    component: maintenance
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hyper2kvm-pvc-cleanup
+subjects:
+- kind: ServiceAccount
+  name: hyper2kvm-pvc-cleanup
+  namespace: hyper2kvm-workers

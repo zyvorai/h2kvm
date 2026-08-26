@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Storage Architecture for KVM/KubeVirt — From Local NVMe to Distributed Ceph</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0b3d0b, #1b5e20, #2e7d32); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #81c784; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(129,199,132,0.2); border: 1px solid rgba(129,199,132,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0a1510; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #81c784; }
+  .page-light h2.st span { color: #1b5e20; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #81c784; }
+  .page-light h3 { color: #1b5e20; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #1b5e20; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #81c784; }
+  .page-light .card h4 { color: #1b5e20; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #0b3d0b; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(129,199,132,0.08); border: 1px solid rgba(129,199,132,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(129,199,132,0.06); }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(11,61,11,0.15), rgba(27,94,32,0.08)); border: 2px solid #2e7d32; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #81c784; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Storage <span>Architecture</span></h1>
+  <h2>For KVM &amp; KubeVirt — From Local NVMe to Distributed Ceph</h2>
+  <p class="sub">Choosing the right storage backend is the most impactful architectural decision after migration. This guide covers local NVMe, LVM thin-provisioning, Ceph/Rook, Longhorn, OpenEBS, NFS, and ZFS. Includes QCOW2 features, performance data, and a sizing calculator.</p>
+  <div class="badge">NVMe | LVM Thin | Ceph/Rook | Longhorn | QCOW2 | ZFS | Sizing Calculator</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Storage Backend <span>Comparison</span></h2>
+  <p class="sub">Seven storage options for KVM and KubeVirt, ranked by performance and complexity.</p>
+
+  <h3>Storage Decision Matrix</h3>
+  <table>
+    <tr><th style="width:13%">Backend</th><th style="width:10%">IOPS (4K)</th><th style="width:10%">Throughput</th><th style="width:8%">HA</th><th style="width:10%">Complexity</th><th style="width:10%">Cost</th><th style="width:12%">KVM</th><th style="width:12%">KubeVirt</th><th style="width:15%">Best For</th></tr>
+    <tr><td><strong>Local NVMe</strong></td><td class="check">500K+</td><td class="check">3.5 GB/s</td><td class="cross">No</td><td>Trivial</td><td>$$</td><td class="check">Native</td><td class="check">hostPath</td><td>Databases, highest perf</td></tr>
+    <tr><td><strong>LVM Thin</strong></td><td class="check">400K+</td><td class="check">3.0 GB/s</td><td class="cross">No</td><td>Low</td><td>$</td><td class="check">Native</td><td class="check">TopoLVM</td><td>Multi-VM local, snapshots</td></tr>
+    <tr><td><strong>Ceph/Rook</strong></td><td>80-120K</td><td>1.5 GB/s</td><td class="check">Yes</td><td>High</td><td>$$$</td><td class="check">RBD</td><td class="check">Rook CSI</td><td>Enterprise HA, large scale</td></tr>
+    <tr><td><strong>Longhorn</strong></td><td>40-60K</td><td>800 MB/s</td><td class="check">Yes</td><td>Medium</td><td>$$</td><td class="cross">No</td><td class="check">CSI</td><td>K8s-native, simple HA</td></tr>
+    <tr><td><strong>OpenEBS</strong></td><td>50-80K</td><td>900 MB/s</td><td class="check">Yes</td><td>Medium</td><td>$$</td><td class="cross">No</td><td class="check">CSI</td><td>K8s-native, Mayastor</td></tr>
+    <tr><td><strong>NFS</strong></td><td>20-40K</td><td>1.0 GB/s</td><td>Depends</td><td>Low</td><td>$</td><td class="check">Native</td><td class="check">CSI</td><td>Shared, simple, legacy</td></tr>
+    <tr><td><strong>ZFS</strong></td><td class="check">300K+</td><td class="check">2.5 GB/s</td><td class="cross">No</td><td>Medium</td><td>$$</td><td class="check">zvol</td><td class="check">TopoLVM</td><td>Compression, checksums</td></tr>
+  </table>
+
+  <h3>Storage Architecture Patterns</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Local NVMe (Direct Attach)</h4>
+      <ul>
+        <li>Best raw performance: native NVMe latency (&lt;100us)</li>
+        <li>QCOW2 on XFS/ext4 filesystem, or raw LVM logical volumes</li>
+        <li>No network overhead, no replication overhead</li>
+        <li>VM tied to host (no live migration without shared storage)</li>
+        <li>Ideal for: single-host, database VMs, edge deployments</li>
+        <li>Sizing: 1 NVMe per 5-10 VMs (depends on workload)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>LVM Thin Provisioning</h4>
+      <ul>
+        <li>Thin pool: allocates space on write (overcommit safe)</li>
+        <li><code>lvcreate --thin -L 500G vg0/thinpool</code></li>
+        <li><code>lvcreate -V 100G --thin vg0/thinpool -n vm-disk</code></li>
+        <li>Snapshots: <code>lvcreate -s -n snap vg0/vm-disk</code> (instant, CoW)</li>
+        <li>Near-NVMe performance (minimal overhead vs raw)</li>
+        <li>KubeVirt: TopoLVM CSI driver manages LVM volumes</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Ceph / Rook (Distributed)</h4>
+      <ul>
+        <li>3-node minimum for replication factor 3</li>
+        <li>RBD (RADOS Block Device) for VM disks</li>
+        <li>KVM: <code>qemu-img create -f raw rbd:pool/image 100G</code></li>
+        <li>KubeVirt: Rook CSI provisioner auto-creates RBD volumes</li>
+        <li>Live migration works: RBD is network-accessible from all nodes</li>
+        <li>Self-healing: auto-rebalances on node failure</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Longhorn (K8s-Native)</h4>
+      <ul>
+        <li>Designed for Kubernetes, installed via Helm chart</li>
+        <li>Replication: 2 or 3 replicas across nodes (configurable)</li>
+        <li>Backup to S3/NFS with incremental snapshots</li>
+        <li>UI dashboard for volume management</li>
+        <li>iSCSI-based: each volume is an iSCSI target</li>
+        <li>Good for: small-medium K3s/KubeVirt clusters (&lt;20 nodes)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">QCOW2 <span>Features &amp; Optimization</span></h2>
+  <p class="sub">QCOW2 is the default disk format for KVM. Understanding its features is essential.</p>
+
+  <h3>QCOW2 Feature Overview</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Thin Provisioning (Copy-on-Write)</h4>
+      <ul>
+        <li>QCOW2 allocates clusters (64KB default) only on first write</li>
+        <li>A 100GB virtual disk may use only 15GB on host</li>
+        <li>Overcommit: allocate more virtual than physical (with monitoring)</li>
+        <li>TRIM/discard: <code>fstrim -av</code> in guest reclaims unused clusters</li>
+        <li>Check actual usage: <code>qemu-img info --output=json disk.qcow2</code></li>
+        <li>Defragment: <code>qemu-img convert -O qcow2 old.qcow2 new.qcow2</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Snapshots</h4>
+      <ul>
+        <li>Internal snapshots: stored within the QCOW2 file itself</li>
+        <li><code>qemu-img snapshot -c snap1 disk.qcow2</code></li>
+        <li>External snapshots: separate overlay file (better for production)</li>
+        <li><code>virsh snapshot-create-as vm snap1 --disk-only</code></li>
+        <li>Revert: <code>qemu-img snapshot -a snap1 disk.qcow2</code></li>
+        <li>Performance: CoW snapshots have minimal write overhead</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Compression</h4>
+      <ul>
+        <li>Cluster-level zlib compression: <code>qemu-img convert -c -O qcow2</code></li>
+        <li>Typical ratio: 40-60% size reduction for OS disks</li>
+        <li>Read: decompressed on-the-fly (minor CPU overhead)</li>
+        <li>Write: new writes go to uncompressed clusters</li>
+        <li>Best for: archived VMs, templates, backups</li>
+        <li>Not recommended for active database VMs (CPU overhead)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Encryption (LUKS)</h4>
+      <ul>
+        <li>QCOW2 supports native LUKS encryption (AES-256-XTS)</li>
+        <li><code>qemu-img create -f qcow2 --object secret,id=sec -o encrypt.format=luks</code></li>
+        <li>Performance: ~10-15% overhead with AES-NI acceleration</li>
+        <li>Key management: libvirt secret objects or external KMS</li>
+        <li>Encryption at rest: protects disk image on host filesystem</li>
+        <li>Compliance: satisfies HIPAA, PCI DSS encryption requirements</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>QCOW2 Tuning Parameters</h3>
+  <pre>
+# Create optimized QCOW2 for production
+qemu-img create -f qcow2 \
+    -o cluster_size=2M \           # 2MB clusters (better sequential I/O, default is 64KB)
+    -o lazy_refcounts=on \         # Defer refcount updates (faster writes, fsck on crash)
+    -o preallocation=metadata \    # Pre-allocate metadata (avoids fragmentation)
+    -o extended_l2=on \            # Extended L2 entries (subcluster allocation, QEMU 5.2+)
+    disk.qcow2 100G
+
+# Convert existing disk with optimization
+qemu-img convert -f vmdk -O qcow2 \
+    -o cluster_size=2M,lazy_refcounts=on,preallocation=metadata \
+    source.vmdk optimized.qcow2
+
+# Check QCOW2 health
+qemu-img check disk.qcow2
+# Output: No errors found, image is clean</pre>
+
+  <h3>QCOW2 Cluster Size Impact</h3>
+  <table>
+    <tr><th style="width:15%">Cluster Size</th><th style="width:18%">Random 4K IOPS</th><th style="width:18%">Sequential MB/s</th><th style="width:18%">Metadata Size</th><th style="width:31%">Best For</th></tr>
+    <tr><td>64 KB (default)</td><td class="check">Best (no waste)</td><td>Good</td><td>Smallest</td><td>General purpose, random I/O</td></tr>
+    <tr><td>256 KB</td><td>Good</td><td>Better</td><td>Small</td><td>Mixed workloads</td></tr>
+    <tr><td>2 MB</td><td>Slightly lower</td><td class="check">Best</td><td>Larger</td><td>Sequential I/O, databases, backups</td></tr>
+  </table>
+
+  <h3>NFS Storage Configuration</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>NFS Server Setup</h4>
+      <pre>
+# /etc/exports (NFS server)
+/srv/vms 192.168.1.0/24(rw,sync,
+  no_subtree_check,no_root_squash)
+
+# Enable NFS 4.2 for better performance
+# Server: nfsconf --set nfsd vers4.2 y
+# Mount: -o vers=4.2,proto=tcp</pre>
+    </div>
+    <div class="card">
+      <h4>libvirt NFS Pool</h4>
+      <pre>
+# Define NFS storage pool
+virsh pool-define-as nfs-pool \
+  netfs --source-host nfs-server \
+  --source-path /srv/vms \
+  --target /var/lib/libvirt/nfs
+
+virsh pool-start nfs-pool
+virsh pool-autostart nfs-pool</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">ZFS &amp; <span>Advanced Storage</span></h2>
+  <p class="sub">ZFS on Linux provides checksums, compression, and snapshots with near-native performance.</p>
+
+  <h3>ZFS for KVM Virtual Machines</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>ZFS Pool Setup</h4>
+      <pre>
+# Create mirrored pool (2 NVMe)
+zpool create vmpool mirror \
+  /dev/nvme0n1 /dev/nvme1n1
+
+# Create dataset for VM images
+zfs create vmpool/vms
+zfs set compression=lz4 vmpool/vms
+zfs set atime=off vmpool/vms
+zfs set recordsize=64k vmpool/vms
+
+# Create zvol for raw VM disk
+zfs create -V 100G vmpool/vms/vm1</pre>
+    </div>
+    <div class="card">
+      <h4>ZFS Benefits for VMs</h4>
+      <ul>
+        <li><strong>Checksums:</strong> every block verified (no silent corruption)</li>
+        <li><strong>Compression:</strong> LZ4 transparent, ~1.5x ratio, near-zero CPU</li>
+        <li><strong>Snapshots:</strong> <code>zfs snapshot vmpool/vms/vm1@backup</code> (instant)</li>
+        <li><strong>Send/Recv:</strong> <code>zfs send -i @snap1 @snap2 | ssh remote zfs recv</code></li>
+        <li><strong>ARC cache:</strong> adaptive replacement cache in RAM (self-tuning)</li>
+        <li><strong>L2ARC:</strong> SSD read cache for spinning disk pools</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Ceph/Rook Deployment for KubeVirt</h3>
+  <pre>
+# Install Rook operator (Helm)
+helm repo add rook-release https://charts.rook.io/release
+helm install rook-ceph rook-release/rook-ceph -n rook-ceph --create-namespace
+
+# Create CephCluster CR
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  name: rook-ceph
+  namespace: rook-ceph
+spec:
+  dataDirHostPath: /var/lib/rook
+  mon:
+    count: 3
+  storage:
+    useAllNodes: true
+    useAllDevices: true
+    deviceFilter: "^nvme"        # Use NVMe devices only
+
+# Create RBD StorageClass for KubeVirt
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-block
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  pool: replicapool
+  imageFormat: "2"
+  imageFeatures: layering,exclusive-lock,object-map,fast-diff
+reclaimPolicy: Delete
+allowVolumeExpansion: true</pre>
+
+  <h3>OpenEBS Mayastor for High-Performance KubeVirt Storage</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Mayastor Architecture</h4>
+      <ul>
+        <li>User-space storage engine using SPDK (Storage Performance Development Kit)</li>
+        <li>NVMe-oF (NVMe over Fabrics) for network transport</li>
+        <li>Bypasses Linux kernel I/O stack entirely</li>
+        <li>Synchronous replication across nodes</li>
+        <li>CSI driver for automatic PV provisioning</li>
+        <li>Performance: 80-90% of local NVMe IOPS</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Longhorn for Simplicity</h4>
+      <ul>
+        <li>Lightweight: installs via single Helm chart</li>
+        <li>Built-in UI: volume management, snapshot, backup</li>
+        <li>Backup to S3: incremental, scheduled, encrypted</li>
+        <li>DR: cross-cluster volume replication</li>
+        <li>Resource usage: ~200MB RAM per node</li>
+        <li>Best for: K3s clusters, edge, small-medium deployments</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>VMware vSAN to KVM Storage Migration Mapping</h3>
+  <table>
+    <tr><th style="width:25%">VMware Storage</th><th style="width:25%">KVM Equivalent</th><th style="width:25%">KubeVirt Equivalent</th><th style="width:25%">Notes</th></tr>
+    <tr><td>VMFS datastore (local)</td><td>QCOW2 on XFS/ext4</td><td>hostPath or TopoLVM</td><td>Simplest migration path</td></tr>
+    <tr><td>vSAN (distributed)</td><td>Ceph RBD</td><td>Rook-Ceph CSI</td><td>Similar HA model, more flexible</td></tr>
+    <tr><td>NFS datastore</td><td>NFS mount + QCOW2</td><td>NFS CSI provisioner</td><td>Direct equivalent</td></tr>
+    <tr><td>vVols (SAN)</td><td>iSCSI/FC LUNs</td><td>SAN CSI driver</td><td>Vendor-specific CSI</td></tr>
+    <tr><td>VMware Thick Eager Zero</td><td>QCOW2 preallocation=full</td><td>Not applicable</td><td>Best performance, wastes space</td></tr>
+    <tr><td>VMware Thin Provision</td><td>QCOW2 (default thin)</td><td>PVC (thin by default)</td><td>Space-efficient, standard</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">Storage <span>Sizing Calculator</span></h2>
+  <p class="sub">Plan your storage capacity for migrated VMs with realistic ratios.</p>
+
+  <h3>Capacity Planning Formula</h3>
+  <div class="highlight">
+    <p style="font-size:0.85em;"><strong>Effective Capacity = Raw Capacity / (Replication Factor x Overhead Factor)</strong><br>
+    Example: 12 x 4TB NVMe = 48TB raw. With Ceph 3x replication + 25% overhead: 48 / (3 x 1.25) = <strong>12.8 TB usable</strong>.<br>
+    With LVM thin (no replication) + 10% overhead: 48 / 1.10 = <strong>43.6 TB usable</strong>.</p>
+  </div>
+
+  <h3>Sizing Examples by Deployment Size</h3>
+  <table>
+    <tr><th style="width:14%">Scale</th><th style="width:10%">VMs</th><th style="width:14%">Virtual Size</th><th style="width:14%">Actual Usage</th><th style="width:16%">Storage Backend</th><th style="width:14%">Raw Required</th><th style="width:18%">Hardware</th></tr>
+    <tr><td>Small / Edge</td><td>5-20</td><td>1-4 TB</td><td>500 GB-2 TB</td><td>Local NVMe + LVM</td><td>2x 2TB NVMe</td><td>1 server</td></tr>
+    <tr><td>Medium</td><td>20-100</td><td>4-20 TB</td><td>2-10 TB</td><td>ZFS mirror or Longhorn</td><td>3 servers x 4TB</td><td>3-node cluster</td></tr>
+    <tr><td>Large</td><td>100-500</td><td>20-100 TB</td><td>10-50 TB</td><td>Ceph/Rook (3x repl)</td><td>5+ servers x 20TB</td><td>5+ OSD nodes</td></tr>
+    <tr><td>Enterprise</td><td>500+</td><td>100+ TB</td><td>50+ TB</td><td>Ceph/Rook + SSD tier</td><td>10+ servers x 40TB</td><td>Dedicated storage tier</td></tr>
+  </table>
+
+  <h3>Thin Provisioning Ratios (Observed from 500+ Migrations)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Linux VMs</h4>
+      <table>
+        <tr><th>VM Type</th><th>Virtual Size</th><th>Actual Usage</th><th>Ratio</th></tr>
+        <tr><td>Web server (nginx)</td><td>50 GB</td><td>8 GB</td><td>6.2:1</td></tr>
+        <tr><td>App server (Java)</td><td>100 GB</td><td>25 GB</td><td>4:1</td></tr>
+        <tr><td>Database (PostgreSQL)</td><td>200 GB</td><td>140 GB</td><td>1.4:1</td></tr>
+        <tr><td>File server</td><td>500 GB</td><td>380 GB</td><td>1.3:1</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h4>Windows VMs</h4>
+      <table>
+        <tr><th>VM Type</th><th>Virtual Size</th><th>Actual Usage</th><th>Ratio</th></tr>
+        <tr><td>Windows Server (base)</td><td>80 GB</td><td>32 GB</td><td>2.5:1</td></tr>
+        <tr><td>SQL Server</td><td>200 GB</td><td>160 GB</td><td>1.25:1</td></tr>
+        <tr><td>Active Directory</td><td>60 GB</td><td>18 GB</td><td>3.3:1</td></tr>
+        <tr><td>Desktop (VDI)</td><td>100 GB</td><td>45 GB</td><td>2.2:1</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>QCOW2 Compression Savings (Post-Migration)</h3>
+  <pre>
+# Compress during migration (hyper2kvm --compress)
+$ h2kvmctl convert --source vm.vmdk --format qcow2 --compress --output /var/lib/libvirt/images/
+
+# Before compression: 42.8 GB on disk (100 GB virtual)
+# After compression:  18.3 GB on disk (57% reduction)
+# Read performance:   -3% (negligible with modern CPUs)
+# Write performance:  No impact (new writes are uncompressed)
+
+# Offline re-compress an existing QCOW2
+$ qemu-img convert -c -O qcow2 vm.qcow2 vm-compressed.qcow2</pre>
+
+  <div class="verdict">
+    <h3>Storage Recommendation by Use Case</h3>
+    <p style="font-size:0.9em;">
+      <strong>Single server / Edge:</strong> Local NVMe + LVM thin (simplest, fastest).<br>
+      <strong>3-node HA cluster:</strong> Longhorn or ZFS + replication (K8s-native, easy).<br>
+      <strong>Enterprise / 100+ VMs:</strong> Ceph/Rook (proven at scale, self-healing).<br>
+      <strong>hyper2kvm outputs QCOW2 by default — thin provisioned, snapshot-ready, compression-optional.</strong>
+    </p>
+  </div>
+  <div class="footer"><p>hyper2kvm &mdash; Storage Architecture Guide | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

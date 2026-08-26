@@ -1,0 +1,17 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 20-live-fix/live-fix-basic.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 20-live-fix/live-fix-basic.yaml
+
+command: live-fix
+host: 192.168.1.100
+user: root
+port: 22
+sudo: true
+fstab_mode: stabilize-all
+print_fstab: true
+regen_initramfs: true
+remove_vmware_tools: true
+no_backup: false
+verbose: 2

@@ -1,0 +1,354 @@
+# ==============================================================================
+# 🐧 Linux Initramfs Driver Injection Examples
+# ==============================================================================
+#
+# Demonstrates how to inject additional kernel modules into the initramfs
+# for Linux guests, similar to how Windows VirtIO drivers are injected.
+#
+# Usage:
+#   hyper2kvm --config 96-linux-initramfs-drivers-examples.yaml local
+#
+# Use Cases:
+#   ✅ Add hardware-specific network drivers (e1000e, ixgbe, mlx5_core)
+#   ✅ Add enterprise storage controllers (megaraid_sas, mpt3sas, hpsa)
+#   ✅ Add RAID modules (md_mod, raid0, raid1, raid456)
+#   ✅ Add filesystem drivers (ext4, xfs, btrfs)
+#   ✅ Add custom or out-of-tree drivers
+#
+# Why Add Drivers to Initramfs?
+#   - Ensures drivers load early during boot (before root filesystem mount)
+#   - Critical for storage controllers, encrypted volumes, and network boot
+#   - Prevents "kernel panic - not syncing: VFS: Unable to mount root fs"
+#
+# ==============================================================================
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 1: Basic - Add Single Network Driver (String Format)
+# ------------------------------------------------------------------------------------
+# Use case: Moving VM from VMware vmxnet3 to physical server with Intel NIC
+cmd: local
+vmdk: /path/to/vm-disk.vmdk
+output_dir: ./out
+to_output: server-ready.qcow2
+out_format: qcow2
+compress: true
+
+# Initramfs configuration
+regen_initramfs: true
+initramfs_add_drivers: "e1000e"  # Intel Gigabit Ethernet driver
+
+verbose: 2
+report: intel-nic-migration.md
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 2: Multiple Drivers (Space-Separated String)
+# ------------------------------------------------------------------------------------
+# Use case: Migrating to bare metal with specific hardware
+cmd: local
+vmdk: /path/to/rhel-vm.vmdk
+output_dir: ./out/rhel-baremetal
+to_output: rhel-baremetal.qcow2
+
+# Add multiple drivers for Dell PowerEdge server
+initramfs_add_drivers: "megaraid_sas bnx2x e1000e"
+# megaraid_sas: LSI/Broadcom RAID controller
+# bnx2x: Broadcom NetXtreme II 10 Gigabit Ethernet
+# e1000e: Intel Gigabit Ethernet fallback
+
+regen_initramfs: true
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 3: YAML List Format (Preferred for Readability)
+# ------------------------------------------------------------------------------------
+# Use case: Enterprise server with multiple hardware types
+cmd: local
+vmdk: /path/to/ubuntu-vm.vmdk
+output_dir: ./out/enterprise
+to_output: ubuntu-enterprise.qcow2
+
+# YAML list format (cleaner, easier to maintain)
+initramfs_add_drivers:
+  # Network drivers
+  - e1000e      # Intel Gigabit Ethernet
+  - ixgbe       # Intel 10 Gigabit Ethernet
+  - i40e        # Intel Ethernet Controller XL710 Family
+  - mlx5_core   # Mellanox ConnectX-4/5 Ethernet
+
+  # Storage controllers
+  - megaraid_sas  # LSI/Broadcom MegaRAID
+  - mpt3sas       # LSI SAS 3.0 HBA
+  - hpsa          # HP Smart Array controllers
+
+  # Additional storage
+  - nvme          # NVMe SSD support (already in default)
+  - ahci          # SATA AHCI support (already in default)
+
+regen_initramfs: true
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 4: Software RAID Configuration
+# ------------------------------------------------------------------------------------
+# Use case: VM moving to server with software RAID
+cmd: local
+vmdk: /path/to/debian-vm.vmdk
+output_dir: ./out/raid-server
+to_output: debian-raid-ready.qcow2
+
+initramfs_add_drivers:
+  # Core RAID support
+  - md_mod      # Multiple Devices driver (RAID core)
+  - raid0       # RAID 0 (striping)
+  - raid1       # RAID 1 (mirroring)
+  - raid10      # RAID 10 (striped mirrors)
+  - raid456     # RAID 4/5/6
+
+  # LVM support (often used with RAID)
+  - dm_mod      # Device mapper core (already in default)
+
+regen_initramfs: true
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 5: Encrypted Root Filesystem (LUKS/dm-crypt)
+# ------------------------------------------------------------------------------------
+# Use case: Enterprise VM with full disk encryption
+cmd: local
+vmdk: /path/to/encrypted-vm.vmdk
+output_dir: ./out/encrypted
+to_output: encrypted-server.qcow2
+
+initramfs_add_drivers:
+  - dm_crypt    # Device mapper crypto (already in default)
+  - xts         # XTS block cipher mode (already in default)
+  - aes_x86_64  # AES CPU instructions
+  - sha256      # SHA-256 hash
+  - algif_skcipher  # Kernel crypto API
+
+regen_initramfs: true
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 6: Advanced Storage - NVMe over Fabrics (NVMe-oF)
+# ------------------------------------------------------------------------------------
+# Use case: Modern data center with NVMe over RDMA/TCP
+cmd: local
+vmdk: /path/to/storage-vm.vmdk
+output_dir: ./out/nvmeof
+to_output: nvmeof-ready.qcow2
+
+initramfs_add_drivers:
+  # NVMe support
+  - nvme        # NVMe block device (already in default)
+  - nvme_core   # NVMe core driver
+  - nvme_fabrics  # NVMe over Fabrics
+  - nvme_rdma   # NVMe over RDMA
+  - nvme_tcp    # NVMe over TCP
+
+  # RDMA/InfiniBand support (if using NVMe-oF over RDMA)
+  - mlx5_core   # Mellanox ConnectX HCA
+  - mlx5_ib     # Mellanox InfiniBand
+  - ib_core     # InfiniBand core
+  - rdma_cm     # RDMA connection manager
+
+regen_initramfs: true
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 7: Specialized Filesystems
+# ------------------------------------------------------------------------------------
+# Use case: VM using advanced filesystems
+cmd: local
+vmdk: /path/to/suse-vm.vmdk
+output_dir: ./out/advanced-fs
+to_output: suse-btrfs.qcow2
+
+initramfs_add_drivers:
+  # Filesystems (may already be in default on some distros)
+  - btrfs       # Btrfs filesystem
+  - xfs         # XFS filesystem
+  - ext4        # ext4 filesystem
+
+  # Filesystem utilities
+  - crc32c      # CRC32C for btrfs
+  - zstd        # Zstandard compression
+
+regen_initramfs: true
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 8: Override Defaults Completely (Custom Driver List)
+# ------------------------------------------------------------------------------------
+# Use case: Minimal initramfs for specific hardware (advanced)
+#
+# NOTE: When you specify initramfs_add_drivers, hyper2kvm uses your list
+# and ADDS it to the defaults. The defaults include essential virtio drivers.
+# If you need ONLY your drivers (no defaults), use the offline_fixer API directly.
+#
+cmd: local
+vmdk: /path/to/minimal-vm.vmdk
+output_dir: ./out/minimal
+to_output: minimal-initramfs.qcow2
+
+# These will be ADDED to the defaults (virtio, nvme, ahci, etc.)
+initramfs_add_drivers:
+  - e1000e      # Only driver I need beyond defaults
+
+regen_initramfs: true
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 9: Multi-VM Batch with Per-VM Drivers
+# ------------------------------------------------------------------------------------
+# Use case: Converting multiple VMs with different target hardware
+cmd: local
+parallel_processing: true
+
+vms:
+  # VM 1: Dell PowerEdge with Broadcom NIC
+  - vmdk: /path/to/web-server.vmdk
+    to_output: web-server-dell.qcow2
+    initramfs_add_drivers:
+      - bnx2x
+      - megaraid_sas
+    regen_initramfs: true
+
+  # VM 2: HP ProLiant with Intel NICs
+  - vmdk: /path/to/db-server.vmdk
+    to_output: db-server-hp.qcow2
+    initramfs_add_drivers:
+      - e1000e
+      - ixgbe
+      - hpsa
+    regen_initramfs: true
+
+  # VM 3: Supermicro with Mellanox NICs
+  - vmdk: /path/to/storage-server.vmdk
+    to_output: storage-server-supermicro.qcow2
+    initramfs_add_drivers:
+      - mlx5_core
+      - nvme_rdma
+      - ib_core
+    regen_initramfs: true
+
+output_dir: ./out/batch-servers
+verbose: 2
+
+
+# ==============================================================================
+# COMMON DRIVER REFERENCE
+# ==============================================================================
+#
+# Network Drivers:
+#   e1000e        - Intel Gigabit Ethernet (1G)
+#   ixgbe         - Intel 10 Gigabit Ethernet
+#   i40e          - Intel Ethernet Controller XL710 Family (10/25/40G)
+#   ice           - Intel Ethernet Controller E800 Series
+#   igb           - Intel 82575/82576 Gigabit Ethernet
+#   mlx4_core     - Mellanox ConnectX-3
+#   mlx5_core     - Mellanox ConnectX-4/5/6 (10/25/40/50/100G)
+#   bnx2x         - Broadcom NetXtreme II 10 Gigabit
+#   tg3           - Broadcom Tigon3 Gigabit Ethernet
+#   r8169         - Realtek RTL8169/8168/8111
+#   vmxnet3       - VMware vmxnet3 (if keeping VMware compatibility)
+#
+# Storage Controllers:
+#   megaraid_sas  - LSI/Broadcom MegaRAID SAS/SATA
+#   mpt3sas       - LSI SAS 3.0 HBA (SAS3008/3108)
+#   mpt2sas       - LSI SAS 2.0 HBA
+#   hpsa          - HP Smart Array controllers
+#   aacraid       - Adaptec/PMC RAID controllers
+#   arcmsr        - Areca SATA/SAS RAID
+#   isci          - Intel C600 SAS controller
+#   lpfc          - Emulex LightPulse Fibre Channel
+#   qla2xxx       - QLogic Fibre Channel
+#
+# NVMe:
+#   nvme          - NVMe block device
+#   nvme_core     - NVMe core driver
+#   nvme_fabrics  - NVMe over Fabrics
+#   nvme_rdma     - NVMe over RDMA
+#   nvme_tcp      - NVMe over TCP
+#   nvme_fc       - NVMe over Fibre Channel
+#
+# RAID (Software):
+#   md_mod        - Multiple Devices (RAID core)
+#   raid0         - RAID 0 (striping)
+#   raid1         - RAID 1 (mirroring)
+#   raid10        - RAID 10 (striped mirrors)
+#   raid456       - RAID 4/5/6
+#
+# Device Mapper:
+#   dm_mod        - Device mapper core
+#   dm_crypt      - Encrypted block devices
+#   dm_mirror     - Device mapper mirroring
+#   dm_snapshot   - Device mapper snapshots
+#
+# Filesystems:
+#   ext4          - Fourth extended filesystem
+#   xfs           - XFS filesystem
+#   btrfs         - Btrfs filesystem
+#   f2fs          - Flash-Friendly File System
+#   jfs           - JFS filesystem
+#
+# Crypto:
+#   aes           - AES cipher
+#   aes_x86_64    - AES with CPU instructions
+#   sha256        - SHA-256 hash
+#   sha512        - SHA-512 hash
+#   xts           - XTS block cipher mode
+#
+# ==============================================================================
+# DISTRIBUTION-SPECIFIC NOTES
+# ==============================================================================
+#
+# RHEL/CentOS/Rocky/Alma:
+#   - Uses dracut for initramfs generation
+#   - Modules added to /etc/dracut.conf.d/90-hyper2kvm.conf
+#   - Command: dracut --force
+#
+# Debian/Ubuntu:
+#   - Uses initramfs-tools (update-initramfs)
+#   - Modules added to /etc/initramfs-tools/modules
+#   - Command: update-initramfs -u
+#
+# SUSE/openSUSE:
+#   - Uses dracut (similar to RHEL)
+#   - Modules added to /etc/dracut.conf.d/
+#
+# Arch Linux:
+#   - Uses mkinitcpio
+#   - Modules added to /etc/mkinitcpio.conf MODULES=()
+#   - Command: mkinitcpio -P
+#
+# Alpine Linux:
+#   - Uses mkinitfs
+#   - Modules added to /etc/mkinitfs/mkinitfs.conf features line
+#   - Command: mkinitfs
+#
+# ==============================================================================
+# TROUBLESHOOTING
+# ==============================================================================
+#
+# If VM fails to boot with "Kernel panic - not syncing: VFS: Unable to mount root":
+#   1. Check that storage driver is in initramfs (nvme, ahci, or your specific RAID controller)
+#   2. Verify module name is correct (use "modinfo <module>" on source VM)
+#   3. Enable verbose logging: verbose: 2
+#   4. Check boot logs in output report.md
+#
+# To verify drivers were added to initramfs:
+#   1. Boot VM in rescue mode or LiveCD
+#   2. Mount root filesystem
+#   3. Run: lsinitrd /boot/initramfs-*.img | grep <module>  # RHEL/CentOS
+#      OR: lsinitramfs /boot/initrd.img-* | grep <module>  # Debian/Ubuntu
+#
+# ==============================================================================

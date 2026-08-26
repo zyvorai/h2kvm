@@ -1,0 +1,11 @@
+{
+  "command": "local",
+  "vmdk": "/path/to/windows.vmdk",
+  "virtio_drivers_dir": "/path/to/virtio-win",
+  "enable_virtio_gpu": true,
+  "enable_virtio_input": true,
+  "enable_virtio_fs": true,
+  "to_output": "windows-kvm-extra.qcow2",
+  "report": "windows-virtio-extra.md",
+  "verbose": 2
+}

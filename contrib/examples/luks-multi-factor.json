@@ -1,0 +1,17 @@
+{
+  "$schema": "https://hyper2kvm.io/schemas/luks-config.json",
+  "description": "Multi-factor LUKS unlock (TPM2 + Vault)",
+
+  "tpm_handle": "0x81000010",
+
+  "vault": {
+    "addr": "https://vault.example.com:8200",
+    "token": "s.XXXXXXXXXXXXXXXXXXXXXX",
+    "path": "secret/hyper2kvm/luks"
+  },
+
+  "comment": "Multi-factor: Both TPM AND Vault keys required.",
+  "comment2": "Keys are combined using HKDF-SHA256.",
+  "comment3": "Security: Prevents disk theft (TPM won't unseal on different HW) AND network attacks (Vault key alone insufficient).",
+  "comment4": "For production: Use env vars for Vault token"
+}

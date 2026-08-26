@@ -1,0 +1,224 @@
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hyper2kvm-test
+  labels:
+    app.kubernetes.io/name: hyper2kvm
+    app.kubernetes.io/part-of: hyper2kvm
+
+---
+# ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hyper2kvm-operator
+  namespace: hyper2kvm-test
+  labels:
+    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/component: operator
+
+---
+# ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: hyper2kvm-operator-test
+  labels:
+    app.kubernetes.io/name: hyper2kvm-operator
+rules:
+  # MigrationJob CRD
+  - apiGroups: ["hyper2kvm.io"]
+    resources: ["migrationjobs", "migrationjobs/status", "migrationjobs/finalizers"]
+    verbs: ["*"]
+  - apiGroups: ["hyper2kvm.io"]
+    resources: ["jobtemplates", "jobtemplates/status"]
+    verbs: ["*"]
+  # Pods
+  - apiGroups: [""]
+    resources: ["pods", "pods/status"]
+    verbs: ["get", "list", "watch"]
+  # ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  # Events
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+  # Namespaces
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "watch"]
+  # Nodes
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  # Leases
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # OpenShift Routes (if available)
+  - apiGroups: ["route.openshift.io"]
+    resources: ["routes"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+# ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: hyper2kvm-operator-test
+  labels:
+    app.kubernetes.io/name: hyper2kvm-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hyper2kvm-operator-test
+subjects:
+  - kind: ServiceAccount
+    name: hyper2kvm-operator
+    namespace: hyper2kvm-test
+
+---
+# Role for leader election
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: hyper2kvm-operator-leader-election
+  namespace: hyper2kvm-test
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+# RoleBinding for leader election
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: hyper2kvm-operator-leader-election
+  namespace: hyper2kvm-test
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: hyper2kvm-operator-leader-election
+subjects:
+  - kind: ServiceAccount
+    name: hyper2kvm-operator
+    namespace: hyper2kvm-test
+
+---
+# Deployment (using production image with operator entrypoint)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hyper2kvm-operator
+  namespace: hyper2kvm-test
+  labels:
+    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/component: operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hyper2kvm-operator
+      app.kubernetes.io/component: operator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: hyper2kvm-operator
+        app.kubernetes.io/component: operator
+    spec:
+      serviceAccountName: hyper2kvm-operator
+      securityContext:
+        runAsNonRoot: true
+        # Let OpenShift assign UID/GID from namespace range
+        # runAsUser will be assigned from range [1000650000, 1000659999]
+      containers:
+        - name: operator
+          image: hyper2kvm-operator:test
+          imagePullPolicy: Never
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          env:
+            - name: OPERATOR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OPERATOR_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: RECONCILE_INTERVAL
+              value: "30"
+            - name: LOG_LEVEL
+              value: "INFO"
+            - name: WORKER_DISCOVERY_INTERVAL
+              value: "60"
+            - name: LEADER_ELECTION_ENABLED
+              value: "false"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      tolerations:
+        - key: node.kubernetes.io/disk-pressure
+          operator: Exists
+          effect: NoSchedule
+      volumes:
+        - name: tmp
+          emptyDir: {}
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: hyper2kvm-operator
+  namespace: hyper2kvm-test
+  labels:
+    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/component: operator
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/component: operator

@@ -1,0 +1,70 @@
+# SPDX-License-Identifier: Apache-2.0
+# test-confs/photon-azure-vhd.yaml
+#
+# Run:
+#   sudo python hyper2kvm.py --config test-confs/photon-azure-vhd.yaml
+#
+# What this does:
+# - Opens the Azure Photon OS VHD offline
+# - Converts to qcow2
+# - Stabilizes fstab (UUID/PARTUUID)
+# - Fixes GRUB + initramfs if needed
+# - Optionally smoke-boots via libvirt
+
+command: vhd
+
+# --------------------------------------------------------------------
+# Input
+# --------------------------------------------------------------------
+vhd: /home/ssahani/Downloads/photon-azure-5.0-dde71ec57.x86_64.vhd
+
+# --------------------------------------------------------------------
+# Output layout
+# --------------------------------------------------------------------
+output_dir: /home/ssahani/by-path/out-photon-azure
+
+# Final output image (relative to output_dir)
+to_output: photon-azure.qcow2
+out_format: qcow2
+compress: true
+checksum: true
+
+# Azure VHDs are flat; no snapshot chain
+flatten: false
+
+# --------------------------------------------------------------------
+# Filesystem + boot fixes (Linux)
+# --------------------------------------------------------------------
+print_fstab: true
+
+# Azure images *often* contain cloud-ish or by-id entries
+# This is a very good test for your stabilizer.
+fstab_mode: stabilize-all
+
+no_grub: false
+regen_initramfs: true
+no_backup: false
+
+# --------------------------------------------------------------------
+# Safety / visibility
+# --------------------------------------------------------------------
+dry_run: false
+verbose: 2
+log_file: /home/ssahani/by-path/out-photon-azure/hyper2kvm.log
+report: /home/ssahani/by-path/out-photon-azure/hyper2kvm-report.md
+
+# --------------------------------------------------------------------
+# Optional smoke test
+# --------------------------------------------------------------------
+libvirt_test: true
+vm_name: photon-azure
+memory: 2048
+vcpus: 2
+
+# Azure Photon is legacy BIOS
+uefi: false
+
+timeout: 45
+keep_domain: false
+headless: true
+

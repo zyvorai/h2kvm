@@ -1,0 +1,20 @@
+# Drop into /run/hyper2kvm/workflow/to_be_processed/ for daemon processing
+input: /var/lib/hyper2kvm/esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+out_format: qcow2
+to_output: rhel88.qcow2
+fstab_mode: stabilize-all
+regen_initramfs: true
+compress: true
+container_isolation: true
+parallel_processing: true
+
+# Libvirt domain XML emission
+emit_domain_xml: true
+virsh_define: true
+vm_name: rhel88-migrated
+memory: 2048
+vcpus: 2
+force_replace: true
+
+verbosity: 2
+debug: true

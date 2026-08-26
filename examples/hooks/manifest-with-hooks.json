@@ -1,0 +1,172 @@
+{
+  "manifest_version": "1.0",
+  "description": "Example Artifact Manifest with Pre/Post Conversion Hooks",
+
+  "source": {
+    "provider": "vmware-esxi",
+    "vm_id": "vm-12345",
+    "vm_name": "web-server-prod",
+    "hypervisor_version": "7.0",
+    "export_timestamp": "2026-01-22T10:00:00Z"
+  },
+
+  "disks": [
+    {
+      "id": "boot",
+      "source_format": "vmdk",
+      "local_path": "/data/exports/web-server/boot.vmdk",
+      "bytes": 53687091200,
+      "checksum": "sha256:abc123...",
+      "boot_order_hint": 0,
+      "disk_type": "boot"
+    }
+  ],
+
+  "firmware": {
+    "type": "uefi"
+  },
+
+  "os_hint": "rhel9",
+
+  "hooks": {
+    "pre_extraction": [
+      {
+        "type": "script",
+        "path": "/opt/migration/scripts/notify-start.sh",
+        "env": {
+          "VM_NAME": "{{ vm_name }}",
+          "MANIFEST_PATH": "{{ manifest_path }}",
+          "TIMESTAMP": "{{ timestamp_iso }}"
+        },
+        "timeout": 60,
+        "continue_on_error": true
+      }
+    ],
+
+    "post_extraction": [
+      {
+        "type": "http",
+        "url": "https://migration-tracker.example.com/api/status",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer TOKEN",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "vm_name": "{{ vm_name }}",
+          "stage": "{{ stage }}",
+          "status": "extraction_complete",
+          "timestamp": "{{ timestamp_iso }}"
+        },
+        "timeout": 30,
+        "continue_on_error": true
+      }
+    ],
+
+    "pre_fix": [
+      {
+        "type": "script",
+        "path": "/opt/migration/scripts/backup-disk.sh",
+        "args": ["{{ source_path }}", "/backups/{{ vm_name }}"],
+        "timeout": 600,
+        "continue_on_error": false
+      }
+    ],
+
+    "post_fix": [
+      {
+        "type": "python",
+        "module": "migration_validators",
+        "function": "verify_boot_config",
+        "args": {
+          "disk_path": "{{ source_path }}",
+          "vm_name": "{{ vm_name }}"
+        },
+        "timeout": 300,
+        "continue_on_error": false
+      }
+    ],
+
+    "pre_convert": [
+      {
+        "type": "script",
+        "path": "/opt/migration/scripts/pre-convert-check.sh",
+        "env": {
+          "SOURCE_PATH": "{{ source_path }}",
+          "OUTPUT_DIR": "{{ output_dir }}"
+        },
+        "timeout": 120,
+        "continue_on_error": false
+      }
+    ],
+
+    "post_convert": [
+      {
+        "type": "python",
+        "module": "migration_validators",
+        "function": "verify_qcow2_integrity",
+        "args": {
+          "disk_path": "{{ output_path }}",
+          "expected_format": "qcow2"
+        },
+        "timeout": 300,
+        "continue_on_error": false
+      },
+      {
+        "type": "http",
+        "url": "https://migration-tracker.example.com/api/status",
+        "method": "POST",
+        "body": {
+          "vm_name": "{{ vm_name }}",
+          "stage": "conversion_complete",
+          "output_path": "{{ output_path }}",
+          "timestamp": "{{ timestamp_iso }}"
+        },
+        "timeout": 30,
+        "continue_on_error": true
+      }
+    ],
+
+    "post_validate": [
+      {
+        "type": "script",
+        "path": "/opt/migration/scripts/finalize-migration.sh",
+        "args": ["{{ vm_name }}", "{{ output_dir }}"],
+        "env": {
+          "USER": "{{ user }}",
+          "HOSTNAME": "{{ hostname }}"
+        },
+        "timeout": 300,
+        "continue_on_error": true
+      }
+    ]
+  },
+
+  "pipeline": {
+    "inspect": {
+      "enabled": true,
+      "collect_guest_info": false
+    },
+    "fix": {
+      "enabled": true,
+      "backup": true,
+      "update_grub": true,
+      "regen_initramfs": true,
+      "fstab_mode": "stabilize-all"
+    },
+    "convert": {
+      "enabled": true,
+      "compress": true,
+      "compress_level": 6
+    },
+    "validate": {
+      "enabled": true,
+      "check_image_integrity": true
+    }
+  },
+
+  "output": {
+    "directory": "/var/lib/libvirt/images/converted",
+    "format": "qcow2"
+  }
+}

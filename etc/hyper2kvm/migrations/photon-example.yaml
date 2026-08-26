@@ -1,0 +1,25 @@
+# Example: Photon OS Migration
+# This is a sample configuration - copy and customize for your VM
+
+command: local
+vmdk: /path/to/your/photon.vmdk
+output_dir: /var/lib/libvirt/images
+to_output: photon-os.qcow2
+out_format: qcow2
+compress: false
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Libvirt integration
+emit_domain_xml: true
+virsh_define: true
+vm_name: photon-os
+libvirt_test: true
+keep_domain: true
+timeout: 120
+
+# Optional: Override system defaults
+# vcpus: 2
+# memory: 2048
+# machine: q35
+# libvirt_network: default

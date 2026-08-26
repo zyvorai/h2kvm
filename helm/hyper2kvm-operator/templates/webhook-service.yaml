@@ -1,0 +1,24 @@
+{{- if .Values.webhook.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "hyper2kvm-operator.webhookServiceName" . }}
+  namespace: {{ include "hyper2kvm-operator.namespace" . }}
+  labels:
+    {{- include "hyper2kvm-operator.webhookLabels" . | nindent 4 }}
+spec:
+  type: {{ .Values.webhook.service.type }}
+  ports:
+    - port: {{ .Values.webhook.service.port }}
+      targetPort: {{ .Values.webhook.service.targetPort }}
+      protocol: TCP
+      name: https
+    {{- if .Values.webhook.metrics.enabled }}
+    - port: {{ .Values.webhook.metrics.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    {{- end }}
+  selector:
+    {{- include "hyper2kvm-operator.webhookSelectorLabels" . | nindent 4 }}
+{{- end }}

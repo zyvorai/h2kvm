@@ -1,0 +1,44 @@
+# AWS EC2 Instance → KVM Migration (requires AWS credentials + boto3)
+#
+# Prerequisites:
+#   1. Configure AWS: aws configure
+#   2. Create S3 bucket: aws s3 mb s3://my-hyper2kvm-exports
+#   3. Create vmimport role: https://docs.aws.amazon.com/vm-import/latest/userguide/required-permissions.html
+#   4. Install boto3: pip install boto3
+#
+# Run:
+#   python3 examples/aws_ec2_migration.py \
+#     --instance-id i-0abc123def456 \
+#     --bucket my-hyper2kvm-exports \
+#     --region us-east-1
+#
+# Or use this YAML with h2kvmctl after downloading the exported image:
+#   sudo h2kvmctl --config test-confs/aws-ec2-migration.yaml \
+#     --vmdk /path/to/exported-disk.vmdk
+
+command: local
+
+# Source: downloaded from S3 after EC2 export
+# Replace with your actual exported disk path
+vmdk: /tmp/hyper2kvm/i-0abc123.vmdk
+
+output_dir: ./out
+to_output: aws-vm.qcow2
+out_format: qcow2
+compress: true
+
+# Offline fixes (critical for cloud → KVM)
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Libvirt deployment
+emit_domain_xml: true
+vm_name: aws-vm
+memory: 4096
+vcpus: 2
+
+# Smoke test
+libvirt_test: true
+timeout: 60
+keep_domain: false
+headless: true

@@ -1,0 +1,226 @@
+---
+# =============================================================================
+# One-shot: Deploy operator → HyperConversion CR → KubeVirt VM
+# =============================================================================
+# Usage:
+#   kubectl apply -f k8s/operator-deploy/deploy-operator-migrate.yaml
+#
+# This deploys:
+#   1. hyper2kvm-system namespace + RBAC + CRD
+#   2. Operator Deployment (watches HyperConversion CRs)
+#   3. HTTP file server serving the converted QCOW2 from PVC
+#   4. HyperConversion CR that triggers: DataVolume → VM creation
+# =============================================================================
+
+# 1. Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hyper2kvm-system
+
+---
+# 2. ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hyperconversion-operator
+  namespace: hyper2kvm-system
+
+---
+# 3. ClusterRole (full permissions for operator)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: hyper2kvm-operator-role
+rules:
+  # HyperConversion CRD
+  - apiGroups: ["hyper2kvm.io"]
+    resources: ["hyperconversions", "hyperconversions/status", "hyperconversions/finalizers"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  # Validation CRD
+  - apiGroups: ["hyper2kvm.io"]
+    resources: ["validations", "validations/status"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  # CDI DataVolumes
+  - apiGroups: ["cdi.kubevirt.io"]
+    resources: ["datavolumes"]
+    verbs: ["create", "delete", "get", "list", "watch"]
+  # KubeVirt VMs
+  - apiGroups: ["kubevirt.io"]
+    resources: ["virtualmachines"]
+    verbs: ["create", "delete", "get", "list", "update", "watch"]
+  # Core resources
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["create", "delete", "get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["create", "get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["create", "get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+  # Leader election
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["create", "get", "update"]
+
+---
+# 4. ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: hyper2kvm-operator-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hyper2kvm-operator-role
+subjects:
+  - kind: ServiceAccount
+    name: hyperconversion-operator
+    namespace: hyper2kvm-system
+
+---
+# 5. Operator Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hyperconversion-operator
+  namespace: hyper2kvm-system
+  labels:
+    control-plane: controller-manager
+    app.kubernetes.io/name: hyperconversion-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      control-plane: controller-manager
+  template:
+    metadata:
+      labels:
+        control-plane: controller-manager
+    spec:
+      serviceAccountName: hyperconversion-operator
+      containers:
+      - name: manager
+        image: hyper2kvm-operator:latest
+        imagePullPolicy: IfNotPresent
+        command: ["/manager"]
+        args: ["--leader-elect"]
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 65532
+          runAsNonRoot: true
+          capabilities:
+            drop: ["ALL"]
+        ports:
+        - containerPort: 8081
+          name: health
+        - containerPort: 8080
+          name: metrics
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      terminationGracePeriodSeconds: 10
+
+---
+# 6. HTTP file server — serves the converted QCOW2 from the migration PVC
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qcow2-fileserver
+  namespace: hyper2kvm-migration
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qcow2-fileserver
+  template:
+    metadata:
+      labels:
+        app: qcow2-fileserver
+    spec:
+      containers:
+      - name: httpd
+        image: busybox:1.37
+        command:
+        - httpd
+        - -f
+        - -p
+        - "8080"
+        - -h
+        - /data
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: qcow2-data
+          mountPath: /data
+          readOnly: true
+      volumes:
+      - name: qcow2-data
+        persistentVolumeClaim:
+          claimName: rhel88-qcow2-output
+
+---
+# 7. Service for file server
+apiVersion: v1
+kind: Service
+metadata:
+  name: qcow2-fileserver
+  namespace: hyper2kvm-migration
+spec:
+  selector:
+    app: qcow2-fileserver
+  ports:
+  - port: 8080
+    targetPort: 8080
+
+---
+# 8. HyperConversion CR — operator watches this and creates DataVolume + VM
+apiVersion: hyper2kvm.io/v1alpha1
+kind: HyperConversion
+metadata:
+  name: rhel88-operator-migration
+  namespace: hyper2kvm-migration
+spec:
+  source:
+    url: "http://qcow2-fileserver.hyper2kvm-migration.svc:8080/rhel8.8-fixed.qcow2"
+
+  storage:
+    storageClass: local-path-immediate
+    size: 20Gi
+    accessMode: ReadWriteOnce
+
+  vm:
+    name: rhel88-operator-vm
+    cpu:
+      cores: 2
+    memory: "4Gi"
+    firmware: bios
+    runStrategy: Always
+    networks:
+      - name: default
+        type: pod
+
+  conversion:
+    compression: zstd
+    offlineFixes: true
+    timeout: 30

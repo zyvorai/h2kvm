@@ -1,0 +1,189 @@
+{{- if .Values.operator.rbac.create -}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "hyper2kvm-operator.fullname" . }}
+  labels:
+    {{- include "hyper2kvm-operator.operatorLabels" . | nindent 4 }}
+rules:
+  # MigrationJob CRD permissions
+  - apiGroups:
+      - hyper2kvm.io
+    resources:
+      - migrationjobs
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - hyper2kvm.io
+    resources:
+      - migrationjobs/status
+    verbs:
+      - get
+      - update
+      - patch
+  - apiGroups:
+      - hyper2kvm.io
+    resources:
+      - migrationjobs/finalizers
+    verbs:
+      - update
+
+  # Worker pod discovery
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods/status
+    verbs:
+      - get
+
+  # ConfigMap for leader election and state
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+
+  # Events for job lifecycle
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+
+  # Namespaces for quota checking
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+
+  # Nodes for worker affinity
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+
+{{- if .Values.openshift.enabled }}
+  # OpenShift SecurityContextConstraints
+  - apiGroups:
+      - security.openshift.io
+    resources:
+      - securitycontextconstraints
+    verbs:
+      - use
+    resourceNames:
+      - {{ .Values.openshift.scc.name }}
+
+  # OpenShift Routes
+  - apiGroups:
+      - route.openshift.io
+    resources:
+      - routes
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+{{- end }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "hyper2kvm-operator.fullname" . }}
+  labels:
+    {{- include "hyper2kvm-operator.operatorLabels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "hyper2kvm-operator.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "hyper2kvm-operator.serviceAccountName" . }}
+    namespace: {{ include "hyper2kvm-operator.namespace" . }}
+
+---
+# Role for operator pod to create leader election configmap
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "hyper2kvm-operator.fullname" . }}-leader-election
+  namespace: {{ include "hyper2kvm-operator.namespace" . }}
+  labels:
+    {{- include "hyper2kvm-operator.operatorLabels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "hyper2kvm-operator.fullname" . }}-leader-election
+  namespace: {{ include "hyper2kvm-operator.namespace" . }}
+  labels:
+    {{- include "hyper2kvm-operator.operatorLabels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "hyper2kvm-operator.fullname" . }}-leader-election
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "hyper2kvm-operator.serviceAccountName" . }}
+    namespace: {{ include "hyper2kvm-operator.namespace" . }}
+{{- end }}

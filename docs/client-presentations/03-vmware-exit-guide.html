@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VMware Exit Strategy — Migration Guide</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #7f1d1d, #991b1b, #1a1a2e); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 3em; font-weight: 800; margin-bottom: 0.3em; }
+  .cover h1 span { color: #fbbf24; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; margin-bottom: 1em; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 550px; }
+  .page { min-height: 100vh; padding: 50px 70px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; }
+  .page-light { background: #fafbfc; }
+  .page-warn { background: linear-gradient(135deg, #451a03, #78350f); color: #fef3c7; }
+  h2.st { font-size: 2em; font-weight: 700; margin-bottom: 0.6em; }
+  h2.st span { color: #fbbf24; }
+  h3 { font-size: 1.2em; font-weight: 600; margin: 1em 0 0.4em; }
+  p { margin-bottom: 0.8em; font-size: 1em; }
+  .sub { font-size: 1.05em; opacity: 0.7; margin-bottom: 1.5em; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 1.2em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 22px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card .icon { font-size: 1.8em; margin-bottom: 8px; }
+  .card h4 { font-size: 1.05em; font-weight: 600; margin-bottom: 6px; }
+  .card p { font-size: 0.9em; opacity: 0.85; margin-bottom: 0; }
+  .timeline { margin: 1.5em 0; }
+  .timeline-item { display: flex; gap: 18px; margin-bottom: 18px; }
+  .timeline-dot { width: 44px; height: 44px; background: #fbbf24; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #1a1a2e; flex-shrink: 0; font-size: 1.1em; }
+  .timeline-content h4 { margin-bottom: 4px; }
+  .timeline-content p { font-size: 0.93em; opacity: 0.85; margin-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 0.9em; }
+  th { background: #b45309; color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .warn { color: #f59e0b; font-weight: 700; }
+  .danger { color: #ef4444; font-weight: 700; }
+  ul { margin: 0.4em 0 0.8em 1.5em; }
+  li { margin-bottom: 0.3em; font-size: 0.95em; }
+  .alert { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 20px; margin: 1.2em 0; }
+  .alert h4 { color: #ef4444; margin-bottom: 8px; }
+  .quote { border-left: 4px solid #fbbf24; padding: 16px 24px; margin: 1.5em 0; font-style: italic; opacity: 0.9; }
+  .stat-row { display: flex; gap: 30px; margin: 1.5em 0; }
+  .stat { text-align: center; flex: 1; }
+  .stat .number { font-size: 2.5em; font-weight: 800; color: #fbbf24; line-height: 1; }
+  .stat .label { font-size: 0.9em; opacity: 0.7; margin-top: 6px; }
+  .cta { background: linear-gradient(135deg, #f59e0b, #d97706); color: #1a1a2e; padding: 30px; border-radius: 14px; text-align: center; margin: 2em 0; }
+  .cta h3 { font-size: 1.4em; margin-bottom: 0.4em; }
+  .footer { text-align: center; padding: 20px; font-size: 0.8em; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>VMware <span>Exit</span> Strategy</h1>
+  <h2>A Practical Migration Guide for Enterprises</h2>
+  <p class="sub">Step-by-step plan for moving from VMware vSphere to KVM/libvirt and KubeVirt — with hyper2kvm + hypersdk.</p>
+</div>
+
+<!-- PAGE: WHY EXIT NOW -->
+<div class="page page-warn">
+  <h2 class="st">Why Exit <span>Now</span></h2>
+  <p class="sub">The Broadcom acquisition changed everything. The clock is ticking.</p>
+
+  <div class="alert">
+    <h4>Broadcom VMware Changes (2024-2026)</h4>
+    <p>Perpetual licenses eliminated. Subscription-only pricing. Product bundles force payment for unused features. Partner ecosystem disrupted. Support response times increasing. Customers reporting 2-12x cost increases.</p>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number">2-12x</div>
+      <div class="label">License cost increase<br>reported by customers</div>
+    </div>
+    <div class="stat">
+      <div class="number">0</div>
+      <div class="label">Perpetual licenses<br>available (eliminated)</div>
+    </div>
+    <div class="stat">
+      <div class="number">60%</div>
+      <div class="label">Partners dropped<br>from program</div>
+    </div>
+  </div>
+
+  <h3>Risk Assessment</h3>
+  <table>
+    <tr><th>Risk</th><th>Impact</th><th>Timeline</th></tr>
+    <tr><td>License cost escalation</td><td class="danger">Critical — budget impact immediate</td><td>Already happening</td></tr>
+    <tr><td>End of support (vSphere 7.x)</td><td class="danger">Critical — security exposure</td><td>2025-2026</td></tr>
+    <tr><td>Feature removal / bundling changes</td><td class="warn">High — forced upgrades</td><td>Ongoing</td></tr>
+    <tr><td>Talent drain (VMware admins leaving)</td><td class="warn">High — operational risk</td><td>12-18 months</td></tr>
+    <tr><td>Compliance audit failures</td><td class="danger">Critical — regulatory risk</td><td>Next audit cycle</td></tr>
+  </table>
+</div>
+
+<!-- PAGE: MIGRATION PHASES -->
+<div class="page page-dark">
+  <h2 class="st">Migration <span>Phases</span></h2>
+  <p class="sub">A phased approach minimizes risk and maintains uptime.</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot">1</div>
+      <div class="timeline-content">
+        <h4>Assessment (Week 1-2)</h4>
+        <p>Inventory all VMs. Classify by criticality (dev/staging/production). Identify dependencies. Estimate disk sizes. Map network requirements. Run pre-flight checks with hyper2kvm.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">2</div>
+      <div class="timeline-content">
+        <h4>Pilot Migration (Week 3-4)</h4>
+        <p>Migrate 5-10 non-critical VMs (dev/test). Validate conversion quality. Test boot success. Verify application functionality. Build team confidence and document process.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">3</div>
+      <div class="timeline-content">
+        <h4>Staging Migration (Week 5-8)</h4>
+        <p>Migrate staging environments. Test with real workloads. Validate performance. Set up monitoring. Create runbooks for common issues. Batch process with YAML automation.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">4</div>
+      <div class="timeline-content">
+        <h4>Production Migration (Week 9-16)</h4>
+        <p>Migrate production VMs in maintenance windows. Use queue-based batch processing. Verify each VM boots and passes health checks. Maintain VMware as rollback for 30 days.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">5</div>
+      <div class="timeline-content">
+        <h4>Decommission VMware (Week 17-20)</h4>
+        <p>After 30-day parallel run, decommission vSphere. Cancel VMware licenses. Reclaim hardware. Document lessons learned. Celebrate savings.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: TARGET ARCHITECTURE -->
+<div class="page page-light">
+  <h2 class="st">Target <span>Architecture</span></h2>
+  <p class="sub">Choose your landing zone based on workload needs.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">🖥️</div>
+      <h4>Option A: KVM + libvirt</h4>
+      <p><strong>Best for:</strong> Traditional IT, existing Linux admin teams, simple VM workloads.</p>
+      <ul>
+        <li>RHEL/Fedora with KVM + libvirt</li>
+        <li>Cockpit web UI for management</li>
+        <li>virt-manager for desktop admin</li>
+        <li>Live migration between hosts</li>
+        <li>Lowest complexity, fastest adoption</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="icon">☸️</div>
+      <h4>Option B: KubeVirt on Kubernetes</h4>
+      <p><strong>Best for:</strong> Cloud-native teams, mixed VM+container workloads, GitOps.</p>
+      <ul>
+        <li>VMs as Kubernetes resources</li>
+        <li>Same tooling for VMs and containers</li>
+        <li>Helm charts, operators, CI/CD</li>
+        <li>Multi-cluster, multi-cloud capable</li>
+        <li>Path to eventual containerization</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="icon">🏗️</div>
+      <h4>Option C: OpenShift Virtualization</h4>
+      <p><strong>Best for:</strong> Enterprise Red Hat shops, need vendor support + SLA.</p>
+      <ul>
+        <li>Red Hat supported KubeVirt</li>
+        <li>Integrated with OpenShift platform</li>
+        <li>MTV (Migration Toolkit for Virtualization)</li>
+        <li>Enterprise support contracts</li>
+        <li>Certified, hardened, tested</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="icon">🌐</div>
+      <h4>Option D: Hybrid (Recommended)</h4>
+      <p><strong>Best for:</strong> Large estates with mixed requirements.</p>
+      <ul>
+        <li>Critical VMs on KVM/libvirt (simple, reliable)</li>
+        <li>Cloud-native workloads on KubeVirt</li>
+        <li>Edge sites on K3s + KubeVirt</li>
+        <li>hyper2kvm deploys to both targets</li>
+        <li>Migrate once, deploy anywhere</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: RISK MITIGATION -->
+<div class="page page-dark">
+  <h2 class="st">Risk <span>Mitigation</span></h2>
+  <p class="sub">How hyper2kvm eliminates common migration failures.</p>
+
+  <table>
+    <tr><th>Risk</th><th>Without hyper2kvm</th><th>With hyper2kvm</th></tr>
+    <tr><td>VM won't boot after migration</td><td class="danger">Common — wrong drivers, broken fstab</td><td class="check">Auto-fixed: initramfs rebuild, fstab stabilization</td></tr>
+    <tr><td>Corrupt disk during conversion</td><td class="danger">Silent corruption, discovered late</td><td class="check">Pre-flight validation catches issues before conversion</td></tr>
+    <tr><td>Windows blue screen (BSOD)</td><td class="danger">Missing VirtIO drivers</td><td class="check">Auto-inject VirtIO drivers + registry fix</td></tr>
+    <tr><td>Wrong boot mode (BIOS vs UEFI)</td><td class="warn">Manual detection required</td><td class="check">Auto-detected, libvirt XML configured correctly</td></tr>
+    <tr><td>Network config breaks</td><td class="warn">VMware NIC names change</td><td class="check">Remove VMware NIC configs, let DHCP handle</td></tr>
+    <tr><td>SELinux denials after migration</td><td class="warn">Boot fails or services broken</td><td class="check">Auto-trigger relabel on first boot</td></tr>
+    <tr><td>Snapshot chain corruption</td><td class="danger">Delta files depend on parent</td><td class="check">Flatten to single self-contained image</td></tr>
+    <tr><td>Manual process errors at scale</td><td class="danger">Human error on VM #47 of #200</td><td class="check">YAML automation, batch queue, per-VM results</td></tr>
+  </table>
+
+  <div class="quote">
+    "The difference between a migration project and a migration disaster is automation. hyper2kvm eliminates the manual steps where things go wrong."
+  </div>
+</div>
+
+<!-- PAGE: NEXT STEPS -->
+<div class="page page-light">
+  <h2 class="st">Next <span>Steps</span></h2>
+  <p class="sub">How to start your VMware exit journey.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">1️⃣</div>
+      <h4>Inventory Assessment</h4>
+      <p>We'll connect to your vCenter, discover all VMs, and generate a migration complexity report. No changes made — read-only assessment.</p>
+    </div>
+    <div class="card">
+      <div class="icon">2️⃣</div>
+      <h4>Proof of Concept</h4>
+      <p>Pick 3-5 VMs. We migrate them live using hyper2kvm. You verify they boot and run. Takes 1-2 hours. Zero risk to production.</p>
+    </div>
+    <div class="card">
+      <div class="icon">3️⃣</div>
+      <h4>Migration Plan</h4>
+      <p>Based on PoC results, we build a phased migration plan with timeline, resource requirements, and rollback procedures.</p>
+    </div>
+    <div class="card">
+      <div class="icon">4️⃣</div>
+      <h4>Execute</h4>
+      <p>Batch migration with YAML automation. Queue processing handles hundreds of VMs. Boot verification on every one. Progress tracking throughout.</p>
+    </div>
+  </div>
+
+  <div class="cta">
+    <h3>Start Your VMware Exit Today</h3>
+    <p>The longer you wait, the more you pay. hyper2kvm is ready now.<br>No vendor lock-in.</p>
+  </div>
+
+  <div class="footer">
+    <p>hyper2kvm + hypersdk — Enterprise VM Migration Platform<br>Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+# ============================================
+# Fetch-and-Fix: ESXi SSH → libvirt
+# ============================================
+# Downloads VMDK from ESXi via SSH/SCP, converts to qcow2,
+# applies guest fixes, and generates libvirt domain XML.
+#
+# Pipeline:
+#   ESXi datastore → SSH/SCP download → flatten → qcow2
+#   → guest fixes → libvirt XML → boot test
+#
+# Prerequisites:
+#   - SSH access to ESXi host (enable SSH in ESXi management)
+#   - ssh-copy-id root@esxi-host (passwordless SSH recommended)
+#   - sudo ./scripts/install-deps.sh
+#
+# Usage:
+#   sudo h2kvmctl --config examples/yaml/70-complete-workflows/fetch-and-fix-esxi.yaml
+# ============================================
+
+cmd: fetch-and-fix
+
+# ── ESXi SSH connection ──
+host: esxi-host.example.com
+user: root
+port: 22
+# identity: ~/.ssh/id_ed25519    # SSH key (optional if using ssh-agent)
+
+# ── Remote VMDK path on ESXi datastore ──
+remote: /vmfs/volumes/datastore1/my-vm/my-vm.vmdk
+# fetch_all: true                 # Fetch all files in VM directory (optional)
+
+# ── Local processing ──
+fetch_dir: ./downloads
+output_dir: ./output-fetched
+to_output: fetched-vm.qcow2
+out_format: qcow2
+flatten: true
+compress: true
+
+# ── Guest fixes ──
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+
+# ── libvirt domain XML ──
+emit_domain_xml: true
+virsh_define: true
+vm_name: fetched-vm
+memory: 4096
+vcpus: 2
+uefi: true
+machine: q35
+disk_bus: virtio
+disk_cache: none
+net_model: virtio
+libvirt_network: default
+serial_console: true
+graphics: vnc
+guest_os: linux
+
+# ── Boot test ──
+libvirt_test: true
+keep_domain: true
+timeout: 120
+
+verbose: 1

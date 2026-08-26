@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ROI Calculator — hyper2kvm Migration Savings Across All Scenarios</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #14532d, #166534, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #4ade80; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(74,222,128,0.2); border: 1px solid rgba(74,222,128,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-green { background: linear-gradient(135deg, #14532d, #0f172a); color: #e8e6df; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #4ade80; }
+  .page-light h2.st span { color: #16a34a; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.7em 0 0.3em; color: #4ade80; }
+  .page-light h3 { color: #16a34a; }
+  p { margin-bottom: 0.6em; font-size: 0.92em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #16a34a; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .fill { background: rgba(74,222,128,0.06); border: 2px dashed rgba(74,222,128,0.3); font-weight: 600; color: #16a34a; min-width: 80px; }
+  .page-dark .fill, .page-green .fill { background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.25); color: #4ade80; }
+  .result { background: rgba(74,222,128,0.12); font-weight: 700; color: #16a34a; font-size: 0.88em; }
+  .page-dark .result, .page-green .result { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #4ade80; } .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  .page-light .card h4 { color: #16a34a; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .stat-box { text-align: center; padding: 14px; }
+  .stat-box .num { font-size: 2em; font-weight: 800; color: #4ade80; } .stat-box .label { font-size: 0.8em; opacity: 0.7; }
+  .highlight { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); border-radius: 8px; padding: 13px; margin: 0.7em 0; }
+  .page-dark .highlight { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.15); }
+  .verdict { background: linear-gradient(135deg, rgba(20,83,45,0.2), rgba(22,101,52,0.1)); border: 2px solid #16a34a; border-radius: 12px; padding: 16px; margin: 0.8em 0; text-align: center; }
+  .verdict h3 { color: #4ade80; font-size: 1.15em; margin-bottom: 5px; }
+  .footer { text-align: center; padding: 12px; font-size: 0.72em; opacity: 0.4; }
+  .note { font-size: 0.78em; opacity: 0.55; font-style: italic; margin-top: 4px; }
+  .scenario-header { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); border-radius: 8px; padding: 10px 14px; margin: 0.5em 0; }
+  .page-dark .scenario-header { background: rgba(74,222,128,0.06); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>ROI <span>Calculator</span></h1>
+  <h2>Migration Savings Across All Scenarios</h2>
+  <p class="sub">Fill-in worksheets for VMware exit, Hyper-V migration, cloud repatriation, edge deployment, SQL Server licensing, and multi-cloud consolidation. Pre-calculated examples for small (25 VMs), medium (100 VMs), and large (500 VMs) estates. Every number you need to build the business case.</p>
+  <div class="badge">6 Worksheets | 8 Pre-Calculated Scenarios | Fillable | $0 Tool Cost | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE 1: VMware Exit ROI Worksheet -->
+<div class="page page-light">
+  <h2 class="st">Worksheet 1: <span>VMware Exit</span></h2>
+  <p class="sub">Calculate savings from migrating VMware vSphere to KVM/KubeVirt.</p>
+
+  <h3>A. Current VMware Costs (Annual)</h3>
+  <table>
+    <tr><th style="width:45%">Cost Item</th><th style="width:20%">Your Number</th><th style="width:18%">Typical Range</th><th style="width:17%">Notes</th></tr>
+    <tr><td>vSphere licenses (per-socket or VCF bundle)</td><td class="fill">$________</td><td>$5K-15K/socket</td><td>Post-Broadcom: 2-12x increase</td></tr>
+    <tr><td>vCenter Server license</td><td class="fill">$________</td><td>$6K-10K</td><td>Required for management</td></tr>
+    <tr><td>vSAN / storage licenses</td><td class="fill">$________</td><td>$2K-8K/socket</td><td>If using vSAN</td></tr>
+    <tr><td>NSX / network licenses</td><td class="fill">$________</td><td>$4K-12K/socket</td><td>If using NSX</td></tr>
+    <tr><td>Support &amp; maintenance</td><td class="fill">$________</td><td>20-25% of license</td><td>Annual SnS renewal</td></tr>
+    <tr><td>Additional (Horizon, SRM, Aria, etc.)</td><td class="fill">$________</td><td>Varies</td><td>All VMware products</td></tr>
+    <tr><td class="result">A. Total VMware Annual Cost</td><td class="result fill">$________</td><td></td><td></td></tr>
+  </table>
+
+  <h3>B. Migration Investment (One-Time)</h3>
+  <table>
+    <tr><th style="width:45%">Cost Item</th><th style="width:20%">Your Number</th><th style="width:18%">Typical Range</th><th style="width:17%">Notes</th></tr>
+    <tr><td>New hardware (if needed)</td><td class="fill">$________</td><td>$0-50K</td><td>Often reuse existing</td></tr>
+    <tr><td>KVM/K8s training</td><td class="fill">$________</td><td>$5K-20K</td><td>Team upskilling</td></tr>
+    <tr><td>Migration labor (internal or consulting)</td><td class="fill">$________</td><td>$10K-50K</td><td>1 engineer, 12-20 weeks</td></tr>
+    <tr><td>Parallel run (VMware overlap)</td><td class="fill">$________</td><td>1-3 mo of license</td><td>Keep VMware as rollback</td></tr>
+    <tr><td>hyper2kvm + hypersdk license</td><td><strong>Contact for pricing*</strong></td><td>Contact for pricing*</td><td>Proprietary (Zyvor AI Labs)</td></tr>
+    <tr><td class="result">B. Total Migration Investment</td><td class="result fill">$________</td><td></td><td></td></tr>
+  </table>
+
+  <h3>C. New Annual Costs (KVM/KubeVirt)</h3>
+  <table>
+    <tr><th style="width:45%">Cost Item</th><th style="width:20%">Your Number</th><th style="width:18%">Typical Range</th><th style="width:17%">Notes</th></tr>
+    <tr><td>KVM hypervisor licensing</td><td><strong>$0</strong></td><td>$0</td><td>In Linux kernel</td></tr>
+    <tr><td>K3s / KubeVirt licensing</td><td><strong>$0</strong></td><td>$0</td><td>CNCF open source</td></tr>
+    <tr><td>OS subscription (RHEL optional)</td><td class="fill">$________</td><td>$0-800/host/yr</td><td>Fedora/Ubuntu = $0</td></tr>
+    <tr><td>Hardware maintenance</td><td class="fill">$________</td><td>Same as current</td><td>Same servers</td></tr>
+    <tr><td>Linux admin FTEs</td><td class="fill">$________</td><td>Same or less</td><td>Often same team retrained</td></tr>
+    <tr><td class="result">C. Total New Annual Cost</td><td class="result fill">$________</td><td></td><td></td></tr>
+  </table>
+
+  <h3>D. Results</h3>
+  <table>
+    <tr><th style="width:45%">Metric</th><th style="width:20%">Your Number</th><th style="width:35%">Formula</th></tr>
+    <tr><td class="result">Annual Savings</td><td class="result fill">$________</td><td>= A - C</td></tr>
+    <tr><td class="result">Payback Period (months)</td><td class="result fill">______ mo</td><td>= B / (Annual Savings / 12)</td></tr>
+    <tr><td class="result">3-Year Net Savings</td><td class="result fill">$________</td><td>= (Annual Savings x 3) - B</td></tr>
+    <tr><td class="result">3-Year ROI</td><td class="result fill">______%</td><td>= ((Annual Savings x 3) - B) / B x 100</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 2: Hyper-V Exit Worksheet -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Worksheet 2: <span>Hyper-V Exit</span></h2>
+  <p class="sub">Calculate savings from eliminating Windows Server Datacenter licensing.</p>
+
+  <h3>A. Current Hyper-V Costs (Annual)</h3>
+  <table>
+    <tr><th style="width:45%">Cost Item</th><th style="width:20%">Your Number</th><th style="width:18%">Typical Range</th><th style="width:17%">Notes</th></tr>
+    <tr><td>Windows Server Datacenter (per 2-core pack)</td><td class="fill">$________</td><td>$6,155 x 8 packs/host</td><td>$49K minimum per host</td></tr>
+    <tr><td>System Center (SCVMM, SCOM, etc.)</td><td class="fill">$________</td><td>$3,607 x 8 packs/host</td><td>If using System Center</td></tr>
+    <tr><td>Windows Server CALs</td><td class="fill">$________</td><td>$30-44/user or device</td><td>Per user or per device</td></tr>
+    <tr><td>Software Assurance / renewals</td><td class="fill">$________</td><td>~25% of license/yr</td><td>For upgrade rights</td></tr>
+    <tr><td class="result">A. Total Hyper-V Annual Cost</td><td class="result fill">$________</td><td></td><td></td></tr>
+  </table>
+
+  <h3>B. Migration Investment (One-Time)</h3>
+  <table>
+    <tr><th style="width:45%">Cost Item</th><th style="width:20%">Your Number</th><th style="width:18%">Typical</th><th style="width:17%">Notes</th></tr>
+    <tr><td>Migration labor</td><td class="fill">$________</td><td>$8K-30K</td><td>Typically faster than VMware</td></tr>
+    <tr><td>Training (Windows admin &rarr; Linux/KVM)</td><td class="fill">$________</td><td>$5K-15K</td><td>Biggest learning curve</td></tr>
+    <tr><td>Hardware (if needed)</td><td class="fill">$________</td><td>$0 (reuse)</td><td>Same servers, install Linux</td></tr>
+    <tr><td class="result">B. Total Migration Investment</td><td class="result fill">$________</td><td></td><td></td></tr>
+  </table>
+
+  <h3>C. Results</h3>
+  <table>
+    <tr><th style="width:45%">Metric</th><th style="width:20%">Your Number</th><th style="width:35%">Formula</th></tr>
+    <tr><td>New annual cost (KVM)</td><td class="fill">$________</td><td>Typically $0-5K (RHEL optional)</td></tr>
+    <tr><td class="result">Annual Savings</td><td class="result fill">$________</td><td>= A - New Annual Cost</td></tr>
+    <tr><td class="result">Payback Period</td><td class="result fill">______ mo</td><td>= B / (Savings / 12)</td></tr>
+    <tr><td class="result">3-Year Net Savings</td><td class="result fill">$________</td><td>= (Savings x 3) - B</td></tr>
+  </table>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Hyper-V hidden cost:</strong> Windows Server Datacenter at $49K/host is often the most expensive single item. A 4-host cluster costs <strong>$197K in licensing alone</strong> — more than most hardware budgets. Moving to Linux + KVM eliminates this entirely.</p>
+  </div>
+</div>
+
+<!-- PAGE 3: Cloud Repatriation Worksheet -->
+<div class="page page-light">
+  <h2 class="st">Worksheet 3: <span>Cloud Repatriation</span></h2>
+  <p class="sub">Calculate savings from bringing VMs home from AWS, Azure, or GCP.</p>
+
+  <h3>A. Current Cloud Costs (Annual)</h3>
+  <table>
+    <tr><th style="width:45%">Cost Item</th><th style="width:20%">Your Number</th><th style="width:18%">Typical Range</th><th style="width:17%">Notes</th></tr>
+    <tr><td>Compute instances (EC2/Azure VMs/GCE)</td><td class="fill">$________</td><td>$200-2,000/VM/mo</td><td>x number of VMs x 12</td></tr>
+    <tr><td>Block storage (EBS/Managed Disk/PD)</td><td class="fill">$________</td><td>$0.08-0.17/GB/mo</td><td>Provisioned or consumed</td></tr>
+    <tr><td>Data egress / transfer</td><td class="fill">$________</td><td>$0.09/GB outbound</td><td>Often the hidden killer</td></tr>
+    <tr><td>Load balancers / NAT gateways</td><td class="fill">$________</td><td>$20-200/mo each</td><td>Per service, per region</td></tr>
+    <tr><td>Monitoring (CloudWatch/Monitor/Logging)</td><td class="fill">$________</td><td>$5-50/VM/mo</td><td>Logs, metrics, alerts</td></tr>
+    <tr><td>Reserved instance premium (if applicable)</td><td class="fill">$________</td><td>30-60% of on-demand</td><td>Commitment lock-in</td></tr>
+    <tr><td class="result">A. Total Cloud Annual Cost</td><td class="result fill">$________</td><td></td><td></td></tr>
+  </table>
+
+  <h3>B. On-Prem KVM Costs (Annual)</h3>
+  <table>
+    <tr><th style="width:45%">Cost Item</th><th style="width:20%">Your Number</th><th style="width:18%">Typical Range</th><th style="width:17%">Notes</th></tr>
+    <tr><td>Server hardware (amortized 5 yr)</td><td class="fill">$________</td><td>$800-2K/mo equiv</td><td>One-time / 60 months</td></tr>
+    <tr><td>NVMe/SSD storage</td><td class="fill">$________</td><td>$200-500/mo equiv</td><td>Much cheaper than cloud</td></tr>
+    <tr><td>Network (no egress fees)</td><td><strong>$0</strong></td><td>$0</td><td>Local — zero egress</td></tr>
+    <tr><td>Monitoring (Prometheus/Grafana)</td><td><strong>$0</strong></td><td>$0</td><td>Open source</td></tr>
+    <tr><td>KVM/KubeVirt licensing</td><td><strong>$0</strong></td><td>$0</td><td>Open source</td></tr>
+    <tr><td>Operations staff delta</td><td class="fill">$________</td><td>Often less than cloud</td><td>No cloud console complexity</td></tr>
+    <tr><td class="result">B. Total On-Prem Annual Cost</td><td class="result fill">$________</td><td></td><td></td></tr>
+  </table>
+
+  <h3>C. Results</h3>
+  <table>
+    <tr><th style="width:45%">Metric</th><th style="width:20%">Your Number</th><th style="width:35%">Formula</th></tr>
+    <tr><td>Migration investment (one-time hardware + labor)</td><td class="fill">$________</td><td>Typically $30K-80K</td></tr>
+    <tr><td class="result">Annual Savings</td><td class="result fill">$________</td><td>= A - B</td></tr>
+    <tr><td class="result">Payback Period</td><td class="result fill">______ mo</td><td>= Investment / (Savings / 12)</td></tr>
+    <tr><td class="result">3-Year Net Savings</td><td class="result fill">$________</td><td>= (Savings x 3) - Investment</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4: Edge Deployment & SQL Server Worksheets -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Worksheet 4: <span>Edge Deployment</span></h2>
+  <p class="sub">Calculate savings from replacing VMware at remote/branch sites with K3s + KubeVirt.</p>
+
+  <table>
+    <tr><th style="width:35%">Cost Item (Per Site)</th><th style="width:20%">VMware</th><th style="width:20%">K3s + KubeVirt</th><th style="width:25%">Savings Per Site</th></tr>
+    <tr><td>Hypervisor licensing</td><td class="fill">$________</td><td><strong>$0</strong></td><td class="fill">$________</td></tr>
+    <tr><td>Management platform</td><td class="fill">$________</td><td><strong>$0</strong> (GitOps)</td><td class="fill">$________</td></tr>
+    <tr><td>Hardware</td><td class="fill">$________</td><td class="fill">$________</td><td class="fill">$________</td></tr>
+    <tr><td class="result">Annual per-site savings</td><td></td><td></td><td class="result fill">$________</td></tr>
+    <tr><td>Number of sites</td><td colspan="2" class="fill" style="text-align:center;">______</td><td></td></tr>
+    <tr><td class="result">Total annual savings (all sites)</td><td colspan="2"></td><td class="result fill">$________</td></tr>
+    <tr><td class="result">3-year savings (all sites)</td><td colspan="2"></td><td class="result fill">$________</td></tr>
+  </table>
+
+  <h2 class="st" style="color:#e8e6df; margin-top:0.8em;">Worksheet 5: <span>SQL Server Licensing</span></h2>
+  <p class="sub">Additional savings from KVM CPU pinning reducing SQL Server per-core costs.</p>
+
+  <table>
+    <tr><th style="width:35%">Cost Item</th><th style="width:20%">On VMware</th><th style="width:20%">On KVM (pinned)</th><th style="width:25%">Savings</th></tr>
+    <tr><td>Physical cores per host</td><td class="fill">______</td><td class="fill">______ (pinned vCPUs)</td><td></td></tr>
+    <tr><td>SQL Standard ($3,945/2-core pack)</td><td class="fill">$________</td><td class="fill">$________</td><td class="fill">$________</td></tr>
+    <tr><td>SQL Enterprise ($15,123/2-core pack)</td><td class="fill">$________</td><td class="fill">$________</td><td class="fill">$________</td></tr>
+    <tr><td>Number of SQL Server VMs</td><td colspan="2" class="fill" style="text-align:center;">______</td><td></td></tr>
+    <tr><td class="result">Total SQL licensing savings</td><td></td><td></td><td class="result fill">$________</td></tr>
+  </table>
+  <p class="note">KVM with CPU pinning exposes only assigned cores to the guest. SQL Server licensing counts visible cores. Typical savings: 20-40% on per-core costs.</p>
+
+  <h2 class="st" style="color:#e8e6df; margin-top:0.8em;">Worksheet 6: <span>Combined Total</span></h2>
+  <table>
+    <tr><th style="width:50%">Source</th><th style="width:25%">3-Year Savings</th><th style="width:25%">Your Number</th></tr>
+    <tr><td>VMware exit (Worksheet 1)</td><td class="fill">$________</td><td></td></tr>
+    <tr><td>Hyper-V exit (Worksheet 2)</td><td class="fill">$________</td><td></td></tr>
+    <tr><td>Cloud repatriation (Worksheet 3)</td><td class="fill">$________</td><td></td></tr>
+    <tr><td>Edge deployment (Worksheet 4)</td><td class="fill">$________</td><td></td></tr>
+    <tr><td>SQL Server licensing (Worksheet 5)</td><td class="fill">$________</td><td></td></tr>
+    <tr><td class="result">GRAND TOTAL 3-YEAR SAVINGS</td><td class="result fill" style="font-size:1em;">$________</td><td></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 5: Pre-Calculated Examples -->
+<div class="page page-light">
+  <h2 class="st">Pre-Calculated <span>Examples</span></h2>
+  <p class="sub">Ready-made scenarios — find the one closest to your environment.</p>
+
+  <div class="scenario-header"><strong>Scenario 1: Small Business</strong> — 25 VMs, 2 hosts, VMware vSphere Standard</div>
+  <table>
+    <tr><th style="width:30%">Metric</th><th style="width:20%">VMware Cost</th><th style="width:20%">KVM Cost</th><th style="width:15%">Savings</th><th style="width:15%">Notes</th></tr>
+    <tr><td>Annual licensing</td><td>$35,000</td><td>$0</td><td class="check">$35,000</td><td>vSphere + vCenter</td></tr>
+    <tr><td>Annual support</td><td>$8,750</td><td>$0</td><td class="check">$8,750</td><td>25% of license</td></tr>
+    <tr><td>Annual ops (delta)</td><td>$0</td><td>$0</td><td>$0</td><td>Same team</td></tr>
+    <tr><td>Migration (one-time)</td><td>—</td><td>$8,000</td><td>-$8,000</td><td>1 engineer, 3 weeks</td></tr>
+    <tr><td class="result">Annual savings</td><td colspan="2"></td><td class="result">$43,750</td><td></td></tr>
+    <tr><td class="result">Payback</td><td colspan="2"></td><td class="result">2.2 months</td><td></td></tr>
+    <tr><td class="result">3-year net savings</td><td colspan="2"></td><td class="result" style="color:#16a34a; font-size:0.95em;">$123,250</td><td></td></tr>
+  </table>
+
+  <div class="scenario-header"><strong>Scenario 2: Mid-Size Enterprise</strong> — 100 VMs, 8 hosts, VMware vSphere Enterprise Plus</div>
+  <table>
+    <tr><th style="width:30%">Metric</th><th style="width:20%">VMware Cost</th><th style="width:20%">KVM Cost</th><th style="width:15%">Savings</th><th style="width:15%">Notes</th></tr>
+    <tr><td>Annual licensing (vSphere+vCenter+vSAN)</td><td>$220,000</td><td>$0</td><td class="check">$220,000</td><td>Post-Broadcom pricing</td></tr>
+    <tr><td>Annual support</td><td>$55,000</td><td>$6,400</td><td class="check">$48,600</td><td>RHEL optional</td></tr>
+    <tr><td>Annual ops (savings)</td><td>$0</td><td>-$15,000</td><td class="check">$15,000</td><td>KVM simpler to manage</td></tr>
+    <tr><td>Migration (one-time)</td><td>—</td><td>$35,000</td><td>-$35,000</td><td>1 engineer, 16 weeks</td></tr>
+    <tr><td class="result">Annual savings</td><td colspan="2"></td><td class="result">$283,600</td><td></td></tr>
+    <tr><td class="result">Payback</td><td colspan="2"></td><td class="result">1.5 months</td><td></td></tr>
+    <tr><td class="result">3-year net savings</td><td colspan="2"></td><td class="result" style="color:#16a34a; font-size:0.95em;">$815,800</td><td></td></tr>
+  </table>
+
+  <div class="scenario-header"><strong>Scenario 3: Large Enterprise</strong> — 500 VMs, 40 hosts, 10 sites, VMware VCF</div>
+  <table>
+    <tr><th style="width:30%">Metric</th><th style="width:20%">VMware Cost</th><th style="width:20%">KVM Cost</th><th style="width:15%">Savings</th><th style="width:15%">Notes</th></tr>
+    <tr><td>Annual licensing (VCF bundle)</td><td>$1,200,000</td><td>$0</td><td class="check">$1,200,000</td><td>VCF at $30K/socket</td></tr>
+    <tr><td>Annual support</td><td>$300,000</td><td>$32,000</td><td class="check">$268,000</td><td>RHEL sub for all hosts</td></tr>
+    <tr><td>Annual ops (savings)</td><td>$0</td><td>-$50,000</td><td class="check">$50,000</td><td>2 fewer FTEs needed</td></tr>
+    <tr><td>Migration (one-time)</td><td>—</td><td>$100,000</td><td>-$100,000</td><td>2 engineers, 20 weeks</td></tr>
+    <tr><td class="result">Annual savings</td><td colspan="2"></td><td class="result">$1,518,000</td><td></td></tr>
+    <tr><td class="result">Payback</td><td colspan="2"></td><td class="result">0.8 months</td><td></td></tr>
+    <tr><td class="result">3-year net savings</td><td colspan="2"></td><td class="result" style="color:#16a34a; font-size:0.95em;">$4,454,000</td><td></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 6: Cloud & Hyper-V Pre-Calculated -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">More Pre-Calculated <span>Scenarios</span></h2>
+
+  <div class="scenario-header"><strong>Scenario 4: AWS Repatriation</strong> — 20 VMs from EC2 to on-prem KVM</div>
+  <table>
+    <tr><th style="width:30%">Metric</th><th style="width:20%">AWS Cost</th><th style="width:20%">On-Prem KVM</th><th style="width:15%">Savings</th><th style="width:15%">Notes</th></tr>
+    <tr><td>Annual compute (m5.2xlarge x 20)</td><td>$176,000</td><td>$13,333</td><td class="check">$162,667</td><td>HW amortized 5yr</td></tr>
+    <tr><td>Annual storage (EBS 20TB)</td><td>$24,000</td><td>$2,667</td><td class="check">$21,333</td><td>NVMe SSDs</td></tr>
+    <tr><td>Annual egress (5TB/mo)</td><td>$5,400</td><td>$0</td><td class="check">$5,400</td><td>Zero egress on-prem</td></tr>
+    <tr><td>Annual monitoring</td><td>$7,200</td><td>$0</td><td class="check">$7,200</td><td>Prometheus free</td></tr>
+    <tr><td>Migration (one-time)</td><td>—</td><td>$15,000</td><td>-$15,000</td><td>hypersdk export + convert</td></tr>
+    <tr><td class="result">Annual savings</td><td colspan="2"></td><td class="result">$196,600</td><td></td></tr>
+    <tr><td class="result">3-year net savings</td><td colspan="2"></td><td class="result" style="color:#4ade80;">$574,800</td><td></td></tr>
+  </table>
+
+  <div class="scenario-header"><strong>Scenario 5: Azure Repatriation</strong> — 20 VMs (D8s_v3) to on-prem KVM</div>
+  <table>
+    <tr><th style="width:30%">Metric</th><th style="width:20%">Azure Cost</th><th style="width:20%">On-Prem KVM</th><th style="width:15%">Savings</th><th style="width:15%">Notes</th></tr>
+    <tr><td>Annual compute</td><td>$153,600</td><td>$13,333</td><td class="check">$140,267</td><td></td></tr>
+    <tr><td>Annual storage (Managed Disks)</td><td>$29,520</td><td>$2,667</td><td class="check">$26,853</td><td></td></tr>
+    <tr><td>Annual egress + monitoring</td><td>$12,960</td><td>$0</td><td class="check">$12,960</td><td></td></tr>
+    <tr><td>Migration (one-time)</td><td>—</td><td>$15,000</td><td>-$15,000</td><td></td></tr>
+    <tr><td class="result">Annual savings</td><td colspan="2"></td><td class="result">$180,080</td><td></td></tr>
+    <tr><td class="result">3-year net savings</td><td colspan="2"></td><td class="result" style="color:#4ade80;">$525,240</td><td></td></tr>
+  </table>
+
+  <div class="scenario-header"><strong>Scenario 6: Hyper-V Exit</strong> — 40 VMs, 2-host cluster, Windows Datacenter</div>
+  <table>
+    <tr><th style="width:30%">Metric</th><th style="width:20%">Hyper-V Cost</th><th style="width:20%">KVM Cost</th><th style="width:15%">Savings</th><th style="width:15%">Notes</th></tr>
+    <tr><td>Annual Windows Datacenter licensing</td><td>$98,480</td><td>$0</td><td class="check">$98,480</td><td>2 hosts x $49K</td></tr>
+    <tr><td>Annual System Center</td><td>$28,856</td><td>$0</td><td class="check">$28,856</td><td>SCVMM + SCOM</td></tr>
+    <tr><td>Annual CALs (200 users)</td><td>$6,000</td><td>$0</td><td class="check">$6,000</td><td>Per-user CALs</td></tr>
+    <tr><td>Migration (one-time)</td><td>—</td><td>$12,000</td><td>-$12,000</td><td></td></tr>
+    <tr><td class="result">Annual savings</td><td colspan="2"></td><td class="result">$133,336</td><td></td></tr>
+    <tr><td class="result">3-year net savings</td><td colspan="2"></td><td class="result" style="color:#4ade80;">$388,008</td><td></td></tr>
+  </table>
+
+  <div class="scenario-header"><strong>Scenario 7: Edge Deployment</strong> — 50 sites, VMware to K3s + KubeVirt</div>
+  <table>
+    <tr><th style="width:30%">Metric</th><th style="width:20%">VMware</th><th style="width:20%">K3s + KubeVirt</th><th style="width:15%">Savings</th><th style="width:15%">Notes</th></tr>
+    <tr><td>Annual software per site</td><td>$10,000</td><td>$0</td><td class="check">$10,000</td><td>vSphere Essentials</td></tr>
+    <tr><td>50 sites annual software</td><td>$500,000</td><td>$0</td><td class="check">$500,000</td><td></td></tr>
+    <tr><td>Management (vCenter vs GitOps)</td><td>$50,000</td><td>$0</td><td class="check">$50,000</td><td>ArgoCD is free</td></tr>
+    <tr><td>Migration (one-time, all sites)</td><td>—</td><td>$30,000</td><td>-$30,000</td><td>Convert once, deploy to all</td></tr>
+    <tr><td class="result">Annual savings</td><td colspan="2"></td><td class="result">$550,000</td><td></td></tr>
+    <tr><td class="result">3-year net savings</td><td colspan="2"></td><td class="result" style="color:#4ade80;">$1,620,000</td><td></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 7: Multi-Cloud & Combined Scenario -->
+<div class="page page-light">
+  <h2 class="st">Combined <span>Scenario</span></h2>
+  <p class="sub">The complete picture: VMware + Hyper-V + cloud + edge + SQL in one migration project.</p>
+
+  <div class="scenario-header"><strong>Scenario 8: Full Migration</strong> — 200 VMs across VMware, Hyper-V, AWS, Azure + 20 edge sites + SQL Server</div>
+
+  <table>
+    <tr><th style="width:30%">Component</th><th style="width:15%">VMs</th><th style="width:20%">Current Annual</th><th style="width:15%">KVM Annual</th><th style="width:20%">Annual Savings</th></tr>
+    <tr><td>VMware vSphere (100 VMs, 8 hosts)</td><td>100</td><td>$280,000</td><td>$6,400</td><td class="check">$273,600</td></tr>
+    <tr><td>Hyper-V (40 VMs, 2 hosts)</td><td>40</td><td>$133,336</td><td>$0</td><td class="check">$133,336</td></tr>
+    <tr><td>AWS EC2 (30 VMs)</td><td>30</td><td>$264,000</td><td>$20,000</td><td class="check">$244,000</td></tr>
+    <tr><td>Azure (30 VMs)</td><td>30</td><td>$234,000</td><td>$20,000</td><td class="check">$214,000</td></tr>
+    <tr><td>Edge sites (20 sites, VMware)</td><td>—</td><td>$200,000</td><td>$0</td><td class="check">$200,000</td></tr>
+    <tr><td>SQL Server licensing (10 instances)</td><td>—</td><td>$632,400</td><td>$379,440</td><td class="check">$252,960</td></tr>
+    <tr><td style="font-weight:700;">Subtotal — current annual</td><td>200</td><td style="font-weight:700;">$1,743,736</td><td style="font-weight:700;">$425,840</td><td style="font-weight:700; color:#16a34a;">$1,317,896</td></tr>
+  </table>
+
+  <table>
+    <tr><th style="width:45%">Investment</th><th style="width:20%">Amount</th><th style="width:35%">Notes</th></tr>
+    <tr><td>Migration labor (2 engineers, 20 weeks)</td><td>$60,000</td><td>hyper2kvm + hypersdk automate most work</td></tr>
+    <tr><td>New hardware (edge + expansion)</td><td>$40,000</td><td>Mini PCs for edge, reuse existing for HQ</td></tr>
+    <tr><td>Training (Linux/KVM/K8s)</td><td>$15,000</td><td>Team upskilling</td></tr>
+    <tr><td>hyper2kvm + hypersdk</td><td><strong>Contact for pricing*</strong></td><td>Proprietary (Zyvor AI Labs)</td></tr>
+    <tr><td class="result">Total one-time investment</td><td class="result">$115,000</td><td></td></tr>
+  </table>
+
+  <div class="card-grid-4">
+    <div class="stat-box card"><div class="num">$1.32M</div><div class="label">Annual savings</div></div>
+    <div class="stat-box card"><div class="num">1.0 mo</div><div class="label">Payback period</div></div>
+    <div class="stat-box card"><div class="num">$3.84M</div><div class="label">3-year net savings</div></div>
+    <div class="stat-box card"><div class="num">3,339%</div><div class="label">3-year ROI</div></div>
+  </div>
+
+  <div class="verdict">
+    <h3>$3.84M Saved Over 3 Years — $115K Investment</h3>
+    <p style="font-size:0.92em;">
+      Payback in 1 month. Every additional month is pure savings.<br>
+      VMware licensing: gone. Hyper-V licensing: gone. Cloud bills: slashed 85%.<br>
+      SQL Server licensing: reduced 40%. Edge sites: $0 software forever.<br>
+      <strong>hyper2kvm + hypersdk made it possible — for $0 in tool cost.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm + hypersdk — Enterprise VM Migration Platform | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

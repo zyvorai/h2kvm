@@ -1,0 +1,12 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 40-ova-ovf/ova-basic.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 40-ova-ovf/ova-basic.yaml
+
+command: ova
+ova: /path/to/appliance.ova
+flatten: true
+to_output: appliance.qcow2
+out_format: qcow2
+compress: true

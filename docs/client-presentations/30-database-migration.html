@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Database Migration Best Practices — PostgreSQL, MySQL, SQL Server, Oracle</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1e3a5f, #0d47a1, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #60a5fa; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(96,165,250,0.2); border: 1px solid rgba(96,165,250,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #60a5fa; }
+  .page-light h2.st span { color: #1d4ed8; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #60a5fa; }
+  .page-light h3 { color: #1d4ed8; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #1d4ed8; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #60a5fa; }
+  .page-light .card h4 { color: #1d4ed8; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #0f172a; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(96,165,250,0.06); }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .alert { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .alert h4 { color: #ef4444; font-size: 0.92em; margin-bottom: 3px; }
+  .verdict { background: linear-gradient(135deg, rgba(30,58,95,0.15), rgba(13,71,161,0.08)); border: 2px solid #1d4ed8; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #60a5fa; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Database <span>Migration</span></h1>
+  <h2>Best Practices for PostgreSQL, MySQL, SQL Server &amp; Oracle</h2>
+  <p class="sub">Database VMs are the highest-risk, highest-reward migration target. This guide covers per-database strategies: when to stop vs snapshot, replication-based cutover, VirtIO I/O performance, SQL Server licensing savings with CPU pinning, and zero-downtime approaches using read replicas.</p>
+  <div class="badge">PostgreSQL | MySQL | SQL Server | Oracle | Zero-Downtime | CPU Pinning</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">The Database <span>Migration Challenge</span></h2>
+  <p class="sub">Database VMs carry the most risk — and the biggest savings opportunity.</p>
+
+  <div class="alert">
+    <h4>Why databases are different from other VMs</h4>
+    <p>Databases have active writes, transaction logs, replication relationships, and strict consistency requirements. A naive VM migration (shutdown → export → convert → boot) causes downtime. A crash-consistent snapshot may lose transactions. The strategy depends on the database engine and acceptable downtime window.</p>
+  </div>
+
+  <h3>Migration Strategies by Downtime Tolerance</h3>
+  <table>
+    <tr><th style="width:18%">Strategy</th><th style="width:15%">Downtime</th><th style="width:22%">How It Works</th><th style="width:22%">Best For</th><th style="width:23%">Databases</th></tr>
+    <tr><td><strong>Cold migration</strong></td><td>30-60 min</td><td>Stop DB → export VM → convert → boot on KVM → start DB</td><td>Dev/test, small DBs, planned windows</td><td>All databases</td></tr>
+    <tr><td><strong>Snapshot migration</strong></td><td>5-15 min</td><td>VMware snapshot → export → convert → boot → DB crash recovery</td><td>Tolerant DBs with WAL/redo logs</td><td>PostgreSQL, MySQL InnoDB, Oracle</td></tr>
+    <tr><td><strong>Replica cutover</strong></td><td>&lt;1 min</td><td>Set up replication to KVM replica → promote → cutover DNS</td><td>Production DBs needing near-zero downtime</td><td>PostgreSQL, MySQL, SQL Server AG</td></tr>
+    <tr><td><strong>Logical migration</strong></td><td>0 (online)</td><td>pg_dump/mysqldump or logical replication to new KVM instance</td><td>Schema + data only (no VM migration)</td><td>PostgreSQL, MySQL (not VM-level)</td></tr>
+  </table>
+
+  <h3>Per-Database Best Practices</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>PostgreSQL</h4>
+      <ul>
+        <li><strong>Preferred:</strong> Streaming replication to KVM replica, then promote</li>
+        <li><strong>Cold:</strong> <code>pg_ctl stop -m fast</code> before export</li>
+        <li><strong>Snapshot:</strong> Safe — WAL replay recovers from crash-consistent state</li>
+        <li><strong>Post-migration:</strong> Verify <code>pg_isready</code>, check replication lag</li>
+        <li><strong>VirtIO performance:</strong> Comparable to PVSCSI for OLTP workloads</li>
+        <li><strong>Tip:</strong> Separate WAL on second VirtIO disk for best I/O</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>MySQL / MariaDB</h4>
+      <ul>
+        <li><strong>Preferred:</strong> MySQL replication to KVM replica, then promote</li>
+        <li><strong>Cold:</strong> <code>mysqladmin shutdown</code> before export (clean shutdown)</li>
+        <li><strong>Snapshot:</strong> InnoDB crash recovery handles inconsistency</li>
+        <li><strong>GTID replication:</strong> Set up replica on KVM, catch up, promote</li>
+        <li><strong>Post-migration:</strong> <code>SHOW SLAVE STATUS</code>, check binary log position</li>
+        <li><strong>Tip:</strong> innodb_flush_log_at_trx_commit=1 for safety</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>SQL Server</h4>
+      <ul>
+        <li><strong>Preferred:</strong> Always-On AG — add KVM replica, failover</li>
+        <li><strong>Cold:</strong> Stop SQL Server service before export</li>
+        <li><strong>VirtIO injection:</strong> hyper2kvm handles automatically</li>
+        <li><strong>Licensing win:</strong> KVM CPU pinning reduces per-core licensing 20-40%</li>
+        <li><strong>Post-migration:</strong> Verify databases online, AG health, agent jobs</li>
+        <li><strong>Tip:</strong> Lock pages in memory + large pages on KVM for performance</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Oracle Database</h4>
+      <ul>
+        <li><strong>Preferred:</strong> Data Guard to KVM standby, switchover</li>
+        <li><strong>Cold:</strong> <code>shutdown immediate</code> before export</li>
+        <li><strong>Snapshot:</strong> Redo log replay recovers crash-consistent state</li>
+        <li><strong>RAC:</strong> Migrate one node at a time (rolling migration)</li>
+        <li><strong>Post-migration:</strong> Verify <code>SELECT STATUS FROM V$INSTANCE</code></li>
+        <li><strong>Tip:</strong> ASM disk groups migrate with the VM disk</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">SQL Server <span>Licensing Savings</span></h2>
+  <p class="sub">The biggest hidden win of database migration: reduced per-core licensing costs on KVM.</p>
+
+  <h3>The VMware SQL Server Licensing Problem</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>On VMware</h4>
+      <ul>
+        <li>VMware vSphere exposes all physical cores to the guest</li>
+        <li>Microsoft licensing may count all host cores</li>
+        <li>A 2-socket, 16-core/socket host = 32 cores to license</li>
+        <li>SQL Standard: $3,945/2-core pack x 16 = <strong>$63,120</strong></li>
+        <li>SQL Enterprise: $15,123/2-core pack x 16 = <strong>$241,968</strong></li>
+        <li>Even if SQL VM uses only 4 vCPUs</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>On KVM (with CPU pinning)</h4>
+      <ul>
+        <li>KVM with CPU pinning exposes only assigned cores</li>
+        <li>SQL VM with 4 pinned vCPUs = license only 4 cores</li>
+        <li>NUMA-aware placement for performance + compliance</li>
+        <li>cgroups enforce CPU isolation — verifiable by auditors</li>
+        <li>SQL Standard: $3,945 x 2 = <strong>$7,890</strong></li>
+        <li>SQL Enterprise: $15,123 x 2 = <strong>$30,246</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Savings Calculator: 10 SQL Server Instances</h3>
+  <table>
+    <tr><th style="width:25%">Edition</th><th style="width:20%">VMware (32 cores/host)</th><th style="width:20%">KVM (4 pinned vCPUs)</th><th style="width:15%">Per-Server Savings</th><th style="width:20%">10 Servers / 3 Years</th></tr>
+    <tr><td><strong>SQL Standard</strong></td><td>$63,120</td><td>$7,890</td><td class="check">$55,230</td><td class="check">$1,656,900</td></tr>
+    <tr><td><strong>SQL Enterprise</strong></td><td>$241,968</td><td>$30,246</td><td class="check">$211,722</td><td class="check">$6,351,660</td></tr>
+  </table>
+  <p style="font-size:0.82em; opacity:0.6; font-style:italic;">Note: Actual savings depend on Microsoft licensing agreement, Software Assurance, and core count. Consult your Microsoft licensing advisor for exact numbers.</p>
+
+  <h3>Zero-Downtime Database Migration with Replication</h3>
+  <pre>
+# PostgreSQL: Streaming replication to KVM target
+# 1. Set up KVM VM with PostgreSQL (same version)
+# 2. Configure streaming replication from VMware source
+# 3. Wait for replica to catch up (lag = 0)
+# 4. Application maintenance mode (1 minute)
+# 5. Promote KVM replica: SELECT pg_promote()
+# 6. Update DNS/connection strings to KVM
+# 7. Verify application connectivity
+# Total downtime: &lt;1 minute
+  </pre>
+
+  <div class="verdict">
+    <h3>Database Migration: Highest Risk, Highest Reward</h3>
+    <p style="font-size:0.9em;">
+      Use replication for near-zero downtime. Use CPU pinning for SQL Server licensing savings.<br>
+      hyper2kvm handles the VM-level conversion (VirtIO, fstab, initramfs) automatically.<br>
+      <strong>The database strategy is your choice. The VM migration is automated.</strong>
+    </p>
+  </div>
+  <div class="footer"><p>hyper2kvm — Database Migration Best Practices | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

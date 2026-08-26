@@ -1,0 +1,68 @@
+# ============================================
+# Batch Migration: Multiple VMs in one config
+# ============================================
+# Migrates multiple VMs with shared defaults. Each VM inherits
+# common settings and can override individually.
+#
+# Usage:
+#   sudo h2kvmctl --batch-manifest examples/yaml/70-complete-workflows/batch-migration.yaml
+# ============================================
+
+# ── Common defaults for all VMs ──
+defaults:
+  cmd: local
+  out_format: qcow2
+  flatten: true
+  compress: true
+  fstab_mode: stabilize-all
+  regen_initramfs: true
+  remove_vmware_tools: true
+  emit_domain_xml: true
+  uefi: true
+  machine: q35
+  disk_bus: virtio
+  disk_cache: none
+  net_model: virtio
+  libvirt_network: default
+  guest_os: linux
+
+# ── Individual VM configurations ──
+migrations:
+  - name: web-server-01
+    vmdk: /vmware/vms/web-01.vmdk
+    to_output: /kvm/vms/web-01.qcow2
+    memory: 4096
+    vcpus: 2
+
+  - name: web-server-02
+    vmdk: /vmware/vms/web-02.vmdk
+    to_output: /kvm/vms/web-02.qcow2
+    memory: 4096
+    vcpus: 2
+
+  - name: db-server
+    vmdk: /vmware/vms/db-server.vmdk
+    to_output: /kvm/vms/db-server.qcow2
+    memory: 16384
+    vcpus: 8
+
+  - name: app-server
+    vmdk: /vmware/vms/app-server.vmdk
+    to_output: /kvm/vms/app-server.qcow2
+    memory: 8192
+    vcpus: 4
+
+  # Windows VM (overrides guest_os and adds virtio ISO)
+  - name: windows-desktop
+    vmdk: /vmware/vms/win10.vmdk
+    to_output: /kvm/vms/win10.qcow2
+    memory: 8192
+    vcpus: 4
+    guest_os: windows
+    windows: true
+    virtio_win_iso: /usr/share/virtio-win/virtio-win.iso
+    win_stage: bootstrap
+    disk_cache: writeback
+    graphics: spice
+    video: qxl
+    clock: localtime

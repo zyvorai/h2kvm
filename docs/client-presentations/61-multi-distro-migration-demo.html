@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hyper2kvm — Multi-Distro VMware to KVM Migration Demo</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1e3a5f, #0ea5e9, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.6em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #38bdf8; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 0.95em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .cover .badge2 { display: inline-block; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 16px; font-size: 0.82em; margin-top: 0.8em; }
+  .page { min-height: 100vh; padding: 34px 44px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.65em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #38bdf8; }
+  .page-light h2.st span { color: #0284c7; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.6em 0 0.25em; color: #38bdf8; }
+  .page-light h3 { color: #0284c7; }
+  p { margin-bottom: 0.5em; font-size: 0.86em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  pre { background: #0f172a; color: #e8e6df; padding: 11px; border-radius: 8px; font-size: 0.7em; line-height: 1.4; font-family: 'JetBrains Mono', 'Fira Code', monospace; margin: 0.5em 0; overflow-x: auto; white-space: pre-wrap; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .page-light pre { background: #1e293b; color: #e8e6df; }
+  .step { display: inline-block; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); padding: 3px 10px; border-radius: 5px; font-size: 0.8em; font-weight: 700; color: #38bdf8; margin-bottom: 0.3em; }
+  .page-light .step { color: #0284c7; background: rgba(2,132,199,0.1); border-color: rgba(2,132,199,0.2); }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 11px; margin: 0.5em 0; }
+  .card-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0.5em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.85em; font-weight: 600; margin-bottom: 4px; color: #38bdf8; }
+  .page-light .card h4 { color: #0284c7; }
+  .card p, .card li { font-size: 0.76em; margin-bottom: 0; }
+  .card ul { padding-left: 1.2em; margin-top: 4px; }
+  .highlight { background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .verdict { background: linear-gradient(135deg, rgba(30,58,95,0.2), rgba(14,165,233,0.1)); border: 2px solid #0284c7; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #38bdf8; font-size: 1.1em; margin-bottom: 4px; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .check { color: #22c55e; font-weight: 700; }
+  .warn { color: #f59e0b; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; margin: 0.5em 0; font-size: 0.74em; }
+  th { background: #0284c7; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .distro-rocky { border-left: 4px solid #10b981; }
+  .distro-ubuntu24 { border-left: 4px solid #e95420; }
+  .distro-ubuntu22 { border-left: 4px solid #dd4814; }
+  .distro-centos { border-left: 4px solid #9b59b6; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>hyper2kvm <span>Multi-Distro Migration</span></h1>
+  <h2>4 VMware VMs &rarr; KVM on Bare-Metal AlmaLinux 9</h2>
+  <p class="sub">Live end-to-end migration demonstration: Rocky Linux 9.4, Ubuntu 24.04 LTS, Ubuntu Server 22.04 LTS, and CentOS Stream 9 &mdash; all converted from VMware VMDK to KVM with automated offline fixes, virtio driver injection, netplan repair, and verified SSH connectivity. Single command per VM. Zero manual intervention.</p>
+  <div class="badge">4 Distros | VMware VMDK &rarr; KVM QCOW2 | VirtIO | Libvirt | DHCP + SSH Verified</div>
+  <div class="badge2">Host: Worldstream Bare-Metal | AlmaLinux 9.7 | Intel Xeon E3-1230 v6 | 16 GB RAM | QEMU 9.1 + Libvirt 10.10</div>
+</div>
+
+<!-- PAGE 1: Host Environment -->
+<div class="page page-dark">
+  <h2 class="st">Test Environment: <span>Bare-Metal Host</span></h2>
+  <p class="sub">All migrations executed on a Worldstream dedicated server running AlmaLinux 9.7 &mdash; a RHEL-derivative without qemu-system-x86_64 or SPICE, validating hyper2kvm's cross-distro auto-detection.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Host Hardware</h4>
+      <pre>
+Hostname:    NLDW3-4-31-12
+Provider:    Worldstream (Netherlands)
+CPU:         Intel Xeon E3-1230 v6 @ 3.50GHz
+             4 cores / 8 threads
+RAM:         16 GB DDR4
+Disk:        219 GB (SSD)
+Network:     1 Gbps public (185.165.240.5)
+      </pre>
+    </div>
+    <div class="card">
+      <h4>Host Software Stack</h4>
+      <pre>
+OS:          AlmaLinux 9.7 (Moss Jungle Cat)
+Kernel:      5.14.0-611.41.1.el9_7.x86_64
+QEMU:        9.1.0 (/usr/libexec/qemu-kvm)
+Libvirt:     10.10.0
+Python:      3.11.13
+h2kvmctl:    0.3.0
+Backend:     VMCraft (pure Python + qemu-nbd)
+Graphics:    VNC (auto-detected, no SPICE)
+      </pre>
+    </div>
+  </div>
+
+  <h3>Cross-Distro Challenges Solved</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>QEMU Binary Path</h4>
+      <p>AlmaLinux uses <code>/usr/libexec/qemu-kvm</code> instead of Fedora's <code>/usr/bin/qemu-system-x86_64</code>. hyper2kvm auto-detects the correct binary across Fedora, RHEL, AlmaLinux, Debian, and Ubuntu.</p>
+    </div>
+    <div class="card">
+      <h4>Graphics Backend</h4>
+      <p>AlmaLinux QEMU is built without SPICE support. hyper2kvm detects this and falls back to VNC automatically &mdash; no user configuration needed.</p>
+    </div>
+    <div class="card">
+      <h4>Netplan VMware NIC Names</h4>
+      <p>Ubuntu VMs use <code>ens33</code> (VMware PCI slot). On KVM it becomes <code>ens3</code>. hyper2kvm replaces hardcoded names with <code>match: name: "en*"</code> for universal compatibility.</p>
+    </div>
+    <div class="card">
+      <h4>Initramfs VirtIO Injection</h4>
+      <p>VMware VMs ship without virtio drivers in initramfs. hyper2kvm runs <code>dracut --add-drivers virtio_blk virtio_net...</code> inside the guest via chroot to ensure first-boot success.</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Demo script:</strong> <code>run-demo.sh &lt;vmdk-path&gt;</code> &mdash; single command handles cleanup, conversion, offline fixes, libvirt define, VM boot, and IP verification.</p>
+  </div>
+</div>
+
+<!-- PAGE 2: Rocky Linux 9.4 -->
+<div class="page page-light">
+  <h2 class="st"><span>1.</span> Rocky Linux 9.4 <span>(Blue Onyx)</span></h2>
+  <p class="sub">RHEL-compatible enterprise Linux &mdash; LVM on XFS, UEFI boot, ifcfg networking.</p>
+
+  <div class="step">Source</div>
+  <pre>
+Source:    RockyLinux_9.4_VMM_LinuxVMImages.COM.vmdk (1.88 GiB)
+Format:    VMware monolithicSparse VMDK
+Layout:    GPT &rarr; /boot/efi (600M) + /boot (1G) + LVM (rl_192: root 70G + swap 2G + home 438G)
+Kernel:    5.14.0-427.13.1.el9_4.x86_64
+  </pre>
+
+  <div class="step">Migration Command</div>
+  <pre>$ run-demo.sh /root/hyper2kvm/RockyLinux_9.4_VMM_LinuxVMImages.COM.vmdk</pre>
+
+  <div class="step">Pipeline Output (key steps)</div>
+  <pre>
+&#10004; Sanity checks: 5/5 passed
+&#10004; VMDK inspection: monolithicSparse, GPT, UEFI detected
+&#10004; qemu-img convert: VMDK &rarr; QCOW2 (virtual: 512 GiB, actual: 2.1 GiB)
+&#10004; LVM activated: VG rl_192 (root + swap + home)
+&#10004; Offline fixes: fstab stabilized, VMware tools masked
+&#10004; Initramfs rebuilt: dracut --add-drivers virtio_blk virtio_scsi virtio_net nvme ahci --add lvm dm
+&#10004; Domain XML emitted: UEFI + Q35 + VirtIO + VNC
+&#10004; virsh define + start: RUNNING
+  </pre>
+
+  <div class="step">Result</div>
+  <div class="card-grid">
+    <div class="card distro-rocky">
+      <h4>virsh dominfo</h4>
+      <pre>
+Name:      RockyLinux_9.4_VMM_LinuxVMImages.COM
+State:     running
+CPU(s):    2
+Memory:    2048 MiB
+Firmware:  UEFI (OVMF)
+Disk:      vda (virtio, qcow2)
+Network:   virtio (virbr0)
+      </pre>
+    </div>
+    <div class="card distro-rocky">
+      <h4>SSH Verification</h4>
+      <pre>
+$ ssh rockylinux@192.168.122.17
+
+rocky9.linuxvmimages.local
+Rocky Linux 9.4 (Blue Onyx)
+5.14.0-427.13.1.el9_4.x86_64
+
+enp1s0  UP  192.168.122.17/24
+
+vda (virtio, LVM: rl_192)
+  ├─rl_192-root  70G  /
+  ├─rl_192-swap   2G  [SWAP]
+  └─rl_192-home 438G  /home
+      </pre>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3 style="color:#10b981;">&#10004; Rocky Linux 9.4 &mdash; Migration Successful</h3>
+    <p style="font-size:0.85em;">VMDK &rarr; QCOW2 | UEFI + VirtIO + LVM | IP: 192.168.122.17 | SSH accessible | ~55s total</p>
+  </div>
+</div>
+
+<!-- PAGE 3: Ubuntu 24.04 -->
+<div class="page page-dark">
+  <h2 class="st"><span>2.</span> Ubuntu 24.04 LTS <span>(Noble Numbat)</span></h2>
+  <p class="sub">Latest Ubuntu LTS with GNOME desktop &mdash; LVM on ext4, BIOS boot, netplan + NetworkManager.</p>
+
+  <div class="step">Source</div>
+  <pre>
+Source:    Ubuntu_24.04_VM_LinuxVMImages.COM.vmdk (6.0 GiB)
+Format:    VMware monolithicSparse VMDK
+Layout:    MBR &rarr; /boot (1M+2G) + LVM (ubuntu-vg: ubuntu-lv 122G)
+Kernel:    6.8.0-31-generic
+Desktop:   GNOME (snap-based Firefox, firmware-updater, snap-store)
+  </pre>
+
+  <div class="step">Migration Command</div>
+  <pre>$ run-demo.sh /root/hyper2kvm/Ubuntu_24.04_VM_LinuxVMImages.COM.vmdk</pre>
+
+  <div class="step">Pipeline Output (key steps)</div>
+  <pre>
+&#10004; Sanity checks: 5/5 passed
+&#10004; qemu-img convert: VMDK &rarr; QCOW2 (virtual: 124 GiB, actual: 6.0 GiB)
+&#10004; LVM activated: VG ubuntu-vg (ubuntu-lv)
+&#10004; Offline fixes: fstab stabilized, VMware tools masked
+&#10004; Initramfs rebuilt: dracut --add-drivers virtio_blk virtio_net --add lvm
+&#10004; Boot mode: BIOS (i440fx)
+&#10004; Domain XML emitted + virsh define + start: RUNNING
+  </pre>
+
+  <div class="step">Result</div>
+  <div class="card-grid">
+    <div class="card distro-ubuntu24">
+      <h4>virsh dominfo</h4>
+      <pre>
+Name:      Ubuntu_24.04_VM_LinuxVMImages.COM
+State:     running
+CPU(s):    2
+Memory:    2048 MiB
+Firmware:  BIOS
+Disk:      vda (virtio, qcow2)
+Network:   virtio (virbr0)
+      </pre>
+    </div>
+    <div class="card distro-ubuntu24">
+      <h4>SSH Verification</h4>
+      <pre>
+$ ssh ubuntu@192.168.122.254
+
+ubuntu2404
+Ubuntu 24.04 LTS (Noble Numbat)
+6.8.0-31-generic
+
+ens3  UP  192.168.122.254/24
+
+vda (virtio, LVM: ubuntu-vg)
+  └─ubuntu--vg-ubuntu--lv 122G /
+      </pre>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3 style="color:#e95420;">&#10004; Ubuntu 24.04 LTS &mdash; Migration Successful</h3>
+    <p style="font-size:0.85em;">VMDK &rarr; QCOW2 | BIOS + VirtIO + LVM | IP: 192.168.122.254 | SSH accessible | ~52s total</p>
+  </div>
+</div>
+
+<!-- PAGE 4: Ubuntu Server 22.04 -->
+<div class="page page-light">
+  <h2 class="st"><span>3.</span> Ubuntu Server 22.04 LTS <span>(Jammy Jellyfish)</span></h2>
+  <p class="sub">Server LTS with netplan DHCP on ens33 (VMware) &mdash; demonstrates automatic netplan NIC name fix.</p>
+
+  <div class="step">Source</div>
+  <pre>
+Source:    UbuntuServer_22.04_VM_LinuxVMImages.COM.vmdk (4.1 GiB)
+Format:    VMware monolithicSparse VMDK
+Layout:    MBR &rarr; /boot (1M+2G) + LVM (ubuntu-vg: ubuntu-lv 100G)
+Kernel:    5.15.0-30-generic
+Network:   netplan with hardcoded ens33 (VMware PCI slot name)
+  </pre>
+
+  <div class="step">The Problem &amp; The Fix</div>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Before (VMware)</h4>
+      <pre>
+# /etc/netplan/00-installer-config.yaml
+network:
+  ethernets:
+    ens33:          # &larr; VMware-specific name
+      dhcp4: true
+  version: 2
+      </pre>
+      <p>On KVM, the NIC becomes <code>ens3</code> &mdash; netplan won't match <code>ens33</code>, so <strong>no network</strong>.</p>
+    </div>
+    <div class="card">
+      <h4>After (hyper2kvm auto-fix)</h4>
+      <pre>
+# /etc/netplan/00-installer-config.yaml
+network:
+  ethernets:
+    all-en:
+      dhcp4: true
+      match:
+        name: en*    # &larr; matches any backend
+  version: 2
+      </pre>
+      <p>hyper2kvm detects VMware NIC names (ens33, ens160, etc.) and replaces with wildcard match. <strong>Works everywhere.</strong></p>
+    </div>
+  </div>
+
+  <div class="step">Pipeline Log</div>
+  <pre>
+&#10004; Fixed /etc/netplan/00-installer-config.yaml (netplan) - 1 fix applied
+    eth-ens33-replaced-vmware-nic-name-with-match
+  </pre>
+
+  <div class="step">Result</div>
+  <div class="card-grid">
+    <div class="card distro-ubuntu22">
+      <h4>virsh dominfo</h4>
+      <pre>
+Name:      UbuntuServer_22.04_VM_LinuxVMImages.COM
+State:     running
+CPU(s):    2
+Memory:    2048 MiB
+Firmware:  BIOS
+Disk:      vda (virtio, qcow2)
+Network:   virtio (virbr0)
+      </pre>
+    </div>
+    <div class="card distro-ubuntu22">
+      <h4>SSH Verification</h4>
+      <pre>
+$ ssh ubuntu@192.168.122.215
+
+ubuntuserver2204
+Ubuntu 22.04 LTS (Jammy Jellyfish)
+5.15.0-30-generic
+
+ens3  UP  192.168.122.215/24
+
+vda (virtio, LVM: ubuntu-vg)
+  └─ubuntu--vg-ubuntu--lv 100G /
+      </pre>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3 style="color:#dd4814;">&#10004; Ubuntu Server 22.04 &mdash; Migration Successful (with netplan auto-fix)</h3>
+    <p style="font-size:0.85em;">VMDK &rarr; QCOW2 | BIOS + VirtIO + LVM | Netplan ens33&rarr;en* | IP: 192.168.122.215 | SSH accessible | ~50s total</p>
+  </div>
+</div>
+
+<!-- PAGE 5: CentOS Stream 9 -->
+<div class="page page-dark">
+  <h2 class="st"><span>4.</span> CentOS Stream 9 <span></span></h2>
+  <p class="sub">RHEL upstream continuous-delivery distribution &mdash; LVM on XFS, BIOS boot, ifcfg/NetworkManager networking.</p>
+
+  <div class="step">Source</div>
+  <pre>
+Source:    CentOS_Stream_9_VMM_LinuxVMImages.COM.vmdk (1.4 GiB)
+Format:    VMware monolithicSparse VMDK
+Layout:    MBR &rarr; /boot (1G) + LVM (cs: root 70G + swap 2G + home 439G)
+Kernel:    5.14.0-22.el9.x86_64
+  </pre>
+
+  <div class="step">Migration Command</div>
+  <pre>$ run-demo.sh /root/hyper2kvm/CentOS_Stream_9_VMM_LinuxVMImages.COM.vmdk</pre>
+
+  <div class="step">Pipeline Output (key steps)</div>
+  <pre>
+&#10004; Sanity checks: 5/5 passed
+&#10004; qemu-img convert: VMDK &rarr; QCOW2 (virtual: 512 GiB, actual: 1.4 GiB)
+&#10004; LVM activated: VG cs (root + swap + home)
+&#10004; Offline fixes: fstab stabilized, VMware tools masked, ifcfg MAC pinning removed
+&#10004; Initramfs rebuilt: dracut --add-drivers virtio_blk virtio_scsi virtio_net nvme ahci --add lvm dm
+&#10004; Domain XML emitted + virsh define + start: RUNNING
+  </pre>
+
+  <div class="step">Result</div>
+  <div class="card-grid">
+    <div class="card distro-centos">
+      <h4>virsh dominfo</h4>
+      <pre>
+Name:      CentOS_Stream_9_VMM_LinuxVMImages.COM
+State:     running
+CPU(s):    2
+Memory:    2048 MiB
+Firmware:  UEFI (OVMF)
+Disk:      vda (virtio, qcow2)
+Network:   virtio (virbr0)
+      </pre>
+    </div>
+    <div class="card distro-centos">
+      <h4>SSH Verification</h4>
+      <pre>
+$ ssh centos@192.168.122.165
+
+centosstream9.linuxvmiages.local
+CentOS Stream 9
+5.14.0-22.el9.x86_64
+
+ens3  UP  192.168.122.165/24
+
+vda (virtio, LVM: cs)
+  ├─cs-root  70G  /
+  ├─cs-swap   2G  [SWAP]
+  └─cs-home 439G  /home
+      </pre>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3 style="color:#9b59b6;">&#10004; CentOS Stream 9 &mdash; Migration Successful</h3>
+    <p style="font-size:0.85em;">VMDK &rarr; QCOW2 | UEFI + VirtIO + LVM | IP: 192.168.122.165 | SSH accessible | ~57s total</p>
+  </div>
+</div>
+
+<!-- PAGE 6: Summary -->
+<div class="page page-light">
+  <h2 class="st">Summary: <span>4/4 Migrations Successful</span></h2>
+  <p class="sub">All four VMware VMDKs converted and booted on KVM with a single command each. Zero manual intervention.</p>
+
+  <table>
+    <tr>
+      <th>#</th>
+      <th>Distribution</th>
+      <th>Kernel</th>
+      <th>Boot</th>
+      <th>Storage</th>
+      <th>Network Fix</th>
+      <th>IP Address</th>
+      <th>SSH</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td><strong>Rocky Linux 9.4</strong></td>
+      <td>5.14.0-427.13.1.el9_4</td>
+      <td>UEFI</td>
+      <td>LVM (rl_192) XFS</td>
+      <td>ifcfg MAC removed</td>
+      <td>192.168.122.17</td>
+      <td class="check">&#10004;</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>Ubuntu 24.04 LTS</strong></td>
+      <td>6.8.0-31-generic</td>
+      <td>BIOS</td>
+      <td>LVM (ubuntu-vg) ext4</td>
+      <td>netplan OK</td>
+      <td>192.168.122.254</td>
+      <td class="check">&#10004;</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>Ubuntu Server 22.04</strong></td>
+      <td>5.15.0-30-generic</td>
+      <td>BIOS</td>
+      <td>LVM (ubuntu-vg) ext4</td>
+      <td>netplan ens33&rarr;en*</td>
+      <td>192.168.122.215</td>
+      <td class="check">&#10004;</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>CentOS Stream 9</strong></td>
+      <td>5.14.0-22.el9</td>
+      <td>UEFI</td>
+      <td>LVM (cs) XFS</td>
+      <td>ifcfg MAC removed</td>
+      <td>192.168.122.165</td>
+      <td class="check">&#10004;</td>
+    </tr>
+  </table>
+
+  <h3>What hyper2kvm Did Automatically</h3>
+  <div class="card-grid-4">
+    <div class="card">
+      <h4>Disk Conversion</h4>
+      <ul>
+        <li>VMware VMDK &rarr; QCOW2</li>
+        <li>LVM volume group activation</li>
+        <li>Format validation</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Offline Fixes</h4>
+      <ul>
+        <li>fstab UUID stabilization</li>
+        <li>VMware tools masked</li>
+        <li>Network config repair</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Boot Repair</h4>
+      <ul>
+        <li>VirtIO driver injection via dracut</li>
+        <li>GRUB config updated</li>
+        <li>UEFI/BIOS auto-detect</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Deploy</h4>
+      <ul>
+        <li>Libvirt XML generation</li>
+        <li>QEMU path auto-detect</li>
+        <li>VNC/SPICE auto-detect</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Host Compatibility Fixes Applied</h3>
+  <table>
+    <tr><th>Issue</th><th>Fedora/Debian</th><th>AlmaLinux 9</th><th>hyper2kvm Fix</th></tr>
+    <tr><td>QEMU binary</td><td>/usr/bin/qemu-system-x86_64</td><td>/usr/libexec/qemu-kvm</td><td>find_qemu_binary() auto-detect</td></tr>
+    <tr><td>Graphics</td><td>SPICE available</td><td>No SPICE (VNC only)</td><td>_default_graphics() checks libspice-server.so</td></tr>
+    <tr><td>Netplan NIC</td><td>N/A</td><td>N/A</td><td>Replace ens33/ens160 with match: name: "en*"</td></tr>
+    <tr><td>Python</td><td>3.12+</td><td>3.9 (system), 3.11 installed</td><td>Works on Python 3.10+</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>4/4 Distros Migrated Successfully &mdash; Zero Manual Steps</h3>
+    <p style="font-size:0.88em;">
+      Rocky Linux 9.4 + Ubuntu 24.04 + Ubuntu Server 22.04 + CentOS Stream 9<br>
+      VMware VMDK &rarr; KVM QCOW2 with VirtIO + LVM + UEFI/BIOS<br>
+      All VMs booted, got DHCP IPs, and are SSH-accessible<br>
+      <strong>Host: AlmaLinux 9.7 bare-metal (Worldstream) &mdash; validated cross-distro compatibility</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.3.0 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

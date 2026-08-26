@@ -1,0 +1,28 @@
+# Example: Ubuntu/Debian Migration
+# This is a sample configuration - copy and customize for your VM
+
+command: local
+vmdk: /path/to/your/ubuntu.vmdk
+output_dir: /var/lib/libvirt/images
+to_output: ubuntu-server.qcow2
+out_format: qcow2
+compress: false
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Libvirt integration
+emit_domain_xml: true
+virsh_define: true
+vm_name: ubuntu-server
+libvirt_network: default
+machine: q35
+headless: false
+
+# Test after migration
+libvirt_test: true
+keep_domain: true
+timeout: 120
+
+# Resource allocation
+vcpus: 4
+memory: 4096

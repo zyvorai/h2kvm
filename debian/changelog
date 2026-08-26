@@ -1,0 +1,52 @@
+hyper2kvm (0.3.0-2) unstable; urgency=medium
+
+  * Add python3-guestfs to Recommends (auto-used for LVM/LUKS disks)
+  * Auto-switch to libguestfs backend when LVM or LUKS detected on guest disk
+
+ -- ZyvorAI Labs Private Limited <ssahani@zyvor.dev>  Wed, 26 Mar 2026 11:00:00 +0530
+
+hyper2kvm (0.3.0-1) unstable; urgency=medium
+
+  * Bump to 0.3.0
+  * Fix progress bar in zkvm TUI during migration
+  * Replace assert() statements with proper error handling
+  * Remove deprecated regenerate_uuids parameter
+  * Update all 89 docs to v0.3.0 and h2kvmctl CLI refs
+  * Add client presentations 53-57
+  * Add RPM build documentation
+
+ -- ZyvorAI Labs Private Limited <ssahani@zyvor.dev>  Tue, 25 Mar 2026 07:00:00 +0530
+
+hyper2kvm (0.2.2-1) unstable; urgency=medium
+
+  * Enable container isolation for LVM operations by default
+  * Add DEFAULT_CONTAINER_ISOLATION constant
+  * Add container_isolation to /etc/hyper2kvm/config.yaml
+  * Install daemon.yaml, modprobe, sysctl, and systemd-limits configs
+  * Add podman/docker as Suggests for container isolation
+  * Add 754 new unit tests across core, vmcraft, containers, pipeline,
+    converters, and fixers modules
+
+ -- ZyvorAI Labs Private Limited <ssahani@zyvor.dev>  Tue, 25 Feb 2025 10:00:00 +0530
+
+hyper2kvm (0.2.1-1) unstable; urgency=medium
+
+  * New upstream release 0.2.1
+  * Add centralized system-wide configuration support
+  * Add /etc/hyper2kvm/config.yaml system configuration
+  * Add migration template examples
+  * Update packaging with proper directory structure
+  * Fix RPM packaging for version 0.2.1
+
+ -- ZyvorAI Labs Private Limited <ssahani@zyvor.dev>  Tue, 18 Feb 2025 19:30:00 +0530
+
+hyper2kvm (0.0.1-1) unstable; urgency=medium
+
+  * Initial Debian package release
+  * Add comprehensive man pages
+  * Include example configurations
+  * Support for VMware vSphere, Hyper-V, and Azure migrations
+  * Add systemd service units for daemon mode
+  * Create system user and directories for daemon operation
+
+ -- ZyvorAI Labs Private Limited <ssahani@zyvor.dev>  Tue, 14 Jan 2025 10:00:00 +0530

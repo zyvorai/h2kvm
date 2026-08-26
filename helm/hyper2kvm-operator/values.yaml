@@ -1,0 +1,518 @@
+# Default values for hyper2kvm-operator Helm chart
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Global configuration
+global:
+  # Namespace to deploy operator (set to "" for all namespaces)
+  namespace: "hyper2kvm-system"
+
+  # Image pull secrets for private registries
+  imagePullSecrets: []
+  # - name: registry-secret
+
+  # Platform detection (auto-detected if not specified)
+  # Options: kubernetes, openshift
+  platform: ""
+
+# OpenShift-specific configuration
+openshift:
+  # Enable OpenShift-specific features
+  enabled: false
+
+  # Auto-detect OpenShift platform (checks for OpenShift API)
+  autoDetect: true
+
+  # Route configuration for operator metrics
+  route:
+    # Enable Route creation
+    enabled: true
+
+    # Route hostname (auto-generated if empty)
+    host: ""
+
+    # TLS configuration
+    tls:
+      # TLS termination: edge, passthrough, reencrypt
+      termination: edge
+
+      # Insecure traffic policy: Allow, Redirect, None
+      insecureEdgeTerminationPolicy: Redirect
+
+      # Custom certificate (optional)
+      certificate: ""
+      key: ""
+      caCertificate: ""
+
+    # Route annotations
+    annotations: {}
+      # haproxy.router.openshift.io/timeout: 60s
+
+  # SecurityContextConstraints for privileged workers
+  scc:
+    # Create SCC for worker pods
+    create: true
+
+    # SCC name
+    name: "hyper2kvm-worker-scc"
+
+    # Allow privileged containers (required for NBD, mount, LVM)
+    allowPrivilegedContainer: true
+
+    # Allow host network
+    allowHostNetwork: false
+
+    # Allow host ports
+    allowHostPorts: false
+
+    # Allow host PID
+    allowHostPID: false
+
+    # Allow host IPC
+    allowHostIPC: false
+
+    # Required capabilities
+    requiredDropCapabilities:
+      - KILL
+      - MKNOD
+      - SETUID
+      - SETGID
+
+    # Allowed capabilities
+    allowedCapabilities:
+      - SYS_ADMIN
+      - SYS_MODULE
+      - SYS_RAWIO
+
+    # SELinux context
+    seLinuxContext:
+      type: MustRunAs
+
+    # Run as user
+    runAsUser:
+      type: RunAsAny
+
+    # FS Group
+    fsGroup:
+      type: RunAsAny
+
+    # Supplemental groups
+    supplementalGroups:
+      type: RunAsAny
+
+    # Volumes
+    volumes:
+      - configMap
+      - downwardAPI
+      - emptyDir
+      - persistentVolumeClaim
+      - projected
+      - secret
+      - hostPath
+
+  # OAuth proxy for authenticated metrics access
+  oauth:
+    # Enable OAuth proxy sidecar
+    enabled: false
+
+    # OAuth proxy image
+    image:
+      repository: quay.io/openshift/origin-oauth-proxy
+      tag: "4.14"
+      pullPolicy: IfNotPresent
+
+    # OAuth proxy port
+    port: 8443
+
+    # Resources for OAuth proxy
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+      requests:
+        cpu: 50m
+        memory: 32Mi
+
+    # Session secret (auto-generated if empty)
+    sessionSecret: ""
+
+  # Template metadata for OpenShift Web Console
+  templateMetadata:
+    # Template annotations
+    annotations:
+      openshift.io/display-name: "Hyper2KVM Operator"
+      openshift.io/provider-display-name: "Hyper2KVM Project"
+      openshift.io/documentation-url: "https://github.com/ssahani/hyper2kvm"
+      openshift.io/support-url: "https://github.com/ssahani/hyper2kvm/issues"
+      description: "Kubernetes operator for automated VM migration from VMware to KVM"
+      iconClass: "icon-openshift"
+      tags: "migration,vmware,kvm,virtualization"
+
+    # Template labels
+    labels:
+      app.kubernetes.io/part-of: "hyper2kvm"
+      app.openshift.io/runtime: "python"
+
+# Operator deployment configuration
+operator:
+  # Operator image
+  image:
+    repository: ghcr.io/ssahani/hyper2kvm
+    tag: "0.3.0"
+    pullPolicy: IfNotPresent
+    digest: ""  # Set to override tag with digest
+
+  # Number of operator replicas (supports HA with leader election)
+  replicaCount: 1
+
+  # Leader election configuration
+  leaderElection:
+    # Enable leader election for HA multi-replica deployments
+    enabled: true
+    # Lease name for leader election
+    leaseName: "hyper2kvm-operator-leader"
+    # Lease duration in seconds
+    leaseDuration: 15
+    # Renew deadline in seconds
+    renewDeadline: 10
+    # Retry period in seconds
+    retryPeriod: 2
+
+  # Resources for operator pod
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # Node selector for operator pod
+  nodeSelector: {}
+
+  # Tolerations for operator pod
+  tolerations: []
+
+  # Affinity rules for operator pod
+  affinity: {}
+
+  # Security context for operator pod
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: true
+
+  # Service account
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "hyper2kvm-operator"
+
+  # RBAC configuration
+  rbac:
+    create: true
+    clusterRole: true  # Use ClusterRole for cluster-wide operator
+
+  # Operator configuration
+  config:
+    # Reconciliation interval (seconds)
+    reconcileInterval: 30
+
+    # Log level (DEBUG, INFO, WARNING, ERROR)
+    logLevel: INFO
+
+    # Enable verbose logging
+    verbose: false
+
+    # Worker discovery interval (seconds)
+    workerDiscoveryInterval: 60
+
+    # Maximum concurrent reconciliations
+    maxConcurrentReconciles: 10
+
+  # Health check endpoints
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: 8080
+    initialDelaySeconds: 15
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /healthz
+      port: 8080
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  # Metrics endpoint
+  metrics:
+    enabled: true
+    port: 8080
+    path: /metrics
+
+    # ServiceMonitor for Prometheus Operator
+    serviceMonitor:
+      enabled: true
+      interval: 30s
+      scrapeTimeout: 10s
+      labels: {}
+      # prometheus: kube-prometheus
+
+  # Pod annotations
+  podAnnotations: {}
+
+  # Pod labels
+  podLabels: {}
+
+# Webhook server configuration
+webhook:
+  # Enable admission webhooks
+  enabled: true
+
+  # Webhook image (uses same image as operator)
+  image:
+    repository: ghcr.io/ssahani/hyper2kvm
+    tag: "0.3.0"
+    pullPolicy: IfNotPresent
+    digest: ""
+
+  # Number of webhook replicas (HA)
+  replicaCount: 2
+
+  # Resources for webhook pods
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # Node selector for webhook pods
+  nodeSelector: {}
+
+  # Tolerations for webhook pods
+  tolerations: []
+
+  # Affinity rules for webhook pods
+  affinity: {}
+
+  # Security context for webhook pods
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: true
+
+  # Webhook service configuration
+  service:
+    type: ClusterIP
+    port: 443
+    targetPort: 8443
+
+  # TLS certificate configuration
+  tls:
+    # Auto-generate certificates using cert-manager
+    certManager:
+      enabled: false
+      issuerRef:
+        name: selfsigned-issuer
+        kind: ClusterIssuer
+
+    # Use existing certificate secret
+    existingSecret: ""
+
+    # Certificate validity (days) for generated certs
+    certValidity: 3650
+
+  # Webhook configuration
+  config:
+    # Resource quota: max active jobs per namespace
+    maxJobsPerNamespace: 10
+
+    # Fail policy for validating webhook
+    validatingFailurePolicy: Fail
+
+    # Fail policy for mutating webhook
+    mutatingFailurePolicy: Ignore
+
+    # Timeout seconds for webhook calls
+    timeoutSeconds: 10
+
+    # Default values applied by mutating webhook
+    defaults:
+      priority: 50
+      timeout: "2h"
+      retryPolicy:
+        maxRetries: 2
+        backoff: "exponential"
+      outputFormat: "qcow2"
+
+  # Health check endpoints
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: 8080
+      scheme: HTTP
+    initialDelaySeconds: 15
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /healthz
+      port: 8080
+      scheme: HTTP
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  # Metrics endpoint
+  metrics:
+    enabled: true
+    port: 8080
+    path: /metrics
+
+    # ServiceMonitor for Prometheus Operator
+    serviceMonitor:
+      enabled: true
+      interval: 30s
+      scrapeTimeout: 10s
+      labels: {}
+
+  # Pod annotations
+  podAnnotations: {}
+
+  # Pod labels
+  podLabels: {}
+
+# Custom Resource Definition (CRD) configuration
+crd:
+  # Install CRDs
+  install: true
+
+  # Keep CRDs on chart uninstall
+  keep: true
+
+  # CRD annotations
+  annotations: {}
+
+# Certificate generation job
+certJob:
+  # Enable certificate generation job (if certManager disabled)
+  enabled: true
+
+  # Image for certificate generation
+  image:
+    repository: alpine/openssl
+    tag: "3.3.2"
+    pullPolicy: IfNotPresent
+
+  # Resources for cert generation job
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+
+  # TTL seconds after finished
+  ttlSecondsAfterFinished: 300
+
+# Monitoring and observability
+monitoring:
+  # Enable Prometheus monitoring
+  prometheus:
+    enabled: true
+
+  # Enable Grafana dashboards
+  grafana:
+    enabled: false
+    # Dashboard ConfigMap will be created with label
+    dashboardLabel: grafana_dashboard
+
+  # Alerts
+  alerts:
+    enabled: true
+    labels: {}
+
+# Network policies
+networkPolicy:
+  enabled: false
+
+  # Ingress rules
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+
+  # Egress rules
+  egress:
+    - to:
+      - namespaceSelector: {}
+    - to:
+      - podSelector: {}
+
+# Pod Security Policy (deprecated in K8s 1.25+)
+podSecurityPolicy:
+  enabled: false
+
+# Pod Security Standards (PSS)
+podSecurityStandards:
+  # Enforce pod security standards
+  enabled: true
+  # Level: privileged, baseline, restricted
+  enforce: baseline
+  audit: restricted
+  warn: restricted
+
+# Priority class for operator and webhook pods
+priorityClassName: ""
+
+# Extra environment variables for operator
+extraEnv: []
+# - name: CUSTOM_VAR
+#   value: "custom-value"
+
+# Extra volumes for operator
+extraVolumes: []
+# - name: extra-volume
+#   emptyDir: {}
+
+# Extra volume mounts for operator
+extraVolumeMounts: []
+# - name: extra-volume
+#   mountPath: /extra
+
+# Testing configuration
+testing:
+  # Enable test suite
+  enabled: true
+
+  # Test image
+  image:
+    repository: ghcr.io/ssahani/hyper2kvm
+    tag: "0.3.0"
+    pullPolicy: IfNotPresent

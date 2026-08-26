@@ -1,0 +1,14 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 10-local/local-linux-raw-for-dd.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 10-local/local-linux-raw-for-dd.yaml
+
+command: local
+vmdk: /path/to/linux.vmdk
+flatten: true
+flatten_format: raw
+to_output: linux.raw
+out_format: raw
+compress: false
+checksum: true

@@ -1,0 +1,203 @@
+# Fedora 42 Server - Complete End-to-End Test Configuration
+# Tests ALL hyper2kvm features comprehensively
+
+cmd: local
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SOURCE CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════
+
+vmdk: /home/ssahani/Downloads/VMs/extracted/fedora/64bit/fedora42-server.vmdk
+
+# ═══════════════════════════════════════════════════════════════════════════
+# OUTPUT CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════
+
+output_dir: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test
+to_output: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test/fedora42-server.qcow2
+out_format: qcow2
+compress: true
+
+# Working directory for temporary files
+workdir: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test/work
+
+# ═══════════════════════════════════════════════════════════════════════════
+# OFFLINE GUEST FIXES - Linux Features
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Enable filesystem repair (fsck)
+filesystem_repair_enable: true
+
+# Fstab fixes (convert UUIDs, remove VMware mounts)
+fstab_fixes_enable: true
+
+# Grub fixes (update bootloader, kernel cmdline)
+grub_fixes_enable: true
+
+# Network configuration fixes
+network_fixes_enable: true
+network_level: aggressive  # aggressive = comprehensive fixes
+
+# ═══════════════════════════════════════════════════════════════════════════
+# INITRAMFS/INITRD REGENERATION
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Regenerate initramfs with VirtIO modules
+initramfs_regen_enable: true
+initramfs_regen_force: true
+
+# Include these modules in initramfs
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+  - virtio_balloon
+  - virtio_console
+  - 9p
+  - 9pnet_virtio
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CLOUD-INIT INJECTION
+# ═══════════════════════════════════════════════════════════════════════════
+
+cloud_init_enable: true
+
+# User configuration
+cloud_init_user:
+  name: fedora
+  password: fedora123
+  shell: /bin/bash
+  sudo: ALL=(ALL) NOPASSWD:ALL
+  ssh_authorized_keys:
+    - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... test-key@hyper2kvm"
+
+# Network configuration (DHCP)
+cloud_init_network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: true
+      dhcp6: false
+
+# Hostname
+cloud_init_hostname: fedora42-kvm
+
+# Install packages on first boot
+cloud_init_packages:
+  - qemu-guest-agent
+  - vim
+  - htop
+  - curl
+  - wget
+
+# Run commands on first boot
+cloud_init_runcmd:
+  - systemctl enable qemu-guest-agent
+  - systemctl start qemu-guest-agent
+  - echo "hyper2kvm migration completed at $(date)" >> /var/log/migration.log
+
+# ═══════════════════════════════════════════════════════════════════════════
+# KERNEL & BOOTLOADER CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Kernel command line parameters to add
+kernel_cmdline_add:
+  - console=ttyS0
+  - console=tty0
+  - net.ifnames=0
+  - biosdevname=0
+
+# Kernel command line parameters to remove
+kernel_cmdline_remove:
+  - quiet
+  - rhgb
+
+# ═══════════════════════════════════════════════════════════════════════════
+# VMWARE CLEANUP
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Remove VMware tools and drivers
+vmware_cleanup_enable: true
+
+# Packages to remove
+vmware_cleanup_packages:
+  - open-vm-tools
+  - vmware-tools
+  - vmware-guest
+
+# ═══════════════════════════════════════════════════════════════════════════
+# STORAGE OPTIMIZATIONS
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Enable TRIM/discard for SSD
+enable_discard: true
+
+# Enable I/O scheduler optimization
+ioscheduler: mq-deadline
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECURITY & HARDENING
+# ═══════════════════════════════════════════════════════════════════════════
+
+# SELinux relabeling
+selinux_relabel: true
+
+# Remove SSH host keys (regenerate on first boot)
+ssh_hostkeys_regenerate: true
+
+# Clear machine-id (regenerate on first boot)
+machine_id_clear: true
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LIBVIRT INTEGRATION
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Generate libvirt XML
+libvirt_xml_generate: true
+
+# VM configuration
+libvirt_vm_name: fedora42-server
+libvirt_memory_mb: 4096
+libvirt_vcpus: 2
+libvirt_disk_bus: virtio
+libvirt_network_model: virtio
+libvirt_graphics: spice
+
+# ═══════════════════════════════════════════════════════════════════════════
+# REPORTING & LOGGING
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Generate detailed reports
+report: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test/migration-report.md
+report_json: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test/migration-report.json
+
+# Detailed logging
+log_file: /home/ssahani/tt/hyper2kvm/out/fedora42-full-test/migration.log
+verbose: 2
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTING & VALIDATION
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Validate image after conversion
+validate_image: true
+
+# Dry run (set to false for actual conversion)
+dry_run: false
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ADVANCED FEATURES
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Performance metrics collection
+collect_metrics: true
+
+# Snapshot/checkpoint before modifications
+create_backup: true
+
+# Parallel processing (where applicable)
+parallel: true
+
+# Timeout for long operations (seconds)
+timeout: 3600

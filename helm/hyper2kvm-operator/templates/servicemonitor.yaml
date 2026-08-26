@@ -1,0 +1,45 @@
+{{- if and .Values.operator.metrics.enabled .Values.operator.metrics.serviceMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "hyper2kvm-operator.fullname" . }}
+  namespace: {{ include "hyper2kvm-operator.namespace" . }}
+  labels:
+    {{- include "hyper2kvm-operator.operatorLabels" . | nindent 4 }}
+    {{- with .Values.operator.metrics.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "hyper2kvm-operator.operatorSelectorLabels" . | nindent 6 }}
+  endpoints:
+    - port: http
+      interval: {{ .Values.operator.metrics.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.operator.metrics.serviceMonitor.scrapeTimeout }}
+      path: {{ .Values.operator.metrics.path }}
+{{- end }}
+
+{{- if and .Values.webhook.enabled .Values.webhook.metrics.enabled .Values.webhook.metrics.serviceMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "hyper2kvm-operator.fullname" . }}-webhook
+  namespace: {{ include "hyper2kvm-operator.namespace" . }}
+  labels:
+    {{- include "hyper2kvm-operator.webhookLabels" . | nindent 4 }}
+    {{- with .Values.webhook.metrics.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "hyper2kvm-operator.webhookSelectorLabels" . | nindent 6 }}
+  endpoints:
+    - port: http
+      interval: {{ .Values.webhook.metrics.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.webhook.metrics.serviceMonitor.scrapeTimeout }}
+      path: {{ .Values.webhook.metrics.path }}
+{{- end }}

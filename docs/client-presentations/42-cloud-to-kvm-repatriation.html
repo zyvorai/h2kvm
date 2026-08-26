@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cloud to KVM Repatriation — AWS, Azure &amp; GCP Exit Deep-Dive</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0c4a6e, #0369a1, #0284c7); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #7dd3fc; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(125,211,252,0.2); border: 1px solid rgba(125,211,252,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0a1420; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #7dd3fc; }
+  .page-light h2.st span { color: #0369a1; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #7dd3fc; }
+  .page-light h3 { color: #0369a1; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #0369a1; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #7dd3fc; }
+  .page-light .card h4 { color: #0369a1; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #0c4a6e; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(125,211,252,0.08); border: 1px solid rgba(125,211,252,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(125,211,252,0.06); }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(12,74,110,0.15), rgba(3,105,161,0.08)); border: 2px solid #0284c7; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #7dd3fc; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Cloud to KVM <span>Repatriation</span></h1>
+  <h2>AWS, Azure &amp; GCP Exit Deep-Dive</h2>
+  <p class="sub">Cloud costs grow 15-25% annually while on-premises hardware costs decrease. Organizations are repatriating workloads from AWS, Azure, and GCP to KVM infrastructure. This guide covers VM export from every major cloud provider, image conversion, cost modeling, and hybrid landing zone architecture.</p>
+  <div class="badge">AWS AMI Export | Azure VHD | GCP Image | Cost Modeling | Hybrid | 10 Cloud Sources | $1.8M Savings</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Cloud Cost <span>Reality Check</span></h2>
+  <p class="sub">Why organizations are bringing workloads back on-premises.</p>
+
+  <h3>Cloud vs On-Prem 3-Year TCO (100 VMs)</h3>
+  <table>
+    <tr><th style="width:25%">Cost Component</th><th style="width:15%">AWS</th><th style="width:15%">Azure</th><th style="width:15%">GCP</th><th style="width:15%">On-Prem KVM</th><th style="width:15%">Notes</th></tr>
+    <tr><td>Compute (3yr)</td><td>$1,080,000</td><td>$1,020,000</td><td>$960,000</td><td>$180,000</td><td>On-prem: server hardware amortized</td></tr>
+    <tr><td>Storage (50TB, 3yr)</td><td>$138,000</td><td>$132,000</td><td>$120,000</td><td>$25,000</td><td>On-prem: NVMe SSDs, one-time purchase</td></tr>
+    <tr><td>Network egress (3yr)</td><td>$216,000</td><td>$180,000</td><td>$144,000</td><td>$0</td><td>Cloud egress: $0.08-$0.12/GB</td></tr>
+    <tr><td>Software licenses</td><td>$0</td><td>$0</td><td>$0</td><td>Contact for pricing*</td><td>KVM: included, Proprietary (Zyvor AI Labs)</td></tr>
+    <tr><td>Operations (staff, 3yr)</td><td>$360,000</td><td>$360,000</td><td>$360,000</td><td>$360,000</td><td>Same staffing either way</td></tr>
+    <tr><td>Data center (colo, 3yr)</td><td>$0</td><td>$0</td><td>$0</td><td>$108,000</td><td>4 racks, power, cooling</td></tr>
+    <tr><td>Migration (one-time)</td><td>—</td><td>—</td><td>—</td><td>$45,000</td><td>hyper2kvm + labor</td></tr>
+    <tr><td><strong>3-Year Total</strong></td><td><strong>$1,794,000</strong></td><td><strong>$1,692,000</strong></td><td><strong>$1,584,000</strong></td><td><strong>$718,000</strong></td><td></td></tr>
+    <tr><td><strong>Savings vs Cloud</strong></td><td></td><td></td><td></td><td><strong>$866K-$1.08M</strong></td><td><strong>55-60% reduction</strong></td></tr>
+  </table>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>When to Repatriate</h4>
+      <ul>
+        <li>Steady-state workloads (predictable, not bursty)</li>
+        <li>Data-heavy applications (storage + egress costs dominate)</li>
+        <li>Compliance requirements (data residency, air-gap)</li>
+        <li>Performance-sensitive (latency, GPU, bare-metal needs)</li>
+        <li>Cloud bill growing &gt; 20% annually without new workloads</li>
+        <li>Multi-year commitments expiring (RI/savings plans ending)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>When to Stay in Cloud</h4>
+      <ul>
+        <li>Highly variable workloads (autoscaling critical)</li>
+        <li>Global presence needed (30+ regions)</li>
+        <li>Managed services dependency (RDS, Lambda, etc.)</li>
+        <li>Small footprint (&lt; 20 VMs — cloud is simpler)</li>
+        <li>No DC operations expertise on staff</li>
+        <li>Short-lived workloads (&lt; 12 months)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">AWS <span>VM Export</span></h2>
+  <p class="sub">Exporting EC2 instances and AMIs for conversion to KVM.</p>
+
+  <h3>AWS Export Methods</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Method 1: VM Export (create-instance-export-task)</h4>
+      <pre>
+# Export running EC2 instance to S3
+aws ec2 create-instance-export-task \
+  --instance-id i-0123456789abcdef0 \
+  --target-environment vmware \
+  --export-to-s3-task \
+    DiskImageFormat=vmdk,\
+    ContainerFormat=ova,\
+    S3Bucket=my-export-bucket,\
+    S3Prefix=exports/
+
+# Monitor export progress
+aws ec2 describe-export-tasks \
+  --export-task-ids export-i-0123456789
+
+# Download from S3
+aws s3 cp s3://my-export-bucket/exports/export-i-012.ova ./
+
+# Convert with h2kvmctl
+h2kvmctl convert --source export.ova \
+  --format qcow2 --fix-all --deploy-libvirt</pre>
+    </div>
+    <div class="card">
+      <h4>Method 2: EBS Snapshot → Raw Image</h4>
+      <pre>
+# Create snapshot of EBS volume
+aws ec2 create-snapshot \
+  --volume-id vol-0123456789abcdef0 \
+  --description "Repatriation export"
+
+# Share snapshot to S3 (via EBS direct API)
+aws ebs get-snapshot-block \
+  --snapshot-id snap-0123456789 \
+  --block-index 0 --block-token xxx
+
+# Or: attach snapshot to helper EC2, dd to S3
+# Faster for large disks
+aws ec2 create-volume --snapshot-id snap-012 \
+  --availability-zone us-east-1a
+# Attach to helper → dd if=/dev/xvdf | gzip | \
+#   aws s3 cp - s3://bucket/disk.raw.gz
+
+# Convert raw to QCOW2
+h2kvmctl convert --source disk.raw \
+  --format qcow2 --fix-all</pre>
+    </div>
+  </div>
+
+  <h3>AWS-Specific Fixes</h3>
+  <table>
+    <tr><th>Issue</th><th>Cause</th><th>Fix</th></tr>
+    <tr><td>NVMe device names (/dev/nvme0n1)</td><td>AWS Nitro instances use NVMe</td><td><code>--fix-fstab</code> converts to UUID (works for both)</td></tr>
+    <tr><td>cloud-init conflicts</td><td>cloud-init resets network on boot</td><td>Disable: <code>touch /etc/cloud/cloud-init.disabled</code></td></tr>
+    <tr><td>AWS SSM agent running</td><td>SSM agent can't reach AWS endpoints</td><td>Uninstall: <code>dnf remove amazon-ssm-agent</code></td></tr>
+    <tr><td>Elastic Network Adapter (ENA) driver</td><td>ENA driver not needed on KVM</td><td>Removed automatically; virtio-net used instead</td></tr>
+    <tr><td>IMDSv2 dependency</td><td>Apps querying 169.254.169.254</td><td>Update apps to use local config instead of IMDS</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Azure <span>VM Export</span></h2>
+  <p class="sub">Exporting Azure VMs as VHD/VHDX for conversion to KVM.</p>
+
+  <h3>Azure Export Workflow</h3>
+  <pre>
+# Step 1: Deallocate VM (required for export)
+az vm deallocate --resource-group myRG --name my-vm
+
+# Step 2: Generalize (optional — skip if preserving identity)
+# az vm generalize --resource-group myRG --name my-vm
+
+# Step 3: Get SAS URL for managed disk download
+DISK_ID=$(az vm show -g myRG -n my-vm --query "storageProfile.osDisk.managedDisk.id" -o tsv)
+az disk grant-access --duration-in-seconds 86400 --ids $DISK_ID --query accessSas -o tsv
+# Returns: https://md-xxx.blob.core.windows.net/xxx?sv=...&amp;sig=...
+
+# Step 4: Download VHD (use azcopy for speed)
+azcopy copy "https://md-xxx.blob.core.windows.net/xxx?sv=...&amp;sig=..." ./my-vm.vhd
+
+# Step 5: Convert VHD to QCOW2 with h2kvmctl
+h2kvmctl convert --source my-vm.vhd --format qcow2 \
+  --fix-fstab --fix-initramfs --fix-network \
+  --emit-domain-xml --deploy-libvirt
+
+# Step 6: Revoke SAS access
+az disk revoke-access --ids $DISK_ID</pre>
+
+  <h3>Azure-Specific Fixes</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Linux VMs from Azure</h4>
+      <ul>
+        <li><strong>waagent:</strong> Azure Linux Agent — disable/remove</li>
+        <li><code>systemctl disable walinuxagent && dnf remove WALinuxAgent</code></li>
+        <li><strong>cloud-init Azure datasource:</strong> disable</li>
+        <li><code>rm /etc/cloud/cloud.cfg.d/10_azure.cfg</code></li>
+        <li><strong>Hyper-V drivers:</strong> hv_vmbus, hv_storvsc, hv_netvsc</li>
+        <li>h2kvmctl replaces with virtio drivers in initramfs</li>
+        <li><strong>Swap:</strong> Azure creates swap on resource disk — configure locally</li>
+        <li><strong>NTP:</strong> Remove Azure-specific chrony config</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Windows VMs from Azure</h4>
+      <ul>
+        <li><strong>Azure Guest Agent:</strong> uninstall from Programs</li>
+        <li><strong>Hyper-V IC:</strong> Integration Components stay (harmless)</li>
+        <li><strong>VirtIO drivers:</strong> inject with h2kvmctl --virtio-drivers</li>
+        <li><strong>Activation:</strong> Azure KMS won't work on-prem</li>
+        <li>Re-activate with on-prem KMS or MAK key</li>
+        <li><strong>RDP:</strong> works immediately (same settings preserved)</li>
+        <li><strong>Azure AD:</strong> if joined, may need to rejoin on-prem AD</li>
+        <li><strong>Disk format:</strong> Azure exports as fixed VHD (fast convert)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">GCP <span>VM Export</span></h2>
+  <p class="sub">Exporting Google Compute Engine instances for KVM conversion.</p>
+
+  <h3>GCP Export Methods</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Method 1: gcloud export (Recommended)</h4>
+      <pre>
+# Export VM disk to GCS as VMDK
+gcloud compute images export \
+  --destination-uri gs://my-bucket/exports/vm-disk.vmdk \
+  --image my-vm-image \
+  --export-format vmdk
+
+# Or export as raw (faster, larger)
+gcloud compute images export \
+  --destination-uri gs://my-bucket/exports/vm-disk.raw.tar.gz \
+  --image my-vm-image \
+  --export-format raw
+
+# Download from GCS
+gsutil cp gs://my-bucket/exports/vm-disk.vmdk ./
+
+# Convert
+h2kvmctl convert --source vm-disk.vmdk \
+  --format qcow2 --fix-all --deploy-libvirt</pre>
+    </div>
+    <div class="card">
+      <h4>Method 2: Disk Snapshot → Image → Export</h4>
+      <pre>
+# Create snapshot of running VM's disk
+gcloud compute disks snapshot my-vm-disk \
+  --snapshot-names my-vm-snap \
+  --zone us-central1-a
+
+# Create image from snapshot
+gcloud compute images create my-vm-image \
+  --source-snapshot my-vm-snap
+
+# Export image (as above)
+gcloud compute images export \
+  --destination-uri gs://bucket/vm.vmdk \
+  --image my-vm-image \
+  --export-format vmdk
+
+# Clean up
+gcloud compute images delete my-vm-image
+gcloud compute snapshots delete my-vm-snap</pre>
+    </div>
+  </div>
+
+  <h3>All Cloud Providers: Export Comparison</h3>
+  <table>
+    <tr><th style="width:15%">Cloud</th><th style="width:15%">Export Format</th><th style="width:15%">Export Method</th><th style="width:12%">Speed</th><th style="width:13%">Egress Cost</th><th style="width:30%">Notes</th></tr>
+    <tr><td><strong>AWS</strong></td><td>VMDK, VHD, RAW</td><td>export-task → S3</td><td>Medium</td><td>$0.09/GB</td><td>Requires vmimport role; limited to EBS-backed</td></tr>
+    <tr><td><strong>Azure</strong></td><td>VHD (fixed)</td><td>SAS URL → download</td><td>Fast</td><td>$0.087/GB</td><td>Must deallocate VM first; azcopy recommended</td></tr>
+    <tr><td><strong>GCP</strong></td><td>VMDK, RAW</td><td>image export → GCS</td><td>Fast</td><td>$0.12/GB</td><td>Uses Daisy workflow; can export running disk snapshot</td></tr>
+    <tr><td><strong>Oracle Cloud</strong></td><td>QCOW2</td><td>object storage export</td><td>Medium</td><td>$0.0085/GB</td><td>Cheapest egress; native QCOW2 export</td></tr>
+    <tr><td><strong>DigitalOcean</strong></td><td>VMDK, QCOW2, RAW</td><td>snapshot → spaces</td><td>Fast</td><td>$0.01/GB</td><td>Custom image export via API</td></tr>
+    <tr><td><strong>Linode/Akamai</strong></td><td>RAW (dd)</td><td>Rescue mode → dd</td><td>Slow</td><td>Free (1TB/mo)</td><td>Manual process, requires rescue boot</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Cloud-Specific <span>Driver Cleanup</span></h2>
+  <p class="sub">Removing cloud agents and replacing cloud drivers with KVM VirtIO.</p>
+
+  <h3>Agent &amp; Driver Removal Checklist</h3>
+  <table>
+    <tr><th style="width:12%">Cloud</th><th style="width:18%">Agent/Driver</th><th style="width:15%">Remove Command</th><th style="width:12%">Safe to Remove?</th><th style="width:43%">Notes</th></tr>
+    <tr><td>AWS</td><td>amazon-ssm-agent</td><td><code>dnf remove amazon-ssm-agent</code></td><td class="check">Yes</td><td>Systems Manager agent, no function outside AWS</td></tr>
+    <tr><td>AWS</td><td>aws-cli (if installed)</td><td>Keep if used locally</td><td>Optional</td><td>Can still use AWS CLI for S3/API access from on-prem</td></tr>
+    <tr><td>AWS</td><td>ENA driver (ena.ko)</td><td>Removed with initramfs rebuild</td><td class="check">Yes</td><td>Replaced by virtio-net</td></tr>
+    <tr><td>Azure</td><td>WALinuxAgent</td><td><code>dnf remove WALinuxAgent</code></td><td class="check">Yes</td><td>Azure provisioning agent, remove completely</td></tr>
+    <tr><td>Azure</td><td>Hyper-V IC (hv_*)</td><td>Keep (harmless)</td><td>Optional</td><td>Kernel modules, won't load without Hyper-V bus</td></tr>
+    <tr><td>Azure</td><td>Azure Guest Agent (Win)</td><td>Uninstall from Programs</td><td class="check">Yes</td><td>Windows agent, remove via Control Panel</td></tr>
+    <tr><td>GCP</td><td>google-guest-agent</td><td><code>dnf remove google-guest-agent</code></td><td class="check">Yes</td><td>GCP metadata agent, safe to remove</td></tr>
+    <tr><td>GCP</td><td>google-osconfig-agent</td><td><code>dnf remove google-osconfig-agent</code></td><td class="check">Yes</td><td>OS Config management, not needed on-prem</td></tr>
+    <tr><td>All</td><td>cloud-init</td><td><code>touch /etc/cloud/cloud-init.disabled</code></td><td class="check">Yes</td><td>Disable (don't remove) to prevent network reset on boot</td></tr>
+  </table>
+
+  <h3>h2kvmctl Cloud Cleanup</h3>
+  <pre>
+# h2kvmctl auto-detects cloud source and cleans up
+h2kvmctl convert --source aws-vm.vmdk --format qcow2 --fix-all
+
+# Automatic cleanup includes:
+# 1. Detect cloud provider from installed agents/drivers
+# 2. Disable cloud-init (preserve config for reference)
+# 3. Remove cloud-specific network rules (169.254.x.x routes)
+# 4. Rebuild initramfs with virtio drivers (removes cloud drivers)
+# 5. Fix fstab (NVMe → virtio device names via UUID)
+# 6. Update GRUB (remove cloud-specific console parameters)
+# 7. Configure serial console for KVM (ttyS0)
+# 8. Set timezone to local (was UTC for cloud billing)</pre>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">Hybrid Landing <span>Zone Architecture</span></h2>
+  <p class="sub">Not everything needs to come back — design a hybrid architecture that optimizes cost and capability.</p>
+
+  <h3>Workload Placement Decision Matrix</h3>
+  <table>
+    <tr><th style="width:20%">Workload Type</th><th style="width:12%">Keep in Cloud</th><th style="width:12%">Repatriate</th><th style="width:28%">Rationale</th><th style="width:28%">Example</th></tr>
+    <tr><td>Steady-state databases</td><td></td><td class="check">Repatriate</td><td>Predictable, storage-heavy, high egress</td><td>PostgreSQL, Oracle, SQL Server</td></tr>
+    <tr><td>Burstable web apps</td><td class="check">Cloud</td><td></td><td>Autoscaling critical, global CDN needed</td><td>Marketing site, SaaS frontend</td></tr>
+    <tr><td>AI/ML training</td><td></td><td class="check">Repatriate</td><td>GPU costs 3x lower on-prem</td><td>LLM training, model fine-tuning</td></tr>
+    <tr><td>ML inference (global)</td><td class="check">Cloud</td><td></td><td>Low latency to users worldwide</td><td>Real-time prediction API</td></tr>
+    <tr><td>CI/CD pipelines</td><td></td><td class="check">Repatriate</td><td>Predictable compute, data locality</td><td>Jenkins, GitLab CI runners</td></tr>
+    <tr><td>Dev/test environments</td><td class="check">Cloud</td><td></td><td>Ephemeral, on-demand, cost-effective spot</td><td>Feature branch environments</td></tr>
+    <tr><td>Backup / DR</td><td class="check">Cloud (S3)</td><td></td><td>Cheap storage, global availability</td><td>Restic to S3, Velero backup</td></tr>
+    <tr><td>ERP / LOB apps</td><td></td><td class="check">Repatriate</td><td>Steady state, data-sensitive, compliance</td><td>SAP, healthcare EHR</td></tr>
+  </table>
+
+  <h3>Hybrid Architecture</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>On-Premises (KVM)</h4>
+      <ul>
+        <li>Databases: PostgreSQL, MySQL, Oracle, SQL Server</li>
+        <li>Application servers: Java, .NET, Python backends</li>
+        <li>AI/ML training: GPU clusters with passthrough</li>
+        <li>CI/CD: Jenkins/GitLab runners, artifact storage</li>
+        <li>Internal services: AD, DNS, DHCP, monitoring</li>
+        <li>Compliance workloads: HIPAA, PCI, SOX</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Cloud (AWS/Azure/GCP)</h4>
+      <ul>
+        <li>Web frontends: CDN, edge, autoscaling</li>
+        <li>Managed services: SQS, SNS, Pub/Sub, Lambda</li>
+        <li>Backup: S3/GCS object storage ($0.023/GB/mo)</li>
+        <li>DR: standby VMs for site failover</li>
+        <li>Dev/test: ephemeral, spot instances</li>
+        <li>SaaS connectors: API gateways, webhooks</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Egress Cost <span>Optimization</span></h2>
+  <p class="sub">Minimizing the one-time cost of downloading VMs from cloud providers.</p>
+
+  <h3>Egress Cost for 100 VMs (10 TB total)</h3>
+  <table>
+    <tr><th style="width:15%">Provider</th><th style="width:12%">Rate</th><th style="width:12%">10 TB Cost</th><th style="width:15%">Free Tier</th><th style="width:46%">Optimization Strategy</th></tr>
+    <tr><td><strong>AWS</strong></td><td>$0.09/GB</td><td>$900</td><td>100 GB/mo</td><td>Use AWS Snowball ($300 flat) for > 10 TB; S3 Transfer Acceleration</td></tr>
+    <tr><td><strong>Azure</strong></td><td>$0.087/GB</td><td>$870</td><td>100 GB/mo</td><td>Azure Data Box ($500 flat) for > 10 TB; azcopy with compression</td></tr>
+    <tr><td><strong>GCP</strong></td><td>$0.12/GB</td><td>$1,200</td><td>1 GB/mo</td><td>Google Transfer Appliance for > 20 TB; compress before transfer</td></tr>
+    <tr><td><strong>Oracle Cloud</strong></td><td>$0.0085/GB</td><td>$85</td><td>10 TB/mo</td><td>10 TB free egress/month — export over 1 month for free</td></tr>
+    <tr><td><strong>DigitalOcean</strong></td><td>$0.01/GB</td><td>$100</td><td>1 TB/mo</td><td>Very cheap; use bandwidth pool across droplets</td></tr>
+  </table>
+
+  <h3>Transfer Optimization</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Compress Before Download</h4>
+      <pre>
+# Compress VM image in cloud before egress
+# Saves 40-60% on egress costs
+
+# AWS: compress in EC2 before S3
+ssh ec2-helper "qemu-img convert -c \
+  -f raw -O qcow2 /dev/xvdf disk.qcow2"
+# Upload compressed to S3, download compressed
+
+# Typical compression ratios:
+# Linux VM: 60-70% reduction
+# Windows VM: 40-50% reduction
+# Database VM: 50-60% reduction
+# Empty space: 95%+ reduction
+
+# 10 TB raw → 4 TB compressed → $360 egress (vs $900)</pre>
+    </div>
+    <div class="card">
+      <h4>Physical Transfer Devices</h4>
+      <ul>
+        <li><strong>AWS Snowball Edge:</strong> 80 TB, $300 per job</li>
+        <li><strong>Azure Data Box:</strong> 100 TB, $500 per device</li>
+        <li><strong>Google Transfer Appliance:</strong> 300 TB, custom pricing</li>
+        <li><strong>Break-even:</strong> physical device cheaper at ~5 TB+</li>
+        <li>Ship time: 5-10 business days typical</li>
+        <li>Encrypted in transit: AES-256 hardware encryption</li>
+        <li>Best for: large migrations (50+ TB), slow internet</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page page-light">
+  <h2 class="st">Implementation &amp; <span>ROI Summary</span></h2>
+  <p class="sub">Phase-by-phase repatriation plan and financial impact.</p>
+
+  <h3>Repatriation Timeline (100 VMs from AWS)</h3>
+  <table>
+    <tr><th>Phase</th><th>Duration</th><th>Activity</th><th>Deliverable</th></tr>
+    <tr><td><strong>1. Assessment</strong></td><td>2 weeks</td><td>Cloud cost analysis, workload classification, hybrid architecture design</td><td>Repatriation plan, workload placement matrix, cost model</td></tr>
+    <tr><td><strong>2. Infrastructure</strong></td><td>3 weeks</td><td>Procure/deploy on-prem servers, install KVM, configure networking</td><td>Production-ready KVM cluster (storage, network, HA)</td></tr>
+    <tr><td><strong>3. Export</strong></td><td>2 weeks</td><td>Export VMs from AWS (compress, download, verify checksums)</td><td>100 VM images on local storage, verified integrity</td></tr>
+    <tr><td><strong>4. Convert</strong></td><td>1 week</td><td>h2kvmctl batch conversion, fix drivers/fstab/initramfs, cloud cleanup</td><td>100 QCOW2 images + libvirt domain XMLs</td></tr>
+    <tr><td><strong>5. Test</strong></td><td>2 weeks</td><td>Boot test, app validation, performance baseline, DR setup</td><td>Test results, performance comparison, DR verified</td></tr>
+    <tr><td><strong>6. Cutover</strong></td><td>2 weekends</td><td>DNS cutover, go-live per wave, monitor, validate</td><td>All VMs running on-prem, cloud instances stopped</td></tr>
+    <tr><td><strong>7. Decommission</strong></td><td>1 month</td><td>Monitor for 30 days, terminate cloud instances, close accounts</td><td>Cloud spend reduced to $0 (or hybrid target)</td></tr>
+  </table>
+
+  <h3>Financial Summary</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>One-Time Migration Costs</h4>
+      <ul>
+        <li>On-prem hardware (8 servers): $240,000</li>
+        <li>Network equipment (switches, firewall): $30,000</li>
+        <li>Colocation setup (4 racks): $15,000</li>
+        <li>Migration labor (12 weeks): $60,000</li>
+        <li>Cloud egress (10 TB compressed): $400</li>
+        <li>hyper2kvm software: Contact for pricing* (Proprietary (Zyvor AI Labs))</li>
+        <li><strong>Total one-time: $345,400</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Annual Ongoing Savings</h4>
+      <ul>
+        <li>Cloud compute eliminated: $360,000/yr</li>
+        <li>Cloud storage eliminated: $46,000/yr</li>
+        <li>Cloud egress eliminated: $72,000/yr</li>
+        <li>New on-prem colo cost: -$36,000/yr</li>
+        <li>Power/cooling: -$18,000/yr</li>
+        <li><strong>Net annual savings: $424,000/yr</strong></li>
+        <li><strong>Payback period: 9.8 months</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Cloud Repatriation Pays for Itself in Under 10 Months</h3>
+    <p>100 VMs repatriated from AWS to KVM saves $424K/yr with a $345K one-time investment — breakeven in 9.8 months. Over 3 years, net savings exceed $927K. hyper2kvm handles the conversion from AWS AMI/VMDK, Azure VHD, or GCP images with automatic cloud agent cleanup, driver replacement, and deployment. Keep bursty workloads in cloud, bring steady-state home.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Cloud to KVM Repatriation Guide</div>
+</div>
+
+</body>
+</html>

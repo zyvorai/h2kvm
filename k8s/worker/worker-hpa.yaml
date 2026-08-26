@@ -1,0 +1,94 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hyper2kvm-worker-hpa
+  namespace: hyper2kvm-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hyper2kvm-worker
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+  # Scale based on CPU utilization
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+
+  # Scale based on memory utilization
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+  # Scale based on custom metric: queue depth
+  - type: Pods
+    pods:
+      metric:
+        name: hyper2kvm_operator_queue_depth
+      target:
+        type: AverageValue
+        averageValue: "3"
+
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      selectPolicy: Max
+
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 120
+      - type: Pods
+        value: 1
+        periodSeconds: 120
+      selectPolicy: Min
+---
+# Service for metrics scraping
+apiVersion: v1
+kind: Service
+metadata:
+  name: hyper2kvm-operator-metrics
+  namespace: hyper2kvm-system
+  labels:
+    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/component: metrics
+spec:
+  selector:
+    app.kubernetes.io/name: hyper2kvm-operator
+    app.kubernetes.io/component: operator
+  ports:
+  - name: metrics
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+---
+# ServiceMonitor for Prometheus Operator
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: hyper2kvm-operator
+  namespace: hyper2kvm-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: metrics
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics

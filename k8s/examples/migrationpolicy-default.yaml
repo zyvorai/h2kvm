@@ -1,0 +1,28 @@
+---
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationPolicy
+metadata:
+  name: default-migration-policy
+spec:
+  # Network bandwidth limit per migration
+  bandwidthPerMigration: "100Mi"
+
+  # Enable auto-convergence for slow migrations
+  allowAutoConverge: true
+
+  # Enable post-copy as fallback (use with caution)
+  allowPostCopy: false
+
+  # Timeout per GiB of VM memory (default: 800s)
+  completionTimeoutPerGiB: 800
+
+  # Progress timeout - migration must show progress within this time
+  progressTimeout: 150
+
+  # Maximum simultaneous migrations cluster-wide
+  maxParallelMigrationsPerCluster: 5
+
+  # Maximum simultaneous migrations per node
+  maxParallelMigrationsPerNode: 2
+
+  # Apply to all VMs (no selector)

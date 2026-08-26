@@ -1,0 +1,26 @@
+# Rocky Linux 9.4 Migration - One-Shot to Libvirt
+command: local
+vmdk: /home/ssahani/Downloads/RockyLinux_9.4_VMM/RockyLinux_9.4_VMM_LinuxVMImages.COM.vmdk
+output_dir: /var/lib/libvirt/images
+to_output: rocky-linux-9.4.qcow2
+out_format: qcow2
+compress: false
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Libvirt Integration - Direct import
+emit_domain_xml: true
+virsh_define: true
+vm_name: rocky-linux-9.4
+libvirt_network: default
+machine: q35
+headless: false
+
+# Auto-test after migration
+libvirt_test: true
+keep_domain: true
+timeout: 120
+
+# Resources (optional - adjust if needed)
+# vcpus: 2
+# memory: 2048

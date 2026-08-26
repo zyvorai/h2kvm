@@ -1,0 +1,26 @@
+command: local
+vmdk: /home/ssahani/Downloads/VM-Images/centos/centos10.vmdk
+to_output: centos10.qcow2
+out_format: qcow2
+compress: true
+
+# Libvirt export options
+libvirt_test: true
+vm_name: centos10-vm
+memory: 2048
+vcpus: 2
+emit_domain_xml: true
+virsh_define: true
+
+# Boot and filesystem options
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Network configuration
+net_model: virtio
+disk_bus: virtio
+
+# Graphics
+graphics: vnc
+graphics_listen: 0.0.0.0
+video: qxl

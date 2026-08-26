@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# Azure VM discovery example - list VMs without downloading
+# Useful for inventory and planning migrations
+
+cmd: azure
+
+# List all VMs in a resource group
+azure_resource_group: "my-resource-group"
+azure_list_only: true
+
+# Optional filters
+# azure_vm_names:
+#   - "web-*"
+# azure_tags: "environment=production"
+# azure_power_state: "running"
+
+output_dir: ./azure-inventory

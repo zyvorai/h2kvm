@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "job_id": "convert-example-001",
+  "operation": "convert",
+  "image": {
+    "path": "/data/input/vm.vmdk",
+    "format": "vmdk"
+  },
+  "capability_requirements": {
+    "needs_nbd": false,
+    "needs_lvm": false,
+    "needs_mount": false,
+    "needs_selinux_tools": false,
+    "min_memory_gb": 4,
+    "min_disk_space_gb": 100
+  },
+  "execution_policy": {
+    "retry_count": 2,
+    "timeout_seconds": 3600,
+    "idempotent": true,
+    "priority": 5
+  },
+  "artifacts": {
+    "log_upload": true,
+    "store_fixed_image": true,
+    "output_path": "/data/output",
+    "keep_intermediates": false
+  },
+  "audit": {
+    "requested_by": "kubernetes-example",
+    "ticket": "DOC-002",
+    "tags": {
+      "environment": "production",
+      "operation": "conversion",
+      "source_format": "vmdk",
+      "target_format": "qcow2"
+    }
+  },
+  "parameters": {
+    "output_format": "qcow2",
+    "compress": true
+  }
+}

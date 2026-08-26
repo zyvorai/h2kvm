@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Windows VM Migration Guide — VMware to KVM</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0c4a6e, #075985, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 3em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #38bdf8; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; margin-bottom: 1em; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 560px; }
+  .cover .badge { display: inline-block; background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 50px 70px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-accent { background: linear-gradient(135deg, #0c4a6e, #0f172a); color: #e8e6df; }
+  h2.st { font-size: 2em; font-weight: 700; margin-bottom: 0.6em; } h2.st span { color: #38bdf8; }
+  h3 { font-size: 1.2em; font-weight: 600; margin: 1em 0 0.4em; color: #38bdf8; } .page-light h3 { color: #0369a1; }
+  p { margin-bottom: 0.8em; font-size: 1em; } .sub { font-size: 1.05em; opacity: 0.7; margin-bottom: 1.5em; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 1.2em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 22px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card .icon { font-size: 1.8em; margin-bottom: 8px; } .card h4 { font-size: 1.05em; font-weight: 600; margin-bottom: 6px; }
+  .card p { font-size: 0.9em; opacity: 0.85; margin-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 0.9em; }
+  th { background: #0369a1; color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.08); } .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  ul { margin: 0.4em 0 0.8em 1.5em; } li { margin-bottom: 0.3em; font-size: 0.95em; }
+  pre { background: #0f172a; color: #e8e6df; padding: 18px; border-radius: 8px; font-size: 0.85em; line-height: 1.7; font-family: monospace; margin: 1em 0; }
+  .alert { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); border-radius: 10px; padding: 18px; margin: 1.2em 0; }
+  .alert h4 { color: #ef4444; margin-bottom: 6px; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 1.5em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.9em; }
+  .flow-arrow { font-size: 1.3em; color: #38bdf8; }
+  .footer { text-align: center; padding: 20px; font-size: 0.8em; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1><span>Windows</span> VM Migration</h1>
+  <h2>VMware to KVM — Complete Guide</h2>
+  <p class="sub">Migrate Windows Server 2016-2025 and Windows 10/11 from vSphere to KVM without BSOD. Automatic VirtIO driver injection, registry fixes, and boot verification.</p>
+  <div class="badge">Zero BSOD | Auto VirtIO | AD-safe | SQL Server tested</div>
+</div>
+
+<div class="page page-dark">
+  <h2 class="st">The Windows <span>BSOD Problem</span></h2>
+  <p class="sub">Why Windows VMs fail after naive VMware-to-KVM migration.</p>
+  <div class="alert"><h4>Without proper driver injection, Windows VMs BSOD on first boot</h4>
+  <p>Windows kernel loads storage drivers at boot time based on registry entries. VMware uses LSI Logic or PVSCSI controllers. KVM uses VirtIO. If VirtIO drivers aren't injected before migration, Windows can't see the boot disk and blue-screens with INACCESSIBLE_BOOT_DEVICE (0x7B).</p></div>
+
+  <h3>What hyper2kvm Fixes Automatically</h3>
+  <table>
+    <tr><th>Problem</th><th>Cause</th><th>hyper2kvm Fix</th></tr>
+    <tr><td>BSOD: INACCESSIBLE_BOOT_DEVICE</td><td>Missing VirtIO storage driver</td><td class="check">Inject viostor/vioscsi from virtio-win ISO</td></tr>
+    <tr><td>No network after boot</td><td>VMware VMXNET3 driver, no VirtIO net</td><td class="check">Inject NetKVM (VirtIO network driver)</td></tr>
+    <tr><td>High memory pressure</td><td>No balloon driver</td><td class="check">Inject Balloon driver for memory management</td></tr>
+    <tr><td>Poor disk performance</td><td>Emulated IDE fallback</td><td class="check">Configure VirtIO SCSI with proper registry entries</td></tr>
+    <tr><td>VMware Tools conflicts</td><td>VMware agents still running</td><td class="check">Remove VMware Tools services and drivers</td></tr>
+    <tr><td>Wrong boot config (BCD)</td><td>Boot device path changed</td><td class="check">Update BCD entries for new disk controller</td></tr>
+    <tr><td>Hyper-V IC conflicts</td><td>Hyper-V integration services</td><td class="check">Remove Hyper-V IC drivers and services</td></tr>
+  </table>
+</div>
+
+<div class="page page-light">
+  <h2 class="st">Migration <span>Pipeline</span></h2>
+  <p class="sub">Multi-stage Windows migration with driver injection.</p>
+  <div class="flow">
+    <div class="flow-step">Export VMDK</div><div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Bootstrap</div><div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Inject Drivers</div><div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Registry Fix</div><div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Cleanup</div><div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Boot Test</div>
+  </div>
+
+  <h3>Supported Windows Versions</h3>
+  <table>
+    <tr><th>OS</th><th>Editions</th><th>Boot Mode</th><th>Status</th></tr>
+    <tr><td>Windows Server 2025</td><td>Standard, Datacenter</td><td>UEFI, BIOS</td><td class="check">Fully tested</td></tr>
+    <tr><td>Windows Server 2022</td><td>Standard, Datacenter, Core</td><td>UEFI, BIOS</td><td class="check">Fully tested</td></tr>
+    <tr><td>Windows Server 2019</td><td>Standard, Datacenter</td><td>UEFI, BIOS</td><td class="check">Fully tested</td></tr>
+    <tr><td>Windows Server 2016</td><td>Standard, Datacenter</td><td>UEFI, BIOS</td><td class="check">Fully tested</td></tr>
+    <tr><td>Windows 11</td><td>Pro, Enterprise</td><td>UEFI + TPM</td><td class="check">Tested (TPM emulated)</td></tr>
+    <tr><td>Windows 10</td><td>Pro, Enterprise, LTSC</td><td>UEFI, BIOS</td><td class="check">Fully tested</td></tr>
+  </table>
+
+  <h3>Example YAML Config</h3>
+  <pre>
+cmd: local
+vmdk: windows-server-2022.vmdk
+output_dir: ./out
+out_format: qcow2
+windows: true
+guest_os: windows
+virtio_win_iso: /usr/share/virtio-win/virtio-win.iso
+win_stage: bootstrap
+emit_domain_xml: true
+vm_name: win-server-2022
+memory: 4096
+vcpus: 4
+machine: q35
+uefi: true
+  </pre>
+</div>
+
+<div class="page page-accent">
+  <h2 class="st">Enterprise Windows <span>Workloads</span></h2>
+  <p class="sub">Special considerations for critical Windows applications.</p>
+  <div class="card-grid">
+    <div class="card"><div class="icon">🗄️</div><h4>SQL Server</h4>
+      <p><strong>Migration safe:</strong> SQL Server data files migrate with the disk. No reinstall needed. VirtIO SCSI provides comparable I/O performance to PVSCSI.<br><strong>Licensing win:</strong> Moving from VMware to KVM may reduce SQL Server licensing costs — KVM hosts are often counted more favorably for per-core licensing.</p></div>
+    <div class="card"><div class="icon">📂</div><h4>Active Directory DCs</h4>
+      <p><strong>Approach:</strong> Migrate secondary DCs first. Verify replication. Then migrate primary. Never migrate all DCs simultaneously.<br><strong>hyper2kvm handles:</strong> NIC MAC preservation optional, DNS settings intact, AD database files migrate with disk.</p></div>
+    <div class="card"><div class="icon">📧</div><h4>Exchange Server</h4>
+      <p><strong>Tested:</strong> Exchange 2016/2019 migrated successfully. Database mounts correctly after VirtIO driver injection. Recommend maintenance mode during migration window.</p></div>
+    <div class="card"><div class="icon">🌐</div><h4>IIS / Web Servers</h4>
+      <p><strong>Simplest migration:</strong> No special handling needed beyond standard VirtIO injection. Sites and app pools start automatically after boot. Verify bindings post-migration.</p></div>
+  </div>
+
+  <h3>SQL Server Licensing Savings</h3>
+  <table>
+    <tr><th>Scenario</th><th>VMware (per-core)</th><th>KVM (per-core)</th><th>Savings</th></tr>
+    <tr><td>SQL Standard (16 cores)</td><td>$3,945 x 16 = $63,120</td><td>Same per-core, but fewer cores exposed</td><td class="check">20-40% with CPU pinning</td></tr>
+    <tr><td>SQL Enterprise (16 cores)</td><td>$15,123 x 16 = $241,968</td><td>KVM allows precise vCPU control</td><td class="check">Significant with right-sizing</td></tr>
+  </table>
+</div>
+
+<div class="page page-light">
+  <h2 class="st">Boot <span>Verification</span></h2>
+  <p class="sub">Every Windows migration is verified before handoff.</p>
+  <div class="card-grid">
+    <div class="card"><div class="icon">✅</div><h4>Automatic Boot Test</h4><p>hyper2kvm starts the converted VM in KVM, waits for Windows to reach login screen, verifies no BSOD. Automated — no manual checking needed.</p></div>
+    <div class="card"><div class="icon">🖥️</div><h4>Console Access</h4><p>VNC/noVNC console available for visual verification. See exactly what the migrated VM displays on first boot. Debug any issues in real-time.</p></div>
+    <div class="card"><div class="icon">📊</div><h4>Health Checks</h4><p>Post-boot validation: disk I/O test, network connectivity, service status. Reports pass/fail for each check. Auditable results.</p></div>
+    <div class="card"><div class="icon">🔄</div><h4>Rollback Ready</h4><p>Source VMDKs preserved until verification passes. If anything fails, original VM is untouched on VMware. Zero-risk migration.</p></div>
+  </div>
+  <div class="footer"><p>hyper2kvm — Windows VM Migration | Proprietary (Zyvor AI Labs)</p></div>
+</div>
+</body>
+</html>

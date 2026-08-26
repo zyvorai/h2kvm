@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>How It Works — hypersdk + hyper2kvm Deep Dive</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; position: relative; }
+  .cover::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 40% 50%, rgba(255,143,63,0.12) 0%, transparent 45%), radial-gradient(circle at 70% 30%, rgba(99,102,241,0.1) 0%, transparent 45%); }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.2em; position: relative; } .cover h1 span { color: #ff8f3f; }
+  .cover h2 { font-size: 1.4em; font-weight: 300; opacity: 0.9; margin-bottom: 0.8em; position: relative; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 600px; position: relative; }
+  .cover .badge { display: inline-block; background: rgba(255,143,63,0.2); border: 1px solid rgba(255,143,63,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; position: relative; }
+  .page { min-height: 100vh; padding: 45px 60px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; }
+  .page-light { background: #fafbfc; }
+  .page-go { background: linear-gradient(135deg, #00303f, #00535e); color: #e8e6df; }
+  .page-py { background: linear-gradient(135deg, #1a1a3e, #2d1b69); color: #e8e6df; }
+  .page-tui { background: linear-gradient(135deg, #1c1917, #292524); color: #e8e6df; }
+  h2.st { font-size: 1.9em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #ff8f3f; }
+  h3 { font-size: 1.15em; font-weight: 600; margin: 0.9em 0 0.3em; color: #ff8f3f; }
+  .page-light h3 { color: #c2410c; }
+  p { margin-bottom: 0.7em; font-size: 0.97em; } .sub2 { font-size: 1em; opacity: 0.7; margin-bottom: 1.2em; }
+  pre { background: #0a0e1a; color: #d4d4d8; padding: 16px 20px; border-radius: 8px; font-size: 0.78em; line-height: 1.65; font-family: 'JetBrains Mono', monospace; margin: 0.7em 0; overflow-x: auto; }
+  .page-dark pre, .page-go pre, .page-py pre, .page-tui pre { background: rgba(0,0,0,0.3); }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 1em 0; }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 9px; padding: 18px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .card .icon { font-size: 1.6em; margin-bottom: 6px; } .card h4 { font-size: 0.98em; font-weight: 600; margin-bottom: 4px; }
+  .card p { font-size: 0.85em; opacity: 0.85; margin-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 0.7em 0; font-size: 0.85em; }
+  th { background: #ff8f3f; color: #fff; padding: 7px 10px; text-align: left; font-weight: 600; font-size: 0.88em; }
+  td { padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.06); } .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  ul { margin: 0.3em 0 0.6em 1.3em; } li { margin-bottom: 0.2em; font-size: 0.9em; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 1.2em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(255,143,63,0.12); border: 1px solid rgba(255,143,63,0.25); padding: 8px 14px; border-radius: 7px; font-weight: 600; font-size: 0.82em; }
+  .flow-arrow { font-size: 1.2em; color: #ff8f3f; }
+  .arch-box { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,143,63,0.2); border-radius: 10px; padding: 16px; margin: 0.8em 0; }
+  .lang-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.72em; font-weight: 700; margin-right: 6px; }
+  .go-tag { background: #00add8; color: #fff; } .py-tag { background: #3776ab; color: #fff; } .tui-tag { background: #ff8f3f; color: #fff; }
+  .footer { text-align: center; padding: 15px; font-size: 0.75em; opacity: 0.35; }
+  .divider { height: 2px; background: linear-gradient(90deg, #ff8f3f, transparent); margin: 1.2em 0; border-radius: 1px; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>How <span>It Works</span></h1>
+  <h2>hypersdk + hyper2kvm Technical Deep Dive</h2>
+  <p class="sub">A two-layer platform: Go daemon for multi-cloud export + Python engine for disk conversion and guest repair. This document shows exactly how every component works together.</p>
+  <div class="badge">For architects, engineers, and technical evaluators</div>
+</div>
+
+<!-- PAGE: SYSTEM OVERVIEW -->
+<div class="page page-dark">
+  <h2 class="st">System <span>Overview</span></h2>
+  <p class="sub2">Two independently deployable layers that work together seamlessly.</p>
+
+  <div class="arch-box">
+<pre style="text-align: center; font-size: 0.82em;">
+              USER INTERFACES
+    ┌────────────┬──────────────┬───────────┐
+    │  zkvm TUI  │  h2kvmctl    │  REST API │
+    │  (Go)      │  (Python CLI)│  (Go)     │
+    └─────┬──────┴──────┬───────┴─────┬─────┘
+          │             │             │
+    ┌─────▼─────────────▼─────────────▼─────┐
+    │            CONTROL PLANE               │
+    │                                        │
+    │   ┌──────────────────────────────┐     │
+    │   │     hypersdk (Go daemon)     │     │
+    │   │  ┌─────────┐ ┌────────────┐  │     │
+    │   │  │  Jobs    │ │ Scheduler  │  │     │
+    │   │  │ Manager  │ │ (cron +    │  │     │
+    │   │  │          │ │  carbon)   │  │     │
+    │   │  └─────────┘ └────────────┘  │     │
+    │   │  ┌─────────┐ ┌────────────┐  │     │
+    │   │  │ Provider │ │   Auth +   │  │     │
+    │   │  │ Registry │ │   RBAC     │  │     │
+    │   │  └─────────┘ └────────────┘  │     │
+    │   └──────────────────────────────┘     │
+    └────────────────┬──────────────────────-┘
+                     │  VMDK / OVA / VHD / RAW
+    ┌────────────────▼──────────────────────-┐
+    │            DATA PLANE                  │
+    │                                        │
+    │   ┌──────────────────────────────┐     │
+    │   │    hyper2kvm (Python)        │     │
+    │   │  ┌─────────┐ ┌────────────┐  │     │
+    │   │  │ Disk     │ │  Guest     │  │     │
+    │   │  │ Convert  │ │  Fixer     │  │     │
+    │   │  │ (qemu)   │ │ (VMCraft)  │  │     │
+    │   │  └─────────┘ └────────────┘  │     │
+    │   │  ┌─────────┐ ┌────────────┐  │     │
+    │   │  │ Libvirt  │ │ KubeVirt   │  │     │
+    │   │  │ Deploy   │ │ Deploy     │  │     │
+    │   │  └─────────┘ └────────────┘  │     │
+    │   └──────────────────────────────┘     │
+    └────────────────┬──────────────────────-┘
+                     │
+    ┌────────────────▼──────────────────────-┐
+    │          TARGET PLATFORM               │
+    │   KVM/libvirt  │  KubeVirt/Kubernetes  │
+    └────────────────────────────────────────┘
+</pre>
+  </div>
+
+  <div class="card-grid">
+    <div class="card"><span class="lang-tag go-tag">Go</span><h4>hypersdk — Control Plane</h4><p>Multi-cloud VM discovery and export. REST API, job scheduling, RBAC, cost estimation, carbon-aware scheduling. Hexagonal architecture with 13+ port interfaces.</p></div>
+    <div class="card"><span class="lang-tag py-tag">Python</span><h4>hyper2kvm — Data Plane</h4><p>Disk conversion, offline guest OS repair, libvirt XML generation, KubeVirt deployment. 1,273 tests. VMCraft engine for filesystem manipulation.</p></div>
+  </div>
+</div>
+
+<!-- PAGE: HYPERSDK DEEP DIVE -->
+<div class="page page-go">
+  <h2 class="st"><span class="lang-tag go-tag">Go</span> hypersdk <span>Architecture</span></h2>
+  <p class="sub2">Hexagonal architecture — domain, ports, and adapters.</p>
+
+  <h3>Domain Layer (internal/domain/) — 70+ Types</h3>
+  <table>
+    <tr><th>File</th><th>Key Types</th><th>Purpose</th></tr>
+    <tr><td>job.go</td><td>Job, JobStatus, JobProgress, Session</td><td>Export job lifecycle</td></tr>
+    <tr><td>schedule.go</td><td>ScheduledJob, RetryPolicy, TimeWindow</td><td>Cron + time-window scheduling</td></tr>
+    <tr><td>provider.go</td><td>ProviderType, VMInfo, ExportOptions</td><td>Cloud provider abstraction</td></tr>
+    <tr><td>cost.go</td><td>CostEstimate, PricingData</td><td>Migration cost calculation</td></tr>
+    <tr><td>carbon.go</td><td>CarbonIntensity, CarbonForecast</td><td>Green IT / ESG scheduling</td></tr>
+    <tr><td>rbac.go</td><td>Role, Permission, Action, Resource</td><td>Access control</td></tr>
+    <tr><td>audit.go</td><td>AuditEvent, AuditQueryFilter</td><td>Compliance audit trail</td></tr>
+    <tr><td>secrets.go</td><td>Secret, SecretType</td><td>Credential management</td></tr>
+    <tr><td>webhook.go</td><td>Webhook, WebhookPayload</td><td>Event notifications</td></tr>
+  </table>
+
+  <h3>Ports Layer (internal/ports/) — 13+ Interfaces</h3>
+  <pre>
+type ComputeProvider interface {
+    ListVMs(ctx context.Context, filter VMFilter) ([]VMInfo, error)
+    GetVM(ctx context.Context, id string) (*VMInfo, error)
+}
+
+type ExportProvider interface {
+    ExportVM(ctx context.Context, vmID string, opts ExportOptions) (*ExportResult, error)
+    GetCapabilities() []ExportCapability
+}
+
+type JobManager interface {
+    CreateJob(def JobDefinition) (*Job, error)
+    GetJob(id string) (*Job, error)
+    ListJobs(filter JobFilter) ([]*Job, error)
+    CancelJob(id string) error
+}
+
+type CarbonScheduler interface {
+    FindOptimalWindow(job *Job, forecast []CarbonForecast) (*TimeWindow, error)
+}
+  </pre>
+</div>
+
+<!-- PAGE: PROVIDERS -->
+<div class="page page-go">
+  <h2 class="st">Cloud <span>Providers</span></h2>
+  <p class="sub2">Each provider implements ComputeProvider + ExportProvider interfaces.</p>
+
+  <table>
+    <tr><th>Provider</th><th>Discovery</th><th>Export Method</th><th>Auth</th></tr>
+    <tr><td><strong>VMware vSphere</strong></td><td>govc / pyvmomi / SOAP API</td><td>OVF export, OVA, HTTPS /folder, VDDK, CBT delta</td><td>SSO, user/pass</td></tr>
+    <tr><td><strong>AWS EC2</strong></td><td>EC2 DescribeInstances</td><td>EBS snapshot → S3 → download, AMI export</td><td>IAM, access keys</td></tr>
+    <tr><td><strong>Microsoft Azure</strong></td><td>Compute client</td><td>Managed disk snapshot → blob → download</td><td>Service principal, MSI</td></tr>
+    <tr><td><strong>Google Cloud</strong></td><td>Compute API</td><td>Disk snapshot → GCS → download</td><td>Service account JSON</td></tr>
+    <tr><td><strong>Hyper-V</strong></td><td>WinRM / PowerShell</td><td>VHD/VHDX direct copy, checkpoint export</td><td>WinRM, SSH</td></tr>
+    <tr><td><strong>OCI</strong></td><td>Core client</td><td>Boot volume → object storage → download</td><td>API key, config file</td></tr>
+    <tr><td><strong>OpenStack</strong></td><td>Nova list-servers</td><td>Glance image download, Cinder snapshot</td><td>Keystone v3</td></tr>
+    <tr><td><strong>Alibaba Cloud</strong></td><td>ECS DescribeInstances</td><td>Disk snapshot → OSS → download</td><td>AccessKey ID/Secret</td></tr>
+    <tr><td><strong>Proxmox VE</strong></td><td>REST API /nodes/qemu</td><td>API-based disk download, qcow2/raw</td><td>Token, PAM</td></tr>
+    <tr><td><strong>KubeVirt</strong></td><td>kubectl get vm</td><td>PVC/DataVolume export, CDI clone</td><td>kubeconfig</td></tr>
+  </table>
+
+  <h3>8 Binary Components</h3>
+  <div class="card-grid">
+    <div class="card"><h4>hyperexport</h4><p>Standalone interactive VM export. Select VMs, choose format, export with progress. Works without daemon.</p></div>
+    <div class="card"><h4>hypervisord</h4><p>Background daemon. REST API on port 9292. Job queue, scheduling, webhooks. Runs as systemd service.</p></div>
+    <div class="card"><h4>hyperctl</h4><p>CLI migration commander. Create jobs, manage schedules, query status. Like kubectl for migrations.</p></div>
+    <div class="card"><h4>hyperconvert</h4><p>Format conversion tool. VMDK/VHD/RAW/qcow2 with progress. Standalone or daemon-integrated.</p></div>
+    <div class="card"><h4>hypersdk-agent</h4><p>gRPC agent for distributed export. Deploy near source infrastructure. Streams data to control plane.</p></div>
+    <div class="card"><h4>hypersdk-control</h4><p>Control plane for multi-agent deployments. Manages agent fleet, routes jobs, aggregates results.</p></div>
+    <div class="card"><h4>hypersdk-dashboard</h4><p>Web UI for monitoring. Job status, metrics, cost reports. Built-in Prometheus + Grafana integration.</p></div>
+    <div class="card"><h4>hypersdk-operator</h4><p>Kubernetes operator. CRDs for migration jobs. GitOps-friendly. Helm chart included.</p></div>
+  </div>
+</div>
+
+<!-- PAGE: HYPER2KVM DEEP DIVE -->
+<div class="page page-py">
+  <h2 class="st"><span class="lang-tag py-tag">Python</span> hyper2kvm <span>Pipeline</span></h2>
+  <p class="sub2">What happens to a VM disk from raw export to running on KVM.</p>
+
+  <div class="flow">
+    <div class="flow-step">Input</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Validate</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Flatten</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Convert</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Guest Fix</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Deploy</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Verify</div>
+  </div>
+
+  <h3>Python Package Structure</h3>
+  <pre>
+hyper2kvm/
+├── orchestration/        # Pipeline orchestrator — chains all stages
+│   ├── orchestrator.py   # Main pipeline: validate → convert → fix → deploy
+│   ├── disk_processor.py # Per-disk processing with retry
+│   └── vsphere_exporter.py  # vSphere export integration
+├── converters/           # Format conversion (qemu-img wrapper)
+├── fixers/               # Offline guest OS repair
+│   ├── offline_vm/       # Linux fixes: fstab, initramfs, grub, selinux
+│   └── windows/          # Windows: VirtIO injection, registry, BCD
+├── providers/
+│   ├── vmware/           # vSphere client, govc wrapper, NFC lease
+│   └── azure/            # Azure disk export
+├── libvirt/              # Domain XML generation, virsh integration
+├── pipeline/             # KubeVirt deployment, PVC upload
+├── cli/                  # Argument parser, formatters, progress bars
+├── config/               # YAML config loading, validation
+├── quality/              # VMDK inspector, pre-flight checks, testing
+├── ai/                   # Migration intelligence (risk analysis)
+└── core/                 # Logging, exceptions, structured tracing
+  </pre>
+</div>
+
+<!-- PAGE: GUEST FIX ENGINE -->
+<div class="page page-py">
+  <h2 class="st">VMCraft: <span>Guest Fix Engine</span></h2>
+  <p class="sub2">The critical differentiator — why VMs boot on first try.</p>
+
+  <div class="card-grid">
+    <div class="card"><div class="icon">📁</div><h4>fstab Stabilization</h4>
+      <p>Scans /etc/fstab inside the disk image. Converts device-name entries (/dev/sda1) to UUID-based entries. Handles LVM, XFS UUID regeneration, BTRFS subvolumes. Three modes: stabilize-all, bypath-only, noop.</p></div>
+    <div class="card"><div class="icon">🔧</div><h4>initramfs Rebuild</h4>
+      <p>Chroots into guest OS. Injects virtio_blk, virtio_net, virtio_scsi kernel modules. Runs dracut/mkinitramfs to rebuild. Supports RHEL, Ubuntu, Debian, SUSE, Photon OS.</p></div>
+    <div class="card"><div class="icon">🖥️</div><h4>GRUB Repair</h4>
+      <p>Updates root= kernel parameter to match new device path. Regenerates grub.cfg. Handles both BIOS and UEFI boot. Fixes broken grubenv symlinks.</p></div>
+    <div class="card"><div class="icon">🐧</div><h4>SELinux Relabel</h4>
+      <p>Creates /.autorelabel trigger file. On first boot, SELinux relabels all files with correct contexts. Prevents boot failures from label mismatches.</p></div>
+    <div class="card"><div class="icon">🪟</div><h4>Windows VirtIO</h4>
+      <p>Mounts virtio-win.iso. Injects viostor (storage), NetKVM (network), Balloon (memory) drivers. Updates Windows registry to load VirtIO at boot. Multi-stage: bootstrap → drivers → cleanup.</p></div>
+    <div class="card"><div class="icon">🧹</div><h4>Cleanup</h4>
+      <p>Removes VMware Tools (open-vm-tools). Removes Hyper-V integration services. Clears stale network configs (VMXNET3 MAC bindings). Reduces attack surface.</p></div>
+  </div>
+
+  <h3>How VMCraft Works (Under the Hood)</h3>
+  <pre>
+# 1. Connect to disk via qemu-nbd (no libguestfs needed)
+sudo qemu-nbd --connect=/dev/nbd0 disk.qcow2
+
+# 2. Detect partitions and mount
+partprobe /dev/nbd0
+mount /dev/nbd0p2 /mnt/guest       # root partition
+mount /dev/nbd0p1 /mnt/guest/boot  # boot partition
+
+# 3. Chroot and fix
+chroot /mnt/guest /bin/bash
+  # Fix fstab (UUID stabilization)
+  # Rebuild initramfs (dracut --force --add virtio)
+  # Update GRUB (grub2-mkconfig)
+  # Create /.autorelabel
+
+# 4. Unmount and disconnect
+umount -R /mnt/guest
+qemu-nbd --disconnect /dev/nbd0
+  </pre>
+</div>
+
+<!-- PAGE: ZKVM TUI -->
+<div class="page page-tui">
+  <h2 class="st"><span class="lang-tag tui-tag">TUI</span> zkvm <span>Interface</span></h2>
+  <p class="sub2">Go + Bubble Tea terminal UI for guided migration.</p>
+
+  <pre style="font-size: 0.72em; line-height: 1.5;">
+╭─ Configuration ────────────────────────────╮╭─ Status ─────────────────────────────╮
+│                                            ││ 📊 Status                            │
+│  ▾ Step 1: Source                          ││   ● READY — Press Ctrl+R to run      │
+│    source                                  ││                                      │
+│    ╭──────────────────────────────────╮    ││ 📋 Execution Plan                    │
+│    │ /data/vm/server.vmdk  📂         │    ││   ✔ Input:   VMDK (VMware)           │
+│    ╰──────────────────────────────────╯    ││   → Convert: qcow2                   │
+│    Detected: VMDK (VMware)                 ││   → Define:  libvirt XML              │
+│                                            ││   → Test:    boot verify              │
+│  ▾ Step 2: Output                          ││                                      │
+│    ╭──────────────────────────────────╮    ││ 🚀 Deploy Targets                    │
+│    │ ./out  📂                        │    ││   [✓] Libvirt XML     (1)            │
+│    ╰──────────────────────────────────╯    ││   [✓] virsh define    (2)            │
+│    ╭──────────────────────────────────╮    ││   [✓] Boot test       (3)            │
+│    │ ◂ [qcow2] ▸                      │    ││   [ ] Kubernetes      (4)            │
+│    ╰──────────────────────────────────╯    ││                                      │
+│                                            ││ ⌨ Shortcuts                          │
+│  ▾ Step 4: Deploy to Libvirt               ││   1-4    Toggle deploy               │
+│    ╭──────────────────────────────────╮    ││   Ctrl+R Run migration               │
+│    │ ◉ ON                             │    ││   Tab    Switch tabs                 │
+│    ╰──────────────────────────────────╯    ││                                      │
+╰────────────────────────────────────────────╯╰────────────────────────────────────────╯
+ 1 Migration │ 2 vSphere │ 3 Logs │ 4 Libvirt VMs │ 5 Kubernetes
+  </pre>
+
+  <div class="card-grid card-grid-3">
+    <div class="card"><h4>5 Tabs</h4><p>Migration (guided form), vSphere (VM discovery + batch select), Logs (scrollable), Libvirt VMs (manage), Kubernetes (KubeVirt VMs)</p></div>
+    <div class="card"><h4>File Browser</h4><p>Built-in fzf-style fuzzy file picker. Filters by extension. Navigate dirs, search instantly. Opens on Enter for path fields.</p></div>
+    <div class="card"><h4>vSphere Discovery</h4><p>Auto-populate from GOVC_* env vars. Batch discover VMs with CPU/RAM/power. Select multiple, queue migrate with Ctrl+R.</p></div>
+  </div>
+</div>
+
+<!-- PAGE: END-TO-END FLOW -->
+<div class="page page-light">
+  <h2 class="st">End-to-End <span>Flow</span></h2>
+  <p class="sub2">What happens when you migrate a VM from VMware vSphere to KubeVirt.</p>
+
+  <table>
+    <tr><th>Step</th><th>Component</th><th>What Happens</th><th>Time</th></tr>
+    <tr><td><strong>1. Discover</strong></td><td><span class="lang-tag go-tag">Go</span> hypersdk / govc</td><td>Connect to vCenter via SOAP API. List VMs with govc ls + vm.info -json. Return CPU, RAM, disk size, power state.</td><td>5-15s</td></tr>
+    <tr><td><strong>2. Export</strong></td><td><span class="lang-tag go-tag">Go</span> hypersdk</td><td>govc export.ovf downloads VMDK via HttpNfcLease. Fallback: OVA, then HTTPS /folder. Progress streamed via \r lines.</td><td>5-60 min</td></tr>
+    <tr><td><strong>3. Validate</strong></td><td><span class="lang-tag py-tag">Py</span> quality/</td><td>Parse VMDK descriptor. Check extent sizes. Detect boot mode (BIOS/UEFI) via virt-inspector. Risk analysis (adapter type, geometry).</td><td>2-5s</td></tr>
+    <tr><td><strong>4. Flatten</strong></td><td><span class="lang-tag py-tag">Py</span> converters/</td><td>qemu-img convert merges snapshot chain into single self-contained qcow2. Progress reported at 1% intervals.</td><td>1-10 min</td></tr>
+    <tr><td><strong>5. Guest Fix</strong></td><td><span class="lang-tag py-tag">Py</span> fixers/</td><td>Mount via qemu-nbd. Fix fstab (UUID). Rebuild initramfs (virtio). Fix GRUB. Remove VMware tools. SELinux relabel trigger.</td><td>30-120s</td></tr>
+    <tr><td><strong>6. Deploy</strong></td><td><span class="lang-tag py-tag">Py</span> libvirt/ + pipeline/</td><td>Generate libvirt domain XML (machine=q35, UEFI if detected). virsh define. OR: create KubeVirt VirtualMachine + PVC, upload via virtctl.</td><td>5-30s</td></tr>
+    <tr><td><strong>7. Verify</strong></td><td><span class="lang-tag py-tag">Py</span> quality/</td><td>Start VM in KVM. Wait for boot. Check no kernel panic. Verify network. Report pass/fail.</td><td>30-60s</td></tr>
+  </table>
+
+  <div class="divider"></div>
+
+  <h3>Data Flow</h3>
+  <pre style="text-align: center; font-size: 0.8em;">
+vCenter ──govc──→ VMDK file ──qemu-img──→ qcow2 ──VMCraft──→ fixed qcow2
+                                                                    │
+                                          ┌─────────────────────────┤
+                                          │                         │
+                                   virsh define              virtctl upload
+                                          │                         │
+                                     ┌────▼────┐             ┌─────▼──────┐
+                                     │  KVM /  │             │  KubeVirt  │
+                                     │ libvirt │             │ on K8s/K3s │
+                                     └─────────┘             └────────────┘
+  </pre>
+</div>
+
+<!-- PAGE: DEPLOYMENT OPTIONS -->
+<div class="page page-dark">
+  <h2 class="st">Deployment <span>Options</span></h2>
+  <p class="sub2">Multiple ways to run the platform.</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card"><div class="icon">💻</div><h4>CLI (h2kvmctl)</h4><p>Single command or YAML config. Best for scripts, CI/CD, cron jobs. No daemon needed.</p>
+      <pre>sudo h2kvmctl --config migration.yaml</pre></div>
+    <div class="card"><div class="icon">🎮</div><h4>TUI (zkvm)</h4><p>Interactive terminal UI. Guided steps, file browser, vSphere discovery. Best for operators.</p>
+      <pre>./zkvm/zkvm</pre></div>
+    <div class="card"><div class="icon">🔧</div><h4>Daemon (hypervisord)</h4><p>REST API on :9292. Job queue, scheduling, webhooks. Best for automation platforms.</p>
+      <pre>hypervisord --config /etc/hypersdk/config.yaml</pre></div>
+    <div class="card"><div class="icon">☸️</div><h4>K8s Operator</h4><p>CRDs for migration jobs. Helm chart. GitOps-friendly. Best for K8s-native teams.</p>
+      <pre>helm install hypersdk ./helm/hypersdk</pre></div>
+    <div class="card"><div class="icon">🐳</div><h4>Container</h4><p>OCI image for Podman/Docker. Mount disks as volumes. Best for CI/CD pipelines.</p>
+      <pre>podman run -v ./:/data hypersdk convert</pre></div>
+    <div class="card"><div class="icon">🌐</div><h4>Distributed (Agent)</h4><p>gRPC agents near source infra. Control plane aggregates. Best for multi-site.</p>
+      <pre>hypersdk-agent --control-plane=hq:9393</pre></div>
+  </div>
+
+  <div class="footer">hypersdk + hyper2kvm | Proprietary (Zyvor AI Labs) Open Source | github.com/ssahani/hyper2kvm</div>
+</div>
+
+<!-- PAGE: API EXAMPLES -->
+<div class="page page-light">
+  <h2 class="st">API <span>Examples</span></h2>
+  <p class="sub2">How to integrate programmatically.</p>
+
+  <h3>YAML Config (h2kvmctl)</h3>
+  <pre>
+# Full vSphere → KubeVirt migration
+cmd: vsphere
+vcenter: vcenter.corp.com
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+dc_name: DC1
+vs_action: export_vm
+vs_vm: production-web-01
+
+output_dir: ./out
+out_format: qcow2
+flatten: true
+regen_initramfs: true
+fstab_mode: stabilize-all
+emit_domain_xml: true
+
+deploy_k8s: true
+k8s_vm_name: web-01
+k8s_namespace: production
+k8s_pvc_size: 20Gi
+k8s_memory: 4Gi
+k8s_cpu: 4
+  </pre>
+
+  <h3>REST API (hypervisord)</h3>
+  <pre>
+# Create export job
+curl -X POST http://localhost:9292/api/v1/jobs \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{
+    "provider": "vsphere",
+    "vm_id": "vm-123",
+    "export_format": "qcow2",
+    "output_dir": "/exports",
+    "schedule": "0 2 * * SAT"
+  }'
+
+# Check job status
+curl http://localhost:9292/api/v1/jobs/job-abc-123
+
+# List VMs from provider
+curl http://localhost:9292/api/v1/providers/vsphere/vms
+  </pre>
+
+  <h3>Kubernetes CRD</h3>
+  <pre>
+apiVersion: hypersdk.io/v1alpha1
+kind: HyperConversion
+metadata:
+  name: migrate-web-01
+spec:
+  source:
+    provider: vsphere
+    vmName: production-web-01
+  target:
+    type: kubevirt
+    namespace: production
+    pvcSize: 20Gi
+  fixes:
+    fstabMode: stabilize-all
+    regenInitramfs: true
+  </pre>
+
+  <div class="footer">hypersdk + hyper2kvm — How It Works | For architects and engineers</div>
+</div>
+</body>
+</html>

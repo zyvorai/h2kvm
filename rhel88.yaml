@@ -1,0 +1,9 @@
+cmd: local
+vmdk: ./esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+output_dir: ./output
+out_format: qcow2
+compress: true
+regen_initramfs: true
+vmdk_auto_fix_controller: true
+verbose: 1
+report: rhel88-migration-report.md

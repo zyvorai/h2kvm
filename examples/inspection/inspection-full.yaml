@@ -1,0 +1,29 @@
+# Full Disk Inspection Pipeline
+# Comprehensive inspection with LVM activation and filesystem checks
+
+# Source disk to inspect
+image: /path/to/disk.vmdk
+
+# Inspection settings
+inspection:
+  # LVM detection and activation
+  check_lvm: true              # Detect LVM structures
+  activate_lvm: true           # Activate VGs to see logical volumes
+
+  # Filesystem checks
+  run_fsck: true               # Run read-only filesystem checks
+
+# Output
+output:
+  report: inspection-full-report.json
+  format: json
+  verbose: true
+
+# This configuration performs:
+# - Partition table inspection
+# - LVM structure detection (PVs, VGs, LVs)
+# - LVM activation to expose logical volumes
+# - Filesystem detection on all devices
+# - Read-only filesystem integrity checks (fsck -n)
+#
+# Use for: Pre-migration validation, troubleshooting

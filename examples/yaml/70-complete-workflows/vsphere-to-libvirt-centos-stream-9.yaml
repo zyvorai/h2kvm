@@ -1,0 +1,87 @@
+# ============================================
+# Complete Workflow: vSphere → libvirt (CentOS Stream 9)
+# ============================================
+# Description: Export CentOS Stream 9 VM from vSphere and prepare for libvirt/KVM
+# Use Case: Enterprise CentOS Stream deployment migration
+#
+# Prerequisites:
+#   - govc or ovftool installed
+#   - pyvmomi: pip install pyvmomi
+#   - qemu-img: dnf install qemu-img
+#   - libguestfs: dnf install libguestfs-tools
+#
+# Environment variables:
+#   export VC_PASSWORD='your-vcenter-password'
+#
+# Run:
+#   sudo -E h2kvmctl --config examples/yaml/70-complete-workflows/vsphere-to-libvirt-centos-stream-9.yaml
+# ============================================
+
+cmd: vsphere
+
+# vSphere Connection
+vcenter: vcenter.example.com
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+vc_insecure: true
+dc_name: Production-DC
+
+# VM Selection
+vm_name: centos-stream-9-server
+
+# vSphere Export
+vs_action: export_vm
+export_mode: ovf_export
+vs_control_plane: govc
+govc_url: "https://vcenter.example.com/sdk"
+govc_password_env: VC_PASSWORD
+govc_insecure: true
+govc_datacenter: Production-DC
+govc_export_remove_cdroms: true
+
+# Snapshot before export
+vs_create_snapshot: true
+snapshot_name: pre-kvm-migration
+snapshot_memory: false
+
+# Disk Processing
+flatten: true
+to_output: centos-stream-9-server.qcow2
+out_format: qcow2
+compress: true
+output_dir: /data/kvm
+
+# Guest Fixes
+regen_initramfs: true
+fstab_mode: stabilize-all
+remove_vmware_tools: true
+initramfs_add_drivers: "virtio virtio_blk virtio_scsi virtio_net virtio_pci"
+
+# libvirt Domain XML
+emit_domain_xml: true
+uefi: true
+ovmf_code: /usr/share/edk2/ovmf/OVMF_CODE.fd
+ovmf_vars_template: /usr/share/edk2/ovmf/OVMF_VARS.fd
+memory: 8192
+vcpus: 8
+cpu_topology: "1:4:2"
+machine: q35
+disk_bus: virtio
+disk_cache: none
+disk_io: native
+disk_discard: unmap
+net_model: virtio
+libvirt_network: bridge:br0
+serial_console: true
+graphics: vnc
+graphics_listen: 127.0.0.1
+guest_os: linux
+
+# Validation
+libvirt_test: true
+timeout: 300
+
+# Reporting
+report: /var/log/migrations/centos-stream-9.md
+enable_recovery: true
+verbose: 1

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Windows VM Migration — Driver Installation Guide — hyper2kvm</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #e2e8f0; background: #0f172a; line-height: 1.5; }
+
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f172a, #1e293b); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .cover h2 { font-size: 1.3em; color: #94a3b8; margin: 0.3em 0 1.5em; }
+  .cover .badge { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); padding: 6px 20px; border-radius: 16px; font-size: 0.85em; color: #3b82f6; }
+  .cover .url { color: #22c55e; font-family: monospace; font-size: 1.1em; margin-top: 1em; }
+  .cover .date { color: #475569; margin-top: 0.5em; font-size: 0.85em; }
+
+  .page { min-height: 100vh; padding: 36px 46px; page-break-after: always; position: relative; }
+  .page-dark { background: #0f172a; }
+  .page-slate { background: #1e293b; }
+
+  h2.title { font-size: 1.8em; font-weight: 700; margin-bottom: 0.2em; }
+  h2.title span { color: #3b82f6; }
+  h2.title .green { color: #22c55e; }
+  .desc { font-size: 0.9em; color: #64748b; margin-bottom: 1.2em; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.8em 0 0.25em; color: #22c55e; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px; }
+  .card h4 { font-size: 0.9em; font-weight: 600; margin-bottom: 4px; color: #3b82f6; }
+  .card ul { padding-left: 14px; font-size: 0.78em; margin: 0; } .card li { margin-bottom: 2px; }
+  .card p { font-size: 0.78em; opacity: 0.85; margin-bottom: 0; }
+
+  .flow { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 0.7em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: 0.8em; }
+  .flow-arrow { font-size: 1.1em; color: #3b82f6; }
+  .flow-fix { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+  .flow-ok { background: rgba(34,197,94,0.2); border: 2px solid rgba(34,197,94,0.5); }
+
+  .features { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1em; }
+  .feat { background: rgba(51,65,85,0.5); border: 1px solid rgba(51,65,85,0.8); border-radius: 8px; padding: 6px 12px; font-size: 0.78em; color: #94a3b8; }
+  .feat-blue { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: #3b82f6; }
+  .feat-green { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #22c55e; }
+
+  .highlight { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .highlight-green { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+  pre { background: rgba(255,255,255,0.04); color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.74em; line-height: 1.45; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  code { background: rgba(59,130,246,0.1); padding: 2px 4px; border-radius: 4px; font-size: 0.85em; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.76em; }
+  th { background: #1d4ed8; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; font-size: 0.82em; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); vertical-align: top; }
+  .check { color: #22c55e; font-weight: 700; }
+  .warn { color: #f59e0b; font-weight: 700; }
+  .fail { color: #ef4444; font-weight: 700; }
+
+  .verdict { background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(34,197,94,0.1)); border: 2px solid #3b82f6; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #3b82f6; font-size: 1.1em; margin-bottom: 4px; }
+
+  .step-num { display: inline-block; background: #3b82f6; color: #fff; width: 28px; height: 28px; line-height: 28px; text-align: center; border-radius: 50%; font-weight: 700; font-size: 0.85em; margin-right: 8px; }
+  .step-num-green { background: #22c55e; }
+
+  .footer { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-size: 0.65em; color: #334155; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Windows VM Migration<br>Driver Installation Guide</h1>
+  <h2>SATA Bootstrap &rarr; VirtIO CD-ROM Install &rarr; Production Ready</h2>
+  <div class="badge">Win10 | Win11 | Server 2019/2022 | SATA Boot | VirtIO Network | Guest Agent | Proprietary (Zyvor AI Labs)</div>
+  <div class="url">github.com/ssahani/hyper2kvm</div>
+  <div class="date">April 2026 &mdash; v0.3.0</div>
+</div>
+
+<!-- PAGE 1: Pre-Install (Recommended) -->
+<div class="page page-dark">
+  <h2 class="title"><span>1.</span> Best Practice: <span>Pre-Install</span> Drivers</h2>
+  <p class="desc">Install VirtIO drivers inside the VM <strong>before migration</strong> for a seamless transition.</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+    <div class="card">
+      <h3 style="color: #22c55e; margin-bottom: 12px;">Why Pre-Install?</h3>
+      <div style="font-size: 0.85em; color: #94a3b8; line-height: 1.8;">
+        &bull; Network works on <strong>first KVM boot</strong> — no manual steps<br>
+        &bull; QEMU Guest Agent already running<br>
+        &bull; No CD-ROM or VNC console needed after migration<br>
+        &bull; Works with any Windows version (7 through 11, Server 2012-2025)<br>
+        &bull; Drivers coexist with VMware tools — no conflict
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="color: #3b82f6; margin-bottom: 12px;">Steps (While Still on VMware)</h3>
+      <div style="font-size: 0.85em; color: #94a3b8; line-height: 1.8;">
+        <strong>1.</strong> Download <code>virtio-win.iso</code> from fedorapeople.org<br>
+        <strong>2.</strong> Attach ISO to VMware VM as CD-ROM<br>
+        <strong>3.</strong> Inside VM: run <code>D:\virtio-win-guest-tools.exe</code><br>
+        <strong>4.</strong> Reboot VM (still on VMware)<br>
+        <strong>5.</strong> Migrate VMDK → KVM boots with drivers ready
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 20px; padding: 16px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 10px;">
+    <strong style="color: #22c55e;">Recommended for production migrations.</strong>
+    <span style="color: #94a3b8;"> If pre-install is not possible (e.g., VM already shut down), use the post-migration workflow on the following pages.</span>
+  </div>
+
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; 1</div>
+</div>
+
+<!-- PAGE 2: Migration Pipeline Overview -->
+<div class="page page-slate">
+  <h2 class="title"><span>2.</span> Post-Migration <span>Pipeline</span> Overview</h2>
+  <p class="desc">If pre-install was not possible: end-to-end flow from VMware VMDK to a running Windows KVM guest.</p>
+
+  <div class="flow">
+    <div class="flow-step">VMDK Source<br><small>VMware / Hyper-V</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Flatten<br><small>qemu-img convert</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Offline Fixes<br><small>registry + drivers</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">SATA Boot<br><small>reliable first boot</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">Driver Install<br><small>CD-ROM D: drive</small></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Why SATA Disk Bus?</h4>
+      <ul>
+        <li>Windows ships with built-in SATA/AHCI drivers</li>
+        <li>VirtIO disk bus requires <code>viostor.sys</code> with <code>Start=0</code> (boot-start) in the registry <strong>before</strong> switching</li>
+        <li>The VirtIO GUI installer does NOT set Start=0 for storage</li>
+        <li>Switching to VirtIO disk without offline registry fix causes BSOD (INACCESSIBLE_BOOT_DEVICE)</li>
+        <li>SATA provides reliable performance for production workloads</li>
+        <li>No risk of boot failure &mdash; always works on first try</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Why CD-ROM Install?</h4>
+      <ul>
+        <li>virtio-win.iso is auto-attached as a CD-ROM device</li>
+        <li>Appears as D: drive inside Windows &mdash; always visible</li>
+        <li><code>virtio-win-guest-tools.exe</code> installs ALL drivers at once</li>
+        <li>Network, balloon, serial, guest agent &mdash; one click</li>
+        <li>Silent install supported: <code>/S</code> flag for automation</li>
+        <li>Most reliable method &mdash; works on all Windows versions</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Automated Mechanisms (Best-Effort)</h4>
+      <ul>
+        <li><strong>SetupComplete.cmd</strong> &mdash; only fires on fresh installs, not migrated VMs</li>
+        <li><strong>rhsrvany.exe service</strong> &mdash; blocked by unsigned binary restrictions on Win10/Win11</li>
+        <li><strong>HKLM RunOnce key</strong> &mdash; only triggers on new login sessions</li>
+        <li><strong>Startup folder .bat</strong> &mdash; requires actual user login</li>
+        <li>All mechanisms are staged during offline fixes but may not execute</li>
+        <li>CD-ROM install is the recommended production approach</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Supported Guest Versions</h4>
+      <ul>
+        <li>Windows 10 Pro/Enterprise (20H2, 21H2, 22H2)</li>
+        <li>Windows 11 Pro/Enterprise (22H2, 23H2)</li>
+        <li>Windows Server 2019 (Core + Desktop Experience)</li>
+        <li>Windows Server 2022 (Core + Desktop Experience)</li>
+        <li>Windows Server 2016 (limited testing)</li>
+        <li>Both BIOS and UEFI firmware modes</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Key principle:</strong> Boot reliability first. SATA disk bus guarantees Windows boots on KVM. VirtIO drivers for network, balloon, and guest agent are installed post-boot via the CD-ROM installer. The disk stays on SATA &mdash; this is the production configuration.</p>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 1</div>
+</div>
+
+<!-- PAGE 2: What's Auto-Staged -->
+<div class="page page-slate">
+  <h2 class="title"><span>2.</span> What's <class="green">Auto-Staged</class></h2>
+  <p class="desc">hyper2kvm stages multiple driver installation mechanisms during offline fixes. These are best-effort for migrated VMs.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Registry Entries (SYSTEM Hive)</h4>
+      <ul>
+        <li>viostor service: <code>Start=0</code> (boot-critical)</li>
+        <li>vioscsi service: <code>Start=0</code> (boot-critical)</li>
+        <li>NetKVM service: <code>Start=2</code> (auto-start)</li>
+        <li>Balloon service: <code>Start=3</code> (demand)</li>
+        <li>vioserial service: <code>Start=3</code> (demand)</li>
+        <li>CriticalDeviceDatabase PCI ID mappings</li>
+        <li>VMware services disabled (Start=4)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Driver Files (.sys)</h4>
+      <ul>
+        <li><code>viostor.sys</code> &rarr; <code>System32\drivers\</code></li>
+        <li><code>vioscsi.sys</code> &rarr; <code>System32\drivers\</code></li>
+        <li><code>netkvm.sys</code> &rarr; <code>System32\drivers\</code></li>
+        <li><code>balloon.sys</code> &rarr; <code>System32\drivers\</code></li>
+        <li><code>vioser.sys</code> &rarr; <code>System32\drivers\</code></li>
+        <li>INF files staged in <code>Windows\INF\</code></li>
+        <li>CAT files for signature verification</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Firstboot Scripts</h4>
+      <ul>
+        <li><code>SetupComplete.cmd</code> in <code>OEM\</code> folder</li>
+        <li>rhsrvany.exe service wrapper registered</li>
+        <li>HKLM RunOnce registry key set</li>
+        <li>Startup folder .bat file placed</li>
+        <li>pnputil driver installation commands staged</li>
+        <li>Self-cleanup after execution</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>CD-ROM Auto-Attachment</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Domain XML Configuration</h4>
+      <pre>&lt;disk type='file' device='cdrom'&gt;
+  &lt;driver name='qemu' type='raw'/&gt;
+  &lt;source file='/var/lib/hyper2kvm/virtio-win.iso'/&gt;
+  &lt;target dev='sdb' bus='sata'/&gt;
+  &lt;readonly/&gt;
+&lt;/disk&gt;</pre>
+      <p>Automatically added when <code>inject_virtio_drivers: true</code> is set.</p>
+    </div>
+    <div class="card">
+      <h4>ISO Discovery Paths</h4>
+      <ul>
+        <li><code>/var/lib/hyper2kvm/virtio-win.iso</code> (primary)</li>
+        <li><code>/usr/share/virtio-win/virtio-win.iso</code> (system)</li>
+        <li><code>/var/lib/libvirt/images/virtio-win.iso</code> (fallback)</li>
+        <li><code>quickstart.sh</code> auto-downloads and extracts the ISO</li>
+        <li>Contains drivers for Win10, Win11, Server 2019, Server 2022</li>
+        <li>Architecture: amd64 for 64-bit guests</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-green highlight">
+    <p style="margin-bottom:0;"><strong>Important:</strong> For migrated VMs, the staged registry entries and driver files establish the foundation, but the <strong>CD-ROM installer</strong> is what reliably activates all drivers. The offline staging ensures the .sys files are present on disk, while the installer handles PnP binding and service registration.</p>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 2</div>
+</div>
+
+<!-- PAGE 3: First Boot — What You'll See -->
+<div class="page page-dark">
+  <h2 class="title"><span>3.</span> First Boot &mdash; <span>What You'll See</span></h2>
+  <p class="desc">After migration, Windows boots on the SATA disk controller. Here is what to expect.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4><span class="step-num">1</span> Windows Boot Screen</h4>
+      <ul>
+        <li>Windows boots normally on SATA disk controller</li>
+        <li>AHCI/SATA drivers are built into Windows &mdash; always work</li>
+        <li>Boot time is similar to VMware (30-90 seconds)</li>
+        <li>No BSOD, no driver errors, no safe mode</li>
+        <li>UEFI or BIOS boot &mdash; both supported</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="step-num">2</span> Desktop Appears</h4>
+      <ul>
+        <li>Windows desktop loads normally</li>
+        <li>Task bar shows <strong>no network icon</strong> (red X or disconnected)</li>
+        <li>This is expected &mdash; VirtIO network driver not yet installed</li>
+        <li>Device Manager shows unknown devices (VirtIO PCI)</li>
+        <li>Access via <strong>VNC console</strong> (h2kweb or virt-manager)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="step-num">3</span> CD-ROM Drive Visible</h4>
+      <ul>
+        <li>D: drive appears in Windows Explorer</li>
+        <li>Contains <code>virtio-win-guest-tools.exe</code> (top level)</li>
+        <li>Also contains individual driver folders (NetKVM, vioscsi, etc.)</li>
+        <li>ISO label: "virtio-win" or similar</li>
+        <li>If D: is not visible, check domain XML for cdrom entry</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="step-num">4</span> Accessing the VM</h4>
+      <ul>
+        <li><strong>h2kweb:</strong> VM Management &rarr; click VM &rarr; Open VNC Console</li>
+        <li><strong>virt-manager:</strong> Double-click the VM to open console</li>
+        <li><strong>CLI:</strong> <code>virt-viewer --connect qemu:///system &lt;vmname&gt;</code></li>
+        <li><strong>Remote:</strong> VNC on auto-assigned port (check XML)</li>
+        <li>No SSH or RDP available yet (no network driver)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>What You Will NOT See</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>No Network (Expected)</h4>
+      <p>The VirtIO network adapter is present in the VM but Windows does not have the driver loaded. The network icon shows disconnected or missing. This is resolved in the next step by running the installer.</p>
+    </div>
+    <div class="card">
+      <h4>No BSOD (Guaranteed)</h4>
+      <p>Because the disk bus is SATA (not VirtIO), Windows uses its built-in AHCI driver. There is no risk of INACCESSIBLE_BOOT_DEVICE. The VM boots reliably every time.</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Tip:</strong> If using h2kweb, the VM list will show the VM as "running" but without an IP address. The IP will appear after you install VirtIO drivers and the QEMU Guest Agent starts.</p>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 3</div>
+</div>
+
+<!-- PAGE 4: Installing Drivers — Step by Step -->
+<div class="page page-slate">
+  <h2 class="title"><span>4.</span> Installing Drivers &mdash; <class="green">Step by Step</class></h2>
+  <p class="desc">Run the VirtIO installer from the CD-ROM. One click installs everything.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4><span class="step-num step-num-green">1</span> Open D: Drive</h4>
+      <ul>
+        <li>Open Windows Explorer (Win+E)</li>
+        <li>Click on the <strong>D:</strong> drive (CD-ROM / DVD)</li>
+        <li>You will see <code>virtio-win-guest-tools.exe</code> at the top level</li>
+        <li>Also visible: driver folders (Balloon, NetKVM, vioscsi, etc.)</li>
+        <li>If D: is not visible, it may be another drive letter &mdash; check "This PC"</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="step-num step-num-green">2</span> Run the Installer</h4>
+      <ul>
+        <li>Double-click <code>virtio-win-guest-tools.exe</code></li>
+        <li>Click "Yes" on the UAC prompt</li>
+        <li>The installer runs silently &mdash; shows a brief progress dialog</li>
+        <li>Installs ALL VirtIO drivers + QEMU Guest Agent + SPICE agent</li>
+        <li>Takes approximately 30-60 seconds</li>
+        <li>No reboot required for network</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="step-num step-num-green">3</span> Silent Install (Automation)</h4>
+      <pre>D:\virtio-win-guest-tools.exe /S</pre>
+      <ul>
+        <li>The <code>/S</code> flag runs a completely silent install</li>
+        <li>No UI, no prompts, no user interaction</li>
+        <li>Useful for scripted or remote installation via VNC paste</li>
+        <li>Exit code 0 = success</li>
+        <li>Can be run from elevated Command Prompt or PowerShell</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="step-num step-num-green">4</span> Network Appears</h4>
+      <ul>
+        <li>Network icon changes to connected (within seconds)</li>
+        <li>DHCP obtains IP address automatically (if DHCP server exists)</li>
+        <li>Static IP: configure manually after network driver loads</li>
+        <li>RDP and SSH become available if previously configured</li>
+        <li>IP address appears in h2kweb VM list</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>What the Installer Does</h3>
+  <table>
+    <tr><th>Component</th><th>Action</th><th>Result</th></tr>
+    <tr><td><strong>NetKVM</strong> (netkvm.sys)</td><td>Installs VirtIO network driver + PnP binding</td><td class="check">Network available immediately</td></tr>
+    <tr><td><strong>Balloon</strong> (balloon.sys)</td><td>Installs memory balloon driver</td><td class="check">Dynamic memory management active</td></tr>
+    <tr><td><strong>VioSerial</strong> (vioser.sys)</td><td>Installs serial port driver</td><td class="check">Guest agent communication channel</td></tr>
+    <tr><td><strong>QEMU Guest Agent</strong></td><td>Installs and starts qemu-ga service</td><td class="check">IP reporting, file operations, shutdown</td></tr>
+    <tr><td><strong>SPICE Agent</strong></td><td>Installs SPICE vdagent (if SPICE)</td><td class="check">Clipboard, resolution auto-resize</td></tr>
+    <tr><td><strong>VioStor</strong> (viostor.sys)</td><td>Registers driver but does NOT activate for boot disk</td><td class="warn">Disk stays on SATA (correct behavior)</td></tr>
+  </table>
+
+  <div class="highlight-green highlight">
+    <p style="margin-bottom:0;"><strong>No reboot needed</strong> for network, balloon, or guest agent. The VirtIO network driver activates immediately after installation. RDP and SSH access become available as soon as the network is up.</p>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 4</div>
+</div>
+
+<!-- PAGE 5: After Installation — What Works -->
+<div class="page page-dark">
+  <h2 class="title"><span>5.</span> After Installation &mdash; <span>What Works</span></h2>
+  <p class="desc">Complete status of all VirtIO components after running the installer.</p>
+
+  <table>
+    <tr><th style="width:20%">Component</th><th style="width:15%">Status</th><th style="width:25%">How to Verify</th><th style="width:40%">Notes</th></tr>
+    <tr>
+      <td><strong>VirtIO Network</strong></td>
+      <td class="check">&#10003; Working</td>
+      <td><code>ipconfig /all</code></td>
+      <td>Red Hat VirtIO Ethernet Adapter in Device Manager. Works immediately, no reboot.</td>
+    </tr>
+    <tr>
+      <td><strong>Memory Balloon</strong></td>
+      <td class="check">&#10003; Working</td>
+      <td>Device Manager &rarr; System devices</td>
+      <td>VirtIO Balloon Driver. Enables dynamic memory with <code>virsh setmem</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>QEMU Guest Agent</strong></td>
+      <td class="check">&#10003; Working</td>
+      <td><code>sc query qemu-ga</code></td>
+      <td>Reports IP, enables file operations, graceful shutdown via <code>virsh shutdown</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>VioSerial</strong></td>
+      <td class="check">&#10003; Working</td>
+      <td>Device Manager &rarr; System devices</td>
+      <td>Communication channel between host and guest agent.</td>
+    </tr>
+    <tr>
+      <td><strong>SPICE Agent</strong></td>
+      <td class="check">&#10003; Working (if SPICE)</td>
+      <td><code>sc query vdservice</code></td>
+      <td>Only relevant for SPICE graphics. VNC deployments skip this.</td>
+    </tr>
+    <tr>
+      <td><strong>Disk Bus</strong></td>
+      <td class="warn">SATA (by design)</td>
+      <td><code>wmic diskdrive get model</code></td>
+      <td>Stays on SATA. VirtIO disk requires offline Start=0 registry fix before switching. SATA is fine for production.</td>
+    </tr>
+  </table>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Why Disk Stays on SATA</h4>
+      <ul>
+        <li>VirtIO storage driver (<code>viostor</code>) must be set to <code>Start=0</code> (boot-start) in registry</li>
+        <li>The GUI installer registers the driver but does NOT set boot-start</li>
+        <li>Switching disk bus to VirtIO without Start=0 causes BSOD at boot</li>
+        <li>Setting Start=0 requires offline registry editing (qemu-nbd + hivex)</li>
+        <li>SATA disk performance is adequate for most production workloads</li>
+        <li>Avoiding this complexity eliminates the most common Windows migration failure</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Performance Comparison: SATA vs VirtIO Disk</h4>
+      <ul>
+        <li><strong>Sequential read:</strong> SATA ~500 MB/s, VirtIO ~600 MB/s</li>
+        <li><strong>Sequential write:</strong> SATA ~400 MB/s, VirtIO ~500 MB/s</li>
+        <li><strong>Random IOPS:</strong> SATA ~30K, VirtIO ~40K</li>
+        <li><strong>CPU overhead:</strong> SATA slightly higher (AHCI emulation)</li>
+        <li>Difference is 15-25% &mdash; marginal for most workloads</li>
+        <li>VirtIO disk is only worth the complexity for high-IOPS databases</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Production-Ready Configuration</h3>
+    <p style="font-size:0.9em;">
+      SATA disk + VirtIO network + VirtIO balloon + QEMU Guest Agent = fully functional Windows VM on KVM.<br>
+      <strong>Network works immediately. Guest agent reports IP. Memory is dynamic. No reboot required.</strong>
+    </p>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 5</div>
+</div>
+
+<!-- PAGE 6: Verification -->
+<div class="page page-slate">
+  <h2 class="title"><span>6.</span> Verification &mdash; <class="green">How to Confirm</class></h2>
+  <p class="desc">Commands and checks to verify that all VirtIO components are installed and working correctly.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Device Manager Check</h4>
+      <ul>
+        <li>Open Device Manager (<code>devmgmt.msc</code>)</li>
+        <li><strong>Network adapters:</strong> "Red Hat VirtIO Ethernet Adapter"</li>
+        <li><strong>System devices:</strong> "VirtIO Balloon Driver"</li>
+        <li><strong>System devices:</strong> "VirtIO Serial Driver"</li>
+        <li>No yellow warning icons = all drivers loaded</li>
+        <li>No "Unknown device" entries for VirtIO PCI IDs</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Driver Enumeration</h4>
+      <pre>pnputil /enum-drivers
+
+Published Name: oem0.inf
+Class Name:     Net
+Driver Version: ...
+Signer Name:    Red Hat, Inc.</pre>
+      <p>Look for Red Hat signed drivers for Net (NetKVM), System (balloon, serial).</p>
+    </div>
+    <div class="card">
+      <h4>Guest Agent Check</h4>
+      <pre>sc query qemu-ga
+
+SERVICE_NAME: qemu-ga
+STATE: 4  RUNNING</pre>
+      <p>From the host, verify with:</p>
+      <pre>virsh qemu-agent-command &lt;vm&gt; \
+  '{"execute":"guest-ping"}'</pre>
+    </div>
+  </div>
+
+  <h3>Host-Side Verification</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Network Connectivity</h4>
+      <pre># Check if VM has an IP address
+virsh domifaddr &lt;vmname&gt;
+
+# Check guest agent is responding
+virsh qemu-agent-command &lt;vmname&gt; \
+  '{"execute":"guest-network-get-interfaces"}'
+
+# Test SSH (if configured)
+ssh administrator@&lt;ip&gt;
+
+# Test RDP (if enabled)
+xfreerdp /v:&lt;ip&gt; /u:Administrator</pre>
+    </div>
+    <div class="card">
+      <h4>h2kweb Dashboard Checks</h4>
+      <ul>
+        <li><strong>VM List:</strong> IP address shown in green = guest agent working</li>
+        <li><strong>Guest agent dot:</strong> Cyan indicator next to VM name</li>
+        <li><strong>Health Check:</strong> Click "Run Check" on VM detail panel</li>
+        <li>  &mdash; VM Running: PASS (green)</li>
+        <li>  &mdash; IP Address: shows the VM's IP</li>
+        <li>  &mdash; Guest Agent: PASS (green)</li>
+        <li><strong>Disk bus badge:</strong> Shows "sata" (yellow) &mdash; expected</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="features">
+    <span class="feat feat-green">Network: ipconfig /all</span>
+    <span class="feat feat-green">Agent: sc query qemu-ga</span>
+    <span class="feat feat-blue">Drivers: pnputil /enum-drivers</span>
+    <span class="feat feat-blue">Host: virsh domifaddr</span>
+    <span class="feat">Device Manager: no warnings</span>
+    <span class="feat">h2kweb: green health checks</span>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 6</div>
+</div>
+
+<!-- PAGE 7: Troubleshooting -->
+<div class="page page-dark">
+  <h2 class="title"><span>7.</span> <span>Troubleshooting</span></h2>
+  <p class="desc">Common issues and solutions for Windows VM migration driver installation.</p>
+
+  <table>
+    <tr><th style="width:22%">Problem</th><th style="width:28%">Cause</th><th style="width:50%">Solution</th></tr>
+    <tr>
+      <td><strong>CD-ROM (D:) not visible</strong></td>
+      <td>virtio-win.iso not attached in domain XML or ISO file missing</td>
+      <td>Verify ISO exists: <code>ls /var/lib/hyper2kvm/virtio-win.iso</code>. Check domain XML for <code>&lt;disk device='cdrom'&gt;</code> entry. Run <code>sudo ./scripts/quickstart.sh</code> to download ISO. Or attach manually: <code>virsh attach-disk &lt;vm&gt; /path/to/virtio-win.iso sdb --type cdrom --mode readonly</code></td>
+    </tr>
+    <tr>
+      <td><strong>No network after installer</strong></td>
+      <td>VM NIC model not set to virtio in domain XML</td>
+      <td>Edit domain XML: <code>&lt;model type='virtio'/&gt;</code> in the <code>&lt;interface&gt;</code> section. Restart VM. Then re-run installer.</td>
+    </tr>
+    <tr>
+      <td><strong>BSOD on boot (INACCESSIBLE_BOOT_DEVICE)</strong></td>
+      <td>Disk bus changed to VirtIO without offline registry fix</td>
+      <td>Change disk bus back to SATA in domain XML: <code>&lt;target dev='sda' bus='sata'/&gt;</code>. Never switch to VirtIO disk without setting <code>viostor Start=0</code> offline via hivex.</td>
+    </tr>
+    <tr>
+      <td><strong>Guest agent not starting</strong></td>
+      <td>VioSerial channel not configured in domain XML</td>
+      <td>Add channel device: <code>&lt;channel type='unix'&gt;&lt;target type='virtio' name='org.qemu.guest_agent.0'/&gt;&lt;/channel&gt;</code>. The agent service may also need manual start: <code>net start qemu-ga</code></td>
+    </tr>
+    <tr>
+      <td><strong>Installer fails with error</strong></td>
+      <td>ISO version mismatch or corrupted download</td>
+      <td>Re-download virtio-win.iso from <code>https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/</code>. Verify ISO integrity with sha256sum.</td>
+    </tr>
+    <tr>
+      <td><strong>Windows boots to Safe Mode</strong></td>
+      <td>VMware drivers conflicting with KVM hardware</td>
+      <td>Boot to Safe Mode, uninstall VMware Tools from Programs and Features. Or during offline fixes, set VMware services to <code>Start=4</code> (Disabled) via registry.</td>
+    </tr>
+    <tr>
+      <td><strong>Slow disk performance</strong></td>
+      <td>SATA emulation overhead (minor)</td>
+      <td>This is expected &mdash; SATA is ~15-25% slower than VirtIO for random I/O. For most workloads this is acceptable. Use cache=writeback in domain XML for better write performance.</td>
+    </tr>
+    <tr>
+      <td><strong>No IP in h2kweb</strong></td>
+      <td>Guest agent not installed or channel missing</td>
+      <td>Install drivers via CD-ROM. Verify <code>sc query qemu-ga</code> shows RUNNING. Check domain XML has virtio-serial channel device.</td>
+    </tr>
+  </table>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Emergency Recovery</h4>
+      <ul>
+        <li>If VM does not boot, switch disk bus to SATA in XML</li>
+        <li><code>virsh edit &lt;vmname&gt;</code> &rarr; change <code>bus='virtio'</code> to <code>bus='sata'</code></li>
+        <li>If stuck at boot, try: <code>virsh destroy &lt;vm&gt; &amp;&amp; virsh start &lt;vm&gt;</code></li>
+        <li>For persistent boot issues, re-run migration with <code>inject_virtio_drivers: true</code></li>
+        <li>Check logs: <code>C:\hyper2kvm\firstboot.log</code> (if firstboot ran)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Manual Driver Install (Alternative)</h4>
+      <ul>
+        <li>If the unified installer fails, install drivers individually:</li>
+        <li>Device Manager &rarr; right-click unknown device &rarr; Update driver</li>
+        <li>Browse to D: drive &rarr; select appropriate folder (e.g., <code>NetKVM\w10\amd64</code>)</li>
+        <li>Or use pnputil: <code>pnputil /add-driver D:\NetKVM\w10\amd64\*.inf /install</code></li>
+        <li>Repeat for each driver folder (Balloon, vioserial, etc.)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 7</div>
+</div>
+
+</body>
+</html>

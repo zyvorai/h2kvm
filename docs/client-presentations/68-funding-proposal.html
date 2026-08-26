@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funding Proposal — hyper2kvm Ecosystem</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f0c29, #1e1b4b, #312e81); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; position: relative; overflow: hidden; }
+  .cover::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 40%, rgba(168,85,247,0.15) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(59,130,246,0.1) 0%, transparent 50%); }
+  .cover h1 { font-size: 2.6em; font-weight: 800; letter-spacing: -1px; margin-bottom: 0.3em; position: relative; }
+  .cover h1 span { color: #a855f7; }
+  .cover h2 { font-size: 1.5em; font-weight: 300; opacity: 0.9; margin-bottom: 0.5em; position: relative; }
+  .cover h3 { font-size: 1.1em; font-weight: 400; opacity: 0.7; margin-bottom: 2em; position: relative; }
+  .cover .tagline { font-size: 1em; opacity: 0.6; max-width: 650px; position: relative; margin-bottom: 1em; }
+  .cover .amount { font-size: 3.5em; font-weight: 800; color: #a855f7; position: relative; margin: 0.3em 0; }
+  .cover .amount-sub { font-size: 1.1em; opacity: 0.7; position: relative; }
+  .cover .badge { display: inline-block; background: rgba(168,85,247,0.2); border: 1px solid rgba(168,85,247,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; position: relative; }
+  .page { min-height: 100vh; padding: 60px 80px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; }
+  .page-light { background: #fafbfc; }
+  .page-accent { background: linear-gradient(135deg, #1e1b4b, #312e81); color: #e8e6df; }
+  .page-green { background: linear-gradient(135deg, #064e3b, #065f46); color: #e8e6df; }
+  h2.section-title { font-size: 2.2em; font-weight: 700; margin-bottom: 0.8em; letter-spacing: -1px; }
+  h2.section-title span { color: #a855f7; }
+  h3 { font-size: 1.3em; font-weight: 600; margin: 1.2em 0 0.5em; }
+  p { margin-bottom: 1em; font-size: 1.05em; }
+  .subtitle { font-size: 1.1em; opacity: 0.7; margin-bottom: 2em; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin: 1.5em 0; }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card-grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .card .icon { font-size: 2em; margin-bottom: 10px; }
+  .card h4 { font-size: 1.15em; font-weight: 600; margin-bottom: 8px; }
+  .card p { font-size: 0.95em; opacity: 0.85; margin-bottom: 0; }
+  .stat-row { display: flex; gap: 30px; margin: 2em 0; }
+  .stat { text-align: center; flex: 1; }
+  .stat .number { font-size: 2.8em; font-weight: 800; color: #a855f7; line-height: 1; }
+  .stat .label { font-size: 0.9em; opacity: 0.7; margin-top: 8px; }
+  table { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.95em; }
+  th { background: #7c3aed; color: #fff; padding: 14px 18px; text-align: left; font-weight: 600; }
+  td { padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+  .page-light tr:nth-child(even) td { background: #f9fafb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .highlight-num { color: #a855f7; font-weight: 700; }
+  ul { margin: 0.5em 0 1em 1.5em; }
+  li { margin-bottom: 0.4em; font-size: 1em; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 2em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 0.95em; }
+  .flow-arrow { font-size: 1.5em; color: #a855f7; }
+  .cta-box { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; padding: 40px; border-radius: 16px; text-align: center; margin: 2em 0; }
+  .cta-box h3 { font-size: 1.5em; margin-bottom: 0.5em; }
+  .cta-box p { opacity: 0.9; }
+  .timeline { margin: 1.5em 0; }
+  .timeline-item { display: flex; gap: 20px; margin-bottom: 16px; align-items: flex-start; }
+  .timeline-dot { width: 36px; height: 36px; background: #7c3aed; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; flex-shrink: 0; font-size: 0.9em; }
+  .timeline-content h4 { margin-bottom: 4px; font-size: 1.05em; }
+  .timeline-content p { font-size: 0.9em; opacity: 0.8; margin-bottom: 0; }
+  .footer { text-align: center; padding: 20px; font-size: 0.85em; opacity: 0.5; }
+  .budget-total { background: rgba(168,85,247,0.15); border: 2px solid rgba(168,85,247,0.4); border-radius: 12px; padding: 20px; text-align: center; margin: 1.5em 0; }
+  .budget-total .amount { font-size: 2.5em; font-weight: 800; color: #a855f7; }
+  .budget-total .label { font-size: 1em; opacity: 0.7; }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <h1>Funding <span>Proposal</span></h1>
+  <h2>hyper2kvm Ecosystem</h2>
+  <h3>VM Migration &amp; Management Platform</h3>
+  <div class="amount">$72,000</div>
+  <div class="amount-sub">6-Month Development &amp; Commercialization Program</div>
+  <p class="tagline">Four integrated products creating a complete VMware exit solution: hyper2kvm (migration), v9s (web management), virtcraft (KubeVirt CLI), hypersdk (multi-cloud export daemon).</p>
+  <div class="badge">Seed Funding Request &mdash; April 2026</div>
+</div>
+
+<!-- PAGE 2: THE OPPORTUNITY -->
+<div class="page page-dark">
+  <h2 class="section-title">The <span>Opportunity</span></h2>
+  <p class="subtitle">$85B virtualization market disrupted by Broadcom's VMware acquisition.</p>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number">$85B</div>
+      <div class="label">Global Virtualization Market</div>
+    </div>
+    <div class="stat">
+      <div class="number">2-12x</div>
+      <div class="label">VMware Price Increase</div>
+    </div>
+    <div class="stat">
+      <div class="number">500K+</div>
+      <div class="label">VMware Customers Seeking Exit</div>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">💸</div>
+      <h4>Broadcom Licensing Shock</h4>
+      <p>VMware customers face 2-12x cost increases. Perpetual licenses eliminated. Forced bundle purchasing. Enterprises urgently seeking alternatives.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔓</div>
+      <h4>KVM Platform Rising</h4>
+      <p>KVM is the Linux kernel's built-in hypervisor. KubeVirt brings VMs to Kubernetes. The technology is ready &mdash; tooling is the gap.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🎯</div>
+      <h4>The Gap We Fill</h4>
+      <p>No end-to-end solution exists for: export from any cloud &rarr; migrate with automated fixes &rarr; manage via web UI. We built all four pieces.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📈</div>
+      <h4>Growing Traction</h4>
+      <p>10K+ PyPI downloads. 1,483 tests passing. 67 client presentations. Production-deployed on bare metal. Active GitHub community.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: PRODUCT PORTFOLIO -->
+<div class="page page-light">
+  <h2 class="section-title">Product <span>Portfolio</span></h2>
+  <p class="subtitle">Four integrated products covering the complete VM lifecycle.</p>
+
+  <div class="flow">
+    <div class="flow-step">hypersdk</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">hyper2kvm</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">virtcraft</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">v9s</div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">☁️</div>
+      <h4>hypersdk</h4>
+      <p><strong>Multi-Cloud VM Export Daemon</strong><br>Go-based hexagonal architecture. 10 cloud providers (VMware, AWS, Azure, GCP, Alibaba, etc.). Daemon mode with job scheduling. REST API + gRPC. 8 binaries.</p>
+      <p style="margin-top:8px; font-size:0.85em; color:#7c3aed;"><strong>Stage:</strong> Production-ready. Systemd service. Helm chart.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔧</div>
+      <h4>hyper2kvm</h4>
+      <p><strong>VM Migration Toolkit</strong><br>Python + VMCraft engine (480+ APIs). 8 input formats. 35+ OS support. Automated offline fixes (GRUB, fstab, VirtIO, initramfs). 5-7x faster than virt-v2v.</p>
+      <p style="margin-top:8px; font-size:0.85em; color:#7c3aed;"><strong>Stage:</strong> PyPI published. 10K+ downloads. 1,483 tests.</p>
+    </div>
+    <div class="card">
+      <div class="icon">⚙️</div>
+      <h4>virtcraft</h4>
+      <p><strong>KubeVirt CLI Manager</strong><br>Rust-based CLI for KubeVirt VMs. Templates, profiles, blueprints, snapshots. Interactive TUI dashboard. Shell completions. Single binary.</p>
+      <p style="margin-top:8px; font-size:0.85em; color:#7c3aed;"><strong>Stage:</strong> Functional. Deployed on production server.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🖥️</div>
+      <h4>v9s</h4>
+      <p><strong>KubeVirt Web Management Platform</strong><br>Rust (Axum) + React. VNC/Serial/SSH console. Real-time WebSocket metrics. Snapshots, ISO mount, network management. Host hardware inventory.</p>
+      <p style="margin-top:8px; font-size:0.85em; color:#7c3aed;"><strong>Stage:</strong> Production. Live at https://185.165.240.5:5050</p>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number" style="color:#7c3aed;">4</div>
+      <div class="label">Integrated Products</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#7c3aed;">3</div>
+      <div class="label">Languages (Python, Rust, Go)</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#7c3aed;">Proprietary</div>
+      <div class="label">Licensed Software</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#7c3aed;">1 Person</div>
+      <div class="label">Built by Solo Developer</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: TRACTION & METRICS -->
+<div class="page page-dark">
+  <h2 class="section-title">Traction &amp; <span>Metrics</span></h2>
+  <p class="subtitle">What's been achieved with zero external funding.</p>
+
+  <table>
+    <tr><th>Metric</th><th>hyper2kvm</th><th>hypersdk</th><th>v9s</th><th>virtcraft</th></tr>
+    <tr><td>Language</td><td>Python</td><td>Go</td><td>Rust + React</td><td>Rust</td></tr>
+    <tr><td>Tests</td><td>1,483</td><td>Full suite</td><td>Build passing</td><td>54 + 8 doc</td></tr>
+    <tr><td>Downloads</td><td>10K+ (PyPI)</td><td>GitHub</td><td>Self-hosted</td><td>GitHub</td></tr>
+    <tr><td>Documentation</td><td>67 presentations</td><td>API docs</td><td>In-app</td><td>CLI help</td></tr>
+    <tr><td>Cloud Providers</td><td>8 formats</td><td>10 providers</td><td>KubeVirt</td><td>KubeVirt</td></tr>
+    <tr><td>OS Support</td><td>35+ versions</td><td>N/A</td><td>N/A</td><td>41 templates</td></tr>
+    <tr><td>Production Deploy</td><td><span class="check">&#x2713;</span></td><td><span class="check">&#x2713;</span></td><td><span class="check">&#x2713;</span></td><td><span class="check">&#x2713;</span></td></tr>
+  </table>
+
+  <h3>Technical Achievements</h3>
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h4>VMCraft Engine</h4>
+      <p>480+ APIs. Pure Python. 5-7x faster than guestfs. 0.71s LVM activation. Zero C dependencies.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🏗️</div>
+      <h4>Hexagonal Architecture</h4>
+      <p>hypersdk: clean domain/port/adapter separation. 10 cloud providers with identical interface.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔐</div>
+      <h4>Security Hardened</h4>
+      <p>70+ security fixes. Command injection prevention. LUKS/TPM2. Systemd hardening. RBAC.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: BUDGET -->
+<div class="page page-light">
+  <h2 class="section-title">Budget <span>Breakdown</span></h2>
+  <p class="subtitle">6-month funding request: $72,000 USD</p>
+
+  <div class="budget-total">
+    <div class="amount">$72,000</div>
+    <div class="label">Total Funding Request &mdash; 6 Months</div>
+  </div>
+
+  <table>
+    <tr><th>Category</th><th>Monthly</th><th>6 Months</th><th>Details</th></tr>
+    <tr><td><strong>Developer Salary</strong></td><td>$4,800</td><td>$28,800</td><td>Lead developer &mdash; full-time, all 4 projects</td></tr>
+    <tr><td><strong>Hardware: Lenovo ThinkPad X1 Carbon (x2)</strong></td><td>&mdash;</td><td>$4,800</td><td>2 laptops for development + testing. 32GB RAM, 1TB SSD each.</td></tr>
+    <tr><td><strong>Dedicated Server (India DC)</strong></td><td>$120</td><td>$720</td><td>Production server for KubeVirt cluster, CI/CD, live demos (10,000 INR/mo)</td></tr>
+    <tr><td><strong>Claude AI Subscription</strong></td><td>$200</td><td>$1,200</td><td>Claude Max ($200/mo x 6) for AI-assisted development, code generation, docs</td></tr>
+    <tr><td><strong>Azure Subscription</strong></td><td>$300</td><td>$1,800</td><td>Azure VMs for Hyper-V testing, Azure VHD export validation, CI/CD</td></tr>
+    <tr><td><strong>AWS Subscription</strong></td><td>$300</td><td>$1,800</td><td>EC2 for AMI export testing, S3 for artifacts, EBS snapshot validation</td></tr>
+    <tr><td><strong>Bare Metal Infrastructure</strong></td><td>$360</td><td>$2,160</td><td>Hetzner/OVH dedicated servers. KubeVirt cluster. Demo environments.</td></tr>
+    <tr><td><strong>VMware vSphere Lab</strong></td><td>$180</td><td>$1,080</td><td>VMUG Advantage or vSphere evaluation for migration testing</td></tr>
+    <tr><td><strong>Domain, SSL, CDN</strong></td><td>$60</td><td>$360</td><td>Project websites, documentation hosting, package distribution</td></tr>
+    <tr><td><strong>Conference &amp; Marketing</strong></td><td>&mdash;</td><td>$3,600</td><td>KubeCon, DevConf, FOSDEM. Stickers, swag, travel.</td></tr>
+    <tr><td><strong>Legal &amp; Compliance</strong></td><td>&mdash;</td><td>$1,200</td><td>Trademark registration, license review, contributor agreements</td></tr>
+    <tr style="background:rgba(168,85,247,0.1);"><td><strong>SUBTOTAL</strong></td><td></td><td><strong>$47,520</strong></td><td><strong>Core development + infrastructure</strong></td></tr>
+    <tr><td><strong>Reserve Fund</strong></td><td>&mdash;</td><td>$24,480</td><td>Runway extension, hiring, partnership development, contingency</td></tr>
+    <tr style="background:rgba(168,85,247,0.15);"><td><strong>GRAND TOTAL</strong></td><td></td><td><strong>$72,000</strong></td><td><strong>Complete 6-month program</strong></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 6: ROADMAP -->
+<div class="page page-dark">
+  <h2 class="section-title">6-Month <span>Roadmap</span></h2>
+  <p class="subtitle">Deliverables and milestones for each month.</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot">M1</div>
+      <div class="timeline-content">
+        <h4>Foundation &amp; Infrastructure</h4>
+        <p>Set up CI/CD pipelines for all 4 projects. Unified documentation site. Hardware procurement (2x Lenovo X1). Automated release system. Project websites live.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">M2</div>
+      <div class="timeline-content">
+        <h4>hyper2kvm v1.0 Release</h4>
+        <p>Polish VMCraft engine. Windows migration GA. Parallel batch improvements. Official v1.0 release on PyPI. Enterprise documentation. Video tutorials.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">M3</div>
+      <div class="timeline-content">
+        <h4>hypersdk v1.0 + v9s GA</h4>
+        <p>hypersdk: all 10 providers tested. Dashboard UI. Helm chart in ArtifactHub. v9s: multi-node support, RBAC, persistent events, metrics history.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">M4</div>
+      <div class="timeline-content">
+        <h4>Integration &amp; Enterprise Features</h4>
+        <p>End-to-end pipeline: hypersdk export &rarr; hyper2kvm fix &rarr; virtcraft/v9s manage. LDAP/SSO auth. Audit logging. Multi-cluster support.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">M5</div>
+      <div class="timeline-content">
+        <h4>Community &amp; Partnerships</h4>
+        <p>KubeCon presentation submission. Partner MSP program. Community contributor onboarding. Blog posts. Conference demos. Case study documentation.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">M6</div>
+      <div class="timeline-content">
+        <h4>Commercial Launch</h4>
+        <p>Enterprise support tier. SaaS management portal. Customer PoC program. Revenue pipeline. Series A preparation with traction metrics.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7: COMPETITIVE LANDSCAPE -->
+<div class="page page-light">
+  <h2 class="section-title">Competitive <span>Landscape</span></h2>
+  <p class="subtitle">How we compare to existing solutions.</p>
+
+  <table>
+    <tr><th>Capability</th><th>virt-v2v (Red Hat)</th><th>MTV (Red Hat)</th><th>hyper2kvm Ecosystem</th></tr>
+    <tr><td>Migration Engine</td><td>C (guestfs)</td><td>Containerized</td><td><span class="check">&#x2713;</span> Python VMCraft (5-7x faster)</td></tr>
+    <tr><td>Cloud Export</td><td>Limited</td><td>VMware only</td><td><span class="check">&#x2713;</span> 10 providers (hypersdk)</td></tr>
+    <tr><td>Web Management</td><td>None</td><td>OCP Console</td><td><span class="check">&#x2713;</span> v9s (standalone)</td></tr>
+    <tr><td>CLI Tool</td><td>Basic</td><td>kubectl</td><td><span class="check">&#x2713;</span> virtcraft (dedicated)</td></tr>
+    <tr><td>Windows VirtIO</td><td>Basic</td><td>Basic</td><td><span class="check">&#x2713;</span> Full PnP + Registry</td></tr>
+    <tr><td>Live Fix</td><td>No</td><td>No</td><td><span class="check">&#x2713;</span> SSH zero-downtime</td></tr>
+    <tr><td>LUKS/LVM</td><td>Partial</td><td>No</td><td><span class="check">&#x2713;</span> Full + TPM2</td></tr>
+    <tr><td>Console (sendkey)</td><td>No</td><td>OCP only</td><td><span class="check">&#x2713;</span> VNC + Serial + SSH</td></tr>
+    <tr><td>License</td><td>GPL</td><td>Requires OCP</td><td><span class="check">&#x2713;</span> Proprietary (licensed)</td></tr>
+    <tr><td>Cost</td><td>Free (needs guestfs)</td><td>$$$$ (OCP license)</td><td><span class="check">&#x2713;</span> Competitive licensing + support</td></tr>
+  </table>
+
+  <h3>Key Differentiator</h3>
+  <p>We are the <strong>only solution</strong> that provides the complete pipeline: multi-cloud export (hypersdk) &rarr; automated migration with offline fixes (hyper2kvm) &rarr; KubeVirt CLI management (virtcraft) &rarr; web-based monitoring &amp; operations (v9s). All integrated. All built by one team.</p>
+</div>
+
+<!-- PAGE 8: REVENUE MODEL -->
+<div class="page page-accent">
+  <h2 class="section-title">Revenue <span>Model</span></h2>
+  <p class="subtitle">Path to sustainability and growth.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">🏢</div>
+      <h4>Enterprise Support</h4>
+      <p>Annual support contracts for enterprises using the platform. SLA-backed response times, priority bug fixes, migration planning assistance.</p>
+      <p style="margin-top:8px;"><strong>Target: $2.4K-6K/customer/year</strong></p>
+    </div>
+    <div class="card">
+      <div class="icon">🤝</div>
+      <h4>MSP/Partner Program</h4>
+      <p>Enable managed service providers to offer migration-as-a-service. Revenue sharing model. Training and certification program.</p>
+      <p style="margin-top:8px;"><strong>Target: 10-20 partners in Y1</strong></p>
+    </div>
+    <div class="card">
+      <div class="icon">🎓</div>
+      <h4>Training &amp; Consulting</h4>
+      <p>Migration planning workshops. On-site migration execution. KubeVirt architecture consulting. Custom integration development.</p>
+      <p style="margin-top:8px;"><strong>Target: $6K-12K/engagement</strong></p>
+    </div>
+    <div class="card">
+      <div class="icon">☁️</div>
+      <h4>SaaS Management Portal</h4>
+      <p>Hosted v9s + hypersdk for multi-cluster management. Per-VM or per-cluster pricing. Migration orchestration dashboard.</p>
+      <p style="margin-top:8px;"><strong>Target: $1.2K-6K/cluster/year</strong></p>
+    </div>
+  </div>
+
+  <h3>12-Month Revenue Projection</h3>
+  <table>
+    <tr><th>Quarter</th><th>Revenue Stream</th><th>Target</th></tr>
+    <tr><td>Q1 (M1-3)</td><td>PoC engagements, conference visibility</td><td>$0 (building pipeline)</td></tr>
+    <tr><td>Q2 (M4-6)</td><td>First enterprise support contracts</td><td>$6K-12K</td></tr>
+    <tr><td>Q3 (M7-9)</td><td>MSP partnerships, training revenue</td><td>$18K-30K</td></tr>
+    <tr><td>Q4 (M10-12)</td><td>Recurring support + SaaS launch</td><td>$36K-60K</td></tr>
+    <tr style="background:rgba(168,85,247,0.1);"><td><strong>Year 1 Total</strong></td><td></td><td><strong>$60K - $102K</strong></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 9: FOUNDING TEAM -->
+<div class="page page-dark">
+  <h2 class="section-title">Founding <span>Team</span></h2>
+  <p class="subtitle">Proven engineers with deep Linux and virtualization expertise.</p>
+
+  <div class="card-grid">
+    <div class="card" style="border-color: rgba(168,85,247,0.3);">
+      <div class="icon">👨‍💻</div>
+      <h4>ZyvorAI Labs Private Limited</h4>
+      <p style="color:#a855f7; font-weight:600; margin-bottom:8px;">Founder &amp; Lead Developer</p>
+      <p><strong>Background:</strong> Senior Software Engineer with 10+ years in Linux systems, networking, and virtualization. Former contributor to systemd, NetworkManager, and enterprise Linux distributions.</p>
+      <p style="margin-top:8px;"><strong>Key Contributions:</strong></p>
+      <ul style="font-size:0.9em;">
+        <li>Built all 4 products (hyper2kvm, v9s, virtcraft, hypersdk) as a solo developer</li>
+        <li>480+ VMCraft API methods &mdash; pure Python VM manipulation engine</li>
+        <li>10 cloud provider integrations in hypersdk (Go)</li>
+        <li>Full-stack: Python, Rust, Go, React, TypeScript</li>
+        <li>Deep systemd expertise &mdash; 20 systemd tools integrated</li>
+        <li>Active maintainer and developer on GitHub</li>
+      </ul>
+      <p style="margin-top:8px; font-size:0.85em; opacity:0.7;">github.com/ssahani</p>
+    </div>
+    <div class="card" style="border-color: rgba(168,85,247,0.3);">
+      <div class="icon">👨‍💻</div>
+      <h4>Sibu</h4>
+      <p style="color:#a855f7; font-weight:600; margin-bottom:8px;">Co-Founder &amp; Engineer</p>
+      <p><strong>Background:</strong> Software engineer with expertise in infrastructure, DevOps, and cloud-native systems. Brings complementary skills in testing, deployment automation, and customer-facing operations.</p>
+      <p style="margin-top:8px;"><strong>Key Responsibilities:</strong></p>
+      <ul style="font-size:0.9em;">
+        <li>QA, testing, and validation across all 4 products</li>
+        <li>CI/CD pipeline management and release engineering</li>
+        <li>Customer PoC execution and technical support</li>
+        <li>Documentation, tutorials, and training materials</li>
+        <li>Infrastructure management (servers, cloud accounts)</li>
+        <li>Community engagement and partner onboarding</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Why This Team</h3>
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">🏗️</div>
+      <h4>Already Built It</h4>
+      <p>4 production products. 1,500+ tests. 68 presentations. Live deployment. Zero external funding. Proven execution.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🐧</div>
+      <h4>Deep Linux DNA</h4>
+      <p>systemd, KVM, libvirt, QEMU, KubeVirt, Kubernetes &mdash; native expertise in every layer of the stack.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🌐</div>
+      <h4>Full Stack</h4>
+      <p>Python + Rust + Go + React + TypeScript. Backend, frontend, CLI, daemon, API, and infrastructure. No gaps.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 10: RISKS & INVESTMENT TERMS -->
+<div class="page page-light">
+  <h2 class="section-title">Risks &amp; <span>Terms</span></h2>
+  <p class="subtitle">Transparent risk assessment and investment structure.</p>
+
+  <h3>Risk Mitigation</h3>
+  <table>
+    <tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
+    <tr><td>Key person dependency</td><td>High</td><td>Second team member (Sibu) provides redundancy. Comprehensive documentation and knowledge sharing. Full IP ownership.</td></tr>
+    <tr><td>Software monetization</td><td>Medium</td><td>Proven model: enterprise licensing + SaaS + consulting. Multiple revenue streams from day one.</td></tr>
+    <tr><td>Competition from Red Hat</td><td>Medium</td><td>Red Hat's MTV requires full OpenShift ($$$). virt-v2v is limited. We are faster, broader, and free. Different market segment.</td></tr>
+    <tr><td>Market timing</td><td>Low</td><td>Broadcom acquisition is <em>accelerating</em> VMware exits. Timing is optimal &mdash; demand is growing, not shrinking.</td></tr>
+    <tr><td>Technical risk</td><td>Low</td><td>Products already work in production. This funding is for polish and commercialization, not R&amp;D.</td></tr>
+  </table>
+
+  <h3>Investment Terms</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Option A: Equity Investment</h4>
+      <p>$72,000 for 10-15% equity stake. Standard SAFE note or priced round. Pro-rata rights for follow-on.</p>
+      <p style="margin-top:8px; font-size:0.9em; opacity:0.7;">Best for: VCs, angel investors seeking upside.</p>
+    </div>
+    <div class="card">
+      <h4>Option B: Revenue-Based Financing</h4>
+      <p>$72,000 repaid as 10% of monthly revenue until 1.5x returned ($108K cap). No equity dilution.</p>
+      <p style="margin-top:8px; font-size:0.9em; opacity:0.7;">Best for: Revenue-focused investors.</p>
+    </div>
+    <div class="card">
+      <h4>Option C: Grant / Sponsorship</h4>
+      <p>$72,000 as development grant. Logo placement, advisory board seat, early access to enterprise features.</p>
+      <p style="margin-top:8px; font-size:0.9em; opacity:0.7;">Best for: Foundations, corporate sponsors (Linux Foundation, CNCF).</p>
+    </div>
+    <div class="card">
+      <h4>Option D: Strategic Partnership</h4>
+      <p>$72,000 from a cloud/infrastructure company. Co-development agreement. Joint go-to-market. Technology integration.</p>
+      <p style="margin-top:8px; font-size:0.9em; opacity:0.7;">Best for: Cloud providers, hosting companies, MSPs.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 11: LIVE DEMO + GITHUB -->
+<div class="page page-accent">
+  <h2 class="section-title">See It <span>Live</span></h2>
+  <p class="subtitle">Working products you can try right now.</p>
+
+  <div class="card-grid">
+    <div class="card" style="text-align:center; padding:40px;">
+      <div class="icon">🌐</div>
+      <h4>v9s Live Demo</h4>
+      <p style="font-size:1.3em; color:#a855f7; font-weight:700; margin:12px 0;">https://185.165.240.5:5050</p>
+      <p>Running on bare metal. KubeVirt v1.8.0 on K3s.<br>Real VMs. Real metrics. Real console access.</p>
+    </div>
+    <div class="card" style="text-align:center; padding:40px;">
+      <div class="icon">📦</div>
+      <h4>Install hyper2kvm</h4>
+      <p style="font-size:1.3em; color:#a855f7; font-weight:700; margin:12px 0; font-family:monospace;">pip install hyper2kvm</p>
+      <p>Available on PyPI. One command install.<br>10,000+ downloads. Licensed software.</p>
+    </div>
+  </div>
+
+  <h3>GitHub Repositories</h3>
+  <table>
+    <tr><th>Project</th><th>Repository</th><th>Language</th><th>Status</th></tr>
+    <tr><td>hyper2kvm</td><td>github.com/ssahani/hyper2kvm</td><td>Python</td><td><span class="check">&#x2713;</span> Active</td></tr>
+    <tr><td>hypersdk</td><td>github.com/ssahani/hypersdk</td><td>Go</td><td><span class="check">&#x2713;</span> Active</td></tr>
+    <tr><td>v9s</td><td>github.com/ssahani/v9s</td><td>Rust + React</td><td><span class="check">&#x2713;</span> Active</td></tr>
+    <tr><td>virtcraft</td><td>github.com/ssahani/virtcraft</td><td>Rust</td><td><span class="check">&#x2713;</span> Active</td></tr>
+  </table>
+
+  <h3>Community Signals</h3>
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number">10K+</div>
+      <div class="label">PyPI Downloads</div>
+    </div>
+    <div class="stat">
+      <div class="number">1,500+</div>
+      <div class="label">Tests Passing</div>
+    </div>
+    <div class="stat">
+      <div class="number">68</div>
+      <div class="label">Client Presentations</div>
+    </div>
+    <div class="stat">
+      <div class="number">4</div>
+      <div class="label">Production Deployments</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 12: WHAT YOU GET -->
+<div class="page page-dark">
+  <h2 class="section-title">What You <span>Get</span></h2>
+  <p class="subtitle">Return on $72K investment over 6 months.</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">📦</div>
+      <h4>4 Production Products</h4>
+      <p>hyper2kvm v1.0, hypersdk v1.0, v9s GA, virtcraft &mdash; all polished, documented, and released.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🌐</div>
+      <h4>Market Position</h4>
+      <p>First-mover in end-to-end VMware exit tooling. Conference presence. Market growth.</p>
+    </div>
+    <div class="card">
+      <div class="icon">💰</div>
+      <h4>Revenue Pipeline</h4>
+      <p>Enterprise customer pipeline. MSP partner program. Recurring support revenue model validated.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h4>Proven Traction</h4>
+      <p>Download metrics, customer case studies, PoC results for Series A fundraising.</p>
+    </div>
+    <div class="card">
+      <div class="icon">👥</div>
+      <h4>IP &amp; Codebase</h4>
+      <p>480+ VMCraft APIs. 10 cloud providers. 3-language platform. 1,500+ tests. 70+ docs.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🚀</div>
+      <h4>Series A Ready</h4>
+      <p>Metrics, revenue, customers, and roadmap ready for $1-5M Series A by end of 6 months.</p>
+    </div>
+  </div>
+
+  <div class="cta-box">
+    <h3>$72,000 to build the complete VMware alternative</h3>
+    <p>One developer. Four products. Six months. The complete VMware exit platform.<br>
+    The market is $85B. The timing is now. The technology is proven.</p>
+  </div>
+
+  <div class="footer">
+    <p>hyper2kvm Ecosystem &mdash; Funding Proposal<br>
+    Founders: ZyvorAI Labs Private Limited &amp; Sibu &mdash; github.com/ssahani<br>
+    Proprietary Software &mdash; April 2026</p>
+  </div>
+</div>
+
+</body>
+</html>

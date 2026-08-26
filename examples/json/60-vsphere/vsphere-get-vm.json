@@ -1,0 +1,10 @@
+{
+  "command": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "vc_user": "administrator@vsphere.local",
+  "vc_password_env": "VC_PASSWORD",
+  "vc_insecure": true,
+  "vs_action": "get_vm_by_name",
+  "name": "myVM",
+  "json": true
+}

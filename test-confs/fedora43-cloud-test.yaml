@@ -1,0 +1,47 @@
+# Fedora Cloud Base 43 - Universal Filesystem Test
+# Tests: QCOW2 source format, cloud-init minimal filesystem
+
+cmd: local
+
+# Source image (QCOW2 format)
+vmdk: /home/ssahani/Downloads/VMs/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
+
+# Output Configuration
+output_dir: /home/ssahani/tt/hyper2kvm/out/fedora43-cloud-test
+to_output: /home/ssahani/tt/hyper2kvm/out/fedora43-cloud-test/fedora43-cloud.qcow2
+out_format: qcow2
+compress: true
+workdir: /home/ssahani/tt/hyper2kvm/out/fedora43-cloud-test/work
+
+# Core Linux Fixes
+fstab_fixes_enable: true
+fstab_mode: stabilize-all
+fstab_prefer_partuuid: false
+fstab_optimize_options: true
+
+grub_fixes_enable: true
+initramfs_regen_enable: true
+initramfs_regen_force: true
+
+# VirtIO modules for initramfs
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+
+# Network fixes
+network_fixes_enable: true
+
+# Libvirt XML generation
+libvirt_xml_generate: true
+libvirt_vm_name: fedora43-cloud
+libvirt_memory_mb: 2048
+libvirt_vcpus: 2
+libvirt_disk_bus: virtio
+
+# Reporting
+report: /home/ssahani/tt/hyper2kvm/out/fedora43-cloud-test/migration-report.md
+log_file: /home/ssahani/tt/hyper2kvm/out/fedora43-cloud-test/migration.log
+verbose: 2
+dry_run: false

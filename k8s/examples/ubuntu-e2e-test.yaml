@@ -1,0 +1,92 @@
+# Ubuntu End-to-End Test MigrationJob
+# Tests complete migration workflow for Ubuntu VMDK to QCOW2
+
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: ubuntu-e2e-test
+  namespace: hyper2kvm-test
+  labels:
+    app: hyper2kvm
+    test: e2e
+    os: ubuntu
+    distro: ubuntu
+spec:
+  # Operation type: convert VMDK to QCOW2
+  operation: convert
+
+  # Source image specification
+  image:
+    path: /data/input/ubuntu.vmdk
+    format: vmdk
+
+  # Operation parameters - Ubuntu specific configuration
+  parameters:
+    # Output configuration
+    output_format: qcow2
+    compress: true
+    compression_type: zstd
+
+    # Filesystem fixes
+    fstab_mode: stabilize-all
+    fstab_prefer_partuuid: true  # Ubuntu prefers PARTUUID
+    fstab_optimize_options: true
+
+    # Boot fixes
+    grub_fixes: true
+    regen_initramfs: true
+    initramfs_force: true
+
+    # VirtIO drivers for Ubuntu
+    initramfs_modules:
+      - virtio_blk
+      - virtio_scsi
+      - virtio_net
+      - virtio_pci
+      - virtio_ring
+      - virtio
+      - virtio_balloon
+      - virtio_console
+
+    # Network configuration
+    network_fixes: true
+    network_config:
+      mode: dhcp
+      use_netplan: true  # Ubuntu uses netplan
+
+    # VM configuration
+    vm_name: ubuntu-e2e-vm
+    memory_mb: 4096
+    vcpus: 2
+    disk_bus: virtio
+    net_model: virtio
+
+    # Graphics
+    graphics: vnc
+    graphics_listen: "0.0.0.0"
+    video: qxl
+
+    # Reporting
+    report_format: markdown
+    verbose: 2
+
+  # Output artifacts
+  artifacts:
+    output_path: /data/output/ubuntu-e2e
+    output_format: qcow2
+    compress: true
+
+  # Job priority (higher for E2E test)
+  priority: 80
+
+  # Timeout for job execution
+  timeout: 2h
+
+  # Retry policy
+  retryPolicy:
+    maxRetries: 3
+    backoff: exponential
+
+  # Worker selection
+  workerSelector:
+    hyper2kvm.io/worker-enabled: "true"

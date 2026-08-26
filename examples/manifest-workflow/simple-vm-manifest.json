@@ -1,0 +1,10 @@
+{
+  "manifest_version": "1.0",
+  "source": {"provider": "vsphere", "vm_name": "my-vm", "export_timestamp": "2026-03-24T10:00:00Z"},
+  "vm": {"cpu": 2, "mem_gb": 4, "firmware": "bios", "os_hint": "linux"},
+  "disks": [
+    {"id": "disk-0", "source_format": "vmdk", "bytes": 10737418240, "local_path": "/data/vms/my-vm.vmdk", "disk_type": "boot"}
+  ],
+  "pipeline": {"inspect": {"enabled": true}, "fix": {"enabled": true, "fstab_mode": "stabilize-all"}, "convert": {"enabled": true, "compress": true}, "validate": {"enabled": true}},
+  "output": {"directory": "/output", "format": "qcow2"}
+}

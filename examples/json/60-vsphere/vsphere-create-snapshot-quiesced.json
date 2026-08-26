@@ -1,0 +1,14 @@
+{
+  "command": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "vc_user": "administrator@vsphere.local",
+  "vc_password_env": "VC_PASSWORD",
+  "vc_insecure": true,
+  "vs_action": "create_snapshot",
+  "vm_name": "myVM",
+  "name": "hyper2kvm-pre-migration",
+  "quiesce": true,
+  "memory": false,
+  "description": "Created by hyper2kvm for offline migration",
+  "json": true
+}

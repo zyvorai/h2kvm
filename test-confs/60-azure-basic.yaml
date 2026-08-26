@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: Apache-2.0
+# Azure VM migration example - basic configuration
+# Export VMs from Azure to local VHD files using snapshots
+
+cmd: azure
+
+# Azure identity (optional - uses current az account if unset)
+# azure_subscription: "12345678-1234-1234-1234-123456789012"
+# azure_tenant: "87654321-4321-4321-4321-210987654321"
+
+# VM selection (required)
+azure_resource_group: "my-resource-group"
+
+# VM name patterns (glob supported)
+azure_vm_names:
+  - "web-*"           # All VMs starting with "web-"
+  - "db-prod-01"      # Specific VM
+
+# Filter by tags (optional)
+# azure_tags: "environment=production,tier=web"
+
+# Filter by power state (optional)
+# azure_power_state: "running"  # running, stopped, deallocated
+
+# Shutdown control (default: no shutdown when using snapshots)
+# azure_shutdown_mode: "none"     # none (default), stop, deallocate
+# azure_shutdown_force: false     # Force shutdown even with snapshots
+# azure_shutdown_wait: true       # Wait for shutdown to complete
+
+# Export strategy (zero-downtime with snapshots)
+azure_use_snapshots: true           # Use snapshots (default: true)
+# azure_stage_disk: false           # Create temp disk from snapshot (slower but safer, default: false)
+# azure_disks: "all"                # all (default), os, data
+# azure_consistency: "crash_consistent"  # crash_consistent (default), best_effort_quiesce
+
+# Resource management
+azure_tag_resources: true           # Tag created resources (default: true)
+# azure_keep_snapshots: false       # Keep snapshots after export (default: delete)
+# azure_keep_temp_disks: false      # Keep temp disks after export (default: delete)
+# azure_run_tag: "migration-001"    # Custom run tag (default: auto-generated)
+# azure_sas_duration: 3600          # SAS token duration in seconds (default: 3600)
+
+# Download control
+# azure_parallel: 4                 # Parallel downloads (default: 4)
+# azure_chunk_mb: 4                 # Download chunk size in MB (default: 4)
+# azure_resume: true                # Resume interrupted downloads (default: true)
+# azure_verify_size: true           # Verify download size (default: true)
+# azure_strict_verify: false        # Fail on size mismatch (default: warn only)
+
+# Output
+output_dir: ./azure-out
+
+# Post-processing (optional)
+# flatten: true
+# out_format: qcow2
+# compress: true

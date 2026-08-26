@@ -1,0 +1,121 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hyper2kvm-migration-JOBID
+  namespace: hyper2kvm-workers
+  labels:
+    app: hyper2kvm
+    component: migration-job
+spec:
+  backoffLimit: 2
+  completions: 1
+  parallelism: 1
+  
+  template:
+    metadata:
+      labels:
+        app: hyper2kvm
+        component: migration-job
+    spec:
+      restartPolicy: OnFailure
+      
+      # Node selection
+      nodeSelector:
+        hyper2kvm.io/worker-enabled: "true"
+      
+      # Service account
+      serviceAccountName: hyper2kvm-worker
+      
+      # Init container: Load NBD module
+      initContainers:
+      - name: nbd-module-loader
+        image: fedora:43
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          if ! lsmod | grep -q nbd; then
+            modprobe nbd max_part=16 nbds_max=16
+          fi
+          echo "NBD module ready"
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: lib-modules
+          mountPath: /lib/modules
+          readOnly: true
+      
+      containers:
+      - name: worker
+        image: hyper2kvm:latest
+        imagePullPolicy: IfNotPresent
+        
+        env:
+        - name: HYPER2KVM_MODE
+          value: "cli"
+        - name: JOB_ID
+          value: "JOBID"
+        
+        # Command will be overridden by job spec
+        command:
+        - python3
+        - -m
+        - hyper2kvm.worker.cli
+        - run
+        - /data/job-spec.json
+        - --follow
+        - --worker-id
+        - $(JOB_ID)
+        
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - SYS_ADMIN
+            - MKNOD
+        
+        resources:
+          requests:
+            cpu: "2"
+            memory: "4Gi"
+          limits:
+            cpu: "8"
+            memory: "16Gi"
+        
+        volumeMounts:
+        - name: job-spec
+          mountPath: /data
+          readOnly: true
+        - name: worker-state
+          mountPath: /var/lib/hyper2kvm
+        - name: dev
+          mountPath: /dev
+          mountPropagation: HostToContainer
+        - name: lib-modules
+          mountPath: /lib/modules
+          readOnly: true
+        - name: input-storage
+          mountPath: /input
+          readOnly: true
+        - name: output-storage
+          mountPath: /output
+      
+      volumes:
+      - name: job-spec
+        configMap:
+          name: hyper2kvm-job-JOBID
+      - name: worker-state
+        emptyDir: {}
+      - name: dev
+        hostPath:
+          path: /dev
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+      - name: input-storage
+        persistentVolumeClaim:
+          claimName: vmdk-input-pvc
+      - name: output-storage
+        persistentVolumeClaim:
+          claimName: qcow2-output-pvc

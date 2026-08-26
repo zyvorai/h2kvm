@@ -1,0 +1,111 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hyper2kvm-migration
+  namespace: vm-migration
+  labels:
+    app: hyper2kvm-cli
+    app.kubernetes.io/name: hyper2kvm
+    app.kubernetes.io/component: cli
+spec:
+  # Allow 1 retry on failure
+  backoffLimit: 1
+
+  template:
+    metadata:
+      labels:
+        app: hyper2kvm-cli
+        app.kubernetes.io/name: hyper2kvm
+        app.kubernetes.io/component: cli
+        app.kubernetes.io/part-of: hyper2kvm
+    spec:
+      serviceAccountName: hyper2kvm
+      restartPolicy: OnFailure
+
+      # Init container: Load NBD module
+      initContainers:
+        - name: nbd-loader
+          image: fedora:43
+          command: ['modprobe', 'nbd', 'max_part=16', 'nbds_max=16']
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: lib-modules
+              mountPath: /lib/modules
+              readOnly: true
+
+      containers:
+        - name: hyper2kvm
+          image: hyper2kvm:v1.2.3-cli
+          imagePullPolicy: IfNotPresent
+
+          # Override with specific migration command
+          command: ['h2kvmctl']
+          args:
+            - --cmd
+            - local
+            - --vmdk
+            - /data/input/server.vmdk
+            - --output-dir
+            - /data/output
+            - --to-output
+            - server.qcow2
+            - --out-format
+            - qcow2
+            - --compress
+
+          env:
+            - name: HYPER2KVM_MODE
+              value: "cli"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+
+          securityContext:
+            privileged: true
+
+          volumeMounts:
+            - name: vmdk-storage
+              mountPath: /data/input
+              readOnly: true
+            - name: output-storage
+              mountPath: /data/output
+            - name: conversion-temp
+              mountPath: /conversions
+            - name: dev
+              mountPath: /dev
+              mountPropagation: HostToContainer
+
+          resources:
+            limits:
+              cpu: "4"
+              memory: "8Gi"
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+
+      volumes:
+        - name: vmdk-storage
+          persistentVolumeClaim:
+            claimName: vmdk-pvc
+        - name: output-storage
+          persistentVolumeClaim:
+            claimName: output-pvc
+        - name: conversion-temp
+          emptyDir:
+            sizeLimit: 200Gi
+        - name: dev
+          hostPath:
+            path: /dev
+            type: Directory
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+            type: Directory
+
+      nodeSelector:
+        hyper2kvm-enabled: "true"
+
+      tolerations:
+        - key: "privileged-workload"
+          operator: "Exists"
+          effect: "NoSchedule"

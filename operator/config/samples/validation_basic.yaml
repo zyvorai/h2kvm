@@ -1,0 +1,22 @@
+apiVersion: hyper2kvm.io/v1
+kind: Validation
+metadata:
+  name: test-vm-validation
+  namespace: default
+spec:
+  image: /images/migrated-vm.qcow2
+  memory: 2048
+  cpus: 2
+  timeout: 300
+  tpm: false
+  vsock: true
+  cloudInit: |
+    #cloud-config
+    hostname: test-vm
+    users:
+      - name: admin
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        ssh_authorized_keys:
+          - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ...
+  kubernetesValidation: false
+  createKubeVirtVM: false

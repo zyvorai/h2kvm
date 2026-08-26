@@ -1,0 +1,41 @@
+# h2kvmctl config: RHEL 8.8 thin-provisioned VMDK → KubeVirt with noVNC console
+cmd: local
+vmdk: ./esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+output_dir: output/rhel88-k8s
+to_output: rhel88.qcow2
+out_format: qcow2
+compress: true
+
+# Offline fixes (critical for VMware → KVM)
+fstab_fixes_enable: true
+fstab_mode: stabilize-all
+grub_fixes_enable: true
+initramfs_regen_enable: true
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+  - virtio_balloon
+  - virtio_console
+network_fixes_enable: true
+
+# Kubernetes deployment
+deploy_k8s: true
+k8s_namespace: hyper2kvm-vms
+k8s_vm_name: rhel88-migrated
+k8s_storage_class: local-path
+k8s_pvc_size: 40Gi
+k8s_cpu: "4"
+k8s_memory: 4Gi
+k8s_auto_start: true
+k8s_wait_ready: true
+
+# noVNC web console (browser-based VNC access)
+# Port auto-allocated from K8s free pool, printed at the end
+k8s_novnc: true
+
+# Reporting
+report: output/rhel88-k8s/migration-report.md
+log_file: output/rhel88-k8s/migration.log
+verbose: 2

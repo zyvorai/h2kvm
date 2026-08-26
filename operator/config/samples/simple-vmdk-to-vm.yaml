@@ -1,0 +1,61 @@
+---
+# Simple VMDK to KubeVirt VM conversion
+# This example shows the most basic use case: convert a VMDK from HTTP URL to a running VM
+apiVersion: hyper2kvm.io/v1alpha1
+kind: HyperConversion
+metadata:
+  name: simple-vmdk-to-vm
+  namespace: default
+spec:
+  # Source disk configuration
+  source:
+    url: "https://example.com/images/ubuntu-22.04.vmdk"
+    format: vmdk
+    # Optional: verify checksum
+    # checksum: "sha256:abc123..."
+    # Optional: authentication secret
+    # secretRef:
+    #   name: my-http-credentials
+
+  # Storage configuration
+  storage:
+    # Use default StorageClass if not specified
+    storageClass: local-path
+    # Auto-detect size from HTTP Content-Length
+    # Or specify explicitly: size: 20Gi
+    accessMode: ReadWriteOnce
+    volumeMode: Filesystem
+
+  # Virtual Machine configuration
+  vm:
+    # VM name (defaults to HyperConversion name if omitted)
+    name: ubuntu-vm
+
+    # CPU configuration
+    cpu:
+      cores: 2
+      sockets: 1
+      threads: 1
+
+    # Memory
+    memory: 4Gi
+
+    # Firmware (bios, uefi, uefi-secure)
+    firmware: bios
+
+    # Run strategy (Always, RerunOnFailure, Manual, Halted)
+    runStrategy: Always
+
+    # Eviction strategy for live migration
+    evictionStrategy: LiveMigrateIfPossible
+
+    # Networks (default pod network with masquerade)
+    networks:
+    - name: default
+      type: pod
+      model: virtio
+
+  # Conversion options (optional)
+  conversion:
+    compression: zstd
+    timeout: 60

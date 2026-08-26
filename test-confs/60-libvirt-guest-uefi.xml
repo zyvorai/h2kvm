@@ -1,0 +1,88 @@
+<domain type='kvm'>
+  <name>guest-uefi</name>
+  <memory unit='MiB'>4096</memory>
+  <currentMemory unit='MiB'>4096</currentMemory>
+  <vcpu placement='static'>2</vcpu>
+
+  <os>
+    <type arch='x86_64' machine='q35'>hvm</type>
+
+    <!-- OVMF firmware (paths vary by distro) -->
+    <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
+    <nvram>/var/lib/libvirt/qemu/nvram/guest-uefi_VARS.fd</nvram>
+
+    <!-- Nice-to-have: enable UEFI boot menu -->
+    <bootmenu enable='yes'/>
+  </os>
+
+  <features>
+    <acpi/>
+    <apic/>
+    <vmport state='off'/>
+  </features>
+
+  <cpu mode='host-passthrough' check='none'/>
+  <clock offset='utc'/>
+
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+
+  <devices>
+    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+
+    <!-- Disk: virtio-blk works for most Linux; Windows may need virtio-scsi (see below) -->
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' cache='none' io='native'/>
+      <source file='/var/lib/libvirt/images/guest.qcow2'/>
+      <target dev='vda' bus='virtio'/>
+      <boot order='1'/>
+    </disk>
+
+    <!-- Optional: attach a cloud-init ISO if you generate one -->
+    <!--
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='/var/lib/libvirt/images/seed.iso'/>
+      <target dev='sda' bus='sata'/>
+      <readonly/>
+    </disk>
+    -->
+
+    <!-- Default network (NAT) -->
+    <interface type='network'>
+      <source network='default'/>
+      <model type='virtio'/>
+    </interface>
+
+    <!-- Console + serial -->
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+
+    <!-- Graphics (Spice) -->
+    <graphics type='spice' autoport='yes' listen='127.0.0.1'/>
+    <video>
+      <model type='qxl' vram='65536'/>
+    </video>
+
+    <!-- Input -->
+    <input type='tablet' bus='usb'/>
+    <input type='keyboard' bus='ps2'/>
+
+    <!-- Virtio RNG (helps entropy during boot) -->
+    <rng model='virtio'>
+      <backend model='random'>/dev/urandom</backend>
+    </rng>
+
+    <!-- Channels (optional but useful for qemu-guest-agent if installed) -->
+    <channel type='unix'>
+      <source mode='bind' path='/var/lib/libvirt/qemu/channel/guest-uefi.agent'/>
+      <target type='virtio' name='org.qemu.guest_agent.0'/>
+    </channel>
+  </devices>
+</domain>
+

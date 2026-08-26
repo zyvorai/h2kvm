@@ -1,0 +1,151 @@
+# Financial Services PCI-DSS Compliant Migration
+#
+# Scenario: Migrating payment processing system from VMware to OpenStack KVM
+# Industry: Financial Services / Payment Processing
+# Compliance: PCI-DSS 4.0, SOC 2 Type II
+#
+# Requirements:
+# - Network segmentation (CDE - Cardholder Data Environment)
+# - Encryption at rest (LUKS) and in transit (TLS 1.3+)
+# - Comprehensive audit logging
+# - Anti-malware scanning before migration
+# - Change control documentation
+# - Quarterly vulnerability scanning
+#
+# VM Profile:
+# - OS: RHEL 9.3 + STIG hardening
+# - Application: Payment Gateway / Card Processing
+# - Database: Oracle 19c (tokenized card data)
+# - Middleware: Apache Tomcat 10 (PCI-hardened)
+#
+
+# Migration mode
+cmd: vsphere
+
+# vCenter connection (production environment)
+vcenter: vcenter-pci.bank.internal
+vc_user: ${VCENTER_ADMIN}
+vc_password_env: VC_PASSWORD
+dc_name: PCI-CDE-DC1
+cluster: Payment-Processing-Cluster
+
+# Source VM (payment gateway)
+vs_vm_name: payment-gw-prod-02
+vs_action: export-vm
+
+# Security: Pre-migration virus scan
+# Run: clamscan -r /vmfs/volumes/datastore1/payment-gw-prod-02/
+
+# Output configuration (encrypted storage)
+output_dir: /secure/pci-migrations/payment-gw
+out_format: raw  # For LUKS encryption wrapper
+compress: false  # Compress after LUKS encryption
+
+# PCI-DSS compliance audit trail
+verbose: 2
+log_file: /var/log/pci-migrations/payment-gw-{timestamp}.log
+report: /secure/pci-migrations/payment-gw/migration-change-record.md
+
+# Guest OS fixes (RHEL 9 STIG)
+regen_initramfs: true
+fstab_mode: stabilize-all
+# grub is auto-handled
+
+# Network configuration
+# CRITICAL: CDE network isolation (VLAN 100 - PCI segment)
+network_mode: preserve
+
+# SELinux (PCI-DSS Requirement 2.2.6)
+preserve_selinux: true  # Must remain in enforcing mode
+
+# Libvirt domain configuration
+domain_name: payment-gw-prod-02-kvm
+domain_memory: 16384  # 16GB
+domain_vcpus: 4
+domain_cpu_mode: host-passthrough
+
+# Storage configuration
+disk_bus: virtio
+disk_cache: none  # PCI-DSS requirement: no caching for card data
+disk_io: native
+
+# Network (PCI CDE segment)
+nic_model: virtio
+libvirt_network: br-pci-cde  # VLAN 100 - CDE
+# Firewall rules: Only 443 (TLS), 8443 (admin - restricted IPs)
+
+# Security hardening checklist (PCI-DSS Requirements)
+#
+# 1. Build and Maintain a Secure Network
+#    [x] Firewall configured (nftables - default deny)
+#    [x] No default passwords
+#    [x] Network segmentation verified
+#
+# 2. Protect Cardholder Data
+#    [ ] LUKS encryption enabled (post-migration)
+#    [ ] TLS 1.3 enforced (Apache/Tomcat)
+#    [ ] Key management (HSM - Thales Luna)
+#
+# 3. Maintain a Vulnerability Management Program
+#    [ ] ClamAV installed and updated
+#    [ ] AIDE file integrity monitoring
+#    [ ] Nessus quarterly scans scheduled
+#
+# 4. Implement Strong Access Control Measures
+#    [ ] MFA required (RSA SecurID / Duo)
+#    [ ] RBAC configured
+#    [ ] Privileged access logged (auditd)
+#
+# 5. Regularly Monitor and Test Networks
+#    [ ] Syslog to SIEM (Splunk)
+#    [ ] IDS/IPS configured (Snort)
+#    [ ] Penetration testing post-migration
+#
+# 6. Maintain an Information Security Policy
+#    [ ] Change control ticket: CHG-2026-00123
+#    [ ] Risk assessment completed
+#    [ ] Rollback plan documented
+
+# Post-migration encryption
+# 1. Create LUKS volume:
+#    cryptsetup luksFormat --type luks2 --pbkdf argon2id \
+#      --cipher aes-xts-plain64 --key-size 512 \
+#      /dev/vg-pci/payment-gw-prod-02
+#
+# 2. Store key in HSM (Thales Luna Network HSM)
+#
+# 3. Configure auto-unlock via clevis + TPM 2.0:
+#    clevis luks bind -d /dev/vg-pci/payment-gw-prod-02 tpm2 '{}'
+
+# Validation tests
+test_boot: true
+test_timeout: 600
+
+# Migration window
+# Schedule: Sunday 3 AM - 5 AM (2-hour window)
+# Change control: CHG-2026-00123
+# Approvers: CISO, IT Director, Change Advisory Board
+# Downtime estimate: 90 minutes
+# Rollback SLA: 30 minutes
+
+# Post-migration validation (PCI-DSS critical services)
+# 1. Payment gateway API (TLS 1.3 verified)
+# 2. Oracle database connectivity (encrypted listener)
+# 3. Tokenization service (test card numbers)
+# 4. PCI firewall rules (nmap scan verification)
+# 5. HSM connectivity (PKCS#11 test)
+# 6. Transaction processing (test transaction)
+# 7. Fraud detection integration
+# 8. Settlement batch processing
+# 9. Audit log forwarding to SIEM
+# 10. Performance baseline (< 500ms transaction response)
+
+# Compliance verification
+# - ASV scan (Approved Scanning Vendor) - Due: 7 days post-migration
+# - QSA review (Qualified Security Assessor) - Scheduled
+# - Evidence for auditors:
+#   * This migration config file
+#   * Change control ticket
+#   * Pre/post migration network diagrams
+#   * Vulnerability scan results
+#   * Penetration test report

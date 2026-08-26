@@ -1,0 +1,161 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: hyper2kvm-daemon
+  namespace: vm-migration
+  labels:
+    app: hyper2kvm-daemon
+    app.kubernetes.io/name: hyper2kvm
+    app.kubernetes.io/component: daemon
+    app.kubernetes.io/part-of: hyper2kvm
+spec:
+  selector:
+    matchLabels:
+      app: hyper2kvm-daemon
+  template:
+    metadata:
+      labels:
+        app: hyper2kvm-daemon
+        app.kubernetes.io/name: hyper2kvm
+        app.kubernetes.io/component: daemon
+        app.kubernetes.io/part-of: hyper2kvm
+    spec:
+      serviceAccountName: hyper2kvm
+
+      # Init container to load NBD kernel module
+      initContainers:
+        - name: nbd-module-loader
+          image: fedora:43
+          command:
+            - sh
+            - -c
+            - |
+              # Load NBD module if not already loaded
+              if ! lsmod | grep -q nbd; then
+                modprobe nbd max_part=16 nbds_max=16
+                echo "NBD module loaded"
+              else
+                echo "NBD module already loaded"
+              fi
+
+              # Verify devices exist
+              for i in $(seq 0 3); do
+                if [ ! -e /dev/nbd$i ]; then
+                  echo "ERROR: /dev/nbd$i not found"
+                  exit 1
+                fi
+              done
+
+              echo "NBD devices ready"
+
+          securityContext:
+            privileged: true
+
+          volumeMounts:
+            - name: lib-modules
+              mountPath: /lib/modules
+              readOnly: true
+            - name: dev
+              mountPath: /dev
+
+      containers:
+        - name: daemon
+          image: hyper2kvm:v1.2.3-daemon
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: HYPER2KVM_MODE
+              value: "daemon"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+
+          securityContext:
+            privileged: true
+            # Alternative: Use capabilities if cluster policy allows
+            # capabilities:
+            #   add:
+            #     - SYS_ADMIN
+            #     - SYS_MODULE
+            #     - MKNOD
+            #     - SYS_CHROOT
+
+          volumeMounts:
+            - name: config
+              mountPath: /etc/hyper2kvm
+              readOnly: true
+            - name: watch-dir
+              mountPath: /data/incoming
+            - name: output-dir
+              mountPath: /data/output
+            - name: workdir
+              mountPath: /var/lib/hyper2kvm
+            - name: dev
+              mountPath: /dev
+              mountPropagation: Bidirectional
+
+          resources:
+            limits:
+              cpu: "6"
+              memory: "12Gi"
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - -f
+                - "hyper2kvm.*daemon"
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "[ -f /var/lib/hyper2kvm/daemon.pid ]"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+
+      volumes:
+        - name: config
+          configMap:
+            name: hyper2kvm-daemon-config
+        - name: watch-dir
+          hostPath:
+            path: /mnt/hyper2kvm/incoming
+            type: DirectoryOrCreate
+        - name: output-dir
+          hostPath:
+            path: /mnt/hyper2kvm/output
+            type: DirectoryOrCreate
+        - name: workdir
+          hostPath:
+            path: /var/lib/hyper2kvm
+            type: DirectoryOrCreate
+        - name: dev
+          hostPath:
+            path: /dev
+            type: Directory
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+            type: Directory
+
+      # Node selection
+      nodeSelector:
+        hyper2kvm-daemon: "true"
+
+      # Tolerations for privileged workloads
+      tolerations:
+        - key: "privileged-workload"
+          operator: "Exists"
+          effect: "NoSchedule"
+
+      # Termination grace period (allow migrations to complete)
+      terminationGracePeriodSeconds: 7200  # 2 hours

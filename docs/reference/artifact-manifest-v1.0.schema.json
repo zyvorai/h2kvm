@@ -1,0 +1,427 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/ssahani/hyper2kvm/schemas/artifact-manifest-v1.0.json",
+  "title": "Artifact Manifest v1.0",
+  "description": "Schema for hypersdk-to-hyper2kvm integration contract. Defines VM disk artifacts and conversion pipeline configuration.",
+  "type": "object",
+  "required": ["manifest_version", "disks"],
+  "additionalProperties": true,
+  "properties": {
+    "manifest_version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "Manifest schema version (semantic versioning)"
+    },
+    "source": {
+      "type": "object",
+      "description": "Source system metadata (informational, not required by hyper2kvm)",
+      "additionalProperties": true,
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "Source provider",
+          "examples": ["vsphere", "azure", "aws", "hyperv", "local"]
+        },
+        "vm_id": {
+          "type": "string",
+          "description": "Provider-specific VM identifier"
+        },
+        "vm_name": {
+          "type": "string",
+          "description": "Human-readable VM name"
+        },
+        "datacenter": {
+          "type": "string",
+          "description": "Datacenter or region"
+        },
+        "export_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When export/fetch occurred (ISO 8601)"
+        },
+        "export_method": {
+          "type": "string",
+          "description": "How artifacts were obtained",
+          "examples": ["govc-export", "ovftool", "snapshot", "direct-download"]
+        }
+      }
+    },
+    "vm": {
+      "type": "object",
+      "description": "VM hardware and firmware metadata",
+      "additionalProperties": true,
+      "properties": {
+        "cpu": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of vCPUs"
+        },
+        "mem_gb": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Memory in GB"
+        },
+        "firmware": {
+          "type": "string",
+          "enum": ["bios", "uefi", "unknown"],
+          "default": "bios",
+          "description": "Firmware type (helps hyper2kvm make boot decisions)"
+        },
+        "secureboot": {
+          "type": "boolean",
+          "default": false,
+          "description": "Secure boot enabled"
+        },
+        "os_hint": {
+          "type": "string",
+          "description": "OS hint (optional, helps decision-making)",
+          "examples": ["linux", "windows", "unknown"]
+        },
+        "os_version": {
+          "type": "string",
+          "description": "OS version string",
+          "examples": ["Ubuntu 22.04", "Windows Server 2019"]
+        }
+      }
+    },
+    "disks": {
+      "type": "array",
+      "description": "Disk artifacts (REQUIRED - must have at least one)",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "source_format", "bytes", "local_path"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "description": "Unique disk identifier within this manifest",
+            "examples": ["disk-0", "boot-disk", "data-disk-1"]
+          },
+          "source_format": {
+            "type": "string",
+            "enum": ["vmdk", "qcow2", "raw", "vhd", "vhdx", "vdi"],
+            "description": "Disk image format"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Disk size in bytes"
+          },
+          "local_path": {
+            "type": "string",
+            "description": "Absolute path to disk file on local filesystem"
+          },
+          "checksum": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$",
+            "description": "SHA-256 checksum (format: 'sha256:hexdigest')",
+            "examples": ["sha256:a1b2c3d4e5f67890123456789012345678901234567890123456789012345678"]
+          },
+          "boot_order_hint": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 999,
+            "description": "Boot priority (0=primary boot disk, 1=secondary, etc.)"
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable disk label"
+          },
+          "disk_type": {
+            "type": "string",
+            "enum": ["boot", "data", "unknown"],
+            "default": "unknown",
+            "description": "Disk type hint"
+          }
+        }
+      }
+    },
+    "nics": {
+      "type": "array",
+      "description": "Network interfaces (informational)",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "NIC identifier"
+          },
+          "mac": {
+            "type": "string",
+            "pattern": "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$",
+            "description": "MAC address",
+            "examples": ["00:50:56:ab:cd:ef"]
+          },
+          "network": {
+            "type": "string",
+            "description": "Network name from source"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "description": "Informational notes from export process",
+      "items": {
+        "type": "string"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "description": "Non-fatal warnings from export process",
+      "items": {
+        "type": "object",
+        "required": ["stage", "message"],
+        "properties": {
+          "stage": {
+            "type": "string",
+            "description": "Export stage where warning occurred"
+          },
+          "message": {
+            "type": "string",
+            "description": "Warning message"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When warning occurred (ISO 8601)"
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata (extensible)",
+      "additionalProperties": true,
+      "properties": {
+        "hypersdk_version": {
+          "type": "string",
+          "description": "hypersdk version that created this manifest"
+        },
+        "job_id": {
+          "type": "string",
+          "description": "hypersdk job identifier"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When manifest was created (ISO 8601)"
+        },
+        "tags": {
+          "type": "object",
+          "description": "User-defined tags",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "pipeline": {
+      "type": "object",
+      "description": "Pipeline stages configuration (optional, for manifest-driven workflow)",
+      "additionalProperties": false,
+      "properties": {
+        "inspect": {
+          "type": "object",
+          "required": ["enabled"],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable/disable INSPECT stage"
+            },
+            "collect_guest_info": {
+              "type": "boolean",
+              "default": false,
+              "description": "Use guestfs to inspect guest OS details"
+            }
+          }
+        },
+        "fix": {
+          "type": "object",
+          "required": ["enabled"],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable/disable FIX stage"
+            },
+            "backup": {
+              "type": "boolean",
+              "default": true,
+              "description": "Create backups before modifications"
+            },
+            "print_fstab": {
+              "type": "boolean",
+              "default": false,
+              "description": "Print /etc/fstab before and after"
+            },
+            "update_grub": {
+              "type": "boolean",
+              "default": true,
+              "description": "Update GRUB configuration"
+            },
+            "regen_initramfs": {
+              "type": "boolean",
+              "default": true,
+              "description": "Regenerate initramfs with virtio drivers"
+            },
+            "fstab_mode": {
+              "type": "string",
+              "enum": ["stabilize-all", "bypath-only", "noop"],
+              "default": "stabilize-all",
+              "description": "fstab rewrite mode"
+            },
+            "remove_vmware_tools": {
+              "type": "boolean",
+              "default": false,
+              "description": "Remove VMware tools packages"
+            },
+            "enable_rdp": {
+              "type": "boolean",
+              "description": "Enable Windows RDP via hyper2kvm firstboot (TermService + firewall). Default when omitted: true if vm.os_hint is windows"
+            }
+          }
+        },
+        "convert": {
+          "type": "object",
+          "required": ["enabled"],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable/disable CONVERT stage"
+            },
+            "compress": {
+              "type": "boolean",
+              "default": false,
+              "description": "Enable qcow2 compression (qcow2 only)"
+            },
+            "compress_level": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9,
+              "description": "Compression level 1-9 (qcow2 only)"
+            }
+          }
+        },
+        "validate": {
+          "type": "object",
+          "required": ["enabled"],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable/disable VALIDATE stage"
+            },
+            "check_image_integrity": {
+              "type": "boolean",
+              "default": true,
+              "description": "Verify image can be opened by qemu-img"
+            }
+          }
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "description": "Guest OS configuration injection (Linux only)",
+      "additionalProperties": true,
+      "properties": {
+        "users": {
+          "type": "object",
+          "description": "User account configuration",
+          "additionalProperties": true
+        },
+        "services": {
+          "type": "object",
+          "description": "Systemd service configuration",
+          "additionalProperties": true
+        },
+        "hostname": {
+          "type": "object",
+          "description": "Hostname and hosts file configuration",
+          "additionalProperties": true
+        },
+        "network": {
+          "type": "object",
+          "description": "Network configuration injection",
+          "additionalProperties": true
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "description": "Output configuration (optional)",
+      "additionalProperties": true,
+      "properties": {
+        "directory": {
+          "type": "string",
+          "description": "Output directory (created if doesn't exist)"
+        },
+        "format": {
+          "type": "string",
+          "enum": ["qcow2", "raw", "vdi"],
+          "default": "qcow2",
+          "description": "Output format"
+        },
+        "filename": {
+          "type": "string",
+          "description": "Output filename (auto-generated if not specified)"
+        }
+      }
+    },
+    "options": {
+      "type": "object",
+      "description": "Global runtime options",
+      "additionalProperties": true,
+      "properties": {
+        "dry_run": {
+          "type": "boolean",
+          "default": false,
+          "description": "Don't modify guest or write output"
+        },
+        "verbose": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 1,
+          "description": "Verbosity level (0=quiet, 1=normal, 2=verbose, 3=debug)"
+        },
+        "report": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Generate report.json"
+            },
+            "path": {
+              "type": "string",
+              "default": "report.json",
+              "description": "Report filename (relative to output directory)"
+            }
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "manifest_version": "1.0",
+      "disks": [
+        {
+          "id": "disk-0",
+          "source_format": "vmdk",
+          "bytes": 10737418240,
+          "local_path": "/path/to/disk.vmdk"
+        }
+      ],
+      "pipeline": {
+        "inspect": {"enabled": true},
+        "fix": {"enabled": true},
+        "convert": {"enabled": true},
+        "validate": {"enabled": true}
+      }
+    }
+  ]
+}

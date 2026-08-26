@@ -1,0 +1,67 @@
+# ============================================
+# Photon OS: VMware → libvirt (local VMDK pipeline)
+# ============================================
+# Converts local photon.vmdk to qcow2, applies guest fixes,
+# generates libvirt domain XML, defines and boot-tests the VM.
+#
+# Prerequisites:
+#
+#   1. Install qemu-img:
+#      # Fedora/RHEL:  dnf install qemu-img
+#      # Debian/Ubuntu: apt install qemu-utils
+#
+#   2. Install libguestfs:
+#      # Fedora/RHEL:  dnf install libguestfs-tools
+#      # Debian/Ubuntu: apt install libguestfs-tools
+#
+#   3. Install OVMF (for UEFI boot):
+#      # Fedora/RHEL:  dnf install edk2-ovmf
+#      # Debian/Ubuntu: apt install ovmf
+#
+#   4. Install libvirt (for boot test):
+#      # Fedora/RHEL:  dnf install libvirt-daemon libvirt-client
+#      # Debian/Ubuntu: apt install libvirt-daemon-system libvirt-clients
+#
+#   5. (Optional) Get a Photon OS VMDK:
+#      Download from: https://packages.vmware.com/photon/
+#      Or export from vCenter: govc export.ovf -vm MyPhotonVM /tmp/
+#
+# Usage:
+#   sudo ./h2kvmctl --config photon-to-libvirt.yaml
+# ============================================
+
+cmd: local
+vmdk: ./photon.vmdk
+output_dir: ./output-photon
+to_output: photon-os.qcow2
+out_format: qcow2
+flatten: true
+compress: true
+
+# Guest fixes
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+
+# libvirt domain XML
+emit_domain_xml: true
+virsh_define: true
+vm_name: photon-os
+memory: 2048
+vcpus: 2
+uefi: true
+machine: q35
+disk_bus: virtio
+disk_cache: none
+net_model: virtio
+libvirt_network: default
+serial_console: true
+graphics: vnc
+guest_os: linux
+
+# Boot test the converted VM
+libvirt_test: true
+keep_domain: true
+timeout: 120
+
+verbose: 1

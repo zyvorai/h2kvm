@@ -1,0 +1,123 @@
+# ==============================================================================
+# 🔄 vSphere Connection with Retry Logic Example
+# ==============================================================================
+#
+# Demonstrates connection retry configuration for unreliable network environments
+#
+# Usage:
+#   export VC_PASSWORD='your-password'
+#   hyper2kvm --config 95-vsphere-connection-retry-example.yaml vsphere
+#
+# Features:
+#   ✅ Automatic connection retry with exponential backoff
+#   ✅ Transient error detection (network timeouts, DNS failures, etc.)
+#   ✅ Configurable retry attempts and backoff timing
+#   ✅ Jitter to prevent thundering herd problem
+#
+# Requirements:
+#   - vCenter/ESXi access credentials
+#   - hyper2kvm with VMwareConnectionOptions support
+# ==============================================================================
+
+cmd: vsphere
+
+# vCenter Credentials
+vcenter: 192.168.73.42
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+vc_insecure: true
+vc_port: 443
+
+# ==============================================================================
+# Connection Retry Configuration (NEW)
+# ==============================================================================
+#
+# These settings control how hyper2kvm handles transient connection failures
+# when connecting to vSphere/vCenter using pyvmomi (SmartConnect).
+#
+# All settings are optional - defaults shown below.
+
+# Maximum number of retry attempts (in addition to initial attempt)
+# Total attempts = max_retries + 1
+# Default: 3 (total of 4 attempts)
+# Set to 0 to disable retries
+vc_connection_max_retries: 3
+
+# Base backoff time in seconds for exponential backoff
+# Actual backoff: base_backoff_s * (2 ** (attempt - 1))
+# Example with base=2.0: 2s, 4s, 8s, 16s...
+# Default: 2.0
+vc_connection_base_backoff_s: 2.0
+
+# Maximum backoff time in seconds (caps exponential growth)
+# Default: 30.0
+vc_connection_max_backoff_s: 30.0
+
+# Connection timeout in seconds
+# Default: 30.0
+vc_connection_timeout_s: 30.0
+
+# Enable random jitter (±25%) to prevent thundering herd
+# When true, adds randomness to backoff timing
+# Default: true
+vc_connection_enable_jitter: true
+
+# ==============================================================================
+# Retry Behavior Examples
+# ==============================================================================
+#
+# Example 1: Conservative (production environments)
+# vc_connection_max_retries: 5
+# vc_connection_base_backoff_s: 5.0
+# vc_connection_max_backoff_s: 60.0
+# → Retry schedule: 5s, 10s, 20s, 40s, 60s
+#
+# Example 2: Aggressive (unstable networks)
+# vc_connection_max_retries: 10
+# vc_connection_base_backoff_s: 1.0
+# vc_connection_max_backoff_s: 30.0
+# → Retry schedule: 1s, 2s, 4s, 8s, 16s, 30s, 30s, 30s, 30s, 30s
+#
+# Example 3: No retries (fail fast)
+# vc_connection_max_retries: 0
+# → Single attempt only, fail immediately on error
+#
+# Example 4: Quick retries for transient issues
+# vc_connection_max_retries: 3
+# vc_connection_base_backoff_s: 0.5
+# vc_connection_max_backoff_s: 5.0
+# → Retry schedule: 0.5s, 1s, 2s
+# ==============================================================================
+
+# ==============================================================================
+# Transient vs Non-Transient Errors
+# ==============================================================================
+#
+# Retry logic only applies to TRANSIENT errors:
+#   ✅ Connection timeouts
+#   ✅ Connection refused (port not open yet)
+#   ✅ DNS resolution failures
+#   ✅ Network unreachable
+#   ✅ SSL handshake failures
+#   ✅ Connection reset by peer
+#
+# Non-transient errors FAIL IMMEDIATELY (no retry):
+#   ❌ Authentication failures (wrong credentials)
+#   ❌ Authorization errors (insufficient permissions)
+#   ❌ Invalid hostname/IP address
+#   ❌ Unsupported protocol versions
+# ==============================================================================
+
+# Standard vSphere settings
+dc_name: data
+vs_action: download_only
+vs_vm: test-vm-rhel-10
+vs_datacenter: data
+
+# Output Configuration
+output_dir: ./out/test-retry
+out_format: qcow2
+
+# Logging (verbose mode recommended to see retry attempts)
+verbose: 2
+report: connection-retry-report.md

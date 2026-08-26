@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "job_id": "offline-fix-example-001",
+  "operation": "offline_fix",
+  "image": {
+    "path": "/data/input/rhel-vm.qcow2",
+    "format": "qcow2"
+  },
+  "requested_actions": [
+    "nbd_attach",
+    "lvm_activate",
+    "fsck",
+    "initramfs_regenerate"
+  ],
+  "capability_requirements": {
+    "needs_nbd": true,
+    "needs_lvm": true,
+    "needs_mount": true,
+    "needs_selinux_tools": false,
+    "min_memory_gb": 8,
+    "min_disk_space_gb": 150
+  },
+  "execution_policy": {
+    "retry_count": 1,
+    "timeout_seconds": 7200,
+    "idempotent": false,
+    "priority": 3
+  },
+  "artifacts": {
+    "log_upload": true,
+    "store_fixed_image": true,
+    "output_path": "/data/output",
+    "keep_intermediates": true
+  },
+  "audit": {
+    "requested_by": "kubernetes-example",
+    "ticket": "PROD-1234",
+    "tags": {
+      "environment": "production",
+      "operation": "offline-repair",
+      "vm_type": "rhel",
+      "criticality": "high"
+    }
+  },
+  "parameters": {
+    "output_format": "qcow2",
+    "compress": false,
+    "virtio_drivers": true,
+    "regenerate_initramfs": true
+  }
+}

@@ -1,0 +1,17 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 00-common/common-strict.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 00-common/common-strict.yaml
+
+verbose: 2
+dry_run: false
+checksum: true
+enable_recovery: true
+no_backup: false
+fstab_mode: stabilize-all
+print_fstab: true
+regen_initramfs: true
+no_grub: false
+flatten: true
+flatten_format: qcow2

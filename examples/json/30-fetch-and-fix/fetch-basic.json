@@ -1,0 +1,13 @@
+{
+  "command": "fetch-and-fix",
+  "host": "esxi.example.com",
+  "user": "root",
+  "port": 22,
+  "remote": "/vmfs/volumes/datastore1/vm/vm.vmdk",
+  "fetch_dir": "./downloads",
+  "flatten": true,
+  "to_output": "esxi-vm-fixed.qcow2",
+  "out_format": "qcow2",
+  "compress": true,
+  "verbose": 1
+}

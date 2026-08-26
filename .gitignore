@@ -1,0 +1,174 @@
+# =================================================
+# Python bytecode / caches (ALL levels)
+# =================================================
+__pycache__/
+**/__pycache__/
+
+*.pyc
+*.pyo
+*.pyd
+*.cpython-*.pyc
+
+# =================================================
+# Python virtual environments
+# =================================================
+.venv/
+venv/
+ENV/
+env/
+.virtualenv/
+
+# Poetry / PDM / Pipenv
+.poetry/
+.pdm-python
+.pdm.toml
+Pipfile.lock
+
+# =================================================
+# Python build / packaging artifacts
+# =================================================
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+pip-wheel-metadata/
+
+# Setuptools / PyInstaller
+*.spec
+
+# =================================================
+# Python testing / coverage / profiling
+# =================================================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.prof
+*.lprof
+
+# =================================================
+# Static analysis / type checking
+# =================================================
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+
+# =================================================
+# Logs / runtime artifacts
+# =================================================
+*.log
+*.pid
+
+# =================================================
+# Jupyter / IPython
+# =================================================
+.ipynb_checkpoints/
+.profile_default/
+ipython_config.py
+
+# =================================================
+# VMDK / disk artifacts (project-specific but safe)
+# =================================================
+*.vmdk
+*-flat.vmdk
+*.qcow2
+*.raw
+*.img
+
+# VMware VM directories and files (test VMs in root only)
+/win10/
+/win11/
+*.vmx
+*.vmxf
+*.nvram
+*.vmsd
+*.scoreboard
+
+# =================================================
+# Archives / generated bundles
+# =================================================
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# =================================================
+# Editor / OS noise
+# =================================================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+
+# Test fixtures
+tests/fixtures/images/
+*.qcow2
+*.vmdk
+*.img
+
+# =================================================
+# Planning / proposal documents (never commit)
+# =================================================
+*_PLAN.md
+*_PROPOSAL.md
+DOCS_IMPROVEMENT_PLAN.md
+LIBRARY_API_PROPOSAL.md
+LINKEDIN_POST.md
+SBAR.md
+
+# =================================================
+# Test output directories (DO NOT COMMIT)
+# =================================================
+out/
+
+# Test VM directories
+win10/
+win11/
+
+# Test disk images (specific)
+photon.vmdk
+test-images/
+.claude/
+coverage.json
+
+# Debian build artifacts
+debian/.debhelper/
+debian/hyper2kvm/
+debian/files
+debian/*.log
+debian/*.substvars
+debian/debhelper-build-stamp
+
+# =================================================
+# Compiled binaries (NEVER commit)
+# =================================================
+*.exe
+*.dll
+*.so
+*.dylib
+operator/hyperconversion-operator
+operator/bin/
+
+# Phony guest images (build artifacts, not committed)
+test-data/phony-guests/*.img
+
+# Deploy state (host/user only, no secrets)
+.deploy-last
+
+# Local AI caches
+.grok/
+**/.DS_Store
+
+# Local presentation exports
+presentations/
+
+# Playwright / dashboard test output
+web/dashboard/test-results/

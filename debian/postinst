@@ -1,0 +1,81 @@
+#!/bin/sh
+set -e
+
+#DEBHELPER#
+
+case "$1" in
+    configure)
+        # Create hyper2kvm system user and group if they don't exist
+        if ! getent group hyper2kvm >/dev/null; then
+            addgroup --system hyper2kvm
+        fi
+
+        if ! getent passwd hyper2kvm >/dev/null; then
+            adduser --system --ingroup hyper2kvm \
+                --home /var/lib/hyper2kvm \
+                --no-create-home \
+                --gecos "hyper2kvm daemon user" \
+                --shell /usr/sbin/nologin \
+                hyper2kvm
+        fi
+
+        # Add hyper2kvm user to necessary groups for QEMU and libvirt access
+        # Only add to groups that exist on the system
+        for group in qemu kvm libvirt disk; do
+            if getent group "$group" >/dev/null 2>&1; then
+                usermod -a -G "$group" hyper2kvm 2>/dev/null || true
+            fi
+        done
+
+        # Clean stale runtime state
+        rm -rf /var/lib/hyper2kvm/conversions 2>/dev/null || true
+        rm -rf /var/lib/hyper2kvm/output 2>/dev/null || true
+        rm -f /var/lib/hyper2kvm/daemon.pid 2>/dev/null || true
+
+        # Create runtime directories via tmpfiles.d (idempotent, survives reboot)
+        systemd-tmpfiles --create hyper2kvm.conf 2>/dev/null || true
+        mkdir -p /var/lib/hyper2kvm/conversions
+        mkdir -p /var/lib/hyper2kvm/output
+
+        # Set ownership and permissions
+        chown -R root:root /var/lib/hyper2kvm
+        chmod 750 /var/lib/hyper2kvm
+
+        if [ -d /var/log/hyper2kvm ]; then
+            chown root:root /var/log/hyper2kvm
+            chmod 750 /var/log/hyper2kvm
+        fi
+
+        if [ -d /etc/hyper2kvm ]; then
+            chown root:hyper2kvm /etc/hyper2kvm
+            chmod 750 /etc/hyper2kvm
+            chmod 755 /etc/hyper2kvm/migrations
+        fi
+
+        # Print helpful message
+        cat << 'EOMSG'
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+hyper2kvm has been installed successfully!
+
+Configuration files:
+  System config: /etc/hyper2kvm/config.yaml
+  Migrations:    /etc/hyper2kvm/migrations/
+
+Usage examples:
+  # Edit system config to add your VM directories
+  sudo vi /etc/hyper2kvm/config.yaml
+
+  # Copy and customize migration template
+  sudo cp /etc/hyper2kvm/migrations/photon-example.yaml \
+          /etc/hyper2kvm/migrations/my-vm.yaml
+
+  # Run migration
+  sudo h2kvmctl --config /etc/hyper2kvm/migrations/my-vm.yaml
+
+Documentation: /usr/share/doc/hyper2kvm/
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EOMSG
+        ;;
+esac
+
+exit 0

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hyper2kvm — Enterprise VM Migration Platform</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+
+  /* Cover Page */
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; position: relative; overflow: hidden; }
+  .cover::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 50%, rgba(255,143,63,0.15) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(99,102,241,0.1) 0%, transparent 50%); }
+  .cover h1 { font-size: 3.5em; font-weight: 800; letter-spacing: -2px; margin-bottom: 0.2em; position: relative; }
+  .cover h1 span { color: #ff8f3f; }
+  .cover h2 { font-size: 1.4em; font-weight: 300; opacity: 0.9; margin-bottom: 2em; position: relative; }
+  .cover .tagline { font-size: 1.1em; opacity: 0.7; max-width: 600px; position: relative; }
+  .cover .badge { display: inline-block; background: rgba(255,143,63,0.2); border: 1px solid rgba(255,143,63,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 2em; position: relative; }
+
+  /* Section Pages */
+  .page { min-height: 100vh; padding: 60px 80px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; }
+  .page-light { background: #fafbfc; }
+  .page-accent { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #e8e6df; }
+
+  h2.section-title { font-size: 2.2em; font-weight: 700; margin-bottom: 0.8em; letter-spacing: -1px; }
+  h2.section-title span { color: #ff8f3f; }
+  h3 { font-size: 1.3em; font-weight: 600; margin: 1.2em 0 0.5em; }
+  p { margin-bottom: 1em; font-size: 1.05em; }
+  .subtitle { font-size: 1.1em; opacity: 0.7; margin-bottom: 2em; }
+
+  /* Cards */
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin: 1.5em 0; }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 28px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .card .icon { font-size: 2em; margin-bottom: 12px; }
+  .card h4 { font-size: 1.15em; font-weight: 600; margin-bottom: 8px; }
+  .card p { font-size: 0.95em; opacity: 0.85; margin-bottom: 0; }
+
+  /* Stats */
+  .stat-row { display: flex; gap: 40px; margin: 2em 0; }
+  .stat { text-align: center; flex: 1; }
+  .stat .number { font-size: 3em; font-weight: 800; color: #ff8f3f; line-height: 1; }
+  .stat .label { font-size: 0.95em; opacity: 0.7; margin-top: 8px; }
+
+  /* Comparison Table */
+  table { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.95em; }
+  th { background: #ff8f3f; color: #fff; padding: 14px 18px; text-align: left; font-weight: 600; }
+  td { padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+  .page-light tr:nth-child(even) td { background: #f9fafb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .cross { color: #ef4444; font-weight: 700; }
+
+  /* Timeline */
+  .timeline { margin: 2em 0; }
+  .timeline-item { display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-start; }
+  .timeline-dot { width: 40px; height: 40px; background: #ff8f3f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .timeline-content h4 { margin-bottom: 4px; }
+  .timeline-content p { font-size: 0.95em; opacity: 0.8; margin-bottom: 0; }
+
+  /* Quote */
+  .quote { border-left: 4px solid #ff8f3f; padding: 20px 30px; margin: 2em 0; font-size: 1.1em; font-style: italic; opacity: 0.9; }
+
+  /* CTA */
+  .cta-box { background: linear-gradient(135deg, #ff8f3f, #e67a30); color: #fff; padding: 40px; border-radius: 16px; text-align: center; margin: 2em 0; }
+  .cta-box h3 { font-size: 1.5em; margin-bottom: 0.5em; }
+  .cta-box p { opacity: 0.9; }
+
+  /* Flow diagram */
+  .flow { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 2em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(255,143,63,0.15); border: 1px solid rgba(255,143,63,0.3); padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 0.95em; }
+  .flow-arrow { font-size: 1.5em; color: #ff8f3f; }
+
+  /* Lists */
+  ul { margin: 0.5em 0 1em 1.5em; }
+  li { margin-bottom: 0.4em; font-size: 1em; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 20px; font-size: 0.85em; opacity: 0.5; }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <h1>hyper<span>2</span>kvm</h1>
+  <h2>Enterprise VM Migration Platform</h2>
+  <p class="tagline">Production-grade toolkit for migrating VMware, Hyper-V, and Azure workloads to KVM/libvirt and Kubernetes — with zero downtime and full automation.</p>
+  <div class="badge">Proprietary (Zyvor AI Labs) — Built for Enterprise Linux</div>
+</div>
+
+<!-- PAGE 2: THE PROBLEM -->
+<div class="page page-dark">
+  <h2 class="section-title">The <span>Problem</span></h2>
+  <p class="subtitle">Why enterprises are leaving VMware — and what's at stake.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">💸</div>
+      <h4>Broadcom Licensing Shock</h4>
+      <p>VMware license costs increased 2-12x after the Broadcom acquisition. Perpetual licenses eliminated. Bundled pricing forces customers to pay for unused products.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔒</div>
+      <h4>Vendor Lock-in Risk</h4>
+      <p>VMDK, vSphere APIs, and proprietary tooling create deep dependencies. Every year of delay increases switching costs exponentially.</p>
+    </div>
+    <div class="card">
+      <div class="icon">⚠️</div>
+      <h4>End-of-Support Pressure</h4>
+      <p>Legacy vSphere versions losing support. Security patches stop. Compliance audits flag unpatched hypervisors. Migration becomes urgent, not optional.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🏗️</div>
+      <h4>Cloud-Native Gap</h4>
+      <p>VMware workloads can't natively run in Kubernetes. Modernization requires re-platforming VMs to KubeVirt — but manual migration is slow and error-prone.</p>
+    </div>
+  </div>
+
+  <div class="quote">
+    "Organizations face a stark choice: absorb 300-1200% cost increases, or migrate to open alternatives. The window for planned migration is closing."
+  </div>
+</div>
+
+<!-- PAGE 3: COST IMPACT -->
+<div class="page page-light">
+  <h2 class="section-title">Cost <span>Impact</span></h2>
+  <p class="subtitle">The financial case for migration is overwhelming.</p>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number">$0</div>
+      <div class="label">KVM/libvirt License Cost<br>(vs $5,000+/socket/yr VMware)</div>
+    </div>
+    <div class="stat">
+      <div class="number">70%</div>
+      <div class="label">Average TCO Reduction<br>over 3 years</div>
+    </div>
+    <div class="stat">
+      <div class="number">10x</div>
+      <div class="label">ROI on Migration<br>Investment</div>
+    </div>
+  </div>
+
+  <h3>3-Year TCO Comparison (100 VMs)</h3>
+  <table>
+    <tr><th>Cost Category</th><th>VMware vSphere</th><th>KVM + KubeVirt</th><th>Savings</th></tr>
+    <tr><td>Hypervisor Licensing</td><td>$500,000</td><td>$0</td><td class="check">$500,000</td></tr>
+    <tr><td>Management Platform</td><td>$200,000</td><td>$0 (Cockpit/CLI)</td><td class="check">$200,000</td></tr>
+    <tr><td>Support Subscription</td><td>$150,000</td><td>$50,000 (RHEL optional)</td><td class="check">$100,000</td></tr>
+    <tr><td>Migration Tooling</td><td>N/A</td><td>Contact for pricing* (hyper2kvm)</td><td class="check">$0</td></tr>
+    <tr><td>Staff Training</td><td>$30,000</td><td>$20,000</td><td class="check">$10,000</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>$880,000</strong></td><td><strong>$70,000</strong></td><td><strong class="check">$810,000</strong></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4: THE SOLUTION -->
+<div class="page page-accent">
+  <h2 class="section-title">The <span>Solution</span></h2>
+  <p class="subtitle">hyper2kvm — one tool for every migration path.</p>
+
+  <div class="flow">
+    <div class="flow-step">VMware vSphere</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">hyper2kvm</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">KVM / libvirt</div>
+  </div>
+  <div class="flow">
+    <div class="flow-step">Hyper-V / VHD</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">hyper2kvm</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">KubeVirt / K8s</div>
+  </div>
+  <div class="flow">
+    <div class="flow-step">Azure / AWS</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">hyper2kvm</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">On-Prem KVM</div>
+  </div>
+
+  <div class="card-grid" style="margin-top: 2em;">
+    <div class="card">
+      <div class="icon">🔄</div>
+      <h4>Any Source Format</h4>
+      <p>VMDK, OVA, OVF, VHD/VHDX, RAW, AMI — auto-detected. No manual format juggling.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🛡️</div>
+      <h4>Offline Guest Fixes</h4>
+      <p>Automatic fstab repair, initramfs rebuild, driver injection, GRUB fix — VMs boot on first try.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🖥️</div>
+      <h4>Dual Deploy Target</h4>
+      <p>Deploy to libvirt (traditional) or KubeVirt (cloud-native) from the same pipeline. Or both.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🎯</div>
+      <h4>Terminal UI (zkvm)</h4>
+      <p>Interactive TUI with vSphere discovery, VM selection, live progress, file browser — no CLI memorization needed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: CAPABILITIES -->
+<div class="page page-light">
+  <h2 class="section-title">Platform <span>Capabilities</span></h2>
+  <p class="subtitle">Enterprise features built for production workloads.</p>
+
+  <table>
+    <tr><th>Capability</th><th>hyper2kvm</th><th>virt-v2v</th><th>Manual</th></tr>
+    <tr><td>VMware vSphere integration (govc/pyvmomi)</td><td class="check">✓</td><td class="check">✓</td><td class="cross">✗</td></tr>
+    <tr><td>Hyper-V / VHD support</td><td class="check">✓</td><td class="check">✓</td><td class="cross">✗</td></tr>
+    <tr><td>Azure VM export</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+    <tr><td>KubeVirt / Kubernetes deploy</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+    <tr><td>Interactive TUI (guided wizard)</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+    <tr><td>Windows driver injection</td><td class="check">✓</td><td class="check">✓</td><td class="cross">✗</td></tr>
+    <tr><td>Automatic fstab/GRUB repair</td><td class="check">✓</td><td>Partial</td><td class="cross">✗</td></tr>
+    <tr><td>Live progress streaming</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+    <tr><td>Batch / queue migration</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+    <tr><td>YAML-driven automation</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+    <tr><td>Pre-flight validation</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+    <tr><td>Boot verification test</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+    <tr><td>Proprietary (Zyvor AI Labs)</td><td class="check">✓</td><td class="check">✓ (GPL)</td><td>N/A</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 6: MIGRATION WORKFLOW -->
+<div class="page page-dark">
+  <h2 class="section-title">Migration <span>Workflow</span></h2>
+  <p class="subtitle">From VMware to production KVM in 4 steps.</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot">1</div>
+      <div class="timeline-content">
+        <h4>Discover & Select</h4>
+        <p>Connect to vCenter, discover all VMs with CPU/RAM/power state. Select targets interactively or via YAML. Pre-flight checks validate the environment.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">2</div>
+      <div class="timeline-content">
+        <h4>Export & Convert</h4>
+        <p>Export VMs via govc/OVF/HTTPS with live progress. Convert VMDK→qcow2 with compression and flattening. Supports multi-disk VMs and snapshots.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">3</div>
+      <div class="timeline-content">
+        <h4>Fix & Optimize</h4>
+        <p>Offline guest repairs: fstab stabilization (UUID/path), initramfs rebuild with virtio drivers, VMware tools removal, SELinux relabel, GRUB reconfiguration.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">4</div>
+      <div class="timeline-content">
+        <h4>Deploy & Verify</h4>
+        <p>Generate libvirt domain XML, register with virsh, or deploy to KubeVirt on Kubernetes. Automatic boot test validates the migrated VM starts correctly.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h4>Minutes, Not Days</h4>
+      <p>Typical VM migration: 5-30 minutes depending on disk size. No manual intervention required for standard Linux/Windows guests.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔁</div>
+      <h4>Batch Processing</h4>
+      <p>Queue multiple VMs for sequential migration. Track progress per-VM. Failed VMs don't block the queue — results summarized at completion.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7: KUBEVIRT VALUE -->
+<div class="page page-light">
+  <h2 class="section-title">Why <span>KubeVirt</span>?</h2>
+  <p class="subtitle">Run VMs and containers on the same platform — the best of both worlds.</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">☸️</div>
+      <h4>Unified Platform</h4>
+      <p>VMs and containers managed by Kubernetes. One API, one toolchain, one team.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📈</div>
+      <h4>Cloud-Native Ops</h4>
+      <p>GitOps, CI/CD, Helm charts, operators — apply modern practices to VM workloads.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔄</div>
+      <h4>Gradual Modernization</h4>
+      <p>Migrate VMs first, containerize later. No big-bang rewrite. Incremental path to cloud-native.</p>
+    </div>
+    <div class="card">
+      <div class="icon">💰</div>
+      <h4>No Hypervisor Tax</h4>
+      <p>KubeVirt runs on standard Linux + KVM. No per-socket licensing. Scale with commodity hardware.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🌍</div>
+      <h4>Multi-Cloud Ready</h4>
+      <p>Same KubeVirt manifests work on-prem, in AWS (EKS), Azure (AKS), or GCP (GKE). True portability.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🛡️</div>
+      <h4>Enterprise Backed</h4>
+      <p>KubeVirt is a CNCF project, backed by Red Hat (OpenShift Virtualization). Production-proven at scale.</p>
+    </div>
+  </div>
+
+  <div class="quote">
+    "KubeVirt lets you run your legacy VMs in Kubernetes today, and modernize them into containers tomorrow — on your schedule, not your vendor's."
+  </div>
+</div>
+
+<!-- PAGE 8: SUPPORTED PLATFORMS -->
+<div class="page page-accent">
+  <h2 class="section-title">Supported <span>Platforms</span></h2>
+  <p class="subtitle">Comprehensive source and target compatibility.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Migration Sources</h4>
+      <ul>
+        <li>VMware vSphere 6.x / 7.x / 8.x</li>
+        <li>VMware ESXi (standalone)</li>
+        <li>Microsoft Hyper-V</li>
+        <li>Microsoft Azure VMs</li>
+        <li>AWS EC2 (AMI export)</li>
+        <li>Raw disk images</li>
+        <li>Any VMDK/OVA/OVF/VHD file</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Deploy Targets</h4>
+      <ul>
+        <li>KVM / libvirt (RHEL, Fedora, Ubuntu)</li>
+        <li>KubeVirt on Kubernetes</li>
+        <li>K3s + KubeVirt (edge)</li>
+        <li>OpenShift Virtualization</li>
+        <li>Proxmox VE (qcow2 import)</li>
+        <li>Any KVM-based hypervisor</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Guest OS Support</h4>
+      <ul>
+        <li>RHEL 7 / 8 / 9 / 10</li>
+        <li>CentOS, AlmaLinux, Rocky</li>
+        <li>Ubuntu 18.04–24.04</li>
+        <li>Debian 10–13</li>
+        <li>SUSE / openSUSE</li>
+        <li>Windows Server 2016–2025</li>
+        <li>Windows 10 / 11</li>
+        <li>Photon OS, Fedora, Arch</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Output Formats</h4>
+      <ul>
+        <li>qcow2 (default, compressed)</li>
+        <li>RAW (maximum performance)</li>
+        <li>VDI (VirtualBox compatible)</li>
+        <li>Libvirt domain XML</li>
+        <li>KubeVirt VirtualMachine YAML</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 9: CUSTOMER SCENARIOS -->
+<div class="page page-light">
+  <h2 class="section-title">Customer <span>Scenarios</span></h2>
+  <p class="subtitle">Real-world migration patterns hyper2kvm solves.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">🏢</div>
+      <h4>VMware Exit — Enterprise</h4>
+      <p><strong>Scenario:</strong> 500 VMs on vSphere, facing 5x license increase.<br>
+      <strong>Solution:</strong> Batch migrate to RHEL + KVM using hyper2kvm YAML automation. Queue processing handles overnight migrations. Boot verification catches issues automatically.<br>
+      <strong>Result:</strong> $2M+ annual savings, zero vendor lock-in.</p>
+    </div>
+    <div class="card">
+      <div class="icon">☁️</div>
+      <h4>Cloud Repatriation</h4>
+      <p><strong>Scenario:</strong> Azure VMs costing $50K/month, moving to on-prem.<br>
+      <strong>Solution:</strong> Export Azure VMs via hyper2kvm's Azure integration. Convert VHD→qcow2, deploy to local KVM cluster.<br>
+      <strong>Result:</strong> 60% cloud cost reduction, data sovereignty maintained.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🚀</div>
+      <h4>Kubernetes Modernization</h4>
+      <p><strong>Scenario:</strong> Legacy VMs that can't be containerized yet, but team wants Kubernetes.<br>
+      <strong>Solution:</strong> Migrate VMs to KubeVirt. Run alongside containers. Modernize incrementally.<br>
+      <strong>Result:</strong> Unified platform, single operations team, gradual containerization path.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🏭</div>
+      <h4>Edge / Factory Floor</h4>
+      <p><strong>Scenario:</strong> Industrial VMs running on expensive VMware licenses at remote sites.<br>
+      <strong>Solution:</strong> K3s + KubeVirt on lightweight hardware. hyper2kvm converts and deploys.<br>
+      <strong>Result:</strong> Zero license cost at edge, GitOps management from central cluster.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 10: WHY HYPER2KVM -->
+<div class="page page-dark">
+  <h2 class="section-title">Why <span>hyper2kvm</span>?</h2>
+  <p class="subtitle">What sets us apart from alternatives.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">🎯</div>
+      <h4>First-Boot Success</h4>
+      <p>Offline guest fixes ensure VMs boot on first try. No manual driver installation, no broken fstab, no missing initramfs. We fix it before you notice.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔧</div>
+      <h4>Production-Grade</h4>
+      <p>1,273 unit tests. Pre-flight validation. Structured logging with tracing. Error diagnosis. This isn't a script — it's a platform.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h4>Interactive TUI</h4>
+      <p>The zkvm terminal UI provides guided migration with live progress, file browser, vSphere discovery, and deploy toggles. No CLI memorization needed.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📝</div>
+      <h4>YAML Automation</h4>
+      <p>Every migration is reproducible via YAML config. Perfect for CI/CD pipelines, GitOps workflows, and batch processing. Automate hundreds of VMs.</p>
+    </div>
+  </div>
+
+  <div class="cta-box">
+    <h3>Ready to Eliminate VMware Costs?</h3>
+    <p>hyper2kvm is Proprietary (Zyvor AI Labs) and ready for production.<br>
+    Start migrating today — no license required, no vendor approval needed.</p>
+    <p style="margin-top: 1em; font-weight: 600;">github.com/ssahani/hyper2kvm</p>
+  </div>
+</div>
+
+<!-- PAGE 11: GETTING STARTED -->
+<div class="page page-light">
+  <h2 class="section-title">Getting <span>Started</span></h2>
+  <p class="subtitle">From zero to migrated VM in 2 commands.</p>
+
+  <h3>Quick Install</h3>
+  <div class="card" style="background: #1a1a2e; color: #e8e6df; font-family: monospace; padding: 24px; border-radius: 8px; margin: 1em 0;">
+    <pre style="font-size: 0.95em; line-height: 1.8;">
+# Install
+sudo ./scripts/quickstart.sh
+
+# Migrate a VMDK
+sudo h2kvmctl --cmd local --vmdk disk.vmdk --output-dir ./out
+
+# Or use the interactive TUI
+./zkvm/zkvm
+
+# Or use YAML automation
+sudo h2kvmctl --config migration.yaml</pre>
+  </div>
+
+  <h3>Example YAML Config</h3>
+  <div class="card" style="background: #1a1a2e; color: #e8e6df; font-family: monospace; padding: 24px; border-radius: 8px; margin: 1em 0;">
+    <pre style="font-size: 0.95em; line-height: 1.8;">
+cmd: vsphere
+vcenter: 10.0.0.100
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+dc_name: Datacenter1
+vs_action: export_vm
+vs_vm: production-web-01
+output_dir: ./out
+out_format: qcow2
+emit_domain_xml: true
+regen_initramfs: true
+deploy_k8s: true
+k8s_vm_name: web-01
+k8s_namespace: production</pre>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number" style="color: #22c55e;">1,273</div>
+      <div class="label">Unit Tests Passing</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color: #22c55e;">Proprietary (Zyvor AI Labs)</div>
+      <div class="label">Open Source License</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color: #22c55e;">Python + Go</div>
+      <div class="label">Dual Language Platform</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>hyper2kvm — Production-Grade Hypervisor to KVM Migration Toolkit<br>
+    Built for the Enterprise Linux ecosystem (Fedora / RHEL / CentOS)<br>
+    github.com/ssahani/hyper2kvm</p>
+  </div>
+</div>
+
+</body>
+</html>

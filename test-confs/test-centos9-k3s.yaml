@@ -1,0 +1,64 @@
+# CentOS 9 - Test Migration to K3s Cluster with Automated Deployment
+# This configuration tests end-to-end migration: VMDK → QCOW2 → K3s deployment
+
+cmd: local
+
+# Automated Kubernetes/k3s deployment
+deploy_k8s: true
+k8s_namespace: hyper2kvm-auto
+k8s_vm_name: centos9-automated
+k8s_storage_class: local-path
+k8s_pvc_size: 10Gi
+k8s_cpu: "2"
+k8s_memory: 2Gi
+k8s_auto_start: false  # Don't auto-start, let user start manually
+k8s_wait_ready: false
+
+# Source VMDK
+vmdk: /home/ssahani/Downloads/VM-Images/centos/centos9.vmdk
+
+# Output Configuration
+output_dir: out/centos9-k3s-test
+to_output: centos9.qcow2
+out_format: qcow2
+compress: true
+
+# Core Linux Fixes
+fstab_fixes_enable: true
+fstab_mode: stabilize-all
+fstab_prefer_partuuid: false
+fstab_optimize_options: true
+
+grub_fixes_enable: true
+initramfs_regen_enable: true
+initramfs_regen_force: true
+
+# VirtIO modules for initramfs (required for KubeVirt)
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+  - virtio_balloon
+  - virtio_console
+
+# Network fixes
+network_fixes_enable: true
+
+# KubeVirt/K3s specific optimizations
+# Enable cloud-init support
+cloud_init_enable: false
+
+# Libvirt XML generation (for local testing before k3s deployment)
+libvirt_xml_generate: true
+libvirt_vm_name: centos9-k3s-test
+libvirt_memory_mb: 2048
+libvirt_vcpus: 2
+libvirt_disk_bus: virtio
+libvirt_import: false  # Don't auto-import, we'll push to k3s
+
+# Reporting
+report: out/centos9-k3s-test/migration-report.md
+log_file: out/centos9-k3s-test/migration.log
+verbose: 2
+dry_run: false

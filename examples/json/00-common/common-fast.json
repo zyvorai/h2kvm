@@ -1,0 +1,10 @@
+{
+  "output_dir": "./out",
+  "workdir": "./out/work",
+  "verbose": 1,
+  "regen_initramfs": false,
+  "remove_vmware_tools": false,
+  "flatten": false,
+  "libvirt_test": false,
+  "qemu_test": false
+}

@@ -1,0 +1,28 @@
+{
+  "command": "local",
+  "flatten": true,
+  "out_format": "qcow2",
+  "compress": true,
+  "parallel_processing": true,
+  "vms": [
+    {
+      "vmdk": "/path/to/app-01.vmdk",
+      "to_output": "app-01.qcow2"
+    },
+    {
+      "vmdk": "/path/to/app-02.vmdk",
+      "to_output": "app-02.qcow2"
+    },
+    {
+      "vmdk": "/path/to/db-01.vmdk",
+      "to_output": "db-01.qcow2",
+      "resize": "+50G"
+    },
+    {
+      "vmdk": "/path/to/win-01.vmdk",
+      "virtio_drivers_dir": "/path/to/virtio-win",
+      "to_output": "win-01.qcow2",
+      "verbose": 2
+    }
+  ]
+}

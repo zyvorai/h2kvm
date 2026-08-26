@@ -1,0 +1,70 @@
+#cloud-config
+# CentOS/RHEL Server Cloud-Init Template
+# Configures a basic CentOS/RHEL server with SSH access and common tools
+
+hostname: centos-server
+fqdn: centos-server.local
+
+# Create default user
+users:
+  - name: centos
+    groups: wheel
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... # Replace with your SSH public key
+
+# Update packages
+package_update: true
+package_upgrade: true
+
+# Install essential packages
+packages:
+  - curl
+  - wget
+  - git
+  - vim
+  - htop
+  - net-tools
+  - qemu-guest-agent
+  - cloud-init
+  - cloud-utils-growpart
+
+# Configure SSH
+ssh_pwauth: false
+disable_root: true
+
+# Set timezone
+timezone: UTC
+
+# Configure NTP
+ntp:
+  enabled: true
+  servers:
+    - 0.centos.pool.ntp.org
+    - 1.centos.pool.ntp.org
+    - 2.centos.pool.ntp.org
+
+# SELinux configuration
+selinux:
+  mode: enforcing
+  policy: targeted
+
+# Run commands on first boot
+runcmd:
+  - echo "Cloud-init completed at $(date)" >> /var/log/cloud-init-custom.log
+  - systemctl enable qemu-guest-agent
+  - systemctl start qemu-guest-agent
+  - firewall-cmd --permanent --add-service=ssh
+  - firewall-cmd --reload
+
+# Write files
+write_files:
+  - path: /etc/motd
+    content: |
+      Welcome to CentOS Server
+      Deployed via HyperConversion Operator
+    permissions: '0644'
+
+# Final message
+final_message: "System boot completed in $UPTIME seconds"

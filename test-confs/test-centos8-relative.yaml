@@ -1,0 +1,47 @@
+# CentOS 8 - Test with relative path
+# Convert and deploy to libvirt
+
+cmd: local
+
+# Source VMDK
+vmdk: /home/ssahani/Downloads/centos8/64bit/centos8.vmdk
+
+# Output Configuration
+output_dir: out/centos8-relative-test
+to_output: centos8.qcow2
+out_format: qcow2
+compress: true
+
+# Core Linux Fixes
+fstab_fixes_enable: true
+fstab_mode: stabilize-all
+fstab_prefer_partuuid: false
+fstab_optimize_options: true
+
+grub_fixes_enable: true
+initramfs_regen_enable: true
+initramfs_regen_force: true
+
+# VirtIO modules for initramfs
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+
+# Network fixes
+network_fixes_enable: true
+
+# Libvirt XML generation and import
+libvirt_xml_generate: true
+libvirt_vm_name: centos8-relative-test
+libvirt_memory_mb: 4096
+libvirt_vcpus: 2
+libvirt_disk_bus: virtio
+libvirt_import: true
+
+# Reporting
+report: out/centos8-relative-test/migration-report.md
+log_file: out/centos8-relative-test/migration.log
+verbose: 2
+dry_run: false

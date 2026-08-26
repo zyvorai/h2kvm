@@ -1,0 +1,8 @@
+storage_mapping:
+  default_pool: "vms"
+  disk_mappings:
+    boot: "/var/lib/libvirt/images/boot"
+    data: "/mnt/storage/data"
+    logs: "/mnt/storage/logs"
+  format_override: "qcow2"  # qcow2|raw|vdi
+  preallocate: false

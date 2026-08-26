@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Windows Custom PNP Drivers &amp; VirtIO Injection — hyper2kvm Deep Dive</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0c4a6e, #075985, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.6em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #38bdf8; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 0.95em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 36px 46px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-blue { background: linear-gradient(135deg, #0c4a6e, #0f172a); color: #e8e6df; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #38bdf8; }
+  .page-light h2.st span { color: #0369a1; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.6em 0 0.25em; color: #38bdf8; }
+  .page-light h3 { color: #0369a1; }
+  p { margin-bottom: 0.5em; font-size: 0.88em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.76em; }
+  th { background: #0369a1; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; font-size: 0.82em; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.9em; font-weight: 600; margin-bottom: 4px; color: #38bdf8; }
+  .page-light .card h4 { color: #0369a1; }
+  .card ul { padding-left: 14px; font-size: 0.78em; margin: 0; } .card li { margin-bottom: 2px; }
+  .card p { font-size: 0.78em; opacity: 0.85; margin-bottom: 0; }
+  .highlight { background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 0.5em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: 0.8em; }
+  .flow-arrow { font-size: 1.1em; color: #38bdf8; }
+  .flow-fix { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); }
+  .flow-ok { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+  pre { background: #0f172a; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.74em; line-height: 1.45; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  code { background: rgba(56,189,248,0.1); padding: 2px 4px; border-radius: 4px; font-size: 0.85em; }
+  .verdict { background: linear-gradient(135deg, rgba(12,74,110,0.2), rgba(7,89,133,0.1)); border: 2px solid #0369a1; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #38bdf8; font-size: 1.1em; margin-bottom: 4px; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .stat-box { text-align: center; padding: 12px; }
+  .stat-box .num { font-size: 1.8em; font-weight: 800; color: #38bdf8; } .stat-box .label { font-size: 0.75em; opacity: 0.7; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Windows <span>Custom PNP Drivers</span><br>&amp; VirtIO Injection</h1>
+  <h2>Deterministic Offline Driver Deployment for VMware-to-KVM Migration</h2>
+  <p class="sub">The complete Windows driver pipeline: offline VirtIO injection with registry editing, custom PNP driver staging via pnputil, network configuration preservation, multi-stage boot verification, and VMware Tools removal. All applied offline via qemu-nbd &mdash; zero BSOD, zero manual intervention.</p>
+  <div class="badge">6 VirtIO Drivers | Custom PNP | Network Preserve | Registry Edit | Multi-Stage Boot | Proprietary (Zyvor AI Labs)</div>
+</div>
+
+<!-- PAGE 1: Architecture Overview -->
+<div class="page page-dark">
+  <h2 class="st">Driver Injection <span>Architecture</span></h2>
+  <p class="sub">How hyper2kvm deterministically prepares Windows for KVM &mdash; entirely offline.</p>
+
+  <div class="flow">
+    <div class="flow-step">Mount QCOW2<br><small>qemu-nbd + ntfs-3g</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Detect OS<br><small>Registry: Version/Build</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Copy .sys Files<br><small>System32\drivers\</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Stage DriverStore<br><small>FileRepository\</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Edit Registry<br><small>SYSTEM + SOFTWARE</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Stage PNP<br><small>Custom drivers</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">Boot &amp; Verify</div>
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Stage 1: Offline Pre-Injection</h4>
+      <ul>
+        <li>Mount disk via qemu-nbd + ntfs-3g</li>
+        <li>Detect OS from registry (ProductName, CurrentBuild)</li>
+        <li>Map architecture (x86 vs amd64)</li>
+        <li>Copy VirtIO .sys files to System32\drivers\</li>
+        <li>Stage INF+SYS in DriverStore\FileRepository\</li>
+        <li>Register OEM INF files in Windows\INF\</li>
+        <li>Edit SYSTEM hive (services, CriticalDeviceDatabase)</li>
+        <li>Edit SOFTWARE hive (RunOnce, OOBE bypass)</li>
+        <li>Disable VMware services in registry</li>
+        <li>Stage custom PNP drivers to C:\hyper2kvm-drivers</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Stage 2: First Boot</h4>
+      <ul>
+        <li>Windows boots with VirtIO storage (Start=0)</li>
+        <li>Auto-login enabled (no password prompt)</li>
+        <li>Win11 OOBE bypass (BypassNRO, SkipMachineOOBE)</li>
+        <li>RunOnce batch file executes:</li>
+        <li>&nbsp;&nbsp;1. pnputil installs VirtIO from ISO</li>
+        <li>&nbsp;&nbsp;2. pnputil installs custom PNP drivers</li>
+        <li>Network apply script runs (PowerShell)</li>
+        <li>QEMU guest agent MSI installed (optional)</li>
+        <li>Serial console available on COM1</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Stage 3: Verification</h4>
+      <ul>
+        <li>Automated boot test (no BSOD check)</li>
+        <li>Guest agent ping confirms drivers installed</li>
+        <li>Offline verification via NBD remount</li>
+        <li>Check: viostor.sys present &amp; loaded</li>
+        <li>Check: netkvm.sys present</li>
+        <li>Check: balloon.sys present</li>
+        <li>Network connectivity verified</li>
+        <li>RDP accessible on port 3389</li>
+        <li>Generate production domain XML</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Key innovation:</strong> All critical drivers are injected offline via direct registry editing. The VM boots with VirtIO storage already functional (Start=0). pnputil on first boot handles the PNP binding &mdash; but the boot itself never fails because the boot-critical driver is already registered.</p>
+  </div>
+</div>
+
+<!-- PAGE 2: VirtIO Drivers Injected -->
+<div class="page page-light">
+  <h2 class="st">VirtIO Drivers <span>Injected</span></h2>
+  <p class="sub">Six VirtIO drivers automatically injected with full registry configuration.</p>
+
+  <table>
+    <tr><th style="width:12%">Driver</th><th style="width:10%">File</th><th style="width:20%">Purpose</th><th style="width:10%">Start</th><th style="width:13%">Group</th><th style="width:35%">PCI Hardware IDs</th></tr>
+    <tr><td><strong>viostor</strong></td><td>viostor.sys</td><td>VirtIO block storage (boot-critical)</td><td>0 (Boot)</td><td>SCSI miniport</td><td>PCI\VEN_1AF4&amp;DEV_1001, PCI\VEN_1AF4&amp;DEV_1042</td></tr>
+    <tr><td><strong>vioscsi</strong></td><td>vioscsi.sys</td><td>VirtIO SCSI controller</td><td>0 (Boot)</td><td>SCSI miniport</td><td>PCI\VEN_1AF4&amp;DEV_1004, PCI\VEN_1AF4&amp;DEV_1048</td></tr>
+    <tr><td><strong>NetKVM</strong></td><td>netkvm.sys</td><td>VirtIO network adapter</td><td>2 (Auto)</td><td>NDIS</td><td>PCI\VEN_1AF4&amp;DEV_1000, PCI\VEN_1AF4&amp;DEV_1041</td></tr>
+    <tr><td><strong>Balloon</strong></td><td>balloon.sys</td><td>Dynamic memory management</td><td>3 (Demand)</td><td>Extended Base</td><td>PCI\VEN_1AF4&amp;DEV_1002, PCI\VEN_1AF4&amp;DEV_1045</td></tr>
+    <tr><td><strong>vioserial</strong></td><td>vioser.sys</td><td>Serial port / guest agent channel</td><td>3 (Demand)</td><td>Extended Base</td><td>PCI\VEN_1AF4&amp;DEV_1003, PCI\VEN_1AF4&amp;DEV_1043</td></tr>
+    <tr><td><strong>viorng</strong></td><td>viorng.sys</td><td>Hardware RNG from KVM host</td><td>3 (Demand)</td><td>Extended Base</td><td>PCI\VEN_1AF4&amp;DEV_1005, PCI\VEN_1AF4&amp;DEV_1044</td></tr>
+  </table>
+
+  <h3>Registry Operations (SYSTEM Hive)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Services Registration</h4>
+      <pre style="font-size:0.72em; background:#1e1e2e; padding:10px; border-radius:6px;">
+HKLM\SYSTEM\ControlSet001\Services\viostor
+  Type        = DWORD:1    (kernel driver)
+  Start       = DWORD:0    (boot-start)
+  ErrorControl = DWORD:1   (normal)
+  ImagePath   = "system32\drivers\viostor.sys"
+  Group       = "SCSI miniport"
+
+HKLM\SYSTEM\ControlSet001\Services\netkvm
+  Type        = DWORD:1
+  Start       = DWORD:2    (auto-start)
+  ImagePath   = "system32\drivers\netkvm.sys"
+  Group       = "NDIS"</pre>
+    </div>
+    <div class="card">
+      <h4>CriticalDeviceDatabase</h4>
+      <pre style="font-size:0.72em; background:#1e1e2e; padding:10px; border-radius:6px;">
+HKLM\SYSTEM\ControlSet001\Control\
+  CriticalDeviceDatabase\
+    PCI#VEN_1AF4&amp;DEV_1001
+      ClassGUID = "{4D36E97B-...}"
+      Service   = "viostor"
+    PCI#VEN_1AF4&amp;DEV_1042
+      ClassGUID = "{4D36E97B-...}"
+      Service   = "viostor"
+    PCI#VEN_1AF4&amp;DEV_1000
+      ClassGUID = "{4D36E972-...}"
+      Service   = "netkvm"</pre>
+    </div>
+  </div>
+
+  <h3>VMware Services Disabled in Registry</h3>
+  <table>
+    <tr><th>Service</th><th>Description</th><th>Action</th></tr>
+    <tr><td>VMTools</td><td>VMware Tools service</td><td class="check">Start = DWORD:4 (Disabled)</td></tr>
+    <tr><td>vm3dservice</td><td>VMware 3D graphics</td><td class="check">Start = DWORD:4 (Disabled)</td></tr>
+    <tr><td>VGAuthService</td><td>VMware Guest Authentication</td><td class="check">Start = DWORD:4 (Disabled)</td></tr>
+    <tr><td>vmvss</td><td>VMware VSS provider</td><td class="check">Start = DWORD:4 (Disabled)</td></tr>
+    <tr><td>vmci</td><td>VMware VMCI driver</td><td class="check">Start = DWORD:4 (Disabled)</td></tr>
+    <tr><td>vsock</td><td>VMware vSock driver</td><td class="check">Start = DWORD:4 (Disabled)</td></tr>
+    <tr><td>vmhgfs</td><td>VMware Shared Folders</td><td class="check">Start = DWORD:4 (Disabled)</td></tr>
+    <tr><td>vmrawdsk</td><td>VMware Raw Disk driver</td><td class="check">Start = DWORD:4 (Disabled)</td></tr>
+    <tr><td>vmusbmouse</td><td>VMware USB mouse</td><td class="check">Start = DWORD:4 (Disabled)</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 3: Custom PNP Drivers -->
+<div class="page page-dark">
+  <h2 class="st">Custom PNP <span>Driver Injection</span></h2>
+  <p class="sub">Stage any vendor-supplied driver for automatic PNP installation on first boot.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>How It Works</h4>
+      <ul>
+        <li>Accepts directories or ISOs as driver sources</li>
+        <li>ISOs are auto-mounted and contents copied</li>
+        <li>All driver files staged to <code>C:\hyper2kvm-drivers\</code></li>
+        <li>RunOnce registry key triggers pnputil on first boot</li>
+        <li>pnputil recursively discovers and installs all INF files</li>
+        <li>Supports multiple driver packages (repeatable flag)</li>
+        <li>Works alongside VirtIO driver injection</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Use Cases</h4>
+      <ul>
+        <li><strong>GPU passthrough:</strong> NVIDIA/AMD vendor drivers</li>
+        <li><strong>Storage HBA:</strong> Fibre Channel, iSCSI drivers</li>
+        <li><strong>Network:</strong> Mellanox, Intel vendor NICs</li>
+        <li><strong>Smart cards:</strong> Security hardware drivers</li>
+        <li><strong>Printers:</strong> Enterprise printer drivers</li>
+        <li><strong>USB devices:</strong> Specialized peripherals</li>
+        <li><strong>Custom hardware:</strong> Any INF-based driver</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Configuration</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>YAML Config</h4>
+      <pre style="font-size:0.72em; background:rgba(255,255,255,0.04); padding:10px; border-radius:6px;">
+# migration.yaml
+custom_pnp_drivers:
+  - /opt/drivers/nvidia-gpu/
+  - /opt/drivers/mellanox-nic.iso
+  - /opt/drivers/vendor-storage/</pre>
+    </div>
+    <div class="card">
+      <h4>CLI</h4>
+      <pre style="font-size:0.72em; background:rgba(255,255,255,0.04); padding:10px; border-radius:6px;">
+h2kvmctl --config migration.yaml \
+  --custom-pnp-drivers /opt/nvidia-gpu/ \
+  --custom-pnp-drivers /opt/mellanox.iso \
+  --custom-pnp-drivers /opt/vendor-hba/</pre>
+    </div>
+  </div>
+
+  <h3>RunOnce Batch File (Staged in Registry)</h3>
+  <pre>
+@echo off
+rem === VirtIO driver installation from ISO ===
+for %%d in (D E F G H I J K L M N) do (
+  if exist "%%d:\viostor" ( set ISO=%%d: &amp; goto :found )
+)
+:found
+rem Install: viostor NetKVM Balloon vioserial viorng qxldod viogpudo vioinput viofs pvpanic
+for %%c in (viostor NetKVM Balloon vioserial viorng qxldod viogpudo vioinput viofs pvpanic smbus qemufwcfg) do (
+  if exist "%ISO%\%%c\%OSFOLDER%\%ARCH%" (
+    pnputil /add-driver "%ISO%\%%c\%OSFOLDER%\%ARCH%\*.inf" /install >nul 2>&1
+  )
+)
+rem Install QEMU guest agent
+if exist "%ISO%\guest-agent\qemu-ga-x86_64.msi" (
+  msiexec /i "%ISO%\guest-agent\qemu-ga-x86_64.msi" /quiet /norestart
+)
+
+rem === Custom PNP driver installation ===
+if exist "C:\hyper2kvm-drivers" (
+  pnputil /add-driver "C:\hyper2kvm-drivers\*.inf" /subdirs /install
+)
+  </pre>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>pnputil /subdirs</strong> recursively scans all subdirectories for INF files. This means you can drop an entire vendor driver package (with multiple architectures and versions) and pnputil will find and install the correct one for the running OS.</p>
+  </div>
+</div>
+
+<!-- PAGE 4: Windows Network Preservation -->
+<div class="page page-light">
+  <h2 class="st">Windows Network <span>Preservation</span></h2>
+  <p class="sub">Snapshot existing TCP/IP config from VMware, apply to VirtIO NIC on KVM &mdash; zero manual IP reconfiguration.</p>
+
+  <div class="flow">
+    <div class="flow-step">Offline Registry Read<br><small>Tcpip\Parameters\Interfaces</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Snapshot to JSON<br><small>saved_network.json</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Stage Override<br><small>network_override.json</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">First Boot Apply<br><small>PowerShell script</small></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>What Gets Captured</h4>
+      <ul>
+        <li>IP addresses (static and DHCP-assigned)</li>
+        <li>Subnet masks</li>
+        <li>Default gateways</li>
+        <li>DNS servers (static and DHCP-derived)</li>
+        <li>DNS suffix / domain</li>
+        <li>Interface profiles</li>
+        <li>DHCP vs Static mode per interface</li>
+        <li>All data from offline SYSTEM registry hive</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Three Configuration Methods</h4>
+      <ul>
+        <li><strong>Auto-preserve:</strong> Snapshot VMware config, apply to KVM NIC</li>
+        <li><strong>Override file:</strong> <code>--win-net-override /path/to/override.json</code></li>
+        <li><strong>Inline JSON:</strong> <code>--win-net-json '{"schema":1,...}'</code></li>
+        <li><strong>YAML native:</strong> <code>win_net:</code> section in config</li>
+        <li>Adapter selection by MAC address or name</li>
+        <li>Supports both DHCP and static modes</li>
+        <li>Optional DNS override in DHCP mode</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Configuration Examples</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Static IP (YAML)</h4>
+      <pre style="font-size:0.7em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+win_net:
+  schema: 1
+  mode: static
+  static:
+    ip: 192.168.1.50
+    mask: 255.255.255.0
+    gateway: 192.168.1.1
+    dns_servers:
+      - "1.1.1.1"
+      - "8.8.8.8"</pre>
+    </div>
+    <div class="card">
+      <h4>DHCP + Custom DNS</h4>
+      <pre style="font-size:0.7em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+win_net:
+  schema: 1
+  mode: dhcp
+  dhcp:
+    dns_servers:
+      - "10.0.0.53"
+      - "10.0.0.54"</pre>
+    </div>
+    <div class="card">
+      <h4>MAC-Based Selection</h4>
+      <pre style="font-size:0.7em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+win_net:
+  schema: 1
+  mode: static
+  adapter:
+    mac: "52-54-00-12-34-56"
+  static:
+    ip: 10.73.1.50
+    mask: 255.255.255.0
+    gateway: 10.73.1.1
+    dns_servers:
+      - "10.73.1.53"</pre>
+    </div>
+  </div>
+
+  <h3>Files Staged in Guest</h3>
+  <table>
+    <tr><th style="width:40%">Path</th><th style="width:60%">Purpose</th></tr>
+    <tr><td><code>C:\hyper2kvm\net\saved_network.json</code></td><td>Snapshot of VMware TCP/IP config from offline registry</td></tr>
+    <tr><td><code>C:\hyper2kvm\net\network_override.json</code></td><td>User-provided override config (optional)</td></tr>
+    <tr><td><code>C:\hyper2kvm\net\apply-network.ps1</code></td><td>PowerShell script that applies config on first boot</td></tr>
+    <tr><td><code>C:\hyper2kvm\net\apply-network.log</code></td><td>Execution log for troubleshooting</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 5: Multi-Stage VirtIO Boot -->
+<div class="page page-dark">
+  <h2 class="st">Multi-Stage <span>VirtIO Boot</span></h2>
+  <p class="sub">The <code>--virtio-deploy-boot</code> flag enables a 4-stage automated deployment for maximum reliability.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Stage 1: Bootstrap Boot</h4>
+      <ul>
+        <li>SATA disk (safe, always works)</li>
+        <li>VirtIO NIC (triggers netkvm driver)</li>
+        <li>VirtIO balloon + serial + guest agent</li>
+        <li>VirtIO ISO attached as CD-ROM</li>
+        <li>UEFI firmware + NVRAM</li>
+        <li>OOBE auto-bypass configured</li>
+        <li>RunOnce batch installs all VirtIO drivers via pnputil</li>
+        <li>Custom PNP drivers installed via pnputil</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Stage 2: Wait for Guest Agent</h4>
+      <ul>
+        <li>Polls <code>virsh qemu-agent-command "guest-ping"</code></li>
+        <li>Default timeout: 180 seconds (configurable)</li>
+        <li>Guest agent confirms RunOnce has executed</li>
+        <li>All drivers installed and bound to devices</li>
+        <li>Network operational (DHCP or static applied)</li>
+        <li>VM is functional and accessible</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Stage 3: Offline Verification</h4>
+      <ul>
+        <li>Shutdown VM cleanly</li>
+        <li>Remount QCOW2 via NBD</li>
+        <li>Verify critical files present:</li>
+        <li>&nbsp;&nbsp;<span class="check">&#10003;</span> viostor.sys (critical)</li>
+        <li>&nbsp;&nbsp;<span class="check">&#10003;</span> netkvm.sys (optional)</li>
+        <li>&nbsp;&nbsp;<span class="check">&#10003;</span> balloon.sys (optional)</li>
+        <li>&nbsp;&nbsp;<span class="check">&#10003;</span> vioser.sys (optional)</li>
+        <li>Fail fast if boot-critical driver missing</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Stage 4: Production VM</h4>
+      <ul>
+        <li>Generate production libvirt domain XML</li>
+        <li>VirtIO disk + VirtIO NIC</li>
+        <li>Q35 machine type with PCIe</li>
+        <li>UEFI/BIOS as detected</li>
+        <li>Optional auto-start final VM</li>
+        <li>KubeVirt manifest (if deploy_k8s: true)</li>
+        <li>Webhook notification on completion</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Configuration</h3>
+  <pre>
+# Enable multi-stage VirtIO boot deployment
+virtio_deploy_boot: true
+virtio_deploy_timeout: 300          # Wait up to 5 minutes for guest agent
+no_virtio_deploy_start_final: false  # Auto-start production VM
+
+# VirtIO ISO source
+virtio_win_iso: /usr/share/virtio-win/virtio-win.iso
+
+# Optional custom drivers (staged alongside VirtIO)
+custom_pnp_drivers:
+  - /opt/vendor-gpu-drivers/
+  - /opt/vendor-storage.iso
+
+# Network preservation
+win_net:
+  schema: 1
+  mode: static
+  static:
+    ip: 10.0.1.50
+    mask: 255.255.255.0
+    gateway: 10.0.1.1
+    dns_servers: ["10.0.1.53"]
+  </pre>
+
+  <div class="verdict">
+    <h3>Zero-Touch Windows Migration</h3>
+    <p style="font-size:0.9em;">
+      Offline VirtIO injection + custom PNP staging + network preservation + automated boot verification.<br>
+      <strong>No manual driver installation. No BSOD. No IP reconfiguration. No VMware remnants.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

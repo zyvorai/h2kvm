@@ -1,0 +1,39 @@
+# ============================================
+# Photon OS: local VMDK → K3s/KubeVirt
+# ============================================
+# Converts local photon.vmdk, applies guest fixes, then
+# deploys as a KubeVirt VirtualMachine on K3s.
+#
+# Pipeline:
+#   photon.vmdk → qcow2 → guest fixes → PVC upload → KubeVirt VM
+#
+# Prerequisites:
+#   sudo ./scripts/setup-k3s-demo.sh    # or K3s + KubeVirt + CDI
+#   kubectl get pods -n kubevirt         # verify running
+#
+# Usage:
+#   sudo h2kvmctl --config photon-to-k3s.yaml
+# ============================================
+
+cmd: local
+vmdk: ./photon.vmdk
+output_dir: ./output-k3s
+to_output: photon-k3s.qcow2
+out_format: qcow2
+flatten: true
+compress: true
+
+# Guest fixes
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+
+# Deploy to Kubernetes/KubeVirt
+deploy_k8s: true
+k8s_vm_name: photon-k3s
+k8s_namespace: default
+k8s_pvc_size: 10Gi
+k8s_memory: 2Gi
+k8s_cpu: 2
+
+verbose: 1

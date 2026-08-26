@@ -1,0 +1,97 @@
+#cloud-config
+# Docker Host Cloud-Init Template
+# Prepares a VM as a Docker host with Docker Engine installed
+
+hostname: docker-host
+fqdn: docker-host.local
+
+# Create docker user
+users:
+  - name: docker
+    groups: sudo,docker
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... # Replace with your SSH public key
+
+# Update packages
+package_update: true
+package_upgrade: true
+
+# Install prerequisites
+packages:
+  - curl
+  - wget
+  - git
+  - vim
+  - htop
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - qemu-guest-agent
+
+# Configure SSH
+ssh_pwauth: false
+disable_root: true
+
+# Set timezone
+timezone: UTC
+
+# Run commands to install Docker
+runcmd:
+  # Add Docker's official GPG key
+  - mkdir -p /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+  # Set up Docker repository
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+  # Install Docker Engine
+  - apt-get update
+  - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+  # Add user to docker group
+  - usermod -aG docker docker
+
+  # Enable and start Docker
+  - systemctl enable docker
+  - systemctl start docker
+
+  # Install Docker Compose standalone
+  - curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  - chmod +x /usr/local/bin/docker-compose
+
+  # Enable qemu-guest-agent
+  - systemctl enable qemu-guest-agent
+  - systemctl start qemu-guest-agent
+
+  # Log completion
+  - echo "Docker installation completed at $(date)" >> /var/log/cloud-init-docker.log
+  - docker --version >> /var/log/cloud-init-docker.log
+  - docker-compose --version >> /var/log/cloud-init-docker.log
+
+# Write files
+write_files:
+  - path: /etc/docker/daemon.json
+    content: |
+      {
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "10m",
+          "max-file": "3"
+        },
+        "storage-driver": "overlay2"
+      }
+    permissions: '0644'
+
+  - path: /etc/motd
+    content: |
+      Welcome to Docker Host
+      Deployed via HyperConversion Operator
+
+      Docker version: Run 'docker --version'
+      Docker Compose: Run 'docker-compose --version'
+    permissions: '0644'
+
+# Final message
+final_message: "Docker host ready. Boot completed in $UPTIME seconds"

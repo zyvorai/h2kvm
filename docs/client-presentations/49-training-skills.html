@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Training &amp; Skills Development — VMware Admin to KVM/Kubernetes Learning Path</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #065f46, #047857, #10b981); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #6ee7b7; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(110,231,183,0.2); border: 1px solid rgba(110,231,183,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #052e16; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #6ee7b7; }
+  .page-light h2.st span { color: #065f46; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #6ee7b7; }
+  .page-light h3 { color: #065f46; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #065f46; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #6ee7b7; }
+  .page-light .card h4 { color: #065f46; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  pre { background: #065f46; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(110,231,183,0.08); border: 1px solid rgba(110,231,183,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(6,95,70,0.15), rgba(4,120,87,0.08)); border: 2px solid #10b981; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #6ee7b7; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Training &amp; <span>Skills Development</span></h1>
+  <h2>VMware Admin to KVM/Kubernetes Learning Path</h2>
+  <p class="sub">VMware admins already know 80% of what they need for KVM — virtualization concepts, networking, storage, and troubleshooting are universal. This guide provides a structured 4-week learning path, concept mapping from VMware to KVM, certification options, and hands-on lab exercises. Your team can be productive on KVM in 2 weeks.</p>
+  <div class="badge">4-Week Learning Path | Concept Mapping | Hands-On Labs | RHCSA/CKA | Career Growth | Lab Setup</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Skills <span>Mapping</span></h2>
+  <p class="sub">VMware admins already have most skills — the gap is smaller than expected.</p>
+
+  <h3>VMware → KVM Concept Mapping</h3>
+  <table>
+    <tr><th style="width:22%">VMware Concept</th><th style="width:22%">KVM Equivalent</th><th style="width:15%">Learning Effort</th><th style="width:41%">What Changes</th></tr>
+    <tr><td>ESXi hypervisor</td><td>KVM kernel module</td><td class="check">Minimal</td><td>KVM is part of Linux kernel — no separate hypervisor install</td></tr>
+    <tr><td>vCenter (GUI)</td><td>virsh CLI + Cockpit (GUI)</td><td>1-2 days</td><td>CLI-first approach; web UI available (Cockpit)</td></tr>
+    <tr><td>vMotion</td><td>virsh migrate --live</td><td class="check">Minimal</td><td>Same concept, different command</td></tr>
+    <tr><td>vSwitch / dvSwitch</td><td>Linux bridge / OVS</td><td>2-3 days</td><td>Linux networking (ip, bridge, nmcli)</td></tr>
+    <tr><td>VMFS / vSAN</td><td>XFS/ext4 / Ceph</td><td>3-5 days</td><td>Linux filesystems + optional Ceph for distributed</td></tr>
+    <tr><td>Snapshots</td><td>QCOW2 snapshots / LVM</td><td class="check">Minimal</td><td>Same concept, virsh snapshot-create-as</td></tr>
+    <tr><td>VM Hardware</td><td>libvirt domain XML</td><td>2-3 days</td><td>XML config instead of GUI dropdowns</td></tr>
+    <tr><td>Resource Pools</td><td>cgroups v2</td><td>1-2 days</td><td>Linux-native resource management</td></tr>
+    <tr><td>vSphere HA</td><td>Pacemaker + Corosync</td><td>3-5 days</td><td>Open-source clustering (more configurable)</td></tr>
+    <tr><td>vRealize / vROps</td><td>Prometheus + Grafana</td><td>2-3 days</td><td>Better dashboards, steeper initial learning</td></tr>
+    <tr><td>PowerCLI / govc</td><td>virsh + bash scripting</td><td>1-2 days</td><td>Shell scripting instead of PowerShell</td></tr>
+    <tr><td>Templates</td><td>QCOW2 backing files + virt-sysprep</td><td class="check">Minimal</td><td>Same workflow, different tools</td></tr>
+  </table>
+
+  <div class="highlight">
+    <h3>Total Learning Investment: 2-4 Weeks for Proficiency</h3>
+    <p>A VMware admin with 3+ years experience can operate KVM productively within 2 weeks. Full proficiency (including Ceph, Pacemaker, and advanced tuning) takes 4 weeks. The underlying concepts — CPU scheduling, memory management, storage I/O, networking — are identical across both platforms.</p>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">4-Week <span>Learning Path</span></h2>
+  <p class="sub">Structured curriculum from VMware admin to KVM/Linux operations engineer.</p>
+
+  <h3>Week-by-Week Plan</h3>
+  <table>
+    <tr><th style="width:8%">Week</th><th style="width:20%">Focus</th><th style="width:35%">Topics</th><th style="width:20%">Hands-On Labs</th><th style="width:17%">Outcome</th></tr>
+    <tr><td><strong>1</strong></td><td>Linux Fundamentals + KVM Basics</td><td>Linux CLI (file system, users, services, networking), systemd, package management, KVM/QEMU architecture, virsh basics, virt-install</td><td>Install Rocky 9, create 3 VMs, virsh start/stop/console</td><td>Can create and manage VMs</td></tr>
+    <tr><td><strong>2</strong></td><td>Networking + Storage</td><td>Linux bridges, VLANs, OVS, bond modes, nftables, QCOW2, LVM, libvirt storage pools, snapshots, disk resize</td><td>Create bridge+VLAN, migrate VM network, snapshot/restore</td><td>Can configure networking and storage</td></tr>
+    <tr><td><strong>3</strong></td><td>HA + DR + Monitoring</td><td>Live migration, Pacemaker basics, backup with BorgBackup, Prometheus + Grafana setup, alerting rules</td><td>Live migrate VM, setup Pacemaker 2-node, restore backup</td><td>Can operate HA cluster</td></tr>
+    <tr><td><strong>4</strong></td><td>Migration + Advanced</td><td>h2kvmctl usage, batch migration, KubeVirt intro, performance tuning (CPU pin, hugepages, NUMA), troubleshooting</td><td>Migrate 10 VMware VMs end-to-end, tune performance</td><td>Can run migration project</td></tr>
+  </table>
+
+  <h3>Daily Schedule (Example)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Morning (Theory — 2 hours)</h4>
+      <ul>
+        <li>Instructor-led or self-paced video/docs</li>
+        <li>Concept mapping: VMware → KVM equivalents</li>
+        <li>Architecture deep-dive for the day's topic</li>
+        <li>Q&amp;A with experienced KVM engineer</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Afternoon (Hands-On — 3 hours)</h4>
+      <ul>
+        <li>Lab exercises on dedicated hardware or cloud VMs</li>
+        <li>Guided then independent practice</li>
+        <li>Break-fix scenarios (troubleshoot intentional issues)</li>
+        <li>Document learnings for team knowledge base</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Certification <span>Paths</span></h2>
+  <p class="sub">Industry certifications that validate KVM/Linux/Kubernetes skills.</p>
+
+  <table>
+    <tr><th style="width:12%">Cert</th><th style="width:15%">Provider</th><th style="width:10%">Level</th><th style="width:8%">Cost</th><th style="width:8%">Duration</th><th style="width:25%">What It Covers</th><th style="width:22%">Relevance to KVM</th></tr>
+    <tr><td><strong>RHCSA</strong></td><td>Red Hat</td><td>Foundation</td><td>$500</td><td>3 hrs</td><td>Linux admin: users, storage, networking, services, SELinux</td><td>Essential — KVM runs on Linux</td></tr>
+    <tr><td><strong>RHCE</strong></td><td>Red Hat</td><td>Advanced</td><td>$500</td><td>4 hrs</td><td>Ansible, advanced networking, security, automation</td><td>Automation of KVM infrastructure</td></tr>
+    <tr><td><strong>RH318</strong></td><td>Red Hat</td><td>Specialized</td><td>$4,000</td><td>5 days</td><td>Red Hat Virtualization (oVirt/KVM), migration</td><td>Directly applicable — KVM admin</td></tr>
+    <tr><td><strong>CKA</strong></td><td>CNCF</td><td>Advanced</td><td>$395</td><td>2 hrs</td><td>Kubernetes administration, networking, storage, security</td><td>Required for KubeVirt path</td></tr>
+    <tr><td><strong>CKAD</strong></td><td>CNCF</td><td>Advanced</td><td>$395</td><td>2 hrs</td><td>Kubernetes app development, workload management</td><td>Useful for container + VM convergence</td></tr>
+    <tr><td><strong>LFCS</strong></td><td>Linux Foundation</td><td>Foundation</td><td>$395</td><td>2 hrs</td><td>Linux system administration (distro-neutral)</td><td>Alternative to RHCSA</td></tr>
+    <tr><td><strong>Ceph</strong></td><td>Red Hat / self-study</td><td>Specialized</td><td>$4,000</td><td>5 days</td><td>Ceph storage administration, RBD, RGW</td><td>For distributed storage setups</td></tr>
+  </table>
+
+  <h3>Recommended Certification Path</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Path 1: KVM Admin (Libvirt Focus)</h4>
+      <ul>
+        <li><strong>Month 1:</strong> RHCSA (Linux fundamentals)</li>
+        <li><strong>Month 3:</strong> RH318 (Red Hat Virtualization)</li>
+        <li><strong>Month 6:</strong> RHCE (Ansible automation)</li>
+        <li>Total cost: ~$5,000 per person</li>
+        <li>Best for: traditional VM admin role</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Path 2: KubeVirt Engineer (K8s Focus)</h4>
+      <ul>
+        <li><strong>Month 1:</strong> RHCSA or LFCS (Linux fundamentals)</li>
+        <li><strong>Month 3:</strong> CKA (Kubernetes administration)</li>
+        <li><strong>Month 6:</strong> CKAD + KubeVirt hands-on</li>
+        <li>Total cost: ~$1,300 per person</li>
+        <li>Best for: converged container + VM platform</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">Hands-On Lab <span>Exercises</span></h2>
+  <p class="sub">10 practical exercises that build KVM proficiency progressively.</p>
+
+  <table>
+    <tr><th style="width:5%">Lab</th><th style="width:20%">Title</th><th style="width:8%">Week</th><th style="width:8%">Time</th><th style="width:30%">Tasks</th><th style="width:29%">Success Criteria</th></tr>
+    <tr><td>1</td><td>First KVM VM</td><td>1</td><td>30 min</td><td>Install Rocky 9, create VM with virt-install, access console</td><td>VM boots, SSH accessible</td></tr>
+    <tr><td>2</td><td>VM Lifecycle</td><td>1</td><td>45 min</td><td>Start, stop, reboot, clone, delete VMs with virsh</td><td>All lifecycle operations successful</td></tr>
+    <tr><td>3</td><td>Networking</td><td>2</td><td>60 min</td><td>Create bridge, add VLAN, assign to VM, verify connectivity</td><td>VM on VLAN can reach gateway</td></tr>
+    <tr><td>4</td><td>Storage</td><td>2</td><td>60 min</td><td>Create QCOW2 disk, attach to VM, snapshot, restore, resize</td><td>Snapshot restore verified, disk grown</td></tr>
+    <tr><td>5</td><td>Live Migration</td><td>3</td><td>60 min</td><td>Setup shared NFS, live migrate VM between two hosts</td><td>VM migrated with &lt; 1s downtime</td></tr>
+    <tr><td>6</td><td>Monitoring</td><td>3</td><td>60 min</td><td>Deploy Prometheus + Grafana, import dashboard, create alert</td><td>Dashboard shows VM metrics, alert fires</td></tr>
+    <tr><td>7</td><td>Backup &amp; Restore</td><td>3</td><td>45 min</td><td>Backup VM with BorgBackup, destroy VM, restore from backup</td><td>Restored VM boots with all data intact</td></tr>
+    <tr><td>8</td><td>VM Migration (h2kvmctl)</td><td>4</td><td>60 min</td><td>Convert VMDK to QCOW2, fix fstab/initramfs, boot on KVM</td><td>Migrated VM fully operational</td></tr>
+    <tr><td>9</td><td>Performance Tuning</td><td>4</td><td>60 min</td><td>CPU pinning, hugepages, VirtIO multiqueue, benchmark</td><td>Performance matches or exceeds baseline</td></tr>
+    <tr><td>10</td><td>KubeVirt</td><td>4</td><td>90 min</td><td>Install K3s + KubeVirt, deploy VM via kubectl, expose service</td><td>VM running on K8s, accessible via Service</td></tr>
+  </table>
+
+  <div class="highlight">
+    <h3>Lab Environment Options</h3>
+    <p><strong>Option A:</strong> Nested virtualization on existing VMware infrastructure (ironic but practical). <strong>Option B:</strong> Dedicated lab server (1x old server with 64GB RAM). <strong>Option C:</strong> Cloud VMs with nested KVM (AWS metal instances, GCP N2 with nested virt). <strong>Option D:</strong> hyper2kvm quickstart.sh on any Linux machine with 16GB+ RAM.</p>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Career <span>Growth Opportunity</span></h2>
+  <p class="sub">KVM/Linux/Kubernetes skills are more valuable and in-demand than VMware skills.</p>
+
+  <h3>Market Demand Comparison</h3>
+  <table>
+    <tr><th style="width:20%">Skill</th><th style="width:15%">Job Listings</th><th style="width:15%">Avg Salary</th><th style="width:12%">Trend</th><th style="width:38%">Career Path</th></tr>
+    <tr><td><strong>VMware Admin</strong></td><td>Declining 20%/yr</td><td>$95,000</td><td>Declining</td><td>Limited to VMware shops; vendor lock-in risk</td></tr>
+    <tr><td><strong>Linux Admin (KVM)</strong></td><td>Stable</td><td>$105,000</td><td>Stable</td><td>Foundation for all cloud/DevOps roles</td></tr>
+    <tr><td><strong>Kubernetes Engineer</strong></td><td>Growing 30%/yr</td><td>$140,000</td><td class="check">Growing</td><td>Platform engineering, SRE, cloud architect</td></tr>
+    <tr><td><strong>DevOps/SRE</strong></td><td>Growing 25%/yr</td><td>$150,000</td><td class="check">Growing</td><td>Combines Linux + K8s + automation</td></tr>
+    <tr><td><strong>Cloud Architect</strong></td><td>Growing 20%/yr</td><td>$170,000</td><td class="check">Growing</td><td>Hybrid cloud strategy, multi-platform</td></tr>
+  </table>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>For VMware Admins: This Is Your Opportunity</h4>
+      <ul>
+        <li>VMware skills are depreciating (Broadcom disruption)</li>
+        <li>Linux/KVM skills are the foundation of ALL cloud platforms</li>
+        <li>AWS, Azure, GCP all run on Linux + KVM underneath</li>
+        <li>Kubernetes is the future of infrastructure management</li>
+        <li>Your virtualization knowledge transfers — concepts are the same</li>
+        <li>Adding Linux + K8s to VMware experience = rare, valuable combo</li>
+        <li>Average salary increase: $10K-$45K by adding K8s skills</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>For Managers: Investment in Your Team</h4>
+      <ul>
+        <li>Training cost: $5K-$10K per person (2-4 weeks)</li>
+        <li>VMware licensing saved: $381K/yr (pays for training 40x over)</li>
+        <li>Retention: team learns in-demand skills (reduces turnover)</li>
+        <li>Hiring: KVM/Linux talent pool is 10x larger than VMware</li>
+        <li>Flexibility: Linux skills apply to cloud, containers, IoT, edge</li>
+        <li>Risk reduction: no vendor dependency for critical skills</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Your VMware Team Can Be a KVM Team in 4 Weeks — And Be More Valuable</h3>
+    <p>The learning curve from VMware to KVM is 2-4 weeks, not 6 months. 80% of concepts are identical. The remaining 20% (Linux CLI, virsh commands, bridge networking) are learnable with structured labs. Certifications like RHCSA and CKA validate the skills. Most importantly, KVM/Linux/Kubernetes skills are growing in demand while VMware skills are shrinking. Investing in training is investing in your team's careers.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Training &amp; Skills Development Guide</div>
+</div>
+
+</body>
+</html>

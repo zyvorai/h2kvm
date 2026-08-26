@@ -1,0 +1,11 @@
+{
+  "output_dir": "./out",
+  "workdir": "./out/work",
+  "verbose": 1,
+  "checksum": true,
+  "fstab_mode": "stabilize-all",
+  "regen_initramfs": true,
+  "flatten": true,
+  "compress": true,
+  "compress_level": 6
+}

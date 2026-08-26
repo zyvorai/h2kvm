@@ -1,0 +1,60 @@
+{
+  "ova": "./photon-hw15-5.0-dde71ec57.x86_64.ova",
+  "output": {
+    "format": "qcow2",
+    "path": "./out/photon-5.0.qcow2",
+    "compress": true
+  },
+  "fix": {
+    "enabled": true,
+    "fstab": {
+      "enabled": true,
+      "prefer": "uuid"
+    },
+    "grub": {
+      "enabled": true,
+      "regenerate": true
+    },
+    "initramfs": {
+      "enabled": true,
+      "regenerate": true
+    }
+  },
+  "test": {
+    "enabled": true,
+    "libvirt": {
+      "enabled": true,
+      "firmware": "bios",
+      "memory_mb": 2048,
+      "vcpus": "2# ------------------------------------------------------------------------------"
+    }
+  },
+  "command": "ova",
+  "output_dir": "./out",
+  "workdir": "./out/work",
+  "log_virt_filesystems": true,
+  "ova_convert_to_qcow2": true,
+  "ova_qcow2_dir": "./out/qcow2",
+  "ova_convert_compress": true,
+  "ova_convert_compress_level": 6,
+  "to_output": "./out/photon-5.0.qcow2",
+  "out_format": "qcow2",
+  "compress": true,
+  "compress_level": 6,
+  "checksum": true,
+  "fstab_mode": "stabilize-all",
+  "print_fstab": true,
+  "no_backup": false,
+  "no_grub": false,
+  "regen_initramfs": true,
+  "remove_vmware_tools": false,
+  "libvirt_test": true,
+  "qemu_test": false,
+  "vm_name": "photon-5.0",
+  "memory": 2048,
+  "vcpus": 2,
+  "uefi": false,
+  "timeout": 60,
+  "headless": true,
+  "keep_domain": false
+}

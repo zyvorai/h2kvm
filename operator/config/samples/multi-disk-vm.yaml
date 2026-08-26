@@ -1,0 +1,72 @@
+apiVersion: hyper2kvm.io/v1alpha1
+kind: HyperConversion
+metadata:
+  name: multi-disk-vm
+spec:
+  # Root disk source
+  source:
+    url: "http://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img"
+    format: qcow2
+
+  # Root disk storage
+  storage:
+    size: 20Gi
+    storageClass: local-path
+
+  # VM with additional disks
+  vm:
+    name: ubuntu-multidisk
+    cpu:
+      cores: 4
+      sockets: 1
+    memory: 8Gi
+    firmware: uefi
+
+    # Additional disks
+    additionalDisks:
+      # Data disk from blank image
+      - name: data-disk
+        source:
+          blank: true
+        size: 50Gi
+        bootOrder: 3
+        bus: virtio
+
+      # Database disk from another URL
+      - name: database-disk
+        source:
+          url: "http://example.com/database-volume.qcow2"
+          format: qcow2
+        size: 100Gi
+        storageClass: fast-ssd
+        bootOrder: 4
+        bus: scsi
+
+      # Backup disk from existing PVC
+      - name: backup-disk
+        source:
+          pvcName: existing-backup-pvc
+        bootOrder: 5
+
+    # Cloud-init for initial setup
+    cloudInit:
+      userData: |
+        #cloud-config
+        hostname: ubuntu-multidisk
+        users:
+          - name: ubuntu
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC...
+
+        # Mount additional disks
+        runcmd:
+          - mkfs.ext4 /dev/vdb
+          - mkdir -p /data
+          - mount /dev/vdb /data
+          - echo '/dev/vdb /data ext4 defaults 0 2' >> /etc/fstab
+
+          - mkfs.ext4 /dev/sda
+          - mkdir -p /database
+          - mount /dev/sda /database
+          - echo '/dev/sda /database ext4 defaults 0 2' >> /etc/fstab

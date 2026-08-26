@@ -1,0 +1,106 @@
+# Healthcare HIPAA-Compliant Migration Example
+#
+# Scenario: Migrating Electronic Health Record (EHR) system from VMware to KVM
+# Industry: Healthcare
+# Compliance: HIPAA, HITECH
+#
+# Requirements:
+# - LUKS encryption for PHI (Protected Health Information)
+# - Audit logging enabled
+# - Network isolation (dedicated VLAN)
+# - SELinux enforcing mode
+# - FIPS 140-2 compliant cryptography
+#
+# VM Profile:
+# - OS: RHEL 9.3 (HIPAA-hardened)
+# - Application: Epic EMR / Cerner / Athenahealth
+# - Database: PostgreSQL 15 (PHI storage)
+# - Network: Isolated medical records VLAN (VLAN 200)
+#
+
+# Migration mode
+cmd: vsphere
+
+# vCenter connection (use environment variables for credentials)
+vcenter: vcenter.hospital.local
+vc_user: ${VCENTER_USER}
+vc_password_env: VC_PASSWORD
+dc_name: Hospital-DC-Primary
+cluster: Production-Cluster
+
+# Source VM
+vs_vm_name: ehr-prod-01
+vs_action: export-vm
+
+# Output configuration
+output_dir: /secure/migrations/ehr
+out_format: qcow2
+compress: true
+
+# HIPAA compliance settings
+verbose: 2  # Detailed audit logs
+log_file: /var/log/hyper2kvm/ehr-migration-{timestamp}.log
+report: /secure/migrations/ehr/migration-report.md
+
+# Guest OS fixes (RHEL 9 healthcare)
+regen_initramfs: true
+fstab_mode: stabilize-all
+# grub is auto-handled
+
+# Network configuration
+# CRITICAL: Keep medical records VLAN isolation
+network_mode: preserve  # Maintain existing network config
+# Post-migration: Verify VLAN 200 assignment
+
+# SELinux (required for HIPAA)
+# Ensure SELinux stays in enforcing mode
+preserve_selinux: true
+
+# Libvirt domain configuration
+domain_name: ehr-prod-01-kvm
+domain_memory: 32768  # 32GB for EHR workload
+domain_vcpus: 8
+domain_cpu_mode: host-passthrough
+
+# Storage
+# Note: Add LUKS encryption post-migration
+# Command: cryptsetup luksFormat /dev/vg0/ehr-prod-01
+disk_bus: virtio
+disk_cache: writethrough  # Data integrity for database
+
+# Network (isolated medical VLAN)
+nic_model: virtio
+libvirt_network: br-medical  # VLAN 200 bridge
+# Port security: MAC filtering enabled
+
+# Security hardening
+# Post-migration checklist:
+# 1. Enable LUKS encryption
+# 2. Configure firewall (PostgreSQL 5432 only from app servers)
+# 3. Enable auditd for PHI access tracking
+# 4. Verify SELinux booleans (postgresql_selinux, httpd_can_network_connect_db)
+# 5. Install AIDE (file integrity monitoring)
+# 6. Configure rsyslog to SIEM (Splunk/ELK)
+# 7. Enable TPM 2.0 for measured boot
+# 8. Backup encryption keys to HSM
+
+# Validation tests
+test_boot: true
+test_timeout: 300
+
+# Backup and rollback
+# Keep VMware snapshot until validation complete (30 days)
+# CBT backup enabled: /backup/ehr-prod-01-cbt/
+
+# Migration window: Saturday 2 AM - 6 AM (4-hour window)
+# Downtime estimate: 1.5 hours
+# Rollback time: 15 minutes (revert VMware snapshot)
+
+# Post-migration validation:
+# 1. EHR application start
+# 2. Database connectivity
+# 3. HL7 interface connectivity (ADT messages)
+# 4. PACS integration (DICOM query/retrieve)
+# 5. Patient portal access
+# 6. Provider portal SSO
+# 7. Performance baseline (< 2s page load)

@@ -1,0 +1,6 @@
+{
+  "verbose": 2,
+  "dry_run": true,
+  "flatten": false,
+  "regen_initramfs": false
+}

@@ -1,0 +1,163 @@
+# ============================================
+# Complete Workflow: vSphere → libvirt (Windows 11)
+# ============================================
+# Description: Export Windows 11 VM from vSphere and prepare for libvirt/KVM with full requirements
+# Use Case: Windows 11 Professional/Enterprise migration with TPM 2.0 and Secure Boot
+# Prerequisites:
+#   - govc installed
+#   - vCenter credentials
+#   - VirtIO driver ISO (virtio-win.iso)
+#   - swtpm package (for TPM 2.0 emulation)
+#   - OVMF with Secure Boot support
+# ============================================
+{
+  "cmd": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "username": "administrator@vsphere.local",
+  "password_file": "~/.vcenter_password",
+  "datacenter": "Production-DC",
+  "cluster": "Windows-Cluster",
+  "vm_name": "windows-11-enterprise",
+  "vs_action": "export",
+  "export_method": "govc",
+  "export_format": "ova",
+  "create_snapshot": true,
+  "snapshot_name": "win11-kvm-migration-$(date +%Y%m%d-%H%M%S)",
+  "snapshot_description": "Windows 11 migration snapshot",
+  "snapshot_memory": false,
+  "snapshot_quiesce": true,
+  "delete_snapshot_after": true,
+  "flatten": true,
+  "compress": true,
+  "disk_format": "qcow2",
+  "windows": true,
+  "os_type": "windows",
+  "os_variant": "win11",
+  "windows_version": 11,
+  "inject_virtio": true,
+  "virtio_win_iso": "/data/virtio-win.iso",
+  "virtio_drivers": [
+    "storage",
+    "network",
+    "balloon",
+    "rng",
+    "vioserial",
+    "viorng",
+    "vioscsi"
+  ],
+  "modify_registry": true,
+  "registry_edits": [
+    "Add VirtIO storage to BOOT_START",
+    "Add VirtIO drivers to CriticalDeviceDatabase",
+    "Configure safe boot for driver detection",
+    "Disable Windows 11 hardware checks (optional)"
+  ],
+  "boot_strategy": "two-phase",
+  "phase1_bus": "sata",
+  "phase2_bus": "virtio",
+  "backup_bcd": true,
+  "repair_bcd": true,
+  "remove_vmware_tools": true,
+  "uninstall_vmware_tools_cleanly": true,
+  "to_output": "/data/kvm/windows-11-enterprise.qcow2",
+  "output_format": "qcow2",
+  "output_dir": "/data/kvm/",
+  "generate_libvirt_xml": true,
+  "libvirt_xml_path": "/data/kvm/windows-11-enterprise.xml",
+  "libvirt_domain_name": "windows-11-enterprise",
+  "memory_mb": 16384,
+  "vcpus": 8,
+  "cpu_mode": "host-passthrough",
+  "cpu_topology": {
+    "sockets": 1,
+    "cores": 4,
+    "threads": 2
+  },
+  "machine_type": "q35",
+  "firmware_type": "uefi",
+  "uefi_loader": "/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd",
+  "uefi_nvram_template": "/usr/share/edk2/ovmf/OVMF_VARS.secboot.fd",
+  "secure_boot": true,
+  "secure_boot_enrolled_keys": true,
+  "enable_tpm": true,
+  "tpm_version": 2.0,
+  "tpm_model": "tpm-crb",
+  "tpm_backend": "emulator",
+  "tpm_persistent_state": "/var/lib/libvirt/swtpm/windows-11-enterprise-tpm.state",
+  "disk_bus_phase1": "sata",
+  "disk_cache_phase1": "writeback",
+  "disk_bus": "virtio",
+  "disk_cache": "writeback",
+  "disk_io": "threads",
+  "disk_discard": "unmap",
+  "disk_detect_zeroes": "unmap",
+  "network_type": "bridge",
+  "network_bridge": "br0",
+  "network_model": "virtio",
+  "enable_spice": true,
+  "spice_listen": "127.0.0.1",
+  "graphics_type": "spice",
+  "enable_qxl": true,
+  "video_ram_mb": 256,
+  "enable_audio": true,
+  "audio_model": "ich9",
+  "enable_usb_tablet": true,
+  "enable_usb_keyboard": true,
+  "enable_usb_redirection": true,
+  "usb_controller": "qemu-xhci",
+  "qemu_guest_agent": true,
+  "qemu_guest_agent_path": "C:\\Program Files\\Qemu-ga\\qemu-ga.exe",
+  "enable_virtio_serial": true,
+  "enable_balloon": true,
+  "enable_rng": true,
+  "rng_model": "virtio",
+  "enable_hyperv_enlightenments": true,
+  "hyperv_features": [
+    "relaxed",
+    "vapic",
+    "spinlocks",
+    "vpindex",
+    "runtime",
+    "synic",
+    "stimer",
+    "reset",
+    "frequencies"
+  ],
+  "clock_offset": "localtime",
+  "clock_timers": [
+    {
+      "rtc": {
+        "tickpolicy": "catchup"
+      }
+    },
+    {
+      "pit": {
+        "tickpolicy": "delay"
+      }
+    },
+    {
+      "hpet": {
+        "present": false
+      }
+    },
+    {
+      "hypervclock": {
+        "present": true
+      }
+    }
+  ],
+  "libvirt_test": true,
+  "boot_timeout": 600,
+  "validate_windows_boot": true,
+  "check_virtio_drivers_loaded": true,
+  "validate_tpm": true,
+  "validate_secure_boot": true,
+  "report": "/var/log/migrations/windows-11-$(date +%Y%m%d-%H%M%S).md",
+  "log_level": "INFO",
+  "verbose": true,
+  "enable_recovery": true,
+  "recovery_checkpoint_dir": "/tmp/hyper2kvm-checkpoints",
+  "post_migration_script": "#!/bin/bash\nset -e\n\necho \"==============================================\"\necho \"Windows 11 Migration Post-Processing\"\necho \"==============================================\"\n\n# Ensure swtpm is installed (for TPM 2.0)\nif ! command -v swtpm &> /dev/null; then\n    echo \"ERROR: swtpm not found. Install with: sudo dnf install swtpm swtpm-tools\"\n    exit 1\nfi\n\n# Create TPM state directory\nsudo mkdir -p /var/lib/libvirt/swtpm\nsudo chown -R qemu:qemu /var/lib/libvirt/swtpm\n\n# Import domain (Phase 1: SATA boot)\nvirsh define /data/kvm/windows-11-enterprise.xml\n\n# Verify TPM device in XML\necho \"Verifying TPM 2.0 configuration...\"\nvirsh dumpxml windows-11-enterprise | grep -A 5 \"<tpm\"\n\n# Verify Secure Boot\necho \"Verifying Secure Boot configuration...\"\nvirsh dumpxml windows-11-enterprise | grep -A 3 \"secboot\"\n\n# Start VM with SATA disk\necho \"Starting Windows 11 VM (Phase 1: SATA boot)...\"\necho \"TPM 2.0 and Secure Boot are enabled\"\nvirsh start windows-11-enterprise\n\n# Wait for Windows to boot\necho \"Waiting for Windows 11 to boot and detect VirtIO drivers...\"\necho \"This may take 5-10 minutes...\"\nsleep 300\n\n# Check VM status\nvirsh list | grep windows-11-enterprise\n\necho \"\"\necho \"Phase 1 Complete: Windows 11 booted with SATA\"\necho \"\"\necho \"Next Steps:\"\necho \"1. Access VM via virt-manager or virt-viewer\"\necho \"2. Verify Windows 11 booted successfully\"\necho \"3. Check Device Manager for VirtIO drivers\"\necho \"4. Verify TPM 2.0: tpm.msc in Windows\"\necho \"5. Verify Secure Boot in System Information\"\necho \"6. Once drivers are installed, shut down VM\"\necho \"7. Switch disk from SATA to VirtIO (Phase 2)\"\necho \"\"\necho \"Phase 2 XML modification:\"\necho \"  virsh shutdown windows-11-enterprise\"\necho \"  virsh edit windows-11-enterprise\"\necho \"  # Change: <disk ... bus='sata'> \u2192 <disk ... bus='virtio'>\"\necho \"  virsh start windows-11-enterprise\"\necho \"\"\necho \"Management:\"\necho \"  virt-manager\"\necho \"  virt-viewer windows-11-enterprise\"\n",
+  "pre_migration_checks": "Windows 11 Hardware Requirements:\n\u2713 UEFI with Secure Boot: Enabled\n\u2713 TPM 2.0: Emulated via swtpm\n\u2713 CPU: host-passthrough (meets requirements)\n\u2713 RAM: 16GB (minimum 4GB required)\n\u2713 Storage: 64GB+ (validated during conversion)\n\u2713 Graphics: SPICE with QXL\n",
+  "post_migration_notes": "Windows 11 Two-Phase Boot Strategy:\n\nPHASE 1 (SATA Bootstrap + Driver Installation):\n- VM boots with SATA disk controller\n- TPM 2.0 device present and functional\n- Secure Boot enabled\n- Windows detects VirtIO drivers injected offline\n- Drivers install via PnP (Plug and Play)\n- VirtIO storage becomes available\n\nPHASE 2 (VirtIO Production):\n- Shutdown VM cleanly\n- Modify libvirt XML: bus=\"sata\" \u2192 bus=\"virtio\"\n- Restart VM\n- Windows 11 boots natively on VirtIO with full performance\n\nTPM 2.0 Verification in Windows:\n- Run: tpm.msc\n- Check: \"TPM Manufacturer Information\"\n- Should show: \"2.0\" under \"Specification Version\"\n\nSecure Boot Verification:\n- Run: msinfo32\n- Check: \"System Summary\" \u2192 \"Secure Boot State\"\n- Should show: \"On\"\n\nThis ensures Windows 11 compliance and zero-risk migration.\n"
+}

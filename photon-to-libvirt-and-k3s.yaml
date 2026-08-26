@@ -1,0 +1,56 @@
+# ============================================
+# Photon OS: VMDK → libvirt + KubeVirt (both)
+# ============================================
+# Single command: converts photon.vmdk, applies guest fixes,
+# deploys to BOTH libvirt (virsh) and K3s/KubeVirt.
+#
+# Pipeline:
+#   photon.vmdk → qcow2 → guest fixes
+#     ├→ libvirt domain XML + virsh define + boot test
+#     └→ PVC upload + KubeVirt VirtualMachine
+#
+# Usage:
+#   sudo h2kvmctl --config photon-to-libvirt-and-k3s.yaml
+# ============================================
+
+cmd: local
+vmdk: ./photon.vmdk
+output_dir: ./output-both
+to_output: photon-both.qcow2
+out_format: qcow2
+flatten: true
+compress: true
+
+# Guest fixes
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+
+# ── libvirt deployment ──
+emit_domain_xml: true
+virsh_define: true
+vm_name: photon-libvirt
+memory: 2048
+vcpus: 2
+uefi: true
+machine: q35
+disk_bus: virtio
+disk_cache: none
+net_model: virtio
+libvirt_network: default
+serial_console: true
+graphics: vnc
+guest_os: linux
+libvirt_test: true
+keep_domain: true
+timeout: 120
+
+# ── KubeVirt deployment ──
+deploy_k8s: true
+k8s_vm_name: photon-kubevirt
+k8s_namespace: default
+k8s_pvc_size: 10Gi
+k8s_memory: 2Gi
+k8s_cpu: 2
+
+verbose: 1

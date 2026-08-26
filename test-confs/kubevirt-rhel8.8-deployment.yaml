@@ -1,0 +1,244 @@
+---
+# KubeVirt RHEL 8.8 Complete Deployment for k3d
+# This is a one-shot deployment that includes all resources needed to run
+# the migrated RHEL 8.8 VM in KubeVirt on k3d
+
+# =============================================================================
+# 1. Namespace
+# =============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rhel-vms
+  labels:
+    app: kubevirt-rhel
+    env: test
+
+---
+# =============================================================================
+# 2. PersistentVolumeClaim for VM Disk
+# =============================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rhel8-disk
+  namespace: rhel-vms
+  labels:
+    app: rhel8.8-vm
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path  # k3d default storage class
+  resources:
+    requests:
+      storage: 20Gi  # Allocate 20GB (image is 4GB compressed)
+
+---
+# =============================================================================
+# 3. ConfigMap for cloud-init user data (optional)
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rhel8-cloudinit
+  namespace: rhel-vms
+data:
+  userdata: |
+    #cloud-config
+    hostname: rhel8-kubevirt
+    fqdn: rhel8-kubevirt.local
+    manage_etc_hosts: true
+
+    # Default user (cloud-user)
+    users:
+      - name: cloud-user
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        groups: wheel
+        shell: /bin/bash
+        lock_passwd: false
+        # Password: redhat (hashed with: mkpasswd --method=SHA-512 --rounds=4096)
+        passwd: $6$rounds=4096$saltsalt$IjEKRpRZ7A8p1CrQYPxKOqD5E0x1gT3hKLVb1p/Q7YcZ4YtJcPJRl2rKRjN7s2k1H1yK1Y1Z1Y1Z1Y1Z1Y1Z1
+
+    # Network configuration (DHCP)
+    network:
+      version: 2
+      ethernets:
+        eth0:
+          dhcp4: true
+
+    # Packages to install on first boot
+    packages:
+      - qemu-guest-agent
+      - vim
+      - curl
+      - wget
+
+    # Commands to run on first boot
+    runcmd:
+      - systemctl enable qemu-guest-agent
+      - systemctl start qemu-guest-agent
+      - echo "RHEL 8.8 on KubeVirt - Migration successful!" > /etc/motd
+
+---
+# =============================================================================
+# 4. VirtualMachine Definition
+# =============================================================================
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: rhel8-migrated
+  namespace: rhel-vms
+  labels:
+    app: rhel8.8-vm
+    os: rhel
+    version: "8.8"
+    migrated-from: vmware
+    migration-tool: hyper2kvm
+  annotations:
+    description: "RHEL 8.8 VM migrated from VMware ESXi using hyper2kvm"
+    migration-date: "2026-02-19"
+    original-source: "esx8.0-rhel8.8-with-thin-provision-disk1.vmdk"
+spec:
+  # VM run strategy (replaces deprecated spec.running)
+  runStrategy: Always
+
+  # VM Template
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: rhel8-migrated
+        app: rhel8.8-vm
+    spec:
+      # Domain specification (QEMU/KVM)
+      domain:
+        # CPU and Memory
+        cpu:
+          cores: 2
+          sockets: 1
+          threads: 1
+
+        resources:
+          requests:
+            memory: 4Gi
+          limits:
+            memory: 4Gi
+
+        # Devices
+        devices:
+          # Disk (boot disk)
+          disks:
+            - name: root-disk
+              disk:
+                bus: virtio  # VirtIO for best performance
+            - name: cloudinit
+              disk:
+                bus: virtio
+
+          # Network interface
+          interfaces:
+            - name: default
+              masquerade: {}  # NAT networking for k3d
+              model: virtio
+
+          # Graphics and console
+          inputs:
+            - type: tablet
+              bus: virtio
+              name: tablet
+
+          # Serial console
+          autoattachSerialConsole: true
+          autoattachGraphicsDevice: true
+
+        # Machine type
+        machine:
+          type: q35  # Modern chipset
+
+        # Firmware (BIOS, not UEFI based on our detection)
+        firmware:
+          bootloader:
+            bios:
+              useSerial: true
+
+        # Features
+        features:
+          acpi:
+            enabled: true
+          apic:
+            enabled: true
+          hyperv:
+            relaxed:
+              enabled: true
+            vapic:
+              enabled: true
+            spinlocks:
+              enabled: true
+              spinlocks: 8191
+
+      # Network configuration
+      networks:
+        - name: default
+          pod: {}  # Use pod networking
+
+      # Volumes
+      volumes:
+        - name: root-disk
+          persistentVolumeClaim:
+            claimName: rhel8-disk
+        - name: cloudinit
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              hostname: rhel8-kubevirt
+              users:
+                - name: cloud-user
+                  sudo: ALL=(ALL) NOPASSWD:ALL
+                  groups: wheel
+                  shell: /bin/bash
+
+      # Termination grace period
+      terminationGracePeriodSeconds: 30
+
+---
+# =============================================================================
+# 5. Service for VM Access (SSH)
+# =============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: rhel8-ssh
+  namespace: rhel-vms
+  labels:
+    app: rhel8.8-vm
+spec:
+  type: NodePort
+  selector:
+    kubevirt.io/vm: rhel8-migrated
+  ports:
+    - name: ssh
+      protocol: TCP
+      port: 22
+      targetPort: 22
+      nodePort: 30022  # Access SSH on k3d node at port 30022
+
+---
+# =============================================================================
+# 6. Service for VNC Console Access
+# =============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: rhel8-vnc
+  namespace: rhel-vms
+  labels:
+    app: rhel8.8-vm
+spec:
+  type: NodePort
+  selector:
+    kubevirt.io/vm: rhel8-migrated
+  ports:
+    - name: vnc
+      protocol: TCP
+      port: 5900
+      targetPort: 5900
+      nodePort: 30590  # Access VNC on k3d node at port 30590

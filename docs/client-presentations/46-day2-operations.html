@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Day-2 Operations — KVM Administration, Maintenance &amp; Lifecycle Management</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1e3a5f, #2563eb, #3b82f6); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #bfdbfe; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(191,219,254,0.2); border: 1px solid rgba(191,219,254,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0a1528; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #bfdbfe; }
+  .page-light h2.st span { color: #1e3a5f; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #bfdbfe; }
+  .page-light h3 { color: #1e3a5f; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #1e3a5f; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #bfdbfe; }
+  .page-light .card h4 { color: #1e3a5f; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  pre { background: #1e3a5f; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(191,219,254,0.08); border: 1px solid rgba(191,219,254,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(30,58,95,0.15), rgba(37,99,235,0.08)); border: 2px solid #3b82f6; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #bfdbfe; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Day-2 <span>Operations</span></h1>
+  <h2>KVM Administration, Maintenance &amp; Lifecycle Management</h2>
+  <p class="sub">Migration is Day-1. Day-2 is operating KVM in production — patching hosts, managing VM lifecycle, storage maintenance, network changes, and incident response. This guide is the VMware admin's reference for daily KVM operations, with virsh command equivalents for every vSphere operation.</p>
+  <div class="badge">virsh Commands | Host Patching | VM Lifecycle | Storage Mgmt | Snapshot | Live Migration | Incident Response</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">VMware → virsh <span>Command Reference</span></h2>
+  <p class="sub">Every vSphere operation has a virsh equivalent — most are simpler.</p>
+
+  <table>
+    <tr><th style="width:25%">vSphere Operation</th><th style="width:35%">virsh Command</th><th style="width:40%">Notes</th></tr>
+    <tr><td>List all VMs</td><td><code>virsh list --all</code></td><td>Shows state: running, shut off, paused</td></tr>
+    <tr><td>Power on VM</td><td><code>virsh start vm-name</code></td><td>Starts from shut off state</td></tr>
+    <tr><td>Power off (graceful)</td><td><code>virsh shutdown vm-name</code></td><td>ACPI shutdown signal (clean)</td></tr>
+    <tr><td>Power off (force)</td><td><code>virsh destroy vm-name</code></td><td>Equivalent to pulling power cable</td></tr>
+    <tr><td>Reboot</td><td><code>virsh reboot vm-name</code></td><td>ACPI reboot signal</td></tr>
+    <tr><td>Suspend / Resume</td><td><code>virsh suspend vm</code> / <code>virsh resume vm</code></td><td>Pauses VM in memory</td></tr>
+    <tr><td>Console (VNC)</td><td><code>virt-viewer vm-name</code></td><td>Or: <code>virsh console vm</code> for serial</td></tr>
+    <tr><td>Create snapshot</td><td><code>virsh snapshot-create-as vm snap1</code></td><td>Add <code>--disk-only</code> for external snapshot</td></tr>
+    <tr><td>Revert snapshot</td><td><code>virsh snapshot-revert vm snap1</code></td><td>Reverts to snapshot state</td></tr>
+    <tr><td>Clone VM</td><td><code>virt-clone --original vm --name vm-clone --auto-clone</code></td><td>Full clone with new MAC and UUID</td></tr>
+    <tr><td>vMotion (live migrate)</td><td><code>virsh migrate --live vm qemu+ssh://host2/system</code></td><td>Requires shared storage</td></tr>
+    <tr><td>Edit VM config</td><td><code>virsh edit vm-name</code></td><td>Opens domain XML in $EDITOR</td></tr>
+    <tr><td>VM info / specs</td><td><code>virsh dominfo vm-name</code></td><td>CPU, memory, state, UUID</td></tr>
+    <tr><td>Hot-add CPU</td><td><code>virsh setvcpus vm 8 --live</code></td><td>Requires maxvcpus set in XML</td></tr>
+    <tr><td>Hot-add memory</td><td><code>virsh setmem vm 16G --live</code></td><td>Requires maxmemory set in XML</td></tr>
+    <tr><td>Attach disk</td><td><code>virsh attach-disk vm /path/disk.qcow2 vdb</code></td><td>Hot-add while running</td></tr>
+    <tr><td>Attach network</td><td><code>virsh attach-interface vm bridge br0 --model virtio</code></td><td>Hot-add NIC</td></tr>
+    <tr><td>Storage usage</td><td><code>virsh domblkinfo vm vda</code></td><td>Allocated vs physical size</td></tr>
+    <tr><td>Network info</td><td><code>virsh domifaddr vm-name</code></td><td>Shows IP addresses of all NICs</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Host Patching <span>&amp; Maintenance</span></h2>
+  <p class="sub">Patch KVM hosts with zero VM downtime using live migration.</p>
+
+  <h3>Rolling Patch Procedure</h3>
+  <pre>
+#!/bin/bash
+# rolling-patch.sh — Patch KVM host with zero VM downtime
+HOST="$1"
+DEST_HOST="$2"
+
+echo "=== Patching $HOST (migrating VMs to $DEST_HOST) ==="
+
+# Step 1: Live-migrate all VMs to another host
+for vm in $(virsh -c qemu+ssh://$HOST/system list --name); do
+    echo "Migrating $vm to $DEST_HOST..."
+    virsh -c qemu+ssh://$HOST/system migrate --live --verbose \
+        "$vm" qemu+ssh://$DEST_HOST/system
+done
+
+# Step 2: Verify no VMs remain
+REMAINING=$(virsh -c qemu+ssh://$HOST/system list --name | wc -l)
+[ "$REMAINING" -gt 0 ] &amp;&amp; echo "ERROR: $REMAINING VMs still on $HOST" &amp;&amp; exit 1
+
+# Step 3: Patch the host
+ssh $HOST "dnf update -y &amp;&amp; reboot"
+
+# Step 4: Wait for host to come back
+echo "Waiting for $HOST to reboot..."
+while ! ssh -o ConnectTimeout=5 $HOST "uptime" &amp;>/dev/null; do sleep 10; done
+
+# Step 5: Verify host health
+ssh $HOST "h2kvmctl doctor"
+
+# Step 6: Migrate VMs back (optional — or leave balanced)
+echo "=== $HOST patched successfully ==="</pre>
+
+  <h3>Maintenance Schedule</h3>
+  <table>
+    <tr><th>Task</th><th>Frequency</th><th>Downtime</th><th>Command</th></tr>
+    <tr><td>Security patches</td><td>Monthly</td><td>0 (live migration)</td><td><code>dnf update --security</code></td></tr>
+    <tr><td>Kernel updates</td><td>Quarterly</td><td>5 min (reboot)</td><td><code>dnf update kernel &amp;&amp; reboot</code></td></tr>
+    <tr><td>QEMU/libvirt update</td><td>Quarterly</td><td>VM restart</td><td><code>dnf update qemu-kvm libvirt</code></td></tr>
+    <tr><td>Firmware update</td><td>Semi-annual</td><td>15 min (reboot)</td><td>Vendor tool (Dell iDRAC, HPE iLO)</td></tr>
+    <tr><td>Storage maintenance</td><td>Monthly</td><td>0</td><td><code>fstrim -av</code>, Ceph scrub</td></tr>
+    <tr><td>Log rotation</td><td>Weekly (auto)</td><td>0</td><td>logrotate (configured)</td></tr>
+    <tr><td>Backup verification</td><td>Monthly</td><td>0</td><td>Test restore of random VM</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">VM Lifecycle <span>Management</span></h2>
+  <p class="sub">Creating, cloning, templating, and decommissioning VMs.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Create New VM</h4>
+      <pre>
+# From ISO
+virt-install --name new-vm \
+  --ram 4096 --vcpus 2 \
+  --disk size=50,format=qcow2 \
+  --os-variant rocky9 \
+  --cdrom /iso/Rocky-9.3-x86_64.iso \
+  --network bridge=br0,model=virtio \
+  --graphics vnc
+
+# From template (clone)
+virt-clone --original template-rocky9 \
+  --name prod-app-01 \
+  --auto-clone
+
+# From cloud image
+wget https://cloud.rocky.page/images/Rocky-9-GenericCloud.qcow2
+virt-install --name cloud-vm \
+  --ram 2048 --vcpus 2 \
+  --import \
+  --disk Rocky-9-GenericCloud.qcow2 \
+  --cloud-init root-password-generate=on</pre>
+    </div>
+    <div class="card">
+      <h4>VM Templates</h4>
+      <pre>
+# Create template from existing VM
+virsh shutdown template-vm
+# Generalize (remove machine-specific data)
+virt-sysprep -d template-vm \
+  --operations defaults,-ssh-userdir
+# Mark as template (prevent accidental start)
+virsh undefine template-vm --keep-all-storage
+# Template disk: /var/lib/libvirt/images/template.qcow2
+
+# Create VM from template (linked clone)
+qemu-img create -f qcow2 \
+  -b template.qcow2 -F qcow2 \
+  new-vm.qcow2
+
+# Define with new XML
+virt-install --name new-vm \
+  --ram 4096 --vcpus 2 \
+  --import --disk new-vm.qcow2 \
+  --network bridge=br0,model=virtio</pre>
+    </div>
+    <div class="card">
+      <h4>VM Decommission</h4>
+      <pre>
+# Safe decommission procedure
+# 1. Notify stakeholders
+# 2. Take final backup
+virsh snapshot-create-as vm final-backup
+borg create /backup/repo::vm-final \
+  /var/lib/libvirt/images/vm.qcow2
+
+# 3. Shutdown and remove
+virsh shutdown vm
+virsh undefine vm --remove-all-storage
+
+# 4. Clean up DNS, DHCP, monitoring
+# 5. Update CMDB / inventory
+# 6. Retain backup for 90 days</pre>
+    </div>
+    <div class="card">
+      <h4>Bulk Operations</h4>
+      <pre>
+# Start all VMs
+for vm in $(virsh list --name --state-shutoff); do
+  virsh start "$vm"
+done
+
+# Graceful shutdown all
+for vm in $(virsh list --name --state-running); do
+  virsh shutdown "$vm"
+done
+
+# Snapshot all running VMs
+for vm in $(virsh list --name --state-running); do
+  virsh snapshot-create-as "$vm" \
+    "backup-$(date +%Y%m%d)" --disk-only
+done
+
+# Report all VM resources
+virsh list --all | tail -n+3 | while read _ name state; do
+  [ -z "$name" ] &amp;&amp; continue
+  echo "$name: $(virsh dominfo $name | grep -E 'CPU|Memory')"
+done</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">Storage <span>Operations</span></h2>
+  <p class="sub">Disk management, resize, snapshots, and cleanup.</p>
+
+  <h3>Common Storage Tasks</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Resize VM Disk</h4>
+      <pre>
+# Grow QCOW2 disk by 50GB
+virsh blockresize vm-name \
+  /var/lib/libvirt/images/vm.qcow2 150G
+
+# Or offline:
+qemu-img resize vm.qcow2 +50G
+
+# Inside guest: extend filesystem
+# Linux (ext4):
+growpart /dev/vda 3
+resize2fs /dev/vda3
+
+# Linux (XFS):
+growpart /dev/vda 3
+xfs_growfs /
+
+# Linux (LVM):
+pvresize /dev/vda3
+lvextend -l +100%FREE /dev/vg/lv
+resize2fs /dev/vg/lv</pre>
+    </div>
+    <div class="card">
+      <h4>Storage Pool Management</h4>
+      <pre>
+# List storage pools
+virsh pool-list --all
+
+# Create directory-based pool
+virsh pool-define-as images dir \
+  --target /var/lib/libvirt/images
+virsh pool-start images
+virsh pool-autostart images
+
+# Check pool usage
+virsh pool-info images
+# Capacity:  15.00 TB
+# Allocation: 4.20 TB
+# Available:  10.80 TB
+
+# List volumes in pool
+virsh vol-list images
+
+# Clean up orphaned images
+# (compare vol-list with VM definitions)</pre>
+    </div>
+  </div>
+
+  <h3>Snapshot Management</h3>
+  <pre>
+# List snapshots for a VM
+virsh snapshot-list vm-name --tree
+
+# Create snapshot with description
+virsh snapshot-create-as vm-name "pre-update" --description "Before kernel update"
+
+# Create disk-only snapshot (external, for backup)
+virsh snapshot-create-as vm-name "backup" --disk-only --quiesce --atomic
+
+# Revert to snapshot
+virsh snapshot-revert vm-name "pre-update"
+
+# Delete snapshot (merge changes)
+virsh snapshot-delete vm-name "pre-update"
+
+# Delete with blockcommit (external snapshots)
+virsh blockcommit vm-name vda --active --pivot</pre>
+
+  <div class="verdict">
+    <h3>KVM Day-2 Operations: Simpler Than VMware, More Powerful with Scripting</h3>
+    <p>Every vSphere operation maps to a virsh command that can be scripted, automated, and version-controlled. No GUI dependency, no vCenter single point of failure. Live migration enables zero-downtime patching. Templates and cloud-init enable rapid VM provisioning. The learning curve for VMware admins is 1-2 weeks — most concepts are identical, only the commands change.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Day-2 Operations Guide</div>
+</div>
+
+</body>
+</html>

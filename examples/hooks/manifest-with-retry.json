@@ -1,0 +1,152 @@
+{
+  "manifest_version": "1.0",
+  "source": {
+    "type": "local",
+    "path": "/data/vm.vmdk"
+  },
+  "disks": [
+    {
+      "disk_id": "disk0",
+      "path": "/data/vm.vmdk",
+      "format": "vmdk",
+      "checksum": "sha256:abc123..."
+    }
+  ],
+  "hooks": {
+    "pre_extraction": [
+      {
+        "type": "script",
+        "path": "/scripts/notify-slack.sh",
+        "env": {
+          "VM_NAME": "{{ vm_name }}",
+          "STAGE": "{{ stage }}"
+        },
+        "timeout": 30,
+        "continue_on_error": true,
+        "retry": {
+          "max_retries": 3,
+          "initial_delay": 2.0,
+          "strategy": "exponential",
+          "max_delay": 30.0,
+          "retry_on_timeout": true
+        }
+      }
+    ],
+    "post_extraction": [
+      {
+        "type": "http",
+        "url": "https://webhook.site/unique-id",
+        "method": "POST",
+        "body": {
+          "event": "extraction_complete",
+          "vm": "{{ vm_name }}",
+          "timestamp": "{{ timestamp }}"
+        },
+        "timeout": 10,
+        "continue_on_error": true,
+        "retry": {
+          "max_retries": 5,
+          "initial_delay": 1.0,
+          "strategy": "exponential",
+          "max_delay": 60.0,
+          "retry_on_timeout": true
+        }
+      }
+    ],
+    "pre_fix": [
+      {
+        "type": "script",
+        "path": "/scripts/backup-disk.sh",
+        "env": {
+          "DISK_PATH": "{{ disks.0.path }}",
+          "BACKUP_DIR": "/backups"
+        },
+        "timeout": 300,
+        "continue_on_error": false,
+        "retry": {
+          "max_retries": 2,
+          "initial_delay": 5.0,
+          "strategy": "linear",
+          "max_delay": 15.0,
+          "retry_on_timeout": false
+        }
+      }
+    ],
+    "post_validate": [
+      {
+        "type": "python",
+        "module": "migration_validators",
+        "function": "verify_boot_disk",
+        "args": {
+          "disk": "{{ output_path }}",
+          "firmware": "{{ firmware }}"
+        },
+        "timeout": 60,
+        "continue_on_error": false,
+        "retry": {
+          "max_retries": 1,
+          "initial_delay": 3.0,
+          "strategy": "constant",
+          "retry_on_timeout": false
+        }
+      }
+    ]
+  },
+  "__comment": [
+    "Hook Retry Configuration Examples:",
+    "",
+    "Retry Strategies:",
+    "1. exponential (default): Delay doubles each retry (1s, 2s, 4s, 8s, ...)",
+    "2. linear: Delay increases linearly (1s, 2s, 3s, 4s, ...)",
+    "3. constant: Same delay for all retries (1s, 1s, 1s, ...)",
+    "",
+    "Configuration Fields:",
+    "- max_retries: Number of retry attempts (default: 0 = no retries)",
+    "- initial_delay: Starting delay in seconds (default: 1.0)",
+    "- strategy: Backoff strategy (default: exponential)",
+    "- max_delay: Maximum delay cap in seconds (default: 60.0)",
+    "- retry_on_timeout: Retry on timeout errors (default: true)",
+    "",
+    "Exponential Backoff Example (max_retries=3, initial_delay=2.0):",
+    "- Attempt 1: Immediate execution",
+    "- Attempt 2: After 2s delay (2.0 * 2^0)",
+    "- Attempt 3: After 4s delay (2.0 * 2^1)",
+    "- Attempt 4: After 8s delay (2.0 * 2^2)",
+    "",
+    "Linear Backoff Example (max_retries=3, initial_delay=2.0):",
+    "- Attempt 1: Immediate execution",
+    "- Attempt 2: After 2s delay (2.0 * 1)",
+    "- Attempt 3: After 4s delay (2.0 * 2)",
+    "- Attempt 4: After 6s delay (2.0 * 3)",
+    "",
+    "Use Cases:",
+    "",
+    "1. Webhook Notifications (exponential, high retries):",
+    "   Webhooks may fail due to network issues, rate limiting, or service unavailability.",
+    "   Exponential backoff gives the service time to recover.",
+    "   Example: max_retries=5, initial_delay=1.0, strategy=exponential",
+    "",
+    "2. Disk Backup (linear, low retries):",
+    "   Disk operations usually succeed or fail deterministically.",
+    "   A few retries with linear delay can handle transient I/O issues.",
+    "   Example: max_retries=2, initial_delay=5.0, strategy=linear",
+    "",
+    "3. API Validation (constant, moderate retries):",
+    "   API calls may fail due to temporary service issues.",
+    "   Constant delay prevents overwhelming the service.",
+    "   Example: max_retries=3, initial_delay=2.0, strategy=constant",
+    "",
+    "4. Critical Operations (retry_on_timeout=false):",
+    "   For time-sensitive operations, don't retry on timeouts.",
+    "   Only retry on transient errors (network, etc.).",
+    "   Example: retry_on_timeout=false",
+    "",
+    "Best Practices:",
+    "- Use exponential backoff for external services (webhooks, APIs)",
+    "- Use linear for predictable operations (disk I/O, database)",
+    "- Use constant for rate-limited services",
+    "- Set max_delay to prevent excessive wait times",
+    "- Set continue_on_error=true for non-critical hooks",
+    "- Set retry_on_timeout=false for time-critical operations"
+  ]
+}

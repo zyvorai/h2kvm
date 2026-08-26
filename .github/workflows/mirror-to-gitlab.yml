@@ -1,0 +1,48 @@
+name: Mirror to GitLab
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'release/**'
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    name: Mirror main repository to GitLab
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0  # Full history for proper mirroring
+
+      - name: Mirror to GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          # Configure git
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+          # Add GitLab remote
+          git remote add gitlab https://oauth2:${GITLAB_TOKEN}@gitlab.com/ssahani/hyper2kvm.git || true
+
+          # Push all branches and tags
+          echo "🔄 Pushing branches to GitLab..."
+          git push gitlab --all --force
+
+          echo "🏷️  Pushing tags to GitLab..."
+          git push gitlab --tags --force
+
+          echo "✅ Mirror complete!"
+
+      - name: Verify mirror
+        run: |
+          echo "📊 Mirror Status:"
+          echo "  - Source: github.com/ssahani/hyper2kvm"
+          echo "  - Target: gitlab.com/ssahani/hyper2kvm"
+          echo "  - Branch: ${GITHUB_REF#refs/heads/}"
+          echo "  - Commit: ${GITHUB_SHA:0:7}"

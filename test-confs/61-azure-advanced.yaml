@@ -1,0 +1,67 @@
+# SPDX-License-Identifier: Apache-2.0
+# Azure VM migration example - advanced configuration
+# Zero-downtime migration with custom settings and post-processing
+
+cmd: azure
+
+# Azure identity
+azure_subscription: "12345678-1234-1234-1234-123456789012"
+azure_tenant: "87654321-4321-4321-4321-210987654321"
+
+# VM selection
+azure_resource_group: "production-rg"
+azure_vm_names:
+  - "app-server-*"
+  - "database-primary"
+azure_tags: "environment=production,migrate=true"
+azure_power_state: "running"
+
+# Shutdown strategy (force shutdown for consistency)
+azure_shutdown_mode: "deallocate"   # deallocate to free compute resources
+azure_shutdown_force: true          # Force shutdown even though we use snapshots
+azure_shutdown_wait: true           # Wait for clean shutdown
+
+# Export with staging (safer for production)
+azure_use_snapshots: true
+azure_stage_disk: true              # Create temp disk from snapshot for safer export
+azure_disks: "all"
+azure_consistency: "best_effort_quiesce"  # Try application-consistent snapshots
+
+# Resource management
+azure_tag_resources: true
+azure_keep_snapshots: true          # Keep snapshots for backup
+azure_keep_temp_disks: false        # Delete temp disks after export
+azure_run_tag: "prod-migration-2024"
+azure_sas_duration: 7200            # 2 hours for large disks
+
+# Download optimization
+azure_parallel: 8                   # More parallel downloads
+azure_chunk_mb: 8                   # Larger chunks for faster download
+azure_resume: true
+azure_verify_size: true
+azure_strict_verify: true           # Fail on size mismatch (production safety)
+azure_connect_timeout: 60
+azure_read_timeout: 600
+azure_retries: 5
+azure_backoff_base: 2.0
+azure_backoff_cap: 120.0
+
+# Output and post-processing
+output_dir: ./azure-migration
+flatten: true
+out_format: qcow2
+compress: true
+compress_level: 6
+
+# Fixing and optimization
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+
+# Validation
+# libvirt_test: true
+# qemu_test: true
+
+# Reporting
+# report: "migration-report.md"
+# checksum: true

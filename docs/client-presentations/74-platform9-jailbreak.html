@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Platform9 Jailbreak — Escape the Managed KVM Trap</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #92400e, #b45309, #d97706); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 3em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #fbbf24; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; max-width: 750px; }
+  .cover .sub { font-size: 1.1em; opacity: 0.7; max-width: 700px; margin-top: 1em; font-style: italic; }
+  .page { min-height: 100vh; padding: 40px 50px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #d97706; }
+  h3 { font-size: 1.1em; font-weight: 600; margin: 0.8em 0 0.3em; color: #b45309; }
+  .page-dark h3 { color: #fbbf24; }
+  p { margin-bottom: 0.6em; font-size: 0.95em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.2em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.8em 0; font-size: 0.82em; }
+  th { background: #b45309; color: #fff; padding: 8px 10px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .page-light th { background: #d97706; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; } .partial { color: #f59e0b; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 1em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 18px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 1em; font-weight: 600; margin-bottom: 5px; color: #d97706; } .card p { font-size: 0.85em; opacity: 0.85; margin-bottom: 0; }
+  .page-dark .card h4 { color: #fbbf24; }
+  .highlight { background: rgba(217,119,6,0.08); border: 1px solid rgba(217,119,6,0.2); border-radius: 8px; padding: 14px; margin: 1em 0; }
+  .page-dark .highlight { background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.15); }
+  .footer { text-align: center; padding: 15px; font-size: 0.75em; opacity: 0.4; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 1em 0; }
+  .col { border-radius: 10px; padding: 20px; }
+  .col-before { background: #fef2f2; border: 2px solid #fca5a5; }
+  .col-after { background: #f0fdf4; border: 2px solid #86efac; }
+  .col h4 { font-size: 1.1em; font-weight: 700; margin-bottom: 10px; }
+  .col-before h4 { color: #dc2626; }
+  .col-after h4 { color: #16a34a; }
+  .col ul { list-style: none; padding: 0; } .col ul li { font-size: 0.88em; padding: 4px 0; }
+  .col-before ul li::before { content: "\2717 "; color: #ef4444; font-weight: 700; }
+  .col-after ul li::before { content: "\2713 "; color: #22c55e; font-weight: 700; }
+  .steps { counter-reset: step; margin: 1em 0; }
+  .step { display: flex; align-items: flex-start; margin-bottom: 14px; }
+  .step-num { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: #d97706; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1em; margin-right: 14px; }
+  .page-dark .step-num { background: #fbbf24; color: #0f111a; }
+  .step-body h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 2px; }
+  .step-body p { font-size: 0.85em; opacity: 0.85; margin-bottom: 0; }
+  code { font-family: 'Cascadia Code', 'Fira Code', monospace; background: rgba(217,119,6,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.88em; }
+  .page-dark code { background: rgba(251,191,36,0.12); color: #fbbf24; }
+  .workflow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 1em 0; }
+  .wf-step { text-align: center; padding: 18px 12px; border-radius: 10px; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); }
+  .wf-step .wf-num { font-size: 1.8em; font-weight: 800; color: #fbbf24; }
+  .wf-step h4 { font-size: 0.95em; margin: 6px 0 4px; color: #fbbf24; }
+  .wf-step p { font-size: 0.8em; opacity: 0.75; margin: 0; }
+  .cta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 1.5em 0; }
+  .cta-card { text-align: center; padding: 20px 14px; border-radius: 10px; background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .cta-card .cta-num { font-size: 2em; font-weight: 800; color: #d97706; }
+  .cta-card h4 { font-size: 0.95em; margin: 6px 0 4px; color: #92400e; }
+  .cta-card p { font-size: 0.82em; opacity: 0.7; margin: 0; }
+  .note { font-size: 0.78em; opacity: 0.55; margin-top: 1em; font-style: italic; }
+  .total-row td { font-weight: 700; border-top: 2px solid rgba(255,255,255,0.2); }
+  .page-light .total-row td { border-top: 2px solid #d97706; }
+  .savings-row td { font-weight: 700; color: #22c55e; font-size: 0.95em; }
+</style>
+</head>
+<body>
+
+<!-- Page 1: Cover -->
+<div class="cover">
+  <h1>Platform9 <span>Jailbreak</span></h1>
+  <h2>Escape the Managed KVM Trap</h2>
+  <p style="font-size: 1.05em; opacity: 0.85; max-width: 780px; margin-top: 0.8em;">Migrate from Platform9 Managed OpenStack/KVM to Self-Managed KVM with hyper2kvm + hypersdk</p>
+  <p class="sub">"Your VMs. Your infrastructure. Your freedom."</p>
+</div>
+
+<!-- Page 2: The Platform9 Lock-In Problem -->
+<div class="page page-light">
+  <h2 class="st">The Platform9 <span>Lock-In Problem</span></h2>
+  <p class="sub">You own the hardware. You own the VMs. Why are you paying someone else to manage them?</p>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Recurring Fees</h4>
+      <p>Platform9 charges per-node per-month for the privilege of managing YOUR hardware. At ~$250/node/month for the Freedom tier, a 50-node cluster costs $150,000/year — for a management layer on top of open-source KVM.</p>
+    </div>
+    <div class="card">
+      <h4>Control Plane Dependency</h4>
+      <p>Platform9's cloud-hosted control plane manages your on-prem nodes. If Platform9 experiences an outage, or if you stop paying, your management interface disappears. Your VMs keep running, but you lose visibility and control.</p>
+    </div>
+    <div class="card">
+      <h4>Limited Customization</h4>
+      <p>Platform9 abstracts away libvirt and KVM behind their own API. You cannot customize VM XML configs, use advanced libvirt features like NUMA pinning or PCI passthrough, or integrate with your own automation tooling directly.</p>
+    </div>
+    <div class="card">
+      <h4>Vendor Lock-In</h4>
+      <p>Migrating away from Platform9 requires re-exporting all VMs, rebuilding domain configurations, and losing Platform9-specific metadata and networking setup. The longer you stay, the deeper the lock-in.</p>
+    </div>
+  </div>
+  <div class="highlight">
+    <p style="margin: 0; font-size: 0.9em;"><strong>The irony:</strong> Platform9 runs on top of open-source KVM and OpenStack. You're paying a premium for a management layer over software that is already free. The question isn't whether you <em>can</em> self-manage — it's whether you have the right migration tooling to make the switch painless.</p>
+  </div>
+</div>
+
+<!-- Page 3: The Escape Path -->
+<div class="page page-dark">
+  <h2 class="st">The Escape Path — <span>hyper2kvm + hypersdk</span></h2>
+  <p class="sub">A four-step jailbreak from Platform9 to self-managed KVM freedom.</p>
+  <div class="workflow">
+    <div class="wf-step">
+      <div class="wf-num">1</div>
+      <h4>Export VMs</h4>
+      <p>Use hypersdk's OpenStack provider adapter to export VMs from Platform9. Parallel export with live progress streaming. No Platform9 API required — goes straight to the OpenStack layer underneath.</p>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">2</div>
+      <h4>Convert &amp; Fix</h4>
+      <p>hyper2kvm's VMCraft engine performs offline disk manipulation: driver injection, initramfs regeneration, fstab UUID stabilization, GRUB repair. No libguestfs appliance needed.</p>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">3</div>
+      <h4>Deploy</h4>
+      <p>Deploy to self-managed KVM/libvirt with auto-generated domain XML, or to KubeVirt for cloud-native VM management. One pipeline, dual targets.</p>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">4</div>
+      <h4>Monitor</h4>
+      <p>Use the hyper2kvm web dashboard with 20+ VM panels for full visibility. No Platform9 dependency. No cloud control plane. Everything runs on your infrastructure.</p>
+    </div>
+  </div>
+  <div class="highlight">
+    <h3 style="margin-top: 0;">Why This Works</h3>
+    <p style="font-size: 0.88em;">Platform9 is built on OpenStack + KVM. Under the hood, your VMs are already KVM guests managed by libvirt. The Platform9 layer adds an abstraction you don't need. hyper2kvm + hypersdk peel off that layer, give you direct libvirt access, and provide a web dashboard that replaces Platform9's management UI — without the monthly bill.</p>
+  </div>
+</div>
+
+<!-- Page 4: Feature Comparison -->
+<div class="page page-light">
+  <h2 class="st">Feature <span>Comparison</span></h2>
+  <p class="sub">Side-by-side capabilities: what you get with Platform9 vs. what you get after the jailbreak.</p>
+  <table>
+    <tr><th style="width:28%">Capability</th><th style="width:36%">Platform9</th><th style="width:36%">hyper2kvm + hypersdk</th></tr>
+    <tr><td><strong>VM management</strong></td><td class="check">&#10003; (their dashboard)</td><td class="check">&#10003; (web dashboard, 20+ panels)</td></tr>
+    <tr><td><strong>KVM/libvirt control</strong></td><td class="partial">Abstracted (limited)</td><td class="check">&#10003; Full access (virsh, XML, API)</td></tr>
+    <tr><td><strong>Cost</strong></td><td class="cross">~$250/node/month</td><td class="check">Contact for pricing*</td></tr>
+    <tr><td><strong>Air-gap support</strong></td><td class="cross">&#10007; (cloud control plane required)</td><td class="check">&#10003; Fully offline capable</td></tr>
+    <tr><td><strong>KubeVirt support</strong></td><td class="partial">Partial</td><td class="check">&#10003; Full lifecycle</td></tr>
+    <tr><td><strong>Multi-cloud export</strong></td><td class="cross">&#10007;</td><td class="check">&#10003; 10 clouds via hypersdk</td></tr>
+    <tr><td><strong>Guest agent insights</strong></td><td class="cross">&#10007;</td><td class="check">&#10003; OS, filesystems, processes</td></tr>
+    <tr><td><strong>Security analysis</strong></td><td>Basic</td><td class="check">&#10003; Exposure scoring</td></tr>
+    <tr><td><strong>VM disk management</strong></td><td>Basic</td><td class="check">&#10003; Hot-plug attach/detach/CDROM</td></tr>
+    <tr><td><strong>Auto disk cleanup</strong></td><td class="cross">&#10007;</td><td class="check">&#10003; Threshold-based</td></tr>
+    <tr><td><strong>Credential store</strong></td><td>Their own</td><td class="check">&#10003; Persisted, auto-reconnect</td></tr>
+    <tr><td><strong>Capacity planning</strong></td><td class="cross">&#10007;</td><td class="check">&#10003; Gauges, top consumers</td></tr>
+    <tr><td><strong>VM create/clone/resize</strong></td><td class="check">&#10003;</td><td class="check">&#10003; CLI + web + API</td></tr>
+    <tr><td><strong>Open source</strong></td><td class="cross">&#10007; Proprietary</td><td class="check">&#10003; Licensed (Zyvor AI Labs)</td></tr>
+  </table>
+</div>
+
+<!-- Page 5: Cost Savings Analysis -->
+<div class="page page-dark">
+  <h2 class="st">Cost Savings <span>Analysis</span></h2>
+  <p class="sub">Three-year total cost of ownership for a 50-node deployment.</p>
+  <table>
+    <tr><th style="width:35%">Item</th><th style="width:32%">Platform9 (50 nodes)</th><th style="width:33%">hyper2kvm + hypersdk</th></tr>
+    <tr><td><strong>License Year 1</strong></td><td class="cross">$150,000</td><td class="check">$0</td></tr>
+    <tr><td><strong>License Year 2</strong></td><td class="cross">$150,000</td><td class="check">$0</td></tr>
+    <tr><td><strong>License Year 3</strong></td><td class="cross">$150,000</td><td class="check">$0</td></tr>
+    <tr><td><strong>Support</strong></td><td>Included</td><td>Lilo Technologies or commercial</td></tr>
+    <tr><td><strong>Migration tooling</strong></td><td>Built-in (to Platform9 only)</td><td>Built-in (any target)</td></tr>
+    <tr class="total-row"><td><strong>3-Year Total</strong></td><td class="cross"><strong>$450,000</strong></td><td class="check"><strong>$0</strong></td></tr>
+    <tr class="savings-row"><td><strong>Savings</strong></td><td>—</td><td><strong>$450,000 (100%)</strong></td></tr>
+  </table>
+  <p class="note">Platform9 pricing is approximately $250/node/month for the Freedom tier. Actual pricing varies by contract size, commitment term, and negotiated discounts. Contact Platform9 for a current quote.</p>
+
+  <div class="highlight" style="margin-top: 1.5em;">
+    <h3 style="margin-top: 0;">What $450K Buys Instead</h3>
+    <div class="card-grid">
+      <div class="card"><h4>More Hardware</h4><p>$450K buys 15-20 additional servers. Expand capacity instead of paying management fees on existing infrastructure.</p></div>
+      <div class="card"><h4>Engineering Talent</h4><p>$450K funds 2-3 full-time engineers for a year. Build internal expertise instead of outsourcing to a vendor.</p></div>
+      <div class="card"><h4>Training &amp; Certification</h4><p>Train your entire ops team on KVM, libvirt, and Kubernetes. Invest in people, not licenses.</p></div>
+      <div class="card"><h4>Other Projects</h4><p>Redirect budget to modernization initiatives, security hardening, or developer tooling that creates competitive advantage.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- Page 6: What You Get After Jailbreak -->
+<div class="page page-light">
+  <h2 class="st">What You Get <span>After Jailbreak</span></h2>
+  <p class="sub">A side-by-side view of life before and after escaping Platform9.</p>
+  <div class="two-col">
+    <div class="col col-before">
+      <h4>Before (Platform9)</h4>
+      <ul>
+        <li>Cloud-dependent control plane</li>
+        <li>Pay-per-node recurring fees ($250/node/month)</li>
+        <li>Limited API — Platform9 abstractions only</li>
+        <li>Vendor lock-in — proprietary management layer</li>
+        <li>No offline / air-gap operation</li>
+        <li>No direct libvirt XML customization</li>
+        <li>No PCI passthrough or NUMA pinning control</li>
+        <li>Outage risk tied to Platform9 cloud availability</li>
+        <li>Migration tooling only works into Platform9</li>
+      </ul>
+    </div>
+    <div class="col col-after">
+      <h4>After (hyper2kvm + hypersdk)</h4>
+      <ul>
+        <li>Self-managed KVM — nothing phones home</li>
+        <li>Licensed* (Zyvor AI Labs)</li>
+        <li>Full libvirt API — virsh, XML, direct qemu access</li>
+        <li>No vendor lock-in — open source, portable</li>
+        <li>Air-gap capable — runs fully offline</li>
+        <li>Web dashboard with 20+ VM management panels</li>
+        <li>KubeVirt + libvirt dual deploy from same pipeline</li>
+        <li>Guest agent insights, security scoring, disk management</li>
+        <li>10-cloud export via hypersdk (migrate from anywhere)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="highlight">
+    <p style="margin: 0; font-size: 0.9em;"><strong>Key insight:</strong> After the jailbreak, you still have all the functionality Platform9 provided — VM lifecycle management, monitoring, a web dashboard — but you also gain capabilities Platform9 never offered: full libvirt control, air-gap operation, multi-cloud migration, and the freedom to customize everything. All for $0/year.</p>
+  </div>
+</div>
+
+<!-- Page 7: hypersdk — The Export Engine -->
+<div class="page page-dark">
+  <h2 class="st">hypersdk — <span>The Export Engine</span></h2>
+  <p class="sub">The Go-based daemon that extracts your VMs from Platform9 and 9 other cloud platforms.</p>
+  <div class="card-grid">
+    <div class="card">
+      <h4>10 Cloud Provider Adapters</h4>
+      <p>OpenStack (Platform9's underlying layer), VMware vSphere, AWS, Azure, GCP, Hyper-V, OCI, Alibaba Cloud, Proxmox — and the list grows. Hexagonal architecture makes adding providers straightforward.</p>
+    </div>
+    <div class="card">
+      <h4>Parallel VM Export</h4>
+      <p>Export multiple VMs simultaneously with live progress streaming. No need to wait for one export to finish before starting the next. Dramatically reduces total migration time for large fleets.</p>
+    </div>
+    <div class="card">
+      <h4>Carbon-Aware Scheduling</h4>
+      <p>Schedule resource-intensive export operations during low-carbon-intensity windows. Meet ESG commitments while migrating. A capability no other migration tool offers.</p>
+    </div>
+    <div class="card">
+      <h4>Job Management &amp; Scheduling</h4>
+      <p>Queue exports, schedule them for off-hours, retry failures automatically. Enterprise-grade job management for large-scale migrations with hundreds of VMs.</p>
+    </div>
+    <div class="card">
+      <h4>REST API (238+ Endpoints)</h4>
+      <p>Full programmatic control over every aspect of the export process. Integrate with your CI/CD pipelines, monitoring systems, or custom automation. OpenAPI documented.</p>
+    </div>
+    <div class="card">
+      <h4>Web Dashboard</h4>
+      <p>Visual management of providers, jobs, and exports. Real-time progress, logs, and status. No CLI required for day-to-day operations — though the CLI is there when you need it.</p>
+    </div>
+  </div>
+  <div class="highlight">
+    <p style="margin: 0; font-size: 0.88em;"><strong>Platform9 escape strategy:</strong> hypersdk connects to the OpenStack API layer that Platform9 runs on top of. It exports VMs using standard OpenStack calls — no Platform9-specific API needed. Your VMs come out as standard disk images ready for hyper2kvm conversion.</p>
+  </div>
+</div>
+
+<!-- Page 8: hyper2kvm — The Conversion Engine -->
+<div class="page page-light">
+  <h2 class="st">hyper2kvm — <span>The Conversion Engine</span></h2>
+  <p class="sub">The Python toolkit that converts exported VMs into production-ready KVM guests.</p>
+  <div class="card-grid">
+    <div class="card">
+      <h4>VMCraft Offline Disk Manipulation</h4>
+      <p>Pure Python + qemu-nbd engine performs all guest fixes without booting the VM or requiring a libguestfs appliance. Faster, lighter, and works in constrained environments.</p>
+    </div>
+    <div class="card">
+      <h4>Windows VirtIO Driver Injection</h4>
+      <p>Three-layer firstboot mechanism (rhsrvany + Run key + Startup folder) ensures VirtIO drivers are installed on Windows guests. SATA disk bus for immediate boot, VirtIO upgrade post-migration.</p>
+    </div>
+    <div class="card">
+      <h4>initramfs/dracut Regeneration</h4>
+      <p>Rebuilds the initial ramdisk with KVM-appropriate drivers (virtio_blk, virtio_net, virtio_scsi). The VM boots on KVM without the "dracut timeout" that kills most migrations.</p>
+    </div>
+    <div class="card">
+      <h4>fstab UUID Stabilization</h4>
+      <p>Fixes device-name-based mount entries (e.g., /dev/sda1) to UUID-based mounts. Prevents boot failures when device naming changes between hypervisors.</p>
+    </div>
+    <div class="card">
+      <h4>GRUB Bootloader Repair</h4>
+      <p>Updates GRUB configuration to reference correct devices and modules for KVM. Handles both BIOS and UEFI boot paths, including Secure Boot awareness.</p>
+    </div>
+    <div class="card">
+      <h4>Netplan NIC Wildcard Fix</h4>
+      <p>Replaces hardcoded VMware NIC names (ens33, ens160) with wildcard match patterns. Network comes up automatically on KVM without manual reconfiguration.</p>
+    </div>
+  </div>
+  <div class="highlight">
+    <p style="margin: 0; font-size: 0.9em;"><strong>Web dashboard:</strong> 75+ API endpoints power a full management interface — VM lifecycle, disk operations, guest agent insights, security analysis, capacity planning, and more. This is what replaces the Platform9 dashboard after your jailbreak.</p>
+  </div>
+</div>
+
+<!-- Page 9: Migration Steps -->
+<div class="page page-dark">
+  <h2 class="st">Migration <span>Steps</span></h2>
+  <p class="sub">Six steps from Platform9 captivity to KVM freedom. Most migrations complete in hours, not weeks.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Install the Tools</h4>
+        <p><code>pip install hyper2kvm</code> for the conversion engine. <code>go install hypersdk</code> for the export daemon. Both install in under a minute with zero external dependencies beyond Python 3.10+ and Go 1.22+.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Export from Platform9</h4>
+        <p><code>hyperexport --provider openstack --vm my-vm --output /tmp/export</code> — hypersdk connects to the OpenStack layer beneath Platform9 and exports your VM's disk images with full progress streaming. Works with any OpenStack credentials.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Convert &amp; Deploy</h4>
+        <p><code>h2kvmctl --vmdk /tmp/export/disk.qcow2 --emit-domain-xml --virsh-define</code> — converts the disk image, applies all offline fixes (initramfs, fstab, GRUB, network), generates libvirt XML, and defines the VM in one command.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Verify</h4>
+        <p>Open <code>https://host:5070</code> in your browser to see the VM running in the hyper2kvm web dashboard. All 20+ panels are live: CPU, memory, disk I/O, network, guest agent info, security analysis.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Repeat for Remaining VMs</h4>
+        <p>Use batch mode for fleet migrations: define all VMs in a YAML file and let hyper2kvm process them in parallel. The zkvm TUI provides a guided wizard for operators who prefer interactive workflows.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h4>Decommission Platform9</h4>
+        <p>Once all VMs are running on self-managed KVM, cancel your Platform9 subscription. Save $150,000/year (50 nodes) or $450,000 over three years. Redirect budget to hardware, talent, or other projects.</p>
+      </div>
+    </div>
+  </div>
+  <div class="highlight">
+    <p style="margin: 0; font-size: 0.88em;"><strong>Risk mitigation:</strong> Run both Platform9 and self-managed KVM in parallel during migration. Verify each VM works on KVM before decommissioning it on Platform9. Zero downtime, zero data loss.</p>
+  </div>
+</div>
+
+<!-- Page 10: Call to Action -->
+<div class="page page-light">
+  <h2 class="st">Ready to <span>Break Free?</span></h2>
+  <p class="sub">Stop paying for management of infrastructure you already own. The tools are free. The path is proven.</p>
+  <div class="cta-grid">
+    <div class="cta-card">
+      <div class="cta-num">10m</div>
+      <h4>Install Time</h4>
+      <p>pip install + go install. Both tools ready in under ten minutes on any Linux system.</p>
+    </div>
+    <div class="cta-card">
+      <div class="cta-num">3</div>
+      <h4>Steps to Migrate</h4>
+      <p>Export, convert, deploy. Each VM migrates with a single command per step.</p>
+    </div>
+    <div class="cta-card">
+      <div class="cta-num">20+</div>
+      <h4>Dashboard Panels</h4>
+      <p>Full VM management UI replaces Platform9's dashboard. No feature gap.</p>
+    </div>
+    <div class="cta-card">
+      <div class="cta-num">Licensed*</div>
+      <h4>Licensing</h4>
+      <p>Proprietary (Zyvor AI Labs). Contact for pricing.* No per-node fees. No subscriptions.</p>
+    </div>
+  </div>
+
+  <div class="highlight" style="text-align: center; padding: 24px;">
+    <h3 style="margin-top: 0; font-size: 1.2em;">Get Started Today</h3>
+    <p style="font-size: 1em; margin-bottom: 0.8em;">
+      <strong>hyper2kvm:</strong> <code>github.com/ssahani/hyper2kvm</code><br>
+      <strong>hypersdk:</strong> <code>github.com/ssahani/hypersdk</code>
+    </p>
+    <p style="font-size: 0.95em; margin-bottom: 0;">Schedule a migration assessment — we'll analyze your Platform9 deployment and provide a step-by-step jailbreak plan tailored to your environment.</p>
+  </div>
+
+  <div class="footer">
+    <p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit — Break free from vendor lock-in</p>
+  </div>
+</div>
+
+</body>
+</html>

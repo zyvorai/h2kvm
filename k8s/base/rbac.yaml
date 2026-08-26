@@ -1,0 +1,39 @@
+---
+# ServiceAccount for hyper2kvm pods
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hyper2kvm
+  namespace: vm-migration
+  labels:
+    app.kubernetes.io/name: hyper2kvm
+    app.kubernetes.io/part-of: hyper2kvm
+
+---
+# ClusterRole for privileged hyper2kvm operations
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: hyper2kvm:privileged
+rules:
+  # Allow use of privileged PSP
+  - apiGroups: ['policy']
+    resources: ['podsecuritypolicies']
+    verbs: ['use']
+    resourceNames:
+      - hyper2kvm-privileged
+
+---
+# ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: hyper2kvm:privileged
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hyper2kvm:privileged
+subjects:
+  - kind: ServiceAccount
+    name: hyper2kvm
+    namespace: vm-migration

@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hyper2kvm-batch-config
+  namespace: vm-migration
+data:
+  batch.yaml: |
+    command: local
+    batch_manifest: /etc/hyper2kvm/manifest.json
+    batch_parallel: 4
+    batch_continue_on_error: true
+    output_dir: /data/output
+    out_format: qcow2
+    compress: true
+    fstab_mode: stabilize-all
+    regen_initramfs: true
+    update_grub: true
+    verbose: 1
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hyper2kvm-batch-manifest
+  namespace: vm-migration
+data:
+  manifest.json: |
+    {
+      "migrations": [
+        {
+          "vmdk": "/data/vmdk/web-01.vmdk",
+          "to_output": "web-01.qcow2",
+          "description": "Web server 1"
+        },
+        {
+          "vmdk": "/data/vmdk/web-02.vmdk",
+          "to_output": "web-02.qcow2",
+          "description": "Web server 2"
+        }
+      ]
+    }

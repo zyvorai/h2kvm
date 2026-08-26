@@ -1,0 +1,38 @@
+# Export RHEL 10.2 from vSphere → libvirt (via ovftool)
+# Env vars required:
+#   export VC_PASSWORD='VCENTER@redhat2025'
+#   export PATH=/opt/ovftool:$PATH
+
+cmd: vsphere
+vs_action: ovftool_export
+
+# vCenter connection
+vcenter: 10.73.213.134
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+vc_insecure: true
+dc_name: data
+
+# ovftool settings
+ovftool_no_ssl_verify: true
+ovftool_accept_all_eulas: true
+
+# VM to export
+vm_name: esx8.0-rhel10.2-x86_64-efi
+
+# Disk processing
+flatten: true
+to_output: rhel10.2.qcow2
+out_format: qcow2
+compress: true
+output_dir: ./output-rhel10
+
+# Fixes
+regen_initramfs: true
+fstab_mode: stabilize-all
+
+# libvirt
+emit_domain_xml: true
+uefi: true
+
+verbose: 1

@@ -1,0 +1,112 @@
+# ============================================
+# End-to-End: vCenter → libvirt (Photon OS / any Linux)
+# ============================================
+# Single-command pipeline: export VM from vCenter via ovftool, convert
+# to qcow2, apply guest fixes (fstab, initramfs, vmware-tools), generate
+# libvirt domain XML, define in virsh, and boot-test.
+#
+# The entire pipeline runs automatically — ovftool export chains into
+# conversion, guest fixes, and libvirt import in one command.
+#
+# Prerequisites:
+#
+#   1. Install OVF Tool (required for this config):
+#      Download from: https://developer.broadcom.com/tools/open-virtualization-format-ovf-tool/latest
+#      sudo mkdir -p /opt/ovftool
+#      sudo unzip VMware-ovftool-*.zip -d /opt/ovftool
+#      sudo ln -sf /opt/ovftool/ovftool /usr/local/bin/ovftool
+#      ovftool --version
+#
+#   2. Install govc (optional, for VM discovery):
+#      curl -L https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x86_64.tar.gz \
+#        | sudo tar xzf - -C /usr/local/bin govc
+#      chmod +x /usr/local/bin/govc
+#      govc version
+#
+#   3. Install pyvmomi:
+#      pip install pyvmomi
+#
+#   4. Install qemu-img + libguestfs:
+#      # Fedora/RHEL:  dnf install qemu-img libguestfs-tools
+#      # Debian/Ubuntu: apt install qemu-utils libguestfs-tools
+#
+#   5. Install OVMF (for UEFI boot):
+#      # Fedora/RHEL:  dnf install edk2-ovmf
+#      # Debian/Ubuntu: apt install ovmf
+#
+# Discover VMs on vCenter:
+#   export GOVC_URL='https://10.73.213.134/sdk'
+#   export GOVC_USERNAME='administrator@vsphere.local'
+#   export GOVC_PASSWORD='VCENTER@redhat2025'
+#   export GOVC_INSECURE=1
+#   export GOVC_DATACENTER='data'
+#   govc ls /data/vm/
+#
+# Usage:
+#   sudo ./h2kvmctl --config photon-vcenter-to-libvirt.yaml
+# ============================================
+
+cmd: vsphere
+
+# Export method: ovftool_export or export_vm (govc)
+#
+# Option A — OVF Tool (current):
+vs_action: ovftool_export
+#
+# Option B — govc (uncomment below, comment out ovftool lines above):
+# vs_action: export_vm
+# export_mode: ovf_export
+# vs_control_plane: govc
+# govc_url: "https://10.73.213.134/sdk"
+# govc_password_env: VC_PASSWORD
+# govc_insecure: true
+# govc_datacenter: data
+# govc_export_remove_cdroms: true
+
+# ── vCenter connection ──
+vcenter: 10.73.213.134
+vc_user: administrator@vsphere.local
+vc_password: VCENTER@redhat2025
+vc_insecure: true
+dc_name: data
+
+# ── ovftool ──
+ovftool_no_ssl_verify: true
+ovftool_accept_all_eulas: true
+
+# ── VM to export (edit this) ──
+vm_name: esx8.0-rhel10.2-x86_64-efi
+
+# ── Disk processing ──
+output_dir: ./output-vcenter-e2e
+flatten: true
+to_output: vcenter-vm.qcow2
+out_format: qcow2
+compress: true
+
+# ── Guest fixes ──
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+
+# ── libvirt domain XML ──
+emit_domain_xml: true
+virsh_define: true
+memory: 2048
+vcpus: 2
+uefi: true
+machine: q35
+disk_bus: virtio
+disk_cache: none
+net_model: virtio
+libvirt_network: default
+serial_console: true
+graphics: vnc
+guest_os: linux
+
+# ── Boot test ──
+libvirt_test: true
+keep_domain: true
+timeout: 120
+
+verbose: 1

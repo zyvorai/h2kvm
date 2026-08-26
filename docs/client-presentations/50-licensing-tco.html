@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Licensing &amp; TCO Deep-Dive — Broadcom Changes, True Cost Modeling &amp; 5-Year Savings</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #450a0a, #7f1d1d, #b91c1c); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #fca5a5; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(252,165,165,0.2); border: 1px solid rgba(252,165,165,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #1a0505; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #fca5a5; }
+  .page-light h2.st span { color: #7f1d1d; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #fca5a5; }
+  .page-light h3 { color: #7f1d1d; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #7f1d1d; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #fca5a5; }
+  .page-light .card h4 { color: #7f1d1d; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  pre { background: #450a0a; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(252,165,165,0.08); border: 1px solid rgba(252,165,165,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .alert { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .alert h4 { color: #ef4444; font-size: 0.92em; margin-bottom: 3px; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(69,10,10,0.15), rgba(127,29,29,0.08)); border: 2px solid #b91c1c; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #fca5a5; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Licensing &amp; <span>TCO Deep-Dive</span></h1>
+  <h2>Broadcom Changes, True Cost Modeling &amp; 5-Year Savings</h2>
+  <p class="sub">Broadcom's acquisition of VMware changed everything: perpetual licenses eliminated, prices increased 2-5x, bundles forced, and small customers dropped. This presentation provides line-by-line cost analysis comparing VMware's new pricing to KVM alternatives at every scale — from 10 VMs to 1,000 VMs — with 5-year projections.</p>
+  <div class="badge">Broadcom Impact | Per-Core Pricing | Bundle Analysis | 5-Year TCO | Hidden Costs | Migration ROI</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Broadcom <span>Licensing Changes</span></h2>
+  <p class="sub">What changed in 2024-2025 and why organizations are forced to re-evaluate.</p>
+
+  <h3>Key Changes Under Broadcom</h3>
+  <table>
+    <tr><th style="width:25%">Change</th><th style="width:25%">Before (VMware)</th><th style="width:25%">After (Broadcom)</th><th style="width:25%">Impact</th></tr>
+    <tr><td>License model</td><td>Perpetual + annual SnS</td><td>Subscription only (no perpetual)</td><td>Never own software; pay forever or lose access</td></tr>
+    <tr><td>Pricing unit</td><td>Per-socket</td><td>Per-core (min 16 cores)</td><td>2-5x price increase for modern CPUs (32-128 cores)</td></tr>
+    <tr><td>Product bundles</td><td>A la carte (buy what you need)</td><td>Forced bundles (VMware Cloud Foundation)</td><td>Pay for NSX, vSAN even if not used</td></tr>
+    <tr><td>Small customer support</td><td>Partners, resellers, online</td><td>Direct Broadcom only (many partners dropped)</td><td>10-50 VM customers lose access to support</td></tr>
+    <tr><td>Perpetual license status</td><td>Valid indefinitely</td><td>End-of-support; no patches after renewal lapse</td><td>Existing perpetual licenses become worthless</td></tr>
+    <tr><td>Multi-year discounts</td><td>Available (10-20%)</td><td>3-year minimum commitment required</td><td>Locked in for 3 years at inflated prices</td></tr>
+    <tr><td>Free ESXi</td><td>Free hypervisor available</td><td>Discontinued</td><td>Lab/test/small deployments need paid license</td></tr>
+    <tr><td>Audit frequency</td><td>Occasional</td><td>Aggressive compliance audits</td><td>Surprise true-up costs; audit disruption</td></tr>
+  </table>
+
+  <div class="alert">
+    <h4>Price Increase Examples (Real Customer Reports)</h4>
+    <p>A 100-VM customer on vSphere Standard saw their renewal quote increase from $45K/yr to $187K/yr (315% increase). A 500-VM enterprise was quoted $1.2M/yr for VMware Cloud Foundation vs $350K/yr previously. Small businesses with 10-20 VMs received "minimum order" requirements of $100K+ or were told to find a different vendor.</p>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Per-Core <span>Pricing Analysis</span></h2>
+  <p class="sub">How per-core pricing dramatically increases costs for modern hardware.</p>
+
+  <h3>Per-Socket vs Per-Core Cost Impact</h3>
+  <table>
+    <tr><th style="width:15%">Server Config</th><th style="width:10%">Sockets</th><th style="width:10%">Cores/Socket</th><th style="width:10%">Total Cores</th><th style="width:15%">Old Price (per-socket)</th><th style="width:15%">New Price (per-core)</th><th style="width:10%">Increase</th><th style="width:15%">Notes</th></tr>
+    <tr><td>Entry (old HW)</td><td>1</td><td>8</td><td>8</td><td>$2,875</td><td>$4,600 (16 min)</td><td class="cross">60%</td><td>16-core minimum applies</td></tr>
+    <tr><td>Small server</td><td>1</td><td>16</td><td>16</td><td>$2,875</td><td>$4,600</td><td class="cross">60%</td><td>Matches minimum</td></tr>
+    <tr><td>Mid-range</td><td>2</td><td>24</td><td>48</td><td>$5,750</td><td>$13,800</td><td class="cross">140%</td><td>Common config today</td></tr>
+    <tr><td>Standard</td><td>2</td><td>32</td><td>64</td><td>$5,750</td><td>$18,400</td><td class="cross">220%</td><td>Dell R760 typical</td></tr>
+    <tr><td>High-density</td><td>2</td><td>48</td><td>96</td><td>$5,750</td><td>$27,600</td><td class="cross">380%</td><td>AMD EPYC</td></tr>
+    <tr><td>Maximum</td><td>2</td><td>64</td><td>128</td><td>$5,750</td><td>$36,800</td><td class="cross">540%</td><td>AMD EPYC 9654</td></tr>
+  </table>
+  <p style="font-size:0.82em;">Based on VMware vSphere Standard per-core pricing (~$287.50/core). Enterprise Plus is higher. VCF bundle adds NSX + vSAN costs.</p>
+
+  <h3>The Modern CPU Penalty</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Why Per-Core Hits Hardest Now</h4>
+      <ul>
+        <li>CPU cores doubled every 3-4 years since 2018</li>
+        <li>2018: typical server = 2x 12-core = 24 cores</li>
+        <li>2024: typical server = 2x 32-core = 64 cores</li>
+        <li>2025: AMD EPYC = 2x 96-core = 192 cores</li>
+        <li>Per-core pricing punishes hardware upgrades</li>
+        <li>Perverse incentive: buy fewer cores (slower) to save license cost</li>
+        <li>Or: switch to KVM (license cost = $0 regardless of core count)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>KVM: $0 Per Core, Forever</h4>
+      <ul>
+        <li>KVM is part of the Linux kernel (GPLv2)</li>
+        <li>No per-core, per-socket, per-VM, or per-CPU licensing</li>
+        <li>Buy the biggest CPU you want — no penalty</li>
+        <li>AMD EPYC 9654 (192 cores): VMware = $55,200/yr; KVM = $0</li>
+        <li>Hardware upgrades never increase software cost</li>
+        <li>No audit risk, no true-up, no surprise bills</li>
+        <li>Optional: RHEL subscription ($799/host/yr) for support</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">5-Year TCO <span>Comparison</span></h2>
+  <p class="sub">Complete total cost of ownership for three deployment sizes.</p>
+
+  <h3>Scenario A: Small (20 VMs, 2 Hosts, 32 cores each)</h3>
+  <table>
+    <tr><th style="width:30%">Cost Category</th><th style="width:15%">VMware (5yr)</th><th style="width:15%">KVM + RHEL (5yr)</th><th style="width:15%">KVM + Rocky (5yr)</th><th style="width:25%">Notes</th></tr>
+    <tr><td>Hypervisor licensing</td><td>$92,000</td><td>$0</td><td>$0</td><td>VCF per-core x 64 cores x 5yr</td></tr>
+    <tr><td>OS subscriptions</td><td>Included</td><td>$8,000</td><td>$0</td><td>RHEL: $799/host/yr x 2 x 5</td></tr>
+    <tr><td>Hardware (2 servers)</td><td>$24,000</td><td>$24,000</td><td>$24,000</td><td>Same hardware</td></tr>
+    <tr><td>Migration cost</td><td>$0</td><td>$10,000</td><td>$10,000</td><td>One-time labor (h2kvmctl included*)</td></tr>
+    <tr><td>Training</td><td>$0</td><td>$5,000</td><td>$5,000</td><td>KVM training for 2 admins</td></tr>
+    <tr><td>Operations (5yr)</td><td>$125,000</td><td>$125,000</td><td>$125,000</td><td>Same admin effort</td></tr>
+    <tr><td><strong>5-Year Total</strong></td><td><strong>$241,000</strong></td><td><strong>$172,000</strong></td><td><strong>$164,000</strong></td><td></td></tr>
+    <tr><td><strong>5-Year Savings</strong></td><td>—</td><td><strong>$69,000 (29%)</strong></td><td><strong>$77,000 (32%)</strong></td><td></td></tr>
+  </table>
+
+  <h3>Scenario B: Medium (100 VMs, 5 Hosts, 64 cores each)</h3>
+  <table>
+    <tr><th style="width:30%">Cost Category</th><th style="width:15%">VMware (5yr)</th><th style="width:15%">KVM + RHEL (5yr)</th><th style="width:15%">KVM + Rocky (5yr)</th><th style="width:25%">Notes</th></tr>
+    <tr><td>Hypervisor licensing</td><td>$460,000</td><td>$0</td><td>$0</td><td>VCF x 320 cores x 5yr</td></tr>
+    <tr><td>OS subscriptions</td><td>Included</td><td>$20,000</td><td>$0</td><td>RHEL x 5 hosts x 5yr</td></tr>
+    <tr><td>Hardware (5 servers)</td><td>$125,000</td><td>$125,000</td><td>$125,000</td><td>Same</td></tr>
+    <tr><td>Migration</td><td>$0</td><td>$45,000</td><td>$45,000</td><td>One-time</td></tr>
+    <tr><td>Training</td><td>$0</td><td>$15,000</td><td>$15,000</td><td>3 admins</td></tr>
+    <tr><td>Operations (5yr)</td><td>$375,000</td><td>$375,000</td><td>$375,000</td><td>Same</td></tr>
+    <tr><td><strong>5-Year Total</strong></td><td><strong>$960,000</strong></td><td><strong>$580,000</strong></td><td><strong>$560,000</strong></td><td></td></tr>
+    <tr><td><strong>5-Year Savings</strong></td><td>—</td><td><strong>$380,000 (40%)</strong></td><td><strong>$400,000 (42%)</strong></td><td></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">Scenario C: <span>Large Enterprise</span></h2>
+  <p class="sub">500 VMs, 20 hosts, 96-core AMD EPYC — where per-core pricing hurts most.</p>
+
+  <h3>500 VMs, 20 Hosts, 96 Cores Each (1,920 total cores)</h3>
+  <table>
+    <tr><th style="width:30%">Cost Category</th><th style="width:15%">VMware VCF (5yr)</th><th style="width:15%">KVM + RHEL (5yr)</th><th style="width:15%">KVM + Rocky (5yr)</th><th style="width:25%">Notes</th></tr>
+    <tr><td>Hypervisor licensing</td><td>$2,760,000</td><td>$0</td><td>$0</td><td>VCF ~$287/core x 1920 x 5yr</td></tr>
+    <tr><td>vCenter + add-ons</td><td>$175,000</td><td>$0</td><td>$0</td><td>vCenter + vROps + Log Insight</td></tr>
+    <tr><td>OS subscriptions</td><td>Included</td><td>$80,000</td><td>$0</td><td>RHEL x 20 hosts x 5yr</td></tr>
+    <tr><td>Hardware (20 servers)</td><td>$800,000</td><td>$800,000</td><td>$800,000</td><td>Same hardware</td></tr>
+    <tr><td>Migration</td><td>$0</td><td>$90,000</td><td>$90,000</td><td>One-time (500 VMs, 2 engineers, 12 weeks)</td></tr>
+    <tr><td>Training</td><td>$0</td><td>$25,000</td><td>$25,000</td><td>5 admins, certifications</td></tr>
+    <tr><td>Operations (5yr)</td><td>$1,250,000</td><td>$1,250,000</td><td>$1,250,000</td><td>Same staffing</td></tr>
+    <tr><td><strong>5-Year Total</strong></td><td><strong>$4,985,000</strong></td><td><strong>$2,245,000</strong></td><td><strong>$2,165,000</strong></td><td></td></tr>
+    <tr><td><strong>5-Year Savings</strong></td><td>—</td><td><strong>$2,740,000 (55%)</strong></td><td><strong>$2,820,000 (57%)</strong></td><td></td></tr>
+  </table>
+
+  <h3>Summary Across All Scales</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>5-Year Savings by Scale</h4>
+      <table>
+        <tr><th>Scale</th><th>VMs</th><th>VMware 5yr</th><th>KVM 5yr</th><th>Savings</th></tr>
+        <tr><td>Small</td><td>20</td><td>$241K</td><td>$164K</td><td><strong>$77K (32%)</strong></td></tr>
+        <tr><td>Medium</td><td>100</td><td>$960K</td><td>$560K</td><td><strong>$400K (42%)</strong></td></tr>
+        <tr><td>Large</td><td>500</td><td>$4,985K</td><td>$2,165K</td><td><strong>$2,820K (57%)</strong></td></tr>
+      </table>
+      <p><strong>Larger scale = larger savings %</strong> (per-core licensing scales linearly, KVM stays at $0)</p>
+    </div>
+    <div class="card">
+      <h4>Hidden VMware Costs Not Included</h4>
+      <ul>
+        <li>Audit true-up penalties (surprise $50K-$200K)</li>
+        <li>Price increases at renewal (10-30% typical)</li>
+        <li>Consultant fees for VMware-specific projects</li>
+        <li>Vendor lock-in exit costs (if delayed)</li>
+        <li>Opportunity cost of 3-year lock-in commitment</li>
+        <li>Management overhead of license compliance</li>
+        <li><strong>True savings likely 10-20% higher than shown</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>KVM Saves $77K to $2.8M Over 5 Years — Depending on Scale</h3>
+    <p>The math is clear: VMware's per-core subscription model creates an ever-growing cost that scales with hardware upgrades. KVM's cost is $0 regardless of cores, sockets, or VMs. The migration investment (one-time) pays for itself in 3-10 months. Over 5 years, even the smallest deployment saves $77K. hyper2kvm makes the migration technically straightforward — the only remaining question is when, not if.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Licensing &amp; TCO Deep-Dive</div>
+</div>
+
+</body>
+</html>

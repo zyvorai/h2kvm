@@ -1,0 +1,100 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: hyperconversion-operator-alerts
+  namespace: hyper2kvm-system
+  labels:
+    app.kubernetes.io/name: hyperconversion-operator
+    app.kubernetes.io/component: alerts
+spec:
+  groups:
+  - name: hyperconversion.rules
+    interval: 30s
+    rules:
+    # High migration failure rate
+    - alert: HighMigrationFailureRate
+      expr: |
+        (
+          rate(hyperconversion_migrations_total{status="failed"}[5m])
+          /
+          rate(hyperconversion_migrations_total[5m])
+        ) > 0.5
+      for: 10m
+      labels:
+        severity: warning
+        component: hyperconversion-operator
+      annotations:
+        summary: "High migration failure rate detected"
+        description: "More than 50% of migrations are failing in the last 10 minutes"
+
+    # Migration stuck in uploading phase
+    - alert: MigrationStuckInUploading
+      expr: hyperconversion_phase_duration_seconds{phase="uploading"} > 3600
+      for: 5m
+      labels:
+        severity: warning
+        component: hyperconversion-operator
+      annotations:
+        summary: "Migration stuck in uploading phase"
+        description: "A migration has been in uploading phase for more than 1 hour"
+
+    # Operator down
+    - alert: HyperConversionOperatorDown
+      expr: up{job="hyperconversion-operator"} == 0
+      for: 5m
+      labels:
+        severity: critical
+        component: hyperconversion-operator
+      annotations:
+        summary: "HyperConversion operator is down"
+        description: "The HyperConversion operator has been down for more than 5 minutes"
+
+    # High reconciliation error rate
+    - alert: HighReconciliationErrorRate
+      expr: rate(hyperconversion_reconcile_errors_total[5m]) > 1
+      for: 10m
+      labels:
+        severity: warning
+        component: hyperconversion-operator
+      annotations:
+        summary: "High reconciliation error rate"
+        description: "More than 1 reconciliation error per second in the last 10 minutes"
+
+    # Slow migration duration
+    - alert: SlowMigrationDuration
+      expr: |
+        histogram_quantile(0.95,
+          rate(hyperconversion_migration_duration_seconds_bucket[30m])
+        ) > 7200
+      for: 15m
+      labels:
+        severity: info
+        component: hyperconversion-operator
+      annotations:
+        summary: "Slow migration duration detected"
+        description: "95th percentile of migration duration is over 2 hours"
+
+    # Too many active migrations
+    - alert: TooManyActiveMigrations
+      expr: hyperconversion_active_migrations > 10
+      for: 5m
+      labels:
+        severity: info
+        component: hyperconversion-operator
+      annotations:
+        summary: "Too many active migrations"
+        description: "More than 10 migrations are currently active, which may impact cluster performance"
+
+    # DataVolume upload stuck
+    - alert: DataVolumeUploadStuck
+      expr: |
+        hyperconversion_datavolume_progress_percent < 100
+        and
+        changes(hyperconversion_datavolume_progress_percent[30m]) == 0
+      for: 30m
+      labels:
+        severity: warning
+        component: hyperconversion-operator
+      annotations:
+        summary: "DataVolume upload appears stuck"
+        description: "DataVolume {{$labels.name}} in namespace {{$labels.namespace}} has not made progress in 30 minutes"

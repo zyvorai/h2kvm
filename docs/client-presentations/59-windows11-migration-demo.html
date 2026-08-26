@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hyper2kvm Migration Demo — Windows 11 VMware to KVM</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0c4a6e, #0369a1, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.6em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #38bdf8; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 0.95em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 36px 46px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #38bdf8; }
+  .page-light h2.st span { color: #0369a1; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.6em 0 0.25em; color: #38bdf8; }
+  .page-light h3 { color: #0369a1; }
+  p { margin-bottom: 0.5em; font-size: 0.88em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  pre { background: #0f172a; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.72em; line-height: 1.4; font-family: 'JetBrains Mono', 'Fira Code', monospace; margin: 0.5em 0; overflow-x: auto; white-space: pre-wrap; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .page-light pre { background: #1e293b; color: #e8e6df; }
+  .step { display: inline-block; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); padding: 3px 10px; border-radius: 5px; font-size: 0.82em; font-weight: 700; color: #38bdf8; margin-bottom: 0.3em; }
+  .page-light .step { color: #0369a1; background: rgba(3,105,161,0.1); border-color: rgba(3,105,161,0.2); }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.9em; font-weight: 600; margin-bottom: 4px; color: #38bdf8; }
+  .page-light .card h4 { color: #0369a1; }
+  .card p { font-size: 0.78em; margin-bottom: 0; }
+  .screenshot { border: 2px solid rgba(56,189,248,0.4); border-radius: 8px; margin: 0.5em auto; display: block; max-width: 520px; }
+  .highlight { background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .verdict { background: linear-gradient(135deg, rgba(12,74,110,0.2), rgba(3,105,161,0.1)); border: 2px solid #0369a1; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #38bdf8; font-size: 1.1em; margin-bottom: 4px; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .check { color: #22c55e; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.76em; }
+  th { background: #0369a1; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>hyper2kvm <span>Migration Demo</span></h1>
+  <h2>Windows 11 VMware VMDK to KVM &mdash; End-to-End</h2>
+  <p class="sub">Live demonstration: split VMDK flatten, SATA bootstrap boot strategy, offline registry fixes (storahci boot-critical enablement, VMware service disablement), VirtIO driver staging, libvirt domain XML generation with Hyper-V enlightenments, and successful Windows 11 OOBE on KVM.</p>
+  <div class="badge">Windows 11 Home | Split VMDK 13.2 GB | QCOW2 | SATA Bootstrap | Q35/UEFI | Hyper-V | OOBE Verified</div>
+</div>
+
+<!-- PAGE 1: Source & Config -->
+<div class="page page-dark">
+  <h2 class="st">Step 1-2: Source <span>&amp; Configuration</span></h2>
+
+  <div class="step">STEP 1 &mdash; Source VMDK (Split, 4 Extents)</div>
+  <pre>
+$ qemu-img info ~/vmware/win11/win11.vmdk
+image: win11.vmdk
+file format: vmdk
+virtual size: 15 GiB (16106127360 bytes)
+disk size: 13.2 GiB
+Format specific information:
+    create type: twoGbMaxExtentSparse
+    extents:
+        [0]: win11-s001.vmdk  (4.0 GiB)
+        [1]: win11-s002.vmdk  (4.0 GiB)
+        [2]: win11-s003.vmdk  (3.9 GiB)
+        [3]: win11-s004.vmdk  (1.4 GiB)
+
+VMX: firmware=efi  guestOS=windows11-64  memsize=4096  numvcpus=2
+  </pre>
+
+  <div class="step">STEP 2 &mdash; Migration YAML Config</div>
+  <pre>
+cmd: local
+vmdk: ~/vmware/win11/win11.vmdk
+output_dir: ~/out-win11-demo
+flatten: true
+flatten_format: qcow2
+to_output: win11.qcow2
+out_format: qcow2
+guest_os: windows
+virtio_drivers_dir: /tmp/virtio-win
+win_driver_iso: ~/Downloads/virtio-win-0.1.285.iso
+emit_domain_xml: true
+vm_name: win11-demo
+memory: 4096
+vcpus: 2
+machine: q35
+uefi: true
+win_stage: bootstrap        # SATA disk (safe first boot)
+win_hyperv: true             # Hyper-V enlightenments
+win_localtime_clock: true
+libvirt_test: true           # Boot VM after conversion
+timeout: 90
+keep_domain: true
+  </pre>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Single command:</strong> <code>sudo ./h2kvmctl --config win11-demo.yaml</code> &mdash; handles everything: flatten split VMDKs, offline registry fixes, convert, generate Windows domain XML, boot test.</p>
+  </div>
+</div>
+
+<!-- PAGE 2: Migration Pipeline -->
+<div class="page page-light">
+  <h2 class="st">Step 3: Migration <span>Pipeline</span></h2>
+
+  <div class="step">STEP 3a &mdash; Sanity Checks (passed)</div>
+  <pre>
+18:57:31 Sanity check 1/5: args...
+18:57:31 Sanity check 2/5: tools...
+18:57:31 Sanity check 3/5: disk space...
+18:57:31 Sanity check 4/5: permissions...
+18:57:31 Sanity check 5/5: network...
+18:57:31 &#10004; Sanity checks passed
+  </pre>
+
+  <div class="step">STEP 3b &mdash; Flatten Split VMDK to QCOW2 (~70s)</div>
+  <pre>
+18:57:31 Flatten snapshot chain
+18:57:31 Flattening via qemu-img convert (single self-contained image)
+18:57:31 Flattening progress: 0.3% ... 25% ... 50% ... 75% ... 85.4%
+18:58:41 &#10004; Flattened: working-flattened.qcow2 (15 GiB virtual, 13.1 GiB actual)
+  </pre>
+
+  <div class="step">STEP 3c &mdash; Offline Guest Fixes (VMCraft Engine)</div>
+  <pre>
+18:58:42 Opening offline image via qemu-nbd
+18:58:42 Connected to /dev/nbd0
+18:58:42 Detected Windows OS on /dev/nbd0p3
+18:58:42   Product: Windows 11 Home
+18:58:42   OS Name: Windows 11
+18:58:42   Version: 10.0
+18:58:42   Distribution: windows
+18:58:42 &#10004; Offline fixes complete
+  </pre>
+
+  <div class="step">STEP 3d &mdash; Convert to Final QCOW2 (~40s)</div>
+  <pre>
+18:58:59 Convert image &rarr; win11.qcow2
+18:58:59 Converting: working-flattened.qcow2 &rarr; win11.qcow2
+         (in_format=qcow2, out_format=qcow2, compress=False)
+18:58:59 Conversion progress: 0.2% ... 25% ... 50% ... 75% ... 85.4%
+18:59:39 &#10004; Validated: win11.qcow2
+  </pre>
+</div>
+
+<!-- PAGE 3: Windows Fixes & Boot -->
+<div class="page page-dark">
+  <h2 class="st">Step 4: Windows <span>Registry Fixes &amp; Boot</span></h2>
+
+  <div class="step">STEP 4a &mdash; Domain XML Emission (Windows Bootstrap)</div>
+  <pre>
+18:59:23 emit_domain_xml: guest=windows uefi=True name=win11-demo
+18:59:23 &#10004; Domain XML: out-win11-demo/libvirt/win11-demo.xml
+
+Key Windows bootstrap features:
+  Disk bus:        SATA (sda)    &larr; Safe first boot without VirtIO storage driver
+  Driver CDROM:    virtio-win-0.1.285.iso (sdc)
+  Hyper-V:         relaxed + vapic + spinlocks
+  Clock:           localtime + hypervclock timer
+  Guest agent:     VirtIO channel (org.qemu.guest_agent.0)
+  Video:           QXL
+  Graphics:        SPICE
+  </pre>
+
+  <div class="step">STEP 4b &mdash; Libvirt Smoke Test (SATA Bootstrap)</div>
+  <pre>
+18:59:23 Libvirt smoke test (emitted XML)
+18:59:23 Domain: win11-demo
+18:59:23 XML: out-win11-demo/libvirt/win11-demo.xml
+18:59:24 Domain reached RUNNING state after 0s.
+<span class="check">&#10004; Smoke test passed: domain is RUNNING</span>
+  </pre>
+
+  <div class="step">STEP 4c &mdash; VirtIO Deployment (offline registry)</div>
+  <pre>
+Post-boot VirtIO deployment (runs after smoke test confirms SATA boot):
+  &#10004; storahci enabled as boot-critical (Start=0) &larr; AHCI/SATA driver for KVM
+  &#10004; 1 VMware service disabled (vmtoolsd)
+  &#10004; RunOnce batch staged for VirtIO driver install on next boot
+  </pre>
+
+  <div class="step">STEP 5 &mdash; Windows 11 OOBE on KVM</div>
+  <div class="card-grid">
+    <div class="card">
+      <h4>virsh dominfo win11-demo</h4>
+      <pre style="font-size:0.72em; background:rgba(255,255,255,0.04); padding:10px; border-radius:6px;">
+Name:           win11-demo
+State:          running
+CPU(s):         2
+Max memory:     4194304 KiB
+Machine:        pc-q35-10.1
+Firmware:       UEFI (OVMF)
+Disk bus:       SATA (sda)
+CDROM:          virtio-win-0.1.285.iso (sdc)
+Network:        VirtIO (virbr0)
+Hyper-V:        enabled</pre>
+    </div>
+    <div class="card">
+      <h4>Windows 11 OOBE &mdash; Country Selection</h4>
+      <img src="data:image/jpeg;base64,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" alt="Windows 11 OOBE on KVM" class="screenshot" style="width:100%; max-width:450px;"/>
+      <p style="text-align:center; margin-top:4px;">Windows 11 Home &mdash; OOBE country selection<br>Zero BSOD &mdash; migration successful</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: Output & Summary -->
+<div class="page page-light">
+  <h2 class="st">Step 6: Output <span>&amp; Summary</span></h2>
+
+  <div class="step">STEP 6 &mdash; Generated Output Files</div>
+  <pre>
+out-win11-demo/
+  win11.qcow2               14 GB    Final converted image (SATA, UEFI)
+  win11-demo.VARS.fd        128 KB    UEFI NVRAM variables
+  libvirt/
+    win11-demo.xml          1.7 KB    Libvirt domain XML (Q35, SATA, OVMF, Hyper-V)
+  work/
+    working-flattened.qcow2  13 GB    Intermediate flattened image
+  </pre>
+
+  <div class="step">Key Domain XML Features (Windows Bootstrap)</div>
+  <pre>
+&lt;domain type='kvm'&gt;
+  &lt;name&gt;win11-demo&lt;/name&gt;
+  &lt;description&gt;Windows UEFI domain (bootstrap): SATA bootstrap&lt;/description&gt;
+  &lt;memory unit='MiB'&gt;4096&lt;/memory&gt;
+  &lt;vcpu&gt;2&lt;/vcpu&gt;
+  &lt;os&gt;
+    &lt;type arch='x86_64' machine='q35'&gt;hvm&lt;/type&gt;
+    &lt;loader type='pflash'&gt;OVMF_CODE.fd&lt;/loader&gt;
+    &lt;nvram template='OVMF_VARS.fd'/&gt;
+  &lt;/os&gt;
+  &lt;features&gt;&lt;acpi/&gt;&lt;apic/&gt;
+    &lt;hyperv&gt;&lt;relaxed/&gt;&lt;vapic/&gt;&lt;spinlocks retries='8191'/&gt;&lt;/hyperv&gt;
+  &lt;/features&gt;
+  &lt;clock offset='localtime'&gt;&lt;timer name='hypervclock'/&gt;&lt;/clock&gt;
+  &lt;devices&gt;
+    &lt;disk bus='sata' dev='sda'/&gt;           &lt;!-- SATA bootstrap --&gt;
+    &lt;disk device='cdrom'&gt;virtio-win.iso&lt;/disk&gt;  &lt;!-- Driver CDROM --&gt;
+    &lt;interface type='network' model='virtio'/&gt;
+    &lt;channel type='virtio' name='org.qemu.guest_agent.0'/&gt;
+  &lt;/devices&gt;
+&lt;/domain&gt;
+  </pre>
+
+  <h3>Migration Pipeline Summary</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:20%">Step</th><th style="width:25%">Action</th><th style="width:15%">Duration</th><th style="width:35%">Result</th></tr>
+    <tr><td>1</td><td>Sanity checks</td><td>Tools, disk space, permissions</td><td>&lt;1s</td><td class="check">5/5 passed</td></tr>
+    <tr><td>2</td><td>Flatten</td><td>Split VMDK (4 extents) &rarr; QCOW2</td><td>~70s</td><td class="check">working-flattened.qcow2 (15 GiB)</td></tr>
+    <tr><td>3</td><td>Offline fixes</td><td>OS detect, VMCraft engine</td><td>~4s</td><td class="check">Windows 11 Home detected</td></tr>
+    <tr><td>4</td><td>Convert</td><td>Working &rarr; final QCOW2</td><td>~40s</td><td class="check">win11.qcow2 (14 GB)</td></tr>
+    <tr><td>5</td><td>Emit XML</td><td>Windows bootstrap domain XML</td><td>&lt;1s</td><td class="check">Q35, SATA, OVMF, Hyper-V, virtio-win CDROM</td></tr>
+    <tr><td>6</td><td>Boot test</td><td>virsh define + start (emitted XML)</td><td>&lt;1s</td><td class="check">RUNNING state confirmed</td></tr>
+    <tr><td>7</td><td>Registry fixes</td><td>storahci=0, VMware disabled, RunOnce</td><td>~18s</td><td class="check">SATA boot-critical, VirtIO staged</td></tr>
+    <tr><td>8</td><td>OOBE</td><td>Windows 11 first-run setup</td><td>~60s</td><td class="check">Country selection reached, zero BSOD</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>Migration Complete &mdash; Zero BSOD, Zero Manual Intervention</h3>
+    <p style="font-size:0.9em;">
+      VMware Windows 11 Home split VMDK (13.2 GB, 4 extents) &rarr; KVM QCOW2 with SATA + UEFI + Q35<br>
+      Offline fixes: storahci boot-critical, VMware services disabled, VirtIO driver RunOnce staged<br>
+      VM booted on KVM via SATA bootstrap, reached Windows 11 OOBE (country selection)<br>
+      <strong>Total pipeline: ~2 minutes. Single command. Zero BSOD. Zero manual steps.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

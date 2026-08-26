@@ -1,0 +1,76 @@
+# ============================================
+# Complete Workflow: vSphere → libvirt (Ubuntu 20.04 LTS)
+# ============================================
+# Description: Export Ubuntu 20.04 VM from vSphere via govc and prepare for libvirt
+# Use Case: Production migration of Ubuntu 20.04 VMs from VMware to KVM
+# Prerequisites:
+#   - govc installed and configured
+#   - vCenter credentials
+#   - Network access to vCenter
+#   - Target output directory with sufficient space
+# ============================================
+# Command
+{
+  "cmd": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "username": "administrator@vsphere.local",
+  "password_file": "~/.vcenter_password",
+  "datacenter": "Production-DC",
+  "cluster": "Compute-Cluster",
+  "vm_name": "ubuntu-2004-web-server",
+  "vs_action": "export",
+  "export_method": "govc",
+  "export_format": "ova",
+  "create_snapshot": true,
+  "snapshot_name": "pre-migration-$(date +%Y%m%d-%H%M%S)",
+  "snapshot_description": "Snapshot before KVM migration",
+  "snapshot_quiesce": true,
+  "flatten": true,
+  "compress": true,
+  "fix_fstab": true,
+  "fix_grub": true,
+  "fix_initramfs": true,
+  "fix_network": true,
+  "remove_vmware_tools": true,
+  "network_config_type": "netplan",
+  "network_fix_level": "full",
+  "remove_mac_binding": true,
+  "setup_dhcp": true,
+  "bootloader_type": "grub2",
+  "firmware_type": "auto",
+  "regenerate_grub": true,
+  "update_grub_config": true,
+  "update_initramfs": true,
+  "install_virtio_modules": true,
+  "clean_cloud_init": false,
+  "clean_ssh_keys": false,
+  "clean_machine_id": true,
+  "to_output": "/data/kvm/ubuntu-2004-web-server.qcow2",
+  "output_format": "qcow2",
+  "output_dir": "/data/kvm/",
+  "generate_libvirt_xml": true,
+  "libvirt_xml_path": "/data/kvm/ubuntu-2004-web-server.xml",
+  "libvirt_domain_name": "ubuntu-2004-web-server",
+  "memory_mb": 4096,
+  "vcpus": 4,
+  "cpu_mode": "host-passthrough",
+  "machine_type": "q35",
+  "disk_bus": "virtio",
+  "disk_cache": "none",
+  "disk_io": "native",
+  "network_type": "bridge",
+  "network_bridge": "virbr0",
+  "network_model": "virtio",
+  "enable_serial_console": true,
+  "enable_vnc": true,
+  "vnc_listen": "127.0.0.1",
+  "libvirt_test": true,
+  "qemu_test": false,
+  "dry_run": false,
+  "report": "/var/log/migrations/ubuntu-2004-web-server-$(date +%Y%m%d).md",
+  "log_level": "INFO",
+  "verbose": true,
+  "enable_recovery": true,
+  "recovery_checkpoint_dir": "/tmp/hyper2kvm-recovery",
+  "post_migration_script": "#!/bin/bash\n# Import to libvirt\nvirsh define /data/kvm/ubuntu-2004-web-server.xml\n\n# Set autostart\nvirsh autostart ubuntu-2004-web-server\n\n# Start VM\nvirsh start ubuntu-2004-web-server\n\n# Wait for boot\nsleep 30\n\n# Check if VM is running\nvirsh list | grep ubuntu-2004-web-server\n"
+}

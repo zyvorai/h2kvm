@@ -1,0 +1,530 @@
+# ==============================================================================
+# 🚀 Linux First-Boot Scripts and Systemd Service Examples
+# ==============================================================================
+#
+# Demonstrates how to inject custom scripts that run on first boot via systemd.
+# Similar to cloud-init but simpler and more lightweight for specific use cases.
+#
+# Usage:
+#   hyper2kvm --config 97-linux-firstboot-scripts-examples.yaml local
+#
+# Use Cases:
+#   ✅ Network configuration without cloud-init
+#   ✅ Hostname and identity setup
+#   ✅ License activation
+#   ✅ Post-migration cleanup (VMware tools removal, etc.)
+#   ✅ Custom initialization scripts
+#   ✅ Service configuration
+#   ✅ User/SSH key setup
+#
+# How It Works:
+#   1. Creates systemd oneshot service (hyper2kvm-firstboot.service)
+#   2. Service runs scripts in /usr/local/lib/hyper2kvm-firstboot/
+#   3. Scripts execute in order on first boot
+#   4. Service disables itself after successful run
+#   5. Logs to /var/log/hyper2kvm-firstboot.log
+#
+# ==============================================================================
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 1: Basic - Single Inline Script
+# ------------------------------------------------------------------------------------
+# Use case: Simple hostname setup
+cmd: local
+vmdk: /path/to/vm.vmdk
+output_dir: ./out
+to_output: vm-with-hostname.qcow2
+
+# Inline script (simplest format)
+firstboot_scripts:
+  script: |
+    #!/bin/bash
+    echo "Setting hostname to kvm-server"
+    hostnamectl set-hostname kvm-server
+    echo "kvm-server" > /etc/hostname
+
+regen_initramfs: true
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 2: Multiple Scripts with Execution Order
+# ------------------------------------------------------------------------------------
+# Use case: Complete post-migration setup
+cmd: local
+vmdk: /path/to/rhel-vm.vmdk
+output_dir: ./out/configured
+
+firstboot_scripts:
+  service_name: "post-migration-setup"  # Optional custom name
+
+  scripts:
+    # Network configuration (runs first)
+    - name: setup-network
+      order: 10
+      content: |
+        #!/bin/bash
+        echo "Configuring network..."
+
+        # Set static IP (example for RHEL/CentOS)
+        nmcli con mod eth0 ipv4.addresses 192.168.1.100/24
+        nmcli con mod eth0 ipv4.gateway 192.168.1.1
+        nmcli con mod eth0 ipv4.dns "8.8.8.8 8.8.4.4"
+        nmcli con mod eth0 ipv4.method manual
+        nmcli con up eth0
+
+        echo "Network configured"
+
+    # Hostname setup (runs second)
+    - name: set-hostname
+      order: 20
+      content: |
+        #!/bin/bash
+        NEW_HOSTNAME="production-server-01"
+
+        echo "Setting hostname to $NEW_HOSTNAME"
+        hostnamectl set-hostname "$NEW_HOSTNAME"
+
+        # Update /etc/hosts
+        sed -i "s/^127.0.1.1.*/127.0.1.1   $NEW_HOSTNAME/" /etc/hosts
+
+    # Cleanup VMware artifacts (runs third)
+    - name: cleanup-vmware
+      order: 30
+      content: |
+        #!/bin/bash
+        echo "Removing VMware artifacts..."
+
+        # Remove VMware tools if present
+        systemctl stop vmtoolsd 2>/dev/null || true
+        systemctl disable vmtoolsd 2>/dev/null || true
+
+        # Remove VMware-specific udev rules
+        rm -f /etc/udev/rules.d/70-persistent-net.rules
+
+        echo "VMware cleanup complete"
+
+    # Register system (runs fourth)
+    - name: register-system
+      order: 40
+      content: |
+        #!/bin/bash
+        echo "Registering system with management tools..."
+
+        # Example: Register with Satellite/Foreman
+        # subscription-manager register --org=ACME --activationkey=PROD-KEY
+
+        # Or custom registration
+        curl -X POST http://management.example.com/register \
+          -d "hostname=$(hostname)" \
+          -d "ip=$(hostname -I | awk '{print $1}')"
+
+        echo "System registered"
+
+verbose: 2
+report: migration-report.md
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 3: Network Configuration (Static IP)
+# ------------------------------------------------------------------------------------
+# Use case: Configure static networking without cloud-init
+cmd: local
+vmdk: /path/to/ubuntu-vm.vmdk
+output_dir: ./out/static-ip
+
+firstboot_scripts:
+  service_name: "network-setup"
+
+  # Systemd service customization
+  service:
+    Description: "Configure static IP on first boot"
+    After: "network-pre.target"
+    Before: "network.target"
+
+  script: |
+    #!/bin/bash
+    set -e
+
+    echo "Configuring static IP for Ubuntu..."
+
+    # For netplan (Ubuntu 18.04+)
+    cat > /etc/netplan/01-netcfg.yaml <<'EOF'
+    network:
+      version: 2
+      ethernets:
+        ens192:
+          addresses:
+            - 192.168.1.50/24
+          gateway4: 192.168.1.1
+          nameservers:
+            addresses:
+              - 8.8.8.8
+              - 8.8.4.4
+    EOF
+
+    # Apply configuration
+    netplan apply
+
+    echo "Network configuration complete"
+
+regen_initramfs: true
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 4: SSH Key Deployment
+# ------------------------------------------------------------------------------------
+# Use case: Deploy SSH keys for root and users
+cmd: local
+vmdk: /path/to/server.vmdk
+output_dir: ./out/ssh-configured
+
+firstboot_scripts:
+  scripts:
+    - name: deploy-ssh-keys
+      order: 10
+      content: |
+        #!/bin/bash
+        set -e
+
+        echo "Deploying SSH keys..."
+
+        # Root SSH key
+        mkdir -p /root/.ssh
+        chmod 700 /root/.ssh
+
+        cat > /root/.ssh/authorized_keys <<'EOF'
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... admin@workstation
+        EOF
+
+        chmod 600 /root/.ssh/authorized_keys
+
+        # User SSH key
+        USER="sysadmin"
+        if id "$USER" &>/dev/null; then
+          mkdir -p /home/$USER/.ssh
+          chown $USER:$USER /home/$USER/.ssh
+          chmod 700 /home/$USER/.ssh
+
+          cat > /home/$USER/.ssh/authorized_keys <<'EOF'
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD... sysadmin@workstation
+        EOF
+
+          chown $USER:$USER /home/$USER/.ssh/authorized_keys
+          chmod 600 /home/$USER/.ssh/authorized_keys
+        fi
+
+        echo "SSH keys deployed"
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 5: Service Configuration and Firewall
+# ------------------------------------------------------------------------------------
+# Use case: Configure services and firewall on first boot
+cmd: local
+vmdk: /path/to/web-server.vmdk
+output_dir: ./out/web-configured
+
+firstboot_scripts:
+  scripts:
+    - name: configure-firewall
+      order: 10
+      content: |
+        #!/bin/bash
+        echo "Configuring firewall..."
+
+        # For firewalld (RHEL/CentOS)
+        if command -v firewall-cmd &>/dev/null; then
+          firewall-cmd --permanent --add-service=http
+          firewall-cmd --permanent --add-service=https
+          firewall-cmd --permanent --add-service=ssh
+          firewall-cmd --reload
+        fi
+
+        # For ufw (Ubuntu/Debian)
+        if command -v ufw &>/dev/null; then
+          ufw allow 22/tcp
+          ufw allow 80/tcp
+          ufw allow 443/tcp
+          ufw --force enable
+        fi
+
+        echo "Firewall configured"
+
+    - name: configure-services
+      order: 20
+      content: |
+        #!/bin/bash
+        echo "Configuring services..."
+
+        # Enable and start services
+        systemctl enable nginx
+        systemctl start nginx
+
+        systemctl enable php-fpm
+        systemctl start php-fpm
+
+        echo "Services configured"
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 6: Database and Application Setup
+# ------------------------------------------------------------------------------------
+# Use case: Initialize database and deploy application
+cmd: local
+vmdk: /path/to/db-server.vmdk
+output_dir: ./out/db-configured
+
+firstboot_scripts:
+  service:
+    Description: "Database and application initialization"
+    After: "multi-user.target postgresql.service"
+    Environment:
+      - "DB_NAME=production"
+      - "DB_USER=appuser"
+
+  scripts:
+    - name: init-database
+      order: 10
+      content: |
+        #!/bin/bash
+        set -e
+
+        echo "Initializing database..."
+
+        # Wait for PostgreSQL to be ready
+        until pg_isready -h localhost; do
+          sleep 1
+        done
+
+        # Create database and user
+        sudo -u postgres psql <<'EOF'
+        CREATE DATABASE production;
+        CREATE USER appuser WITH ENCRYPTED PASSWORD 'secure-password';
+        GRANT ALL PRIVILEGES ON DATABASE production TO appuser;
+        EOF
+
+        echo "Database initialized"
+
+    - name: deploy-schema
+      order: 20
+      content: |
+        #!/bin/bash
+        set -e
+
+        echo "Deploying database schema..."
+
+        # Run migration scripts
+        PGPASSWORD=secure-password psql -h localhost -U appuser -d production -f /opt/app/schema.sql
+
+        echo "Schema deployed"
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 7: Cloud Provider Integration (Without cloud-init)
+# ------------------------------------------------------------------------------------
+# Use case: Register with cloud metadata service
+cmd: local
+vmdk: /path/to/cloud-vm.vmdk
+output_dir: ./out/cloud-ready
+
+firstboot_scripts:
+  scripts:
+    - name: fetch-cloud-metadata
+      order: 10
+      content: |
+        #!/bin/bash
+        set -e
+
+        echo "Fetching cloud metadata..."
+
+        # AWS EC2-style metadata (if in AWS-compatible environment)
+        if timeout 2 curl -s http://169.254.169.254/latest/meta-data/ &>/dev/null; then
+          INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+          INSTANCE_TYPE=$(curl -s http://169.254.169.254/latest/meta-data/instance-type)
+          AZ=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
+
+          echo "Instance ID: $INSTANCE_ID"
+          echo "Instance Type: $INSTANCE_TYPE"
+          echo "Availability Zone: $AZ"
+
+          # Store metadata
+          cat > /etc/cloud-metadata <<EOF
+        INSTANCE_ID=$INSTANCE_ID
+        INSTANCE_TYPE=$INSTANCE_TYPE
+        AVAILABILITY_ZONE=$AZ
+        EOF
+        fi
+
+        echo "Metadata fetched"
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 8: Multi-VM Batch with Different First-Boot Scripts
+# ------------------------------------------------------------------------------------
+# Use case: Deploy multiple VMs with different configurations
+cmd: local
+parallel_processing: true
+
+vms:
+  # Web server
+  - vmdk: /path/to/web-server.vmdk
+    to_output: web-server.qcow2
+    firstboot_scripts:
+      scripts:
+        - name: setup-webserver
+          content: |
+            #!/bin/bash
+            hostnamectl set-hostname web-server-01
+            systemctl enable --now nginx
+            firewall-cmd --permanent --add-service=http --add-service=https
+            firewall-cmd --reload
+
+  # Database server
+  - vmdk: /path/to/db-server.vmdk
+    to_output: db-server.qcow2
+    firstboot_scripts:
+      scripts:
+        - name: setup-dbserver
+          content: |
+            #!/bin/bash
+            hostnamectl set-hostname db-server-01
+            systemctl enable --now postgresql
+            firewall-cmd --permanent --add-service=postgresql
+            firewall-cmd --reload
+
+  # Application server
+  - vmdk: /path/to/app-server.vmdk
+    to_output: app-server.qcow2
+    firstboot_scripts:
+      scripts:
+        - name: setup-appserver
+          content: |
+            #!/bin/bash
+            hostnamectl set-hostname app-server-01
+            systemctl enable --now application.service
+            firewall-cmd --permanent --add-port=8080/tcp
+            firewall-cmd --reload
+
+output_dir: ./out/batch
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 9: Debug Mode - Keep Service Enabled
+# ------------------------------------------------------------------------------------
+# Use case: Debugging first-boot scripts
+cmd: local
+vmdk: /path/to/test-vm.vmdk
+output_dir: ./out/debug
+
+firstboot_scripts:
+  service_name: "debug-firstboot"
+
+  # Keep service enabled for debugging (won't disable after run)
+  keep_enabled: true
+
+  script: |
+    #!/bin/bash
+    set -x  # Enable debug output
+
+    echo "Debug first-boot script"
+    echo "Hostname: $(hostname)"
+    echo "IP Address: $(hostname -I)"
+    echo "Kernel: $(uname -r)"
+
+    # Your debug commands here
+
+    # To manually disable later:
+    # systemctl disable debug-firstboot.service
+
+verbose: 2
+
+
+# ==============================================================================
+# COMMON USE CASES AND TEMPLATES
+# ==============================================================================
+
+# Network Configuration Templates:
+
+# 1. RHEL/CentOS with NetworkManager (nmcli)
+network_rhel_template: |
+  #!/bin/bash
+  nmcli con mod eth0 ipv4.addresses 192.168.1.100/24
+  nmcli con mod eth0 ipv4.gateway 192.168.1.1
+  nmcli con mod eth0 ipv4.dns "8.8.8.8"
+  nmcli con mod eth0 ipv4.method manual
+  nmcli con up eth0
+
+# 2. Ubuntu/Debian with Netplan
+network_ubuntu_template: |
+  #!/bin/bash
+  cat > /etc/netplan/01-netcfg.yaml <<'EOF'
+  network:
+    version: 2
+    ethernets:
+      ens192:
+        addresses: [192.168.1.100/24]
+        gateway4: 192.168.1.1
+        nameservers:
+          addresses: [8.8.8.8, 8.8.4.4]
+  EOF
+  netplan apply
+
+# 3. Debian with /etc/network/interfaces
+network_debian_template: |
+  #!/bin/bash
+  cat > /etc/network/interfaces <<'EOF'
+  auto lo
+  iface lo inet loopback
+
+  auto eth0
+  iface eth0 inet static
+    address 192.168.1.100
+    netmask 255.255.255.0
+    gateway 192.168.1.1
+    dns-nameservers 8.8.8.8 8.8.4.4
+  EOF
+  systemctl restart networking
+
+# 4. SUSE with wicked
+network_suse_template: |
+  #!/bin/bash
+  cat > /etc/sysconfig/network/ifcfg-eth0 <<'EOF'
+  BOOTPROTO='static'
+  IPADDR='192.168.1.100/24'
+  STARTMODE='auto'
+  EOF
+  wicked ifup eth0
+
+# ==============================================================================
+# TROUBLESHOOTING
+# ==============================================================================
+#
+# If first-boot scripts don't run:
+#   1. Check service status: systemctl status hyper2kvm-firstboot.service
+#   2. View logs: journalctl -u hyper2kvm-firstboot.service
+#   3. Check script log: cat /var/log/hyper2kvm-firstboot.log
+#   4. Verify service is enabled: systemctl is-enabled hyper2kvm-firstboot.service
+#   5. Manually run: bash /usr/local/lib/hyper2kvm-firstboot/run-firstboot.sh
+#
+# To re-run first-boot scripts:
+#   1. Re-enable service: systemctl enable hyper2kvm-firstboot.service
+#   2. Reboot or run manually: systemctl start hyper2kvm-firstboot.service
+#
+# To remove first-boot infrastructure:
+#   systemctl disable hyper2kvm-firstboot.service
+#   rm -f /etc/systemd/system/hyper2kvm-firstboot.service
+#   rm -rf /usr/local/lib/hyper2kvm-firstboot
+#   systemctl daemon-reload
+#
+# ==============================================================================

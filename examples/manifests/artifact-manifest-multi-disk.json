@@ -1,0 +1,154 @@
+{
+  "manifest_version": "1.0",
+  "source": {
+    "provider": "vsphere",
+    "vm_id": "vm-5678",
+    "vm_name": "database-server-01",
+    "datacenter": "DC2",
+    "export_timestamp": "2026-01-21T19:00:00Z",
+    "export_method": "govc-export"
+  },
+  "vm": {
+    "cpu": 8,
+    "mem_gb": 32,
+    "firmware": "bios",
+    "secureboot": false,
+    "os_hint": "linux",
+    "os_version": "Red Hat Enterprise Linux 9.2"
+  },
+  "disks": [
+    {
+      "id": "boot-disk",
+      "source_format": "vmdk",
+      "bytes": 107374182400,
+      "local_path": "/work/job456/artifacts/boot-disk.vmdk",
+      "checksum": "sha256:1a2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "boot_order_hint": 0,
+      "label": "OS Boot Disk (100GB)",
+      "disk_type": "boot"
+    },
+    {
+      "id": "data-disk-1",
+      "source_format": "vmdk",
+      "bytes": 536870912000,
+      "local_path": "/work/job456/artifacts/data-disk-1.vmdk",
+      "checksum": "sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "boot_order_hint": 1,
+      "label": "Database Data (500GB)",
+      "disk_type": "data"
+    },
+    {
+      "id": "data-disk-2",
+      "source_format": "vmdk",
+      "bytes": 1073741824000,
+      "local_path": "/work/job456/artifacts/data-disk-2.vmdk",
+      "checksum": "sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321",
+      "boot_order_hint": 2,
+      "label": "Database Logs (1TB)",
+      "disk_type": "data"
+    }
+  ],
+  "nics": [
+    {
+      "id": "eth0",
+      "mac": "00:50:56:12:34:56",
+      "network": "Production-Network"
+    },
+    {
+      "id": "eth1",
+      "mac": "00:50:56:78:90:ab",
+      "network": "Storage-Network"
+    }
+  ],
+  "notes": [
+    "Multi-disk database server migration",
+    "Boot disk contains OS, data disks contain PostgreSQL data and logs"
+  ],
+  "warnings": [
+    {
+      "stage": "export",
+      "message": "Large data disks detected, export took longer than expected",
+      "timestamp": "2026-01-21T19:15:00Z"
+    }
+  ],
+  "metadata": {
+    "hypersdk_version": "0.1.0",
+    "job_id": "job-456",
+    "created_at": "2026-01-21T19:00:00Z",
+    "tags": {
+      "environment": "production",
+      "team": "database",
+      "application": "postgresql",
+      "criticality": "high"
+    }
+  },
+  "pipeline": {
+    "inspect": {
+      "enabled": true,
+      "collect_guest_info": true
+    },
+    "fix": {
+      "enabled": true,
+      "backup": true,
+      "print_fstab": true,
+      "update_grub": true,
+      "regen_initramfs": true,
+      "fstab_mode": "stabilize-all",
+      "remove_vmware_tools": true
+    },
+    "convert": {
+      "enabled": true,
+      "compress": true,
+      "compress_level": 4
+    },
+    "validate": {
+      "enabled": true,
+      "check_image_integrity": true
+    }
+  },
+  "configuration": {
+    "users": {
+      "create": [
+        {
+          "name": "dbadmin",
+          "uid": 2001,
+          "password": "$6$rounds=656000$SaltForDB$HashedPasswordForDatabase",
+          "groups": ["wheel", "postgres"],
+          "shell": "/bin/bash",
+          "ssh_authorized_keys": [
+            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQ... dbadmin@management"
+          ]
+        }
+      ]
+    },
+    "services": {
+      "enable": ["sshd", "postgresql"],
+      "disable": ["vmware-tools", "open-vm-tools"]
+    },
+    "hostname": {
+      "hostname": "dbserver01",
+      "domain": "prod.example.com",
+      "hosts": [
+        {
+          "ip": "127.0.0.1",
+          "hostname": "localhost"
+        },
+        {
+          "ip": "10.1.0.20",
+          "hostname": "dbserver01.prod.example.com dbserver01"
+        }
+      ]
+    }
+  },
+  "output": {
+    "format": "qcow2"
+  },
+  "options": {
+    "dry_run": false,
+    "verbose": 2,
+    "report": {
+      "enabled": true,
+      "path": "report.json"
+    }
+  }
+}

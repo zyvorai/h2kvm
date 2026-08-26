@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GPU Passthrough &amp; vGPU — AI/ML Workloads on KVM</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1a2e05, #365314, #4d7c0f); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #bef264; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(190,242,100,0.2); border: 1px solid rgba(190,242,100,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0c1005; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #bef264; }
+  .page-light h2.st span { color: #365314; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #bef264; }
+  .page-light h3 { color: #365314; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #365314; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #bef264; }
+  .page-light .card h4 { color: #365314; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #1a2e05; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(190,242,100,0.08); border: 1px solid rgba(190,242,100,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(190,242,100,0.06); }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(26,46,5,0.15), rgba(54,83,20,0.08)); border: 2px solid #4d7c0f; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #bef264; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>GPU Passthrough &amp; <span>vGPU</span></h1>
+  <h2>AI/ML &amp; Graphics Workloads on KVM</h2>
+  <p class="sub">GPU-accelerated workloads are the fastest-growing segment of virtualization. KVM supports full GPU passthrough (dedicated GPU per VM), NVIDIA vGPU (shared GPU across VMs), and Intel SR-IOV GPU. This guide covers IOMMU setup, vfio-pci binding, CUDA validation, and migrating GPU VMs from VMware to KVM.</p>
+  <div class="badge">NVIDIA vGPU | PCI Passthrough | IOMMU | CUDA | Inference VMs | KubeVirt GPU | AMD ROCm</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">GPU Virtualization <span>Options</span></h2>
+  <p class="sub">Three approaches to GPU access in VMs — choose based on workload and sharing needs.</p>
+
+  <h3>GPU Virtualization Comparison</h3>
+  <table>
+    <tr><th style="width:14%">Method</th><th style="width:10%">Sharing</th><th style="width:12%">Performance</th><th style="width:12%">Live Migration</th><th style="width:12%">License Cost</th><th style="width:15%">GPU Support</th><th style="width:25%">Best For</th></tr>
+    <tr><td><strong>PCI Passthrough</strong></td><td>1 GPU : 1 VM</td><td class="check">100% native</td><td class="cross">No</td><td class="check">$0</td><td>Any PCIe GPU</td><td>Training, HPC, rendering</td></tr>
+    <tr><td><strong>NVIDIA vGPU</strong></td><td>1 GPU : 2-32 VMs</td><td>85-95%</td><td class="check">Yes</td><td>$$ (licensed)</td><td>NVIDIA Tesla/Ampere/Hopper</td><td>VDI, shared inference</td></tr>
+    <tr><td><strong>Intel SR-IOV GPU</strong></td><td>1 GPU : 4-8 VMs</td><td>80-90%</td><td class="cross">No</td><td class="check">$0</td><td>Intel Flex/Arc</td><td>Media transcode, light ML</td></tr>
+    <tr><td><strong>Mediated Device (mdev)</strong></td><td>1 GPU : N VMs</td><td>70-90%</td><td>Partial</td><td>Varies</td><td>NVIDIA, Intel</td><td>Framework-level sharing</td></tr>
+    <tr><td><strong>virtio-gpu (virgl)</strong></td><td>Shared</td><td>30-60%</td><td class="check">Yes</td><td class="check">$0</td><td>Host GPU</td><td>Desktop VMs, basic 3D</td></tr>
+  </table>
+
+  <h3>VMware vs KVM GPU Support</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>VMware GPU Limitations</h4>
+      <ul>
+        <li>vSphere GPU passthrough: DirectPath I/O (manual, per-host)</li>
+        <li>NVIDIA vGPU on VMware: requires vSphere Enterprise Plus</li>
+        <li>VMware SVGA 3D: limited OpenGL 4.1, no CUDA</li>
+        <li>No AMD GPU passthrough support (officially)</li>
+        <li>Broadcom licensing: GPU hosts cost same as CPU-only</li>
+        <li>vMotion with GPU: only NVIDIA vGPU (not passthrough)</li>
+        <li>Cost: $6,175/CPU + NVIDIA vGPU license = $12K+/host</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>KVM GPU Advantages</h4>
+      <ul>
+        <li>PCI passthrough: any GPU, zero overhead, no extra license</li>
+        <li>NVIDIA vGPU: fully supported on KVM (same as VMware)</li>
+        <li>AMD ROCm: supported with passthrough (AI/ML on AMD)</li>
+        <li>Intel Flex Series: SR-IOV GPU sharing, no license</li>
+        <li>Multiple GPUs per VM: NVLINK-aware allocation</li>
+        <li>KubeVirt: GPU operator + device plugin = K8s native</li>
+        <li>Cost: $0 hypervisor + optional vGPU license</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">PCI Passthrough <span>Setup</span></h2>
+  <p class="sub">Dedicate a physical GPU to a VM for 100% native performance — ideal for training and HPC.</p>
+
+  <h3>Step-by-Step GPU Passthrough</h3>
+  <pre>
+# Step 1: Enable IOMMU in BIOS + kernel
+# Intel: intel_iommu=on iommu=pt
+# AMD: amd_iommu=on iommu=pt
+grubby --update-kernel=ALL --args="intel_iommu=on iommu=pt"
+reboot
+
+# Step 2: Identify GPU PCI address and IOMMU group
+lspci -nn | grep -i nvidia
+# 41:00.0 3D controller [0302]: NVIDIA Corporation A100 [10de:20b2] (rev a1)
+# 41:00.1 Audio device [0403]: NVIDIA Corporation [10de:1aef] (rev a1)
+
+# Verify IOMMU group (all devices in group must be passed through)
+find /sys/kernel/iommu_groups/ -type l | grep "41:00"
+# /sys/kernel/iommu_groups/56/devices/0000:41:00.0
+# /sys/kernel/iommu_groups/56/devices/0000:41:00.1
+
+# Step 3: Bind GPU to vfio-pci driver
+echo "10de 20b2" > /sys/bus/pci/drivers/vfio-pci/new_id
+echo "10de 1aef" > /sys/bus/pci/drivers/vfio-pci/new_id
+
+# Persistent via modprobe.d
+echo "options vfio-pci ids=10de:20b2,10de:1aef" > /etc/modprobe.d/vfio.conf
+echo "vfio-pci" > /etc/modules-load.d/vfio.conf
+
+# Step 4: Blacklist NVIDIA host driver (so it doesn't grab the GPU)
+echo "blacklist nouveau" > /etc/modprobe.d/blacklist-gpu.conf
+echo "blacklist nvidia" >> /etc/modprobe.d/blacklist-gpu.conf
+dracut --force</pre>
+
+  <h3>Libvirt XML for GPU Passthrough</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>GPU Device Assignment</h4>
+      <pre>
+&lt;hostdev mode='subsystem' type='pci'
+         managed='yes'&gt;
+  &lt;source&gt;
+    &lt;address domain='0x0000' bus='0x41'
+            slot='0x00' function='0x0'/&gt;
+  &lt;/source&gt;
+  &lt;address type='pci' domain='0x0000'
+           bus='0x06' slot='0x00'
+           function='0x0'/&gt;
+&lt;/hostdev&gt;
+
+&lt;!-- Also pass audio device (same IOMMU group) --&gt;
+&lt;hostdev mode='subsystem' type='pci'
+         managed='yes'&gt;
+  &lt;source&gt;
+    &lt;address domain='0x0000' bus='0x41'
+            slot='0x00' function='0x1'/&gt;
+  &lt;/source&gt;
+&lt;/hostdev&gt;</pre>
+    </div>
+    <div class="card">
+      <h4>VM Configuration for GPU</h4>
+      <pre>
+&lt;!-- Q35 machine type (required for PCIe) --&gt;
+&lt;os&gt;
+  &lt;type machine='pc-q35-8.2'&gt;hvm&lt;/type&gt;
+  &lt;loader type='pflash'&gt;
+    /usr/share/OVMF/OVMF_CODE.fd
+  &lt;/loader&gt;
+&lt;/os&gt;
+
+&lt;!-- CPU: host-passthrough for AVX-512 --&gt;
+&lt;cpu mode='host-passthrough'/&gt;
+
+&lt;!-- Memory: pin for GPU DMA --&gt;
+&lt;memoryBacking&gt;
+  &lt;hugepages/&gt;
+  &lt;locked/&gt;
+&lt;/memoryBacking&gt;
+
+&lt;!-- Verify in guest --&gt;
+# nvidia-smi
+# CUDA test: python3 -c "import torch; print(torch.cuda.is_available())"</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">NVIDIA vGPU <span>on KVM</span></h2>
+  <p class="sub">Share a single GPU across multiple VMs with NVIDIA vGPU — supports live migration.</p>
+
+  <h3>NVIDIA vGPU Profiles</h3>
+  <table>
+    <tr><th>GPU</th><th>Profile</th><th>FB Memory</th><th>Max VMs</th><th>Use Case</th><th>Perf vs Bare Metal</th></tr>
+    <tr><td><strong>A100 (80GB)</strong></td><td>A100-1Q</td><td>1 GB</td><td>32</td><td>VDI, light inference</td><td>~5%</td></tr>
+    <tr><td></td><td>A100-5Q</td><td>5 GB</td><td>16</td><td>ML inference, CAD</td><td>~15%</td></tr>
+    <tr><td></td><td>A100-10Q</td><td>10 GB</td><td>8</td><td>Training (small models)</td><td>~25%</td></tr>
+    <tr><td></td><td>A100-20Q</td><td>20 GB</td><td>4</td><td>Training (medium models)</td><td>~50%</td></tr>
+    <tr><td></td><td>A100-40Q</td><td>40 GB</td><td>2</td><td>Large model training</td><td>~90%</td></tr>
+    <tr><td><strong>L40S (48GB)</strong></td><td>L40S-4Q</td><td>4 GB</td><td>12</td><td>Inference + rendering</td><td>~15%</td></tr>
+    <tr><td></td><td>L40S-12Q</td><td>12 GB</td><td>4</td><td>LLM inference</td><td>~50%</td></tr>
+    <tr><td></td><td>L40S-24Q</td><td>24 GB</td><td>2</td><td>Fine-tuning, RAG</td><td>~85%</td></tr>
+    <tr><td><strong>H100 (80GB)</strong></td><td>H100-20Q</td><td>20 GB</td><td>4</td><td>Inference</td><td>~50%</td></tr>
+    <tr><td></td><td>H100-80Q</td><td>80 GB</td><td>1</td><td>Full GPU (MIG alternative)</td><td>~95%</td></tr>
+  </table>
+
+  <h3>vGPU Setup on KVM</h3>
+  <pre>
+# Install NVIDIA vGPU Manager (requires license)
+rpm -i nvidia-vgpu-kvm-550.90.05.x86_64.rpm
+systemctl enable --now nvidia-vgpud nvidia-vgpu-mgr
+
+# List available vGPU types
+mdevctl types
+# nvidia-256 (A100-5Q): 5120 MB, max instances: 16
+# nvidia-257 (A100-10Q): 10240 MB, max instances: 8
+
+# Create vGPU instance
+mdevctl start -u $(uuidgen) -p 0000:41:00.0 --type nvidia-256
+
+# Or persistent:
+mdevctl define -u $(uuidgen) -p 0000:41:00.0 --type nvidia-256 -a
+
+# Libvirt XML for vGPU
+# &lt;hostdev mode='subsystem' type='mdev' managed='no' model='vfio-pci' display='on'&gt;
+#   &lt;source&gt;
+#     &lt;address uuid='a618089c-523f-11ec-bf63-0242ac130002'/&gt;
+#   &lt;/source&gt;
+# &lt;/hostdev&gt;</pre>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">AI/ML Workload <span>Migration</span></h2>
+  <p class="sub">Migrating GPU-accelerated VMs from VMware to KVM with CUDA validation.</p>
+
+  <h3>GPU VM Migration Workflow</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Step 1: Export from VMware</h4>
+      <ul>
+        <li>Remove VMware SVGA adapter from VM settings</li>
+        <li>Remove DirectPath I/O GPU assignment</li>
+        <li>Export VM as OVA (without GPU passthrough)</li>
+        <li>GPU driver stays installed in guest OS</li>
+        <li><code>h2kvmctl export --server vcenter --vm ml-training-01</code></li>
+        <li>Note: GPU is host-specific, not part of VM image</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Step 2: Convert &amp; Deploy</h4>
+      <ul>
+        <li>Convert VMDK to QCOW2 with h2kvmctl</li>
+        <li>h2kvmctl adds GPU passthrough to domain XML</li>
+        <li><code>h2kvmctl convert --source ml-training.vmdk --gpu-passthrough 41:00.0 --emit-domain-xml --deploy-libvirt</code></li>
+        <li>Auto-detects NVIDIA driver in guest OS</li>
+        <li>Sets machine type to Q35, enables UEFI</li>
+        <li>Configures hugepages and locked memory</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Step 3: Validate CUDA</h4>
+      <pre>
+# In guest VM after boot
+nvidia-smi
+# GPU: NVIDIA A100 80GB
+# Driver: 550.90.05
+# CUDA: 12.4
+
+# Test CUDA
+python3 -c "
+import torch
+print(f'CUDA: {torch.cuda.is_available()}')
+print(f'GPU: {torch.cuda.get_device_name(0)}')
+print(f'Memory: {torch.cuda.get_device_properties(0).total_mem / 1e9:.1f} GB')
+t = torch.randn(10000, 10000, device='cuda')
+print(f'Matrix mul: OK')
+"</pre>
+    </div>
+    <div class="card">
+      <h4>Step 4: Performance Validation</h4>
+      <ul>
+        <li>Run original training benchmark on KVM</li>
+        <li>Expected: 98-100% of bare metal performance</li>
+        <li>Check: NCCL multi-GPU communication (if multi-GPU)</li>
+        <li>Verify: NVLink bandwidth with <code>nvidia-smi nvlink -s</code></li>
+        <li>Test: mixed precision training (TF32, FP16, BF16)</li>
+        <li>Compare: time-to-train on VMware vs KVM (should match)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <h3>Common Issue: NVIDIA Driver Version</h3>
+    <p>The NVIDIA driver in the guest must match the host vGPU Manager version (for vGPU) or be compatible with the GPU (for passthrough). If the VM was running an older driver on VMware, update it after migration: <code>dnf install nvidia-driver-550</code> or download from NVIDIA's website. For passthrough, any compatible driver works. For vGPU, host and guest driver versions must match exactly.</p>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">KubeVirt <span>GPU Integration</span></h2>
+  <p class="sub">Schedule GPU workloads on Kubernetes with KubeVirt and NVIDIA GPU Operator.</p>
+
+  <h3>NVIDIA GPU Operator for KubeVirt</h3>
+  <pre>
+# Install NVIDIA GPU Operator (auto-installs drivers, device plugin, etc.)
+helm install gpu-operator nvidia/gpu-operator \
+  --set driver.enabled=true \
+  --set toolkit.enabled=true \
+  --set devicePlugin.enabled=true \
+  --set sandboxDevicePlugin.enabled=true  # For KubeVirt vGPU
+
+# Verify GPUs discovered
+kubectl get nodes -o json | jq '.items[].status.allocatable["nvidia.com/gpu"]'
+# "4"  (4 GPUs available)
+
+# KubeVirt VM with GPU passthrough
+kubectl apply -f - &lt;&lt;'EOF'
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: ml-training-vm
+spec:
+  running: true
+  template:
+    spec:
+      domain:
+        devices:
+          gpus:
+            - name: gpu1
+              deviceName: nvidia.com/gpu
+        resources:
+          requests:
+            memory: 32Gi
+            cpu: "8"
+      volumes:
+        - name: rootdisk
+          persistentVolumeClaim:
+            claimName: ml-training-disk
+EOF
+
+# Verify GPU in VM
+virtctl console ml-training-vm
+# nvidia-smi shows GPU inside VM</pre>
+
+  <h3>vGPU on KubeVirt</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>vGPU with Mediated Devices</h4>
+      <pre>
+# KubeVirt VM with vGPU
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: inference-vm
+spec:
+  template:
+    spec:
+      domain:
+        devices:
+          gpus:
+            - name: vgpu1
+              deviceName: nvidia.com/NVIDIA_A100-5Q
+        resources:
+          requests:
+            memory: 16Gi
+            cpu: "4"</pre>
+    </div>
+    <div class="card">
+      <h4>Multi-GPU Training VM</h4>
+      <pre>
+# 4x GPU for distributed training
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: llm-training
+spec:
+  template:
+    spec:
+      domain:
+        devices:
+          gpus:
+            - name: gpu1
+              deviceName: nvidia.com/gpu
+            - name: gpu2
+              deviceName: nvidia.com/gpu
+            - name: gpu3
+              deviceName: nvidia.com/gpu
+            - name: gpu4
+              deviceName: nvidia.com/gpu
+        resources:
+          requests:
+            memory: 256Gi
+            cpu: "64"</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">AMD &amp; Intel <span>GPU Support</span></h2>
+  <p class="sub">NVIDIA isn't the only option — AMD ROCm and Intel Flex Series work on KVM.</p>
+
+  <h3>GPU Vendor Comparison for KVM</h3>
+  <table>
+    <tr><th style="width:15%">Feature</th><th style="width:22%">NVIDIA</th><th style="width:22%">AMD</th><th style="width:22%">Intel</th><th style="width:19%">Notes</th></tr>
+    <tr><td>Passthrough</td><td class="check">Full support</td><td class="check">Full support</td><td class="check">Full support</td><td>All vendors work with VFIO</td></tr>
+    <tr><td>vGPU (shared)</td><td class="check">vGPU (licensed)</td><td class="cross">No vGPU</td><td class="check">SR-IOV (free)</td><td>Intel SR-IOV = no license</td></tr>
+    <tr><td>AI/ML framework</td><td class="check">CUDA (dominant)</td><td class="check">ROCm (growing)</td><td>OneAPI (limited)</td><td>CUDA: widest framework support</td></tr>
+    <tr><td>Inference</td><td class="check">TensorRT</td><td class="check">MIGraphX</td><td class="check">OpenVINO</td><td>All competitive for inference</td></tr>
+    <tr><td>VDI/Desktop</td><td class="check">GRID</td><td class="check">MxGPU (limited)</td><td class="check">Flex Series</td><td>NVIDIA GRID most mature</td></tr>
+    <tr><td>Media transcode</td><td class="check">NVENC</td><td class="check">VCE/VCN</td><td class="check">QSV (best $/stream)</td><td>Intel: 30+ streams per Flex 170</td></tr>
+    <tr><td>Live migration</td><td class="check">vGPU only</td><td class="cross">No</td><td class="cross">No</td><td>Passthrough: no migration for any</td></tr>
+    <tr><td>Typical card cost</td><td>$7K-$30K</td><td>$4K-$15K</td><td>$2K-$5K</td><td>Intel: best value for media/VDI</td></tr>
+  </table>
+
+  <h3>AMD ROCm on KVM</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>AMD Instinct MI300X Passthrough</h4>
+      <pre>
+# Same VFIO passthrough process as NVIDIA
+echo "1002 740f" > /sys/bus/pci/drivers/vfio-pci/new_id
+
+# In guest: install ROCm
+amdgpu-install --usecase=rocm
+
+# Verify
+rocm-smi
+# GPU: AMD Instinct MI300X (192GB HBM3)
+
+# PyTorch with ROCm
+pip install torch --index-url https://download.pytorch.org/whl/rocm6.0
+python3 -c "import torch; print(torch.cuda.is_available())"
+# True (ROCm uses CUDA compatibility layer)</pre>
+    </div>
+    <div class="card">
+      <h4>Intel Flex Series SR-IOV</h4>
+      <pre>
+# Enable SR-IOV on Intel Flex 170
+echo 7 > /sys/class/drm/card0/device/sriov_numvfs
+
+# Each VF gets ~7GB VRAM (out of 48GB total)
+# Libvirt XML:
+# &lt;hostdev mode='subsystem' type='pci'&gt;
+#   &lt;source&gt;
+#     &lt;address bus='0x4d' slot='0x00'
+#             function='0x1'/&gt; &lt;!-- VF --&gt;
+#   &lt;/source&gt;
+# &lt;/hostdev&gt;
+
+# In guest: media transcode
+ffmpeg -hwaccel qsv -i input.mp4 \
+  -c:v hevc_qsv output.mp4
+# 30+ 1080p streams per Flex 170</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">GPU Workload <span>Architectures</span></h2>
+  <p class="sub">Common deployment patterns for GPU-accelerated VMs on KVM.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Pattern 1: ML Training Cluster</h4>
+      <ul>
+        <li><strong>Hardware:</strong> 4 servers, 8x A100 80GB each</li>
+        <li><strong>Config:</strong> PCI passthrough, 8 GPUs per VM</li>
+        <li><strong>Network:</strong> InfiniBand or RoCE for NCCL</li>
+        <li><strong>Storage:</strong> NVMe local or Ceph for datasets</li>
+        <li><strong>Use case:</strong> LLM training, 30B+ parameter models</li>
+        <li><strong>Performance:</strong> 100% of bare metal (passthrough)</li>
+        <li><strong>VMware cost:</strong> $300K/yr (licensing + GPU support)</li>
+        <li><strong>KVM cost:</strong> $0 (hypervisor free, GPU same cost)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Pattern 2: Inference Farm</h4>
+      <ul>
+        <li><strong>Hardware:</strong> 8 servers, 4x L40S each</li>
+        <li><strong>Config:</strong> vGPU, 4 VMs per GPU (48 VMs total)</li>
+        <li><strong>Profile:</strong> L40S-12Q (12GB per VM)</li>
+        <li><strong>Use case:</strong> LLM inference (Llama 70B, Mistral)</li>
+        <li><strong>Concurrent models:</strong> 48 instances</li>
+        <li><strong>VMware cost:</strong> $200K/yr + $96K vGPU licenses</li>
+        <li><strong>KVM cost:</strong> $96K (vGPU licenses only)</li>
+        <li><strong>Savings:</strong> $200K/yr (hypervisor cost eliminated)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Pattern 3: VDI with GPU</h4>
+      <ul>
+        <li><strong>Hardware:</strong> 6 servers, 2x L40S each</li>
+        <li><strong>Config:</strong> vGPU, 16 users per GPU (192 desktops)</li>
+        <li><strong>Profile:</strong> L40S-3Q (3GB per user)</li>
+        <li><strong>Use case:</strong> CAD/CAM, GIS, engineering</li>
+        <li><strong>Protocols:</strong> SPICE (open), NICE DCV, Parsec</li>
+        <li><strong>VMware Horizon:</strong> $200/user/yr + ESXi</li>
+        <li><strong>KVM + SPICE:</strong> $0 + vGPU license</li>
+        <li><strong>Savings:</strong> $150K/yr (192 users)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Pattern 4: Media Transcode</h4>
+      <ul>
+        <li><strong>Hardware:</strong> 3 servers, 4x Intel Flex 170 each</li>
+        <li><strong>Config:</strong> SR-IOV, 7 VMs per GPU (84 VMs)</li>
+        <li><strong>Use case:</strong> Live streaming, VOD transcode</li>
+        <li><strong>Capacity:</strong> 30 streams/GPU x 12 = 360 streams</li>
+        <li><strong>Codec:</strong> H.264, H.265, AV1 hardware encode</li>
+        <li><strong>Intel SR-IOV:</strong> No license required (free)</li>
+        <li><strong>VMware cost:</strong> $120K/yr + no SR-IOV support</li>
+        <li><strong>KVM cost:</strong> $0 (Intel SR-IOV free on KVM)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page page-light">
+  <h2 class="st">Cost Analysis &amp; <span>Migration Summary</span></h2>
+  <p class="sub">GPU workloads benefit the most from VMware exit — zero hypervisor tax on expensive GPU hardware.</p>
+
+  <h3>Total Cost: GPU Infrastructure (3-Year, 32 GPUs)</h3>
+  <table>
+    <tr><th style="width:30%">Component</th><th style="width:20%">VMware</th><th style="width:20%">KVM</th><th style="width:30%">Notes</th></tr>
+    <tr><td>GPU hardware (32x A100 80GB)</td><td>$480,000</td><td>$480,000</td><td>Same hardware cost</td></tr>
+    <tr><td>Server hardware (8 hosts)</td><td>$240,000</td><td>$240,000</td><td>Same servers</td></tr>
+    <tr><td>vSphere Enterprise Plus (3yr)</td><td>$296,400</td><td class="check">$0</td><td>$6,175/CPU x 16 CPUs x 3yr</td></tr>
+    <tr><td>vGPU licenses (3yr)</td><td>$288,000</td><td>$288,000</td><td>Same NVIDIA vGPU cost (if used)</td></tr>
+    <tr><td>vCenter (3yr)</td><td>$33,675</td><td class="check">$0</td><td>Not needed for KVM</td></tr>
+    <tr><td>VMware GPU support add-on</td><td>$48,000</td><td class="check">$0</td><td>VMware charges extra for GPU hosts</td></tr>
+    <tr><td>hyper2kvm migration</td><td>—</td><td>Contact for pricing*</td><td>Proprietary (Zyvor AI Labs)</td></tr>
+    <tr><td>Migration labor</td><td>—</td><td>$30,000</td><td>One-time (32 GPU VMs)</td></tr>
+    <tr><td><strong>3-Year Total</strong></td><td><strong>$1,386,075</strong></td><td><strong>$1,038,000</strong></td><td><strong>Savings: $348,075 (25%)</strong></td></tr>
+  </table>
+  <p style="font-size:0.85em;">Without vGPU (passthrough only): VMware $1,098,075 vs KVM $750,000 — savings: <strong>$348,075 (32%)</strong></p>
+
+  <div class="verdict">
+    <h3>GPU + KVM = Maximum Performance at Minimum Cost</h3>
+    <p>PCI passthrough on KVM delivers 100% native GPU performance — identical to bare metal, identical to VMware passthrough, but without $378K in hypervisor licensing over 3 years. For AI/ML workloads where GPU hardware is the major cost, eliminating the hypervisor tax is the single most impactful optimization. hyper2kvm migrates GPU VMs with auto-configured passthrough, UEFI, hugepages, and CUDA validation.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | GPU Passthrough &amp; vGPU Guide</div>
+</div>
+
+</body>
+</html>

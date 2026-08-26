@@ -1,0 +1,62 @@
+<!--
+  Photon OS Libvirt Domain XML - SATA Configuration (Fallback)
+
+  This configuration uses SATA disk interface as a fallback option.
+  Modern Photon OS versions (3.0+) include virtio drivers and should
+  use the virtio configuration for better performance.
+
+  When to use this:
+    - Only if virtio configuration fails to boot (very rare)
+    - Legacy Photon OS versions without virtio support
+    - Troubleshooting boot issues
+
+  Recommended:
+    - Try test-confs/photon-virtio.xml first
+    - Only use this as a last resort
+
+  Usage:
+    sudo virsh define test-confs/photon-sata.xml
+    sudo virsh start photon-converted
+
+  Related:
+    - Conversion config: test-confs/04-local-photon-os-vmdk.yaml
+    - Documentation: docs/os-support/photon-os.md
+    - Virtio config: test-confs/photon-virtio.xml (recommended)
+-->
+<domain type='kvm'>
+  <name>photon-converted</name>
+  <memory unit='MiB'>2048</memory>
+  <vcpu>2</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <cpu mode='host-passthrough'/>
+  <devices>
+    <!-- Disk using SATA (compatibility fallback) -->
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/home/ssahani/by-path/out/photon-libvirt.qcow2'/>
+      <target dev='sda' bus='sata'/>
+    </disk>
+    <!-- Network -->
+    <interface type='network'>
+      <source network='default'/>
+      <model type='virtio'/>
+    </interface>
+    <!-- Graphics -->
+    <graphics type='vnc' autoport='yes' listen='127.0.0.1'/>
+    <!-- Video -->
+    <video>
+      <model type='vga' vram='65536'/>
+    </video>
+    <input type='tablet' bus='usb'/>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+  </devices>
+</domain>

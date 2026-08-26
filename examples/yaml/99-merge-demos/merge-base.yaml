@@ -1,0 +1,15 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 99-merge-demos/merge-base.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 99-merge-demos/merge-base.yaml
+
+output_dir: ./out
+workdir: ./out/work
+verbose: 1
+checksum: true
+fstab_mode: stabilize-all
+regen_initramfs: true
+flatten: true
+compress: true
+compress_level: 6

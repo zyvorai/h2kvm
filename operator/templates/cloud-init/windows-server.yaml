@@ -1,0 +1,40 @@
+#cloud-config
+# Windows Server Cloud-Init Template
+# Note: Windows support in cloud-init is limited. Use cloudbase-init for Windows.
+# This is a reference template for the cloudbase-init format.
+
+# For Windows, you would typically use cloudbase-init with a different format.
+# See: https://cloudbase-init.readthedocs.io/
+
+# Example cloudbase-init configuration (NOT cloud-config format):
+# This should be provided as a cloudbase-init config file
+
+# Cloudbase-init PowerShell script example:
+# ---
+# Set-ExecutionPolicy Unrestricted -Force
+#
+# # Set hostname
+# Rename-Computer -NewName "windows-server" -Force
+#
+# # Configure network
+# Get-NetAdapter | Set-NetIPInterface -DHCP Enabled
+#
+# # Install features
+# Install-WindowsFeature -Name RSAT-AD-PowerShell
+#
+# # Configure Windows updates
+# Set-Service -Name wuauserv -StartupType Automatic
+# Start-Service -Name wuauserv
+#
+# # Set timezone
+# Set-TimeZone -Id "UTC"
+#
+# # Enable Remote Desktop
+# Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -value 0
+# Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+#
+# # Final reboot
+# Restart-Computer -Force
+
+# Note: For actual Windows deployment, create a cloudbase-init config
+# and inject it using the ConfigMap mechanism described in the README.

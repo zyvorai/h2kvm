@@ -1,0 +1,31 @@
+apiVersion: hyper2kvm.io/v1alpha1
+kind: HyperConversion
+metadata:
+  name: rhel88-lvm
+  namespace: default
+spec:
+  source:
+    url: "https://storage.example.com/rhel88.vmdk"
+    format: vmdk
+  storage:
+    size: "40Gi"
+    storageClass: "local-path"
+    accessMode: ReadWriteOnce
+  conversion:
+    # Enable offline fixes for LVM detection, initramfs rebuild, fstab/network updates
+    offlineFixes: true
+    compression: zstd
+    timeout: 120  # minutes
+  vm:
+    name: rhel88-migrated
+    cpu:
+      cores: 4
+      sockets: 1
+      threads: 1
+    memory: "4Gi"
+    firmware: bios
+    runStrategy: Always
+    networks:
+      - name: default
+        type: pod
+        model: virtio

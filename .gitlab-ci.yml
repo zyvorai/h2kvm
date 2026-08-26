@@ -1,0 +1,181 @@
+stages:
+  - test
+  - build
+  - deploy
+  - release
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
+.python_test_template: &python_test
+  image: python:$PYTHON_VERSION
+  stage: test
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install -e .[dev,test]
+  script:
+    - ruff check . || true
+    - ruff format --check . || true
+    - pytest tests/ -v --cov=hyper2kvm --cov-report=xml --cov-report=term
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+test:python3.10:
+  <<: *python_test
+  variables:
+    PYTHON_VERSION: "3.10"
+
+test:python3.11:
+  <<: *python_test
+  variables:
+    PYTHON_VERSION: "3.11"
+
+test:python3.12:
+  <<: *python_test
+  variables:
+    PYTHON_VERSION: "3.12"
+
+test:worker-protocol:
+  image: python:3.12
+  stage: test
+  before_script:
+    - pip install -e .[dev,test]
+  script:
+    - pytest tests/test_worker_protocol.py -v
+
+build:docker:
+  stage: build
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build --target worker -t $CI_REGISTRY_IMAGE:worker-$CI_COMMIT_SHORT_SHA .
+    - docker build --target cli -t $CI_REGISTRY_IMAGE:cli-$CI_COMMIT_SHORT_SHA .
+    - docker build --target daemon -t $CI_REGISTRY_IMAGE:daemon-$CI_COMMIT_SHORT_SHA .
+    - docker build --target batch -t $CI_REGISTRY_IMAGE:batch-$CI_COMMIT_SHORT_SHA .
+    - docker push $CI_REGISTRY_IMAGE:worker-$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_IMAGE:cli-$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_IMAGE:daemon-$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_IMAGE:batch-$CI_COMMIT_SHORT_SHA
+  only:
+    - main
+    - develop
+    - tags
+
+helm:lint:
+  stage: test
+  image: alpine/helm:3.14.0
+  script:
+    - helm lint helm/hyper2kvm-worker
+    - helm template test-release helm/hyper2kvm-worker --namespace test --values helm/hyper2kvm-worker/values.yaml > /tmp/manifests.yaml
+    - cat /tmp/manifests.yaml
+
+integration:k3d:
+  stage: deploy
+  image: rancher/k3s:v1.28.5-k3s1
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: /certs/client
+  before_script:
+    - apk add --no-cache curl
+    - curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+    - k3d cluster create test-cluster --agents 2 --wait
+    - k3d image import $CI_REGISTRY_IMAGE:worker-$CI_COMMIT_SHORT_SHA -c test-cluster
+  script:
+    - kubectl create namespace hyper2kvm-workers || true
+    - |
+      helm install test-release helm/hyper2kvm-worker \
+        --namespace hyper2kvm-workers \
+        --set worker.image.repository=$CI_REGISTRY_IMAGE \
+        --set worker.image.tag=worker-$CI_COMMIT_SHORT_SHA \
+        --set worker.nodeSelector=null \
+        --set storage.state.enabled=false \
+        --set storage.events.enabled=false \
+        --set storage.input.enabled=false \
+        --set storage.output.enabled=false \
+        --set storage.temp.enabled=false \
+        --set initContainer.enabled=false \
+        --set monitoring.serviceMonitor.enabled=false \
+        --wait --timeout 5m
+    - kubectl get pods -n hyper2kvm-workers
+    - kubectl wait --for=condition=Ready pods -l app=hyper2kvm-worker -n hyper2kvm-workers --timeout=300s || true
+  after_script:
+    - kubectl logs -n hyper2kvm-workers -l app=hyper2kvm-worker --tail=100 || true
+    - k3d cluster delete test-cluster || true
+  only:
+    - main
+    - merge_requests
+
+security:trivy:
+  stage: test
+  image: aquasec/trivy:latest
+  script:
+    - trivy image --exit-code 0 --severity HIGH,CRITICAL $CI_REGISTRY_IMAGE:worker-$CI_COMMIT_SHORT_SHA
+  dependencies:
+    - build:docker
+  only:
+    - main
+    - tags
+
+release:helm:
+  stage: release
+  image: alpine/helm:3.14.0
+  before_script:
+    - apk add --no-cache git
+  script:
+    - VERSION=${CI_COMMIT_TAG#v}
+    - sed -i "s/^version:.*/version: $VERSION/" helm/hyper2kvm-worker/Chart.yaml
+    - sed -i "s/^appVersion:.*/appVersion: \"$VERSION\"/" helm/hyper2kvm-worker/Chart.yaml
+    - helm package helm/hyper2kvm-worker -d helm-releases
+    - helm repo index helm-releases --url https://gitlab.com/$CI_PROJECT_PATH/-/packages/helm/stable
+  artifacts:
+    paths:
+      - helm-releases/
+  only:
+    - tags
+
+release:docker:
+  stage: release
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - VERSION=${CI_COMMIT_TAG#v}
+    - |
+      for target in worker cli daemon batch; do
+        docker pull $CI_REGISTRY_IMAGE:${target}-$CI_COMMIT_SHORT_SHA
+        docker tag $CI_REGISTRY_IMAGE:${target}-$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:${target}-$VERSION
+        docker tag $CI_REGISTRY_IMAGE:${target}-$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:${target}-latest
+        docker push $CI_REGISTRY_IMAGE:${target}-$VERSION
+        docker push $CI_REGISTRY_IMAGE:${target}-latest
+      done
+  only:
+    - tags
+
+release:pypi:
+  stage: release
+  image: python:3.12
+  before_script:
+    - pip install build twine
+  script:
+    - python -m build
+    - twine upload dist/* || echo "PyPI upload skipped (no token configured)"
+  artifacts:
+    paths:
+      - dist/
+  only:
+    - tags
+  when: manual

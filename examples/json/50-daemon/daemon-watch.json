@@ -1,0 +1,12 @@
+{
+  "command": "daemon",
+  "daemon": true,
+  "watch_dir": "/incoming",
+  "output_dir": "/out",
+  "workdir": "/out/work",
+  "verbose": 1,
+  "flatten": true,
+  "out_format": "qcow2",
+  "compress": true,
+  "enable_recovery": true
+}

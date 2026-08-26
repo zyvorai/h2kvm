@@ -1,0 +1,10 @@
+{
+  "command": "local",
+  "vmdk": "/path/to/linux.vmdk",
+  "dry_run": true,
+  "print_fstab": true,
+  "fstab_mode": "stabilize-all",
+  "regen_initramfs": false,
+  "flatten": false,
+  "verbose": 2
+}

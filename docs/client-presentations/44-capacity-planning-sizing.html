@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Capacity Planning &amp; Sizing — Right-Size VMs &amp; Optimize Host Consolidation</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #4a1d96, #6d28d9, #8b5cf6); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #ddd6fe; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(221,214,254,0.2); border: 1px solid rgba(221,214,254,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #120a1e; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #ddd6fe; }
+  .page-light h2.st span { color: #4a1d96; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #ddd6fe; }
+  .page-light h3 { color: #4a1d96; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #4a1d96; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #ddd6fe; }
+  .page-light .card h4 { color: #4a1d96; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  pre { background: #4a1d96; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(221,214,254,0.08); border: 1px solid rgba(221,214,254,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(74,29,150,0.15), rgba(109,40,217,0.08)); border: 2px solid #8b5cf6; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #ddd6fe; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Capacity Planning &amp; <span>Sizing</span></h1>
+  <h2>Right-Size VMs &amp; Optimize Host Consolidation</h2>
+  <p class="sub">70% of VMs are over-provisioned on VMware. Migration is the perfect time to right-size. This guide covers CPU/memory/storage analysis, consolidation ratios, host sizing formulas, NUMA-aware placement, and growth planning. Save 30-40% on hardware by right-sizing during migration.</p>
+  <div class="badge">Right-Sizing | Consolidation Ratios | NUMA Placement | Growth Planning | Hardware Sizing | Cost Optimization</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">VM Right-Sizing <span>Analysis</span></h2>
+  <p class="sub">Most VMs use a fraction of their allocated resources — measure before migrating.</p>
+
+  <h3>Typical Over-Provisioning (VMware Environments)</h3>
+  <table>
+    <tr><th style="width:15%">Resource</th><th style="width:15%">Avg Allocated</th><th style="width:15%">Avg Used (P95)</th><th style="width:12%">Waste</th><th style="width:43%">Right-Size Recommendation</th></tr>
+    <tr><td><strong>vCPU</strong></td><td>4 vCPUs</td><td>1.2 vCPUs</td><td class="cross">70%</td><td>Set to P95 usage + 50% headroom = 2 vCPUs (saves 50%)</td></tr>
+    <tr><td><strong>Memory</strong></td><td>8 GB</td><td>3.5 GB</td><td class="cross">56%</td><td>Set to P95 usage + 25% headroom = 4.5 GB → round to 4 GB</td></tr>
+    <tr><td><strong>Storage</strong></td><td>200 GB</td><td>45 GB</td><td class="cross">78%</td><td>Allocate actual + 50% growth = 70 GB (thin-provisioned)</td></tr>
+    <tr><td><strong>Network</strong></td><td>10 Gbps</td><td>200 Mbps</td><td class="cross">98%</td><td>VirtIO handles up to 9.5 Gbps — no action needed</td></tr>
+  </table>
+
+  <h3>Data Collection Methods</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>From VMware (Pre-Migration)</h4>
+      <pre>
+# govc: collect 30 days of performance data
+govc metric.ls vm/db-server | head -20
+govc metric.sample -n 720 -i 3600 \
+  vm/db-server cpu.usage.average \
+  mem.active.average \
+  disk.usage.average \
+  net.usage.average
+
+# Or export from vCenter performance charts:
+# Monitor → Performance → Advanced
+# Export CSV for 30 days, hourly interval
+
+# RVTools (free): export full VM inventory
+# Produces Excel with CPU, memory, disk, network
+# rvtools.com — run on Windows, connects to vCenter</pre>
+    </div>
+    <div class="card">
+      <h4>Right-Size Calculator</h4>
+      <pre>
+# right-size.py — calculate optimal sizing
+import json
+
+def right_size(vm_data):
+    """Calculate right-sized resources from usage data."""
+    cpu_p95 = vm_data['cpu_p95_percent'] / 100
+    mem_p95 = vm_data['mem_p95_gb']
+
+    # CPU: P95 usage * allocated + 50% headroom
+    optimal_cpu = max(2, round(
+        cpu_p95 * vm_data['allocated_vcpus'] * 1.5
+    ))
+
+    # Memory: P95 usage + 25% headroom, round to nearest 2GB
+    optimal_mem = max(2, round(
+        mem_p95 * 1.25 / 2
+    ) * 2)
+
+    # Storage: actual used + 50% growth
+    optimal_disk = round(
+        vm_data['disk_used_gb'] * 1.5
+    )
+
+    return {
+        'vcpus': optimal_cpu,
+        'memory_gb': optimal_mem,
+        'disk_gb': optimal_disk
+    }</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Host <span>Sizing Formulas</span></h2>
+  <p class="sub">Calculate how many KVM hosts you need for your VM fleet.</p>
+
+  <h3>Consolidation Ratio Guidelines</h3>
+  <table>
+    <tr><th style="width:18%">Workload Type</th><th style="width:12%">vCPU:pCPU</th><th style="width:12%">Memory</th><th style="width:15%">VMs/Host (typical)</th><th style="width:43%">Notes</th></tr>
+    <tr><td>General (mixed)</td><td>3:1 - 5:1</td><td>1:1 (no overcommit)</td><td>15-30</td><td>Most conservative; safe for all workloads</td></tr>
+    <tr><td>Web servers</td><td>5:1 - 8:1</td><td>1.2:1</td><td>25-50</td><td>Low CPU usage, can overcommit more</td></tr>
+    <tr><td>Application servers</td><td>3:1 - 5:1</td><td>1:1</td><td>15-25</td><td>Moderate CPU, memory-sensitive</td></tr>
+    <tr><td>Database servers</td><td>1:1 - 2:1</td><td>1:1 (pinned)</td><td>4-10</td><td>CPU-intensive, NUMA-aware, hugepages</td></tr>
+    <tr><td>VDI desktops</td><td>4:1 - 6:1</td><td>1:1</td><td>30-60</td><td>Bursty but short duration</td></tr>
+    <tr><td>AI/ML (GPU)</td><td>1:1</td><td>1:1</td><td>1-4</td><td>Dedicated cores + GPU passthrough</td></tr>
+  </table>
+
+  <h3>Host Sizing Calculator</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Formula</h4>
+      <pre>
+# Number of hosts needed
+Total_vCPUs = sum(vm.vcpus for vm in fleet)
+Total_RAM = sum(vm.memory_gb for vm in fleet)
+Total_Storage = sum(vm.disk_gb for vm in fleet)
+
+# Per-host specs (example: Dell R760)
+Host_Cores = 64    # 2x 32-core Xeon
+Host_RAM = 512     # GB DDR5
+Host_Storage = 15  # TB NVMe (usable)
+
+# CPU hosts needed (with overcommit ratio)
+CPU_Hosts = ceil(Total_vCPUs / (Host_Cores * Overcommit_Ratio))
+
+# Memory hosts needed (no overcommit)
+Mem_Hosts = ceil(Total_RAM / (Host_RAM * 0.90))  # 90% usable
+
+# Storage hosts needed
+Stor_Hosts = ceil(Total_Storage / Host_Storage)
+
+# Final answer: max of all three
+Hosts_Needed = max(CPU_Hosts, Mem_Hosts, Stor_Hosts)
+# Add N+1 for HA</pre>
+    </div>
+    <div class="card">
+      <h4>Example: 100 VMs Fleet</h4>
+      <ul>
+        <li><strong>After right-sizing:</strong></li>
+        <li>Total vCPUs: 280 (was 420 before right-sizing)</li>
+        <li>Total RAM: 640 GB (was 980 GB)</li>
+        <li>Total Storage: 8 TB (was 18 TB, thin provisioned)</li>
+        <li>&nbsp;</li>
+        <li><strong>Host: Dell R760 (64 cores, 512 GB, 15 TB NVMe)</strong></li>
+        <li>CPU hosts (3:1 ratio): 280 / (64 × 3) = 1.5 → 2</li>
+        <li>Memory hosts: 640 / (512 × 0.9) = 1.4 → 2</li>
+        <li>Storage hosts: 8 / 15 = 0.53 → 1</li>
+        <li>Result: <strong>2 hosts + 1 for HA = 3 hosts</strong></li>
+        <li>&nbsp;</li>
+        <li><strong>Without right-sizing: 5 hosts needed</strong></li>
+        <li><strong>Savings: 2 hosts × $25K = $50K hardware</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">NUMA-Aware <span>VM Placement</span></h2>
+  <p class="sub">Proper NUMA placement prevents 40% performance penalties on multi-socket servers.</p>
+
+  <h3>NUMA Architecture</h3>
+  <pre>
+# Typical 2-socket server NUMA topology
+# Node 0: CPU 0 (cores 0-31), 256 GB local RAM, PCIe slots 1-4
+# Node 1: CPU 1 (cores 32-63), 256 GB local RAM, PCIe slots 5-8
+#
+# Local memory access: ~80ns
+# Remote memory access: ~140ns (75% slower!)
+#
+# Rule: Keep VM's vCPUs and memory on the SAME NUMA node
+
+# Check NUMA topology
+numactl --hardware
+# node 0: cpus 0-31, size 262144 MB
+# node 1: cpus 32-63, size 262144 MB
+# node distances:
+#   node 0 1
+#     0: 10 21   ← 21 = 2.1x latency to remote node
+
+# Bad placement (crosses NUMA boundary):
+virsh vcpupin db-server 0 0    # NUMA 0
+virsh vcpupin db-server 1 32   # NUMA 1 ← CROSS-NODE!
+
+# Good placement (all on NUMA 0):
+virsh vcpupin db-server 0 0
+virsh vcpupin db-server 1 1
+virsh vcpupin db-server 2 2
+virsh vcpupin db-server 3 3
+virsh numatune db-server --nodeset 0 --mode strict</pre>
+
+  <h3>NUMA Placement Rules</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Small VMs (&lt; 16 vCPU, &lt; 64 GB)</h4>
+      <ul>
+        <li>Fit within a single NUMA node</li>
+        <li>Pin all vCPUs to cores on same NUMA node</li>
+        <li>Pin memory to same NUMA node</li>
+        <li>Multiple small VMs can share a NUMA node</li>
+        <li>Max ~4 small VMs per NUMA node (avoid contention)</li>
+        <li>Performance: optimal (100% local memory access)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Large VMs (&gt; 32 vCPU, &gt; 256 GB)</h4>
+      <ul>
+        <li>Must span NUMA nodes (too large for one)</li>
+        <li>Use <code>numatune --mode interleave</code> for balanced access</li>
+        <li>Or use vNUMA: expose NUMA topology to guest OS</li>
+        <li><code>&lt;numa&gt;&lt;cell cpus='0-15' memory='131072'/&gt;&lt;cell cpus='16-31' memory='131072'/&gt;&lt;/numa&gt;</code></li>
+        <li>Guest OS then optimizes memory allocation per-NUMA</li>
+        <li>Required for: large databases, in-memory analytics</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">Storage <span>Capacity Planning</span></h2>
+  <p class="sub">QCOW2 thin provisioning + compression can reduce storage needs by 60-80%.</p>
+
+  <h3>Storage Efficiency Comparison</h3>
+  <table>
+    <tr><th style="width:20%">Method</th><th style="width:15%">Virtual Size</th><th style="width:15%">Actual Disk</th><th style="width:12%">Savings</th><th style="width:38%">Notes</th></tr>
+    <tr><td>VMware thick eager</td><td>100 GB</td><td>100 GB</td><td>0%</td><td>Full allocation at creation</td></tr>
+    <tr><td>VMware thick lazy</td><td>100 GB</td><td>100 GB</td><td>0%</td><td>Full allocation, zeroed on first write</td></tr>
+    <tr><td>VMware thin</td><td>100 GB</td><td>45 GB</td><td>55%</td><td>Similar to QCOW2 thin provisioning</td></tr>
+    <tr><td>QCOW2 (default)</td><td>100 GB</td><td>42 GB</td><td>58%</td><td>Copy-on-write, 64KB clusters</td></tr>
+    <tr><td>QCOW2 + compress</td><td>100 GB</td><td>25 GB</td><td class="check">75%</td><td>zlib compression per-cluster</td></tr>
+    <tr><td>QCOW2 + compress + TRIM</td><td>100 GB</td><td>18 GB</td><td class="check">82%</td><td>Guest runs fstrim to reclaim unused</td></tr>
+  </table>
+
+  <h3>Storage Sizing Example (100 VMs)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Before Right-Sizing</h4>
+      <ul>
+        <li>Total virtual size: 20 TB (100 VMs × 200 GB avg)</li>
+        <li>VMware thick: 20 TB physical needed</li>
+        <li>VMware thin: 9 TB physical used</li>
+        <li>Hardware: 4x 6.4 TB NVMe = 25.6 TB raw</li>
+        <li>With RAID/overhead: ~19 TB usable</li>
+        <li><strong>Cost: $10,000 (4x NVMe drives)</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>After Right-Sizing + QCOW2 Compression</h4>
+      <ul>
+        <li>Total virtual size: 7 TB (right-sized + growth room)</li>
+        <li>QCOW2 compressed: 4.2 TB physical</li>
+        <li>With TRIM configured: 3.5 TB physical</li>
+        <li>Hardware: 2x 3.84 TB NVMe = 7.68 TB raw</li>
+        <li>With overhead: ~6 TB usable (70% headroom)</li>
+        <li><strong>Cost: $4,000 (2x NVMe drives)</strong></li>
+        <li><strong>Savings: $6,000 (60%)</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <h3>Enable TRIM/Discard in Guest VMs</h3>
+    <p>Add <code>discard='unmap'</code> to libvirt disk XML and run <code>fstrim -av</code> periodically in guests (or enable continuous TRIM with <code>discard</code> mount option in fstab). This returns unused blocks to the QCOW2 image, keeping actual disk usage minimal. Schedule weekly fstrim via cron for best results.</p>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Growth Planning &amp; <span>Forecasting</span></h2>
+  <p class="sub">Plan for 2-3 years of growth to avoid emergency hardware purchases.</p>
+
+  <h3>Growth Rate Assumptions</h3>
+  <table>
+    <tr><th style="width:20%">Resource</th><th style="width:15%">Conservative</th><th style="width:15%">Moderate</th><th style="width:15%">Aggressive</th><th style="width:35%">Based On</th></tr>
+    <tr><td>VM count</td><td>10%/yr</td><td>20%/yr</td><td>35%/yr</td><td>Historical VM creation rate</td></tr>
+    <tr><td>CPU per VM</td><td>5%/yr</td><td>10%/yr</td><td>15%/yr</td><td>Application version upgrades</td></tr>
+    <tr><td>Memory per VM</td><td>10%/yr</td><td>15%/yr</td><td>25%/yr</td><td>Data growth, caching, JVM heap</td></tr>
+    <tr><td>Storage per VM</td><td>15%/yr</td><td>25%/yr</td><td>40%/yr</td><td>Logs, databases, media files</td></tr>
+    <tr><td>Network</td><td>5%/yr</td><td>10%/yr</td><td>20%/yr</td><td>API traffic growth</td></tr>
+  </table>
+
+  <h3>3-Year Capacity Forecast</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Moderate Growth (100 VMs start)</h4>
+      <table>
+        <tr><th>Year</th><th>VMs</th><th>vCPUs</th><th>RAM (GB)</th><th>Storage (TB)</th><th>Hosts</th></tr>
+        <tr><td>Year 0</td><td>100</td><td>280</td><td>640</td><td>3.5</td><td>3</td></tr>
+        <tr><td>Year 1</td><td>120</td><td>370</td><td>880</td><td>5.3</td><td>3</td></tr>
+        <tr><td>Year 2</td><td>144</td><td>490</td><td>1,210</td><td>8.2</td><td>4</td></tr>
+        <tr><td>Year 3</td><td>173</td><td>650</td><td>1,660</td><td>12.5</td><td>5</td></tr>
+      </table>
+      <p><strong>Add 1 host in Year 2, 1 more in Year 3</strong></p>
+    </div>
+    <div class="card">
+      <h4>Hardware Procurement Timeline</h4>
+      <ul>
+        <li><strong>Day 0:</strong> 3 hosts (covers Year 0-1 with headroom)</li>
+        <li><strong>Month 18:</strong> Order 4th host (6-8 week lead time)</li>
+        <li><strong>Month 30:</strong> Order 5th host</li>
+        <li><strong>Budget:</strong> Year 0: $75K, Year 2: $25K, Year 3: $25K</li>
+        <li><strong>vs VMware:</strong> Year 0: $75K + $180K licensing/yr</li>
+        <li>KVM: buy hardware on demand, no license scaling</li>
+        <li>Alert: set monitoring at 70% capacity threshold</li>
+        <li>Procurement lead time: plan 3 months ahead</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">Hardware <span>Selection Guide</span></h2>
+  <p class="sub">Recommended server configurations for KVM hosting at different scales.</p>
+
+  <h3>Server Recommendations</h3>
+  <table>
+    <tr><th style="width:12%">Scale</th><th style="width:8%">VMs</th><th style="width:15%">Server Model</th><th style="width:13%">CPU</th><th style="width:10%">RAM</th><th style="width:12%">Storage</th><th style="width:10%">Network</th><th style="width:10%">Hosts</th><th style="width:10%">Cost/Host</th></tr>
+    <tr><td>Small</td><td>10-30</td><td>Dell R660xs</td><td>1x 24-core</td><td>256 GB</td><td>4x 1.92TB NVMe</td><td>2x 25GbE</td><td>2</td><td>$12,000</td></tr>
+    <tr><td>Medium</td><td>30-100</td><td>Dell R760</td><td>2x 32-core</td><td>512 GB</td><td>8x 3.84TB NVMe</td><td>2x 25GbE</td><td>3-5</td><td>$25,000</td></tr>
+    <tr><td>Large</td><td>100-300</td><td>Dell R760</td><td>2x 48-core</td><td>1 TB</td><td>12x 3.84TB NVMe</td><td>2x 100GbE</td><td>8-12</td><td>$40,000</td></tr>
+    <tr><td>GPU/ML</td><td>10-50</td><td>Dell R760xa</td><td>2x 32-core</td><td>512 GB</td><td>4x 3.84TB NVMe</td><td>2x 100GbE</td><td>4-8</td><td>$35,000+GPU</td></tr>
+    <tr><td>Edge</td><td>5-15</td><td>Dell R360</td><td>1x 16-core</td><td>128 GB</td><td>2x 1.92TB NVMe</td><td>2x 10GbE</td><td>1-2</td><td>$8,000</td></tr>
+  </table>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>CPU Selection</h4>
+      <ul>
+        <li><strong>Intel Xeon Scalable (Sapphire/Emerald Rapids):</strong> best single-thread, proven VMware migration path</li>
+        <li><strong>AMD EPYC (Genoa/Bergamo):</strong> best core count per dollar, 96-128 cores/socket</li>
+        <li><strong>Rule:</strong> Intel for latency-sensitive, AMD for density</li>
+        <li>Always: match CPU family across cluster for live migration</li>
+        <li>Enable: VT-x/AMD-V, VT-d/IOMMU in BIOS</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Memory Selection</h4>
+      <ul>
+        <li><strong>DDR5-4800+:</strong> required for latest Xeon/EPYC</li>
+        <li><strong>ECC:</strong> mandatory for production (error correction)</li>
+        <li><strong>Populate evenly:</strong> same DIMMs per channel per socket</li>
+        <li><strong>Don't overcommit:</strong> RAM is the #1 bottleneck for VMs</li>
+        <li>Reserve: 10% for host OS + KVM overhead</li>
+        <li>Hugepages: allocate 80% of host RAM as 2MB hugepages</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Migration-Time <span>Right-Sizing</span></h2>
+  <p class="sub">Apply right-sizing during migration — the best time to change VM resources.</p>
+
+  <h3>h2kvmctl Right-Sizing During Conversion</h3>
+  <pre>
+# Right-size during migration (set new resource allocation)
+h2kvmctl convert \
+  --source db-server.vmdk \
+  --format qcow2 --compress \
+  --fix-all \
+  --emit-domain-xml \
+  --deploy-libvirt \
+  --memory 8192 \    # Was 16384 on VMware (only used 5GB)
+  --vcpus 4 \        # Was 8 on VMware (only used 1.8 cores)
+  --network-bridge br-db
+
+# Batch right-sizing from analysis spreadsheet
+# migration-rightsized.yaml
+vms:
+  - name: db-server
+    source: { vmdk: /data/db-server.vmdk }
+    deploy:
+      memory: 8192    # Right-sized from 16384
+      vcpus: 4         # Right-sized from 8
+      network_bridge: br-db
+
+  - name: web-server
+    source: { vmdk: /data/web-server.vmdk }
+    deploy:
+      memory: 2048    # Right-sized from 8192
+      vcpus: 2         # Right-sized from 4
+      network_bridge: br0</pre>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Right-Sizing Safety Net</h4>
+      <ul>
+        <li>KVM makes it easy to adjust after migration</li>
+        <li>Add CPU: <code>virsh setvcpus vm 6 --config</code> (reboot)</li>
+        <li>Add RAM: <code>virsh setmem vm 12G --config</code> (reboot)</li>
+        <li>CPU hotplug: <code>virsh setvcpus vm 6 --live</code> (no reboot!)</li>
+        <li>Memory hotplug: <code>virsh setmem vm 12G --live</code> (if guest supports)</li>
+        <li>Start conservative, scale up if monitoring shows need</li>
+        <li>Set alerts at 80% utilization for proactive scaling</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Impact of Right-Sizing (100 VMs)</h4>
+      <ul>
+        <li><strong>Before:</strong> 420 vCPUs, 980 GB RAM → 5 hosts</li>
+        <li><strong>After:</strong> 280 vCPUs, 640 GB RAM → 3 hosts</li>
+        <li><strong>Hardware saved:</strong> 2 hosts × $25K = $50,000</li>
+        <li><strong>Power saved:</strong> 2 hosts × 800W × 8760h × $0.10 = $1,400/yr</li>
+        <li><strong>Rack space saved:</strong> 2U × 2 hosts = 4U</li>
+        <li><strong>Better performance:</strong> less contention, lower latency</li>
+        <li><strong>Total 3-yr savings: $54,200</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page page-light">
+  <h2 class="st">Sizing <span>Summary &amp; Checklist</span></h2>
+  <p class="sub">Quick reference for capacity planning decisions.</p>
+
+  <h3>Capacity Planning Checklist</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:35%">Action</th><th style="width:25%">Tool/Method</th><th style="width:35%">Output</th></tr>
+    <tr><td>1</td><td>Collect 30 days of VM performance data</td><td>govc metrics, vCenter CSV, RVTools</td><td>CPU/memory/disk usage per VM (P95)</td></tr>
+    <tr><td>2</td><td>Calculate right-sized resources per VM</td><td>Right-sizing calculator (P95 + headroom)</td><td>Optimal vCPU, memory, disk per VM</td></tr>
+    <tr><td>3</td><td>Sum total resources needed</td><td>Spreadsheet or script</td><td>Total vCPUs, RAM, storage for fleet</td></tr>
+    <tr><td>4</td><td>Apply consolidation ratios</td><td>Workload-type based ratios</td><td>Physical CPU cores, RAM, storage needed</td></tr>
+    <tr><td>5</td><td>Select host configuration</td><td>Hardware selection guide (Page 6)</td><td>Server model, specs, quantity</td></tr>
+    <tr><td>6</td><td>Add N+1 for HA</td><td>+1 host minimum</td><td>Final host count with HA</td></tr>
+    <tr><td>7</td><td>Plan NUMA placement</td><td>numactl, placement rules</td><td>VM-to-NUMA-node assignment map</td></tr>
+    <tr><td>8</td><td>Forecast 3-year growth</td><td>Growth rate model</td><td>Procurement timeline for additional hosts</td></tr>
+    <tr><td>9</td><td>Set monitoring thresholds</td><td>Prometheus alerts at 70%/80%/90%</td><td>Early warning for capacity issues</td></tr>
+    <tr><td>10</td><td>Apply right-sizing during migration</td><td>h2kvmctl --memory --vcpus</td><td>Migrated VMs with optimal resources</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>Right-Size During Migration: Save 30-40% on Hardware</h3>
+    <p>Migration is the one chance to fix years of VM sprawl. By right-sizing during conversion with h2kvmctl, you reduce host requirements by 40%, save $50K+ on hardware, and get better performance through less contention. Use thin-provisioned QCOW2 with compression to cut storage needs by 75%. Plan for 3 years of growth — buy hosts incrementally as needed, not all upfront.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Capacity Planning &amp; Sizing Guide</div>
+</div>
+
+</body>
+</html>

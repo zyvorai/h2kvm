@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cross-Distribution Deployment — hyper2kvm</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #e2e8f0; background: #0f172a; line-height: 1.5; }
+
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f172a, #1e293b); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .cover h2 { font-size: 1.3em; color: #94a3b8; margin: 0.3em 0 1.5em; }
+  .cover .badge { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); padding: 6px 20px; border-radius: 16px; font-size: 0.85em; color: #f59e0b; }
+  .cover .url { color: #f97316; font-family: monospace; font-size: 1.1em; margin-top: 1em; }
+  .cover .date { color: #475569; margin-top: 0.5em; font-size: 0.85em; }
+
+  .page { min-height: 100vh; padding: 36px 46px; page-break-after: always; position: relative; }
+  .page-dark { background: #0f172a; }
+  .page-slate { background: #1e293b; }
+
+  h2.title { font-size: 1.8em; font-weight: 700; margin-bottom: 0.2em; }
+  h2.title span { color: #f59e0b; }
+  .desc { font-size: 0.9em; color: #64748b; margin-bottom: 1.2em; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.8em 0 0.25em; color: #f97316; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px; }
+  .card h4 { font-size: 0.9em; font-weight: 600; margin-bottom: 4px; color: #f59e0b; }
+  .card ul { padding-left: 14px; font-size: 0.78em; margin: 0; } .card li { margin-bottom: 2px; }
+  .card p { font-size: 0.78em; opacity: 0.85; margin-bottom: 0; }
+
+  .flow { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 0.7em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: 0.8em; }
+  .flow-arrow { font-size: 1.1em; color: #f59e0b; }
+  .flow-orange { background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3); }
+  .flow-ok { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+
+  .features { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1em; }
+  .feat { background: rgba(51,65,85,0.5); border: 1px solid rgba(51,65,85,0.8); border-radius: 8px; padding: 6px 12px; font-size: 0.78em; color: #94a3b8; }
+  .feat-amber { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: #f59e0b; }
+  .feat-orange { background: rgba(249,115,22,0.1); border-color: rgba(249,115,22,0.3); color: #f97316; }
+  .feat-green { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #22c55e; }
+
+  .highlight { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  pre { background: rgba(255,255,255,0.04); color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.74em; line-height: 1.45; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  code { background: rgba(245,158,11,0.1); padding: 2px 4px; border-radius: 4px; font-size: 0.85em; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.76em; }
+  th { background: #b45309; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; font-size: 0.82em; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); vertical-align: top; }
+  .check { color: #22c55e; font-weight: 700; }
+  .warn { color: #f59e0b; font-weight: 700; }
+
+  .verdict { background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(249,115,22,0.1)); border: 2px solid #f59e0b; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #f59e0b; font-size: 1.1em; margin-bottom: 4px; }
+
+  .footer { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-size: 0.65em; color: #334155; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Cross-Distribution<br>Deployment</h1>
+  <h2>Fedora, RHEL, AlmaLinux, Ubuntu &mdash; One Script, Any Host</h2>
+  <div class="badge">Auto-Detect | deploy-remote.sh | hivex Rebuild | SPICE/VNC | Proprietary (Zyvor AI Labs)</div>
+  <div class="url">github.com/ssahani/hyper2kvm</div>
+  <div class="date">April 2026 &mdash; v0.3.0</div>
+</div>
+
+<!-- PAGE 1: The Challenge -->
+<div class="page page-dark">
+  <h2 class="title"><span>1.</span> The Challenge</h2>
+  <p class="desc">Every Linux distribution ships different packages, paths, and Python versions. hyper2kvm handles all of them.</p>
+
+  <table>
+    <tr><th style="width:18%">Component</th><th style="width:20%">Fedora 43</th><th style="width:20%">RHEL 8.8</th><th style="width:22%">AlmaLinux 9</th><th style="width:20%">Ubuntu 24.04</th></tr>
+    <tr><td><strong>Python</strong></td><td>3.13</td><td>3.6</td><td>3.9</td><td>3.12</td></tr>
+    <tr><td><strong>QEMU path</strong></td><td>/usr/bin/qemu-system-x86_64</td><td>/usr/libexec/qemu-kvm</td><td>/usr/libexec/qemu-kvm</td><td>/usr/bin/qemu-system-x86_64</td></tr>
+    <tr><td><strong>Graphics</strong></td><td>SPICE + QXL</td><td>VNC only</td><td>VNC only</td><td>SPICE + QXL</td></tr>
+    <tr><td><strong>hivex Python</strong></td><td>dnf package</td><td>dnf package</td><td class="warn">source rebuild</td><td class="warn">source rebuild</td></tr>
+    <tr><td><strong>libguestfs</strong></td><td>dnf package</td><td>dnf package</td><td>dnf package</td><td>apt package</td></tr>
+    <tr><td><strong>virtio-win</strong></td><td>dnf package</td><td>subscription</td><td>manual download</td><td>manual download</td></tr>
+    <tr><td><strong>OVMF path</strong></td><td>/usr/share/edk2/ovmf/</td><td>/usr/share/OVMF/</td><td>/usr/share/OVMF/</td><td>/usr/share/OVMF/</td></tr>
+    <tr><td><strong>supermin</strong></td><td>dnf package</td><td>dnf package</td><td>dnf package</td><td>apt package</td></tr>
+  </table>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Pain Points</h4>
+      <ul>
+        <li>Python 3.12 drops <code>distutils</code> &mdash; breaks older setup.py builds</li>
+        <li>RHEL/AlmaLinux ship no SPICE libraries &mdash; must use VNC</li>
+        <li>QXL video model fails without SPICE &mdash; must use virtio-gpu</li>
+        <li>hivex Python bindings missing on newer distros &mdash; source build required</li>
+        <li>virtio-win ISO not packaged on non-Red Hat systems</li>
+        <li>tmpfs /run directory missing h2kvmctl runtime dirs</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Solution: Auto-Everything</h4>
+      <ul>
+        <li>Auto-detect QEMU binary from 3 known paths</li>
+        <li>Auto-detect SPICE availability via <code>libspice-server.so</code></li>
+        <li>Auto-select QXL (SPICE) vs virtio-gpu (VNC)</li>
+        <li>Auto-rebuild hivex from source when needed</li>
+        <li>Auto-download virtio-win ISO if missing</li>
+        <li>Auto-create runtime directories via tmpfiles.d</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Goal:</strong> Run <code>deploy-remote.sh</code> on any supported distro and get a fully working migration environment. No manual package hunting, no path editing, no configuration files.</p>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 1</div>
+</div>
+
+<!-- PAGE 2: deploy-remote.sh -->
+<div class="page page-slate">
+  <h2 class="title"><span>2.</span> deploy-remote.sh</h2>
+  <p class="desc">One-command deployment: rsync the project, install dependencies, build hivex, configure services.</p>
+
+  <div class="flow">
+    <div class="flow-step">rsync<br><small>project files</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-orange">detect distro<br><small>/etc/os-release</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-orange">install deps<br><small>dnf/apt</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-orange">pip install<br><small>editable mode</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-orange">hivex rebuild<br><small>if needed</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">services up<br><small>systemd</small></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>What It Does</h4>
+      <ul>
+        <li>Detects distro family: RHEL, Fedora, Debian/Ubuntu</li>
+        <li>Installs system packages (qemu-kvm, libvirt, libguestfs, etc.)</li>
+        <li>Installs Python packages via pip (editable mode)</li>
+        <li>Rebuilds hivex from source if Python bindings missing</li>
+        <li>Downloads virtio-win ISO to <code>/usr/share/virtio-win/</code></li>
+        <li>Installs h2kvmctl to <code>/usr/local/sbin/</code></li>
+        <li>Installs h2kweb systemd service</li>
+        <li>Creates tmpfiles.d entry for <code>/run/hyper2kvm</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Usage</h4>
+      <pre>
+# Deploy to remote server
+./scripts/deploy-remote.sh \
+  --host 185.165.240.5 \
+  --user root \
+  --key ~/.ssh/id_ed25519
+
+# Deploy locally
+./scripts/deploy-remote.sh --local
+
+# With custom options
+./scripts/deploy-remote.sh \
+  --host 10.0.1.50 \
+  --port 2222 \
+  --no-web         # skip h2kweb
+  --no-virtio-win  # skip ISO download
+      </pre>
+    </div>
+  </div>
+
+  <h3>Distro-Specific Package Lists</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Fedora / RHEL / AlmaLinux</h4>
+      <ul>
+        <li>qemu-kvm, libvirt, virt-install</li>
+        <li>libguestfs, libguestfs-tools</li>
+        <li>python3-hivex, hivex-devel</li>
+        <li>python3-libguestfs</li>
+        <li>python3-augeas</li>
+        <li>nbdkit, qemu-img</li>
+        <li>supermin</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Ubuntu / Debian</h4>
+      <ul>
+        <li>qemu-system-x86, libvirt-daemon-system</li>
+        <li>libguestfs-tools, libguestfs-dev</li>
+        <li>libhivex-dev, python3-hivex</li>
+        <li>python3-guestfs</li>
+        <li>python3-augeas</li>
+        <li>nbdkit, qemu-utils</li>
+        <li>supermin</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Common (pip)</h4>
+      <ul>
+        <li>pyyaml, jinja2</li>
+        <li>rich, click</li>
+        <li>requests</li>
+        <li>libvirt-python</li>
+        <li>hyper2kvm (editable)</li>
+        <li>h2kweb frontend build</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 2</div>
+</div>
+
+<!-- PAGE 3: Auto-Detection -->
+<div class="page page-dark">
+  <h2 class="title"><span>3.</span> Auto-Detection</h2>
+  <p class="desc">Runtime detection of host capabilities ensures correct configuration without manual tuning.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>SPICE / QXL Availability</h4>
+      <ul>
+        <li>Check: <code>ldconfig -p | grep libspice-server</code></li>
+        <li>SPICE present: use QXL video + SPICE graphics</li>
+        <li>SPICE absent: use virtio-gpu video + VNC graphics</li>
+        <li>Fedora/Ubuntu: typically have SPICE</li>
+        <li>RHEL/AlmaLinux: typically VNC-only</li>
+        <li>Domain XML generated with correct model automatically</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>QEMU Binary Paths</h4>
+      <ul>
+        <li>Priority 1: <code>/usr/bin/qemu-system-x86_64</code> (Fedora, Ubuntu)</li>
+        <li>Priority 2: <code>/usr/libexec/qemu-kvm</code> (RHEL, AlmaLinux)</li>
+        <li>Priority 3: <code>/usr/bin/qemu-kvm</code> (older systems)</li>
+        <li>Verified: file exists and is executable</li>
+        <li>Used in domain XML <code>&lt;emulator&gt;</code> element</li>
+        <li>Error if no QEMU binary found on system</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>libguestfs Appliance</h4>
+      <ul>
+        <li>Scan: <code>/usr/lib64/guestfs/</code></li>
+        <li>Scan: <code>/usr/lib/guestfs/</code></li>
+        <li>Set LIBGUESTFS_PATH if needed</li>
+        <li>supermin rebuild if stale</li>
+        <li>Kernel + initrd verification</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>OVMF Firmware</h4>
+      <ul>
+        <li><code>/usr/share/edk2/ovmf/</code> (Fedora)</li>
+        <li><code>/usr/share/OVMF/</code> (RHEL/Ubuntu)</li>
+        <li>Prefer secboot variant if present</li>
+        <li>NVRAM template path auto-set</li>
+        <li>BIOS fallback for MBR guests</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>VirtIO-Win ISO</h4>
+      <ul>
+        <li><code>/usr/share/virtio-win/</code> (packaged)</li>
+        <li><code>/var/lib/hyper2kvm/</code> (downloaded)</li>
+        <li>Auto-download from fedorapeople.org</li>
+        <li>Version detection from filename</li>
+        <li>Attached as CD-ROM in domain XML</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>All detection happens at runtime.</strong> The same h2kvmctl binary and Python code runs identically on Fedora 43 and AlmaLinux 9 &mdash; auto-detection adapts the output (domain XML, graphics, firmware) to what the host actually provides.</p>
+  </div>
+
+  <div class="features">
+    <span class="feat feat-amber">SPICE auto-detect</span>
+    <span class="feat feat-orange">QEMU path scan</span>
+    <span class="feat">libguestfs appliance</span>
+    <span class="feat feat-amber">OVMF firmware</span>
+    <span class="feat feat-green">VirtIO ISO auto-download</span>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 3</div>
+</div>
+
+<!-- PAGE 4: Dependency Resolution -->
+<div class="page page-slate">
+  <h2 class="title"><span>4.</span> Dependency <span>Resolution</span></h2>
+  <p class="desc">Handling the hard cases: hivex source rebuild, libguestfs symlinks, NBD module loading.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>hivex Source Rebuild</h4>
+      <ul>
+        <li>Required when: Python 3.12+ and no distro python3-hivex package</li>
+        <li>AlmaLinux 9 (Python 3.9): package available, no rebuild</li>
+        <li>Ubuntu 24.04 (Python 3.12): must rebuild from source</li>
+        <li>Build deps: hivex-devel, python3-devel, gcc, automake</li>
+        <li>Script: <code>./configure --prefix=/usr &amp;&amp; make &amp;&amp; make install</code></li>
+        <li>Installs to system Python site-packages</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>libguestfs Symlink</h4>
+      <ul>
+        <li>Some distros install to <code>/usr/lib64/</code> but Python checks <code>/usr/lib/</code></li>
+        <li>deploy-remote.sh creates symlink if needed</li>
+        <li>LIBGUESTFS_PATH environment variable set in service file</li>
+        <li>supermin appliance rebuilt after package updates</li>
+        <li>Appliance cache at <code>/var/tmp/.guestfs-*</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>supermin</h4>
+      <ul>
+        <li>Required for libguestfs appliance</li>
+        <li>Builds minimal Linux kernel + initrd</li>
+        <li>Auto-rebuild on kernel updates</li>
+        <li>Cache: <code>/var/tmp/.guestfs-0/</code></li>
+        <li>install-deps.sh includes supermin</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>python-augeas</h4>
+      <ul>
+        <li>Used for Linux guest config editing</li>
+        <li>Fedora/RHEL: <code>python3-augeas</code></li>
+        <li>Ubuntu: <code>python3-augeas</code></li>
+        <li>Edits /etc/fstab, grub.cfg, network</li>
+        <li>Lens-based config file parsing</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>NBD Module</h4>
+      <ul>
+        <li><code>modprobe nbd max_part=8</code></li>
+        <li>Required for qemu-nbd disk mount</li>
+        <li>Persistent via <code>/etc/modules-load.d/nbd.conf</code></li>
+        <li>Options via <code>/etc/modprobe.d/nbd.conf</code></li>
+        <li>Verified during readiness checks</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Build Matrix</h3>
+  <table>
+    <tr><th style="width:20%">Distro</th><th style="width:15%">hivex</th><th style="width:15%">libguestfs</th><th style="width:15%">augeas</th><th style="width:15%">NBD</th><th style="width:20%">Status</th></tr>
+    <tr><td>Fedora 43</td><td class="check">&#10003; Package</td><td class="check">&#10003; Package</td><td class="check">&#10003; Package</td><td class="check">&#10003; Module</td><td class="check">&#10003; Ready</td></tr>
+    <tr><td>RHEL 8.8</td><td class="check">&#10003; Package</td><td class="check">&#10003; Package</td><td class="check">&#10003; Package</td><td class="check">&#10003; Module</td><td class="check">&#10003; Ready</td></tr>
+    <tr><td>AlmaLinux 9</td><td class="warn">Source</td><td class="check">&#10003; Package</td><td class="check">&#10003; Package</td><td class="check">&#10003; Module</td><td class="check">&#10003; Ready</td></tr>
+    <tr><td>Ubuntu 24.04</td><td class="warn">Source</td><td class="check">&#10003; Package</td><td class="check">&#10003; Package</td><td class="check">&#10003; Module</td><td class="check">&#10003; Ready</td></tr>
+    <tr><td>Ubuntu 22.04</td><td class="warn">Source</td><td class="check">&#10003; Package</td><td class="check">&#10003; Package</td><td class="check">&#10003; Module</td><td class="check">&#10003; Ready</td></tr>
+  </table>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 4</div>
+</div>
+
+<!-- PAGE 5: Runtime Infrastructure -->
+<div class="page page-dark">
+  <h2 class="title"><span>5.</span> Runtime <span>Infrastructure</span></h2>
+  <p class="desc">Directories, locking, tmpfiles.d, daemon configuration, and service management.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>/run/hyper2kvm</h4>
+      <ul>
+        <li>Created by tmpfiles.d on boot: <code>d /run/hyper2kvm 0755 root root -</code></li>
+        <li>Also created by h2kweb service on startup</li>
+        <li>Stores runtime PID files and lock files</li>
+        <li>NBD device lock files prevent concurrent access</li>
+        <li>Conversion progress files for WebSocket streaming</li>
+        <li>Cleaned on reboot (tmpfs)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>NBD Locking</h4>
+      <ul>
+        <li>Lock file per NBD device: <code>/run/hyper2kvm/nbd0.lock</code></li>
+        <li>Prevents two conversions from using same <code>/dev/nbd*</code></li>
+        <li>Acquired before <code>qemu-nbd --connect</code></li>
+        <li>Released after <code>qemu-nbd --disconnect</code></li>
+        <li>Stale lock detection and cleanup on startup</li>
+        <li>Supports up to 16 concurrent NBD devices</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Conversion Directories</h4>
+      <ul>
+        <li>Input: <code>/var/lib/hyper2kvm/incoming/</code></li>
+        <li>Output: <code>/var/lib/hyper2kvm/converted/</code></li>
+        <li>Temp: <code>/tmp/hyper2kvm-*</code> (16GB tmpfs)</li>
+        <li>Configurable via CLI or daemon config</li>
+        <li>Auto-cleanup of temp files on completion</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Daemon Config</h4>
+      <pre style="font-size:0.72em;">
+# /etc/hyper2kvm/daemon.yaml
+watch_dir: /var/lib/hyper2kvm/incoming
+output_dir: /var/lib/hyper2kvm/converted
+auto_deploy: true
+concurrency: 2
+log_level: info
+      </pre>
+    </div>
+    <div class="card">
+      <h4>systemd Services</h4>
+      <ul>
+        <li><code>h2kweb.service</code> &mdash; web dashboard</li>
+        <li><code>h2kvmctl-daemon.service</code> &mdash; watch dir</li>
+        <li>Both: Restart=on-failure</li>
+        <li>Both: After=libvirtd.service</li>
+        <li>Journal integration for logging</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>File System Layout</h3>
+  <table>
+    <tr><th style="width:40%">Path</th><th style="width:60%">Purpose</th></tr>
+    <tr><td><code>/usr/local/sbin/h2kvmctl</code></td><td>Main CLI binary (editable install symlink)</td></tr>
+    <tr><td><code>/usr/bin/zkvm</code></td><td>TUI binary (Go, Bubble Tea)</td></tr>
+    <tr><td><code>/usr/bin/h2kweb</code></td><td>Web dashboard binary (Go + embedded frontend)</td></tr>
+    <tr><td><code>/run/hyper2kvm/</code></td><td>Runtime: PID, locks, progress (tmpfs)</td></tr>
+    <tr><td><code>/var/lib/hyper2kvm/</code></td><td>Persistent: converted images, virtio-win ISO</td></tr>
+    <tr><td><code>/etc/hyper2kvm/</code></td><td>Configuration: daemon.yaml</td></tr>
+    <tr><td><code>/usr/share/virtio-win/</code></td><td>VirtIO drivers ISO</td></tr>
+  </table>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 5</div>
+</div>
+
+<!-- PAGE 6: Migration Readiness Dashboard -->
+<div class="page page-slate">
+  <h2 class="title"><span>6.</span> Migration Readiness <span>Dashboard</span></h2>
+  <p class="desc">19 automated checks verify that the host is fully ready to migrate VMs. All green = ready to migrate.</p>
+
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:30%">Check</th><th style="width:30%">What It Verifies</th><th style="width:15%">Fedora 43</th><th style="width:20%">AlmaLinux 9</th></tr>
+    <tr><td>1</td><td>KVM acceleration</td><td><code>/dev/kvm</code> present and accessible</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>2</td><td>QEMU binary</td><td>qemu-system-x86_64 or qemu-kvm found</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>3</td><td>libvirt daemon</td><td>libvirtd running and socket accessible</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>4</td><td>qemu-img</td><td>Image conversion tool available</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>5</td><td>qemu-nbd</td><td>NBD server for disk mounting</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>6</td><td>NBD kernel module</td><td><code>lsmod | grep nbd</code> loaded</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>7</td><td>libguestfs</td><td>Python bindings importable</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>8</td><td>hivex</td><td>Registry editing bindings available</td><td class="check">&#10003;</td><td class="check">&#10003; (rebuilt)</td></tr>
+    <tr><td>9</td><td>augeas</td><td>Config file editing available</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>10</td><td>OVMF firmware</td><td>UEFI firmware files found</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>11</td><td>virtio-win ISO</td><td>Windows VirtIO drivers present</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>12</td><td>virsh</td><td>Domain management CLI available</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>13</td><td>virt-install</td><td>VM creation tool available</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>14</td><td>Network bridge/NAT</td><td>Default libvirt network active</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>15</td><td>Disk space</td><td>Sufficient free space for conversion</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>16</td><td>Runtime directory</td><td><code>/run/hyper2kvm</code> exists and writable</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>17</td><td>supermin appliance</td><td>libguestfs appliance built and cached</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>18</td><td>ntfs-3g</td><td>NTFS mount support for Windows guests</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>19</td><td>govc (optional)</td><td>VMware vSphere CLI for remote migration</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>One Script, Any Host, All Green</h3>
+    <p style="font-size:0.9em;">
+      deploy-remote.sh handles every distro difference automatically. After deployment, all 19 checks pass.<br>
+      <strong>Fedora, RHEL, AlmaLinux, Ubuntu &mdash; same binary, same config, same results.</strong>
+    </p>
+  </div>
+
+  <div class="features">
+    <span class="feat feat-green">19/19 checks passing</span>
+    <span class="feat feat-amber">4 distros supported</span>
+    <span class="feat feat-orange">Auto hivex rebuild</span>
+    <span class="feat">SPICE/VNC auto-select</span>
+    <span class="feat feat-green">One-command deploy</span>
+    <span class="feat">doctor.sh diagnostics</span>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 6</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# ============================================================================
+# deploy — ✨🔄 one command to ship hyper2kvm anywhere
+# ============================================================================
+#   ./scripts/deploy remote 185.165.240.5 sus
+#   ./scripts/deploy remote sus@host --quick
+#   ./scripts/deploy remote --quick          # reuse .deploy-last
+#   ./scripts/deploy local
+#   ./scripts/deploy status
+# ============================================================================
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+# shellcheck source=lib/deploy-common.sh
+source "$SCRIPT_DIR/lib/deploy-common.sh"
+
+usage() {
+    cat <<EOF
+Usage:
+  $(basename "$0") remote [host] [user] [password] [options]
+  $(basename "$0") local [options]
+  $(basename "$0") status
+
+Options:
+  --quick --uninstall --verbose --keep-sources --dry-run --skip-dashboard --skip-smoke
+
+Examples:
+  $(basename "$0") remote sus@185.165.240.5
+  $(basename "$0") remote --quick
+  $(basename "$0") local --quick
+
+State: $(hyper2kvm_deploy_state_file "$REPO_DIR")
+EOF
+}
+
+cmd="${1:-}"
+shift || true
+
+case "$cmd" in
+    -h|--help|help|'')
+        usage
+        exit 0
+        ;;
+    status)
+        if hyper2kvm_load_deploy_last "$REPO_DIR"; then
+            deploy_ui_banner "📊 Deploy status" "${VERSION:-?} @ ${COMMIT:-?}" "🔄"
+            deploy_ui_kv "🎯" "Host" "${HOST:-?}"
+            deploy_ui_kv "👤" "User" "${USER:-root}"
+            deploy_ui_kv "🕐" "Updated" "${UPDATED:-?}"
+            if [ -n "${HOST:-}" ]; then
+                code=$(curl -sk -o /dev/null -w '%{http_code}' --max-time 5 "https://${HOST}:5070/api/v1/health" 2>/dev/null || echo "000")
+                if [ "$code" = "200" ]; then
+                    deploy_ui_info "💚 Health → https://${HOST}:5070/api/v1/health ($code)"
+                else
+                    deploy_ui_warn "💔 Health → https://${HOST}:5070/api/v1/health ($code)"
+                fi
+            fi
+        else
+            deploy_ui_warn "No .deploy-last — run: $(basename "$0") remote <host>"
+        fi
+        exit 0
+        ;;
+    local)
+        exec "$SCRIPT_DIR/deploy-local.sh" "$@"
+        ;;
+    remote)
+        exec "$SCRIPT_DIR/deploy-remote.sh" "$@"
+        ;;
+    *)
+        if [[ "$cmd" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || [[ "$cmd" == *.* ]] || [[ "$cmd" == *@* ]]; then
+            exec "$SCRIPT_DIR/deploy-remote.sh" "$cmd" "$@"
+        fi
+        deploy_ui_error "Unknown subcommand: $cmd"
+        ;;
+esac

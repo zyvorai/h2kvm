@@ -1,0 +1,26 @@
+# Simple Job Configuration
+# ========================
+# Drop this file into to_be_processed/ along with your VM disk file
+#
+# Usage:
+#   1. Place your VM disk in to_be_processed/:
+#      cp my-vm.vmdk /var/lib/hyper2kvm/workflow/to_be_processed/
+#
+#   2. Optionally, create a job config for custom settings:
+#      cp job-config-simple.yaml /var/lib/hyper2kvm/workflow/to_be_processed/my-vm-job.yaml
+#
+#   3. Daemon picks up and processes automatically
+
+# Input file (can be relative to to_be_processed/ or absolute path)
+input: my-vm.vmdk
+
+# Output settings
+output_format: qcow2
+compress: true
+flatten: true
+
+# Guest OS fixes
+fstab_mode: stabilize-all
+regen_initramfs: true
+# grub is auto-handled
+# network is auto-handled

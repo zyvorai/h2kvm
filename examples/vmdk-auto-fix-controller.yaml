@@ -1,0 +1,240 @@
+# ==============================================================================
+# VMDK Auto-Fix Controller Mismatch Example
+# ==============================================================================
+#
+# This example demonstrates automatic controller mismatch remediation.
+#
+# When vmdk_auto_fix_controller is enabled, hyper2kvm will:
+#   1. Inspect the VMDK for controller compatibility
+#   2. Detect LSI Logic, IDE, or other non-virtio controllers
+#   3. Automatically inject virtio drivers into guest initramfs
+#   4. Result: VM boots successfully on KVM with virtio controllers
+#
+# Use Cases:
+#   ✅ VMware VMs with LSI Logic controllers
+#   ✅ VMware VMs with BusLogic (will fail with clear error - must fix in VMware first)
+#   ✅ VMware VMs with IDE controllers
+#   ✅ Batch migrations where some VMs need driver injection
+#
+# ==============================================================================
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 1: Basic Auto-Fix (LSI Logic → virtio)
+# ------------------------------------------------------------------------------------
+cmd: local
+vmdk: /path/to/vm-with-lsilogic.vmdk
+output_dir: ./output
+to_output: vm-fixed.qcow2
+out_format: qcow2
+
+# Enable automatic controller fix
+vmdk_auto_fix_controller: true
+
+# These are enabled automatically when controller mismatch detected:
+# regen_initramfs: true  (auto-enabled)
+# initramfs_add_drivers: [virtio, virtio_blk, virtio_scsi, virtio_net, virtio_pci]  (auto-added)
+
+verbose: 2
+report: migration-report.md
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 2: Auto-Fix with Custom Drivers
+# ------------------------------------------------------------------------------------
+# If you need additional drivers beyond the default virtio set
+cmd: local
+vmdk: /path/to/vm-with-special-hardware.vmdk
+output_dir: ./output
+to_output: vm-custom.qcow2
+
+# Enable auto-fix
+vmdk_auto_fix_controller: true
+
+# Specify custom drivers (replaces defaults)
+initramfs_add_drivers:
+  # Virtio (required for KVM)
+  - virtio
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+
+  # Additional hardware-specific drivers
+  - e1000e      # Intel NIC
+  - nvme        # NVMe storage
+  - megaraid_sas  # RAID controller
+
+regen_initramfs: true
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 3: Batch Migration with Auto-Fix
+# ------------------------------------------------------------------------------------
+# Migrate multiple VMs, some with controller mismatches
+cmd: local
+parallel_processing: true
+
+# Global auto-fix setting (applies to all VMs)
+vmdk_auto_fix_controller: true
+
+vms:
+  # VM 1: LSI Logic (will be auto-fixed)
+  - vmdk: /data/vm1-lsilogic.vmdk
+    to_output: vm1-fixed.qcow2
+
+  # VM 2: Virtio already (no fix needed)
+  - vmdk: /data/vm2-virtio.vmdk
+    to_output: vm2.qcow2
+
+  # VM 3: LSI Logic with custom drivers
+  - vmdk: /data/vm3-lsilogic.vmdk
+    to_output: vm3-fixed.qcow2
+    initramfs_add_drivers: "virtio virtio_blk virtio_scsi e1000e"
+
+output_dir: ./batch-output
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 4: vSphere → KVM with Auto-Fix
+# ------------------------------------------------------------------------------------
+# Download from vSphere and auto-fix controller mismatch
+cmd: vsphere
+vcenter_host: vcenter.example.com
+vcenter_user: administrator@vsphere.local
+vcenter_password: ${VCENTER_PASSWORD}
+
+vm_name: production-web-server
+output_dir: ./migrated-vms
+to_output: web-server.qcow2
+
+# Enable auto-fix for downloaded VMDK
+vmdk_auto_fix_controller: true
+
+# Additional migration settings
+compress: true
+verbose: 2
+report: web-server-migration.md
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 5: Without Auto-Fix (Manual Control)
+# ------------------------------------------------------------------------------------
+# Use this if you want to manually control initramfs drivers
+cmd: local
+vmdk: /path/to/vm.vmdk
+output_dir: ./output
+to_output: vm-manual.qcow2
+
+# Disable auto-fix (default is false)
+vmdk_auto_fix_controller: false
+
+# Manually specify initramfs rebuild
+regen_initramfs: true
+initramfs_add_drivers:
+  - virtio
+  - virtio_blk
+  - custom_driver
+
+verbose: 2
+
+
+# ==============================================================================
+# WHAT HAPPENS DURING AUTO-FIX
+# ==============================================================================
+#
+# Pipeline flow with vmdk_auto_fix_controller: true
+#
+# 1. Pre-Migration Validation
+#    ➡️ VMDK Inspector analyzes disk
+#    ➡️ Detects: "Controller 'lsilogic' – initramfs may lack driver"
+#
+# 2. Auto-Fix Trigger
+#    ➡️ Pipeline sees: vmdk_auto_fix_controller: true
+#    ➡️ Automatically enables: regen_initramfs: true
+#    ➡️ Automatically adds: initramfs_add_drivers: [virtio, ...]
+#
+# 3. Conversion
+#    ➡️ VMDK → qcow2 conversion
+#
+# 4. Guest Fixing (Offline)
+#    ➡️ Mounts guest filesystem with guestfs
+#    ➡️ Detects OS (RHEL/Ubuntu/SUSE/etc)
+#    ➡️ Rebuilds initramfs with virtio drivers:
+#       - RHEL/CentOS: dracut --force --add-drivers "virtio virtio_blk virtio_scsi..."
+#       - Ubuntu/Debian: update-initramfs -u (after adding to /etc/initramfs-tools/modules)
+#       - SUSE: dracut with /etc/dracut.conf.d/90-virtio.conf
+#    ➡️ Verifies drivers were added (lsinitrd/lsinitramfs)
+#
+# 5. Result
+#    ➡️ Bootable qcow2 with virtio drivers
+#    ➡️ VM boots successfully on KVM/libvirt
+#    ➡️ Uses virtio-blk/virtio-scsi controllers
+#
+# ==============================================================================
+# SUPPORTED SCENARIOS
+# ==============================================================================
+#
+# ✅ Can Auto-Fix:
+#   - LSI Logic → virtio
+#   - LSI Logic SAS → virtio
+#   - IDE → virtio
+#   - SATA → virtio
+#   - Any non-virtio controller where KVM driver exists
+#
+# ❌ Cannot Auto-Fix:
+#   - BusLogic → No KVM driver (FATAL - must change in VMware first)
+#   - Snapshot chains → Must consolidate snapshots
+#   - Missing extent files → Must re-export from VMware
+#
+# ==============================================================================
+# TROUBLESHOOTING
+# ==============================================================================
+#
+# If VM fails to boot after auto-fix:
+#
+# 1. Check migration report (report: migration-report.md)
+#    - Look for "Initramfs regeneration" section
+#    - Verify drivers were added successfully
+#
+# 2. Verify drivers in initramfs:
+#    # RHEL/CentOS
+#    lsinitrd /boot/initramfs-*.img | grep virtio
+#
+#    # Ubuntu/Debian
+#    lsinitramfs /boot/initrd.img-* | grep virtio
+#
+# 3. Check libvirt domain XML:
+#    - Ensure <target dev='vda' bus='virtio'/>
+#    - Not <target dev='sda' bus='scsi'/>
+#
+# 4. Enable verbose logging:
+#    verbose: 2
+#    # Shows detailed initramfs rebuild commands
+#
+# 5. Manual initramfs rebuild (if auto-fix failed):
+#    # Boot VM in rescue mode
+#    # RHEL/CentOS
+#    dracut --force --add-drivers "virtio virtio_blk virtio_scsi"
+#
+#    # Ubuntu/Debian
+#    echo "virtio_blk" >> /etc/initramfs-tools/modules
+#    update-initramfs -u
+#
+# ==============================================================================
+# SEE ALSO
+# ==============================================================================
+#
+# Documentation:
+#   - docs/features/vmdk-inspector.md
+#   - test-confs/96-linux-initramfs-drivers-examples.yaml
+#
+# Related examples:
+#   - examples/yaml/10-local/local-linux-dry-run-preview.yaml
+#   - test-confs/02-local-rhel-10-vmdk.yaml
+#
+# Standalone CLI:
+#   ./scripts/vmdk_inspect.py --auto-fix --output fixed.qcow2 disk.vmdk
+#
+# ==============================================================================

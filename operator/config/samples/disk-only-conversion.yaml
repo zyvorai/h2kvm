@@ -1,0 +1,27 @@
+---
+# Disk-only conversion (no VM creation)
+# Useful when you just want to convert a disk image to a DataVolume
+# The VM can be created manually later
+apiVersion: hyper2kvm.io/v1alpha1
+kind: HyperConversion
+metadata:
+  name: disk-only-conversion
+  namespace: default
+spec:
+  source:
+    url: "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
+    format: qcow2
+    checksum: "sha256:checksum-here"
+
+  storage:
+    storageClass: ceph-rbd
+    size: 30Gi
+    accessMode: ReadWriteOnce
+    volumeMode: Filesystem
+
+  # No VM spec - only create DataVolume
+  # vm: null
+
+  conversion:
+    compression: zstd
+    timeout: 30

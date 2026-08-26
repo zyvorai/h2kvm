@@ -1,0 +1,14 @@
+{
+  "command": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "vc_user": "administrator@vsphere.local",
+  "vc_password_env": "VC_PASSWORD",
+  "vc_insecure": true,
+  "vs_action": "query_changed_disk_areas",
+  "vm_name": "myVM",
+  "snapshot_name": "hyper2kvm-cbt",
+  "disk": 0,
+  "start_offset": 0,
+  "change_id": "*",
+  "json": true
+}

@@ -1,0 +1,85 @@
+---
+# PersistentVolumeClaim for worker state (jobs, state machine)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hyper2kvm-worker-state
+  namespace: hyper2kvm-workers
+  labels:
+    app: hyper2kvm-worker
+    component: state-storage
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nfs-storage  # Adjust to your storage class
+  resources:
+    requests:
+      storage: 10Gi
+---
+# PersistentVolumeClaim for worker events (progress events, logs)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hyper2kvm-worker-events
+  namespace: hyper2kvm-workers
+  labels:
+    app: hyper2kvm-worker
+    component: event-storage
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nfs-storage  # Adjust to your storage class
+  resources:
+    requests:
+      storage: 5Gi
+---
+# PersistentVolumeClaim for input VMDKs (read-only)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vmdk-input-storage
+  namespace: hyper2kvm-workers
+  labels:
+    app: hyper2kvm
+    component: input-storage
+spec:
+  accessModes:
+  - ReadOnlyMany
+  storageClassName: nfs-vmdk-storage  # NFS for large VMDK files
+  resources:
+    requests:
+      storage: 1Ti
+---
+# PersistentVolumeClaim for output qcow2 (read-write, fast)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qcow2-output-storage
+  namespace: hyper2kvm-workers
+  labels:
+    app: hyper2kvm
+    component: output-storage
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: ceph-rbd-fast  # Fast storage for output
+  resources:
+    requests:
+      storage: 500Gi
+---
+# PersistentVolumeClaim for conversion temp (local NVMe, fastest)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: conversion-temp-storage
+  namespace: hyper2kvm-workers
+  labels:
+    app: hyper2kvm
+    component: temp-storage
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-nvme  # Local NVMe for maximum performance
+  resources:
+    requests:
+      storage: 200Gi

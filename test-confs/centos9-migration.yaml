@@ -1,0 +1,21 @@
+command: local
+vmdk: /home/ssahani/Downloads/centos/CentOS_Stream_9_VMM_LinuxVMImages.COM.vmdk
+output_dir: /home/hyper2kvm-test
+to_output: centos9.qcow2
+out_format: qcow2
+fstab_mode: stabilize-all
+regen_initramfs: true
+compress: true
+container_isolation: true
+
+# Libvirt domain XML emission
+emit_domain_xml: true
+virsh_define: true
+vm_name: centos9-migrated
+memory: 2048
+vcpus: 2
+force_replace: true
+
+# Enable debug logging
+verbosity: 2
+debug: true

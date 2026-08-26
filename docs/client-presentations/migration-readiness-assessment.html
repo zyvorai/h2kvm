@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Migration Readiness Assessment — Are You Ready to Exit VMware?</title>
+<style>
+  :root {
+    --bg: #0f172a; --bg2: #1e293b; --bg3: #334155;
+    --text: #e2e8f0; --text2: #94a3b8; --text3: #64748b;
+    --accent: #8b5cf6; --accent2: #a78bfa; --accent-glow: rgba(139,92,246,0.15);
+    --green: #22c55e; --yellow: #eab308; --orange: #f59e0b; --red: #ef4444;
+    --card: #1e293b; --card-border: #334155;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, #1e1b4b, #312e81, #4f46e5); border-bottom: 1px solid var(--card-border); padding: 28px 0; text-align: center; }
+  .header h1 { font-size: 2em; font-weight: 800; } .header h1 span { color: var(--accent2); }
+  .header p { color: rgba(255,255,255,0.7); font-size: 1.05em; margin-top: 4px; }
+  .header .badge { display: inline-block; background: rgba(167,139,250,0.2); border: 1px solid rgba(167,139,250,0.4); color: var(--accent2); padding: 4px 14px; border-radius: 20px; font-size: 0.82em; margin-top: 10px; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  .card { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+  .card h2 { font-size: 1.15em; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .card .desc { font-size: 0.85em; color: var(--text2); margin-bottom: 16px; }
+
+  /* Category header */
+  .cat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--card-border); }
+  .cat-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9em; flex-shrink: 0; }
+  .cat-title { font-size: 1.1em; font-weight: 700; }
+  .cat-score { margin-left: auto; font-size: 0.85em; color: var(--text2); }
+
+  /* Questions */
+  .question { margin-bottom: 18px; }
+  .question .q-text { font-size: 0.92em; font-weight: 500; margin-bottom: 8px; }
+  .q-hint { font-size: 0.78em; color: var(--text3); margin-bottom: 6px; }
+  .options { display: flex; gap: 8px; flex-wrap: wrap; }
+  .opt { padding: 8px 16px; border: 1px solid var(--card-border); border-radius: 8px; font-size: 0.85em; cursor: pointer; transition: all 0.2s; background: var(--bg); color: var(--text2); user-select: none; }
+  .opt:hover { border-color: var(--accent); color: var(--text); }
+  .opt.selected { background: var(--accent-glow); border-color: var(--accent); color: var(--accent2); font-weight: 600; }
+  .opt.sel-green { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.5); color: var(--green); }
+  .opt.sel-yellow { background: rgba(234,179,8,0.12); border-color: rgba(234,179,8,0.5); color: var(--yellow); }
+  .opt.sel-orange { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.5); color: var(--orange); }
+  .opt.sel-red { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.4); color: var(--red); }
+
+  /* Score display */
+  .score-section { position: sticky; top: 0; z-index: 10; background: var(--bg); padding: 16px 0; }
+  .score-bar-outer { width: 100%; height: 16px; background: var(--bg2); border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); }
+  .score-bar-fill { height: 100%; border-radius: 8px; transition: width 0.5s ease, background 0.5s ease; }
+  .score-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .score-num { font-size: 1.6em; font-weight: 800; }
+  .score-label { font-size: 0.95em; font-weight: 600; padding: 4px 14px; border-radius: 20px; }
+  .score-detail { font-size: 0.82em; color: var(--text3); }
+
+  /* Results */
+  .results-card { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 24px; margin-top: 24px; }
+  .result-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 16px 0; }
+  @media (max-width: 700px) { .result-grid { grid-template-columns: repeat(2, 1fr); } }
+  .result-item { text-align: center; padding: 12px 8px; background: var(--bg); border-radius: 8px; border: 1px solid var(--card-border); }
+  .result-item .ri-label { font-size: 0.72em; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .result-item .ri-value { font-size: 1.3em; font-weight: 800; }
+  .result-item .ri-bar { height: 4px; background: var(--bg3); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+  .result-item .ri-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
+
+  .recommendation { margin-top: 16px; padding: 16px; border-radius: 8px; font-size: 0.9em; }
+  .rec-green { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.3); }
+  .rec-yellow { background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.3); }
+  .rec-orange { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); }
+  .rec-red { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); }
+  .rec-title { font-weight: 700; font-size: 1.05em; margin-bottom: 6px; }
+
+  .action-list { list-style: none; margin-top: 10px; }
+  .action-list li { padding: 6px 0; font-size: 0.88em; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 8px; }
+  .action-list li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+  .action-list li.done::before { background: var(--green); }
+  .action-list li.todo::before { background: var(--orange); }
+  .action-list li.blocker::before { background: var(--red); }
+
+  .print-btn { background: var(--accent); color: #fff; border: none; padding: 10px 24px; border-radius: 8px; font-size: 0.9em; font-weight: 600; cursor: pointer; margin-top: 16px; }
+  .print-btn:hover { background: #7c3aed; }
+
+  .footer { text-align: center; padding: 24px; color: var(--text3); font-size: 0.82em; border-top: 1px solid var(--card-border); margin-top: 40px; }
+  .footer a { color: var(--accent2); text-decoration: none; }
+
+  @media print {
+    body { background: #fff; color: #1a1a2e; }
+    .card, .results-card { background: #fff; border: 1px solid #ddd; }
+    .opt.selected, .opt.sel-green, .opt.sel-yellow, .opt.sel-orange, .opt.sel-red { border-width: 2px; }
+    .print-btn { display: none; }
+    .score-section { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Migration Readiness <span>Assessment</span></h1>
+  <p>Answer 25 questions to score your organization's readiness for VMware to KVM migration</p>
+  <div class="badge">25 Questions &bull; 5 Categories &bull; Instant Scoring &bull; Actionable Recommendations</div>
+</div>
+
+<div class="container">
+
+  <!-- Sticky score bar -->
+  <div class="score-section">
+    <div class="score-bar-outer"><div class="score-bar-fill" id="scoreBarFill" style="width:0%; background: var(--text3);"></div></div>
+    <div class="score-row">
+      <div><span class="score-num" id="totalScore">0</span><span style="color:var(--text3);font-size:0.9em;"> / 100</span></div>
+      <span class="score-label" id="scoreLabel" style="background:var(--bg3); color:var(--text2);">Answer questions below</span>
+      <span class="score-detail" id="answeredCount">0 / 25 answered</span>
+    </div>
+  </div>
+
+  <!-- Questions rendered by JS -->
+  <div id="questionsContainer"></div>
+
+  <!-- Results -->
+  <div class="results-card" id="resultsCard" style="display:none;">
+    <h2 style="margin-bottom:12px;">Assessment Results</h2>
+    <div class="result-grid" id="categoryScores"></div>
+    <div id="recommendation"></div>
+    <div style="text-align:center;"><button class="print-btn" onclick="window.print()">&#128424; Print Assessment Report</button></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p><a href="https://hyper2kvm.io">hyper2kvm.io</a> &bull; Proprietary (Zyvor AI Labs) &bull; All answers stay in your browser &bull; No data sent anywhere</p>
+</div>
+
+<script>
+const categories = [
+  {
+    id: 'infra', title: 'Infrastructure & Environment', icon: '1',
+    questions: [
+      { q: 'How many VMs do you need to migrate?', hint: 'Total count across all ESXi hosts',
+        opts: [{t:'1-20', s:4}, {t:'21-50', s:4}, {t:'51-200', s:3}, {t:'201-500', s:2}, {t:'500+', s:1}] },
+      { q: 'What VMware products are you currently running?', hint: 'More products = more savings potential',
+        opts: [{t:'ESXi only', s:3}, {t:'ESXi + vCenter', s:4}, {t:'+ vSAN', s:4}, {t:'Full VCF stack', s:4}, {t:'Horizon VDI', s:2}] },
+      { q: 'What is the age of your physical server hardware?', hint: 'Newer hardware has better KVM support',
+        opts: [{t:'< 2 years', s:4}, {t:'2-4 years', s:4}, {t:'4-6 years', s:3}, {t:'6+ years', s:2}] },
+      { q: 'Do your servers support hardware virtualization (VT-x/AMD-V)?', hint: 'Required for KVM',
+        opts: [{t:'Yes, confirmed', s:4}, {t:'Probably yes (recent HW)', s:3}, {t:'Not sure', s:2}, {t:'No / very old HW', s:0}] },
+      { q: 'What is your primary storage backend?', hint: 'Affects migration complexity',
+        opts: [{t:'Local disk (VMFS)', s:4}, {t:'SAN (FC/iSCSI)', s:3}, {t:'vSAN', s:3}, {t:'NFS', s:4}, {t:'Mixed / complex', s:2}] },
+    ]
+  },
+  {
+    id: 'workload', title: 'Workload Characteristics', icon: '2',
+    questions: [
+      { q: 'What operating systems run on your VMs?', hint: 'Linux is easiest, Windows needs VirtIO drivers',
+        opts: [{t:'Mostly Linux', s:4}, {t:'50/50 Linux/Windows', s:3}, {t:'Mostly Windows', s:3}, {t:'Legacy OS (Win 2008, RHEL 5)', s:1}] },
+      { q: 'Do any VMs require GPU passthrough?', hint: 'KVM supports GPU passthrough natively',
+        opts: [{t:'No GPUs', s:4}, {t:'A few GPU VMs', s:3}, {t:'Many GPU VMs (VDI)', s:2}, {t:'Not sure', s:3}] },
+      { q: 'Are there any physical-to-virtual (P2V) appliances?', hint: 'Vendor appliances may have restrictions',
+        opts: [{t:'No appliances', s:4}, {t:'A few (firewall, NAS)', s:3}, {t:'Several vendor appliances', s:2}, {t:'Many locked appliances', s:1}] },
+      { q: 'How are your VMs currently backed up?', hint: 'Backup strategy needs updating post-migration',
+        opts: [{t:'Veeam / CommVault', s:3}, {t:'VMware-native snapshots', s:3}, {t:'Agent-based (in-guest)', s:4}, {t:'No formal backup', s:2}] },
+      { q: 'What is your maximum acceptable downtime per VM during migration?', hint: 'Pre-converted VMs: typically 5-15 min cutover',
+        opts: [{t:'< 15 minutes', s:4}, {t:'1-4 hours', s:4}, {t:'One weekend', s:4}, {t:'Zero downtime required', s:1}] },
+    ]
+  },
+  {
+    id: 'team', title: 'Team & Skills', icon: '3',
+    questions: [
+      { q: 'Does your team have Linux administration experience?', hint: 'KVM runs on Linux — this is the #1 skill',
+        opts: [{t:'Strong (daily Linux use)', s:4}, {t:'Moderate (some Linux)', s:3}, {t:'Basic (occasional)', s:2}, {t:'None (Windows only)', s:1}] },
+      { q: 'How many people will be on the migration team?', hint: 'More people = faster migration, but need coordination',
+        opts: [{t:'1 person', s:2}, {t:'2-3 people', s:4}, {t:'4-6 people', s:4}, {t:'7+ (large team)', s:3}] },
+      { q: 'Is there executive sponsorship for VMware exit?', hint: 'Critical for budget, timeline, and organizational buy-in',
+        opts: [{t:'CTO/CIO fully sponsoring', s:4}, {t:'VP/Director supports', s:3}, {t:'Manager level only', s:2}, {t:'No sponsor yet', s:1}] },
+      { q: 'Is your team open to learning new tools (virsh, Ansible)?', hint: 'Willingness to learn is more important than current skill',
+        opts: [{t:'Enthusiastic', s:4}, {t:'Willing', s:3}, {t:'Reluctant', s:2}, {t:'Resistant to change', s:1}] },
+      { q: 'Do you have a change management process (CAB, ITIL)?', hint: 'Structured process reduces risk',
+        opts: [{t:'Formal ITIL/CAB process', s:4}, {t:'Informal but documented', s:3}, {t:'Ad-hoc', s:2}, {t:'None', s:1}] },
+    ]
+  },
+  {
+    id: 'business', title: 'Business Drivers', icon: '4',
+    questions: [
+      { q: 'When does your VMware contract/license expire?', hint: 'Urgency drives timeline',
+        opts: [{t:'Already expired', s:4}, {t:'Within 6 months', s:4}, {t:'6-12 months', s:3}, {t:'1-2 years', s:3}, {t:'3+ years remaining', s:2}] },
+      { q: 'How much did your VMware costs increase at last renewal?', hint: 'Broadcom typically increased 2-5x',
+        opts: [{t:'No increase', s:2}, {t:'< 50% increase', s:3}, {t:'50-200% increase', s:4}, {t:'200%+ increase', s:4}, {t:'Haven\'t renewed yet', s:3}] },
+      { q: 'What is your annual VMware licensing spend?', hint: 'Higher spend = higher savings potential',
+        opts: [{t:'< $50K', s:3}, {t:'$50K-$150K', s:4}, {t:'$150K-$500K', s:4}, {t:'$500K+', s:4}] },
+      { q: 'Are there compliance requirements (HIPAA, PCI, SOX)?', hint: 'Compliance adds planning but doesn\'t block migration',
+        opts: [{t:'No compliance reqs', s:4}, {t:'SOX', s:3}, {t:'HIPAA or PCI-DSS', s:3}, {t:'Multiple frameworks', s:2}, {t:'Air-gap / classified', s:2}] },
+      { q: 'Is there a strategic direction toward Kubernetes/containers?', hint: 'KubeVirt enables running VMs + containers on same platform',
+        opts: [{t:'Already using K8s', s:4}, {t:'Planning K8s adoption', s:4}, {t:'Evaluating', s:3}, {t:'No container plans', s:3}] },
+    ]
+  },
+  {
+    id: 'risk', title: 'Risk Tolerance & Timeline', icon: '5',
+    questions: [
+      { q: 'Have you done a POC or tested KVM with any workloads?', hint: 'Even 1 VM test greatly reduces risk',
+        opts: [{t:'Yes, successful POC', s:4}, {t:'Tested in lab', s:3}, {t:'Read documentation', s:2}, {t:'No exposure yet', s:1}] },
+      { q: 'What is your target migration timeline?', hint: 'Faster timelines need more resources',
+        opts: [{t:'1-3 months', s:3}, {t:'3-6 months', s:4}, {t:'6-12 months', s:4}, {t:'No deadline', s:2}] },
+      { q: 'Do you have a rollback strategy if migration fails?', hint: 'Keep VMware VMs for 48hr after cutover',
+        opts: [{t:'Yes, documented rollback', s:4}, {t:'Can keep VMware running', s:3}, {t:'Partial rollback possible', s:2}, {t:'No rollback plan', s:1}] },
+      { q: 'How risk-averse is your organization?', hint: 'Conservative = more testing phases, slower waves',
+        opts: [{t:'Risk-tolerant (startup/tech)', s:4}, {t:'Moderate', s:3}, {t:'Conservative (enterprise)', s:3}, {t:'Very risk-averse (regulated)', s:2}] },
+      { q: 'Is there a DR/HA requirement for migrated VMs?', hint: 'KVM supports Pacemaker HA and Ceph replication',
+        opts: [{t:'No HA needed', s:4}, {t:'Basic HA (restart on failure)', s:3}, {t:'Full HA + DR site', s:3}, {t:'Active-active required', s:2}] },
+    ]
+  }
+];
+
+const answers = {};
+let totalQuestions = 0;
+categories.forEach(c => totalQuestions += c.questions.length);
+
+function renderQuestions() {
+  let html = '';
+  let qIdx = 0;
+  categories.forEach((cat, ci) => {
+    html += `<div class="card">
+      <div class="cat-header">
+        <div class="cat-num">${cat.icon}</div>
+        <div class="cat-title">${cat.title}</div>
+        <div class="cat-score" id="catScore_${cat.id}">0 / ${cat.questions.length * 4}</div>
+      </div>`;
+    cat.questions.forEach((q, qi) => {
+      const key = `${cat.id}_${qi}`;
+      html += `<div class="question">
+        <div class="q-text">${qIdx + 1}. ${q.q}</div>
+        ${q.hint ? `<div class="q-hint">${q.hint}</div>` : ''}
+        <div class="options">`;
+      q.opts.forEach((o, oi) => {
+        html += `<div class="opt" data-key="${key}" data-score="${o.s}" data-idx="${oi}" onclick="selectOpt(this)">${o.t}</div>`;
+      });
+      html += `</div></div>`;
+      qIdx++;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('questionsContainer').innerHTML = html;
+}
+
+function selectOpt(el) {
+  const key = el.dataset.key;
+  const score = parseInt(el.dataset.score);
+
+  // Deselect siblings
+  el.parentElement.querySelectorAll('.opt').forEach(o => {
+    o.className = 'opt';
+  });
+
+  // Select this one with color
+  const colorClass = score >= 4 ? 'sel-green' : score >= 3 ? 'sel-yellow' : score >= 2 ? 'sel-orange' : 'sel-red';
+  el.classList.add('selected', colorClass);
+
+  answers[key] = score;
+  updateScores();
+}
+
+function updateScores() {
+  let total = 0;
+  let answered = Object.keys(answers).length;
+  const catScores = {};
+
+  categories.forEach(cat => {
+    let catTotal = 0;
+    let catMax = cat.questions.length * 4;
+    cat.questions.forEach((q, qi) => {
+      const key = `${cat.id}_${qi}`;
+      if (answers[key] !== undefined) {
+        catTotal += answers[key];
+        total += answers[key];
+      }
+    });
+    catScores[cat.id] = { score: catTotal, max: catMax, pct: catMax > 0 ? (catTotal / catMax * 100) : 0 };
+    document.getElementById(`catScore_${cat.id}`).textContent = `${catTotal} / ${catMax}`;
+  });
+
+  const maxScore = totalQuestions * 4;
+  const pct = maxScore > 0 ? (total / maxScore * 100) : 0;
+  const normalizedScore = Math.round(pct);
+
+  // Update score bar
+  const fill = document.getElementById('scoreBarFill');
+  fill.style.width = pct + '%';
+  if (pct >= 80) fill.style.background = 'linear-gradient(90deg, #16a34a, #22c55e)';
+  else if (pct >= 60) fill.style.background = 'linear-gradient(90deg, #ca8a04, #eab308)';
+  else if (pct >= 40) fill.style.background = 'linear-gradient(90deg, #d97706, #f59e0b)';
+  else fill.style.background = 'linear-gradient(90deg, #dc2626, #ef4444)';
+
+  document.getElementById('totalScore').textContent = normalizedScore;
+  document.getElementById('answeredCount').textContent = `${answered} / ${totalQuestions} answered`;
+
+  // Score label
+  const label = document.getElementById('scoreLabel');
+  if (answered < totalQuestions) {
+    label.textContent = 'Keep answering...';
+    label.style.background = 'var(--bg3)'; label.style.color = 'var(--text2)';
+  } else if (pct >= 80) {
+    label.textContent = 'Ready to Migrate';
+    label.style.background = 'rgba(34,197,94,0.15)'; label.style.color = '#22c55e';
+  } else if (pct >= 60) {
+    label.textContent = 'Nearly Ready';
+    label.style.background = 'rgba(234,179,8,0.15)'; label.style.color = '#eab308';
+  } else if (pct >= 40) {
+    label.textContent = 'Needs Preparation';
+    label.style.background = 'rgba(245,158,11,0.15)'; label.style.color = '#f59e0b';
+  } else {
+    label.textContent = 'Significant Gaps';
+    label.style.background = 'rgba(239,68,68,0.1)'; label.style.color = '#ef4444';
+  }
+
+  // Show results when all answered
+  if (answered >= totalQuestions) {
+    showResults(normalizedScore, catScores);
+  }
+}
+
+function showResults(score, catScores) {
+  const resultsCard = document.getElementById('resultsCard');
+  resultsCard.style.display = 'block';
+
+  // Category score bars
+  let catHtml = '';
+  const catNames = { infra: 'Infrastructure', workload: 'Workloads', team: 'Team & Skills', business: 'Business', risk: 'Risk & Timeline' };
+  categories.forEach(cat => {
+    const cs = catScores[cat.id];
+    const color = cs.pct >= 80 ? '#22c55e' : cs.pct >= 60 ? '#eab308' : cs.pct >= 40 ? '#f59e0b' : '#ef4444';
+    catHtml += `<div class="result-item">
+      <div class="ri-label">${catNames[cat.id]}</div>
+      <div class="ri-value" style="color:${color}">${Math.round(cs.pct)}%</div>
+      <div class="ri-bar"><div class="ri-bar-fill" style="width:${cs.pct}%; background:${color};"></div></div>
+    </div>`;
+  });
+  document.getElementById('categoryScores').innerHTML = catHtml;
+
+  // Recommendation
+  let recHtml = '';
+  if (score >= 80) {
+    recHtml = `<div class="recommendation rec-green">
+      <div class="rec-title" style="color:#22c55e;">Ready to Migrate — Start Your POC This Week</div>
+      <p>Your organization scores <strong>${score}/100</strong> — you have the infrastructure, skills, and business drivers to proceed confidently.</p>
+      <ul class="action-list">
+        <li class="done">Run <code>h2kvmctl doctor</code> on your target KVM hosts</li>
+        <li class="done">Convert 3-5 dev/test VMs as POC (use <code>h2kvmctl convert</code>)</li>
+        <li class="done">Benchmark performance against VMware baseline</li>
+        <li class="todo">Create migration project plan (see presentation #48)</li>
+        <li class="todo">Schedule Wave 1 cutover window</li>
+        <li class="todo">Notify VMware/Broadcom of non-renewal intent</li>
+      </ul>
+    </div>`;
+  } else if (score >= 60) {
+    recHtml = `<div class="recommendation rec-yellow">
+      <div class="rec-title" style="color:#eab308;">Nearly Ready — Address 2-3 Gaps, Then Proceed</div>
+      <p>Your organization scores <strong>${score}/100</strong> — close to ready with a few areas to strengthen.</p>
+      <ul class="action-list">
+        <li class="todo">Address lowest-scoring category first</li>
+        <li class="todo">Schedule team training (see presentation #49 — 2-4 weeks)</li>
+        <li class="todo">Run a POC with 5 VMs to build confidence</li>
+        <li class="todo">Secure executive sponsorship if not already in place</li>
+        <li class="todo">Document rollback procedure</li>
+        <li class="done">Use the TCO calculator to quantify savings for business case</li>
+      </ul>
+    </div>`;
+  } else if (score >= 40) {
+    recHtml = `<div class="recommendation rec-orange">
+      <div class="rec-title" style="color:#f59e0b;">Needs Preparation — Plan for 2-3 Month Ramp-Up</div>
+      <p>Your organization scores <strong>${score}/100</strong> — migration is achievable but requires preparation.</p>
+      <ul class="action-list">
+        <li class="blocker">Critical: build Linux/KVM skills (team training first)</li>
+        <li class="blocker">Secure executive sponsor and budget approval</li>
+        <li class="todo">Start with a lab environment (nested KVM or spare server)</li>
+        <li class="todo">Migrate 1 non-critical VM as learning exercise</li>
+        <li class="todo">Inventory all VMs and classify by risk/complexity</li>
+        <li class="todo">Engage a KVM consultant for initial architecture review</li>
+      </ul>
+    </div>`;
+  } else {
+    recHtml = `<div class="recommendation rec-red">
+      <div class="rec-title" style="color:#ef4444;">Significant Gaps — Start With Foundation Building</div>
+      <p>Your organization scores <strong>${score}/100</strong> — significant preparation needed before migration.</p>
+      <ul class="action-list">
+        <li class="blocker">Invest in Linux training for the team (RHCSA or equivalent)</li>
+        <li class="blocker">Verify hardware supports KVM (VT-x/AMD-V in BIOS)</li>
+        <li class="blocker">Build executive business case with TCO calculator</li>
+        <li class="todo">Consider engaging a migration partner/MSP</li>
+        <li class="todo">Start with a 6-month timeline to build readiness</li>
+        <li class="todo">Set up a lab and experiment with KVM basics</li>
+      </ul>
+    </div>`;
+  }
+  document.getElementById('recommendation').innerHTML = recHtml;
+
+  // Scroll to results
+  resultsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+renderQuestions();
+</script>
+</body>
+</html>

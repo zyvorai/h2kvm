@@ -1,0 +1,44 @@
+{
+  "manifest_version": "1.0",
+  "profile": "production",
+  "profile_overrides": {
+    "pipeline": {
+      "convert": {
+        "compress_level": 9
+      }
+    }
+  },
+  "source": {
+    "type": "local",
+    "provider": "vmware",
+    "vm_name": "web-server-01",
+    "vm_id": "vm-123"
+  },
+  "disks": [
+    {
+      "id": "boot",
+      "source_format": "vmdk",
+      "bytes": 53687091200,
+      "local_path": "/work/vm1/boot.vmdk",
+      "boot_order_hint": 0,
+      "disk_type": "boot",
+      "label": "System Disk"
+    }
+  ],
+  "vm": {
+    "firmware": "bios",
+    "os_hint": "linux",
+    "cpu": 4,
+    "mem_gb": 8
+  },
+  "network_mapping": {
+    "source_networks": {
+      "VM Network": "br0"
+    },
+    "mac_address_policy": "preserve"
+  },
+  "storage_mapping": {
+    "default_pool": "vms",
+    "format_override": "qcow2"
+  }
+}

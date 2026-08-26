@@ -1,0 +1,73 @@
+# hyper2kvm Migration Pipeline Configuration
+# This config demonstrates the complete migration workflow:
+# VMDK → Conversion → Fixes → Validation → QCOW2
+
+# Input configuration
+input:
+  vmdk: ./esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+  # Source can also be:
+  # - OVA/OVF files
+  # - VHD/VHDX (Hyper-V)
+  # - Raw disk images
+
+# Output configuration
+output:
+  dir: ./output
+  filename: rhel8.8-fixed.qcow2
+  format: qcow2  # Options: qcow2, raw, vmdk
+  compress: true  # Compress output (qcow2 only)
+
+# Conversion options
+conversion:
+  flatten: true  # Flatten multi-layer disk chains
+  fstab_mode: stabilize-all  # Options: preserve, uuid, label, stabilize-all
+  regen_initramfs: true  # Regenerate initramfs with correct drivers
+
+  # Additional options (uncomment to use):
+  # preserve_mac: true
+  # fix_networking: true
+  # strip_vmware_tools: true
+
+# Validation configuration
+validation:
+  enabled: true
+  memory: 2048  # MB
+  cpus: 2
+  timeout: 300  # seconds
+  tpm: false  # Enable TPM emulation for secure boot
+
+  # Validation checks
+  checks:
+    - systemd  # Verify systemd is running
+    - network  # Verify network configuration
+    - boot_complete  # Verify boot completed successfully
+
+  # Kubernetes validation (if this is a K8s node)
+  kubernetes:
+    enabled: false
+    # checks:
+    #   - kubelet
+    #   - container_runtime
+    #   - cni
+
+# Reporting
+reporting:
+  format: json  # Options: json, yaml, text
+  output: ./output/migration-report.json
+  verbose: true
+
+# Advanced options
+advanced:
+  # Worker threads for parallel operations
+  workers: 4
+
+  # Retry configuration
+  retry:
+    enabled: true
+    max_attempts: 3
+    delay: 5  # seconds
+
+  # Cleanup options
+  cleanup:
+    temp_files: true
+    on_failure: false  # Keep files for debugging

@@ -1,0 +1,7 @@
+{
+  "command": "local",
+  "vmdk": "/path/to/linux.vmdk",
+  "cloud_init_config": "/path/to/cloud-config.yaml",
+  "to_output": "linux-cloudinit.qcow2",
+  "report": "local-linux-cloudinit.md"
+}

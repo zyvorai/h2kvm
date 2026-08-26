@@ -1,0 +1,311 @@
+# User Account & SSH Key Management Examples
+
+cmd: local
+vmdk: /path/to/vm.vmdk
+output_dir: ./out
+
+# Example 1: Basic Admin User Setup
+# Create admin user with sudo access and SSH key
+user_config_inject:
+  users:
+    - name: admin
+      uid: 1000
+      groups: [wheel, docker]
+      comment: "System Administrator"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... admin@workstation"
+      sudo: "ALL=(ALL) NOPASSWD:ALL"
+
+  disable_users: ["ubuntu", "centos"]
+
+verbose: 2
+
+---
+
+# Example 2: Multiple Users with Different Permissions
+# Admin, developer, and read-only monitoring user
+cmd: local
+vmdk: /path/to/multi-user.vmdk
+output_dir: ./out
+
+user_config_inject:
+  users:
+    - name: admin
+      uid: 1000
+      groups: [wheel, docker]
+      comment: "System Administrator"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... admin@workstation"
+      sudo: "ALL=(ALL) NOPASSWD:ALL"
+
+    - name: developer
+      uid: 1001
+      groups: [docker]
+      comment: "Application Developer"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD... dev@workstation"
+      password: "changeme123"
+      sudo: "ALL=(ALL) ALL"
+
+    - name: monitor
+      uid: 1002
+      comment: "Monitoring User"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDx... monitor@prometheus"
+      # No sudo access - read-only monitoring
+
+  disable_users: ["ubuntu", "centos", "cloud-user"]
+
+---
+
+# Example 3: Team SSH Keys
+# Deploy user with multiple team member SSH keys
+cmd: local
+vmdk: /path/to/team-server.vmdk
+output_dir: ./out
+
+user_config_inject:
+  users:
+    - name: deploy
+      uid: 2000
+      groups: [docker, www-data]
+      comment: "Deployment User"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... alice@laptop"
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD... bob@laptop"
+        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE... charlie@laptop"
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQE... ci-server"
+      sudo: "/usr/bin/systemctl restart nginx, /usr/bin/systemctl restart app"
+
+---
+
+# Example 4: Service Accounts
+# Application-specific service accounts
+cmd: local
+vmdk: /path/to/app-server.vmdk
+output_dir: ./out
+
+user_config_inject:
+  users:
+    - name: webapp
+      uid: 3000
+      groups: [www-data]
+      comment: "Web Application User"
+      # No SSH access, no sudo - just for application ownership
+
+    - name: dbbackup
+      uid: 3001
+      comment: "Database Backup User"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... backup-server"
+      sudo: "/usr/bin/pg_dump, /usr/bin/pg_dumpall"
+
+    - name: deploy
+      uid: 3002
+      groups: [docker]
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... jenkins"
+      sudo: "/usr/bin/docker, /usr/bin/systemctl restart app"
+
+---
+
+# Example 5: Security Hardening
+# Remove default users, create secure admin
+cmd: local
+vmdk: /path/to/secure-server.vmdk
+output_dir: ./out
+
+user_config_inject:
+  users:
+    - name: secadmin
+      uid: 1000
+      groups: [wheel]
+      comment: "Security Administrator"
+      ssh_keys:
+        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE... admin@secure-workstation"
+      sudo: "ALL=(ALL) ALL"  # Requires password for sudo
+
+  disable_users: ["root", "ubuntu", "centos", "admin", "user"]
+  delete_users: ["games", "ftp"]
+
+---
+
+# Example 6: Kubernetes Cluster Nodes
+# Admin user consistent across all cluster nodes
+cmd: local
+vmdk: /path/to/k8s-node.vmdk
+output_dir: ./out
+
+user_config_inject:
+  users:
+    - name: k8s-admin
+      uid: 1000
+      groups: [wheel, docker]
+      comment: "Kubernetes Administrator"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... k8s-admin@bastion"
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD... ansible@controller"
+      sudo: "ALL=(ALL) NOPASSWD:ALL"
+
+  disable_users: ["ubuntu"]
+
+hostname_config_inject:
+  hostname: k8s-worker01
+  domain: cluster.local
+
+---
+
+# Example 7: CI/CD Integration
+# Users for automated deployment pipelines
+cmd: local
+vmdk: /path/to/production-server.vmdk
+output_dir: ./out
+
+user_config_inject:
+  users:
+    - name: admin
+      uid: 1000
+      groups: [wheel]
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... admin@bastion"
+      sudo: "ALL=(ALL) NOPASSWD:ALL"
+
+    - name: jenkins
+      uid: 2001
+      groups: [docker]
+      comment: "Jenkins CI/CD User"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... jenkins@ci-server"
+      sudo: "/usr/bin/docker, /usr/bin/systemctl restart *, /usr/bin/systemctl start *, /usr/bin/systemctl stop *"
+
+    - name: gitlab-runner
+      uid: 2002
+      groups: [docker]
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD... gitlab-runner@runner01"
+      sudo: "/usr/bin/docker"
+
+---
+
+# Example 8: Database Server
+# DBA and backup users with limited sudo
+cmd: local
+vmdk: /path/to/postgres-server.vmdk
+output_dir: ./out
+
+user_config_inject:
+  users:
+    - name: dba
+      uid: 1000
+      groups: [wheel, postgres]
+      comment: "Database Administrator"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... dba@workstation"
+      sudo: "ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart postgresql, /usr/bin/systemctl stop postgresql, /usr/bin/systemctl start postgresql"
+
+    - name: pgbackup
+      uid: 2000
+      groups: [postgres]
+      comment: "PostgreSQL Backup User"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD... backup@backup-server"
+
+  disable_users: ["ubuntu", "centos"]
+
+service_config_inject:
+  enable:
+    - postgresql
+    - sshd
+  disable:
+    - bluetooth
+    - cups
+
+---
+
+# Example 9: Development Team Server
+# Multiple developers with shared group access
+cmd: local
+vmdk: /path/to/dev-server.vmdk
+output_dir: ./out
+
+user_config_inject:
+  users:
+    - name: alice
+      uid: 1001
+      groups: [developers, docker]
+      comment: "Alice Smith - Senior Developer"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... alice@laptop"
+      sudo: "/usr/bin/docker"
+
+    - name: bob
+      uid: 1002
+      groups: [developers, docker]
+      comment: "Bob Johnson - Backend Developer"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD... bob@laptop"
+      sudo: "/usr/bin/docker"
+
+    - name: charlie
+      uid: 1003
+      groups: [developers]
+      comment: "Charlie Brown - Frontend Developer"
+      ssh_keys:
+        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE... charlie@laptop"
+
+---
+
+# Example 10: Complete Production Stack
+# Full configuration with users, services, and hostname
+cmd: local
+vmdk: /path/to/prod-app-server.vmdk
+output_dir: ./out
+
+user_config_inject:
+  users:
+    - name: sysadmin
+      uid: 1000
+      groups: [wheel, docker]
+      comment: "System Administrator"
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... sysadmin@bastion"
+      sudo: "ALL=(ALL) NOPASSWD:ALL"
+
+    - name: appuser
+      uid: 3000
+      groups: [docker, www-data]
+      comment: "Application Runtime User"
+      # No SSH, no sudo - just for process ownership
+
+    - name: deploy
+      uid: 2000
+      groups: [docker]
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD... gitlab-ci"
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQE... jenkins"
+      sudo: "/usr/bin/docker, /usr/bin/systemctl restart app, /usr/bin/systemctl restart nginx"
+
+  disable_users: ["ubuntu", "centos", "admin"]
+
+service_config_inject:
+  enable:
+    - nginx
+    - docker
+    - sshd
+    - node_exporter
+  disable:
+    - bluetooth
+    - cups
+    - avahi-daemon
+  mask:
+    - snapd
+
+hostname_config_inject:
+  hostname: app-prod-01
+  domain: prod.example.com
+  hosts:
+    192.168.1.10: "db.prod.example.com postgres"
+    192.168.1.20: "cache.prod.example.com redis"
+    192.168.1.100: "monitor.prod.example.com prometheus"
+
+verbose: 2

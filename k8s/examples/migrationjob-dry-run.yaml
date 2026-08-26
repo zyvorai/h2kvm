@@ -1,0 +1,95 @@
+# Dry-Run MigrationJob Example
+# Validates migration without executing it
+
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: validate-centos9-migration
+  namespace: migrations
+spec:
+  # Enable dry-run mode
+  dryRun: true
+
+  # Validation options
+  validationOptions:
+    checkStorageAvailability: true
+    checkNodeResources: true
+    checkKubeVirt: true
+    checkNBDCapability: true
+
+  # Source to validate
+  source:
+    type: vmdk-url
+    vmdk:
+      url: "https://storage.example.com/centos9.vmdk"
+
+  # Migration options to validate
+  migration:
+    offlineFixes:
+      fstabMode: stabilize-all
+      grubFixes: true
+      initramfsRegen: true
+      initramfsModules:
+        - virtio_blk
+        - virtio_scsi
+        - virtio_net
+    conversion:
+      format: qcow2
+      compress: true
+
+  # Destination to validate
+  destination:
+    storageClass: longhorn  # Will check if this exists
+    size: 50Gi              # Will check if sufficient capacity
+
+  # VM creation to validate
+  createVM:
+    enabled: true
+    cpu: "16"      # Will check if nodes have sufficient CPU
+    memory: 32Gi   # Will check if nodes have sufficient memory
+    autoStart: true
+
+  timeout: 30m
+
+---
+# After validation passes, create the actual migration job
+# (Remove dryRun: true or set it to false)
+
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: centos9-migration
+  namespace: migrations
+spec:
+  # Actual migration (not dry-run)
+  dryRun: false
+
+  source:
+    type: vmdk-url
+    vmdk:
+      url: "https://storage.example.com/centos9.vmdk"
+
+  migration:
+    offlineFixes:
+      fstabMode: stabilize-all
+      grubFixes: true
+      initramfsRegen: true
+      initramfsModules:
+        - virtio_blk
+        - virtio_scsi
+        - virtio_net
+    conversion:
+      format: qcow2
+      compress: true
+
+  destination:
+    storageClass: longhorn
+    size: 50Gi
+
+  createVM:
+    enabled: true
+    cpu: "16"
+    memory: 32Gi
+    autoStart: true
+
+  timeout: 1h

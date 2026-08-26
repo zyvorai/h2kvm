@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced Migration Features — hyper2kvm Deep Dive</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1e1b4b, #312e81, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.6em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #a78bfa; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 0.95em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 36px 46px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #a78bfa; }
+  .page-light h2.st span { color: #6d28d9; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.6em 0 0.25em; color: #a78bfa; }
+  .page-light h3 { color: #6d28d9; }
+  p { margin-bottom: 0.5em; font-size: 0.88em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.76em; }
+  th { background: #6d28d9; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; font-size: 0.82em; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0.6em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.9em; font-weight: 600; margin-bottom: 4px; color: #a78bfa; }
+  .page-light .card h4 { color: #6d28d9; }
+  .card ul { padding-left: 14px; font-size: 0.78em; margin: 0; } .card li { margin-bottom: 2px; }
+  .card p { font-size: 0.78em; opacity: 0.85; margin-bottom: 0; }
+  .highlight { background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  pre { background: #0f172a; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.74em; line-height: 1.45; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  code { background: rgba(139,92,246,0.1); padding: 2px 4px; border-radius: 4px; font-size: 0.85em; }
+  .verdict { background: linear-gradient(135deg, rgba(30,27,75,0.3), rgba(49,46,129,0.15)); border: 2px solid #6d28d9; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #a78bfa; font-size: 1.1em; margin-bottom: 4px; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .stat-box { text-align: center; padding: 12px; }
+  .stat-box .num { font-size: 1.8em; font-weight: 800; color: #a78bfa; } .stat-box .label { font-size: 0.75em; opacity: 0.7; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 0.5em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: 0.8em; }
+  .flow-arrow { font-size: 1.1em; color: #a78bfa; }
+  .flow-fix { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); }
+  .flow-ok { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Advanced <span>Migration Features</span></h1>
+  <h2>LUKS Encryption, LVM, Batch Orchestration, AI Diagnostics, Daemon Mode &amp; More</h2>
+  <p class="sub">Enterprise-grade features for complex migrations: LUKS2 + TPM encryption, container-isolated LVM handling, batch migration with checkpoint/resume, AI-powered diagnostics and remediation, daemon mode with file system watching, structured observability, and recovery with rollback.</p>
+  <div class="badge">LUKS2 + TPM | LVM Isolation | Batch + Resume | AI Engine | Daemon Mode | 17 Feature Flags</div>
+</div>
+
+<!-- PAGE 1: LUKS & Storage -->
+<div class="page page-dark">
+  <h2 class="st">LUKS2 Encryption <span>&amp; Storage</span></h2>
+  <p class="sub">Migrate VMs to encrypted disks with automatic TPM enrollment &mdash; zero-touch encryption for confidential compute.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>LUKS2 + TPM Pipeline</h4>
+      <ul>
+        <li>End-to-end: VMDK &rarr; LUKS2 container &rarr; filesystem migration</li>
+        <li>AES-XTS-plain64 encryption, SHA256 hashing</li>
+        <li>Argon2id PBKDF (memory-hard key derivation)</li>
+        <li>Key management: keyfiles or TPM auto-unlock</li>
+        <li>TPM2 enrollment for seamless boot</li>
+        <li>initramfs rebuild with dm_crypt + xts modules</li>
+        <li>Targets: OpenShift confidential VMs, Talos, Flatcar</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Configuration</h4>
+      <pre style="font-size:0.72em; background:rgba(255,255,255,0.04); padding:10px; border-radius:6px;">
+# Enable LUKS encryption
+luks_enable: true
+luks_passphrase: "encryption-key"
+# Or use environment variable:
+luks_passphrase_env: LUKS_KEY
+# Or use keyfile:
+luks_keyfile: /path/to/keyfile
+luks_mapper_prefix: "hyper2kvm"
+
+# initramfs auto-includes:
+#   dm_crypt, xts, dm_mod</pre>
+    </div>
+  </div>
+
+  <h3>LVM Handling &mdash; Container-Isolated</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Two-Phase Activation</h4>
+      <ul>
+        <li><strong>Phase 1:</strong> Container-isolated VG discovery</li>
+        <li>Podman/Docker with private LVM dirs</li>
+        <li>No --privileged, targeted capabilities</li>
+        <li>--network=none for security</li>
+        <li><strong>Phase 2:</strong> Host-side DM table activation</li>
+        <li>Device filter regex per NBD device</li>
+        <li>Prevents host VG cache pollution</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Safety Features</h4>
+      <ul>
+        <li>Per-job <code>LVM_SYSTEM_DIR</code> isolation</li>
+        <li>File lock per NBD device (no collisions)</li>
+        <li>Stale NBD recovery on startup</li>
+        <li>Deactivation of stale VGs before re-activation</li>
+        <li>udev settling + dmsetup + 200ms buffer</li>
+        <li>30-second timeout per operation</li>
+        <li>Auto-install podman/docker if missing</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Storage Support Matrix</h4>
+      <table style="font-size:0.72em;">
+        <tr><td><strong>LVM2</strong></td><td class="check">Full (VG/LV/PV)</td></tr>
+        <tr><td><strong>mdadm RAID</strong></td><td class="check">Software RAID</td></tr>
+        <tr><td><strong>LUKS2</strong></td><td class="check">Auto-unlock</td></tr>
+        <tr><td><strong>Btrfs</strong></td><td class="check">Subvolume-aware</td></tr>
+        <tr><td><strong>ZFS</strong></td><td class="check">Pool import</td></tr>
+        <tr><td><strong>ext4/XFS</strong></td><td class="check">UUID repair</td></tr>
+        <tr><td><strong>GPT/MBR</strong></td><td class="check">Both schemes</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: Batch & Daemon -->
+<div class="page page-light">
+  <h2 class="st">Batch Migration <span>&amp; Daemon Mode</span></h2>
+  <p class="sub">Orchestrate hundreds of VMs with parallel workers, checkpoint/resume, and file system watching.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Batch Orchestrator</h4>
+      <ul>
+        <li>Parallel execution with configurable worker limit</li>
+        <li>Priority-based VM ordering</li>
+        <li>Per-VM error isolation (continue-on-error)</li>
+        <li>Shared config + per-VM overrides</li>
+        <li>Aggregate progress reporting</li>
+        <li>JSON and YAML manifest formats</li>
+      </ul>
+      <pre style="font-size:0.7em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+# batch-manifest.yaml
+batch_version: 1
+batch_metadata:
+  batch_id: "vmware-exit-2026"
+  parallel_limit: 4
+  continue_on_error: true
+shared_config:
+  output_dir: /data/converted
+  out_format: qcow2
+  regen_initramfs: true
+  emit_domain_xml: true
+vms:
+  - name: web-01
+    vmdk: /exports/web-01.vmdk
+    priority: 1
+  - name: db-primary
+    vmdk: /exports/db-primary.vmdk
+    priority: 2
+    memory: 16384
+    vcpus: 8</pre>
+    </div>
+    <div class="card">
+      <h4>Checkpoint / Resume</h4>
+      <ul>
+        <li>Automatic checkpoint after each VM completion</li>
+        <li>Atomic writes (temp + replace for safety)</li>
+        <li>Per-VM granularity &mdash; skip completed/failed VMs</li>
+        <li>Re-run same command to resume</li>
+        <li>Auto-cleanup after successful batch</li>
+      </ul>
+      <pre style="font-size:0.7em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+# Checkpoint file (auto-generated):
+# .checkpoints/checkpoint-vmware-exit-2026.json
+{
+  "batch_id": "vmware-exit-2026",
+  "completed_vms": ["web-01", "web-02"],
+  "failed_vms": ["legacy-app"],
+  "resume_from": 3,
+  "total_vms": 50
+}
+
+# Resume: just re-run the same command
+h2kvmctl --batch-manifest batch.yaml
+# Skips web-01, web-02, legacy-app
+# Continues from VM #4</pre>
+    </div>
+  </div>
+
+  <h3>Daemon / Watch Mode</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>3-Directory Workflow</h4>
+      <ul>
+        <li><strong>to_be_processed/</strong> &mdash; Drop zone for manifests</li>
+        <li><strong>processing/</strong> &mdash; Currently processing</li>
+        <li><strong>processed/</strong> &mdash; Completed with reports</li>
+        <li><strong>failed/</strong> &mdash; Failed with error context</li>
+        <li>File system watcher (watchdog library)</li>
+        <li>Supports .json, .yaml, .yml manifests</li>
+        <li>File deduplication tracking</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Daemon Features</h4>
+      <ul>
+        <li>Concurrent processing (ThreadPoolExecutor)</li>
+        <li>Statistics tracking (duration, throughput)</li>
+        <li>Detailed reporting with artifact tracking</li>
+        <li>Signal handling (SIGTERM, SIGINT)</li>
+        <li>Systemd service integration</li>
+        <li>Thread-safe processing queue</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Systemd Service</h4>
+      <pre style="font-size:0.7em; background:#1e1e2e; color:#e8e6df; padding:10px; border-radius:6px;">
+# hyper2kvm@.service
+[Unit]
+Description=hyper2kvm daemon
+
+[Service]
+ExecStart=/usr/local/sbin/h2kvmctl \
+  --manifest-workflow-mode \
+  --manifest-workflow-dir %i
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+# Enable:
+systemctl enable --now \
+  hyper2kvm@/data/migrations</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: AI & Observability -->
+<div class="page page-dark">
+  <h2 class="st">AI Diagnostics <span>&amp; Observability</span></h2>
+  <p class="sub">Machine learning-powered migration intelligence with production-grade structured logging.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>AI Migration Intelligence</h4>
+      <ul>
+        <li>6 sub-engines coordinated by AIOrchestrator</li>
+        <li>Fail-safe: exceptions logged, migration continues</li>
+        <li>Persistent knowledge base (SQLite)</li>
+        <li>Learns from every migration</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Diagnostic Engine</h4>
+      <ul>
+        <li>13 built-in error patterns with regex</li>
+        <li>fstab_uuid_mismatch, grub_not_found</li>
+        <li>initramfs_missing_drivers, buslogic_no_driver</li>
+        <li>vmware_tools_conflict, disk_space_exhausted</li>
+        <li>permission_denied, qemu_img_error</li>
+        <li>lvm_activation_failed, mount_failed</li>
+        <li>Root cause analysis per pattern</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Remediation Engine</h4>
+      <ul>
+        <li>Fix registry: pattern_id &rarr; fix templates</li>
+        <li>Risk levels: LOW, MEDIUM, HIGH</li>
+        <li>Auto-applicable flag for automation</li>
+        <li>Deduplication and risk filtering</li>
+        <li>Suggested commands with explanations</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Predictive Engine</h4>
+      <ul>
+        <li>Pre-migration OS/workload prediction</li>
+        <li>Success probability scoring</li>
+        <li>Risk assessment before starting</li>
+        <li>Based on historical migration data</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Workload Classifier</h4>
+      <ul>
+        <li>Classifies VM workload type</li>
+        <li>Categories: web, database, container, etc.</li>
+        <li>Feature extraction for prediction</li>
+        <li>Informs fix strategy selection</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Anomaly Detector</h4>
+      <ul>
+        <li>Post-migration anomaly detection</li>
+        <li>Duration anomaly (too fast/slow)</li>
+        <li>Error rate anomaly vs baseline</li>
+        <li>Pattern-based identification</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Structured Logging &amp; Observability</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Canonical Event Schema</h4>
+      <pre style="font-size:0.72em; background:rgba(255,255,255,0.04); padding:10px; border-radius:6px;">
+{
+  "ts": "2026-03-24T09:45:14.260+00:00",
+  "level": "info",
+  "service": "hyper2kvm",
+  "component": "disk_processor",
+  "host": "kvm-host-01",
+  "pid": 12345,
+  "trace_id": "50b8fc3c01f9",
+  "vm_id": "rhel9-web-01.vmdk",
+  "workflow": "disk_processing",
+  "span_id": "eb5d54ac",
+  "parent_span_id": "a1b2c3d4",
+  "event": "flatten_start",
+  "phase": "flatten",
+  "duration_ms": 45200.5,
+  "status": "success"
+}</pre>
+    </div>
+    <div class="card">
+      <h4>Production Features</h4>
+      <ul>
+        <li><strong>Async writes:</strong> Non-blocking with bounded queue + backpressure</li>
+        <li><strong>Rate limiting:</strong> Per-event token-bucket with suppression counts</li>
+        <li><strong>Sampling:</strong> Probabilistic by event-name prefix</li>
+        <li><strong>Field truncation:</strong> Prevents log bloat</li>
+        <li><strong>Safe serialization:</strong> datetime, UUID, Path, bytes</li>
+        <li><strong>Trace propagation:</strong> trace_id, span_id, parent_span_id</li>
+        <li><strong>PhaseTimer:</strong> Context manager for operation timing</li>
+        <li><strong>Audit channel:</strong> Bypasses rate-limit + sampling</li>
+        <li><strong>Dynamic log level:</strong> Runtime control</li>
+        <li><strong>Graceful shutdown:</strong> Queue drain on exit</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: Recovery, Feature Flags, Summary -->
+<div class="page page-light">
+  <h2 class="st">Recovery, Security <span>&amp; Feature Flags</span></h2>
+  <p class="sub">Stage-based recovery with rollback, integrity verification, and gradual feature rollout.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Recovery Manager</h4>
+      <ul>
+        <li>Atomic checkpoint saves (temp + fsync + replace)</li>
+        <li>Stage-based recovery (load, inspect, fix, convert)</li>
+        <li>Stage order violation detection</li>
+        <li>JSON persistence with SHA256 integrity</li>
+        <li>POSIX fcntl lock for concurrency</li>
+        <li>Crash-safe directory fsync</li>
+        <li>Exit codes for automation (20-29)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Snapshot &amp; Rollback</h4>
+      <ul>
+        <li>Snapshot types: FULL, QCOW2, LVM, FILESYSTEM</li>
+        <li>Pre-migration snapshot creation</li>
+        <li>SHA256 checksum per snapshot</li>
+        <li>Snapshot metadata in JSON</li>
+        <li>Integrity verification on restore</li>
+        <li>Source disk never modified (copy-based)</li>
+        <li>Optional <code>--checksum</code> for output images</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Health Checks</h4>
+      <ul>
+        <li>8 check types: SYSTEM, SERVICE, NETWORK, DATABASE, APPLICATION, STORAGE, SECURITY, PERFORMANCE</li>
+        <li>Status: PASS, FAIL, WARN, SKIP, ERROR</li>
+        <li>Remediation suggestions per check</li>
+        <li>Post-migration validation (no disk I/O)</li>
+        <li>boot_config, fstab_valid, virtio_drivers</li>
+        <li>no_vmware_remnants, network_config</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Feature Flags (17 Configurable)</h3>
+  <table>
+    <tr><th style="width:8%">Status</th><th style="width:22%">Flag</th><th style="width:40%">Description</th><th style="width:30%">Control</th></tr>
+    <tr><td class="check">Stable</td><td>vmcraft_backend</td><td>Pure Python + qemu-nbd backend (no libguestfs)</td><td>Default: ON</td></tr>
+    <tr><td class="check">Stable</td><td>fstab_stabilize</td><td>UUID-based fstab rewriting</td><td>Default: ON</td></tr>
+    <tr><td class="check">Stable</td><td>initramfs_regen</td><td>VirtIO initramfs rebuild</td><td>Default: ON</td></tr>
+    <tr><td class="check">Stable</td><td>serial_console</td><td>Serial console injection</td><td>Default: ON</td></tr>
+    <tr><td class="check">Stable</td><td>buslogic_autofix</td><td>BusLogic driver auto-remediation</td><td>Default: ON</td></tr>
+    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>ai_diagnostics</td><td>AI-powered error diagnosis and remediation</td><td>HYPER2KVM_FF_AI_DIAGNOSTICS=1</td></tr>
+    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>multi_drive</td><td>Multi-disk VM support</td><td>HYPER2KVM_FF_MULTI_DRIVE=1</td></tr>
+    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>parallel_conversion</td><td>Parallel qemu-img conversions</td><td>HYPER2KVM_FF_PARALLEL_CONVERSION=1</td></tr>
+    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>container_isolation</td><td>Container-isolated LVM operations</td><td>HYPER2KVM_FF_CONTAINER_ISOLATION=1</td></tr>
+    <tr><td style="color:#f59e0b; font-weight:700;">Beta</td><td>incremental_sync</td><td>Incremental disk sync (CBT)</td><td>HYPER2KVM_FF_INCREMENTAL_SYNC=1</td></tr>
+    <tr><td style="color:#ef4444; font-weight:700;">Exp</td><td>luks_auto_unlock</td><td>LUKS2 + TPM auto-unlock enrollment</td><td>HYPER2KVM_FF_LUKS_AUTO_UNLOCK=1</td></tr>
+    <tr><td style="color:#ef4444; font-weight:700;">Exp</td><td>tpm_enrollment</td><td>TPM2 measured boot enrollment</td><td>HYPER2KVM_FF_TPM_ENROLLMENT=1</td></tr>
+    <tr><td style="color:#ef4444; font-weight:700;">Exp</td><td>network_topology_map</td><td>Network topology discovery and mapping</td><td>HYPER2KVM_FF_NETWORK_TOPOLOGY_MAP=1</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>Enterprise-Grade Migration Platform</h3>
+    <p style="font-size:0.9em;">
+      LUKS2 encryption | Container-isolated LVM | Batch with checkpoint/resume | AI diagnostics<br>
+      Daemon mode | Structured observability | Recovery + rollback | 17 feature flags<br>
+      <strong>Production-hardened with error handling, timeouts, logging, and concurrency control.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

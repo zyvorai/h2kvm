@@ -1,0 +1,22 @@
+{
+  "command": "fetch-and-fix",
+  "flatten": true,
+  "out_format": "qcow2",
+  "parallel_processing": true,
+  "enable_recovery": true,
+  "vms": [
+    {
+      "host": "esxi1.example.com",
+      "user": "root",
+      "remote": "/vmfs/volumes/ds1/vm1/vm1.vmdk",
+      "fetch_all": true
+    },
+    {
+      "host": "esxi2.example.com",
+      "user": "root",
+      "remote": "/vmfs/volumes/ds2/vm2/vm2.vmdk",
+      "identity": "~/.ssh/key2",
+      "fetch_all": true
+    }
+  ]
+}

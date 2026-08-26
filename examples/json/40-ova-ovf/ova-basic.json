@@ -1,0 +1,8 @@
+{
+  "command": "ova",
+  "ova": "/path/to/appliance.ova",
+  "flatten": true,
+  "to_output": "appliance.qcow2",
+  "out_format": "qcow2",
+  "compress": true
+}

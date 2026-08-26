@@ -1,0 +1,561 @@
+# ==============================================================================
+# 🌐 Linux Network Configuration Injection Examples
+# ==============================================================================
+#
+# Demonstrates how to inject static network configuration files for systemd-networkd
+# and NetworkManager without requiring cloud-init.
+#
+# Usage:
+#   hyper2kvm --config 98-linux-network-config-injection-examples.yaml local
+#
+# Use Cases:
+#   ✅ Static IP configuration
+#   ✅ Bond/bridge/VLAN setup
+#   ✅ Custom DNS/gateway/routes
+#   ✅ Network device renaming
+#   ✅ Virtual network devices (bonds, bridges, VLANs, VXLANs, tunnels)
+#   ✅ NetworkManager connection profiles
+#
+# Backends Supported:
+#   - systemd-networkd (.network, .netdev files)
+#   - NetworkManager (.nmconnection files)
+#
+# ==============================================================================
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 1: Basic - Single Static IP (systemd-networkd)
+# ------------------------------------------------------------------------------------
+# Use case: Simple static IP configuration
+cmd: local
+vmdk: /path/to/vm.vmdk
+output_dir: ./out
+to_output: vm-static-ip.qcow2
+
+network_config_inject:
+  network_files:
+    - name: eth0
+      type: network
+      priority: 10
+      content: |
+        [Match]
+        Name=eth0
+
+        [Network]
+        Address=192.168.1.100/24
+        Gateway=192.168.1.1
+        DNS=8.8.8.8
+        DNS=8.8.4.4
+
+  enable_networkd: true
+
+regen_initramfs: true
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 2: Multiple Interfaces with Different Configurations
+# ------------------------------------------------------------------------------------
+# Use case: Server with management and data networks
+cmd: local
+vmdk: /path/to/server.vmdk
+output_dir: ./out/multi-net
+
+network_config_inject:
+  network_files:
+    # Management interface - static IP
+    - name: eth0
+      type: network
+      priority: 10
+      content: |
+        [Match]
+        Name=eth0
+
+        [Network]
+        Address=192.168.1.100/24
+        Gateway=192.168.1.1
+        DNS=192.168.1.1
+
+    # Data interface - static IP, no gateway
+    - name: eth1
+      type: network
+      priority: 20
+      content: |
+        [Match]
+        Name=eth1
+
+        [Network]
+        Address=10.0.0.100/24
+
+  enable_networkd: true
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 3: Bridge Configuration
+# ------------------------------------------------------------------------------------
+# Use case: VM host with bridge for guest networking
+cmd: local
+vmdk: /path/to/hypervisor.vmdk
+output_dir: ./out/bridge
+
+network_config_inject:
+  network_files:
+    # Create bridge device
+    - name: br0
+      type: netdev
+      priority: 10
+      content: |
+        [NetDev]
+        Name=br0
+        Kind=bridge
+
+    # Configure bridge with static IP
+    - name: br0
+      type: network
+      priority: 10
+      content: |
+        [Match]
+        Name=br0
+
+        [Network]
+        Address=192.168.1.100/24
+        Gateway=192.168.1.1
+        DNS=8.8.8.8
+
+    # Attach physical interface to bridge
+    - name: eth0
+      type: network
+      priority: 20
+      content: |
+        [Match]
+        Name=eth0
+
+        [Network]
+        Bridge=br0
+
+  enable_networkd: true
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 4: Bond (Link Aggregation)
+# ------------------------------------------------------------------------------------
+# Use case: High availability with bonded interfaces
+cmd: local
+vmdk: /path/to/ha-server.vmdk
+output_dir: ./out/bond
+
+network_config_inject:
+  network_files:
+    # Create bond device
+    - name: bond0
+      type: netdev
+      priority: 10
+      content: |
+        [NetDev]
+        Name=bond0
+        Kind=bond
+
+        [Bond]
+        Mode=802.3ad
+        TransmitHashPolicy=layer3+4
+        MIIMonitorSec=1s
+        LACPTransmitRate=fast
+
+    # Configure bond with static IP
+    - name: bond0
+      type: network
+      priority: 10
+      content: |
+        [Match]
+        Name=bond0
+
+        [Network]
+        Address=192.168.1.100/24
+        Gateway=192.168.1.1
+        DNS=8.8.8.8
+
+    # Attach first physical interface to bond
+    - name: eth0
+      type: network
+      priority: 20
+      content: |
+        [Match]
+        Name=eth0
+
+        [Network]
+        Bond=bond0
+
+    # Attach second physical interface to bond
+    - name: eth1
+      type: network
+      priority: 20
+      content: |
+        [Match]
+        Name=eth1
+
+        [Network]
+        Bond=bond0
+
+  enable_networkd: true
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 5: VLAN Configuration
+# ------------------------------------------------------------------------------------
+# Use case: Multiple VLANs on single interface
+cmd: local
+vmdk: /path/to/vlan-server.vmdk
+output_dir: ./out/vlan
+
+network_config_inject:
+  network_files:
+    # Physical interface (trunk)
+    - name: eth0
+      type: network
+      priority: 10
+      content: |
+        [Match]
+        Name=eth0
+
+        [Network]
+        VLAN=vlan100
+        VLAN=vlan200
+
+    # VLAN 100 device
+    - name: vlan100
+      type: netdev
+      priority: 10
+      content: |
+        [NetDev]
+        Name=vlan100
+        Kind=vlan
+
+        [VLAN]
+        Id=100
+
+    # VLAN 100 network config
+    - name: vlan100
+      type: network
+      priority: 10
+      content: |
+        [Match]
+        Name=vlan100
+
+        [Network]
+        Address=192.168.100.10/24
+
+    # VLAN 200 device
+    - name: vlan200
+      type: netdev
+      priority: 10
+      content: |
+        [NetDev]
+        Name=vlan200
+        Kind=vlan
+
+        [VLAN]
+        Id=200
+
+    # VLAN 200 network config
+    - name: vlan200
+      type: network
+      priority: 10
+      content: |
+        [Match]
+        Name=vlan200
+
+        [Network]
+        Address=192.168.200.10/24
+
+  enable_networkd: true
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 6: NetworkManager Configuration (RHEL/CentOS/Fedora)
+# ------------------------------------------------------------------------------------
+# Use case: Static IP using NetworkManager
+cmd: local
+vmdk: /path/to/rhel-vm.vmdk
+output_dir: ./out/nm-static
+
+network_config_inject:
+  nm_connections:
+    - name: eth0
+      content: |
+        [connection]
+        id=eth0
+        type=ethernet
+        interface-name=eth0
+        autoconnect=true
+
+        [ipv4]
+        method=manual
+        address1=192.168.1.100/24,192.168.1.1
+        dns=8.8.8.8;8.8.4.4;
+
+        [ipv6]
+        method=ignore
+
+  enable_network_manager: true
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 7: NetworkManager with Multiple Connections
+# ------------------------------------------------------------------------------------
+# Use case: Multiple interfaces managed by NetworkManager
+cmd: local
+vmdk: /path/to/multi-if-vm.vmdk
+output_dir: ./out/nm-multi
+
+network_config_inject:
+  nm_connections:
+    # Management interface
+    - name: Management
+      content: |
+        [connection]
+        id=Management
+        type=ethernet
+        interface-name=eth0
+        autoconnect=true
+
+        [ipv4]
+        method=manual
+        address1=192.168.1.100/24,192.168.1.1
+        dns=192.168.1.1;
+
+        [ipv6]
+        method=ignore
+
+    # Storage network
+    - name: Storage
+      content: |
+        [connection]
+        id=Storage
+        type=ethernet
+        interface-name=eth1
+        autoconnect=true
+
+        [ipv4]
+        method=manual
+        address1=10.0.0.100/24
+
+        [ipv6]
+        method=ignore
+
+  enable_network_manager: true
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 8: Advanced Routing
+# ------------------------------------------------------------------------------------
+# Use case: Custom static routes
+cmd: local
+vmdk: /path/to/router.vmdk
+output_dir: ./out/routing
+
+network_config_inject:
+  network_files:
+    - name: eth0
+      type: network
+      priority: 10
+      content: |
+        [Match]
+        Name=eth0
+
+        [Network]
+        Address=192.168.1.100/24
+        Gateway=192.168.1.1
+        DNS=8.8.8.8
+
+        [Route]
+        Destination=10.0.0.0/8
+        Gateway=192.168.1.254
+
+        [Route]
+        Destination=172.16.0.0/12
+        Gateway=192.168.1.253
+
+  enable_networkd: true
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 9: VXLAN Tunnel
+# ------------------------------------------------------------------------------------
+# Use case: Overlay network with VXLAN
+cmd: local
+vmdk: /path/to/overlay-vm.vmdk
+output_dir: ./out/vxlan
+
+network_config_inject:
+  network_files:
+    # VXLAN device
+    - name: vxlan100
+      type: netdev
+      priority: 10
+      content: |
+        [NetDev]
+        Name=vxlan100
+        Kind=vxlan
+
+        [VXLAN]
+        VNI=100
+        Local=192.168.1.100
+        Remote=192.168.1.200
+        DestinationPort=4789
+
+    # VXLAN network config
+    - name: vxlan100
+      type: network
+      priority: 10
+      content: |
+        [Match]
+        Name=vxlan100
+
+        [Network]
+        Address=10.100.0.1/24
+
+    # Underlay interface
+    - name: eth0
+      type: network
+      priority: 20
+      content: |
+        [Match]
+        Name=eth0
+
+        [Network]
+        Address=192.168.1.100/24
+
+  enable_networkd: true
+
+verbose: 2
+
+
+# ------------------------------------------------------------------------------------
+# EXAMPLE 10: Hybrid - systemd-networkd + NetworkManager
+# ------------------------------------------------------------------------------------
+# Use case: Use both backends (for different interfaces)
+cmd: local
+vmdk: /path/to/hybrid-vm.vmdk
+output_dir: ./out/hybrid
+
+network_config_inject:
+  # Use systemd-networkd for bridge
+  network_files:
+    - name: br0
+      type: netdev
+      priority: 10
+      content: |
+        [NetDev]
+        Name=br0
+        Kind=bridge
+
+    - name: br0
+      type: network
+      priority: 10
+      content: |
+        [Match]
+        Name=br0
+
+        [Network]
+        Address=192.168.1.100/24
+        Gateway=192.168.1.1
+
+  # Use NetworkManager for other interfaces
+  nm_connections:
+    - name: eth1
+      content: |
+        [connection]
+        id=eth1
+        type=ethernet
+        interface-name=eth1
+        autoconnect=true
+
+        [ipv4]
+        method=manual
+        address1=10.0.0.100/24
+
+  enable_networkd: true
+  enable_network_manager: true
+
+verbose: 2
+
+
+# ==============================================================================
+# COMMON USE CASES AND TEMPLATES
+# ==============================================================================
+
+# Static IP Template (systemd-networkd):
+static_ip_template: |
+  [Match]
+  Name=eth0
+
+  [Network]
+  Address=192.168.1.100/24
+  Gateway=192.168.1.1
+  DNS=8.8.8.8
+  DNS=8.8.4.4
+
+# DHCP Template (systemd-networkd):
+dhcp_template: |
+  [Match]
+  Name=eth0
+
+  [Network]
+  DHCP=yes
+
+# NetworkManager Static IP Template:
+nm_static_template: |
+  [connection]
+  id=eth0
+  type=ethernet
+  interface-name=eth0
+  autoconnect=true
+
+  [ipv4]
+  method=manual
+  address1=192.168.1.100/24,192.168.1.1
+  dns=8.8.8.8;8.8.4.4;
+
+  [ipv6]
+  method=ignore
+
+# ==============================================================================
+# TROUBLESHOOTING
+# ==============================================================================
+#
+# If network configuration doesn't apply:
+#
+# For systemd-networkd:
+#   1. Check service status: systemctl status systemd-networkd
+#   2. View logs: journalctl -u systemd-networkd
+#   3. Verify files: ls -la /etc/systemd/network/
+#   4. Test config: networkctl
+#   5. Reload: networkctl reload
+#
+# For NetworkManager:
+#   1. Check service status: systemctl status NetworkManager
+#   2. View logs: journalctl -u NetworkManager
+#   3. Verify files: ls -la /etc/NetworkManager/system-connections/
+#   4. Check permissions: Files must be 0600
+#   5. Reload: nmcli connection reload
+#
+# Common Issues:
+#   - Conflicting network managers (disable one)
+#   - Wrong interface names (use ip link to check)
+#   - Permission issues (.nmconnection must be 0600)
+#   - Service not enabled (enable with enable_networkd or enable_network_manager)
+#
+# ==============================================================================

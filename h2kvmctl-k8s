@@ -1,0 +1,126 @@
+#!/bin/bash
+# h2kvmctl wrapper for Kubernetes deployments
+# Automatically handles KUBECONFIG when using sudo
+
+set -e
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+H2KVMCTL="$SCRIPT_DIR/h2kvmctl"
+
+# Check if h2kvmctl exists
+if [ ! -x "$H2KVMCTL" ]; then
+    echo -e "${RED}Error: h2kvmctl not found or not executable${NC}"
+    echo "Expected location: $H2KVMCTL"
+    exit 1
+fi
+
+# Function to detect kubeconfig
+detect_kubeconfig() {
+    # Priority order:
+    # 1. KUBECONFIG environment variable (if already set)
+    # 2. User's ~/.kube/config
+    # 3. k3s config at /etc/rancher/k3s/k3s.yaml
+
+    if [ -n "$KUBECONFIG" ]; then
+        echo "$KUBECONFIG"
+        return 0
+    fi
+
+    # Check user's config
+    if [ -f "$HOME/.kube/config" ]; then
+        echo "$HOME/.kube/config"
+        return 0
+    fi
+
+    # Check k3s config
+    if [ -f "/etc/rancher/k3s/k3s.yaml" ]; then
+        echo "/etc/rancher/k3s/k3s.yaml"
+        return 0
+    fi
+
+    # No kubeconfig found
+    echo ""
+    return 1
+}
+
+# Main execution
+main() {
+    # Detect if we need to use sudo
+    NEED_SUDO=false
+
+    # Check if any config file is specified
+    for arg in "$@"; do
+        if [[ "$arg" == *.yaml ]] || [[ "$arg" == *.yml ]]; then
+            # Migration typically needs sudo for disk mounting
+            NEED_SUDO=true
+            break
+        fi
+    done
+
+    # Detect kubeconfig
+    KUBECONFIG_PATH=$(detect_kubeconfig)
+
+    if [ -z "$KUBECONFIG_PATH" ]; then
+        echo -e "${YELLOW}Warning: No kubeconfig found${NC}"
+        echo "Searched locations:"
+        echo "  - \$KUBECONFIG"
+        echo "  - $HOME/.kube/config"
+        echo "  - /etc/rancher/k3s/k3s.yaml"
+        echo ""
+        echo "K8s deployment will likely fail without valid kubeconfig"
+        echo ""
+    fi
+
+    # Build command
+    if [ "$NEED_SUDO" = true ]; then
+        if [ -n "$KUBECONFIG_PATH" ]; then
+            echo -e "${BLUE}Running with sudo and KUBECONFIG=$KUBECONFIG_PATH${NC}"
+            sudo KUBECONFIG="$KUBECONFIG_PATH" "$H2KVMCTL" "$@"
+        else
+            echo -e "${YELLOW}Running with sudo (no kubeconfig detected)${NC}"
+            sudo "$H2KVMCTL" "$@"
+        fi
+    else
+        # No sudo needed
+        if [ -n "$KUBECONFIG_PATH" ]; then
+            KUBECONFIG="$KUBECONFIG_PATH" "$H2KVMCTL" "$@"
+        else
+            "$H2KVMCTL" "$@"
+        fi
+    fi
+}
+
+# Help message
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    echo "h2kvmctl-k8s - Kubernetes-aware wrapper for hyper2kvm"
+    echo ""
+    echo "This wrapper automatically:"
+    echo "  - Detects and sets KUBECONFIG when using sudo"
+    echo "  - Finds kubeconfig from common locations"
+    echo "  - Passes all arguments to h2kvmctl"
+    echo ""
+    echo "Usage:"
+    echo "  $0 [h2kvmctl arguments]"
+    echo ""
+    echo "Examples:"
+    echo "  $0 --config centos9.yaml --deploy-k8s"
+    echo "  $0 --config prod.yaml --deploy-k8s --k8s-namespace production"
+    echo ""
+    echo "Kubeconfig detection priority:"
+    echo "  1. \$KUBECONFIG environment variable"
+    echo "  2. $HOME/.kube/config"
+    echo "  3. /etc/rancher/k3s/k3s.yaml"
+    echo ""
+    exit 0
+fi
+
+# Run main
+main "$@"

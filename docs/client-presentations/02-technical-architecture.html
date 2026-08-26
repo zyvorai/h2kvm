@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hyper2kvm + hypersdk — Technical Architecture</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 3em; font-weight: 800; letter-spacing: -2px; margin-bottom: 0.3em; }
+  .cover h1 span { color: #ff8f3f; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; margin-bottom: 1em; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 550px; }
+  .page { min-height: 100vh; padding: 50px 70px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; }
+  .page-light { background: #fafbfc; }
+  .page-accent { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #e8e6df; }
+  h2.st { font-size: 2em; font-weight: 700; margin-bottom: 0.6em; }
+  h2.st span { color: #ff8f3f; }
+  h3 { font-size: 1.2em; font-weight: 600; margin: 1em 0 0.4em; }
+  p { margin-bottom: 0.8em; font-size: 1em; }
+  .sub { font-size: 1.05em; opacity: 0.7; margin-bottom: 1.5em; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 1.2em 0; }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 22px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card .icon { font-size: 1.8em; margin-bottom: 8px; }
+  .card h4 { font-size: 1.05em; font-weight: 600; margin-bottom: 6px; }
+  .card p { font-size: 0.9em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #1a1a2e; color: #e8e6df; padding: 20px; border-radius: 8px; font-size: 0.85em; line-height: 1.7; overflow-x: auto; margin: 1em 0; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+  .page-dark pre { background: rgba(255,255,255,0.05); }
+  table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 0.9em; }
+  th { background: #ff8f3f; color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 1.5em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(255,143,63,0.15); border: 1px solid rgba(255,143,63,0.3); padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.9em; }
+  .flow-arrow { font-size: 1.3em; color: #ff8f3f; }
+  ul { margin: 0.4em 0 0.8em 1.5em; }
+  li { margin-bottom: 0.3em; font-size: 0.95em; }
+  .arch-box { background: rgba(255,255,255,0.03); border: 2px solid rgba(255,143,63,0.3); border-radius: 12px; padding: 24px; margin: 1.2em 0; }
+  .footer { text-align: center; padding: 20px; font-size: 0.8em; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>hyper<span>2</span>kvm + hyper<span>sdk</span></h1>
+  <h2>Technical Architecture Deep Dive</h2>
+  <p class="sub">How the two-layer platform handles multi-cloud VM export, conversion, and deployment at enterprise scale.</p>
+</div>
+
+<!-- PAGE: TWO-LAYER ARCHITECTURE -->
+<div class="page page-dark">
+  <h2 class="st">Two-Layer <span>Architecture</span></h2>
+  <p class="sub">hypersdk handles cloud APIs. hyper2kvm handles disk conversion and guest fixes.</p>
+
+  <div class="arch-box">
+    <pre>
+  Client Request (CLI / TUI / API)
+         |
+   +-----v-----------+
+   |    hypersdk      |   Go daemon — multi-cloud VM export
+   |                  |   10 cloud providers, hexagonal architecture
+   |  vSphere | AWS   |   Job scheduling, webhook notifications
+   |  Azure  | GCP    |   Cost estimation, carbon tracking
+   |  Proxmox | OCI   |   RBAC, audit logging
+   +-----+------------+
+         |  VMDK / OVA / VHD / RAW
+   +-----v-----------+
+   |    hyper2kvm     |   Python — disk conversion + guest fixes
+   |                  |   Format conversion (qcow2/raw)
+   |  VMCraft engine  |   Offline OS repair (fstab, initramfs, drivers)
+   |  libguestfs      |   Libvirt domain generation
+   |  Guest fixes     |   KubeVirt deployment
+   +-----+------------+
+         |
+   +-----v-----------+
+   |  Deploy Target   |   KVM/libvirt or KubeVirt/Kubernetes
+   +------------------+
+    </pre>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">🔷</div>
+      <h4>hypersdk (Go)</h4>
+      <p>Cloud-native daemon with REST API. Handles provider authentication, VM discovery, disk export, job queue, scheduling. Hexagonal architecture with 13+ port interfaces.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🟠</div>
+      <h4>hyper2kvm (Python)</h4>
+      <p>Disk processing engine. Converts formats, applies offline guest fixes, generates libvirt XML, deploys to KubeVirt. 1,273 tests. Interactive TUI (zkvm).</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: HYPERSDK PROVIDERS -->
+<div class="page page-light">
+  <h2 class="st">hypersdk: <span>10 Cloud Providers</span></h2>
+  <p class="sub">One API, every hypervisor and cloud platform.</p>
+
+  <table>
+    <tr><th>Provider</th><th>Export Method</th><th>Auth</th><th>Features</th></tr>
+    <tr><td>VMware vSphere</td><td>OVF/OVA, VDDK, HTTPS</td><td>SSO, username/password</td><td>CBT delta sync, snapshot export</td></tr>
+    <tr><td>AWS EC2</td><td>EBS snapshot, AMI export</td><td>IAM, access keys</td><td>Cross-region, S3 staging</td></tr>
+    <tr><td>Microsoft Azure</td><td>Managed disk export</td><td>Service principal, MSI</td><td>Snapshot-based, parallel download</td></tr>
+    <tr><td>Google Cloud</td><td>Persistent disk export</td><td>Service account</td><td>GCS staging, image export</td></tr>
+    <tr><td>Microsoft Hyper-V</td><td>VHD/VHDX direct</td><td>WinRM, SSH</td><td>Checkpoint export</td></tr>
+    <tr><td>Oracle Cloud (OCI)</td><td>Boot volume export</td><td>API key</td><td>Object storage staging</td></tr>
+    <tr><td>OpenStack</td><td>Glance image, Cinder</td><td>Keystone v3</td><td>Swift staging</td></tr>
+    <tr><td>Alibaba Cloud</td><td>ECS disk export</td><td>AccessKey</td><td>OSS staging</td></tr>
+    <tr><td>Proxmox VE</td><td>API disk export</td><td>Token, PAM</td><td>qcow2/raw direct</td></tr>
+    <tr><td>KubeVirt</td><td>PVC/DataVolume</td><td>kubeconfig</td><td>Live migration, CDI</td></tr>
+  </table>
+
+  <h3>Provider Interface (Go)</h3>
+  <pre>
+type Provider interface {
+    ListVMs(ctx context.Context, filter VMFilter) ([]VMInfo, error)
+    ExportVM(ctx context.Context, vmID string, opts ExportOptions) (*ExportResult, error)
+    GetCapabilities() []ExportCapability
+    Validate(ctx context.Context) error
+}
+  </pre>
+</div>
+
+<!-- PAGE: HYPERSDK ARCHITECTURE -->
+<div class="page page-accent">
+  <h2 class="st">hypersdk: <span>Hexagonal Architecture</span></h2>
+  <p class="sub">Clean separation of domain, ports, and adapters.</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">🎯</div>
+      <h4>Domain Layer</h4>
+      <p>70+ canonical Go types. Job, Schedule, VM, Cost, Carbon, Webhook, Audit, RBAC. Zero dependencies on external packages.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔌</div>
+      <h4>Ports Layer</h4>
+      <p>13+ interfaces defining contracts. JobManager, ScheduleManager, CapabilityDetector, CostEstimator, CarbonTracker, AuditLogger.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🧩</div>
+      <h4>Adapters Layer</h4>
+      <p>Concrete implementations. REST API, provider clients, SQLite store, Prometheus metrics, webhook dispatcher, secrets vault.</p>
+    </div>
+  </div>
+
+  <h3>Key Daemon Features</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Job Scheduling</h4>
+      <ul>
+        <li>Cron-based scheduling with time windows</li>
+        <li>Retry policies with exponential backoff</li>
+        <li>Priority queues, concurrency limits</li>
+        <li>Webhook notifications on completion</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Observability</h4>
+      <ul>
+        <li>Prometheus metrics endpoint</li>
+        <li>Structured JSON logging with trace IDs</li>
+        <li>Audit trail for all operations</li>
+        <li>Cost estimation per migration</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Security</h4>
+      <ul>
+        <li>RBAC with roles and permissions</li>
+        <li>API key + JWT authentication</li>
+        <li>Secrets management (vault integration)</li>
+        <li>TLS everywhere, cert rotation</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Enterprise Features</h4>
+      <ul>
+        <li>Carbon-aware scheduling (green migration)</li>
+        <li>Multi-tenant with namespace isolation</li>
+        <li>Backup and disaster recovery</li>
+        <li>HA with leader election</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: HYPER2KVM PIPELINE -->
+<div class="page page-light">
+  <h2 class="st">hyper2kvm: <span>Conversion Pipeline</span></h2>
+  <p class="sub">What happens to a VM disk from export to first boot.</p>
+
+  <div class="flow">
+    <div class="flow-step">Input Disk</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Validate</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Flatten</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Convert</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Guest Fix</div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">Deploy</div>
+  </div>
+
+  <table>
+    <tr><th>Stage</th><th>What It Does</th><th>Why It Matters</th></tr>
+    <tr><td><strong>Validate</strong></td><td>VMDK descriptor parsing, extent verification, boot mode detection (BIOS/UEFI), risk analysis</td><td>Catches corrupt/truncated disks before wasting hours on conversion</td></tr>
+    <tr><td><strong>Flatten</strong></td><td>Merge snapshot chain into single image via qemu-img convert</td><td>Eliminates snapshot dependencies, produces self-contained disk</td></tr>
+    <tr><td><strong>Convert</strong></td><td>VMDK/VHD/RAW to qcow2 with optional compression</td><td>qcow2 is the native KVM format — thin provisioning, snapshots, compression</td></tr>
+    <tr><td><strong>Guest Fix</strong></td><td>Mount disk offline, fix fstab (UUID stabilization), rebuild initramfs with virtio drivers, remove VMware tools, fix GRUB, relabel SELinux</td><td>Without this, VMs fail to boot on KVM — missing drivers, wrong device paths</td></tr>
+    <tr><td><strong>Deploy</strong></td><td>Generate libvirt XML, virsh define, or create KubeVirt VirtualMachine + PVC upload</td><td>VM is ready to start — no manual XML editing or kubectl gymnastics</td></tr>
+  </table>
+
+  <h3>Guest Fix Engine (VMCraft)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Linux Fixes</h4>
+      <ul>
+        <li>fstab: convert device names to UUID/path</li>
+        <li>initramfs: inject virtio_blk, virtio_net, virtio_scsi</li>
+        <li>GRUB: update root= parameter, rebuild config</li>
+        <li>SELinux: trigger autorelabel on next boot</li>
+        <li>Network: remove VMware/Hyper-V NIC configs</li>
+        <li>VMware tools: remove open-vm-tools packages</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Windows Fixes</h4>
+      <ul>
+        <li>VirtIO driver injection (disk, net, balloon)</li>
+        <li>Registry: update boot device driver stack</li>
+        <li>Remove VMware Tools/Hyper-V IC services</li>
+        <li>Fix BCD boot configuration</li>
+        <li>Enable serial console for headless access</li>
+        <li>Multi-stage: bootstrap, drivers, cleanup</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: ZKVM TUI -->
+<div class="page page-dark">
+  <h2 class="st">zkvm: <span>Interactive TUI</span></h2>
+  <p class="sub">Terminal UI built with Go + Bubble Tea for guided migration.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">📋</div>
+      <h4>Guided Steps</h4>
+      <p>Step 1: Source (auto-detect format) &#8594; Step 2: Output &#8594; Step 3: Fixes &#8594; Step 4: Deploy to Libvirt. No CLI memorization.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔌</div>
+      <h4>vSphere Integration</h4>
+      <p>Auto-populate from GOVC_* env vars. Discover VMs with CPU/RAM/power state. Select, queue, migrate — all from the TUI.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📂</div>
+      <h4>File Browser</h4>
+      <p>Built-in fzf-style fuzzy file picker. Filters by extension (.vmdk, .ova, etc). Navigate dirs, search instantly.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h4>Live Progress</h4>
+      <p>Real-time streaming of govc export progress, conversion status, and deployment steps. Progress bar with speed and ETA.</p>
+    </div>
+  </div>
+
+  <h3>5 Tabs</h3>
+  <table>
+    <tr><th>Tab</th><th>Purpose</th></tr>
+    <tr><td>1. Migration</td><td>Config form (guided steps) + deploy targets + execution plan</td></tr>
+    <tr><td>2. vSphere</td><td>vCenter connection, VM discovery, batch selection, queue migration</td></tr>
+    <tr><td>3. Logs</td><td>Full scrollable log viewer with color-coded levels</td></tr>
+    <tr><td>4. Libvirt VMs</td><td>List/manage local KVM VMs, start/stop/delete, console access</td></tr>
+    <tr><td>5. Kubernetes</td><td>KubeVirt VMs, PVCs, namespaces, multi-context support</td></tr>
+  </table>
+</div>
+
+<!-- PAGE: DEPLOYMENT OPTIONS -->
+<div class="page page-light">
+  <h2 class="st">Deployment <span>Options</span></h2>
+  <p class="sub">Flexible deployment for every environment.</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">🖥️</div>
+      <h4>Standalone CLI</h4>
+      <p>Single binary + Python package. Run on any Linux box. YAML-driven for automation. Perfect for scripts and CI/CD.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🎮</div>
+      <h4>Interactive TUI</h4>
+      <p>zkvm terminal UI for guided migration. File browser, vSphere discovery, live progress. Zero learning curve.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔧</div>
+      <h4>Daemon Mode</h4>
+      <p>hypersdk runs as systemd service. REST API for programmatic access. Job scheduling, webhooks, RBAC.</p>
+    </div>
+    <div class="card">
+      <div class="icon">☸️</div>
+      <h4>Kubernetes Operator</h4>
+      <p>Deploy as K8s operator. CRDs for migration jobs. GitOps-friendly. Helm chart included.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🐳</div>
+      <h4>Container Image</h4>
+      <p>OCI container for Podman/Docker. Mount disks as volumes, convert in isolation. CI/CD pipeline ready.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📦</div>
+      <h4>RPM / DEB Package</h4>
+      <p>Native packages for RHEL, Fedora, Ubuntu, Debian. Standard install, systemd integration, man pages.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>hyper2kvm + hypersdk — Enterprise VM Migration Platform<br>Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm</p>
+  </div>
+</div>
+
+</body>
+</html>

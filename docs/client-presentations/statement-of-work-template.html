@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statement of Work — VMware to KVM Migration Services</title>
+<style>
+  @page { size: A4; margin: 22mm 20mm; }
+  :root { --accent: #1e40af; --accent2: #2563eb; --text: #1e293b; --text2: #475569; --text3: #94a3b8; --border: #e2e8f0; --light: #f8fafc; --green: #16a34a; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: var(--text); background: #fff; line-height: 1.7; font-size: 10.5pt; }
+
+  /* Cover */
+  .cover { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 40%, #1e40af 100%); color: #fff; page-break-after: always; padding: 60px 40px; }
+  .cover h1 { font-size: 2.6em; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.15em; }
+  .cover h1 span { color: #93c5fd; }
+  .cover .subtitle { font-size: 1.2em; font-weight: 300; opacity: 0.85; margin-bottom: 2em; }
+  .cover .parties { text-align: left; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 28px 36px; width: 100%; max-width: 560px; line-height: 2.2; }
+  .cover .parties strong { display: inline-block; width: 140px; opacity: 0.7; font-weight: 500; }
+  .e { background: rgba(255,255,255,0.08); border: 1px dashed rgba(255,255,255,0.25); padding: 1px 10px; border-radius: 4px; min-width: 160px; display: inline-block; }
+  .pe { background: #fffbeb; border: 1px dashed #fbbf24; padding: 1px 8px; border-radius: 4px; min-width: 100px; display: inline-block; color: var(--text); }
+
+  /* Content */
+  .page { max-width: 800px; margin: 0 auto; padding: 10px 0 40px; }
+  h2 { font-size: 1.25em; font-weight: 700; color: var(--accent); margin: 28px 0 10px; padding-bottom: 5px; border-bottom: 2px solid var(--accent2); page-break-after: avoid; }
+  h3 { font-size: 1.02em; font-weight: 600; color: var(--text); margin: 18px 0 6px; }
+  p, li { font-size: 0.93em; color: var(--text2); margin-bottom: 8px; }
+  ul, ol { padding-left: 22px; }
+  ol > li { margin-bottom: 6px; }
+  ul > li { margin-bottom: 4px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.88em; page-break-inside: avoid; }
+  th { background: var(--accent); color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: var(--light); }
+
+  .clause { margin-bottom: 18px; }
+  .clause-num { font-weight: 700; color: var(--accent); margin-right: 4px; }
+  .indent { padding-left: 24px; }
+
+  .sig-block { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; page-break-inside: avoid; }
+  .sig-party { border-top: 2px solid var(--text); padding-top: 16px; }
+  .sig-party .label { font-size: 0.82em; color: var(--text3); margin-bottom: 2px; }
+  .sig-line { border-bottom: 1px solid var(--border); height: 36px; margin: 8px 0 4px; }
+  .sig-party .field-label { font-size: 0.78em; color: var(--text3); }
+
+  .edit-note { background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 10px 14px; font-size: 0.82em; color: #92400e; margin: 16px 0; }
+  .edit-note::before { content: '✏️ '; }
+
+  .highlight-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 14px 18px; margin: 12px 0; font-size: 0.9em; }
+  .highlight-box.green { background: #f0fdf4; border-color: #86efac; }
+
+  .footer-print { text-align: center; font-size: 0.72em; color: var(--text3); margin-top: 40px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+  @media screen {
+    body { background: #f1f5f9; }
+    .page { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; padding: 40px; margin: 20px auto; }
+    .cover { border-radius: 8px; margin: 20px auto; max-width: 800px; min-height: auto; }
+  }
+  @media print {
+    .edit-note { display: none; }
+    .pe { background: transparent; border: none; }
+    .print-btn { display: none; }
+  }
+  .print-btn { display: block; margin: 20px auto; background: var(--accent2); color: #fff; border: none; padding: 10px 28px; border-radius: 8px; font-size: 0.9em; font-weight: 600; cursor: pointer; }
+  .print-btn:hover { background: var(--accent); }
+  .toc { list-style: none; padding: 0; }
+  .toc li { padding: 5px 0; border-bottom: 1px dotted var(--border); display: flex; justify-content: space-between; font-size: 0.93em; }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <h1>Statement of <span>Work</span></h1>
+  <div class="subtitle">VMware to KVM Migration Services</div>
+  <div class="parties">
+    <strong>Client:</strong> <span class="e" contenteditable="true">[Customer Organization]</span><br>
+    <strong>Provider:</strong> <span class="e" contenteditable="true">[Your Company Name]</span><br>
+    <strong>SOW Number:</strong> <span class="e" contenteditable="true">SOW-2026-001</span><br>
+    <strong>Effective Date:</strong> <span class="e" contenteditable="true">[Start Date]</span><br>
+    <strong>Completion Date:</strong> <span class="e" contenteditable="true">[End Date]</span><br>
+    <strong>Version:</strong> <span class="e" contenteditable="true">1.0</span>
+  </div>
+</div>
+
+<!-- ============ CONTENT ============ -->
+<div class="page">
+
+  <div class="edit-note">This is a customizable SOW template. Yellow-highlighted fields are editable — click to modify. Print or save as PDF when ready. All hyper2kvm references are pre-written; customize scope, pricing, and timeline for your engagement.</div>
+
+  <!-- TOC -->
+  <h2>Table of Contents</h2>
+  <ul class="toc">
+    <li><span>1. Purpose & Background</span></li>
+    <li><span>2. Scope of Work</span></li>
+    <li><span>3. Deliverables</span></li>
+    <li><span>4. Project Phases & Timeline</span></li>
+    <li><span>5. Acceptance Criteria</span></li>
+    <li><span>6. Roles & Responsibilities</span></li>
+    <li><span>7. Assumptions & Dependencies</span></li>
+    <li><span>8. Out of Scope</span></li>
+    <li><span>9. Change Control</span></li>
+    <li><span>10. Pricing & Payment Terms</span></li>
+    <li><span>11. Warranty & Support</span></li>
+    <li><span>12. Confidentiality & Security</span></li>
+    <li><span>13. Termination</span></li>
+    <li><span>14. Signatures</span></li>
+    <li><span>Exhibit A: VM Migration Inventory</span></li>
+    <li><span>Exhibit B: Target Architecture Diagram</span></li>
+  </ul>
+
+  <!-- ============ 1. PURPOSE ============ -->
+  <h2>1. Purpose & Background</h2>
+
+  <div class="clause">
+    <p><span class="clause-num">1.1</span> <span class="pe" contenteditable="true">[Customer]</span> ("Client") engages <span class="pe" contenteditable="true">[Your Company]</span> ("Provider") to perform migration services to transition Client's virtualized workloads from VMware vSphere/ESXi infrastructure to KVM-based infrastructure.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">1.2</span> <strong>Business Context.</strong> Client's current VMware licensing agreement expires on <span class="pe" contenteditable="true">[Date]</span>. Under Broadcom's revised pricing model, renewal costs have increased by approximately <span class="pe" contenteditable="true">[X]</span>%, making migration to open-source KVM a strategic priority to reduce annual infrastructure costs by an estimated <span class="pe" contenteditable="true">$XXX,XXX</span>/year.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">1.3</span> <strong>Migration Tooling.</strong> Provider will utilize the <strong>hyper2kvm</strong> (h2kvmctl) migration toolkit, licensed under Proprietary (Zyvor AI Labs). The toolkit supports automated VM conversion from VMware VMDK/OVA format to KVM QCOW2 format with offline guest OS fixes.</p>
+  </div>
+
+  <!-- ============ 2. SCOPE ============ -->
+  <h2>2. Scope of Work</h2>
+
+  <div class="clause">
+    <p><span class="clause-num">2.1</span> <strong>Environment Summary.</strong></p>
+    <table>
+      <tr><th style="width:35%">Item</th><th>Details</th></tr>
+      <tr><td>Total VMs to migrate</td><td><span class="pe" contenteditable="true">[N]</span> virtual machines (see Exhibit A)</td></tr>
+      <tr><td>Source platform</td><td>VMware vSphere <span class="pe" contenteditable="true">[version]</span> on <span class="pe" contenteditable="true">[N]</span> ESXi hosts</td></tr>
+      <tr><td>Target platform</td><td>KVM (libvirt) on <span class="pe" contenteditable="true">[N]</span> hosts running <span class="pe" contenteditable="true">[Rocky Linux 9 / RHEL 9]</span></td></tr>
+      <tr><td>Guest operating systems</td><td><span class="pe" contenteditable="true">[e.g., RHEL 8/9, Ubuntu 22.04, Windows Server 2019/2022]</span></td></tr>
+      <tr><td>Storage backend</td><td><span class="pe" contenteditable="true">[Local NVMe / Ceph / NFS]</span></td></tr>
+      <tr><td>Network architecture</td><td><span class="pe" contenteditable="true">[Linux bridge / OVS, VLANs: X-Y]</span></td></tr>
+      <tr><td>HA requirement</td><td><span class="pe" contenteditable="true">[Pacemaker cluster / standalone / KubeVirt]</span></td></tr>
+    </table>
+  </div>
+
+  <div class="clause">
+    <p><span class="clause-num">2.2</span> <strong>Services Included.</strong> Provider shall perform the following services:</p>
+    <ol>
+      <li><strong>Discovery & Assessment</strong> — Inventory all VMs, document dependencies, classify workloads by migration complexity, perform readiness assessment, and produce a detailed migration plan.</li>
+      <li><strong>Target Infrastructure Design & Build</strong> — Design KVM host architecture (compute, storage, network, HA), procure and deploy target hosts, configure networking (bridges, VLANs, bonds), storage pools, and monitoring stack (Prometheus + Grafana).</li>
+      <li><strong>Proof of Concept</strong> — Migrate <span class="pe" contenteditable="true">[5]</span> representative VMs (mix of Linux and Windows) to validate the migration process, measure performance, and obtain Client approval to proceed.</li>
+      <li><strong>Wave-Based Migration</strong> — Convert all in-scope VMs from VMware VMDK/OVA to KVM QCOW2 format using h2kvmctl, applying automated fixes (VirtIO driver injection, initramfs rebuild, fstab UUID conversion, GRUB repair, network reconfiguration) and deploying to target KVM hosts in agreed migration waves.</li>
+      <li><strong>Testing & Validation</strong> — Perform boot testing, application smoke testing, network connectivity verification, and performance baseline comparison for each migrated VM.</li>
+      <li><strong>Cutover Execution</strong> — Execute production cutover during agreed maintenance windows, coordinating with Client application owners for service validation and sign-off.</li>
+      <li><strong>Monitoring & Backup Configuration</strong> — Deploy Prometheus + Grafana monitoring with pre-built KVM dashboards and alerting rules. Configure backup solution (<span class="pe" contenteditable="true">[BorgBackup / Restic / Velero]</span>) with agreed retention policy.</li>
+      <li><strong>Knowledge Transfer</strong> — Deliver <span class="pe" contenteditable="true">[N]</span> days of hands-on training covering KVM administration (virsh), networking, storage management, monitoring, troubleshooting, and Day-2 operations.</li>
+      <li><strong>Documentation</strong> — Provide complete operational runbooks, architecture documentation, and migration evidence package for audit/compliance purposes.</li>
+      <li><strong>VMware Decommission Support</strong> — Assist Client in powering off and decommissioning VMware ESXi hosts and vCenter after 48-hour soak period confirmation.</li>
+    </ol>
+  </div>
+
+  <!-- ============ 3. DELIVERABLES ============ -->
+  <h2>3. Deliverables</h2>
+
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:30%">Deliverable</th><th style="width:15%">Phase</th><th style="width:15%">Format</th><th style="width:35%">Description</th></tr>
+    <tr><td>D1</td><td>VM Inventory & Migration Plan</td><td>Discovery</td><td>Document (PDF)</td><td>Complete VM inventory, dependency map, risk assessment, wave schedule, rollback procedures</td></tr>
+    <tr><td>D2</td><td>Target Architecture Document</td><td>Design</td><td>Document (PDF)</td><td>KVM host specs, network topology, storage layout, HA design, monitoring architecture</td></tr>
+    <tr><td>D3</td><td>POC Results Report</td><td>POC</td><td>Document (PDF)</td><td>POC VM list, conversion results, boot test results, performance comparison, go/no-go recommendation</td></tr>
+    <tr><td>D4</td><td>Production KVM Infrastructure</td><td>Build</td><td>Deployed systems</td><td><span class="pe" contenteditable="true">[N]</span> configured KVM hosts with networking, storage, monitoring operational</td></tr>
+    <tr><td>D5</td><td>Migrated Virtual Machines</td><td>Migrate</td><td>Running VMs</td><td><span class="pe" contenteditable="true">[N]</span> VMs converted, deployed, tested, and accepted on KVM</td></tr>
+    <tr><td>D6</td><td>Migration Evidence Package</td><td>Migrate</td><td>JSON + PDF</td><td>Per-VM conversion logs, checksums, boot test results, acceptance sign-offs</td></tr>
+    <tr><td>D7</td><td>Operational Runbooks</td><td>Close</td><td>Document (PDF)</td><td>KVM admin guide, troubleshooting, backup/restore, DR procedures</td></tr>
+    <tr><td>D8</td><td>Training Materials</td><td>Close</td><td>Slides + Labs</td><td>Training slides, hands-on lab guides, recorded sessions</td></tr>
+    <tr><td>D9</td><td>Project Closure Report</td><td>Close</td><td>Document (PDF)</td><td>Final status, lessons learned, recommendations, sign-off</td></tr>
+  </table>
+
+  <!-- ============ 4. PHASES & TIMELINE ============ -->
+  <h2>4. Project Phases & Timeline</h2>
+
+  <table>
+    <tr><th>Phase</th><th>Duration</th><th>Start</th><th>End</th><th>Key Activities</th><th>Gate</th></tr>
+    <tr><td><strong>1. Discovery</strong></td><td><span class="pe" contenteditable="true">2 weeks</span></td><td><span class="pe" contenteditable="true">[Date]</span></td><td><span class="pe" contenteditable="true">[Date]</span></td><td>VM inventory, risk assessment, migration plan</td><td>Plan approved by Client</td></tr>
+    <tr><td><strong>2. Design & Build</strong></td><td><span class="pe" contenteditable="true">2 weeks</span></td><td><span class="pe" contenteditable="true">[Date]</span></td><td><span class="pe" contenteditable="true">[Date]</span></td><td>Architecture design, host deployment, network/storage config</td><td>Infrastructure passes h2kvmctl doctor</td></tr>
+    <tr><td><strong>3. POC</strong></td><td><span class="pe" contenteditable="true">1 week</span></td><td><span class="pe" contenteditable="true">[Date]</span></td><td><span class="pe" contenteditable="true">[Date]</span></td><td>Migrate 5 VMs, validate, benchmark</td><td>POC sign-off by Client</td></tr>
+    <tr><td><strong>4. Migration Waves</strong></td><td><span class="pe" contenteditable="true">4-6 weeks</span></td><td><span class="pe" contenteditable="true">[Date]</span></td><td><span class="pe" contenteditable="true">[Date]</span></td><td>Wave 1: dev/test, Wave 2: databases, Wave 3: apps, Wave 4: web/remaining</td><td>Per-wave acceptance</td></tr>
+    <tr><td><strong>5. Optimization & Close</strong></td><td><span class="pe" contenteditable="true">2 weeks</span></td><td><span class="pe" contenteditable="true">[Date]</span></td><td><span class="pe" contenteditable="true">[Date]</span></td><td>Performance tuning, training, documentation, VMware decommission, PIR</td><td>Final project sign-off</td></tr>
+  </table>
+
+  <div class="clause">
+    <p><span class="clause-num">4.2</span> <strong>Migration Waves.</strong> VMs shall be migrated in waves ordered by risk and dependency:</p>
+    <table>
+      <tr><th>Wave</th><th>VMs</th><th>Category</th><th>Weekend</th><th>Rollback Window</th></tr>
+      <tr><td>Wave 0</td><td><span class="pe" contenteditable="true">[N]</span></td><td>Internal / Lab (lowest risk)</td><td><span class="pe" contenteditable="true">[Date]</span></td><td>Unlimited</td></tr>
+      <tr><td>Wave 1</td><td><span class="pe" contenteditable="true">[N]</span></td><td>Dev / Test environments</td><td><span class="pe" contenteditable="true">[Date]</span></td><td>48 hours</td></tr>
+      <tr><td>Wave 2</td><td><span class="pe" contenteditable="true">[N]</span></td><td>Database servers</td><td><span class="pe" contenteditable="true">[Date]</span></td><td>48 hours</td></tr>
+      <tr><td>Wave 3</td><td><span class="pe" contenteditable="true">[N]</span></td><td>Application servers</td><td><span class="pe" contenteditable="true">[Date]</span></td><td>48 hours</td></tr>
+      <tr><td>Wave 4</td><td><span class="pe" contenteditable="true">[N]</span></td><td>Web / Load Balancers / Remaining</td><td><span class="pe" contenteditable="true">[Date]</span></td><td>48 hours</td></tr>
+    </table>
+  </div>
+
+  <!-- ============ 5. ACCEPTANCE ============ -->
+  <h2>5. Acceptance Criteria</h2>
+
+  <div class="clause">
+    <p><span class="clause-num">5.1</span> Each migrated VM shall be considered accepted when all of the following are met:</p>
+    <ol>
+      <li>VM boots successfully on KVM within 2 minutes</li>
+      <li>All application services start automatically and respond to health checks</li>
+      <li>Network connectivity verified to all documented dependencies</li>
+      <li>Performance within 10% of pre-migration VMware baseline (CPU, I/O, network)</li>
+      <li>Data integrity verified (database row counts, file checksums, or application-level checks)</li>
+      <li>Monitoring agents reporting to Prometheus/Grafana</li>
+      <li>Backup configured and first backup completed successfully</li>
+      <li>Application owner signs acceptance form</li>
+    </ol>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">5.2</span> Client shall have <span class="pe" contenteditable="true">[5]</span> business days after each wave cutover to review, test, and either accept or reject the deliverable. Failure to respond within this period constitutes acceptance.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">5.3</span> If a VM fails acceptance criteria, Provider shall remediate at no additional cost. If remediation is not possible within <span class="pe" contenteditable="true">[5]</span> business days, the VM shall be rolled back to VMware and excluded from scope (with corresponding pricing adjustment per Section 9.4).</p>
+  </div>
+
+  <!-- ============ 6. ROLES ============ -->
+  <h2>6. Roles & Responsibilities</h2>
+
+  <h3>6.1 Provider Responsibilities</h3>
+  <ul>
+    <li>Provide qualified migration engineers for the duration of the project</li>
+    <li>Supply and configure migration tooling (h2kvmctl, Ansible playbooks, monitoring stack)</li>
+    <li>Perform all VM conversions, testing, and cutover activities</li>
+    <li>Provide 24/7 on-call support during cutover weekends</li>
+    <li>Deliver all documentation and training as specified in Section 3</li>
+    <li>Maintain project plan, status reporting, and risk management</li>
+  </ul>
+
+  <h3>6.2 Client Responsibilities</h3>
+  <ul>
+    <li>Provide remote access (VPN/SSH) to source VMware environment and target KVM hosts</li>
+    <li>Provide vCenter administrative credentials for VM export</li>
+    <li>Procure and rack target KVM server hardware prior to Phase 2 start</li>
+    <li>Assign application owners for each VM to participate in validation and sign-off</li>
+    <li>Provide maintenance windows (weekends) for production cutover activities</li>
+    <li>Provide network VLAN configurations, firewall rule changes, and DNS updates as needed</li>
+    <li>Make timely decisions on acceptance within the agreed review period</li>
+    <li>Assign a Client project manager as single point of contact</li>
+  </ul>
+
+  <h3>6.3 Key Personnel</h3>
+  <table>
+    <tr><th>Role</th><th>Provider</th><th>Client</th></tr>
+    <tr><td>Project Manager</td><td><span class="pe" contenteditable="true">[Name]</span></td><td><span class="pe" contenteditable="true">[Name]</span></td></tr>
+    <tr><td>Technical Lead</td><td><span class="pe" contenteditable="true">[Name]</span></td><td><span class="pe" contenteditable="true">[Name]</span></td></tr>
+    <tr><td>Migration Engineer(s)</td><td><span class="pe" contenteditable="true">[Name(s)]</span></td><td>N/A</td></tr>
+    <tr><td>Network Engineer</td><td><span class="pe" contenteditable="true">[Name]</span></td><td><span class="pe" contenteditable="true">[Name]</span></td></tr>
+    <tr><td>Executive Sponsor</td><td>N/A</td><td><span class="pe" contenteditable="true">[Name, Title]</span></td></tr>
+  </table>
+
+  <!-- ============ 7. ASSUMPTIONS ============ -->
+  <h2>7. Assumptions & Dependencies</h2>
+
+  <ol>
+    <li>Client's VMware environment is running vSphere <span class="pe" contenteditable="true">[6.7 or later]</span> with vCenter available for API access.</li>
+    <li>Target KVM hosts meet minimum requirements: 64-bit x86 CPU with VT-x/AMD-V, RHEL 9 or Rocky Linux 9, minimum 256 GB RAM, NVMe storage with at least 2x the total VM disk footprint available.</li>
+    <li>Network connectivity exists between Provider's engineers (remote) and Client's VMware/KVM infrastructure.</li>
+    <li>Client provides server hardware racked, cabled, and accessible with IPMI/iDRAC/iLO before Phase 2 begins.</li>
+    <li>VMs do not use VMware-proprietary features that prevent export (e.g., vSphere FT, vGPU without separate NVIDIA license). Any such VMs will be identified during Discovery and handled as exceptions.</li>
+    <li>Weekend maintenance windows of at least 4 hours are available for production cutover.</li>
+    <li>Provider work is performed remotely unless on-site presence is specifically requested.</li>
+    <li>VirtIO-compatible drivers exist for all guest operating systems in scope. Legacy operating systems (Windows Server 2008 R2 or earlier, RHEL 5) may require additional effort billed under Change Control (Section 9).</li>
+  </ol>
+
+  <!-- ============ 8. OUT OF SCOPE ============ -->
+  <h2>8. Out of Scope</h2>
+
+  <ul>
+    <li>Application refactoring, re-platforming, or containerization</li>
+    <li>Hardware procurement, shipping, or physical installation</li>
+    <li>Operating system upgrades within guest VMs (migration preserves existing OS version)</li>
+    <li>Application-level configuration changes (database tuning, application settings)</li>
+    <li>Migration of VMware-specific features with no KVM equivalent (vSphere FT, vSphere Replication to non-Ceph targets)</li>
+    <li>Physical-to-virtual (P2V) conversions of bare-metal servers</li>
+    <li>Third-party vendor appliance migrations requiring vendor involvement</li>
+    <li>Ongoing managed services after the warranty period</li>
+  </ul>
+
+  <!-- ============ 9. CHANGE CONTROL ============ -->
+  <h2>9. Change Control</h2>
+
+  <div class="clause">
+    <p><span class="clause-num">9.1</span> Any changes to scope, timeline, or deliverables must be documented in a Change Request (CR) signed by both parties before work begins.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">9.2</span> Provider shall assess each CR within 3 business days and provide a written estimate of impact on timeline and cost.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">9.3</span> Additional VMs beyond the <span class="pe" contenteditable="true">[N]</span> specified in Exhibit A may be added at the per-VM rate specified in Section 10.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">9.4</span> VMs removed from scope (e.g., vendor appliances that cannot be migrated) shall reduce the total price by the per-VM rate.</p>
+  </div>
+
+  <!-- ============ 10. PRICING ============ -->
+  <h2>10. Pricing & Payment Terms</h2>
+
+  <div class="edit-note">Customize all pricing based on your rates and engagement scope.</div>
+
+  <h3>10.1 Fixed-Price Services</h3>
+  <table>
+    <tr><th>Service</th><th>Price</th><th>Notes</th></tr>
+    <tr><td>Discovery & Assessment</td><td><span class="pe" contenteditable="true">$XX,XXX</span></td><td>Deliverables: D1</td></tr>
+    <tr><td>Architecture Design & Build</td><td><span class="pe" contenteditable="true">$XX,XXX</span></td><td>Deliverables: D2, D4</td></tr>
+    <tr><td>POC (<span class="pe" contenteditable="true">5</span> VMs)</td><td><span class="pe" contenteditable="true">$X,XXX</span></td><td>Deliverable: D3</td></tr>
+    <tr><td>VM Migration (<span class="pe" contenteditable="true">[N]</span> VMs)</td><td><span class="pe" contenteditable="true">$XXX,XXX</span></td><td>Deliverables: D5, D6. Includes conversion, testing, cutover.</td></tr>
+    <tr><td>Monitoring & Backup Setup</td><td>Included</td><td>Prometheus + Grafana + backup configuration</td></tr>
+    <tr><td>Knowledge Transfer & Training (<span class="pe" contenteditable="true">[N]</span> days)</td><td><span class="pe" contenteditable="true">$XX,XXX</span></td><td>Deliverables: D7, D8</td></tr>
+    <tr><td>Hypercare Support (2 weeks)</td><td>Included</td><td>24/7 post-migration support</td></tr>
+    <tr><td>hyper2kvm Software License</td><td><strong>Contact for pricing*</strong></td><td>Proprietary (Zyvor AI Labs) — licensed*</td></tr>
+    <tr style="font-weight:700; background:#f0fdf4;"><td>TOTAL PROJECT PRICE</td><td><span class="pe" contenteditable="true">$XXX,XXX</span></td><td></td></tr>
+  </table>
+
+  <h3>10.2 Per-VM Rate (for scope changes)</h3>
+  <p>Additional VMs: <span class="pe" contenteditable="true">$XXX</span> per VM (includes conversion, testing, cutover, and documentation).</p>
+
+  <h3>10.3 Payment Schedule</h3>
+  <table>
+    <tr><th>Milestone</th><th>Amount</th><th>Due</th></tr>
+    <tr><td>SOW execution (deposit)</td><td><span class="pe" contenteditable="true">25%</span></td><td>Upon signing</td></tr>
+    <tr><td>POC sign-off (Phase 3 gate)</td><td><span class="pe" contenteditable="true">25%</span></td><td>POC acceptance</td></tr>
+    <tr><td>Migration 50% complete</td><td><span class="pe" contenteditable="true">25%</span></td><td>Wave 2 acceptance</td></tr>
+    <tr><td>Final project sign-off</td><td><span class="pe" contenteditable="true">25%</span></td><td>Project closure</td></tr>
+  </table>
+
+  <div class="clause">
+    <p><span class="clause-num">10.4</span> All invoices are due within <span class="pe" contenteditable="true">[30]</span> days of receipt. Late payments accrue interest at <span class="pe" contenteditable="true">[1.5]</span>% per month.</p>
+  </div>
+
+  <!-- ============ 11. WARRANTY ============ -->
+  <h2>11. Warranty & Support</h2>
+
+  <div class="clause">
+    <p><span class="clause-num">11.1</span> <strong>Warranty Period.</strong> Provider warrants all deliverables for <span class="pe" contenteditable="true">[90]</span> days following final project acceptance. During the warranty period, Provider shall remediate any defects in deliverables at no additional cost.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">11.2</span> <strong>Hypercare.</strong> For the first 14 days following each production cutover wave, Provider shall maintain 24/7 on-call availability with a 15-minute response time for critical issues (VM not booting, data inaccessibility) and 1-hour response for high-priority issues.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">11.3</span> <strong>Extended Support.</strong> Post-warranty managed services are available under a separate agreement at <span class="pe" contenteditable="true">$X,XXX</span>/month.</p>
+  </div>
+
+  <!-- ============ 12. CONFIDENTIALITY ============ -->
+  <h2>12. Confidentiality & Security</h2>
+
+  <div class="clause">
+    <p><span class="clause-num">12.1</span> Provider shall treat all Client data, infrastructure details, and credentials as confidential. No Client data shall be stored on Provider systems beyond the project duration.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">12.2</span> All VM data remains within Client's data center/infrastructure at all times. The hyper2kvm tooling runs locally and makes no external network calls.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">12.3</span> Provider engineers shall comply with Client's security policies, including background checks if required, and shall access systems only through Client-approved methods (VPN, jump hosts).</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">12.4</span> Upon project completion, Provider shall securely delete all Client credentials, access keys, and any temporary data copies.</p>
+  </div>
+
+  <!-- ============ 13. TERMINATION ============ -->
+  <h2>13. Termination</h2>
+
+  <div class="clause">
+    <p><span class="clause-num">13.1</span> Either party may terminate this SOW with <span class="pe" contenteditable="true">[30]</span> days written notice. Upon termination, Client shall pay for all work completed to date, including any partially completed phases at a pro-rata basis.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">13.2</span> Upon termination, Provider shall deliver all work product completed to date, including partial documentation, converted VM images, and configuration files.</p>
+  </div>
+  <div class="clause">
+    <p><span class="clause-num">13.3</span> Client's right to use hyper2kvm software is governed by the Proprietary (Zyvor AI Labs) license agreement.</p>
+  </div>
+
+  <!-- ============ 14. SIGNATURES ============ -->
+  <h2>14. Signatures</h2>
+
+  <p>By signing below, both parties agree to the terms and conditions set forth in this Statement of Work.</p>
+
+  <div class="sig-block">
+    <div class="sig-party">
+      <div class="label"><strong>CLIENT:</strong> <span class="pe" contenteditable="true">[Customer Organization]</span></div>
+      <div class="sig-line"></div>
+      <div class="field-label">Authorized Signature</div>
+      <div class="sig-line"></div>
+      <div class="field-label">Printed Name & Title</div>
+      <div class="sig-line"></div>
+      <div class="field-label">Date</div>
+    </div>
+    <div class="sig-party">
+      <div class="label"><strong>PROVIDER:</strong> <span class="pe" contenteditable="true">[Your Company]</span></div>
+      <div class="sig-line"></div>
+      <div class="field-label">Authorized Signature</div>
+      <div class="sig-line"></div>
+      <div class="field-label">Printed Name & Title</div>
+      <div class="sig-line"></div>
+      <div class="field-label">Date</div>
+    </div>
+  </div>
+
+  <!-- ============ EXHIBITS ============ -->
+  <h2 style="page-break-before:always;">Exhibit A: VM Migration Inventory</h2>
+
+  <p>The following VMs are in scope for migration under this SOW. This list may be amended via Change Control (Section 9).</p>
+
+  <table>
+    <tr><th>#</th><th>VM Name</th><th>OS</th><th>vCPU</th><th>RAM (GB)</th><th>Disk (GB)</th><th>Wave</th><th>Priority</th><th>Notes</th></tr>
+    <tr><td>1</td><td class="pe" contenteditable="true">db-primary</td><td class="pe" contenteditable="true">RHEL 9</td><td class="pe" contenteditable="true">8</td><td class="pe" contenteditable="true">32</td><td class="pe" contenteditable="true">500</td><td class="pe" contenteditable="true">2</td><td>Critical</td><td class="pe" contenteditable="true">PostgreSQL primary</td></tr>
+    <tr><td>2</td><td class="pe" contenteditable="true">db-replica</td><td class="pe" contenteditable="true">RHEL 9</td><td class="pe" contenteditable="true">8</td><td class="pe" contenteditable="true">32</td><td class="pe" contenteditable="true">500</td><td class="pe" contenteditable="true">2</td><td>Critical</td><td class="pe" contenteditable="true">PostgreSQL replica</td></tr>
+    <tr><td>3</td><td class="pe" contenteditable="true">app-server-01</td><td class="pe" contenteditable="true">Rocky 9</td><td class="pe" contenteditable="true">4</td><td class="pe" contenteditable="true">16</td><td class="pe" contenteditable="true">100</td><td class="pe" contenteditable="true">3</td><td>High</td><td class="pe" contenteditable="true">Java application</td></tr>
+    <tr><td>4</td><td class="pe" contenteditable="true">win-sql-01</td><td class="pe" contenteditable="true">Win 2022</td><td class="pe" contenteditable="true">4</td><td class="pe" contenteditable="true">16</td><td class="pe" contenteditable="true">200</td><td class="pe" contenteditable="true">2</td><td>Critical</td><td class="pe" contenteditable="true">SQL Server Standard</td></tr>
+    <tr><td>5</td><td class="pe" contenteditable="true">web-frontend</td><td class="pe" contenteditable="true">Ubuntu 22</td><td class="pe" contenteditable="true">2</td><td class="pe" contenteditable="true">4</td><td class="pe" contenteditable="true">50</td><td class="pe" contenteditable="true">4</td><td>Medium</td><td class="pe" contenteditable="true">Nginx + React</td></tr>
+    <tr><td colspan="9" style="text-align:center; color:var(--text3); font-style:italic;">Add additional VMs as needed — click any cell to edit</td></tr>
+  </table>
+
+  <h2>Exhibit B: Target Architecture Diagram</h2>
+
+  <div style="border:2px dashed var(--border); border-radius:8px; padding:60px; text-align:center; color:var(--text3); margin:16px 0;">
+    <p style="font-size:1.1em;">[Insert Target Architecture Diagram Here]</p>
+    <p style="font-size:0.85em; margin-top:8px;">Include: KVM hosts, network topology (bridges, VLANs), storage layout, monitoring stack, HA cluster design</p>
+  </div>
+
+  <div class="footer-print">
+    <p>Statement of Work — VMware to KVM Migration Services | <span class="pe" contenteditable="true">[SOW-2026-001]</span> | Confidential</p>
+    <p>Powered by hyper2kvm (hyper2kvm.io) | Proprietary (Zyvor AI Labs)</p>
+  </div>
+
+  <button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
+
+</div>
+
+</body>
+</html>

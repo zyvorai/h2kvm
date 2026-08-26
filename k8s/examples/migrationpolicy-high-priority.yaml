@@ -1,0 +1,24 @@
+---
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationPolicy
+metadata:
+  name: high-priority-migration-policy
+spec:
+  # Higher bandwidth for high-priority VMs
+  bandwidthPerMigration: "1Gi"
+
+  allowAutoConverge: true
+  allowPostCopy: true
+
+  # Longer timeout for large VMs
+  completionTimeoutPerGiB: 1200
+  progressTimeout: 300
+
+  # Allow more parallel migrations for high-priority workloads
+  maxParallelMigrationsPerCluster: 10
+  maxParallelMigrationsPerNode: 3
+
+  # Apply only to VMs with priority: high label
+  vmSelector:
+    matchLabels:
+      priority: "high"

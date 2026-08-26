@@ -1,0 +1,12 @@
+node_modules
+dashboard/node_modules
+dashboard/dist
+.git
+*.md
+.env
+.env.*
+*.test
+*.spec
+__pycache__
+.vscode
+.idea

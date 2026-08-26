@@ -1,0 +1,22 @@
+# Photon OS Migration - Direct Export to Libvirt
+command: local
+vmdk: ./photon.vmdk
+output_dir: /var/lib/libvirt/images
+to_output: photon-os-1.qcow2
+out_format: qcow2
+compress: false  # Don't compress for better performance in libvirt
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Libvirt Integration
+emit_domain_xml: true
+virsh_define: true
+vm_name: photon-os
+libvirt_network: default
+machine: q35
+headless: false  # Set to true for no graphics console
+
+# Optional: Test the VM after migration
+libvirt_test: true
+keep_domain: true
+timeout: 120

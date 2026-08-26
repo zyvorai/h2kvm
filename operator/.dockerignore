@@ -1,0 +1,35 @@
+# Binaries
+bin/
+testbin/
+
+# Test and build artifacts
+*.test
+*.out
+cover.out
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Documentation
+*.md
+docs/
+
+# Git
+.git
+.gitignore
+
+# CI/CD
+.github/
+
+# Config (keep only needed for build)
+config/samples/
+config/default/
+tests/
+
+# Temporary files
+tmp/
+temp/

@@ -1,0 +1,21 @@
+{
+  "command": "live-fix",
+  "print_fstab": true,
+  "fstab_mode": "stabilize-all",
+  "verbose": 2,
+  "vms": [
+    {
+      "host": "vm1.example.com",
+      "user": "root",
+      "sudo": true,
+      "regen_initramfs": true
+    },
+    {
+      "host": "vm2.example.com",
+      "user": "admin",
+      "identity": "~/.ssh/key",
+      "sudo": true,
+      "remove_vmware_tools": false
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+# RHEL 8.8 with LVM Migration Test
+# ESXi thin-provisioned VMDK to KVM
+
+cmd: local
+
+# Source VMDK (inspected successfully)
+vmdk: /home/ssahani/tt/hyper2kvm/esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+
+# Conversion directory (use local dir with more space)
+conversion_dir: /home/ssahani/tt/hyper2kvm/tmp-conversions
+
+# Output Configuration
+output_dir: out/rhel88-test
+to_output: rhel88-migrated.qcow2
+out_format: qcow2
+compress: true
+
+# Core Linux Fixes
+fstab_fixes_enable: true
+fstab_mode: stabilize-all
+fstab_prefer_partuuid: false  # RHEL uses UUID for LVM
+fstab_optimize_options: true
+
+grub_fixes_enable: true
+initramfs_regen_enable: true
+initramfs_regen_force: true
+
+# VirtIO modules for initramfs (required for KVM)
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+  - dm_mod         # LVM support
+  - dm_crypt       # LUKS support (detected encrypted device)
+
+# Network fixes
+network_fixes_enable: true
+
+# Libvirt XML generation and import
+libvirt_xml_generate: true
+libvirt_vm_name: rhel88-test
+libvirt_memory_mb: 4096
+libvirt_vcpus: 2
+libvirt_disk_bus: virtio
+libvirt_import: true
+
+# Reporting
+report: out/rhel88-test/migration-report.md
+log_file: out/rhel88-test/migration.log
+verbose: 2
+dry_run: false

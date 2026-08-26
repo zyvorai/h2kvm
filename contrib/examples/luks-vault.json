@@ -1,0 +1,14 @@
+{
+  "$schema": "https://hyper2kvm.io/schemas/luks-config.json",
+  "description": "Vault-only LUKS auto-unlock configuration",
+
+  "vault": {
+    "addr": "https://vault.example.com:8200",
+    "token": "s.XXXXXXXXXXXXXXXXXXXXXX",
+    "path": "secret/hyper2kvm/luks"
+  },
+
+  "comment": "This configuration uses HashiCorp Vault for unlock.",
+  "comment2": "Store the key in Vault with: vault kv put secret/hyper2kvm/luks key=$(xxd -p keyfile | tr -d '\\n')",
+  "comment3": "For production, use environment variables for token: HYPER2KVM_VAULT_TOKEN"
+}

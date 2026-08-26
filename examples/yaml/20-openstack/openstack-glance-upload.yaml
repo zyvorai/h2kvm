@@ -1,0 +1,25 @@
+# Convert a disk and upload to OpenStack Glance (auth via clouds.yaml or OS_* env).
+#
+#   pip install 'hyper2kvm[openstack]'
+#   export OS_CLOUD=production   # or use --os-cloud on CLI
+#   sudo h2kvmctl --config examples/yaml/20-openstack/openstack-glance-upload.yaml
+#
+cmd: local
+output_dir: ./out-openstack
+
+vmdk: /path/to/source.vmdk
+flatten: true
+to_output: migrated.qcow2
+regen_initramfs: true
+fstab_mode: stabilize-all
+
+deploy_openstack: true
+glance_name: my-migrated-vm
+os_cloud: production
+
+# Optional: boot Nova after upload
+# openstack_boot_instance: true
+# openstack_flavor: m1.medium
+# openstack_network: <neutron-network-uuid>
+# openstack_key_name: admin-key
+# openstack_wait: true

@@ -1,0 +1,37 @@
+apiVersion: hyper2kvm.io/v1
+kind: Validation
+metadata:
+  name: k8s-node-validation
+  namespace: default
+spec:
+  image: /images/k8s-node.qcow2
+  memory: 4096
+  cpus: 4
+  timeout: 600
+  tpm: true
+  vsock: true
+  kubernetesValidation: true
+  createKubeVirtVM: true
+  kubevirtTemplate:
+    metadata:
+      labels:
+        app: k8s-node
+    spec:
+      runStrategy: Always
+      template:
+        spec:
+          domain:
+            cpu:
+              cores: 4
+            devices:
+              disks:
+                - name: disk0
+                  disk:
+                    bus: virtio
+            resources:
+              requests:
+                memory: 4Gi
+          volumes:
+            - name: disk0
+              persistentVolumeClaim:
+                claimName: k8s-node-disk

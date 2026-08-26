@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VMware to KubeVirt — Complete Migration Journey</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; position: relative; overflow: hidden; }
+  .cover::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 50%, rgba(255,143,63,0.15) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(99,102,241,0.1) 0%, transparent 50%); }
+  .cover h1 { font-size: 2.8em; font-weight: 800; letter-spacing: -2px; margin-bottom: 0.3em; position: relative; }
+  .cover h1 span { color: #ff8f3f; }
+  .cover h2 { font-size: 1.4em; font-weight: 300; opacity: 0.9; margin-bottom: 1.5em; position: relative; }
+  .cover .tagline { font-size: 1.1em; opacity: 0.7; max-width: 650px; position: relative; }
+  .cover .badge { display: inline-block; background: rgba(255,143,63,0.2); border: 1px solid rgba(255,143,63,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 2em; position: relative; }
+  .page { min-height: 100vh; padding: 60px 80px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; }
+  .page-light { background: #fafbfc; }
+  .page-accent { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #e8e6df; }
+  h2.section-title { font-size: 2.2em; font-weight: 700; margin-bottom: 0.8em; letter-spacing: -1px; }
+  h2.section-title span { color: #ff8f3f; }
+  h3 { font-size: 1.3em; font-weight: 600; margin: 1.2em 0 0.5em; }
+  p { margin-bottom: 1em; font-size: 1.05em; }
+  .subtitle { font-size: 1.1em; opacity: 0.7; margin-bottom: 2em; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin: 1.5em 0; }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 28px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .card .icon { font-size: 2em; margin-bottom: 12px; }
+  .card h4 { font-size: 1.15em; font-weight: 600; margin-bottom: 8px; }
+  .card p { font-size: 0.95em; opacity: 0.85; margin-bottom: 0; }
+  .stat-row { display: flex; gap: 40px; margin: 2em 0; }
+  .stat { text-align: center; flex: 1; }
+  .stat .number { font-size: 3em; font-weight: 800; color: #ff8f3f; line-height: 1; }
+  .stat .label { font-size: 0.95em; opacity: 0.7; margin-top: 8px; }
+  table { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.95em; }
+  th { background: #ff8f3f; color: #fff; padding: 14px 18px; text-align: left; font-weight: 600; }
+  td { padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+  .page-light tr:nth-child(even) td { background: #f9fafb; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 2em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(255,143,63,0.15); border: 1px solid rgba(255,143,63,0.3); padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 0.95em; }
+  .flow-arrow { font-size: 1.5em; color: #ff8f3f; }
+  ul { margin: 0.5em 0 1em 1.5em; }
+  li { margin-bottom: 0.4em; font-size: 1em; }
+  .cta-box { background: linear-gradient(135deg, #ff8f3f, #e67a30); color: #fff; padding: 40px; border-radius: 16px; text-align: center; margin: 2em 0; }
+  .cta-box h3 { font-size: 1.5em; margin-bottom: 0.5em; }
+  .cta-box p { opacity: 0.9; }
+  .timeline { margin: 2em 0; }
+  .timeline-item { display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-start; }
+  .timeline-dot { width: 40px; height: 40px; background: #ff8f3f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .timeline-content h4 { margin-bottom: 4px; }
+  .timeline-content p { font-size: 0.95em; opacity: 0.8; margin-bottom: 0; }
+  .footer { text-align: center; padding: 20px; font-size: 0.85em; opacity: 0.5; }
+  .check { color: #22c55e; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>VMware to <span>KubeVirt</span></h1>
+  <h2>The Complete Migration Journey</h2>
+  <p class="tagline">From VMware VMDK to a fully managed KubeVirt VM — migration with hyper2kvm, management with v9s. End-to-end automation with first-boot success.</p>
+  <div class="badge">hyper2kvm + v9s &mdash; Migrate &amp; Manage</div>
+</div>
+
+<!-- PAGE 2: THE JOURNEY -->
+<div class="page page-dark">
+  <h2 class="section-title">The <span>Journey</span></h2>
+  <p class="subtitle">Six stages from VMware to production KubeVirt.</p>
+
+  <div class="flow">
+    <div class="flow-step">1. Export VMDK</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">2. Flatten &amp; Convert</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">3. Offline Fixes</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">4. CDI Upload</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">5. KubeVirt VM</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">6. v9s Manage</div>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot">1</div>
+      <div class="timeline-content">
+        <h4>Export from VMware</h4>
+        <p>Export VMDK via govc, OVF Tool, vSphere HTTP API, or VDDK. hyper2kvm supports all export methods with automatic format detection.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">2</div>
+      <div class="timeline-content">
+        <h4>Flatten &amp; Convert</h4>
+        <p>Flatten sparse/split VMDKs into a single file. Convert to qcow2 with optional compression. Checksum validation for integrity.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">3</div>
+      <div class="timeline-content">
+        <h4>Automated Offline Fixes</h4>
+        <p>VMCraft engine mounts the image and applies deterministic fixes: GRUB repair, VirtIO drivers, fstab stabilization, initramfs rebuild, network config, serial console.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">4</div>
+      <div class="timeline-content">
+        <h4>CDI Upload to Kubernetes</h4>
+        <p>Automatic CDI (Containerized Data Importer) upload creates a PersistentVolumeClaim with the disk image. qcow2&rarr;raw conversion handled by CDI.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">5</div>
+      <div class="timeline-content">
+        <h4>KubeVirt VM Creation</h4>
+        <p>VirtualMachine manifest generated with CPU, memory, disk, and network configuration. VM boots successfully on first attempt.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">6</div>
+      <div class="timeline-content">
+        <h4>Ongoing Management with v9s</h4>
+        <p>Web-based management: console access, metrics monitoring, snapshots, storage, network, and host visibility. Full day-2 operations.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: MIGRATION COMMAND -->
+<div class="page page-light">
+  <h2 class="section-title">Step 1&ndash;5: <span>Migration</span></h2>
+  <p class="subtitle">One command to migrate a VMware VM to KubeVirt.</p>
+
+  <h3>Single Command Migration</h3>
+  <div style="background:#1a1a2e; color:#e8e6df; border-radius:12px; padding:24px; font-family:monospace; font-size:0.95em; margin:1.5em 0; line-height:1.8;">
+    <span style="color:#ff8f3f;">$</span> h2kvmctl \<br>
+    &nbsp;&nbsp;--cmd local \<br>
+    &nbsp;&nbsp;--vmdk /vmware/ubuntu-server2504.vmdk \<br>
+    &nbsp;&nbsp;--output-dir /output \<br>
+    &nbsp;&nbsp;--flatten \<br>
+    &nbsp;&nbsp;--to-output ubuntu-server2504.qcow2 \<br>
+    &nbsp;&nbsp;--out-format qcow2 \<br>
+    &nbsp;&nbsp;--fstab-mode stabilize-all \<br>
+    &nbsp;&nbsp;--regen-initramfs \<br>
+    &nbsp;&nbsp;--serial-console \<br>
+    &nbsp;&nbsp;--compress
+  </div>
+
+  <h3>What Happens Automatically</h3>
+  <table>
+    <tr><th>Stage</th><th>Action</th><th>Result</th></tr>
+    <tr><td>Flatten</td><td>Merge sparse VMDK extents</td><td>Single monolithic disk file</td></tr>
+    <tr><td>Convert</td><td>VMDK &rarr; qcow2</td><td>KVM-native format with compression</td></tr>
+    <tr><td>Inspect</td><td>VMCraft mounts &amp; detects OS</td><td>Ubuntu 25.04, GRUB2, ext4, no LVM</td></tr>
+    <tr><td>Fix GRUB</td><td>Reinstall bootloader for VirtIO</td><td>Boot from virtio-blk instead of SCSI</td></tr>
+    <tr><td>Fix initramfs</td><td>Add VirtIO modules</td><td>Kernel loads virtio_blk, virtio_net</td></tr>
+    <tr><td>Fix fstab</td><td>Device names &rarr; UUID</td><td>Stable mounts regardless of device order</td></tr>
+    <tr><td>Serial console</td><td>Enable ttyS0</td><td>Headless management via serial</td></tr>
+    <tr><td>Validate</td><td>QEMU smoke test</td><td>VM boots successfully</td></tr>
+  </table>
+
+  <h3>KubeVirt Deployment</h3>
+  <div style="background:#1a1a2e; color:#e8e6df; border-radius:12px; padding:24px; font-family:monospace; font-size:0.95em; margin:1.5em 0; line-height:1.8;">
+    <span style="color:#ff8f3f;">$</span> demo-kubevirt.sh ubuntu-server2504.vmdk<br>
+    <span style="color:#6b7280;"># Pipeline: VMDK &rarr; flatten &rarr; offline fixes &rarr; CDI upload &rarr; VM</span>
+  </div>
+</div>
+
+<!-- PAGE 4: RESULT - DASHBOARD -->
+<div class="page page-dark">
+  <h2 class="section-title">Step 6: <span>Management</span></h2>
+  <p class="subtitle">VM running on KubeVirt, managed through v9s web UI.</p>
+
+  <h3>Dashboard View</h3>
+  <p>After migration, the VM appears in the v9s dashboard with real-time metrics. The dashboard shows KubeVirt cluster status, host resources, and recent events.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">📊</div>
+      <h4>Cluster Overview</h4>
+      <p>1 VM running on KubeVirt v1.8.0 / K3s v1.34.5. Host CPU at 66%, memory at 52%, disk at 78%. Uptime 2d 21h. Real-time metrics refresh.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🖥️</div>
+      <h4>VM Status</h4>
+      <p>ubuntu-server2504 showing as "Running" with green status badge. Namespace: default. Ready: True. Full lifecycle controls available.</p>
+    </div>
+  </div>
+
+  <h3>VM Details Panel</h3>
+  <p>Click the VM to open the 10-tab detail panel with complete management capabilities:</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">📋</div>
+      <h4>Summary</h4>
+      <p>Status, namespace, ready state, node placement, resource allocation, action buttons.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🎮</div>
+      <h4>Console</h4>
+      <p>VNC graphical + serial + SSH. Ctrl+Alt+Delete sendkey. Fullscreen mode.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📈</div>
+      <h4>Metrics</h4>
+      <p>Real-time CPU, memory, network I/O, disk I/O via WebSocket streaming.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: HOST VISIBILITY -->
+<div class="page page-light">
+  <h2 class="section-title">Host <span>Visibility</span></h2>
+  <p class="subtitle">Complete hardware and system inventory of the KubeVirt host.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>System Information</h4>
+      <table style="font-size:0.85em;">
+        <tr><td>Hostname</td><td><strong>NLDW3-4-31-12</strong></td></tr>
+        <tr><td>OS</td><td>AlmaLinux 9.7 (Moss Jungle Cat)</td></tr>
+        <tr><td>Kernel</td><td>5.14.0-611.41.1.el9_7.x86_64</td></tr>
+        <tr><td>CPU</td><td>Intel Xeon E3-1230 v6 @ 3.50GHz</td></tr>
+        <tr><td>Cores</td><td>8 / 8 threads</td></tr>
+        <tr><td>Vendor</td><td>FUJITSU PRIMERGY RX1330 M3</td></tr>
+        <tr><td>KubeVirt</td><td>v1.8.0 on K3s v1.34.5</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h4>Hardware Inventory</h4>
+      <table style="font-size:0.85em;">
+        <tr><td>RAM</td><td><strong>16 GB DDR4</strong> (Kingston, 2400 MHz)</td></tr>
+        <tr><td>PCI Devices</td><td>15+ devices (Intel Host Bridge, USB, SATA, NIC)</td></tr>
+        <tr><td>Disk</td><td>/dev/sda4 (219 GB ext4, 78% used)</td></tr>
+        <tr><td>Boot</td><td>/dev/sda2 (1 GB xfs, 34% used)</td></tr>
+        <tr><td>EFI</td><td>/dev/sda1 (600 MB vfat, 2% used)</td></tr>
+        <tr><td>Services</td><td>55+ systemd services tracked</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>Operational Capabilities</h3>
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">📸</div>
+      <h4>Snapshots</h4>
+      <p>Create point-in-time backups. Restore on demand. API version auto-detection.</p>
+    </div>
+    <div class="card">
+      <div class="icon">💽</div>
+      <h4>Storage</h4>
+      <p>Manage disks, mount ISOs, view storage classes. Duplicate protection.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🌐</div>
+      <h4>Network</h4>
+      <p>Add interfaces (pod/multus). Bridge, masquerade, SR-IOV bindings.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: RESULTS + CTA -->
+<div class="page page-accent">
+  <h2 class="section-title">Migration <span>Results</span></h2>
+  <p class="subtitle">Real-world migration of Ubuntu Server 25.04 from VMDK to KubeVirt.</p>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number">1</div>
+      <div class="label">Command to Migrate</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#22c55e;">100%</div>
+      <div class="label">First-Boot Success</div>
+    </div>
+    <div class="stat">
+      <div class="number">0</div>
+      <div class="label">Manual Fixes Required</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#22c55e;">Running</div>
+      <div class="label">VM Status on KubeVirt</div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Metric</th><th>Value</th></tr>
+    <tr><td>Source Format</td><td>VMware VMDK (Ubuntu Server 25.04)</td></tr>
+    <tr><td>Target Platform</td><td>KubeVirt v1.8.0 on K3s (AlmaLinux 9.7)</td></tr>
+    <tr><td>Automated Fixes</td><td>GRUB2, initramfs, fstab (UUID), serial console</td></tr>
+    <tr><td>Boot Test</td><td><span class="check">&#x2713;</span> QEMU smoke test passed</td></tr>
+    <tr><td>CDI Upload</td><td><span class="check">&#x2713;</span> PVC created, image uploaded</td></tr>
+    <tr><td>VM Status</td><td><span class="check">&#x2713;</span> Running, Ready: True</td></tr>
+    <tr><td>Web Management</td><td><span class="check">&#x2713;</span> v9s: console, metrics, snapshots, host info</td></tr>
+  </table>
+
+  <div class="cta-box">
+    <h3>From VMware to KubeVirt in Minutes</h3>
+    <p>hyper2kvm handles the migration. v9s handles the management.<br>Zero downtime. First-boot success. Complete visibility.</p>
+  </div>
+
+  <div class="footer">
+    <p>hyper2kvm + v9s &mdash; The Complete VMware Exit Solution<br>
+    github.com/ssahani/hyper2kvm</p>
+  </div>
+</div>
+
+</body>
+</html>

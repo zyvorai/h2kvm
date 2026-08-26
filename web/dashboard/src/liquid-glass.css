@@ -1,0 +1,703 @@
+/* macOS Tahoe Liquid Glass — HyperSDK desktop shell */
+
+:root {
+  --layout-max-width: 87.5rem;
+  --radius-liquid: 22px;
+  --radius-liquid-lg: 28px;
+  --blur-liquid: 24px;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --glass-bg: rgba(20, 22, 28, 0.68);
+  --glass-bg-elevated: rgba(28, 31, 40, 0.82);
+  --glass-bg-strong: rgba(36, 39, 50, 0.92);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-strong: rgba(255, 255, 255, 0.15);
+  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
+  --glass-highlight: rgba(255, 255, 255, 0.13);
+  --glass-tint: rgba(180, 200, 255, 0.015);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --machina-status-ok: rgb(52, 211, 153);
+  --machina-status-warn: rgb(251, 191, 36);
+  --machina-status-error: rgb(248, 113, 113);
+  --machina-status-info: rgb(96, 165, 250);
+  --machina-status-neutral: rgb(148, 163, 184);
+  --machina-accent: rgb(56, 189, 248);
+}
+
+.glass {
+  background-color: var(--glass-bg);
+  background-image: linear-gradient(to bottom, var(--glass-highlight), transparent 45%);
+  backdrop-filter: blur(var(--blur-liquid)) saturate(1.15);
+  -webkit-backdrop-filter: blur(var(--blur-liquid)) saturate(1.15);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-liquid);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to bottom, var(--glass-highlight), transparent);
+  opacity: 0.35;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.glass-elevated {
+  background-color: var(--glass-bg-elevated);
+  border-color: var(--glass-border-strong);
+}
+
+.glass-strong {
+  background-color: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.glass:hover,
+.glass-elevated:hover {
+  border-color: var(--glass-border-strong);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+}
+
+.glass-hover-lift {
+  transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease;
+}
+.glass-hover-lift:hover {
+  transform: scale(1.005);
+}
+
+.rounded-liquid { border-radius: var(--radius-liquid); }
+.rounded-liquid-lg { border-radius: var(--radius-liquid-lg); }
+
+.mac-desktop-root {
+  --mac-vibrancy: rgba(12, 18, 32, 0.88);
+  --mac-border: rgba(255, 255, 255, 0.06);
+  --glass-panel: linear-gradient(155deg, var(--glass-highlight) 0%, var(--glass-bg) 100%);
+}
+
+.mac-desktop-root[data-wallpaper='tahoe'] {
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(30, 58, 95, 0.35), transparent 55%),
+    linear-gradient(180deg, rgb(8, 12, 22) 0%, rgb(6, 10, 18) 100%);
+}
+
+.mac-desktop-root[data-wallpaper='aurora'] {
+  background:
+    radial-gradient(ellipse 100% 70% at 20% -10%, rgba(124, 58, 237, 0.28), transparent 50%),
+    radial-gradient(ellipse 80% 60% at 90% 10%, rgba(14, 165, 233, 0.18), transparent 45%),
+    linear-gradient(180deg, rgb(10, 8, 24) 0%, rgb(6, 10, 18) 100%);
+}
+
+.mac-menubar-inner {
+  background: var(--glass-bg);
+  background-image: linear-gradient(180deg, var(--glass-highlight), transparent 60%);
+  backdrop-filter: blur(var(--blur-liquid)) saturate(1.5);
+  -webkit-backdrop-filter: blur(var(--blur-liquid)) saturate(1.5);
+  border-bottom: 1px solid var(--glass-border);
+  overflow: visible;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.mac-dynamic-island {
+  backdrop-filter: blur(var(--blur-liquid)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--blur-liquid)) saturate(1.4);
+  box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.45);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.mac-dynamic-island:hover { transform: scale(1.02); }
+.mac-dynamic-island[aria-expanded='true'] { transform: scale(1.04); }
+
+.mac-finder-sidebar {
+  background: var(--glass-bg-elevated);
+  backdrop-filter: blur(calc(var(--blur-liquid) + 10px)) saturate(1.45);
+  -webkit-backdrop-filter: blur(calc(var(--blur-liquid) + 10px)) saturate(1.45);
+  border-color: var(--glass-border);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04), 4px 0 24px -12px rgba(0, 0, 0, 0.35);
+}
+
+.tahoe-sidebar-expanded {
+  border-top-right-radius: 1.25rem;
+  border-bottom-right-radius: 1.25rem;
+}
+
+.tahoe-context-bar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(8, 12, 22, 0.55);
+  backdrop-filter: blur(calc(var(--blur-liquid) + 4px)) saturate(1.35);
+  -webkit-backdrop-filter: blur(calc(var(--blur-liquid) + 4px)) saturate(1.35);
+}
+
+.tahoe-context-bar-inner {
+  padding: 0.5rem 1rem 0.625rem;
+  max-width: 160rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tahoe-context-app-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(186, 230, 253, 0.9);
+}
+
+.tahoe-context-app-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  transition: color 0.15s ease;
+}
+
+button.tahoe-context-app-title:hover {
+  color: rgb(186, 230, 253);
+}
+
+.tahoe-context-pills { scrollbar-width: none; overflow-x: auto; }
+.tahoe-context-pills::-webkit-scrollbar { display: none; }
+
+.tahoe-context-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.55);
+  border: 1px solid transparent;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.tahoe-context-pill:hover {
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.tahoe-context-pill-active {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.22);
+}
+
+.tahoe-context-more {
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.tahoe-context-overflow-menu {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  min-width: 11rem;
+  padding: 0.35rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 16px 40px -16px rgba(0, 0, 0, 0.65);
+}
+
+.tahoe-context-overflow-item {
+  display: block;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.72);
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.tahoe-context-overflow-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+}
+
+.tahoe-context-overflow-item-active {
+  background: rgba(56, 189, 248, 0.12);
+  color: rgb(186, 230, 253);
+}
+
+.tahoe-sidebar-link-active {
+  background: rgba(56, 189, 248, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.22), 0 2px 12px -4px rgba(14, 165, 233, 0.35);
+}
+
+.tahoe-sidebar-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+}
+
+.tahoe-canvas { position: relative; background: rgba(2, 6, 23, 0.25); }
+
+.tahoe-mesh {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(56, 189, 248, 0.08), transparent 55%),
+    radial-gradient(ellipse 60% 45% at 90% 20%, rgba(59, 130, 246, 0.06), transparent 50%);
+  pointer-events: none;
+}
+
+.tahoe-glass-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-liquid);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-panel);
+  backdrop-filter: blur(var(--blur-liquid)) saturate(1.25);
+  -webkit-backdrop-filter: blur(var(--blur-liquid)) saturate(1.25);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, var(--glass-shadow);
+  transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tahoe-glass-card:hover { border-color: rgba(56, 189, 248, 0.2); }
+
+.tahoe-segment-active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(99, 102, 241, 0.2));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+}
+
+.mac-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 1rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+}
+
+.mac-dock-inner {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.35rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-liquid);
+  background: var(--glass-bg-elevated);
+  backdrop-filter: blur(calc(var(--blur-liquid) + 2px)) saturate(1.45);
+  -webkit-backdrop-filter: blur(calc(var(--blur-liquid) + 2px)) saturate(1.45);
+  border: 1px solid var(--glass-border-strong);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.mac-dock-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  color: rgba(248, 250, 252, 0.9);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease;
+}
+
+.mac-dock-item:hover {
+  transform: scale(1.14) translateY(-5px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mac-dock-item:hover .mac-dock-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.mac-dock-tooltip {
+  position: absolute;
+  bottom: calc(100% + 0.35rem);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.65rem;
+  font-weight: 500;
+  white-space: nowrap;
+  color: rgba(248, 250, 252, 0.95);
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 5;
+}
+
+.mac-dock-item-active { background: rgba(56, 189, 248, 0.12); }
+
+.mac-dock-dot {
+  position: absolute;
+  bottom: 0.12rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.2rem;
+  height: 0.2rem;
+  border-radius: 9999px;
+  background: rgba(248, 250, 252, 0.9);
+  box-shadow: 0 0 4px rgba(56, 189, 248, 0.5);
+}
+
+.mac-dock-divider {
+  width: 1px;
+  height: 2.25rem;
+  margin: 0 0.25rem;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.mac-dock-spotlight {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: rgba(248, 250, 252, 0.85);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.2s ease, background 0.15s ease;
+}
+
+.mac-dock-spotlight:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mac-dock-inner-scroll {
+  max-width: min(100vw - 2rem, 56rem);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.mac-dock-inner-scroll::-webkit-scrollbar { display: none; }
+
+.dashboard-liquid-glass {
+  position: relative;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(30, 58, 95, 0.35), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(56, 189, 248, 0.06), transparent 55%),
+    linear-gradient(180deg, rgb(8, 12, 22) 0%, rgb(6, 10, 18) 100%);
+}
+
+.tahoe-page-root .card,
+.liquid-glass-app .card {
+  border-radius: var(--radius-liquid);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-panel);
+  backdrop-filter: blur(var(--blur-liquid)) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--blur-liquid)) saturate(1.2);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, var(--glass-shadow);
+}
+
+.tahoe-page-root .btn-primary,
+.liquid-glass-app .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #fff;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgb(56, 189, 248), rgb(37, 99, 235));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 20px -6px rgba(37, 99, 235, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.tahoe-page-root .btn-secondary,
+.liquid-glass-app .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  border-radius: var(--radius-liquid);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  transition: background 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.liquid-glass-app .rounded-xl.border.bg-slate-800\/50,
+.liquid-glass-app .rounded-xl.border.border-slate-700\/50,
+.liquid-glass-app .rounded-xl.border.border-slate-700\/60,
+.liquid-glass-app [class*="bg-slate-800/50"].rounded-xl,
+.liquid-glass-app [class*="bg-slate-900/40"].rounded-xl,
+.liquid-glass-app [class*="bg-zinc-800/50"].rounded-xl {
+  border-radius: var(--radius-liquid) !important;
+  border-color: var(--glass-border) !important;
+  background: linear-gradient(155deg, var(--glass-highlight) 0%, var(--glass-bg) 100%) !important;
+  backdrop-filter: blur(var(--blur-liquid)) saturate(1.15);
+  -webkit-backdrop-filter: blur(var(--blur-liquid)) saturate(1.15);
+  box-shadow: var(--glass-shadow);
+}
+
+.liquid-glass-modal-backdrop {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.liquid-glass-modal-panel {
+  border-radius: var(--radius-liquid-lg);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border-strong);
+  backdrop-filter: blur(var(--blur-liquid)) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--blur-liquid)) saturate(1.2);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+}
+
+.text-gradient-blue {
+  background: linear-gradient(135deg, #93c5fd, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@media (max-width: 1023px) {
+  .mac-dock { display: flex !important; }
+  .mac-dock-item { width: 2.65rem; height: 2.65rem; }
+}
+
+.tahoe-mobile-jump-select {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.8125rem;
+  padding: 0.45rem 0.75rem;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.tahoe-mobile-jump-select:focus {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.06);
+}
+
+@keyframes aurora-drift {
+  0%, 100% { opacity: 0.55; transform: translate(0, 0) scale(1); }
+  33% { opacity: 0.9; transform: translate(2%, -1%) scale(1.03); }
+  66% { opacity: 0.7; transform: translate(-1%, 1%) scale(0.99); }
+}
+
+.dashboard-steel {
+  background:
+    radial-gradient(circle at top center, rgba(120, 140, 160, 0.15), transparent 30%),
+    linear-gradient(180deg, #06080d 0%, #0b1017 40%, #101722 70%, #0b1018 100%);
+}
+
+.dashboard-aurora {
+  position: relative;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -15%, rgba(34, 211, 238, 0.14), transparent 55%),
+    radial-gradient(ellipse 60% 45% at 90% 60%, rgba(168, 85, 247, 0.12), transparent 50%),
+    radial-gradient(ellipse 50% 40% at 8% 75%, rgba(236, 72, 153, 0.08), transparent 45%),
+    linear-gradient(180deg, #020408 0%, #050816 35%, #0a0618 65%, #030712 100%);
+}
+
+.dashboard-aurora::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 55% 40% at 20% 10%, rgba(34, 211, 238, 0.06), transparent 60%),
+    radial-gradient(ellipse 45% 35% at 75% 85%, rgba(168, 85, 247, 0.07), transparent 55%);
+  animation: aurora-drift 18s ease-in-out infinite;
+}
+
+.steel-theme {
+  --glass-bg: rgba(26, 31, 39, 0.72);
+  --glass-bg-elevated: rgba(34, 40, 50, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --text-primary: #d7dde5;
+}
+
+.aurora-theme {
+  --glass-bg: rgba(12, 8, 28, 0.68);
+  --glass-bg-elevated: rgba(20, 12, 40, 0.82);
+  --glass-border: rgba(167, 139, 250, 0.18);
+  --text-primary: #e8e4f8;
+  --accent: #22d3ee;
+}
+
+.aurora-theme .tahoe-context-pill-active {
+  background: rgba(168, 85, 247, 0.14);
+  border-color: rgba(168, 85, 247, 0.28);
+}
+
+.aurora-theme .tahoe-sidebar-link-active {
+  background: rgba(168, 85, 247, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(168, 85, 247, 0.22), 0 2px 12px -4px rgba(168, 85, 247, 0.35);
+}
+
+/* Mission Control overlay */
+.mission-control-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(2, 6, 12, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  overflow-y: auto;
+  animation: fade-in 0.2s ease;
+}
+
+.mission-control-backdrop {
+  position: absolute;
+  inset: 0;
+  cursor: default;
+  border: 0;
+  background: transparent;
+}
+
+.mission-control-panel {
+  position: relative;
+  z-index: 1;
+  min-height: 100%;
+  max-width: 96rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 3rem;
+}
+
+.mission-control-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 1.25rem;
+}
+
+.mission-control-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.mission-control-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.mission-control-stat-ok {
+  border-color: rgba(34, 197, 94, 0.25);
+  background: rgba(34, 197, 94, 0.08);
+  color: rgba(187, 247, 208, 0.95);
+}
+
+.mission-control-stat-warn {
+  border-color: rgba(251, 191, 36, 0.25);
+  background: rgba(251, 191, 36, 0.08);
+  color: rgba(253, 230, 138, 0.95);
+}
+
+.mission-control-zone-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mission-control-launchpad {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 1rem 0.75rem;
+}
+
+.mission-control-app-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.25rem;
+  border-radius: 0.85rem;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.82);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  cursor: pointer;
+}
+
+.mission-control-app-icon:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.mission-control-app-icon-active {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: rgba(219, 234, 254, 0.98);
+}
+
+.mission-control-app-icon-glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.mission-control-app-icon-label {
+  font-size: 0.6875rem;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 5.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-hover-lift:hover,
+  .mac-dock-item:hover { transform: none; }
+  .dashboard-aurora::before { animation: none; }
+}

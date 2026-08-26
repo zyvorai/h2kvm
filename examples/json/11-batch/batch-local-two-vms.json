@@ -1,0 +1,25 @@
+{
+  "command": "local",
+  "output_dir": "./out-batch",
+  "workdir": "./out-batch/work",
+  "flatten": true,
+  "out_format": "qcow2",
+  "compress": true,
+  "parallel_processing": true,
+  "enable_recovery": true,
+  "vms": [
+    {
+      "vmdk": "/path/to/vm1.vmdk",
+      "to_output": "vm1.qcow2",
+      "resize": "+10G",
+      "report": "vm1.md"
+    },
+    {
+      "vmdk": "/path/to/vm2.vmdk",
+      "to_output": "vm2.qcow2",
+      "remove_vmware_tools": false,
+      "regen_initramfs": false,
+      "report": "vm2.md"
+    }
+  ]
+}

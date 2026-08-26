@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hyper2kvm — Web Dashboard Live Screenshots</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #e2e8f0; background: #0f172a; }
+
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f172a, #1e293b); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 3em; font-weight: 800; background: linear-gradient(135deg, #38bdf8, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .cover h2 { font-size: 1.3em; color: #94a3b8; margin: 0.3em 0 1.5em; }
+  .cover .badge { background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); padding: 6px 20px; border-radius: 16px; font-size: 0.85em; color: #38bdf8; }
+  .cover .url { color: #22c55e; font-family: monospace; font-size: 1.1em; margin-top: 1em; }
+  .cover .date { color: #475569; margin-top: 0.5em; font-size: 0.85em; }
+
+  .page { min-height: 100vh; padding: 40px 60px; page-break-after: always; position: relative; }
+  .page-dark { background: #0f172a; }
+  .page-slate { background: #1e293b; }
+
+  h2.title { font-size: 1.8em; font-weight: 700; margin-bottom: 0.2em; }
+  h2.title span { color: #38bdf8; }
+  .desc { font-size: 0.9em; color: #64748b; margin-bottom: 1.5em; }
+  .screenshot-frame { border: 1px solid #334155; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .screenshot-frame img { width: 100%; display: block; }
+  .screenshot-bar { background: #1e293b; padding: 8px 14px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #334155; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .url-bar { margin-left: auto; color: #64748b; font-size: 0.8em; font-family: monospace; }
+
+  .features { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1em; }
+  .feat { background: rgba(51,65,85,0.5); border: 1px solid rgba(51,65,85,0.8); border-radius: 8px; padding: 6px 12px; font-size: 0.78em; color: #94a3b8; }
+  .feat-green { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #22c55e; }
+  .feat-blue { background: rgba(56,189,248,0.1); border-color: rgba(56,189,248,0.3); color: #38bdf8; }
+
+  .footer { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-size: 0.65em; color: #334155; }
+
+  .two-screenshots { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>h2kweb Dashboard</h1>
+  <h2>Live Screenshots — Production Server</h2>
+  <div class="badge">Captured from Worldstream bare-metal (AlmaLinux 9.7)</div>
+  <div class="url">http://185.165.240.5:5070</div>
+  <div class="date">April 1, 2026 — 3 VMs migrated &amp; running</div>
+</div>
+
+<!-- PAGE 1: Login -->
+<div class="page page-dark">
+  <h2 class="title"><span>1.</span> Login Page — PAM Authentication</h2>
+  <p class="desc">System-level authentication using Linux PAM. Same credentials as SSH. Glassmorphism UI with gradient logo.</p>
+  <div class="screenshot-frame">
+    <div class="screenshot-bar">
+      <div class="dot" style="background:#ef4444"></div>
+      <div class="dot" style="background:#eab308"></div>
+      <div class="dot" style="background:#22c55e"></div>
+      <div class="url-bar">http://185.165.240.5:5070</div>
+    </div>
+    <img src="screenshots/01-login.png" alt="Login Page">
+  </div>
+  <div class="features">
+    <span class="feat feat-green">PAM authentication</span>
+    <span class="feat feat-blue">HttpOnly cookies</span>
+    <span class="feat">SameSite=Strict</span>
+    <span class="feat">32-byte random tokens</span>
+    <span class="feat">Username validation</span>
+  </div>
+  <div class="footer">hyper2kvm Web Dashboard — Login</div>
+</div>
+
+<!-- PAGE 2: Dashboard -->
+<div class="page page-slate">
+  <h2 class="title"><span>2.</span> Dashboard — Real-time Host Monitoring</h2>
+  <p class="desc">Live CPU/RAM/disk metrics, migration pipeline, libvirt VM status, system info, and health checks.</p>
+  <div class="screenshot-frame">
+    <div class="screenshot-bar">
+      <div class="dot" style="background:#ef4444"></div>
+      <div class="dot" style="background:#eab308"></div>
+      <div class="dot" style="background:#22c55e"></div>
+      <div class="url-bar">http://185.165.240.5:5070/</div>
+    </div>
+    <img src="screenshots/02-dashboard.png" alt="Dashboard">
+  </div>
+  <div class="features">
+    <span class="feat feat-blue">8-core Xeon E3-1230 v6</span>
+    <span class="feat feat-green">15.6 GB RAM (47%)</span>
+    <span class="feat" style="color:#eab308;">219 GB disk (94%)</span>
+    <span class="feat feat-green">3 VMs running</span>
+    <span class="feat">Load avg 4.59</span>
+    <span class="feat">QEMU 9.1.0</span>
+    <span class="feat feat-green">KVM enabled</span>
+    <span class="feat">WebSocket live</span>
+  </div>
+  <div class="footer">hyper2kvm Web Dashboard — Dashboard</div>
+</div>
+
+<!-- PAGE 3: Providers -->
+<div class="page page-dark">
+  <h2 class="title"><span>3.</span> Providers — Multi-Cloud VM Discovery</h2>
+  <p class="desc">3 dedicated provider cards with gradient headers, login forms, and integrated VM browser after connecting.</p>
+  <div class="screenshot-frame">
+    <div class="screenshot-bar">
+      <div class="dot" style="background:#ef4444"></div>
+      <div class="dot" style="background:#eab308"></div>
+      <div class="dot" style="background:#22c55e"></div>
+      <div class="url-bar">http://185.165.240.5:5070/providers</div>
+    </div>
+    <img src="screenshots/03-providers.png" alt="Providers">
+  </div>
+  <div class="features">
+    <span class="feat feat-blue">VMware vSphere (govmomi)</span>
+    <span class="feat" style="color:#06b6d4; background:rgba(6,182,212,0.1); border-color:rgba(6,182,212,0.3);">Microsoft Azure (az CLI)</span>
+    <span class="feat" style="color:#f97316; background:rgba(249,115,22,0.1); border-color:rgba(249,115,22,0.3);">AWS EC2 (aws CLI)</span>
+    <span class="feat">VM browser with search</span>
+    <span class="feat">Multi-select for batch</span>
+  </div>
+  <div class="footer">hyper2kvm Web Dashboard — Providers</div>
+</div>
+
+<!-- PAGE 4: Migrate -->
+<div class="page page-slate">
+  <h2 class="title"><span>4.</span> Migration Wizard — Source Selection</h2>
+  <p class="desc">4 source types: Local File browser, VMware vSphere, Azure, EC2. 3-step wizard with full YAML config.</p>
+  <div class="screenshot-frame">
+    <div class="screenshot-bar">
+      <div class="dot" style="background:#ef4444"></div>
+      <div class="dot" style="background:#eab308"></div>
+      <div class="dot" style="background:#22c55e"></div>
+      <div class="url-bar">http://185.165.240.5:5070/migrate</div>
+    </div>
+    <img src="screenshots/04-migrate.png" alt="Migration Wizard">
+  </div>
+  <div class="features">
+    <span class="feat">Local file browser</span>
+    <span class="feat">VMDK / OVA / VHD</span>
+    <span class="feat feat-green">Flatten + Compress ON</span>
+    <span class="feat feat-green">initramfs + GRUB ON</span>
+    <span class="feat feat-blue">Libvirt auto-deploy ON</span>
+    <span class="feat">KubeVirt deploy</span>
+    <span class="feat">YAML preview</span>
+    <span class="feat">All h2kvmctl options</span>
+  </div>
+  <div class="footer">hyper2kvm Web Dashboard — Migration Wizard</div>
+</div>
+
+<!-- PAGE 5: Jobs -->
+<div class="page page-dark">
+  <h2 class="title"><span>5.</span> Job Monitor — Live Logs &amp; Deployment</h2>
+  <p class="desc">Real completed migration: Ubuntu Server 25.04 — LVM detected, initramfs rebuilt, deployed to libvirt with IP.</p>
+  <div class="screenshot-frame">
+    <div class="screenshot-bar">
+      <div class="dot" style="background:#ef4444"></div>
+      <div class="dot" style="background:#eab308"></div>
+      <div class="dot" style="background:#22c55e"></div>
+      <div class="url-bar">http://185.165.240.5:5070/jobs</div>
+    </div>
+    <img src="screenshots/05-jobs.png" alt="Job Monitor">
+  </div>
+  <div class="features">
+    <span class="feat feat-green">ubuntu-server2504: completed (2m 22s)</span>
+    <span class="feat feat-green">Libvirt: running</span>
+    <span class="feat feat-green">IP: 192.168.122.136</span>
+    <span class="feat feat-blue">386 log lines streamed</span>
+    <span class="feat">WebSocket real-time</span>
+    <span class="feat">Copy IP / SSH link</span>
+    <span class="feat">Auto-scroll logs</span>
+  </div>
+  <div class="footer">hyper2kvm Web Dashboard — Job Monitor</div>
+</div>
+
+<!-- PAGE 6: Settings -->
+<div class="page page-slate">
+  <h2 class="title"><span>6.</span> Settings &amp; Service Management</h2>
+  <p class="desc">Server configuration reference and systemd service management commands.</p>
+  <div class="screenshot-frame">
+    <div class="screenshot-bar">
+      <div class="dot" style="background:#ef4444"></div>
+      <div class="dot" style="background:#eab308"></div>
+      <div class="dot" style="background:#22c55e"></div>
+      <div class="url-bar">http://185.165.240.5:5070/settings</div>
+    </div>
+    <img src="screenshots/06-settings.png" alt="Settings">
+  </div>
+  <div class="features">
+    <span class="feat">--binary (auto-detect)</span>
+    <span class="feat">--addr :5070</span>
+    <span class="feat">--api-key</span>
+    <span class="feat">--static-dir</span>
+    <span class="feat feat-blue">systemctl status h2kweb</span>
+    <span class="feat">journalctl -u h2kweb -f</span>
+  </div>
+  <div class="footer">hyper2kvm Web Dashboard — Settings</div>
+</div>
+
+</body>
+</html>

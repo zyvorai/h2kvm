@@ -1,0 +1,112 @@
+# ============================================
+# Complete Workflow: vSphere → libvirt (Windows 11)
+# ============================================
+# Description: Export Windows 11 VM from vSphere and prepare for libvirt/KVM
+# Use Case: Windows 11 Professional/Enterprise migration with TPM 2.0
+#
+# Prerequisites:
+#   - govc or ovftool installed
+#   - pyvmomi: pip install pyvmomi
+#   - qemu-img: dnf install qemu-img
+#   - libguestfs: dnf install libguestfs-tools
+#   - VirtIO driver ISO: dnf install virtio-win (or download virtio-win.iso)
+#   - swtpm: dnf install swtpm swtpm-tools (for TPM 2.0 emulation)
+#   - OVMF with Secure Boot: dnf install edk2-ovmf
+#
+# Environment variables:
+#   export VC_PASSWORD='your-vcenter-password'
+#
+# Run:
+#   sudo -E h2kvmctl --config examples/yaml/70-complete-workflows/vsphere-to-libvirt-windows-11.yaml
+# ============================================
+
+cmd: vsphere
+
+# vSphere Connection
+vcenter: vcenter.example.com
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+vc_insecure: true
+dc_name: Production-DC
+
+# VM Selection
+vm_name: windows-11-enterprise
+
+# vSphere Export
+vs_action: export_vm
+export_mode: ovf_export
+vs_control_plane: govc
+govc_url: "https://vcenter.example.com/sdk"
+govc_password_env: VC_PASSWORD
+govc_insecure: true
+govc_datacenter: Production-DC
+govc_export_remove_cdroms: true
+
+# Snapshot before export
+vs_create_snapshot: true
+snapshot_name: pre-kvm-migration
+snapshot_memory: false
+
+# Disk Processing
+flatten: true
+to_output: windows-11-enterprise.qcow2
+out_format: qcow2
+compress: true
+output_dir: /data/kvm
+
+# Windows Detection
+windows: true
+guest_os: windows
+
+# VirtIO Driver Injection
+virtio_win_iso: /usr/share/virtio-win/virtio-win.iso
+remove_vmware_tools: true
+
+# Two-phase boot: bootstrap with SATA, then switch to VirtIO
+win_stage: bootstrap
+
+# libvirt Domain XML
+emit_domain_xml: true
+uefi: true
+ovmf_code: /usr/share/edk2/ovmf/OVMF_CODE.secboot.fd
+ovmf_vars_template: /usr/share/edk2/ovmf/OVMF_VARS.secboot.fd
+memory: 16384
+vcpus: 8
+cpu_topology: "1:4:2"
+machine: q35
+disk_bus: virtio
+disk_cache: writeback
+disk_io: threads
+disk_discard: unmap
+net_model: virtio
+libvirt_network: bridge:br0
+graphics: spice
+graphics_listen: 127.0.0.1
+video: qxl
+usb_tablet: true
+clock: localtime
+high_perf: true
+
+# Validation
+libvirt_test: true
+timeout: 600
+
+# Reporting
+report: /var/log/migrations/windows-11.md
+enable_recovery: true
+verbose: 1
+
+# Post-migration notes:
+# Windows 11 requires TPM 2.0 and Secure Boot.
+# After h2kvmctl generates the domain XML, you may need to manually add:
+#   <tpm model='tpm-crb'>
+#     <backend type='emulator' version='2.0'/>
+#   </tpm>
+# to the XML if not auto-generated.
+#
+# Two-phase boot strategy:
+# 1. Phase 1 (bootstrap): boots with SATA — Windows detects VirtIO drivers
+# 2. After drivers install, shutdown VM
+# 3. Run again with win_stage: final to switch to VirtIO boot
+# 4. Verify TPM: run tpm.msc in Windows
+# 5. Verify Secure Boot: run msinfo32 → System Summary → Secure Boot State

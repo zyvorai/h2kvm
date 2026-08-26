@@ -1,0 +1,13 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 10-local/local-linux-grow-root.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 10-local/local-linux-grow-root.yaml
+
+command: local
+vmdk: /path/to/linux.vmdk
+resize: +20G
+to_output: linux-grown.qcow2
+compress: true
+compress_level: 6
+report: local-linux-grow-report.md

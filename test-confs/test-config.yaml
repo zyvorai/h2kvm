@@ -1,0 +1,30 @@
+# hyper2kvm migration configuration
+cmd: local
+
+# Input
+vmdk: ./esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+
+# Output
+output_dir: ./output
+to_output: rhel8.8-fixed.qcow2
+out_format: qcow2
+compress: true
+
+# Conversion options
+flatten: true
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Backend selection (guestfs, vmcraft, namespace)
+backend: vmcraft
+
+# Libvirt integration
+emit_domain_xml: true
+virsh_define: true
+vm_name: rhel8.8-migrated
+memory: 4096
+vcpus: 2
+machine: q35
+libvirt_network: default
+copy_to_libvirt_images: true
+guest_os: linux

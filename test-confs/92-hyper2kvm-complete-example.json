@@ -1,0 +1,44 @@
+{
+  "_comment": "Complete hyper2kvm JSON Configuration Example",
+  "_comment_docs": "See 91-hyper2kvm-full-config.md for detailed field documentation",
+  "_comment_yaml": "For inline comments, use YAML format instead",
+  "_comment_note": "JSON fields starting with '_comment' are ignored by the parser",
+
+  "command": "local",
+
+  "vmdk": "/path/to/source-vm.vmdk",
+  "output_dir": "/path/to/output",
+  "workdir": "/path/to/fast-storage/work",
+
+  "flatten": true,
+  "flatten_format": "qcow2",
+
+  "to_output": "converted-vm.qcow2",
+  "out_format": "qcow2",
+  "compress": true,
+  "checksum": true,
+
+  "print_fstab": true,
+  "fstab_mode": "stabilize-all",
+  "no_grub": false,
+  "regen_initramfs": true,
+  "no_backup": false,
+
+  "virtio_drivers_dir": "/path/to/virtio-win-extracted",
+
+  "libvirt_test": false,
+  "qemu_test": false,
+  "vm_name": "test-vm",
+  "memory": 2048,
+  "vcpus": 2,
+  "uefi": false,
+  "timeout": 60,
+  "keep_domain": false,
+  "headless": true,
+
+  "dry_run": false,
+  "verbose": 2,
+  "log_file": "/path/to/output/conversion.log",
+  "report": "/path/to/output/conversion-report.md",
+  "json": false
+}

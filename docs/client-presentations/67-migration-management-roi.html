@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Migration + Management ROI — hyper2kvm &amp; v9s</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; position: relative; }
+  .cover h1 { font-size: 3em; font-weight: 800; margin-bottom: 0.3em; }
+  .cover h1 span { color: #4ade80; }
+  .cover h2 { font-size: 1.4em; font-weight: 300; opacity: 0.9; margin-bottom: 2em; }
+  .cover .tagline { font-size: 1.1em; opacity: 0.7; max-width: 600px; }
+  .cover .badge { display: inline-block; background: rgba(74,222,128,0.2); border: 1px solid rgba(74,222,128,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 2em; }
+  .page { min-height: 100vh; padding: 60px 80px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; }
+  .page-light { background: #fafbfc; }
+  .page-accent { background: linear-gradient(135deg, #0f2027, #203a43); color: #e8e6df; }
+  h2.section-title { font-size: 2.2em; font-weight: 700; margin-bottom: 0.8em; }
+  h2.section-title span { color: #4ade80; }
+  h3 { font-size: 1.3em; font-weight: 600; margin: 1.2em 0 0.5em; }
+  p { margin-bottom: 1em; font-size: 1.05em; }
+  .subtitle { font-size: 1.1em; opacity: 0.7; margin-bottom: 2em; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin: 1.5em 0; }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 28px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .card .icon { font-size: 2em; margin-bottom: 12px; }
+  .card h4 { font-size: 1.15em; font-weight: 600; margin-bottom: 8px; }
+  .card p { font-size: 0.95em; opacity: 0.85; margin-bottom: 0; }
+  .stat-row { display: flex; gap: 40px; margin: 2em 0; }
+  .stat { text-align: center; flex: 1; }
+  .stat .number { font-size: 3em; font-weight: 800; color: #4ade80; line-height: 1; }
+  .stat .label { font-size: 0.95em; opacity: 0.7; margin-top: 8px; }
+  table { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.95em; }
+  th { background: #059669; color: #fff; padding: 14px 18px; text-align: left; font-weight: 600; }
+  td { padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+  .page-light tr:nth-child(even) td { background: #f9fafb; }
+  ul { margin: 0.5em 0 1em 1.5em; }
+  li { margin-bottom: 0.4em; }
+  .savings { color: #4ade80; font-weight: 700; }
+  .cost { color: #ef4444; font-weight: 700; }
+  .cta-box { background: linear-gradient(135deg, #059669, #047857); color: #fff; padding: 40px; border-radius: 16px; text-align: center; margin: 2em 0; }
+  .cta-box h3 { font-size: 1.5em; margin-bottom: 0.5em; }
+  .cta-box p { opacity: 0.9; }
+  .footer { text-align: center; padding: 20px; font-size: 0.85em; opacity: 0.5; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Migration + Management <span>ROI</span></h1>
+  <h2>The Business Case for hyper2kvm &amp; v9s</h2>
+  <p class="tagline">Quantifying the return on investment from VMware exit to KubeVirt with automated migration and web-based management.</p>
+  <div class="badge">For CFOs, VPs of Infrastructure, IT Directors</div>
+</div>
+
+<!-- PAGE 2: COST PROBLEM -->
+<div class="page page-dark">
+  <h2 class="section-title">The <span>Cost</span> Problem</h2>
+  <p class="subtitle">VMware licensing costs are unsustainable after Broadcom acquisition.</p>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number" style="color:#ef4444;">2-12x</div>
+      <div class="label">License Cost Increase</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#ef4444;">$0</div>
+      <div class="label">Perpetual Licenses Left</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#ef4444;">Forced</div>
+      <div class="label">Bundle Purchasing</div>
+    </div>
+  </div>
+
+  <h3>Typical VMware Costs (100 VMs)</h3>
+  <table>
+    <tr><th>Item</th><th>Annual Cost</th><th>Notes</th></tr>
+    <tr><td>vSphere Standard (per CPU)</td><td class="cost">$50,000 - $150,000</td><td>Subscription-only since Broadcom</td></tr>
+    <tr><td>vCenter Server</td><td class="cost">$15,000 - $30,000</td><td>Required for management</td></tr>
+    <tr><td>vSAN / Storage</td><td class="cost">$20,000 - $60,000</td><td>Bundled, can't opt out</td></tr>
+    <tr><td>NSX / Networking</td><td class="cost">$15,000 - $40,000</td><td>Bundled in VCF</td></tr>
+    <tr><td>Support &amp; Maintenance</td><td class="cost">$20,000 - $50,000</td><td>20-25% of license cost</td></tr>
+    <tr><td><strong>Total Annual</strong></td><td class="cost"><strong>$120,000 - $330,000</strong></td><td>Per year, every year</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 3: KVM ALTERNATIVE -->
+<div class="page page-light">
+  <h2 class="section-title">The KVM <span>Alternative</span></h2>
+  <p class="subtitle">Open source KVM + KubeVirt eliminates vendor licensing entirely.</p>
+
+  <h3>KubeVirt Stack Costs (100 VMs)</h3>
+  <table>
+    <tr><th>Item</th><th>Annual Cost</th><th>Notes</th></tr>
+    <tr><td>KVM Hypervisor</td><td class="savings">$0</td><td>Built into Linux kernel</td></tr>
+    <tr><td>KubeVirt</td><td class="savings">$0</td><td>Open source, CNCF project</td></tr>
+    <tr><td>Kubernetes (K3s/K8s)</td><td class="savings">$0</td><td>Open source orchestration</td></tr>
+    <tr><td>hyper2kvm Migration</td><td class="savings">Contact for pricing*</td><td>Proprietary (Zyvor AI Labs)</td></tr>
+    <tr><td>v9s Management UI</td><td class="savings">$0</td><td>Included, web-based</td></tr>
+    <tr><td>Linux OS (AlmaLinux/Rocky)</td><td class="savings">$0</td><td>Enterprise Linux, free</td></tr>
+    <tr><td>Migration Engineering (one-time)</td><td>$15,000 - $30,000</td><td>Staff time for migration project</td></tr>
+    <tr><td>Optional: RHEL Support</td><td>$5,000 - $15,000</td><td>If commercial Linux support desired</td></tr>
+    <tr><td><strong>Year 1 Total</strong></td><td><strong>$15,000 - $45,000</strong></td><td>One-time migration + optional support</td></tr>
+    <tr><td><strong>Year 2+ Total</strong></td><td class="savings"><strong>$0 - $15,000</strong></td><td>Optional support only</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4: ROI CALCULATION -->
+<div class="page page-dark">
+  <h2 class="section-title">ROI <span>Calculation</span></h2>
+  <p class="subtitle">3-year total cost of ownership comparison.</p>
+
+  <table>
+    <tr><th>Metric</th><th>VMware (3yr)</th><th>KubeVirt (3yr)</th><th>Savings</th></tr>
+    <tr><td>Licensing</td><td class="cost">$360K - $990K</td><td class="savings">$0</td><td class="savings">$360K - $990K</td></tr>
+    <tr><td>Migration</td><td>$0</td><td>$15K - $30K</td><td class="cost">-$30K</td></tr>
+    <tr><td>Management Tool</td><td>Included (vCenter)</td><td class="savings">$0 (v9s)</td><td>$0</td></tr>
+    <tr><td>Optional Support</td><td>Included</td><td>$0 - $45K</td><td>Varies</td></tr>
+    <tr><td>Hardware</td><td>Same</td><td>Same</td><td>$0</td></tr>
+    <tr><td><strong>3-Year Total</strong></td><td class="cost"><strong>$360K - $990K</strong></td><td><strong>$15K - $75K</strong></td><td class="savings"><strong>$285K - $915K</strong></td></tr>
+  </table>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="number">85-95%</div>
+      <div class="label">Cost Reduction</div>
+    </div>
+    <div class="stat">
+      <div class="number">3-6</div>
+      <div class="label">Month Payback Period</div>
+    </div>
+    <div class="stat">
+      <div class="number">10-20x</div>
+      <div class="label">3-Year ROI</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: OPERATIONAL VALUE -->
+<div class="page page-light">
+  <h2 class="section-title">Operational <span>Value</span></h2>
+  <p class="subtitle">Beyond licensing savings &mdash; operational efficiency gains.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h4>Faster Migration</h4>
+      <p>hyper2kvm's VMCraft engine is 5-7x faster than traditional tools. Parallel batch processing. One command per VM. Automated fixes eliminate manual debugging.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔧</div>
+      <h4>Self-Service Management</h4>
+      <p>v9s web UI enables team self-service. No kubectl expertise needed. Start/stop/console/snapshot from the browser. Reduces ops team ticket volume.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h4>Built-in Monitoring</h4>
+      <p>Real-time metrics per VM without Prometheus/Grafana setup. Host hardware inventory without SSH access. Reduces monitoring tool costs.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔒</div>
+      <h4>No Vendor Lock-in</h4>
+      <p>All open source. No contract negotiations. No forced upgrades. No bundle purchasing. Freedom to choose support vendors or self-support.</p>
+    </div>
+  </div>
+
+  <h3>Time Savings per VM</h3>
+  <table>
+    <tr><th>Activity</th><th>Manual / virt-v2v</th><th>hyper2kvm + v9s</th><th>Savings</th></tr>
+    <tr><td>Migration + fixes</td><td>2-4 hours</td><td>15-30 minutes</td><td class="savings">75-85%</td></tr>
+    <tr><td>Boot troubleshooting</td><td>1-3 hours</td><td>0 (first-boot success)</td><td class="savings">100%</td></tr>
+    <tr><td>Console access setup</td><td>30 min (SSH keys, VPN)</td><td>2 clicks (browser)</td><td class="savings">95%</td></tr>
+    <tr><td>VM monitoring setup</td><td>1-2 hours (Prometheus)</td><td>0 (built-in)</td><td class="savings">100%</td></tr>
+    <tr><td>Snapshot management</td><td>CLI commands</td><td>1 click</td><td class="savings">90%</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 6: CTA -->
+<div class="page page-accent">
+  <h2 class="section-title">Investment <span>Summary</span></h2>
+  <p class="subtitle">What you get with hyper2kvm + v9s.</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="icon">📦</div>
+      <h4>hyper2kvm</h4>
+      <ul>
+        <li>8 input formats</li>
+        <li>35+ OS support</li>
+        <li>480+ VMCraft APIs</li>
+        <li>Parallel batch</li>
+        <li>LUKS/LVM</li>
+        <li>K8s native deploy</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="icon">🖥️</div>
+      <h4>v9s</h4>
+      <ul>
+        <li>Web management UI</li>
+        <li>VNC/Serial/SSH console</li>
+        <li>Real-time metrics</li>
+        <li>Snapshot management</li>
+        <li>Host hardware inventory</li>
+        <li>ISO mount, add network</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="icon">💰</div>
+      <h4>ROI</h4>
+      <ul>
+        <li>85-95% cost reduction</li>
+        <li>3-6 month payback</li>
+        <li>No vendor lock-in</li>
+        <li>Proprietary (Zyvor AI Labs) license</li>
+        <li>Self-service operations</li>
+        <li>Built-in monitoring</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="cta-box">
+    <h3>Start your VMware exit today</h3>
+    <p>Migrate with confidence. Manage with ease. Save 85-95% on virtualization costs.<br>
+    hyper2kvm + v9s: the complete alternative to VMware.</p>
+  </div>
+
+  <div class="footer">
+    <p>hyper2kvm + v9s &mdash; Migration + Management ROI<br>
+    Proprietary (Zyvor AI Labs)<br>
+    github.com/ssahani/hyper2kvm</p>
+  </div>
+</div>
+
+</body>
+</html>

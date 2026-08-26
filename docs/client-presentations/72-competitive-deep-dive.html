@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Competitive Deep Dive — hyper2kvm + hypersdk vs Microsoft, virt-v2v &amp; Others</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1e1b4b, #7c3aed, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #c4b5fd; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 750px; margin-top: 1em; }
+  .page { min-height: 100vh; padding: 40px 50px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #7c3aed; }
+  h3 { font-size: 1.1em; font-weight: 600; margin: 0.8em 0 0.3em; color: #7c3aed; }
+  p { margin-bottom: 0.6em; font-size: 0.95em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1.2em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.8em 0; font-size: 0.78em; }
+  th { background: #7c3aed; color: #fff; padding: 7px 8px; text-align: left; font-weight: 600; font-size: 0.82em; }
+  td { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; } .partial { color: #f59e0b; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 1em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 1em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 16px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 4px; color: #7c3aed; } .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  .highlight { background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); border-radius: 8px; padding: 12px; margin: 1em 0; }
+  .footer { text-align: center; padding: 12px; font-size: 0.72em; opacity: 0.4; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 1em 0; }
+  .col { padding: 16px; border-radius: 10px; }
+  .col-bad { background: rgba(255,255,255,0.05); border: 1px solid rgba(239,68,68,0.3); }
+  .col-good { background: rgba(255,255,255,0.05); border: 1px solid rgba(34,197,94,0.3); }
+  .page-light .col-bad { background: #fef2f2; border: 1px solid #fecaca; }
+  .page-light .col-good { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  ul.panel-list { column-count: 3; column-gap: 20px; margin: 0.8em 0; list-style: none; }
+  ul.panel-list li { font-size: 0.82em; padding: 3px 0; break-inside: avoid; }
+  ul.panel-list li::before { content: "\2713 "; color: #22c55e; font-weight: 700; margin-right: 4px; }
+  code { background: rgba(124,58,237,0.1); padding: 2px 5px; border-radius: 3px; font-size: 0.88em; }
+  .page-dark code { background: rgba(255,255,255,0.1); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Competitive <span>Deep Dive</span></h1>
+  <h2>hyper2kvm + hypersdk vs Microsoft SCVMM, Azure Migrate, virt-v2v &amp; Others</h2>
+  <p class="sub">Feature-by-feature, architecture, cost, and capability comparison across all major VM migration tools. Why open-source wins for KVM/libvirt and KubeVirt targets.</p>
+</div>
+
+<!-- PAGE 2: Master Feature Matrix -->
+<div class="page page-dark">
+  <h2 class="st">Master Feature <span>Matrix</span></h2>
+  <p class="sub">All major VM migration tools compared head-to-head.</p>
+  <table>
+    <tr><th style="width:17%">Capability</th><th style="width:12%">hyper2kvm + hypersdk</th><th style="width:10%">virt-v2v</th><th style="width:10%">Red Hat MTV</th><th style="width:10%">SCVMM</th><th style="width:10%">Azure Migrate</th><th style="width:10%">AWS MGN</th><th style="width:10%">Carbonite</th></tr>
+    <tr><td><strong>VMware source</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Hyper-V source</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Multi-cloud source</strong></td><td class="check">&#10003; (10)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Azure</td><td class="partial">AWS</td><td class="partial">Limited</td></tr>
+    <tr><td><strong>Target: KVM/libvirt</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Target: KubeVirt</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Offline guest fixes</strong></td><td class="check">&#10003; VMCraft</td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Windows VirtIO 3-layer</strong></td><td class="check">&#10003;</td><td class="partial">Basic</td><td class="partial">Basic</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+    <tr><td><strong>Web dashboard</strong></td><td class="check">&#10003; (20+ panels)</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="check">Portal</td><td class="check">Portal</td><td class="check">Console</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Guest agent insights</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Partial</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Security analysis</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Partial</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Air-gap / offline</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Licensing</strong></td><td class="check">Proprietary (Zyvor AI Labs)</td><td class="check">GPL</td><td class="partial">OCP req</td><td class="cross">$$$</td><td class="cross">Free tier</td><td class="cross">Free tier</td><td class="cross">$$$</td></tr>
+    <tr><td><strong>Auto disk cleanup</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Credential persistence</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+  </table>
+  <div class="footer" style="color:#e8e6df;"><p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit — github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+<!-- PAGE 3: vs Microsoft -->
+<div class="page page-light">
+  <h2 class="st">vs Microsoft <span>SCVMM &amp; Azure Migrate</span></h2>
+  <p class="sub">Open-source migration vs Microsoft's proprietary, cloud-locked stack.</p>
+
+  <div class="cols">
+    <div class="col col-bad">
+      <h3 style="color:#dc2626;">Microsoft Approach</h3>
+      <div style="background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:12px; font-family:monospace; font-size:0.75em; line-height:1.7;">
+        VMware / Hyper-V<br>
+        &nbsp;&nbsp;&darr;<br>
+        Azure Migrate Appliance <em style="color:#6366f1;">[requires internet]</em><br>
+        &nbsp;&nbsp;&darr;<br>
+        Azure cloud <em style="color:#dc2626;">[locked-in, pay monthly]</em><br>
+        &nbsp;&nbsp;&darr;<br>
+        Azure Portal (management)
+      </div>
+      <p style="font-size:0.8em; margin-top:8px; color:#dc2626;"><strong>Lock-in:</strong> Azure AD required, outbound HTTPS, per-VM compute charges, data egress fees to leave.</p>
+    </div>
+    <div class="col col-good">
+      <h3 style="color:#16a34a;">hyper2kvm + hypersdk Approach</h3>
+      <div style="background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:12px; font-family:monospace; font-size:0.75em; line-height:1.7;">
+        VMware / Hyper-V / 10 Clouds<br>
+        &nbsp;&nbsp;&darr;<br>
+        h2kvmctl + VMCraft <em style="color:#16a34a;">[offline fixes]</em><br>
+        &nbsp;&nbsp;&darr;<br>
+        KVM/libvirt + KubeVirt <em style="color:#16a34a;">[your servers]</em><br>
+        &nbsp;&nbsp;&darr;<br>
+        Web Dashboard (self-hosted)
+      </div>
+      <p style="font-size:0.8em; margin-top:8px; color:#16a34a;"><strong>Freedom:</strong> No cloud account, no internet needed, no per-VM charges, full infrastructure control.</p>
+    </div>
+  </div>
+
+  <h3>Cost: 100-VM Migration (3 years)</h3>
+  <table>
+    <tr><th>Item</th><th>hyper2kvm + hypersdk</th><th>Microsoft Azure Migrate</th></tr>
+    <tr><td><strong>License</strong></td><td class="check">Contact for pricing*</td><td>Free (compute costs apply)</td></tr>
+    <tr><td><strong>Target infra (3yr)</strong></td><td class="check">Your existing servers</td><td class="cross">$150,000+ Azure compute</td></tr>
+    <tr><td><strong>Support</strong></td><td>Lilo Technologies + commercial</td><td>$500+/hr Premier</td></tr>
+    <tr><td><strong>Total</strong></td><td class="check"><strong>Contact for pricing*</strong></td><td class="cross"><strong>$150,000+</strong></td></tr>
+  </table>
+  <div class="footer"><p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
+</div>
+
+<!-- PAGE 4: vs virt-v2v -->
+<div class="page page-dark">
+  <h2 class="st">vs <span>virt-v2v</span></h2>
+  <p class="sub">Next-generation VMCraft engine vs legacy libguestfs appliance.</p>
+
+  <div class="cols">
+    <div class="col col-bad" style="border-color:rgba(245,158,11,0.3);">
+      <h3 style="color:#fbbf24;">virt-v2v Architecture</h3>
+      <div style="font-family:monospace; font-size:0.75em; line-height:1.7; padding:8px;">
+        Source &rarr; nbdkit &rarr; libguestfs <em style="color:#fbbf24;">[boots kernel!]</em><br>
+        &rarr; output disk &rarr; <em style="color:#fbbf24;">manual virsh define</em>
+      </div>
+      <p style="font-size:0.8em; color:#fbbf24;">~500MB deps, supermin required, no web UI, no KubeVirt, no multi-cloud, basic Windows</p>
+    </div>
+    <div class="col col-good" style="border-color:rgba(34,197,94,0.3);">
+      <h3 style="color:#4ade80;">hyper2kvm Architecture</h3>
+      <div style="font-family:monospace; font-size:0.75em; line-height:1.7; padding:8px;">
+        Source (10 clouds) &rarr; govc &rarr; qemu-nbd <em style="color:#4ade80;">[no kernel]</em><br>
+        &rarr; VMCraft fixes &rarr; <em style="color:#4ade80;">auto define + start + dashboard</em>
+      </div>
+      <p style="font-size:0.8em; color:#4ade80;">~50MB install, any Linux distro, 20+ panel dashboard, KubeVirt deploy, 3-layer Windows</p>
+    </div>
+  </div>
+
+  <table>
+    <tr><th style="width:25%">Aspect</th><th style="width:37%">hyper2kvm</th><th style="width:38%">virt-v2v</th></tr>
+    <tr><td><strong>Engine</strong></td><td class="check">VMCraft (qemu-nbd, no kernel)</td><td>libguestfs (boots kernel appliance)</td></tr>
+    <tr><td><strong>Install size</strong></td><td class="check">~50MB pip</td><td class="cross">~500MB + kernel</td></tr>
+    <tr><td><strong>Cloud sources</strong></td><td class="check">10 providers</td><td class="cross">VMware + Hyper-V only</td></tr>
+    <tr><td><strong>Windows VirtIO</strong></td><td class="check">3-layer firstboot + SATA default</td><td class="partial">Basic injection</td></tr>
+    <tr><td><strong>KubeVirt deploy</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Web dashboard</strong></td><td class="check">20+ panels</td><td class="cross">None</td></tr>
+    <tr><td><strong>Progress streaming</strong></td><td class="check">Real-time WebSocket</td><td class="cross">Batch stderr</td></tr>
+    <tr><td><strong>Auto VM start</strong></td><td class="check">&#10003; (define + start)</td><td class="cross">Manual virsh define</td></tr>
+    <tr><td><strong>Cross-distro</strong></td><td class="check">Fedora/RHEL/Ubuntu/Alma</td><td class="partial">RHEL/Fedora primary</td></tr>
+  </table>
+  <div class="footer" style="color:#e8e6df;"><p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
+</div>
+
+<!-- PAGE 5: Windows Deep Dive -->
+<div class="page page-light">
+  <h2 class="st">Windows Migration <span>Deep Dive</span></h2>
+  <p class="sub">The critical difference: hyper2kvm's 3-layer firstboot vs everyone else's "hope for the best."</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Layer 1: rhsrvany Service</h4>
+      <p>Windows service that runs VirtIO driver install at startup. Survives Safe Mode. Most reliable mechanism. Self-removing after completion.</p>
+    </div>
+    <div class="card">
+      <h4>Layer 2: RunOnce Registry Key</h4>
+      <p>Writes to <code>HKLM\...\RunOnce</code>. Backup if service fails. Runs once at next login, auto-removes. Covers user-session scenarios.</p>
+    </div>
+    <div class="card">
+      <h4>Layer 3: Startup Folder</h4>
+      <p>Script in All Users Startup folder. Final fallback — if service and registry both fail, this ensures firstboot runs when any user logs in.</p>
+    </div>
+    <div class="card">
+      <h4>SATA Boot Bus (Default)</h4>
+      <p>Uses SATA as default disk bus. Windows has built-in SATA/AHCI drivers — VM <strong>always boots</strong> on first attempt. No VirtIO disk driver needed at boot time.</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p><strong>Why this matters:</strong> Microsoft's tools don't target KVM so they don't need VirtIO injection. virt-v2v does basic driver injection but uses VirtIO as boot bus — if drivers don't load, the VM blue-screens. hyper2kvm is the only tool with a production-grade, multi-fallback Windows migration path.</p>
+  </div>
+
+  <h3>Windows OS Detection</h3>
+  <p>hyper2kvm auto-detects Windows VMs even when the name doesn't contain "win" — by checking libvirt XML for <code>&lt;hyperv&gt;</code> features, <code>localtime</code> clock offset, and <code>&lt;description&gt;</code> tags. This powers correct driver injection, boot bus selection, and OS-specific dashboard badges.</p>
+
+  <div class="footer"><p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
+</div>
+
+<!-- PAGE 6: hypersdk — The Export Engine -->
+<div class="page page-dark">
+  <h2 class="st">hypersdk — The <span>Export Engine</span></h2>
+  <p class="sub">10 cloud providers, 238+ API endpoints, parallel export, carbon-aware scheduling.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>10 Cloud Providers</h4>
+      <p>VMware vSphere, Hyper-V, AWS EC2, Azure, GCP, Oracle Cloud, OpenStack, Alibaba Cloud, Proxmox, and more. Unified API across all sources.</p>
+    </div>
+    <div class="card">
+      <h4>238+ REST API Endpoints</h4>
+      <p>Full lifecycle management: jobs, schedules, webhooks, libvirt domains, KubeVirt VMs, VM introspection, disk management, credentials, capacity planning.</p>
+    </div>
+    <div class="card">
+      <h4>Carbon-Aware Scheduling</h4>
+      <p>Delays backup jobs to low-carbon grid periods. 30-50% carbon reduction. ESG compliance reporting with zone-based intensity tracking.</p>
+    </div>
+    <div class="card">
+      <h4>Parallel VM Export</h4>
+      <p>Export multiple VMs simultaneously with per-file progress streaming. Configurable parallelism (1-32 concurrent downloads).</p>
+    </div>
+    <div class="card">
+      <h4>Web Dashboard</h4>
+      <p>React/TypeScript dashboard: VM management, KubeVirt, capacity gauges, top consumers, activity feed, storage cleanup, credential store.</p>
+    </div>
+    <div class="card">
+      <h4>Job Scheduling</h4>
+      <p>Cron-based scheduled exports. Create, update, enable/disable, trigger manually. Webhook notifications on completion/failure.</p>
+    </div>
+  </div>
+
+  <div class="highlight" style="border-color:rgba(124,58,237,0.3);">
+    <p><strong>No other migration tool offers all of this:</strong> hypersdk is a complete VM export platform — not just a conversion tool. Combined with hyper2kvm's conversion engine, it provides the full migration pipeline from any cloud to self-managed KVM infrastructure.</p>
+  </div>
+  <div class="footer" style="color:#e8e6df;"><p>hyper2kvm + hypersdk — github.com/ssahani/hyper2kvm &amp; github.com/ssahani/hypersdk</p></div>
+</div>
+
+<!-- PAGE 7: Web Dashboard -->
+<div class="page page-light">
+  <h2 class="st">Web Dashboard <span>Capabilities</span></h2>
+  <p class="sub">20+ panels for VM lifecycle management — included free. No other open-source tool has this.</p>
+
+  <ul class="panel-list">
+    <li>Guest Agent OS Insights</li>
+    <li>Security Exposure Analysis</li>
+    <li>Smart Recommendations</li>
+    <li>Connectivity Testing</li>
+    <li>Process Viewer (guest-level)</li>
+    <li>Storage Detail &amp; I/O Stats</li>
+    <li>Network Interface Detail</li>
+    <li>VM Events Timeline</li>
+    <li>Disk Hot-Plug Management</li>
+    <li>CDROM Insert/Eject</li>
+    <li>Cluster Capacity Gauges</li>
+    <li>Top Resource Consumers</li>
+    <li>Activity Feed</li>
+    <li>VM Create / Clone / Resize</li>
+    <li>VM Import from Disk</li>
+    <li>Snapshot Management</li>
+    <li>Live Migration Monitoring</li>
+    <li>Multi-Kubeconfig Mgmt</li>
+    <li>Domain XML Viewer</li>
+    <li>Auto Disk Cleanup</li>
+    <li>Credential Persistence</li>
+    <li>Batch Migration Queue</li>
+    <li>Real-Time Progress</li>
+    <li>HTTPS by Default</li>
+  </ul>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Self-Hosted &amp; Air-Gap Ready</h4>
+      <p>Dashboard at <code>https://host:5070</code>. No cloud, no internet, no external deps. Auto-generated ECDSA P-256 TLS certificates. Perfect for classified environments.</p>
+    </div>
+    <div class="card">
+      <h4>75+ API Endpoints (hyper2kvm)</h4>
+      <p>Full REST API with auto-generated docs at <code>/api/v1/docs</code>. Session auth, audit logging, webhook notifications, email alerts. Production-ready.</p>
+    </div>
+  </div>
+  <div class="footer"><p>hyper2kvm + hypersdk — Production-Grade VM Migration Toolkit</p></div>
+</div>
+
+<!-- PAGE 8: Migration Workflow -->
+<div class="page page-dark">
+  <h2 class="st">Migration <span>Workflow</span></h2>
+  <p class="sub">Microsoft: 8 steps. virt-v2v: 5 steps. hyper2kvm: 3 steps.</p>
+
+  <div class="card-grid-3">
+    <div class="card" style="border-color:rgba(239,68,68,0.3);">
+      <h4 style="color:#f87171;">Microsoft (8 steps)</h4>
+      <p>1. Create Azure account<br>2. Deploy appliance<br>3. Configure discovery<br>4. Run assessment<br>5. Begin replication<br>6. Test migration<br>7. Cutover<br>8. Decommission</p>
+      <p style="margin-top:6px; color:#f87171; font-size:0.78em;">Timeline: 2-6 weeks per batch</p>
+    </div>
+    <div class="card" style="border-color:rgba(245,158,11,0.3);">
+      <h4 style="color:#fbbf24;">virt-v2v (5 steps)</h4>
+      <p>1. Install libguestfs<br>2. Run virt-v2v command<br>3. Wait (no progress)<br>4. Manual virsh define<br>5. Manual virsh start</p>
+      <p style="margin-top:6px; color:#fbbf24; font-size:0.78em;">Timeline: hours. Manual post-work.</p>
+    </div>
+    <div class="card" style="border-color:rgba(34,197,94,0.3);">
+      <h4 style="color:#4ade80;">hyper2kvm (3 steps)</h4>
+      <p>1. <code style="background:rgba(255,255,255,0.1);">h2kvmctl --config m.yaml</code><br>2. Watch dashboard<br>3. Done (auto-defined + started)</p>
+      <p style="margin-top:6px; color:#4ade80; font-size:0.78em;">Timeline: minutes. Fully automated.</p>
+    </div>
+  </div>
+
+  <div class="highlight" style="border-color:rgba(124,58,237,0.3);">
+    <p><strong>The bottom line:</strong> If your target is Azure, use Azure Migrate. If your target is <em>your own KVM/libvirt or KubeVirt infrastructure</em>, hyper2kvm + hypersdk is the only production-grade migration platform that exists. 3 steps. Contact for pricing.* Air-gap capable. 20+ dashboard panels. 10 cloud sources. Done.</p>
+  </div>
+
+  <div class="footer" style="color:#e8e6df;"><p>hyper2kvm + hypersdk — github.com/ssahani/hyper2kvm &amp; github.com/ssahani/hypersdk</p></div>
+</div>
+
+</body>
+</html>

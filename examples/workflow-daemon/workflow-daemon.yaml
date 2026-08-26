@@ -1,0 +1,36 @@
+# hyper2kvm Workflow Daemon Configuration
+# =========================================
+# 3-Directory workflow for production VM conversion processing
+#
+# Directory structure:
+#   workflow_dir/
+#     ├── to_be_processed/   # Drop zone - place files here
+#     ├── processing/        # Active conversions
+#     ├── processed/         # Successfully completed
+#     └── failed/            # Failed with error logs
+
+command: daemon
+daemon: true
+workflow_mode: true
+
+# Base directory for workflow (subdirectories created automatically)
+workflow_dir: /var/lib/hyper2kvm/workflow
+
+# Output directory for converted VMs
+output_dir: /var/lib/hyper2kvm/output
+
+# Worker pool settings
+max_concurrent_jobs: 3
+
+# Default conversion settings (applied to all disk files)
+out_format: qcow2
+compress: true
+flatten: true
+
+# Guest OS fixes
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Logging
+log_file: /var/log/hyper2kvm/workflow-daemon.log
+verbose: 1

@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hyper2kvm-worker
+  namespace: hyper2kvm-workers
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: hyper2kvm-worker
+  namespace: hyper2kvm-workers
+rules:
+# Allow workers to read ConfigMaps for job specs
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+
+# Allow workers to update their own status
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "patch"]
+
+# Allow workers to create events
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+
+# Allow workers to read secrets for credentials
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: hyper2kvm-worker
+  namespace: hyper2kvm-workers
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: hyper2kvm-worker
+subjects:
+- kind: ServiceAccount
+  name: hyper2kvm-worker
+  namespace: hyper2kvm-workers

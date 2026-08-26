@@ -1,0 +1,10 @@
+command: local
+vmdk: ./photon.vmdk
+output_dir: ./output
+to_output: photon-migrated.qcow2
+out_format: qcow2
+compress: true
+fstab_mode: stabilize-all
+regen_initramfs: true
+allowed_dirs:
+- /home/ssahani/tt/hyper2kvm

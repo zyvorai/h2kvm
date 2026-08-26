@@ -1,0 +1,49 @@
+# ==============================================================================
+# vSphere VDDK Download - Single Disk
+# ==============================================================================
+#
+# Downloads single VM disk using VDDK (no virt-v2v)
+#
+# Usage:
+#   export VC_PASSWORD='your-password'
+#   sudo -E hyper2kvm --config 40-vsphere-vddk-download-disk.yaml vsphere
+#
+# Features:
+#   - VDDK raw disk download
+#   - Direct disk access (faster than NFC)
+#   - No guest OS conversion
+# ==============================================================================
+
+command: vsphere
+
+# vCenter / ESXi Connection (pyvmomi control-plane)
+vcenter: vcenter.example.com
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+vc_insecure: true
+vc_port: 443
+dc_name: ha-datacenter
+
+# Action
+vs_action: vddk_download_disk
+
+# Target VM + Disk Selector
+vm_name: esx8.0-rhel10.0beta-x86_64-efi
+disk: 0
+
+# Output file path (downloaded raw VMDK stream)
+local_path: ./downloads/esx8.0-rhel10.0beta-x86_64-efi-disk0.vmdk
+
+# VDDK Configuration
+# Note: Fixed field naming - using vs_vddk_libdir instead of vs_vddk_libdir2
+vs_vddk_libdir: /path/to/vmware-vix-disklib-distrib
+# vs_vddk_thumbprint: "AA:BB:CC:DD:EE:..."   # Recommended if you enable verification
+vs_no_verify: true
+vs_vddk_transports: "nbdssl:nbd"
+
+# Logging / Output
+output_dir: ./out
+verbose: 2
+log_file: ./out/vddk-download.log
+json: true
+checksum: true

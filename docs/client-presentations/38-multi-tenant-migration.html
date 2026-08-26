@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Multi-Tenant Migration — MSP &amp; Hosting Provider VM Isolation on KVM</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #164e63, #0e7490, #06b6d4); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #a5f3fc; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(165,243,252,0.2); border: 1px solid rgba(165,243,252,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0a1218; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #a5f3fc; }
+  .page-light h2.st span { color: #0e7490; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #a5f3fc; }
+  .page-light h3 { color: #0e7490; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #0e7490; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #a5f3fc; }
+  .page-light .card h4 { color: #0e7490; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #164e63; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(165,243,252,0.08); border: 1px solid rgba(165,243,252,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(165,243,252,0.06); }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(22,78,99,0.15), rgba(14,116,144,0.08)); border: 2px solid #06b6d4; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #a5f3fc; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Multi-Tenant <span>Migration</span></h1>
+  <h2>MSP &amp; Hosting Provider VM Isolation on KVM</h2>
+  <p class="sub">MSPs and hosting providers managing multiple customer environments on VMware face compounding Broadcom license costs. Migrating to KVM with proper tenant isolation — cgroups, namespaces, VLAN separation, resource quotas — delivers the same multi-tenant guarantees at zero software cost. hyper2kvm automates per-tenant migration waves.</p>
+  <div class="badge">Tenant Isolation | cgroups v2 | VLAN Separation | Resource Quotas | Per-Tenant Billing | KubeVirt Namespaces</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Multi-Tenant <span>Challenge</span></h2>
+  <p class="sub">VMware licensing costs scale linearly with tenants — KVM doesn't.</p>
+
+  <h3>VMware vs KVM Multi-Tenant Cost Model (10 Tenants, 200 VMs)</h3>
+  <table>
+    <tr><th style="width:25%">Cost Component</th><th style="width:18%">VMware (Annual)</th><th style="width:18%">KVM (Annual)</th><th style="width:39%">Notes</th></tr>
+    <tr><td>Hypervisor licensing</td><td>$98,800</td><td>$0</td><td>vSphere Enterprise Plus: $6,175/CPU x 16 CPUs</td></tr>
+    <tr><td>vCenter management</td><td>$11,225</td><td>$0</td><td>vCenter Standard + SnS</td></tr>
+    <tr><td>vSAN storage</td><td>$89,200</td><td>$0</td><td>$5,575/CPU x 16 CPUs; KVM uses Ceph (free)</td></tr>
+    <tr><td>NSX networking</td><td>$111,920</td><td>$0</td><td>$6,995/CPU x 16 CPUs; KVM uses OVS (free)</td></tr>
+    <tr><td>Tenant isolation tools</td><td>$25,000</td><td>$0</td><td>VMware vRealize; KVM uses cgroups + nftables</td></tr>
+    <tr><td>Backup (per-tenant)</td><td>$45,000</td><td>$0</td><td>Veeam Enterprise; KVM uses BorgBackup (free)</td></tr>
+    <tr><td>OS subscriptions (optional)</td><td>—</td><td>$26,000</td><td>RHEL for 16 hosts; Rocky/Alma = $0</td></tr>
+    <tr><td><strong>Annual Total</strong></td><td><strong>$381,145</strong></td><td><strong>$0-$26,000</strong></td><td><strong>Savings: $355K-$381K/yr</strong></td></tr>
+  </table>
+
+  <h3>MSP Revenue Impact</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Per-Tenant Economics (VMware)</h4>
+      <ul>
+        <li>Infrastructure cost per tenant: $38,114/yr</li>
+        <li>Typical MSP margin: 30-40%</li>
+        <li>Price to customer: $50,000-$55,000/yr</li>
+        <li>Profit per tenant: $12,000-$17,000/yr</li>
+        <li>Broadcom price increase risk: 2-5x on renewal</li>
+        <li>Customer churn risk if prices passed through</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Per-Tenant Economics (KVM)</h4>
+      <ul>
+        <li>Infrastructure cost per tenant: $0-$2,600/yr</li>
+        <li>Keep same customer pricing: $50,000/yr</li>
+        <li>Profit per tenant: $47,400-$50,000/yr</li>
+        <li><strong>Margin increase: 30% → 95%</strong></li>
+        <li>Or: reduce prices 40% and still improve margin</li>
+        <li>No vendor lock-in risk, no surprise price hikes</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Tenant Isolation <span>Architecture</span></h2>
+  <p class="sub">Four layers of isolation ensure tenant workloads are securely separated.</p>
+
+  <h3>Isolation Layers</h3>
+  <table>
+    <tr><th style="width:12%">Layer</th><th style="width:15%">Technology</th><th style="width:18%">VMware Equivalent</th><th style="width:25%">KVM Implementation</th><th style="width:30%">Guarantee</th></tr>
+    <tr><td><strong>Compute</strong></td><td>cgroups v2</td><td>Resource Pools</td><td>CPU/memory limits per tenant group</td><td>Tenant A can't consume Tenant B's CPU/RAM</td></tr>
+    <tr><td><strong>Network</strong></td><td>VLANs + OVS</td><td>dvSwitch Port Groups</td><td>Separate VLAN per tenant, OVS ACLs</td><td>No L2/L3 cross-tenant traffic possible</td></tr>
+    <tr><td><strong>Storage</strong></td><td>LVM/Ceph quotas</td><td>vSAN Storage Policies</td><td>Separate LV or Ceph pool per tenant</td><td>Tenant can't exceed allocated storage</td></tr>
+    <tr><td><strong>Management</strong></td><td>libvirt ACLs</td><td>vCenter Permissions</td><td>Per-tenant libvirt connection with RBAC</td><td>Tenant admin can only see own VMs</td></tr>
+  </table>
+
+  <h3>Compute Isolation with cgroups v2</h3>
+  <pre>
+# Create tenant cgroup hierarchy
+mkdir -p /sys/fs/cgroup/tenant-acme
+mkdir -p /sys/fs/cgroup/tenant-globex
+
+# Allocate 40% CPU to Tenant Acme (on 16-core host = 6.4 cores)
+echo "640000 1000000" > /sys/fs/cgroup/tenant-acme/cpu.max
+
+# Allocate 8 GB memory to Tenant Acme
+echo "8589934592" > /sys/fs/cgroup/tenant-acme/memory.max
+
+# Move VM processes into tenant cgroup (libvirt hook)
+# /etc/libvirt/hooks/qemu:
+#!/bin/bash
+VM_NAME="$1"
+ACTION="$2"
+if [[ "$ACTION" == "started" ]]; then
+  TENANT=$(grep -l "$VM_NAME" /etc/hyper2kvm/tenants/*/vms.list | head -1 | cut -d/ -f5)
+  for pid in $(virsh qemu-monitor-command "$VM_NAME" --hmp info cpus | grep -oP 'thread_id=\K\d+'); do
+    echo "$pid" > /sys/fs/cgroup/tenant-${TENANT}/cgroup.procs
+  done
+fi</pre>
+
+  <h3>Network Isolation</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>VLAN-Per-Tenant Model</h4>
+      <ul>
+        <li>Tenant Acme: VLAN 100-109 (10 VLANs reserved)</li>
+        <li>Tenant Globex: VLAN 200-209</li>
+        <li>Tenant Initech: VLAN 300-309</li>
+        <li>Management: VLAN 999 (host-only, no tenant access)</li>
+        <li>OVS trunk port carries all VLANs to physical switch</li>
+        <li>Each VM tagged to tenant's VLAN in libvirt XML</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>OVS Inter-Tenant Firewall</h4>
+      <pre>
+# Block all cross-tenant traffic
+ovs-ofctl add-flow ovsbr0 \
+  "priority=200,dl_vlan=100,\
+   actions=mod_vlan_vid:100,normal"
+ovs-ofctl add-flow ovsbr0 \
+  "priority=100,dl_vlan=100,\
+   nw_dst=10.200.0.0/16,actions=drop"
+# VLAN 100 can't reach VLAN 200 subnet</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Storage &amp; Resource <span>Quotas</span></h2>
+  <p class="sub">Per-tenant storage pools, IOPS limits, and capacity quotas.</p>
+
+  <h3>Storage Isolation Options</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>LVM Thin Pool Per Tenant</h4>
+      <pre>
+# Create tenant storage pools
+lvcreate --thin -L 500G vg0/tenant-acme-pool
+lvcreate --thin -L 300G vg0/tenant-globex-pool
+
+# Create VM disk in tenant pool
+lvcreate -V 100G --thin \
+  vg0/tenant-acme-pool \
+  -n acme-db-server
+
+# Quota enforcement: thin pool = hard limit
+# Tenant can't exceed pool size
+# Monitor: lvs -o+data_percent vg0/tenant-*
+
+# Per-VM IOPS limit (libvirt XML)
+# &lt;iotune&gt;
+#   &lt;total_iops_sec&gt;5000&lt;/total_iops_sec&gt;
+#   &lt;total_bytes_sec&gt;209715200&lt;/total_bytes_sec&gt;
+# &lt;/iotune&gt;</pre>
+    </div>
+    <div class="card">
+      <h4>Ceph Pool Per Tenant</h4>
+      <pre>
+# Create dedicated Ceph pool per tenant
+ceph osd pool create tenant-acme 64
+ceph osd pool create tenant-globex 64
+
+# Set quota (max 2 TB for Acme)
+ceph osd pool set-quota tenant-acme \
+  max_bytes 2199023255552
+
+# Set IOPS limit per pool
+ceph osd pool set tenant-acme \
+  target_max_objects 100000
+
+# RBD image for VM
+rbd create tenant-acme/db-server \
+  --size 100G
+
+# KubeVirt: separate StorageClass per tenant
+# storageClassName: ceph-tenant-acme</pre>
+    </div>
+    <div class="card">
+      <h4>Resource Quota Summary</h4>
+      <table>
+        <tr><th>Resource</th><th>Mechanism</th><th>Enforcement</th></tr>
+        <tr><td>CPU</td><td>cgroups v2 cpu.max</td><td>Hard limit</td></tr>
+        <tr><td>Memory</td><td>cgroups v2 memory.max</td><td>OOM kill</td></tr>
+        <tr><td>Storage</td><td>LVM thin / Ceph quota</td><td>Write blocked</td></tr>
+        <tr><td>IOPS</td><td>libvirt iotune</td><td>Throttled</td></tr>
+        <tr><td>Network BW</td><td>OVS QoS / tc</td><td>Throttled</td></tr>
+        <tr><td>VM count</td><td>Management policy</td><td>API reject</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h4>Monitoring Per Tenant</h4>
+      <ul>
+        <li>Prometheus + node_exporter with cgroup labels</li>
+        <li>Per-tenant Grafana dashboards (data source filtering)</li>
+        <li>Alerts: tenant approaching 80% of CPU/memory/storage quota</li>
+        <li>Billing integration: export usage metrics to billing system</li>
+        <li>libvirt domstats: CPU time, block I/O, network I/O per VM</li>
+        <li><code>virsh domstats --cpu-total --block --net tenant-vm</code></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">Per-Tenant Migration <span>Workflow</span></h2>
+  <p class="sub">Migrate each tenant independently with isolated configs, networks, and storage.</p>
+
+  <h3>Per-Tenant YAML Configuration</h3>
+  <pre>
+# tenant-acme-migration.yaml
+tenant:
+  name: acme-corp
+  vlan_range: 100-109
+  storage_pool: tenant-acme-pool   # LVM thin pool or Ceph pool
+  cgroup: tenant-acme
+  resource_limits:
+    max_vcpus: 32
+    max_memory_gb: 64
+    max_storage_gb: 2000
+    max_vms: 20
+
+global:
+  output_directory: /var/lib/libvirt/images/tenants/acme/
+  format: qcow2
+  compress: true
+  fixes: { fstab: true, initramfs: true }
+
+vms:
+  - name: acme-db-primary
+    source: { vmdk: /data/exports/acme/db-primary.vmdk }
+    deploy: { memory: 16384, vcpus: 8, network_bridge: br-vlan100 }
+    iotune: { total_iops_sec: 10000 }
+
+  - name: acme-app-server
+    source: { vmdk: /data/exports/acme/app-server.vmdk }
+    deploy: { memory: 8192, vcpus: 4, network_bridge: br-vlan101 }
+    iotune: { total_iops_sec: 5000 }
+
+  - name: acme-web-frontend
+    source: { vmdk: /data/exports/acme/web-frontend.vmdk }
+    deploy: { memory: 4096, vcpus: 2, network_bridge: br-vlan102 }
+    iotune: { total_iops_sec: 3000 }</pre>
+
+  <h3>Migration Wave Strategy for MSPs</h3>
+  <table>
+    <tr><th>Week</th><th>Tenant</th><th>VMs</th><th>Risk Level</th><th>Strategy</th><th>Rollback Window</th></tr>
+    <tr><td>1</td><td>Internal / Lab</td><td>10</td><td>None</td><td>Full migration, validate tooling and process</td><td>Unlimited</td></tr>
+    <tr><td>2</td><td>Tenant C (smallest)</td><td>8</td><td>Low</td><td>Pilot tenant, close coordination with customer</td><td>72 hours</td></tr>
+    <tr><td>3</td><td>Tenant B (medium)</td><td>25</td><td>Medium</td><td>Weekend migration, parallel run Monday-Wednesday</td><td>48 hours</td></tr>
+    <tr><td>4-5</td><td>Tenant A (largest)</td><td>50</td><td>High</td><td>Phased: DB weekend 1, App/Web weekend 2</td><td>48 hours per phase</td></tr>
+    <tr><td>6-8</td><td>Remaining tenants</td><td>107</td><td>Medium</td><td>Batch 2-3 tenants per weekend, proven process</td><td>48 hours</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">KubeVirt <span>Multi-Tenancy</span></h2>
+  <p class="sub">Kubernetes namespaces provide native multi-tenant isolation for KubeVirt VMs.</p>
+
+  <h3>Namespace-Per-Tenant Model</h3>
+  <pre>
+# Create tenant namespaces
+kubectl create namespace tenant-acme
+kubectl create namespace tenant-globex
+
+# Resource quotas per tenant
+kubectl apply -f - &lt;&lt;'EOF'
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: tenant-quota
+  namespace: tenant-acme
+spec:
+  hard:
+    requests.cpu: "32"
+    requests.memory: 64Gi
+    limits.cpu: "48"
+    limits.memory: 96Gi
+    persistentvolumeclaims: "20"
+    requests.storage: 2Ti
+    count/virtualmachines.kubevirt.io: "20"
+EOF
+
+# Network policy: isolate tenant namespaces
+kubectl apply -f - &lt;&lt;'EOF'
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-cross-tenant
+  namespace: tenant-acme
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            tenant: acme
+  egress:
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            tenant: acme
+    - to:    # Allow DNS
+      - namespaceSelector: {}
+        podSelector:
+          matchLabels:
+            k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+EOF</pre>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>RBAC Per Tenant</h4>
+      <ul>
+        <li>Tenant admin: full control within their namespace</li>
+        <li><code>kubectl create rolebinding acme-admin --clusterrole=admin --user=acme-admin -n tenant-acme</code></li>
+        <li>Tenant viewer: read-only access to their VMs</li>
+        <li>MSP admin: cluster-admin across all namespaces</li>
+        <li>OIDC integration with customer Active Directory</li>
+        <li>Audit logging: who did what in which namespace</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Per-Tenant Storage Classes</h4>
+      <ul>
+        <li>Separate Ceph pools per tenant via StorageClass</li>
+        <li><code>storageClassName: ceph-tenant-acme</code></li>
+        <li>IOPS limits via Ceph pool QoS settings</li>
+        <li>Snapshots scoped to tenant namespace</li>
+        <li>Backup: Velero per-namespace schedules</li>
+        <li>Capacity alerts at 80% of tenant quota</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">Billing &amp; <span>Usage Tracking</span></h2>
+  <p class="sub">Metered billing from VM resource consumption for per-tenant invoicing.</p>
+
+  <h3>Usage Metrics Collection</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>libvirt-based Metering</h4>
+      <pre>
+#!/usr/bin/env python3
+# tenant-billing.py — collect usage per tenant
+import libvirt
+import json
+from datetime import datetime
+
+conn = libvirt.open('qemu:///system')
+usage = {}
+
+for dom in conn.listAllDomains():
+    name = dom.name()
+    tenant = name.split('-')[0]  # acme-db → acme
+    stats = dom.getCPUStats(True)[0]
+    blk = dom.blockStats('vda')
+    net = dom.interfaceStats('vnet0')
+
+    if tenant not in usage:
+        usage[tenant] = {
+            'cpu_seconds': 0,
+            'disk_read_gb': 0,
+            'disk_write_gb': 0,
+            'net_rx_gb': 0,
+            'net_tx_gb': 0,
+            'vm_count': 0
+        }
+    usage[tenant]['cpu_seconds'] += stats['cpu_time'] / 1e9
+    usage[tenant]['disk_read_gb'] += blk[1] / 1e9
+    usage[tenant]['disk_write_gb'] += blk[3] / 1e9
+    usage[tenant]['net_rx_gb'] += net[0] / 1e9
+    usage[tenant]['net_tx_gb'] += net[4] / 1e9
+    usage[tenant]['vm_count'] += 1
+
+print(json.dumps(usage, indent=2))</pre>
+    </div>
+    <div class="card">
+      <h4>Billing Model Options</h4>
+      <table>
+        <tr><th>Model</th><th>Metric</th><th>Rate</th></tr>
+        <tr><td><strong>Per-VM flat</strong></td><td>VM count</td><td>$150-$500/VM/mo</td></tr>
+        <tr><td><strong>vCPU-hour</strong></td><td>CPU time</td><td>$0.02-$0.05/hr</td></tr>
+        <tr><td><strong>RAM-GB-hour</strong></td><td>Memory allocated</td><td>$0.005-$0.01/hr</td></tr>
+        <tr><td><strong>Storage-GB</strong></td><td>Disk allocated</td><td>$0.05-$0.15/GB/mo</td></tr>
+        <tr><td><strong>IOPS tier</strong></td><td>IOPS consumed</td><td>$5-$20/1000 IOPS/mo</td></tr>
+        <tr><td><strong>Network-GB</strong></td><td>Traffic out</td><td>$0.01-$0.05/GB</td></tr>
+      </table>
+      <ul>
+        <li>Export to CSV/JSON for integration with billing (WHMCS, Blesta)</li>
+        <li>Prometheus metrics → custom Grafana billing dashboard</li>
+        <li>Monthly report generated per tenant with usage breakdown</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <h3>Revenue Example: 10 Tenants, 200 VMs</h3>
+    <p><strong>VMware infrastructure cost:</strong> $381K/yr → charge customers $550K/yr → profit $169K/yr (31% margin). <strong>KVM infrastructure cost:</strong> $26K/yr → charge customers $400K/yr (20% discount to win deals) → profit $374K/yr (94% margin). <strong>Result:</strong> Lower prices for customers AND 2.2x profit increase for the MSP.</p>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Self-Service <span>Tenant Portal</span></h2>
+  <p class="sub">Give tenants VM management capabilities without exposing host infrastructure.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Cockpit (Web UI for KVM)</h4>
+      <ul>
+        <li>Red Hat Cockpit with cockpit-machines plugin</li>
+        <li>Web-based VM console (VNC/SPICE via browser)</li>
+        <li>Start/stop/reboot VMs from web UI</li>
+        <li>Create snapshots, view performance graphs</li>
+        <li>RBAC: tenant sees only their VMs (polkit rules)</li>
+        <li>URL: <code>https://host:9090/machines</code></li>
+        <li>No SSH access needed for tenant admins</li>
+        <li>Free, included with RHEL/Rocky/Fedora</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>oVirt / OLVM (Enterprise)</h4>
+      <ul>
+        <li>VMware vCenter equivalent for KVM</li>
+        <li>Multi-tenant with user portal per tenant</li>
+        <li>VM provisioning, templates, snapshots</li>
+        <li>Resource quotas enforced in UI</li>
+        <li>REST API for automation</li>
+        <li>Live migration, HA, load balancing</li>
+        <li>Oracle Linux Virtualization Manager (OLVM) = supported</li>
+        <li>Free (oVirt) or $1,200/host/yr (OLVM)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>KubeVirt Dashboard</h4>
+      <ul>
+        <li>Kubernetes Dashboard or Rancher UI</li>
+        <li>Namespace isolation = tenant isolation</li>
+        <li>Tenant admin creates/manages VMs via UI</li>
+        <li>virtctl CLI for power users</li>
+        <li>Resource quotas shown in dashboard</li>
+        <li>Integrated with OIDC / LDAP auth</li>
+        <li>Free (open source)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>API-First Management</h4>
+      <ul>
+        <li>libvirt API (C/Python/Go bindings)</li>
+        <li>REST wrapper: build custom portal in hours</li>
+        <li>KubeVirt: standard Kubernetes API</li>
+        <li>Terraform libvirt provider for IaC</li>
+        <li>Ansible virt module for automation</li>
+        <li>Webhook events for provisioning/billing</li>
+        <li>Custom branding: white-label portal</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page page-light">
+  <h2 class="st">Implementation &amp; <span>ROI Summary</span></h2>
+  <p class="sub">Migration timeline and financial impact for MSP with 10 tenants.</p>
+
+  <h3>Implementation Timeline</h3>
+  <table>
+    <tr><th>Week</th><th>Activity</th><th>Deliverable</th></tr>
+    <tr><td>1</td><td>Architecture: design tenant isolation, VLAN plan, storage pools</td><td>Multi-tenant architecture document, VLAN allocation matrix</td></tr>
+    <tr><td>2</td><td>Infrastructure: deploy KVM hosts, configure cgroups, OVS, Ceph</td><td>Production-ready multi-tenant KVM infrastructure</td></tr>
+    <tr><td>3</td><td>Pilot: migrate internal lab + 1 small tenant (8 VMs)</td><td>Validated migration process, tenant isolation verified</td></tr>
+    <tr><td>4-5</td><td>Wave 1: migrate 3 medium tenants (75 VMs)</td><td>3 tenants operational on KVM with isolation</td></tr>
+    <tr><td>6-8</td><td>Wave 2: migrate remaining 6 tenants (117 VMs)</td><td>All tenants migrated, VMware decommissioned</td></tr>
+    <tr><td>9</td><td>Portal: deploy Cockpit/oVirt tenant portal, billing integration</td><td>Self-service portal live, automated billing reports</td></tr>
+    <tr><td>10</td><td>Handoff: train NOC team, document runbooks, DR drill</td><td>Operations team certified, DR tested, project closed</td></tr>
+  </table>
+
+  <h3>3-Year Financial Summary</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Cost Savings</h4>
+      <ul>
+        <li>VMware licensing eliminated: $381K/yr x 3 = $1,143K</li>
+        <li>KVM cost (RHEL optional): $26K/yr x 3 = $78K</li>
+        <li>Migration one-time cost: $60K (labor)</li>
+        <li>Portal/tooling: $15K (one-time)</li>
+        <li><strong>Net 3-Year Savings: $990,000</strong></li>
+        <li>Payback period: 2.5 months</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Revenue Opportunity</h4>
+      <ul>
+        <li>Current margin at VMware cost: 31% ($169K/yr)</li>
+        <li>New margin at KVM cost: 94% ($374K/yr)</li>
+        <li><strong>Additional profit: $205K/yr</strong></li>
+        <li>Option: reduce customer prices 20% to win more clients</li>
+        <li>At 15 tenants (50% growth): $561K/yr profit on KVM</li>
+        <li>VMware would cost $572K/yr for 15 tenants (net loss)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>KVM Multi-Tenancy: Same Isolation, Zero License Cost, 3x Profit Margin</h3>
+    <p>cgroups v2 + OVS VLANs + Ceph pool quotas deliver the same tenant isolation as VMware resource pools + dvSwitch + vSAN policies. hyper2kvm migrates each tenant independently with per-tenant YAML configs. MSPs save $990K over 3 years while tripling their profit margin — or pass savings to customers and grow faster.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Multi-Tenant Migration for MSPs &amp; Hosting Providers</div>
+</div>
+
+</body>
+</html>

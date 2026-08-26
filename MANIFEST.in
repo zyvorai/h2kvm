@@ -1,0 +1,58 @@
+# Include essential documentation
+include README.md
+include LICENSE
+include requirements.txt
+include hyper2kvm.spec
+
+# Include documentation
+recursive-include docs *.md
+recursive-include docs *.rst
+
+# Include examples
+recursive-include examples *.py
+recursive-include examples *.yaml
+recursive-include examples *.json
+recursive-include examples *.sh
+recursive-include examples README.md
+
+# Include shell completions
+recursive-include completions *.bash
+recursive-include completions *.zsh
+recursive-include completions *.fish
+recursive-include completions *.sh
+recursive-include completions README.md
+
+# Include systemd service files
+recursive-include systemd *.service
+recursive-include systemd *.md
+
+# Include configuration templates
+recursive-include test-confs *.yaml
+recursive-include test-confs *.json
+
+# Include system configuration samples
+recursive-include etc *.yaml
+recursive-include etc *.sample
+recursive-include etc *.md
+
+# Include man pages
+recursive-include man *.py
+recursive-include man *.rst
+recursive-include man *.md
+recursive-include man Makefile
+
+# Exclude build artifacts
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *$py.class
+global-exclude *.so
+global-exclude .DS_Store
+global-exclude *.swp
+global-exclude *.swo
+
+# Exclude test files
+prune tests
+
+# Exclude git files
+global-exclude .git*
+global-exclude .github

@@ -1,0 +1,92 @@
+# ==============================================================================
+# 🎩 RHEL 10 Local VMDK Conversion
+# ==============================================================================
+#
+# Converts a local Red Hat Enterprise Linux 10 VMDK to QCOW2 format
+#
+# Usage:
+#   hyper2kvm --config 02-local-rhel-10-vmdk.yaml local
+#
+# Features:
+#   ✅ UUID-based fstab stabilization
+#   ✅ GRUB root= fixing
+#   ✅ Dracut initramfs regeneration
+#   ✅ QCOW2 compression
+#   ✅ SELinux compatibility
+#
+# Requirements:
+#   - guestfs-tools with dracut support
+#   - RHEL/Fedora guest OS
+# ==============================================================================
+
+cmd: local
+
+# Source VMDK
+vmdk: /home/ssahani/tt/hyper2kvm/downloads/esx8.0-rhel10.1-x86_64-efi/esx8.0-rhel10.1-x86_64-efi/esx8.0-rhel10.1-x86_64-efi.vmdk
+
+# Output Configuration
+output_dir: /home/ssahani/by-path/out
+
+# Flatten snapshot chain first (recommended for complex VMs)
+flatten: true
+flatten_format: qcow2
+
+# Final output image (relative to output_dir)
+to_output: rhel10-fixed.qcow2
+out_format: qcow2
+compress: true
+checksum: true
+
+# Filesystem + Boot Fixes
+# Show fstab before and after conversion
+print_fstab: true
+
+# Rewrite all entries to stable identifiers
+# Priority: UUID → PARTUUID → LABEL
+fstab_mode: stabilize-all
+
+# Update GRUB root= parameter
+no_grub: false
+
+# Regenerate initramfs using dracut
+regen_initramfs: true
+
+# Optional: Add additional drivers to initramfs (for specific hardware)
+# Useful when migrating to bare metal with specific NICs or storage controllers
+# Examples:
+#   - Network: e1000e, ixgbe, mlx5_core, i40e
+#   - Storage: megaraid_sas, mpt3sas, hpsa
+#   - RAID: md_mod, raid0, raid1, raid456
+# initramfs_add_drivers: "e1000e mlx5_core"
+# OR use list format:
+# initramfs_add_drivers:
+#   - e1000e
+#   - mlx5_core
+
+# Keep backups inside guest filesystem
+no_backup: false
+
+# Safety & Visibility
+dry_run: false
+
+# Verbosity levels:
+#   0 = INFO
+#   1 = verbose info
+#   2 = DEBUG (recommended for troubleshooting)
+verbose: 2
+
+# Optional logfile
+log_file: /home/ssahani/by-path/out/hyper2kvm.log
+
+# Optional Markdown report
+report: /home/ssahani/by-path/out/hyper2kvm-report.md
+
+# Optional Smoke Tests (disabled by default)
+# libvirt_test: true
+# vm_name: rhel10-fixed
+# memory: 2048
+# vcpus: 2
+# uefi: false
+# timeout: 30
+# keep_domain: false
+# headless: true

@@ -1,0 +1,147 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: hyper2kvm-operator-role
+rules:
+  # Validation CRD permissions
+  - apiGroups:
+      - hyper2kvm.io
+    resources:
+      - validations
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - hyper2kvm.io
+    resources:
+      - validations/status
+    verbs:
+      - get
+      - patch
+      - update
+  # HyperConversion CRD permissions
+  - apiGroups:
+      - hyper2kvm.io
+    resources:
+      - hyperconversions
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - hyper2kvm.io
+    resources:
+      - hyperconversions/status
+      - hyperconversions/finalizers
+    verbs:
+      - get
+      - patch
+      - update
+  # CDI DataVolume permissions
+  - apiGroups:
+      - cdi.kubevirt.io
+    resources:
+      - datavolumes
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - watch
+  # Job permissions for fixer Jobs
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - watch
+  # Pod permissions for validation pods
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods/log
+    verbs:
+      - get
+  # PVC permissions
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+    verbs:
+      - create
+      - get
+      - list
+      - watch
+  # ConfigMap and Secret permissions (for cloud-init, credentials)
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - secrets
+    verbs:
+      - create
+      - get
+      - list
+      - watch
+  # KubeVirt VM permissions
+  - apiGroups:
+      - kubevirt.io
+    resources:
+      - virtualmachines
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - update
+      - watch
+  # Events
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: hyper2kvm-operator-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hyper2kvm-operator-role
+subjects:
+  - kind: ServiceAccount
+    name: hyper2kvm-operator
+    namespace: hyper2kvm-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hyper2kvm-operator
+  namespace: hyper2kvm-system

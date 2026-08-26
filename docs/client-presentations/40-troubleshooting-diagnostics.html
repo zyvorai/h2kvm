@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Troubleshooting &amp; Diagnostics — Solving Migration Issues Fast</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #713f12, #a16207, #ca8a04); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #fde68a; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(253,230,138,0.2); border: 1px solid rgba(253,230,138,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #1a1005; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #fde68a; }
+  .page-light h2.st span { color: #a16207; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #fde68a; }
+  .page-light h3 { color: #a16207; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #a16207; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #fde68a; }
+  .page-light .card h4 { color: #a16207; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  pre { background: #713f12; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(253,230,138,0.08); border: 1px solid rgba(253,230,138,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(253,230,138,0.06); }
+  .alert { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .alert h4 { color: #ef4444; font-size: 0.92em; margin-bottom: 3px; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(113,63,18,0.15), rgba(161,98,7,0.08)); border: 2px solid #ca8a04; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #fde68a; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Troubleshooting &amp; <span>Diagnostics</span></h1>
+  <h2>Solving Migration Issues Fast</h2>
+  <p class="sub">95% of migration issues fall into 10 common categories. This guide provides immediate diagnosis and fix for every known failure mode — from BSOD on Windows VMs to initramfs panics on Linux, from UEFI boot failures to network-after-migration issues. Includes h2kvmctl doctor output interpretation and log analysis.</p>
+  <div class="badge">Boot Failures | BSOD Fix | initramfs Panic | UEFI/BIOS | doctor.sh | Log Analysis | 10 Common Issues</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Top 10 Migration <span>Issues</span></h2>
+  <p class="sub">Quick reference: symptom → cause → fix for the most common problems.</p>
+
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:15%">Symptom</th><th style="width:8%">OS</th><th style="width:20%">Root Cause</th><th style="width:27%">Fix</th><th style="width:25%">h2kvmctl Flag</th></tr>
+    <tr><td>1</td><td>BSOD 0x7B INACCESSIBLE_BOOT_DEVICE</td><td>Windows</td><td>Missing VirtIO SCSI/block driver</td><td>Inject VirtIO drivers before boot</td><td><code>--virtio-drivers /path/virtio-win.iso</code></td></tr>
+    <tr><td>2</td><td>Kernel panic: no init found</td><td>Linux</td><td>initramfs missing virtio modules</td><td>Rebuild initramfs with virtio drivers</td><td><code>--fix-initramfs</code></td></tr>
+    <tr><td>3</td><td>VM won't boot (black screen)</td><td>Both</td><td>UEFI VM booted in BIOS mode (or vice versa)</td><td>Match firmware type to source VM</td><td><code>--firmware uefi</code> or <code>--firmware bios</code></td></tr>
+    <tr><td>4</td><td>Filesystem mount failed</td><td>Linux</td><td>fstab references old device names (sda→vda)</td><td>Convert fstab to UUID-based entries</td><td><code>--fix-fstab</code></td></tr>
+    <tr><td>5</td><td>No network after boot</td><td>Both</td><td>NIC changed from e1000/vmxnet3 to virtio</td><td>Regenerate network config for new NIC</td><td><code>--fix-network</code></td></tr>
+    <tr><td>6</td><td>Slow disk I/O</td><td>Both</td><td>Using IDE emulation instead of VirtIO</td><td>Change disk bus to virtio in domain XML</td><td>Auto (h2kvmctl uses virtio by default)</td></tr>
+    <tr><td>7</td><td>GRUB rescue prompt</td><td>Linux</td><td>GRUB config references old disk layout</td><td>Regenerate GRUB config</td><td><code>--fix-grub</code></td></tr>
+    <tr><td>8</td><td>Windows activation lost</td><td>Windows</td><td>Hardware fingerprint changed</td><td>Re-activate or use KMS server</td><td>N/A (Windows issue, not h2kvmctl)</td></tr>
+    <tr><td>9</td><td>Conversion error: qemu-img failed</td><td>N/A</td><td>Corrupt source VMDK or insufficient space</td><td>Check source integrity, free disk space</td><td><code>h2kvmctl doctor</code> checks space</td></tr>
+    <tr><td>10</td><td>VM starts but no console output</td><td>Both</td><td>Serial console not configured, video driver mismatch</td><td>Add virtio-vga or QXL video device</td><td>Auto (h2kvmctl adds appropriate video)</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Windows Boot <span>Failures (BSOD)</span></h2>
+  <p class="sub">The #1 migration issue: Windows BSOD 0x7B — and how h2kvmctl prevents it.</p>
+
+  <h3>BSOD Prevention Workflow</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Why BSOD Happens</h4>
+      <ul>
+        <li>VMware uses LSI Logic SAS or PVSCSI virtual disk controller</li>
+        <li>KVM uses VirtIO SCSI (vioscsi) or VirtIO Block (viostor)</li>
+        <li>Windows doesn't have VirtIO drivers in-box</li>
+        <li>At boot, Windows can't find the boot disk → BSOD 0x7B</li>
+        <li>This is the most common migration failure (affects 100% of Windows VMs without fix)</li>
+        <li>Solution: inject VirtIO drivers BEFORE first boot</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>h2kvmctl Auto-Fix</h4>
+      <pre>
+# Automatic VirtIO injection
+h2kvmctl convert \
+  --source win-server.vmdk \
+  --format qcow2 \
+  --virtio-drivers /usr/share/virtio-win/virtio-win.iso \
+  --emit-domain-xml --deploy-libvirt
+
+# What h2kvmctl does internally:
+# 1. Mounts QCOW2 with qemu-nbd
+# 2. Loads Windows registry hive (SYSTEM)
+# 3. Adds viostor/vioscsi driver entries
+# 4. Copies .sys/.inf files to drivers dir
+# 5. Marks drivers as boot-critical
+# 6. Unmounts cleanly
+# 7. Result: Windows boots with VirtIO</pre>
+    </div>
+    <div class="card">
+      <h4>Manual Fix (if auto-fix fails)</h4>
+      <pre>
+# Mount VM disk
+modprobe nbd max_part=8
+qemu-nbd -c /dev/nbd0 win-server.qcow2
+
+# Mount Windows partition
+mount /dev/nbd0p2 /mnt/win
+
+# Copy VirtIO drivers
+mkdir -p /mnt/win/drivers/virtio
+cp /mnt/virtio-win/viostor/2k22/amd64/* \
+   /mnt/win/drivers/virtio/
+cp /mnt/virtio-win/vioscsi/2k22/amd64/* \
+   /mnt/win/drivers/virtio/
+
+# Load registry and add driver
+# (h2kvmctl handles this automatically)
+hivex /mnt/win/Windows/System32/config/SYSTEM \
+  --add-driver viostor
+
+# Cleanup
+umount /mnt/win
+qemu-nbd -d /dev/nbd0</pre>
+    </div>
+    <div class="card">
+      <h4>VirtIO Driver Versions</h4>
+      <table>
+        <tr><th>Windows Version</th><th>Driver Path</th></tr>
+        <tr><td>Server 2025</td><td>viostor/2k25/amd64</td></tr>
+        <tr><td>Server 2022</td><td>viostor/2k22/amd64</td></tr>
+        <tr><td>Server 2019</td><td>viostor/2k19/amd64</td></tr>
+        <tr><td>Server 2016</td><td>viostor/2k16/amd64</td></tr>
+        <tr><td>Windows 11</td><td>viostor/w11/amd64</td></tr>
+        <tr><td>Windows 10</td><td>viostor/w10/amd64</td></tr>
+      </table>
+      <p>Download: <code>dnf install virtio-win</code> (Fedora/RHEL)</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Linux Boot <span>Failures</span></h2>
+  <p class="sub">Kernel panics, mount failures, and GRUB issues — all fixable offline.</p>
+
+  <h3>initramfs Kernel Panic</h3>
+  <pre>
+# Symptom: "Kernel panic - not syncing: VFS: Unable to mount root fs"
+# Or: "ALERT! /dev/sda1 does not exist. Dropping to a shell!"
+
+# Cause: initramfs was built with VMware SCSI drivers (mptspi, vmw_pvscsi)
+# but doesn't contain VirtIO drivers (virtio_blk, virtio_scsi, virtio_pci)
+
+# h2kvmctl fix (automatic):
+h2kvmctl convert --source linux-vm.vmdk --fix-initramfs
+
+# What it does internally:
+# 1. Mounts guest filesystem with qemu-nbd
+# 2. Chroots into the guest OS
+# 3. Detects distro (RHEL, Ubuntu, SUSE, etc.)
+# 4. Runs appropriate initramfs rebuild:
+#    RHEL/Rocky: dracut --force --add-drivers "virtio_blk virtio_scsi virtio_net virtio_pci"
+#    Ubuntu:     update-initramfs -u -k all
+#    SUSE:       mkinitrd -m "virtio_blk virtio_scsi"
+# 5. Verifies virtio modules are in new initramfs:
+#    lsinitrd /boot/initramfs-*.img | grep virtio</pre>
+
+  <h3>fstab Device Name Issues</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Problem: Device Names Change</h4>
+      <pre>
+# VMware uses SCSI emulation:
+# /dev/sda1 → /boot
+# /dev/sda2 → swap
+# /dev/sda3 → /
+
+# KVM with VirtIO uses:
+# /dev/vda1 → /boot
+# /dev/vda2 → swap
+# /dev/vda3 → /
+
+# If fstab says /dev/sda1 → mount fails!</pre>
+    </div>
+    <div class="card">
+      <h4>Fix: Convert to UUID</h4>
+      <pre>
+# h2kvmctl --fix-fstab converts to UUIDs:
+
+# Before (broken):
+/dev/sda1  /boot  ext4  defaults  0 1
+/dev/sda2  swap   swap  defaults  0 0
+/dev/sda3  /      xfs   defaults  0 1
+
+# After (works everywhere):
+UUID=a1b2c3d4  /boot  ext4  defaults  0 1
+UUID=e5f6a7b8  swap   swap  defaults  0 0
+UUID=c9d0e1f2  /      xfs   defaults  0 1</pre>
+    </div>
+  </div>
+
+  <h3>GRUB Recovery</h3>
+  <pre>
+# Symptom: "error: no such partition" or GRUB rescue shell
+# Cause: GRUB references (hd0,msdos1) which changed with disk controller
+
+# h2kvmctl --fix-grub rebuilds GRUB config:
+# BIOS: grub2-install /dev/vda && grub2-mkconfig -o /boot/grub2/grub.cfg
+# UEFI: grub2-mkconfig -o /boot/efi/EFI/*/grub.cfg
+
+# Manual rescue from host:
+qemu-nbd -c /dev/nbd0 linux-vm.qcow2
+mount /dev/nbd0p3 /mnt/rescue
+mount /dev/nbd0p1 /mnt/rescue/boot
+mount --bind /dev /mnt/rescue/dev
+mount --bind /proc /mnt/rescue/proc
+mount --bind /sys /mnt/rescue/sys
+chroot /mnt/rescue grub2-mkconfig -o /boot/grub2/grub.cfg
+umount -R /mnt/rescue && qemu-nbd -d /dev/nbd0</pre>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">UEFI &amp; Firmware <span>Issues</span></h2>
+  <p class="sub">Mismatched firmware type is the #3 most common boot failure.</p>
+
+  <h3>Firmware Detection &amp; Configuration</h3>
+  <table>
+    <tr><th style="width:20%">Indicator</th><th style="width:15%">BIOS (Legacy)</th><th style="width:15%">UEFI</th><th style="width:25%">How h2kvmctl Detects</th><th style="width:25%">If Wrong</th></tr>
+    <tr><td>Partition table</td><td>MBR (msdos)</td><td>GPT</td><td><code>parted -s /dev/nbd0 print | grep "Partition Table"</code></td><td>Wrong firmware = no boot</td></tr>
+    <tr><td>Boot partition</td><td>/boot (ext4/xfs)</td><td>/boot/efi (vfat, ESP)</td><td>Checks for EFI System Partition</td><td>BIOS can't read ESP, UEFI needs it</td></tr>
+    <tr><td>Windows boot</td><td>bootmgr (MBR)</td><td>bootmgfw.efi</td><td>Checks for EFI\\Microsoft\\Boot</td><td>BSOD or "no bootable device"</td></tr>
+    <tr><td>VMware source</td><td>firmware="bios"</td><td>firmware="efi"</td><td>Reads OVF descriptor</td><td>Auto-detected from OVF/OVA</td></tr>
+  </table>
+
+  <h3>Fixing Firmware Mismatches</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Libvirt UEFI Configuration</h4>
+      <pre>
+&lt;!-- UEFI boot (for GPT/EFI VMs) --&gt;
+&lt;os&gt;
+  &lt;type machine='pc-q35-8.2'&gt;hvm&lt;/type&gt;
+  &lt;loader readonly='yes' type='pflash'&gt;
+    /usr/share/OVMF/OVMF_CODE.fd
+  &lt;/loader&gt;
+  &lt;nvram&gt;
+    /var/lib/libvirt/qemu/nvram/vm_VARS.fd
+  &lt;/nvram&gt;
+&lt;/os&gt;
+
+&lt;!-- BIOS boot (for MBR VMs) --&gt;
+&lt;os&gt;
+  &lt;type machine='pc-i440fx-8.2'&gt;hvm&lt;/type&gt;
+  &lt;boot dev='hd'/&gt;
+&lt;/os&gt;</pre>
+    </div>
+    <div class="card">
+      <h4>Secure Boot</h4>
+      <ul>
+        <li>VMware EFI VMs may have Secure Boot enabled</li>
+        <li>KVM supports Secure Boot with OVMF + enrolled keys</li>
+        <li>h2kvmctl detects Secure Boot from OVF metadata</li>
+        <li>Uses <code>OVMF_CODE.secboot.fd</code> firmware for Secure Boot</li>
+        <li>Windows 11 requires Secure Boot + vTPM</li>
+        <li>vTPM: <code>swtpm</code> package provides virtual TPM 2.0</li>
+        <li>If Secure Boot causes issues: disable in OVMF setup (F2 at boot)</li>
+        <li><code>&lt;os firmware='efi'&gt;&lt;firmware&gt;&lt;feature enabled='yes' name='secure-boot'/&gt;&lt;/firmware&gt;&lt;/os&gt;</code></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">h2kvmctl Doctor <span>Output</span></h2>
+  <p class="sub">Pre-flight system readiness check — run before any migration.</p>
+
+  <h3>Doctor Check Areas</h3>
+  <pre>
+$ h2kvmctl doctor
+
+ System Readiness Check
+ =====================
+
+ [PASS] KVM kernel module loaded (kvm_intel)
+ [PASS] /dev/kvm exists and accessible
+ [PASS] QEMU version 8.2.0 (minimum 6.0)
+ [PASS] libvirtd running (version 10.0.0)
+ [PASS] qemu-img available (version 8.2.0)
+ [PASS] qemu-nbd available
+ [PASS] VirtIO drivers: /usr/share/virtio-win/virtio-win.iso (0.1.240)
+ [PASS] OVMF firmware: /usr/share/OVMF/OVMF_CODE.fd
+ [PASS] swtpm available (for Windows 11 vTPM)
+ [PASS] Bridge br0 exists (state: UP, IP: 10.0.1.1/24)
+ [PASS] Free disk space: 850 GB on /var/lib/libvirt/images/
+ [WARN] NBD module not loaded — run: modprobe nbd max_part=8
+ [PASS] Python 3.11 with required packages
+ [PASS] SELinux: enforcing (contexts correct)
+
+ Result: 13/14 checks passed, 1 warning
+ Ready for migration (fix warnings for optimal operation)</pre>
+
+  <h3>Doctor Check Details</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:20%">Check</th><th style="width:20%">What It Verifies</th><th style="width:25%">Common Failure</th><th style="width:30%">Fix</th></tr>
+    <tr><td>1</td><td>KVM kernel module</td><td>kvm + kvm_intel or kvm_amd loaded</td><td>VM host doesn't support VT-x/AMD-V</td><td>Enable virtualization in BIOS</td></tr>
+    <tr><td>2</td><td>/dev/kvm access</td><td>Device exists and user has access</td><td>Missing kvm group membership</td><td><code>usermod -aG kvm $USER</code></td></tr>
+    <tr><td>3</td><td>QEMU version</td><td>qemu-system-x86_64 version >= 6.0</td><td>Old RHEL 7 QEMU (2.12)</td><td>Upgrade to RHEL 9 / Rocky 9</td></tr>
+    <tr><td>4</td><td>libvirtd running</td><td>Service active and socket available</td><td>Not installed or not started</td><td><code>dnf install libvirt && systemctl enable --now libvirtd</code></td></tr>
+    <tr><td>5</td><td>qemu-img/qemu-nbd</td><td>Conversion tools available</td><td>qemu-img-extra not installed</td><td><code>dnf install qemu-img</code></td></tr>
+    <tr><td>6</td><td>VirtIO drivers</td><td>virtio-win.iso exists</td><td>Not installed (needed for Windows)</td><td><code>dnf install virtio-win</code></td></tr>
+    <tr><td>7</td><td>OVMF firmware</td><td>UEFI firmware files exist</td><td>Missing edk2-ovmf package</td><td><code>dnf install edk2-ovmf</code></td></tr>
+    <tr><td>8</td><td>Disk space</td><td>>= 2x largest VM size free</td><td>Not enough space for conversion</td><td>Free space or use different output dir</td></tr>
+    <tr><td>9</td><td>Network bridge</td><td>At least one bridge exists and is UP</td><td>No bridge configured</td><td>Create bridge with nmcli (see network guide)</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">Conversion <span>Errors</span></h2>
+  <p class="sub">Diagnosing qemu-img failures, corrupt source images, and space issues.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Error: qemu-img convert failed</h4>
+      <pre>
+# Check source image integrity
+qemu-img check source.vmdk
+# Result: image corrupt / leaked clusters
+
+# Fix: try to repair
+qemu-img check --repair=all source.vmdk
+
+# If still failing: extract with verbose
+qemu-img convert -f vmdk -O qcow2 \
+  -p source.vmdk output.qcow2 2>&1 | tee convert.log
+
+# Common causes:
+# 1. Incomplete OVA extract (truncated)
+# 2. VMDK descriptor references missing extents
+# 3. Snapshot chain not fully resolved
+# 4. Source still in use (lock file)</pre>
+    </div>
+    <div class="card">
+      <h4>Error: Insufficient disk space</h4>
+      <pre>
+# Check space before conversion
+qemu-img info --output=json source.vmdk | \
+  jq '.["virtual-size"]'
+# 107374182400 (100 GB virtual)
+
+# Actual size on disk (thin provisioned)
+qemu-img info source.vmdk | grep "disk size"
+# disk size: 42 GB
+
+# With compression, output typically 30-50% of actual
+# Need: ~42 GB free (or ~25 GB with --compress)
+
+# Use different output directory if needed
+h2kvmctl convert --source vm.vmdk \
+  --output /data/large-disk/images/
+
+# Or convert to compressed QCOW2
+h2kvmctl convert --source vm.vmdk \
+  --compress  # Saves 40-60% space</pre>
+    </div>
+    <div class="card">
+      <h4>Error: OVA extraction failed</h4>
+      <ul>
+        <li><strong>Symptom:</strong> tar extraction fails or produces 0-byte files</li>
+        <li><strong>Cause:</strong> OVA was downloaded incompletely or corrupted</li>
+        <li><strong>Verify:</strong> <code>tar tf export.ova</code> should list .ovf + .vmdk</li>
+        <li><strong>Check size:</strong> Compare file size to expected (from vSphere)</li>
+        <li><strong>SHA256:</strong> Verify checksum if available from export</li>
+        <li><strong>Re-export:</strong> If corrupt, export again from VMware</li>
+        <li><strong>govc:</strong> <code>govc export.ovf -vm /DC/vm/name</code> (more reliable)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Error: VMDK descriptor invalid</h4>
+      <ul>
+        <li><strong>Symptom:</strong> "Could not open: unsupported VMDK format"</li>
+        <li><strong>Cause 1:</strong> VMDK is sesparse (vSphere snapshot format)</li>
+        <li><strong>Fix 1:</strong> Consolidate snapshots in VMware before export</li>
+        <li><strong>Cause 2:</strong> Split VMDK (2 GB extents)</li>
+        <li><strong>Fix 2:</strong> Use the descriptor file (-flat.vmdk referenced)</li>
+        <li><strong>Cause 3:</strong> VMDK from ESXi datastore (monolithic flat)</li>
+        <li><strong>Fix 3:</strong> Copy both descriptor + flat file together</li>
+        <li><strong>Verify:</strong> <code>head -5 vm.vmdk</code> should show descriptor</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Network &amp; Performance <span>Issues</span></h2>
+  <p class="sub">Post-migration network and performance troubleshooting.</p>
+
+  <h3>Network Issues After Migration</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>No Network Connectivity</h4>
+      <pre>
+# Check 1: Is the NIC visible in guest?
+ip link show
+# If only 'lo' visible: VirtIO driver missing
+
+# Check 2: Wrong interface name
+# VMware: ens192 or eth0
+# KVM: eth0, ens3, or enp1s0
+# Fix: rename or update network config
+
+# Check 3: Bridge not configured
+virsh domiflist vm-name
+# If bridge is wrong or missing:
+virsh attach-interface vm-name bridge br0 \
+  --model virtio
+
+# Check 4: IP address not assigned
+# DHCP: should auto-assign (same MAC)
+# Static: update config in guest
+# NetworkManager: nmcli con up "Wired 1"</pre>
+    </div>
+    <div class="card">
+      <h4>Slow Network Performance</h4>
+      <pre>
+# Check: using virtio NIC (not e1000)
+virsh dumpxml vm-name | grep "model type"
+# Should be: &lt;model type='virtio'/&gt;
+# Not: &lt;model type='e1000'/&gt; (10x slower)
+
+# Check: vhost-net enabled
+lsmod | grep vhost_net
+# If not: modprobe vhost_net
+
+# Check: MTU mismatch
+ip link show br0   # host bridge MTU
+# Inside guest:
+ip link show eth0   # guest MTU
+# Must match! Fix: ip link set eth0 mtu 1500
+
+# Benchmark
+iperf3 -c 10.0.1.1 -t 30
+# Expected: >8 Gbps on 10GbE with virtio</pre>
+    </div>
+  </div>
+
+  <h3>Performance Troubleshooting</h3>
+  <table>
+    <tr><th style="width:20%">Issue</th><th style="width:20%">Symptom</th><th style="width:25%">Diagnosis</th><th style="width:35%">Fix</th></tr>
+    <tr><td>CPU contention</td><td>High steal time in guest</td><td><code>top</code> → %st column > 5%</td><td>Pin vCPUs: <code>virsh vcpupin vm 0 2</code>; avoid overcommit</td></tr>
+    <tr><td>Memory balloon</td><td>Guest sees less RAM than configured</td><td><code>virsh dommemstat vm</code></td><td>Disable balloon: <code>&lt;memballoon model='none'/&gt;</code></td></tr>
+    <tr><td>Disk I/O slow</td><td>High iowait, slow writes</td><td><code>iostat -x 1</code> in guest</td><td>Use cache=none + io=native; check disk bus=virtio</td></tr>
+    <tr><td>NUMA mismatch</td><td>40-70ns memory latency</td><td><code>numastat -p $(pgrep qemu)</code></td><td>Pin vCPUs + memory to same NUMA node</td></tr>
+    <tr><td>No hugepages</td><td>TLB misses, higher latency</td><td><code>grep HugePages /proc/meminfo</code></td><td>Enable hugepages in domain XML</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page page-light">
+  <h2 class="st">Log Analysis &amp; <span>Escalation</span></h2>
+  <p class="sub">Where to find logs and how to interpret h2kvmctl output.</p>
+
+  <h3>Log Locations</h3>
+  <table>
+    <tr><th style="width:20%">Component</th><th style="width:35%">Log File</th><th style="width:45%">What It Contains</th></tr>
+    <tr><td>h2kvmctl</td><td><code>/var/log/hyper2kvm/migration.log</code></td><td>Conversion steps, errors, timing, file operations</td></tr>
+    <tr><td>h2kvmctl (verbose)</td><td><code>h2kvmctl convert --verbose 2>&1 | tee debug.log</code></td><td>Full debug output including qemu-img commands</td></tr>
+    <tr><td>libvirtd</td><td><code>/var/log/libvirt/qemu/vm-name.log</code></td><td>QEMU startup, device errors, shutdown</td></tr>
+    <tr><td>QEMU monitor</td><td><code>virsh qemu-monitor-command vm --hmp info status</code></td><td>Real-time VM state, device info</td></tr>
+    <tr><td>Guest console</td><td><code>virsh console vm-name</code></td><td>Boot messages, kernel output, login prompt</td></tr>
+    <tr><td>Guest serial</td><td>Add <code>console=ttyS0</code> to kernel cmdline</td><td>Serial console for headless debugging</td></tr>
+    <tr><td>systemd journal</td><td><code>journalctl -u libvirtd -f</code></td><td>libvirt service messages</td></tr>
+    <tr><td>Audit</td><td><code>ausearch -m VIRT_CONTROL -ts recent</code></td><td>VM start/stop/migrate audit events</td></tr>
+  </table>
+
+  <h3>Troubleshooting Decision Tree</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>VM Won't Start</h4>
+      <ul>
+        <li>1. Check <code>virsh start vm 2>&1</code> error message</li>
+        <li>2. Common: "Cannot access storage file" → check permissions</li>
+        <li>3. Common: "unsupported configuration" → check XML syntax</li>
+        <li>4. UEFI: verify OVMF firmware path exists</li>
+        <li>5. SELinux: <code>sealert -a /var/log/audit/audit.log</code></li>
+        <li>6. AppArmor (Ubuntu): <code>aa-complain /etc/apparmor.d/*libvirt*</code></li>
+        <li>7. Resource: <code>virsh freecell</code> — enough memory?</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>VM Starts But Won't Boot</h4>
+      <ul>
+        <li>1. Open console: <code>virt-viewer vm-name</code></li>
+        <li>2. Black screen → firmware mismatch (BIOS vs UEFI)</li>
+        <li>3. GRUB prompt → disk layout changed, rebuild GRUB</li>
+        <li>4. Kernel panic → initramfs missing virtio (--fix-initramfs)</li>
+        <li>5. BSOD → Windows missing VirtIO drivers</li>
+        <li>6. Drops to dracut shell → fstab issue (--fix-fstab)</li>
+        <li>7. Still stuck? Boot rescue ISO: <code>--cdrom /path/rescue.iso</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>95% of Issues Solved by: --fix-initramfs --fix-fstab --virtio-drivers</h3>
+    <p>Run <code>h2kvmctl doctor</code> before migration. Use <code>--fix-initramfs --fix-fstab --fix-network</code> for Linux VMs and <code>--virtio-drivers</code> for Windows VMs. These four flags prevent the top 5 failure modes. For everything else, check the decision tree above and the log files. Most issues are diagnosed within 5 minutes.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Troubleshooting &amp; Diagnostics Guide</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VMware &amp; Hyper-V to KVM Migration — hypersdk + hyper2kvm</title>
+<style>
+  @page { size: landscape; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    color: #1a1a1a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .slide {
+    width: 100vw; height: 100vh;
+    padding: 48px 65px;
+    page-break-after: always;
+    position: relative;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .slide:last-child { page-break-after: auto; }
+
+  /* ── Title slide ── */
+  .slide.title-slide {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b2838 50%, #1b3a4b 100%);
+    color: white; justify-content: center; align-items: center; text-align: center;
+  }
+  .slide.title-slide h1 { font-size: 48pt; color: #ff6600; border: none; margin-bottom: 6px; letter-spacing: 1px; }
+  .slide.title-slide .subtitle { font-size: 22pt; color: #ffb74d; font-weight: 300; margin-bottom: 6px; }
+  .slide.title-slide .tagline { font-size: 14pt; color: #90a4ae; margin-bottom: 35px; }
+  .slide.title-slide .tool-pills { margin-bottom: 30px; }
+  .slide.title-slide .pill { display: inline-block; padding: 8px 22px; border-radius: 20px; font-size: 13pt; font-weight: 600; margin: 0 8px; }
+  .slide.title-slide .pill.go { background: #00ADD8; color: white; }
+  .slide.title-slide .pill.py { background: #3776AB; color: white; }
+  .slide.title-slide .author { font-size: 13pt; color: #b0bec5; margin-top: 10px; }
+  .slide.title-slide .meta { font-size: 10pt; color: #78909c; margin-top: 6px; }
+
+  /* ── Section slide ── */
+  .slide.section-slide {
+    justify-content: center; align-items: center; text-align: center;
+  }
+  .slide.section-slide.orange { background: linear-gradient(135deg, #e65100, #ff6600); color: white; }
+  .slide.section-slide.blue { background: linear-gradient(135deg, #0d47a1, #1565c0); color: white; }
+  .slide.section-slide.dark { background: linear-gradient(135deg, #0d1b2a, #1b3a4b); color: white; }
+  .slide.section-slide h2 { font-size: 38pt; color: white; border: none; }
+  .slide.section-slide p { font-size: 16pt; color: rgba(255,255,255,0.85); margin-top: 12px; }
+
+  /* ── End slide ── */
+  .slide.end-slide {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b2838 50%, #1b3a4b 100%);
+    color: white; justify-content: center; align-items: center; text-align: center;
+  }
+  .slide.end-slide h2 { font-size: 32pt; color: #ff6600; border: none; margin-bottom: 12px; }
+  .slide.end-slide .tagline { font-size: 18pt; color: #ffb74d; font-style: italic; margin-bottom: 35px; }
+  .slide.end-slide .links { font-size: 12pt; color: #90a4ae; line-height: 2.2; }
+  .slide.end-slide .links strong { color: #ff8a65; }
+  .slide.end-slide table { width: 60%; margin: 0 auto 30px; font-size: 13pt; }
+  .slide.end-slide td { border-bottom: 1px solid #263238; color: #ccc; padding: 8px 12px; }
+  .slide.end-slide td strong { color: #ff8a65; }
+
+  /* ── Content ── */
+  h2 { font-size: 24pt; color: #e65100; border-bottom: 3px solid #ff8a65; padding-bottom: 8px; margin-bottom: 22px; flex-shrink: 0; }
+  h3 { font-size: 15pt; color: #bf360c; margin-top: 14px; margin-bottom: 6px; }
+  .content { flex: 1; display: flex; flex-direction: column; }
+  ul { font-size: 13pt; line-height: 1.75; padding-left: 26px; }
+  li { margin-bottom: 3px; }
+  li strong { color: #d84315; }
+  p { font-size: 13pt; line-height: 1.55; margin-bottom: 8px; }
+  ol { font-size: 13pt; line-height: 1.75; padding-left: 26px; }
+
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 11.5pt; }
+  th { background-color: #e65100; color: white; padding: 9px 14px; text-align: left; font-weight: 600; }
+  td { padding: 8px 14px; border-bottom: 1px solid #e0e0e0; }
+  tr:nth-child(even) { background-color: #fff3e0; }
+  table.blue th { background-color: #1565c0; }
+  table.blue tr:nth-child(even) { background-color: #e3f2fd; }
+
+  pre { background: #1e1e2e; color: #cdd6f4; padding: 14px 20px; border-radius: 8px;
+        font-size: 10.5pt; line-height: 1.45; border-left: 4px solid #ff6600; margin: 8px 0; overflow: hidden; }
+  code { font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; }
+
+  .two-col { display: flex; gap: 35px; flex: 1; }
+  .two-col .col { flex: 1; }
+  .three-col { display: flex; gap: 22px; flex: 1; }
+  .three-col .col { flex: 1; }
+
+  .highlight-box { background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-left: 5px solid #ff6600;
+                   padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 13pt; }
+  .highlight-box.blue { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-left-color: #1565c0; }
+  .highlight-box.red { background: linear-gradient(135deg, #fce4ec, #f8bbd0); border-left-color: #c62828; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 10pt; font-weight: 600; margin: 2px; color: white; }
+  .badge.orange { background: #e65100; }
+  .badge.green { background: #2e7d32; }
+  .badge.blue { background: #1565c0; }
+  .badge.red { background: #c62828; }
+  .badge.gray { background: #546e7a; }
+
+  .stat-grid { display: grid; gap: 16px; margin: 10px 0; }
+  .stat-grid.four { grid-template-columns: repeat(4, 1fr); }
+  .stat-grid.three { grid-template-columns: repeat(3, 1fr); }
+  .stat-card { border-radius: 10px; padding: 16px; text-align: center; border-top: 4px solid #ff6600; background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
+  .stat-card.blue-card { border-top-color: #1565c0; background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
+  .stat-card .number { font-size: 24pt; font-weight: 700; color: #e65100; display: block; }
+  .stat-card.blue-card .number { color: #1565c0; }
+  .stat-card .label { font-size: 9pt; color: #5d4037; margin-top: 3px; display: block; }
+
+  .pipeline { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 14px 0; }
+  .pipeline-step { padding: 14px 16px; border-radius: 10px; text-align: center; font-size: 10pt; font-weight: 600; min-width: 120px; color: white; }
+  .pipeline-step.blue { background: linear-gradient(135deg, #1565c0, #1976d2); }
+  .pipeline-step.orange { background: linear-gradient(135deg, #e65100, #ff6600); }
+  .pipeline-step.green { background: linear-gradient(135deg, #2e7d32, #43a047); }
+  .pipeline-step .step-num { font-size: 8pt; opacity: 0.8; display: block; margin-bottom: 3px; }
+  .pipeline-arrow { font-size: 20pt; color: #78909c; font-weight: bold; }
+  .source-box { background: #546e7a; color: white; padding: 14px 16px; border-radius: 10px; text-align: center; font-size: 10pt; min-width: 100px; }
+  .target-box { background: #2e7d32; color: white; padding: 14px 16px; border-radius: 10px; text-align: center; font-size: 10pt; min-width: 100px; }
+
+  .slide-number { position: absolute; bottom: 18px; right: 36px; font-size: 9pt; color: #bdbdbd; }
+  .logo-footer { position: absolute; bottom: 18px; left: 36px; font-size: 9pt; color: #bdbdbd; }
+
+  .icon-row { display: flex; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
+  .icon-card { flex: 1; min-width: 100px; background: #f5f5f5; border-radius: 8px; padding: 12px; text-align: center; font-size: 10pt; border-top: 3px solid #ff6600; }
+  .icon-card.blue-top { border-top-color: #1565c0; }
+
+  .vs-container { display: flex; align-items: stretch; gap: 0; margin: 10px 0; }
+  .vs-panel { flex: 1; padding: 18px 22px; }
+  .vs-panel.left { background: #eceff1; border-radius: 10px 0 0 10px; }
+  .vs-panel.right { background: #e8f5e9; border-radius: 0 10px 10px 0; }
+  .vs-divider { width: 50px; background: #37474f; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14pt; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════ SLIDE 1: Title ════════════════════════════════════════════ -->
+<div class="slide title-slide">
+  <h1>VMware &amp; Hyper-V to KVM</h1>
+  <div class="subtitle">End-to-End Automated Migration Pipeline</div>
+  <div class="tagline">From Traditional Manual Steps to a Fully Automated Two-Tool Solution</div>
+  <div class="tool-pills">
+    <span class="pill go">hypersdk &mdash; Go</span>
+    <span class="pill py">hyper2kvm &mdash; Python</span>
+  </div>
+  <div class="author">ZyvorAI Labs Private Limited</div>
+  <div class="meta">Proprietary (Zyvor AI Labs) &nbsp;|&nbsp; Production Ready</div>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 2: Traditional Steps ════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Key Steps: Traditional VMware / Hyper-V &rarr; KVM Migration</h2>
+  <div class="content">
+    <div class="two-col">
+      <div class="col">
+        <h3 style="color: #1565c0; margin-top: 0;">VMware (vSphere / ESXi)</h3>
+        <ol style="font-size: 11pt; line-height: 1.8;">
+          <li><strong>Export VM</strong> &mdash; OVF/OVA via ovftool or vSphere client</li>
+          <li><strong>Extract VMDK</strong> &mdash; untar OVA, locate disk files</li>
+          <li><strong>Convert</strong> &mdash; <code>qemu-img convert -f vmdk -O qcow2</code></li>
+          <li><strong>Transfer</strong> &mdash; SCP to KVM host</li>
+          <li><strong>Create VM</strong> &mdash; virt-manager / virt-install</li>
+          <li><strong>Fix drivers, GRUB, fstab</strong> &mdash; manual debugging</li>
+          <li><strong>Remove VMware Tools</strong> &mdash; uninstall open-vm-tools</li>
+        </ol>
+        <h3 style="color: #6a1b9a; margin-top: 10px;">Hyper-V</h3>
+        <ol style="font-size: 11pt; line-height: 1.8;">
+          <li><strong>Shut down VM</strong> &mdash; ensure data consistency</li>
+          <li><strong>Convert</strong> &mdash; <code>qemu-img convert -f vhdx -O qcow2</code></li>
+          <li><strong>Transfer</strong> &mdash; SCP / WinSCP to KVM host</li>
+          <li><strong>Create VM</strong> &mdash; map UEFI/Gen2 to OVMF</li>
+          <li><strong>Fix drivers</strong> &mdash; install VirtIO, fix network</li>
+          <li><strong>Remove Hyper-V services</strong> &mdash; integration components</li>
+        </ol>
+      </div>
+      <div class="col">
+        <h3>Common Challenges (Both Platforms)</h3>
+        <ul style="margin-top: 8px; font-size: 12pt;">
+          <li><span class="badge red">BSOD</span> Missing VirtIO drivers &rarr; boot failure</li>
+          <li><span class="badge red">Network</span> VMXNet3 / Hyper-V vSwitch adapters gone</li>
+          <li><span class="badge red">UEFI</span> Gen2 / EFI VMs need OVMF in KVM</li>
+          <li><span class="badge red">fstab</span> Stale <code>/dev/sdX</code> names break mount</li>
+          <li><span class="badge red">GRUB</span> Wrong disk controller in bootloader</li>
+          <li><span class="badge red">VMware Tools</span> Conflicts with KVM guest agent</li>
+          <li><span class="badge red">Snapshots</span> VMDK chains must be flattened first</li>
+        </ul>
+        <div class="highlight-box red" style="margin-top: 12px; font-size: 12pt;">
+          <strong>Each step is manual, error-prone, and must be repeated per VM.</strong><br>
+          Traditional tools (virt-v2v, qemu-img, StarWind) only convert &mdash; they don't fix.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="slide-number">2</div>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 3: Section — Our Solution ════════════════════════════════════════════ -->
+<div class="slide section-slide dark">
+  <h2>Our Solution: Two Tools, One Pipeline</h2>
+  <p><strong>hypersdk</strong> (Go) exports &amp; discovers &nbsp;&nbsp;&bull;&nbsp;&nbsp; <strong>hyper2kvm</strong> (Python) fixes &amp; converts</p>
+  <p style="font-size: 13pt; margin-top: 20px; color: rgba(255,255,255,0.6);">Clean separation of concerns via a JSON manifest contract</p>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 4: Architecture Overview ════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Architecture: How They Work Together</h2>
+  <div class="content" style="justify-content: center;">
+    <div class="pipeline" style="margin-bottom: 20px;">
+      <div class="source-box">
+        <strong>Source</strong><br>
+        Hyper-V<br>VMware<br>AWS/Azure<br>GCP/OCI
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step blue" style="min-width: 130px;">
+        <span class="step-num">hypersdk</span>
+        Discover<br>&amp; Export
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div style="background: #37474f; color: #ffb74d; padding: 14px 12px; border-radius: 8px; text-align: center; font-size: 10pt; font-weight: 600; border: 2px dashed #ff6600;">
+        JSON<br>Manifest<br><span style="font-size: 8pt; color: #90a4ae;">v1.0</span>
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step orange" style="min-width: 130px;">
+        <span class="step-num">hyper2kvm</span>
+        Inspect<br>&amp; Fix
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step orange">
+        <span class="step-num">hyper2kvm</span>
+        Convert<br>&amp; Validate
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="target-box">
+        <strong>Target</strong><br>
+        KVM<br>libvirt<br>KubeVirt<br>OpenShift
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 10px;">
+      <div class="col">
+        <div class="highlight-box blue" style="font-size: 11pt; padding: 12px 16px;">
+          <strong style="color: #1565c0;">hypersdk</strong> (Go daemon) handles the <em>messy outside world</em>:<br>
+          &bull; Multi-cloud provider abstraction (10 providers)<br>
+          &bull; VM discovery, export, transfer<br>
+          &bull; Job scheduling &amp; REST API (67+ endpoints)<br>
+          &bull; Authentication, RBAC, audit logging<br>
+          &bull; Produces artifacts + manifest
+        </div>
+      </div>
+      <div class="col">
+        <div class="highlight-box" style="font-size: 11pt; padding: 12px 16px;">
+          <strong style="color: #e65100;">hyper2kvm</strong> (Python) handles <em>deterministic operations</em>:<br>
+          &bull; Consumes manifest, never talks to providers<br>
+          &bull; Deep OS inspection via VMCraft engine<br>
+          &bull; Bootloader, fstab, initramfs, driver fixes<br>
+          &bull; Windows VirtIO injection + registry mods<br>
+          &bull; Validation &amp; smoke testing
+        </div>
+      </div>
+    </div>
+    <div style="text-align: center; margin-top: 10px; font-size: 11pt; color: #78909c;">
+      <strong>Contract principle:</strong> Same manifest &rarr; same outcome. Provider-agnostic. Deterministic. Resumable.
+    </div>
+  </div>
+  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="slide-number">4</div>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 5: hypersdk Deep Dive ════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>hypersdk &mdash; Multi-Cloud Export &amp; Discovery</h2>
+  <div class="content">
+    <div class="two-col">
+      <div class="col">
+        <h3>Supported Providers (10)</h3>
+        <table class="blue" style="font-size: 10.5pt;">
+          <tr><th>Provider</th><th>Status</th></tr>
+          <tr><td>vSphere (VMware)</td><td><span class="badge green">Production</span></td></tr>
+          <tr><td>AWS (EC2)</td><td><span class="badge green">Production</span></td></tr>
+          <tr><td>Azure</td><td><span class="badge green">Production</span></td></tr>
+          <tr><td>GCP</td><td><span class="badge green">Production</span></td></tr>
+          <tr><td>Hyper-V</td><td><span class="badge green">Production</span></td></tr>
+          <tr><td>OCI (Oracle)</td><td><span class="badge green">Production</span></td></tr>
+          <tr><td>OpenStack</td><td><span class="badge green">Production</span></td></tr>
+          <tr><td>Alibaba Cloud</td><td><span class="badge green">Production</span></td></tr>
+          <tr><td>Proxmox VE</td><td><span class="badge green">Production</span></td></tr>
+          <tr><td>KubeVirt</td><td><span class="badge green">Production</span></td></tr>
+        </table>
+      </div>
+      <div class="col">
+        <h3>Components</h3>
+        <div class="icon-row" style="margin-top: 6px;">
+          <div class="icon-card blue-top"><strong>hyperexport</strong><br><span style="font-size:9pt">Interactive export</span></div>
+          <div class="icon-card blue-top"><strong>hypervisord</strong><br><span style="font-size:9pt">REST API daemon</span></div>
+          <div class="icon-card blue-top"><strong>hyperctl</strong><br><span style="font-size:9pt">CLI commander</span></div>
+          <div class="icon-card blue-top"><strong>hyperconvert</strong><br><span style="font-size:9pt">Format converter</span></div>
+        </div>
+        <h3 style="margin-top: 10px;">Key Capabilities</h3>
+        <ul style="font-size: 11pt;">
+          <li><strong>67+ REST endpoints</strong> with WebSocket updates</li>
+          <li><strong>Hexagonal architecture</strong> &mdash; clean domain/ports/adapters</li>
+          <li><strong>Job scheduling</strong> &mdash; cron, dependencies, retry policies</li>
+          <li><strong>Carbon-aware scheduling</strong> &mdash; grid intensity optimization</li>
+          <li><strong>Multi-format export</strong> &mdash; OVF, OVA, VMDK, QCOW2, VHD</li>
+          <li><strong>Incremental export</strong> via Changed Block Tracking (CBT)</li>
+          <li><strong>Security</strong> &mdash; RBAC, API keys, audit logging, Vault</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="slide-number">5</div>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 6: hyper2kvm Deep Dive ════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>hyper2kvm &mdash; Fix, Convert &amp; Validate Engine</h2>
+  <div class="content">
+    <div class="two-col">
+      <div class="col">
+        <div class="stat-grid four" style="margin-bottom: 12px;">
+          <div class="stat-card"><span class="number">480+</span><span class="label">VMCraft APIs</span></div>
+          <div class="stat-card"><span class="number">35+</span><span class="label">OS Versions</span></div>
+          <div class="stat-card"><span class="number">5-7x</span><span class="label">Faster</span></div>
+          <div class="stat-card"><span class="number">380+</span><span class="label">Tests</span></div>
+        </div>
+        <h3>Automated Offline Fixes</h3>
+        <ul style="font-size: 11pt;">
+          <li><strong>Bootloader</strong> &mdash; GRUB/GRUB2 repair for VirtIO</li>
+          <li><strong>fstab</strong> &mdash; UUID/PARTUUID stabilization</li>
+          <li><strong>initramfs</strong> &mdash; VirtIO driver injection</li>
+          <li><strong>Network</strong> &mdash; interface adaptation</li>
+          <li><strong>LVM</strong> &mdash; sandboxed activation (0.71s, 7x faster)</li>
+        </ul>
+        <h3 style="margin-top: 10px;">Windows Migration</h3>
+        <ul style="font-size: 11pt;">
+          <li><strong>VirtIO injection</strong> &mdash; storage, network, balloon</li>
+          <li><strong>Registry</strong> &mdash; boot-critical driver registration</li>
+          <li><strong>License</strong> &mdash; OEM/Retail/MAK/KMS preservation</li>
+          <li><strong>Active Directory</strong> &mdash; domain rejoin support</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3>VMCraft Engine Performance</h3>
+        <table style="font-size: 10.5pt; margin-bottom: 10px;">
+          <tr><th>Metric</th><th>libguestfs</th><th>VMCraft</th></tr>
+          <tr><td>Launch Time</td><td>9.7s</td><td><strong>1.9s</strong></td></tr>
+          <tr><td>Memory</td><td>280 MB</td><td><strong>95 MB</strong></td></tr>
+          <tr><td>System Calls</td><td>14,200</td><td><strong>8,500</strong></td></tr>
+        </table>
+        <h3>Code Example</h3>
+        <pre><code>from hyper2kvm.core.vmcraft import VMCraft
+
+with VMCraft() as g:
+    g.add_disk("/vms/server.qcow2")
+    g.launch()  # ~1.9 seconds
+
+    os_info = g.inspect_os()
+    print(f"OS: {os_info.product_name}")
+
+    # Fix fstab, inject drivers, etc.
+    g.write("/etc/motd", "Migrated!\n")</code></pre>
+        <h3 style="margin-top: 8px;">Deployment Targets</h3>
+        <div>
+          <span class="badge green">KVM</span>
+          <span class="badge green">libvirt</span>
+          <span class="badge green">KubeVirt</span>
+          <span class="badge green">OpenShift</span>
+          <span class="badge green">k3s</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="slide-number">6</div>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 7: Integration Contract ════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>The Manifest Contract: How They Communicate</h2>
+  <div class="content">
+    <div class="two-col">
+      <div class="col">
+        <p style="margin-bottom: 10px;">Communication is <strong>file-based</strong> via a versioned <strong>JSON manifest</strong>. hypersdk produces it, hyper2kvm consumes it.</p>
+        <h3>Design Principles</h3>
+        <ul style="font-size: 12pt;">
+          <li><strong>Provider-agnostic</strong> &mdash; hyper2kvm never talks to providers</li>
+          <li><strong>Minimal requirements</strong> &mdash; only <code>disks[]</code> + firmware hint</li>
+          <li><strong>Deterministic</strong> &mdash; same manifest &rarr; same outcome</li>
+          <li><strong>Resumable</strong> &mdash; checksums enable idempotent ops</li>
+          <li><strong>Backward compatible</strong> &mdash; within major version</li>
+        </ul>
+        <h3 style="margin-top: 12px;">Manifest Workflow</h3>
+        <pre><code>manifest-workflow/
+  to_be_processed/  # Drop manifests here
+  processing/       # Currently running
+  processed/        # Completed
+  failed/           # Errors</code></pre>
+      </div>
+      <div class="col">
+        <h3>Manifest v1.0 (Simplified)</h3>
+        <pre><code>{
+  "manifest_version": "1.0",
+  "source": {
+    "provider": "hyperv",
+    "vm_name": "web-server-01",
+    "export_timestamp": "2026-03-10T..."
+  },
+  "vm": {
+    "cpu": 4, "memory_mb": 8192,
+    "firmware": "uefi"
+  },
+  "disks": [{
+    "path": "/exports/web-01.vhdx",
+    "format": "vhdx",
+    "size_bytes": 42949672960,
+    "controller": "scsi",
+    "checksum": "sha256:abc123..."
+  }],
+  "network": [{
+    "mac": "00:15:5d:01:02:03",
+    "type": "external"
+  }]
+}</code></pre>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="slide-number">7</div>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 8: Hyper-V Specific Flow ════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Hyper-V Migration: Step by Step</h2>
+  <div class="content">
+    <div class="three-col">
+      <div class="col">
+        <h3 style="color: #1565c0;">Phase 1: Export (hypersdk)</h3>
+        <pre style="border-left-color: #1565c0;"><code># Start daemon
+hypervisord --config config.yaml
+
+# Export Hyper-V VM
+hyperctl export \
+  --provider hyperv \
+  --vm "web-server-01" \
+  --output /exports/
+
+# Or schedule recurring
+hyperctl schedules create \
+  nightly-export \
+  "0 2 * * *" \
+  --vm web-server-01</code></pre>
+        <div class="highlight-box blue" style="font-size: 10pt; padding: 10px;">
+          <strong>Produces:</strong> VHDX files + JSON manifest with VM metadata, firmware type, network config
+        </div>
+      </div>
+      <div class="col">
+        <h3 style="color: #e65100;">Phase 2: Fix &amp; Convert (hyper2kvm)</h3>
+        <pre><code># YAML config
+cmd: local
+vmdk: /exports/web-01.vhdx
+output_dir: /kvm
+to_output: web-01.qcow2
+out_format: qcow2
+fstab_mode: stabilize-all
+regen_initramfs: true
+no_grub: false
+
+# For Windows VMs
+virtio_iso: /path/to/virtio.iso
+
+# Run
+sudo h2kvmctl \
+  --config migration.yaml</code></pre>
+        <div class="highlight-box" style="font-size: 10pt; padding: 10px;">
+          <strong>Automated:</strong> Disk convert + OS inspect + bootloader fix + driver inject + fstab stabilize
+        </div>
+      </div>
+      <div class="col">
+        <h3 style="color: #2e7d32;">Phase 3: Deploy</h3>
+        <pre style="border-left-color: #2e7d32;"><code># Option A: libvirt
+sudo virsh define web-01.xml
+sudo virsh start web-01
+
+# Option B: Direct to K8s
+sudo h2kvmctl \
+  --config migration.yaml \
+  --deploy-k8s \
+  --k8s-namespace prod \
+  --k8s-vm-name web-01 \
+  --k8s-auto-start
+
+# Verify
+sudo virsh domifaddr web-01
+nc -zv &lt;IP&gt; 22</code></pre>
+        <div class="highlight-box" style="font-size: 10pt; padding: 10px; background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border-left-color: #2e7d32;">
+          <strong>Result:</strong> VM boots first time, every time. Network, drivers, storage all working.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="slide-number">8</div>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 9: VMware Migration Step by Step ════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>VMware Migration: Step by Step</h2>
+  <div class="content">
+    <div class="three-col">
+      <div class="col">
+        <h3 style="color: #1565c0;">Phase 1: Export (hypersdk)</h3>
+        <pre style="border-left-color: #1565c0;"><code># Configure vSphere credentials
+export GOVC_URL='https://vcenter/sdk'
+export GOVC_USERNAME='admin@vsphere'
+export GOVC_PASSWORD='password'
+
+# Start daemon
+hypervisord --config config.yaml
+
+# Export from vSphere
+hyperctl export \
+  --provider vsphere \
+  --vm /dc1/vm/web-server \
+  --format ova \
+  --output /exports/
+
+# Batch export entire folder
+hyperctl export \
+  --provider vsphere \
+  --folder /dc1/vm/prod/ \
+  --concurrent 4</code></pre>
+        <div class="highlight-box blue" style="font-size: 10pt; padding: 10px;">
+          <strong>Produces:</strong> VMDK/OVA files + JSON manifest. Supports CBT incremental export, snapshot management, resumable downloads.
+        </div>
+      </div>
+      <div class="col">
+        <h3 style="color: #e65100;">Phase 2: Fix &amp; Convert (hyper2kvm)</h3>
+        <pre><code># YAML config
+cmd: local
+vmdk: /exports/web-server.vmdk
+output_dir: /kvm
+to_output: web-server.qcow2
+out_format: qcow2
+flatten: true
+fstab_mode: stabilize-all
+regen_initramfs: true
+no_grub: false
+compress: true
+checksum: true
+
+# Run
+sudo h2kvmctl \
+  --config migration.yaml</code></pre>
+        <div class="highlight-box" style="font-size: 10pt; padding: 10px;">
+          <strong>Handles:</strong> VMDK flatten (snapshot chains) + VMware Tools cleanup + VirtIO inject + GRUB repair + fstab stabilize
+        </div>
+      </div>
+      <div class="col">
+        <h3 style="color: #2e7d32;">Phase 3: Deploy</h3>
+        <pre style="border-left-color: #2e7d32;"><code># Option A: libvirt
+sudo virsh define web-server.xml
+sudo virsh start web-server
+
+# Option B: Direct to K8s
+sudo h2kvmctl \
+  --config migration.yaml \
+  --deploy-k8s \
+  --k8s-namespace prod \
+  --k8s-vm-name web-srv \
+  --k8s-auto-start
+
+# Option C: vSphere Python API
+from hyper2kvm.vmware import \
+    VMwareClient, ExportOptions
+client = VMwareClient(
+    vcenter_host='vcenter',
+    username='admin@vsphere',
+    password='pass'
+)
+await client.async_export_vm(
+    vm_name='web-server',
+    output_dir='/exports',
+    export_mode='export'
+)</code></pre>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="slide-number">10</div>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 10: Before vs After ════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Before vs After: Traditional vs Our Pipeline</h2>
+  <div class="content">
+    <div class="vs-container">
+      <div class="vs-panel left">
+        <h3 style="color: #c62828; margin-bottom: 10px;">Traditional (Manual)</h3>
+        <ol style="font-size: 11.5pt; line-height: 2;">
+          <li>Shut down VM manually</li>
+          <li>Run <code>qemu-img convert</code></li>
+          <li>SCP file to KVM host</li>
+          <li>Create VM with virt-manager</li>
+          <li>Boot &mdash; <span class="badge red">BSOD / panic</span></li>
+          <li>Debug: install VirtIO drivers</li>
+          <li>Boot &mdash; <span class="badge red">fstab error</span></li>
+          <li>Debug: fix fstab entries</li>
+          <li>Boot &mdash; <span class="badge red">GRUB error</span></li>
+          <li>Debug: rebuild initramfs</li>
+          <li>Boot &mdash; <span class="badge red">no network</span></li>
+          <li>Debug: reconfigure network</li>
+          <li>Finally works <em>(hours later)</em></li>
+        </ol>
+        <div style="text-align: center; margin-top: 8px; font-size: 12pt; color: #c62828; font-weight: 600;">
+          ~2-4 hours per VM &nbsp;&bull;&nbsp; Error-prone &nbsp;&bull;&nbsp; No batch
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-panel right">
+        <h3 style="color: #2e7d32; margin-bottom: 10px;">hypersdk + hyper2kvm (Automated)</h3>
+        <ol style="font-size: 11.5pt; line-height: 2;">
+          <li><code>hyperctl export --provider vsphere --vm web-01</code></li>
+          <li><code>h2kvmctl --config migration.yaml</code></li>
+          <li>VM boots successfully <span class="badge green">first time</span></li>
+        </ol>
+        <div style="margin-top: 20px;">
+          <h3 style="color: #2e7d32;">What happens automatically:</h3>
+          <ul style="font-size: 11pt; margin-top: 6px;">
+            <li><span class="badge green">Export</span> VM discovery + disk download + manifest</li>
+            <li><span class="badge green">Convert</span> VMDK/VHDX &rarr; QCOW2 with compression</li>
+            <li><span class="badge green">Inspect</span> OS detection, firmware, partition layout</li>
+            <li><span class="badge green">Fix</span> Bootloader, fstab, initramfs, drivers, network</li>
+            <li><span class="badge green">Validate</span> QEMU smoke test &rarr; boot confirmed</li>
+            <li><span class="badge green">Deploy</span> libvirt or Kubernetes (optional)</li>
+          </ul>
+        </div>
+        <div style="text-align: center; margin-top: 12px; font-size: 12pt; color: #2e7d32; font-weight: 600;">
+          ~5-15 minutes per VM &nbsp;&bull;&nbsp; Deterministic &nbsp;&bull;&nbsp; Batch ready
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="slide-number">9</div>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 11: Windows Specific ════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Windows VM Migration: Solving the Hard Problem</h2>
+  <div class="content">
+    <p>Windows VMs are the <strong>hardest to migrate</strong> &mdash; missing VirtIO drivers = immediate BSOD. hyper2kvm automates everything.</p>
+    <div class="two-col" style="margin-top: 10px;">
+      <div class="col">
+        <h3>What hyper2kvm Does Automatically</h3>
+        <table style="font-size: 10.5pt;">
+          <tr><th>Fix</th><th>Details</th></tr>
+          <tr><td><strong>VirtIO Drivers</strong></td><td>Injects viostor, netkvm, vioscsi, balloon, serial into DriverStore</td></tr>
+          <tr><td><strong>Registry</strong></td><td>Registers boot-critical drivers, sets start type, creates service entries</td></tr>
+          <tr><td><strong>BCD Store</strong></td><td>Updates boot configuration for VirtIO disk controller</td></tr>
+          <tr><td><strong>Unattend.xml</strong></td><td>Generates first-boot script for driver finalization</td></tr>
+          <tr><td><strong>VMware Cleanup</strong></td><td>Removes VMware Tools, PVSCSI refs, VMXNet3 config</td></tr>
+          <tr><td><strong>Hyper-V Cleanup</strong></td><td>Removes integration services, synthetic drivers</td></tr>
+          <tr><td><strong>License</strong></td><td>Extracts &amp; preserves OEM/Retail/MAK/KMS keys</td></tr>
+          <tr><td><strong>Active Directory</strong></td><td>Detects domain membership, prepares rejoin</td></tr>
+        </table>
+      </div>
+      <div class="col">
+        <h3>Supported Windows Versions</h3>
+        <div style="margin: 8px 0;">
+          <span class="badge blue">Windows 7</span>
+          <span class="badge blue">Windows 8/8.1</span>
+          <span class="badge blue">Windows 10</span>
+          <span class="badge blue">Windows 11</span><br>
+          <span class="badge blue" style="margin-top:4px;">Server 2008 R2</span>
+          <span class="badge blue">Server 2012/R2</span>
+          <span class="badge blue">Server 2016</span><br>
+          <span class="badge blue" style="margin-top:4px;">Server 2019</span>
+          <span class="badge blue">Server 2022</span>
+          <span class="badge blue">Server 2025</span>
+        </div>
+        <h3 style="margin-top: 14px;">Migration Config</h3>
+        <pre><code>cmd: local
+vmdk: /exports/win-server.vhdx
+output_dir: /kvm
+to_output: win-server.qcow2
+out_format: qcow2
+virtio_iso: /path/to/virtio-win.iso
+# Auto-detects Windows, injects
+# all required drivers &amp; registry mods</code></pre>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="slide-number">11</div>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 12: Enterprise & K8s ════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Enterprise &amp; Cloud-Native Deployment</h2>
+  <div class="content">
+    <div class="two-col">
+      <div class="col">
+        <h3>hypersdk Enterprise Features</h3>
+        <ul style="font-size: 11.5pt;">
+          <li><strong>REST API</strong> &mdash; 67+ endpoints, WebSocket updates</li>
+          <li><strong>Job scheduling</strong> &mdash; cron, dependencies, priority queue</li>
+          <li><strong>RBAC</strong> &mdash; admin, operator, viewer roles</li>
+          <li><strong>Secrets management</strong> &mdash; Vault, AWS SM, Azure KV</li>
+          <li><strong>Audit logging</strong> &mdash; full event trail</li>
+          <li><strong>Rate limiting</strong> &mdash; per-user and global</li>
+          <li><strong>Prometheus metrics</strong> &mdash; observability built-in</li>
+          <li><strong>Cost estimation</strong> &mdash; AWS S3, Azure Blob, GCS</li>
+          <li><strong>Carbon-aware</strong> &mdash; schedule by grid intensity</li>
+          <li><strong>Web dashboard</strong> &mdash; React-based monitoring</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3>hyper2kvm Cloud-Native</h3>
+        <ul style="font-size: 11.5pt;">
+          <li><strong>One-command K8s deploy</strong> &mdash; convert + upload + provision</li>
+          <li><strong>KubeVirt</strong> &mdash; VirtualMachine resource creation</li>
+          <li><strong>OpenShift</strong> &mdash; OperatorHub, SCC, Routes, OAuth</li>
+          <li><strong>OLM bundle</strong> &mdash; operator packaging</li>
+          <li><strong>Batch processing</strong> &mdash; parallel multi-VM migration</li>
+          <li><strong>Daemon mode</strong> &mdash; systemd service + REST API</li>
+          <li><strong>LUKS/TPM2</strong> &mdash; encryption support</li>
+          <li><strong>Sandboxed LVM</strong> &mdash; 100% host protection</li>
+          <li><strong>TUI dashboard</strong> &mdash; Textual/Curses/CLI</li>
+          <li><strong>Debug bundles</strong> &mdash; automated troubleshooting</li>
+        </ul>
+        <pre style="font-size: 9.5pt; margin-top: 8px;"><code># Migrate + deploy to K8s in one command
+sudo h2kvmctl --config migration.yaml \
+  --deploy-k8s --k8s-namespace prod \
+  --k8s-vm-name web-01 --k8s-auto-start</code></pre>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hypersdk + hyper2kvm</div>
+  <div class="slide-number">12</div>
+</div>
+
+<!-- ════════════════════════════════════════════ SLIDE 13: Summary ════════════════════════════════════════════ -->
+<div class="slide end-slide">
+  <h2>hypersdk + hyper2kvm</h2>
+  <div class="tagline">"Export Anywhere, Migrate Once, Boot Right."</div>
+  <table>
+    <tr><td><strong>hypersdk</strong> (Go)</td><td style="color:#aaa;">10 cloud providers, 67+ API endpoints, job scheduling, RBAC, audit</td></tr>
+    <tr><td><strong>hyper2kvm</strong> (Python)</td><td style="color:#aaa;">480+ APIs, 35+ OS versions, deterministic fixes, first-boot success</td></tr>
+    <tr><td><strong>Contract</strong></td><td style="color:#aaa;">JSON manifest &mdash; provider-agnostic, deterministic, resumable</td></tr>
+    <tr><td><strong>Windows</strong></td><td style="color:#aaa;">Full VirtIO injection, registry mods, license &amp; AD support</td></tr>
+    <tr><td><strong>Cloud-Native</strong></td><td style="color:#aaa;">KVM, libvirt, KubeVirt, Kubernetes, OpenShift, k3s</td></tr>
+    <tr><td><strong>Performance</strong></td><td style="color:#aaa;">5-7x faster, 66% less memory, minutes instead of hours</td></tr>
+  </table>
+  <div class="links">
+    <strong>hypersdk:</strong> github.com/ssahani/hypersdk &nbsp;&nbsp;|&nbsp;&nbsp;
+    <strong>hyper2kvm:</strong> github.com/ssahani/hyper2kvm &nbsp;&nbsp;|&nbsp;&nbsp;
+    <strong>PyPI:</strong> pypi.org/project/hyper2kvm<br>
+    <strong>License:</strong> Proprietary (Zyvor AI Labs)
+  </div>
+</div>
+
+</body>
+</html>

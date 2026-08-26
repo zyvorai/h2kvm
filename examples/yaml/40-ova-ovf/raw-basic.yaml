@@ -1,0 +1,34 @@
+# Extract and convert raw disk image or tarball
+#
+# Supports:
+# - Raw disk images (.raw, .img)
+# - Tarballs containing raw disks (.tar, .tar.gz, .tgz)
+# - Cloud images (AWS AMI, Azure VHD in tar format)
+
+command: raw
+
+# Input: raw disk image or tarball
+raw: /images/ubuntu-2204-cloudimg.img
+
+# Output
+output_dir: ./out
+to_output: ubuntu-2204.qcow2
+out_format: qcow2
+compress: true
+
+# Filesystem fixes
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Optional: Convert extracted payload to qcow2 first
+convert_to_qcow2: true
+qcow2_dir: ./out/qcow2
+
+# Optional: Nested tarball extraction (for AMI-style archives)
+extract_nested_tar: true
+
+# Optional: libvirt smoke test
+libvirt_test: true
+vm_name: ubuntu-2204-test
+memory: 2048
+vcpus: 2

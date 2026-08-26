@@ -1,0 +1,475 @@
+# GitHub Actions Workflow for hyper2kvm VM Migrations
+#
+# Place this file in: .github/workflows/vm-migration.yml
+#
+# Features:
+# - Automated VM migration on workflow dispatch or schedule
+# - Matrix strategy for parallel processing
+# - Automated testing and validation
+# - GitHub Deployments integration
+# - Slack/email notifications via GitHub Actions
+#
+# Prerequisites:
+# - Self-hosted runner with KVM support
+# - hyper2kvm installed on runner
+# - GitHub Secrets configured (vCenter credentials)
+# - GitHub Environment protection rules (optional)
+
+name: VM Migration to KVM
+
+on:
+  # Manual trigger with parameters
+  workflow_dispatch:
+    inputs:
+      migration_batch:
+        description: 'Which batch of VMs to migrate'
+        required: true
+        type: choice
+        options:
+          - dev
+          - test
+          - staging
+          - production
+      dry_run:
+        description: 'Perform dry-run (validation only)'
+        required: true
+        type: boolean
+        default: true
+      auto_rollback:
+        description: 'Automatically rollback on failure'
+        required: true
+        type: boolean
+        default: true
+
+  # Scheduled migrations (every Sunday at 2 AM)
+  schedule:
+    - cron: '0 2 * * 0'  # Weekly on Sunday
+
+  # Trigger on PR for validation
+  pull_request:
+    paths:
+      - 'configs/migrations/**/*.yaml'
+      - '.github/workflows/vm-migration.yml'
+
+env:
+  VCENTER_HOST: vcenter.example.com
+  MIGRATION_BASE: /data/migrations/${{ github.run_number }}
+
+jobs:
+  # ======================================================================== ====
+  # JOB 1: PRE-FLIGHT CHECKS
+  # ========================================================================== =
+
+  preflight:
+    name: Pre-flight Checks
+    runs-on: [self-hosted, kvm-migration]
+
+    outputs:
+      vm_count: ${{ steps.count_vms.outputs.count }}
+      migration_batch: ${{ steps.setup.outputs.batch }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        id: setup
+        run: |
+          echo "batch=${{ github.event.inputs.migration_batch || 'dev' }}" >> $GITHUB_OUTPUT
+          mkdir -p ${MIGRATION_BASE}/{configs,logs,reports}
+
+      - name: Check hyper2kvm version
+        run: |
+          python -m hyper2kvm --version | tee ${MIGRATION_BASE}/logs/version.log
+
+      - name: Check KVM host resources
+        run: |
+          echo "=== System Resources ===" | tee ${MIGRATION_BASE}/logs/resources.log
+          free -h | tee -a ${MIGRATION_BASE}/logs/resources.log
+          df -h | tee -a ${MIGRATION_BASE}/logs/resources.log
+          virsh list --all | tee -a ${MIGRATION_BASE}/logs/resources.log
+
+      - name: Verify vCenter connectivity
+        env:
+          VCENTER_USER: ${{ secrets.VCENTER_USER }}
+          VCENTER_PASSWORD: ${{ secrets.VCENTER_PASSWORD }}
+        run: |
+          govc about -u "${VCENTER_USER}:${VCENTER_PASSWORD}@${VCENTER_HOST}" | \
+            tee ${MIGRATION_BASE}/logs/vcenter.log
+
+      - name: Count VMs to migrate
+        id: count_vms
+        run: |
+          BATCH=${{ steps.setup.outputs.batch }}
+          COUNT=$(yq e '.vms | length' configs/vm-batches/${BATCH}.yaml)
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+          echo "VMs to migrate: $COUNT"
+
+      - name: Upload preflight logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: preflight-logs
+          path: ${MIGRATION_BASE}/logs/
+          retention-days: 7
+
+  # ========================================================================
+  # JOB 2: CREATE BACKUPS
+  # ========================================================================
+
+  backup:
+    name: Create VMware Snapshots
+    runs-on: [self-hosted, kvm-migration]
+    needs: preflight
+    if: github.event.inputs.dry_run != 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create snapshots
+        env:
+          VCENTER_USER: ${{ secrets.VCENTER_USER }}
+          VCENTER_PASSWORD: ${{ secrets.VCENTER_PASSWORD }}
+          BATCH: ${{ needs.preflight.outputs.migration_batch }}
+        run: |
+          echo "=== Creating VMware Snapshots ==="
+
+          for vm in $(yq e '.vms[].name' configs/vm-batches/${BATCH}.yaml); do
+            echo "Snapshot: $vm"
+
+            govc snapshot.create \
+              -u "${VCENTER_USER}:${VCENTER_PASSWORD}@${VCENTER_HOST}" \
+              -vm "$vm" \
+              -m "GitHub Actions Run ${{ github.run_number }}" \
+              "gh-backup-${{ github.run_number }}"
+
+            echo "$vm|${{ github.run_number }}|$(date +%Y%m%d-%H%M%S)" >> \
+              ${MIGRATION_BASE}/logs/snapshots.csv
+          done
+
+      - name: Upload snapshot manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-manifest
+          path: ${MIGRATION_BASE}/logs/snapshots.csv
+          retention-days: 30
+
+  # ========================================================================
+  # JOB 3: MIGRATE VMs (MATRIX STRATEGY)
+  # ========================================================================
+
+  migrate:
+    name: Migrate VM - ${{ matrix.vm.name }}
+    runs-on: [self-hosted, kvm-migration]
+    needs: [preflight, backup]
+    if: always() && (github.event.inputs.dry_run != 'true' || needs.backup.result == 'skipped')
+
+    strategy:
+      fail-fast: false  # Continue other migrations even if one fails
+      max-parallel: 3   # Max 3 concurrent migrations
+      matrix:
+        # Dynamic matrix from vm-batches config file
+        # In reality, you'd generate this from the YAML file
+        vm:
+          - { name: 'web-01', memory: 8192, vcpus: 4 }
+          - { name: 'web-02', memory: 8192, vcpus: 4 }
+          - { name: 'db-01', memory: 16384, vcpus: 8 }
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Migrate ${{ matrix.vm.name }}
+        id: migrate
+        env:
+          VCENTER_USER: ${{ secrets.VCENTER_USER }}
+          VCENTER_PASSWORD: ${{ secrets.VCENTER_PASSWORD }}
+          VM_NAME: ${{ matrix.vm.name }}
+        run: |
+          echo "=== Migrating: ${VM_NAME} ==="
+
+          python -m hyper2kvm vsphere \
+            --vcenter ${VCENTER_HOST} \
+            --username ${VCENTER_USER} \
+            --password ${VCENTER_PASSWORD} \
+            --vs-action export-vm \
+            --vs-vm-name "${VM_NAME}" \
+            --output-dir ${MIGRATION_BASE}/vms/${VM_NAME} \
+            --out-format qcow2 \
+            --compress \
+            --regen-initramfs \
+            --fstab-mode stabilize-all \
+            --fix-grub \
+            --verbose 2 \
+            --log-file ${MIGRATION_BASE}/logs/${VM_NAME}.log \
+            --report ${MIGRATION_BASE}/reports/${VM_NAME}.md
+
+      - name: Upload migration artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-${{ matrix.vm.name }}
+          path: |
+            ${MIGRATION_BASE}/vms/${{ matrix.vm.name }}/
+            ${MIGRATION_BASE}/logs/${{ matrix.vm.name }}.log
+            ${MIGRATION_BASE}/reports/${{ matrix.vm.name }}.md
+          retention-days: 30
+
+      - name: Rollback on failure
+        if: failure() && github.event.inputs.auto_rollback == 'true'
+        env:
+          VCENTER_USER: ${{ secrets.VCENTER_USER }}
+          VCENTER_PASSWORD: ${{ secrets.VCENTER_PASSWORD }}
+          VM_NAME: ${{ matrix.vm.name }}
+        run: |
+          echo "⚠ Migration failed, reverting snapshot..."
+
+          govc snapshot.revert \
+            -u "${VCENTER_USER}:${VCENTER_PASSWORD}@${VCENTER_HOST}" \
+            -vm "${VM_NAME}" \
+            "gh-backup-${{ github.run_number }}"
+
+          echo "✓ Snapshot reverted"
+
+  # ========================================================================
+  # JOB 4: POST-MIGRATION TESTS
+  # ========================================================================
+
+  test:
+    name: Validation Tests
+    runs-on: [self-hosted, kvm-migration]
+    needs: migrate
+    if: success()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download migration artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: migration-*
+          path: ${MIGRATION_BASE}/vms/
+
+      - name: Boot validation tests
+        run: |
+          echo "=== Boot Validation Tests ==="
+
+          for vm_dir in ${MIGRATION_BASE}/vms/migration-*/; do
+            vm=$(basename "$vm_dir" | sed 's/migration-//')
+            qcow2=$(find "$vm_dir" -name "*.qcow2" | head -1)
+
+            if [ ! -f "$qcow2" ]; then
+              echo "⚠ Skipping $vm (qcow2 not found)"
+              continue
+            fi
+
+            echo "Testing: $vm"
+
+            virt-install \
+              --name "${vm}-test-${{ github.run_number }}" \
+              --memory 2048 \
+              --vcpus 1 \
+              --disk path="$qcow2",bus=virtio \
+              --network bridge=br-test,model=virtio \
+              --import \
+              --noautoconsole
+
+            sleep 60
+
+            if virsh domstate "${vm}-test-${{ github.run_number }}" | grep -q "running"; then
+              echo "✓ $vm boot successful"
+            else
+              echo "✗ $vm boot failed"
+              exit 1
+            fi
+
+            # Cleanup
+            virsh destroy "${vm}-test-${{ github.run_number }}"
+            virsh undefine "${vm}-test-${{ github.run_number }}"
+          done
+
+      - name: Run smoke tests
+        run: |
+          pytest tests/smoke/ \
+            --junitxml=${MIGRATION_BASE}/test-results/smoke.xml \
+            --html=${MIGRATION_BASE}/test-results/smoke.html
+
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Migration Tests
+          path: ${MIGRATION_BASE}/test-results/*.xml
+          reporter: java-junit
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: ${MIGRATION_BASE}/test-results/
+          retention-days: 30
+
+  # ========================================================================
+  # JOB 5: DEPLOY TO STAGING/PRODUCTION
+  # ========================================================================
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: [self-hosted, kvm-migration]
+    needs: test
+    if: github.ref == 'refs/heads/develop' && success()
+    environment:
+      name: staging
+      url: https://staging.example.com
+
+    steps:
+      - name: Deploy to staging
+        run: |
+          echo "=== Deploying to Staging Environment ==="
+          # Deployment logic here
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: [self-hosted, kvm-migration]
+    needs: test
+    if: github.ref == 'refs/heads/main' && success()
+    environment:
+      name: production
+      url: https://example.com
+
+    steps:
+      - name: Deploy to production
+        run: |
+          echo "=== Deploying to Production Environment ==="
+          # Deployment logic here
+
+  # ========================================================================
+  # JOB 6: GENERATE REPORTS
+  # ========================================================================
+
+  report:
+    name: Generate Migration Report
+    runs-on: [self-hosted, kvm-migration]
+    needs: [migrate, test]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Generate summary report
+        run: |
+          cat > ${MIGRATION_BASE}/reports/summary.md <<EOF
+          # Migration Report - Run ${{ github.run_number }}
+
+          **Workflow:** ${{ github.workflow }}
+          **Triggered by:** ${{ github.actor }}
+          **Branch:** ${{ github.ref_name }}
+          **Commit:** ${{ github.sha }}
+          **Status:** ${{ job.status }}
+          **Date:** $(date)
+
+          ## VMs Migrated
+
+          EOF
+
+          # Aggregate individual reports
+          for report in ${MIGRATION_BASE}/reports/*.md; do
+            [ -f "$report" ] || continue
+            cat "$report" >> ${MIGRATION_BASE}/reports/summary.md
+            echo "---" >> ${MIGRATION_BASE}/reports/summary.md
+          done
+
+      - name: Upload summary report
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-summary
+          path: ${MIGRATION_BASE}/reports/summary.md
+          retention-days: 90
+
+      - name: Create GitHub release (for production)
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: migration-${{ github.run_number }}
+          name: Migration Run #${{ github.run_number }}
+          body_path: ${MIGRATION_BASE}/reports/summary.md
+          files: ${MIGRATION_BASE}/reports/*.md
+
+  # ========================================================================
+  # JOB 7: NOTIFICATIONS
+  # ========================================================================
+
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [migrate, test, report]
+    if: always()
+
+    steps:
+      - name: Slack notification (success)
+        if: success()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+          payload: |
+            {
+              "text": "✅ Migration Pipeline Successful",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Migration Successful!* :white_check_mark:\n\n*Batch:* ${{ github.event.inputs.migration_batch }}\n*Run:* #${{ github.run_number }}\n*Actor:* ${{ github.actor }}\n*Duration:* ${{ job.status }}"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Workflow"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+
+      - name: Slack notification (failure)
+        if: failure()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+          payload: |
+            {
+              "text": "❌ @channel Migration Pipeline FAILED",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Migration Failed!* :x:\n\n*Batch:* ${{ github.event.inputs.migration_batch }}\n*Run:* #${{ github.run_number }}\n*Actor:* ${{ github.actor }}"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Logs"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                      "style": "danger"
+                    }
+                  ]
+                }
+              ]
+            }

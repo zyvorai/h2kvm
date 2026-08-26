@@ -1,0 +1,7 @@
+packageName: hyper2kvm-operator
+channels:
+  - name: stable
+    currentCSV: hyper2kvm-operator.v0.3.0
+  - name: preview
+    currentCSV: hyper2kvm-operator.v0.3.0
+defaultChannel: stable

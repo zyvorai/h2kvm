@@ -1,0 +1,9 @@
+command: local
+vmdk: /home/ssahani/vmware/opensuse/openSUSE_Leap_15.4_VM_LinuxVMImages.COM-cl1.vmdk
+output_dir: ./output
+flatten: true
+to_output: opensuse-leap-15.4-fixed.qcow2
+out_format: qcow2
+compress: true
+fstab_mode: stabilize-all
+regen_initramfs: true

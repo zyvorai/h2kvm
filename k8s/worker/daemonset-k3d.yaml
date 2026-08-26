@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: hyper2kvm-worker
+  namespace: hyper2kvm-workers
+  labels:
+    app: hyper2kvm-worker
+    component: worker-daemon
+spec:
+  selector:
+    matchLabels:
+      app: hyper2kvm-worker
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: hyper2kvm-worker
+        component: worker-daemon
+    spec:
+      # Node selection for worker-capable nodes
+      nodeSelector:
+        hyper2kvm.io/worker-enabled: "true"
+
+      tolerations:
+      - key: hyper2kvm.io/privileged
+        operator: Exists
+        effect: NoSchedule
+
+      # Service account for worker operations
+      serviceAccountName: hyper2kvm-worker
+
+      # Main worker container (no init containers for k3d)
+      containers:
+      - name: worker
+        image: hyper2kvm:worker
+        imagePullPolicy: IfNotPresent  # Use local image in k3d
+
+        env:
+        - name: HYPER2KVM_MODE
+          value: "worker"
+        - name: WORKER_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: HYPER2KVM_STATE_DIR
+          value: "/var/lib/hyper2kvm/jobs"
+        - name: HYPER2KVM_EVENT_DIR
+          value: "/var/lib/hyper2kvm/events"
+        - name: HYPER2KVM_QUEUE_DIR
+          value: "/var/lib/hyper2kvm/queue"
+        - name: PYTHONUNBUFFERED
+          value: "1"
+
+        # Use the entrypoint from the image
+        # command: inherited from image (/usr/local/bin/docker-entrypoint.sh)
+
+        # Privileged mode required for operations
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - SYS_ADMIN
+            - MKNOD
+
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "4"
+            memory: "8Gi"
+
+        volumeMounts:
+        # Persistent worker state
+        - name: worker-state
+          mountPath: /var/lib/hyper2kvm/jobs
+
+        # Persistent events
+        - name: worker-events
+          mountPath: /var/lib/hyper2kvm/events
+
+        # Device access
+        - name: dev
+          mountPath: /dev
+
+        # Input storage (host path for testing)
+        - name: input-storage
+          mountPath: /data/input
+
+        # Output storage
+        - name: output-storage
+          mountPath: /data/output
+
+        # Lifecycle hooks for graceful shutdown
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - "kill -TERM $(cat /var/lib/hyper2kvm/worker.pid 2>/dev/null) 2>/dev/null; sleep 30"
+
+        ports:
+        - name: metrics
+          containerPort: 9090
+
+      # Graceful shutdown with long grace period for in-progress migrations
+      terminationGracePeriodSeconds: 7200
+
+      volumes:
+      # Persistent storage for worker state
+      - name: worker-state
+        persistentVolumeClaim:
+          claimName: hyper2kvm-worker-state
+
+      # Persistent storage for events
+      - name: worker-events
+        persistentVolumeClaim:
+          claimName: hyper2kvm-worker-events
+
+      # Device access
+      - name: dev
+        hostPath:
+          path: /dev
+          type: Directory
+
+      # Host paths for testing (replace with PVCs in production)
+      - name: input-storage
+        hostPath:
+          path: /tmp/hyper2kvm/input
+          type: DirectoryOrCreate
+
+      - name: output-storage
+        hostPath:
+          path: /tmp/hyper2kvm/output
+          type: DirectoryOrCreate

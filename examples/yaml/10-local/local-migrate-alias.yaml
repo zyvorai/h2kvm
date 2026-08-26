@@ -1,0 +1,26 @@
+# Example using "migrate" command alias (equivalent to "local")
+#
+# The "migrate" command is an alias for "local" for user convenience.
+# Both work identically for local VMDK conversion.
+
+command: migrate  # Alias for "local"
+
+# Input
+vmdk: /vms/centos7.vmdk
+
+# Output
+output_dir: ./out
+to_output: centos7-migrated.qcow2
+out_format: qcow2
+compress: true
+
+# Filesystem fixes
+fstab_mode: stabilize-all  # Convert all device specs to stable UUIDs
+regen_initramfs: true      # Rebuild initramfs for new hardware
+
+# Optional: libvirt smoke test
+libvirt_test: true
+vm_name: centos7-test
+memory: 2048
+vcpus: 2
+timeout: 60

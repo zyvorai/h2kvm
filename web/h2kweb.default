@@ -1,0 +1,10 @@
+# /etc/default/h2kweb — h2kweb environment configuration
+
+# Listen address (host:port)
+H2KWEB_ADDR=:5070
+
+# Path to h2kvmctl binary (empty = auto-detect from PATH)
+H2KWEB_BINARY=
+
+# API key for authentication (empty = disabled)
+# H2KWEB_API_KEY=

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Migration Testing &amp; Validation — Structured Test Plans for Zero-Defect Cutover</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #134e4a, #0f766e, #14b8a6); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #99f6e4; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(153,246,228,0.2); border: 1px solid rgba(153,246,228,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0a1512; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #99f6e4; }
+  .page-light h2.st span { color: #134e4a; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #99f6e4; }
+  .page-light h3 { color: #134e4a; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #134e4a; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #99f6e4; }
+  .page-light .card h4 { color: #134e4a; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  pre { background: #134e4a; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(153,246,228,0.08); border: 1px solid rgba(153,246,228,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(19,78,74,0.15), rgba(15,118,110,0.08)); border: 2px solid #14b8a6; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #99f6e4; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Migration Testing &amp; <span>Validation</span></h1>
+  <h2>Structured Test Plans for Zero-Defect Cutover</h2>
+  <p class="sub">A failed migration test costs hours. A failed production cutover costs thousands. This guide provides structured test plans at every stage — pre-migration readiness, conversion verification, boot testing, application smoke tests, performance baselines, and acceptance sign-off. Every test is automatable with h2kvmctl.</p>
+  <div class="badge">Test Plans | Boot Test | Smoke Test | Performance Baseline | Acceptance Criteria | Automated Validation</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Testing <span>Framework</span></h2>
+  <p class="sub">Five testing stages ensure zero-defect migration from VMware to KVM.</p>
+
+  <h3>Migration Testing Stages</h3>
+  <table>
+    <tr><th style="width:5%">Stage</th><th style="width:15%">Test Type</th><th style="width:10%">When</th><th style="width:10%">Duration</th><th style="width:25%">What It Validates</th><th style="width:15%">Tool</th><th style="width:20%">Pass Criteria</th></tr>
+    <tr><td>1</td><td>Pre-flight Readiness</td><td>Before migration</td><td>5 min</td><td>Host capabilities, disk space, packages, network</td><td><code>h2kvmctl doctor</code></td><td>All checks pass (0 failures)</td></tr>
+    <tr><td>2</td><td>Dry-Run Validation</td><td>Before migration</td><td>2 min/VM</td><td>YAML config, source files, dependencies, space</td><td><code>h2kvmctl --dry-run</code></td><td>Zero errors, all sources found</td></tr>
+    <tr><td>3</td><td>Conversion Verification</td><td>After conversion</td><td>1 min/VM</td><td>Output file integrity, size, format, checksum</td><td><code>qemu-img check</code></td><td>No corruption, checksum match</td></tr>
+    <tr><td>4</td><td>Boot Test</td><td>After deploy</td><td>2 min/VM</td><td>VM boots, gets IP, SSH accessible, OS functional</td><td><code>h2kvmctl boot-test</code></td><td>VM reaches login prompt in &lt;120s</td></tr>
+    <tr><td>5</td><td>Application Smoke Test</td><td>After boot</td><td>5-30 min/VM</td><td>Application responds, data intact, services running</td><td>Custom scripts</td><td>All endpoints respond correctly</td></tr>
+    <tr><td>6</td><td>Performance Baseline</td><td>After smoke test</td><td>15 min/VM</td><td>CPU, memory, disk I/O, network match or exceed VMware</td><td><code>sysbench, fio, iperf3</code></td><td>Within 10% of VMware baseline</td></tr>
+    <tr><td>7</td><td>Acceptance Sign-off</td><td>After all tests</td><td>1 day</td><td>App owner verifies functionality in production</td><td>Manual + monitoring</td><td>App owner signs acceptance form</td></tr>
+  </table>
+
+  <div class="highlight">
+    <h3>Test Automation Coverage</h3>
+    <p>Stages 1-4 are fully automated by h2kvmctl. Stage 5 requires custom scripts per application (templates provided). Stage 6 uses standard benchmarking tools. Stage 7 is a manual sign-off. <strong>Target: 85%+ test automation coverage.</strong></p>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">Pre-Flight &amp; <span>Dry-Run Tests</span></h2>
+  <p class="sub">Catch problems before they happen — validate everything before touching production.</p>
+
+  <h3>Pre-Flight Checklist (Automated)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Host Readiness (h2kvmctl doctor)</h4>
+      <pre>
+# Run on each target KVM host
+h2kvmctl doctor --json | jq '.checks[] | select(.status != "pass")'
+
+# Critical checks:
+# - KVM module loaded
+# - QEMU version >= 6.0
+# - libvirtd running
+# - Disk space >= 2x largest VM
+# - Network bridge exists + UP
+# - VirtIO drivers available
+# - OVMF firmware installed
+
+# Gate: ALL critical checks must pass
+# Warning: non-critical can proceed with note</pre>
+    </div>
+    <div class="card">
+      <h4>Dry-Run Validation</h4>
+      <pre>
+# Validate migration config without executing
+h2kvmctl convert --config batch.yaml --dry-run --json
+
+# What dry-run checks:
+# 1. YAML syntax valid
+# 2. All source files exist and readable
+# 3. Source format recognized (VMDK/OVA/VHD)
+# 4. Output directory writable
+# 5. Sufficient disk space for all VMs
+# 6. Network bridges referenced exist
+# 7. Dependency ordering valid (no cycles)
+# 8. Estimated conversion time
+
+# Example output:
+# { "status": "ready",
+#   "vms": 15,
+#   "total_source_size_gb": 750,
+#   "estimated_output_gb": 450,
+#   "available_space_gb": 1200,
+#   "estimated_duration_minutes": 95 }</pre>
+    </div>
+  </div>
+
+  <h3>Source Image Validation</h3>
+  <table>
+    <tr><th style="width:15%">Check</th><th style="width:25%">Command</th><th style="width:20%">Pass Criteria</th><th style="width:40%">Failure Action</th></tr>
+    <tr><td>File integrity</td><td><code>qemu-img check source.vmdk</code></td><td>No errors, 0 leaked clusters</td><td>Re-export from VMware; if persistent, repair with --repair=all</td></tr>
+    <tr><td>Format detection</td><td><code>qemu-img info source.vmdk</code></td><td>Format correctly identified</td><td>Specify format explicitly: <code>-f vmdk</code></td></tr>
+    <tr><td>Size reasonable</td><td><code>qemu-img info --output=json</code></td><td>Virtual size matches expected</td><td>Verify correct VM was exported</td></tr>
+    <tr><td>OVA structure</td><td><code>tar tf export.ova</code></td><td>Contains .ovf + .vmdk files</td><td>OVA corrupted during download; re-export</td></tr>
+    <tr><td>Checksum</td><td><code>sha256sum source.vmdk</code></td><td>Matches source manifest</td><td>File corrupted in transfer; re-copy</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Boot Test <span>Automation</span></h2>
+  <p class="sub">Automatically verify every VM boots successfully after conversion.</p>
+
+  <h3>Automated Boot Test Script</h3>
+  <pre>
+#!/bin/bash
+# boot-test.sh — Verify VM boots and reaches network
+VM_NAME="$1"
+TIMEOUT=120
+BRIDGE="br0"
+
+echo "[TEST] Starting boot test for $VM_NAME..."
+
+# Start VM
+virsh start "$VM_NAME" 2>/dev/null
+if [ $? -ne 0 ]; then echo "[FAIL] Cannot start $VM_NAME"; exit 1; fi
+
+# Wait for VM to get IP address
+echo "[TEST] Waiting for IP address (timeout: ${TIMEOUT}s)..."
+for i in $(seq 1 $TIMEOUT); do
+    IP=$(virsh domifaddr "$VM_NAME" 2>/dev/null | grep -oP '(\d+\.){3}\d+')
+    if [ -n "$IP" ]; then
+        echo "[PASS] $VM_NAME got IP: $IP (${i}s)"
+        break
+    fi
+    sleep 1
+done
+
+if [ -z "$IP" ]; then echo "[FAIL] No IP after ${TIMEOUT}s"; virsh destroy "$VM_NAME"; exit 1; fi
+
+# Test SSH connectivity (Linux VMs)
+echo "[TEST] Testing SSH connectivity..."
+for i in $(seq 1 30); do
+    ssh -o ConnectTimeout=3 -o StrictHostKeyChecking=no "$IP" "hostname" &>/dev/null
+    if [ $? -eq 0 ]; then echo "[PASS] SSH accessible at $IP"; exit 0; fi
+    sleep 2
+done
+
+# Test RDP connectivity (Windows VMs)
+nc -z -w 3 "$IP" 3389 &>/dev/null
+if [ $? -eq 0 ]; then echo "[PASS] RDP accessible at $IP (Windows)"; exit 0; fi
+
+echo "[WARN] VM booted with IP but SSH/RDP not accessible"
+exit 2</pre>
+
+  <h3>Boot Test Results Matrix</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:18%">VM Name</th><th style="width:8%">OS</th><th style="width:10%">Boot Time</th><th style="width:12%">Got IP?</th><th style="width:10%">SSH/RDP?</th><th style="width:8%">Result</th><th style="width:29%">Notes</th></tr>
+    <tr><td>1</td><td>db-server</td><td>RHEL 9</td><td>18s</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">PASS</td><td>Clean boot, all services started</td></tr>
+    <tr><td>2</td><td>app-server-01</td><td>Ubuntu 22</td><td>22s</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">PASS</td><td>Cloud-init disabled successfully</td></tr>
+    <tr><td>3</td><td>web-frontend</td><td>Rocky 9</td><td>15s</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">PASS</td><td>nginx responding on port 80</td></tr>
+    <tr><td>4</td><td>win-server-01</td><td>Win 2022</td><td>45s</td><td class="check">Yes</td><td class="check">RDP</td><td class="check">PASS</td><td>VirtIO drivers loaded, RDP accessible</td></tr>
+    <tr><td>5</td><td>legacy-app</td><td>CentOS 7</td><td>35s</td><td class="check">Yes</td><td class="cross">No</td><td class="cross">WARN</td><td>SSH key auth changed; need password</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">Application <span>Smoke Tests</span></h2>
+  <p class="sub">Verify applications work correctly after migration — templates for common services.</p>
+
+  <h3>Smoke Test Templates</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Web Application</h4>
+      <pre>
+#!/bin/bash
+# smoke-test-web.sh
+VM_IP="$1"
+echo "[TEST] Web app smoke test..."
+
+# HTTP response
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+  "http://$VM_IP/")
+[ "$HTTP_CODE" = "200" ] && echo "[PASS] HTTP 200" \
+  || echo "[FAIL] HTTP $HTTP_CODE"
+
+# HTTPS
+HTTP_CODE=$(curl -sk -o /dev/null -w "%{http_code}" \
+  "https://$VM_IP/")
+[ "$HTTP_CODE" = "200" ] && echo "[PASS] HTTPS 200" \
+  || echo "[FAIL] HTTPS $HTTP_CODE"
+
+# API health endpoint
+HEALTH=$(curl -s "http://$VM_IP/api/health" | jq -r '.status')
+[ "$HEALTH" = "ok" ] && echo "[PASS] API healthy" \
+  || echo "[FAIL] API: $HEALTH"</pre>
+    </div>
+    <div class="card">
+      <h4>Database Server</h4>
+      <pre>
+#!/bin/bash
+# smoke-test-db.sh
+VM_IP="$1"
+echo "[TEST] Database smoke test..."
+
+# PostgreSQL connection
+psql -h "$VM_IP" -U app_user -d appdb -c "SELECT 1" \
+  &>/dev/null && echo "[PASS] PostgreSQL connected" \
+  || echo "[FAIL] PostgreSQL connection failed"
+
+# Row count check (compare to pre-migration)
+COUNT=$(psql -h "$VM_IP" -U app_user -d appdb -tAc \
+  "SELECT count(*) FROM orders")
+PRE_COUNT=1542387  # from pre-migration baseline
+[ "$COUNT" = "$PRE_COUNT" ] \
+  && echo "[PASS] Row count matches ($COUNT)" \
+  || echo "[FAIL] Row count mismatch: $COUNT vs $PRE_COUNT"
+
+# Replication status (if replica)
+psql -h "$VM_IP" -U postgres -c "SELECT * FROM pg_stat_replication" \
+  &>/dev/null && echo "[PASS] Replication active"</pre>
+    </div>
+    <div class="card">
+      <h4>Windows / Active Directory</h4>
+      <pre>
+# smoke-test-windows.ps1 (run via WinRM)
+# RDP accessibility
+Test-NetConnection -ComputerName $VM_IP -Port 3389
+# [PASS] RDP port open
+
+# Domain services (if DC)
+Get-ADDomainController -Filter *
+# [PASS] AD DS responding
+
+# DNS resolution
+Resolve-DnsName -Name corp.local -Server $VM_IP
+# [PASS] DNS resolution working
+
+# File share accessibility
+Test-Path "\\$VM_IP\shared$"
+# [PASS] File share accessible
+
+# SQL Server (if applicable)
+Invoke-Sqlcmd -ServerInstance $VM_IP \
+  -Query "SELECT @@VERSION"
+# [PASS] SQL Server responding</pre>
+    </div>
+    <div class="card">
+      <h4>Generic Service Check</h4>
+      <pre>
+#!/bin/bash
+# smoke-test-services.sh
+VM_IP="$1"
+SERVICES_FILE="$2"  # services.txt
+
+# Test each service port
+while IFS=, read -r name port protocol; do
+  if [ "$protocol" = "tcp" ]; then
+    nc -z -w 3 "$VM_IP" "$port" &>/dev/null
+    [ $? -eq 0 ] \
+      && echo "[PASS] $name (TCP/$port)" \
+      || echo "[FAIL] $name (TCP/$port)"
+  fi
+done < "$SERVICES_FILE"
+
+# Example services.txt:
+# ssh,22,tcp
+# http,80,tcp
+# https,443,tcp
+# postgresql,5432,tcp
+# redis,6379,tcp
+# elasticsearch,9200,tcp</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Performance <span>Baseline</span></h2>
+  <p class="sub">Measure before and after — prove KVM matches or exceeds VMware performance.</p>
+
+  <h3>Benchmark Suite</h3>
+  <table>
+    <tr><th style="width:12%">Metric</th><th style="width:15%">Tool</th><th style="width:25%">Command</th><th style="width:15%">VMware Baseline</th><th style="width:15%">KVM Target</th><th style="width:18%">Pass Criteria</th></tr>
+    <tr><td>CPU (single)</td><td>sysbench</td><td><code>sysbench cpu --threads=1 run</code></td><td>1,250 events/s</td><td>1,250+ events/s</td><td>Within 5%</td></tr>
+    <tr><td>CPU (multi)</td><td>sysbench</td><td><code>sysbench cpu --threads=8 run</code></td><td>9,800 events/s</td><td>9,800+ events/s</td><td>Within 5%</td></tr>
+    <tr><td>Memory BW</td><td>sysbench</td><td><code>sysbench memory --threads=4 run</code></td><td>8.5 GB/s</td><td>8.5+ GB/s</td><td>Within 10%</td></tr>
+    <tr><td>Disk IOPS</td><td>fio</td><td><code>fio --name=test --rw=randread --bs=4k --iodepth=32 --runtime=30</code></td><td>45,000 IOPS</td><td>45,000+ IOPS</td><td>Within 10%</td></tr>
+    <tr><td>Disk throughput</td><td>fio</td><td><code>fio --name=test --rw=read --bs=1M --iodepth=8 --runtime=30</code></td><td>1.2 GB/s</td><td>1.2+ GB/s</td><td>Within 10%</td></tr>
+    <tr><td>Disk latency</td><td>fio</td><td><code>fio --name=test --rw=randread --bs=4k --iodepth=1 --runtime=30</code></td><td>0.15ms</td><td>0.15ms or less</td><td>Within 20%</td></tr>
+    <tr><td>Network BW</td><td>iperf3</td><td><code>iperf3 -c target -t 30</code></td><td>9.2 Gbps</td><td>9.2+ Gbps</td><td>Within 5%</td></tr>
+    <tr><td>Network latency</td><td>ping</td><td><code>ping -c 100 target</code></td><td>0.3ms avg</td><td>0.3ms avg</td><td>Within 20%</td></tr>
+  </table>
+
+  <h3>Performance Comparison Report</h3>
+  <pre>
+# Generate performance comparison report
+h2kvmctl perf-report --baseline vmware-baseline.json --current kvm-results.json
+
+# Output:
+# Performance Comparison: db-server
+# ===================================
+# Metric              VMware      KVM         Delta    Status
+# CPU single-thread   1,250 ev/s  1,285 ev/s  +2.8%   PASS
+# CPU multi-thread    9,800 ev/s  10,100 ev/s +3.1%   PASS (better)
+# Memory bandwidth    8.5 GB/s    9.1 GB/s    +7.1%   PASS (better)
+# Disk IOPS (4K)      45,000      52,000      +15.6%  PASS (better)
+# Disk throughput     1.2 GB/s    1.4 GB/s    +16.7%  PASS (better)
+# Disk latency        0.15ms      0.12ms      -20.0%  PASS (better)
+# Network bandwidth   9.2 Gbps    9.5 Gbps    +3.3%   PASS (better)
+# Network latency     0.3ms       0.28ms      -6.7%   PASS (better)
+#
+# Overall: 8/8 PASS — KVM outperforms VMware on all metrics</pre>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page page-light">
+  <h2 class="st">Acceptance <span>Criteria &amp; Sign-off</span></h2>
+  <p class="sub">Formal acceptance process with documented sign-off from stakeholders.</p>
+
+  <h3>Acceptance Criteria Template</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:25%">Criterion</th><th style="width:10%">Priority</th><th style="width:25%">Verification Method</th><th style="width:15%">Status</th><th style="width:20%">Sign-off By</th></tr>
+    <tr><td>1</td><td>VM boots within 2 minutes</td><td>Critical</td><td>Automated boot test timer</td><td></td><td>Migration Lead</td></tr>
+    <tr><td>2</td><td>All services start automatically</td><td>Critical</td><td>Service port check script</td><td></td><td>Migration Lead</td></tr>
+    <tr><td>3</td><td>Application responds to requests</td><td>Critical</td><td>Smoke test script</td><td></td><td>App Owner</td></tr>
+    <tr><td>4</td><td>Data integrity verified (row counts, checksums)</td><td>Critical</td><td>Database validation script</td><td></td><td>DBA / App Owner</td></tr>
+    <tr><td>5</td><td>Network connectivity to all dependencies</td><td>Critical</td><td>Connectivity matrix test</td><td></td><td>Network Admin</td></tr>
+    <tr><td>6</td><td>Performance within 10% of VMware baseline</td><td>High</td><td>Benchmark comparison report</td><td></td><td>Migration Lead</td></tr>
+    <tr><td>7</td><td>Monitoring agents reporting (Prometheus, Zabbix)</td><td>High</td><td>Dashboard verification</td><td></td><td>Ops Team</td></tr>
+    <tr><td>8</td><td>Backup schedule configured and tested</td><td>High</td><td>Backup test restore</td><td></td><td>Backup Admin</td></tr>
+    <tr><td>9</td><td>DNS records updated (if IP changed)</td><td>High</td><td><code>nslookup</code> verification</td><td></td><td>Network Admin</td></tr>
+    <tr><td>10</td><td>Rollback procedure documented and tested</td><td>Medium</td><td>Rollback drill in pre-prod</td><td></td><td>Migration Lead</td></tr>
+  </table>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Go/No-Go Decision Matrix</h4>
+      <ul>
+        <li><strong>GO:</strong> All Critical criteria pass + 80%+ High criteria pass</li>
+        <li><strong>CONDITIONAL GO:</strong> All Critical pass, some High fail with workaround</li>
+        <li><strong>NO-GO:</strong> Any Critical criterion fails</li>
+        <li>Decision made 1 hour before cutover window</li>
+        <li>Decision authority: Migration Lead + App Owner + Ops Manager</li>
+        <li>No-Go = rollback to VMware, retry next window</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Sign-off Template</h4>
+      <pre>
+MIGRATION ACCEPTANCE SIGN-OFF
+
+VM Name: ________________
+Migration Date: __________
+Change Ticket: ___________
+
+I confirm that:
+[ ] Application functionality verified
+[ ] Data integrity confirmed
+[ ] Performance acceptable
+[ ] Monitoring in place
+[ ] Backup configured
+
+App Owner: _______________
+Signature: _______________
+Date: ____________________
+
+Migration Lead: __________
+Signature: _______________
+Date: ____________________</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Regression &amp; <span>Soak Testing</span></h2>
+  <p class="sub">Extended validation to catch issues that only appear under sustained load.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>24-Hour Soak Test</h4>
+      <ul>
+        <li>Run VM under production-like load for 24 hours</li>
+        <li>Monitor: CPU, memory, disk I/O, network, swap usage</li>
+        <li>Check for: memory leaks, disk space growth, log rotation</li>
+        <li>Verify: no kernel panics, no OOM kills, no service crashes</li>
+        <li>Compare metrics to VMware 24-hour baseline</li>
+        <li>Tool: <code>stress-ng --cpu 4 --vm 2 --vm-bytes 2G --timeout 86400</code></li>
+        <li>Gate: zero errors in 24 hours = pass</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Failover Testing</h4>
+      <ul>
+        <li>Kill VM process unexpectedly: <code>kill -9 $(pgrep qemu)</code></li>
+        <li>Verify Pacemaker restarts VM on same or different host</li>
+        <li>Measure RTO: time from failure to VM responding</li>
+        <li>Test live migration: <code>virsh migrate --live vm host2</code></li>
+        <li>Verify application state preserved after migration</li>
+        <li>Test storage failover (if Ceph): kill OSD, verify recovery</li>
+        <li>Gate: RTO &lt; 5 minutes for automated failover</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Network Partition Test</h4>
+      <ul>
+        <li>Simulate network outage to VM: <code>iptables -A FORWARD -d $VM_IP -j DROP</code></li>
+        <li>Verify application handles gracefully (timeouts, retries)</li>
+        <li>Restore network: <code>iptables -D FORWARD -d $VM_IP -j DROP</code></li>
+        <li>Verify application recovers automatically</li>
+        <li>Check database replication catches up</li>
+        <li>Verify monitoring alerts fired during outage</li>
+        <li>Gate: application recovers within 60 seconds of network restore</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Backup / Restore Test</h4>
+      <ul>
+        <li>Take backup of migrated VM</li>
+        <li>Restore to a different name/location</li>
+        <li>Boot restored VM, verify data integrity</li>
+        <li>Measure restore time (RTO for backup recovery)</li>
+        <li>Test with: QCOW2 snapshot, BorgBackup, Velero</li>
+        <li>Verify backup encryption works correctly</li>
+        <li>Gate: successful restore with data verification</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page page-light">
+  <h2 class="st">Test Automation <span>Pipeline</span></h2>
+  <p class="sub">Integrate all tests into CI/CD for fully automated migration validation.</p>
+
+  <h3>Automated Test Pipeline</h3>
+  <pre>
+# .gitlab-ci.yml — Migration Test Pipeline
+stages: [preflight, convert, boot-test, smoke-test, perf-test, accept]
+
+preflight:
+  stage: preflight
+  script:
+    - h2kvmctl doctor --json > doctor-report.json
+    - h2kvmctl convert --config $CONFIG --dry-run --json > dry-run.json
+    - "[ $(jq -r '.status' dry-run.json) = 'ready' ]"
+  artifacts: { paths: [doctor-report.json, dry-run.json] }
+
+convert:
+  stage: convert
+  script:
+    - h2kvmctl convert --config $CONFIG --json > conversion.json
+    - "[ $(jq -r '.status' conversion.json) = 'success' ]"
+  artifacts: { paths: [conversion.json] }
+
+boot-test:
+  stage: boot-test
+  script:
+    - for vm in $(jq -r '.vms[].name' $CONFIG); do ./boot-test.sh "$vm"; done
+  allow_failure: false
+
+smoke-test:
+  stage: smoke-test
+  script:
+    - for vm in $(jq -r '.vms[].name' $CONFIG); do ./smoke-test.sh "$vm"; done
+
+perf-test:
+  stage: perf-test
+  script:
+    - ./perf-baseline.sh --compare vmware-baseline.json --output kvm-results.json
+    - h2kvmctl perf-report --baseline vmware-baseline.json --current kvm-results.json
+
+accept:
+  stage: accept
+  script:
+    - echo "All automated tests passed. Manual acceptance required."
+    - h2kvmctl evidence-package --dir evidence/ --sign
+  when: manual  # Requires human approval</pre>
+
+  <div class="verdict">
+    <h3>Automated Testing = Confident Cutover. Every Time.</h3>
+    <p>With 7 test stages and 85% automation, you know before cutover that every VM will boot, every application will respond, and performance will match or exceed VMware. The evidence package satisfies auditors, the go/no-go matrix protects against risk, and the CI/CD pipeline makes it repeatable for every migration wave. Test once, trust always.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Migration Testing &amp; Validation Guide</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+---
+# Fast local NVMe storage for conversion temp space
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-nvme
+  namespace: vm-migration
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+allowVolumeExpansion: false
+
+---
+# NFS storage for VMDK input (ReadOnlyMany)
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-vmdk-storage
+  namespace: vm-migration
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: nfs-server.example.com
+  share: /vmware/datastores
+mountOptions:
+  - hard
+  - nfsvers=4.1
+  - ro  # Read-only for safety
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+
+---
+# Ceph RBD storage for qcow2 output (ReadWriteMany)
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-rbd-output
+  namespace: vm-migration
+provisioner: rbd.csi.ceph.com
+parameters:
+  clusterID: ceph-cluster
+  pool: kvm-images
+  imageFeatures: layering
+  csi.storage.k8s.io/provisioner-secret-name: ceph-rbd-secret
+  csi.storage.k8s.io/provisioner-secret-namespace: vm-migration
+  csi.storage.k8s.io/controller-expand-secret-name: ceph-rbd-secret
+  csi.storage.k8s.io/controller-expand-secret-namespace: vm-migration
+  csi.storage.k8s.io/node-stage-secret-name: ceph-rbd-secret
+  csi.storage.k8s.io/node-stage-secret-namespace: vm-migration
+reclaimPolicy: Retain
+allowVolumeExpansion: true

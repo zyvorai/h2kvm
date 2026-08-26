@@ -1,0 +1,26 @@
+# Batch Job Configuration
+# ========================
+# Process multiple VMs with different settings in a single batch
+#
+# Usage:
+#   Drop this config file into to_be_processed/ directory
+
+# Batch mode - multiple jobs
+jobs:
+  - input: vm1.vmdk
+    output_format: qcow2
+    compress: true
+    fstab_mode: stabilize-all
+    regen_initramfs: true
+
+  - input: vm2.vhd
+    output_format: raw
+    compress: false
+    fstab_mode: bypath-only
+
+  - input: vm3.ova
+    output_format: qcow2
+    compress: true
+    flatten: true
+    # grub is auto-handled
+    fix_network: true

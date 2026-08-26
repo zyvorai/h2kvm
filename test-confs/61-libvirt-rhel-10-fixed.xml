@@ -1,0 +1,126 @@
+<domain type='kvm'>
+  <name>rhel10-fixed</name>
+  <uuid>11111111-2222-3333-4444-555555555555</uuid>
+
+  <metadata>
+    <libosinfo:libosinfo xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">
+      <libosinfo:os id="http://redhat.com/rhel/10.0"/>
+    </libosinfo:libosinfo>
+  </metadata>
+
+  <memory unit='MiB'>4096</memory>
+  <currentMemory unit='MiB'>4096</currentMemory>
+  <vcpu placement='static'>2</vcpu>
+
+  <os>
+    <type arch='x86_64' machine='q35'>hvm</type>
+
+    <!-- UEFI firmware (non-secureboot) -->
+    <loader readonly='yes' type='pflash'>/usr/share/edk2/ovmf/OVMF_CODE.fd</loader>
+
+    <!-- Per-VM NVRAM file, copied from template on first boot -->
+    <nvram template='/usr/share/edk2/ovmf/OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/rhel10-fixed_VARS.fd</nvram>
+
+    <!-- Optional: enable temporarily for deep boot debugging -->
+    <!-- <cmdline>rd.debug rd.shell loglevel=7 systemd.log_level=debug systemd.log_target=console</cmdline> -->
+  </os>
+
+  <features>
+    <acpi/>
+    <apic/>
+    <vmport state='off'/>
+  </features>
+
+  <cpu mode='host-passthrough' check='none'/>
+
+  <clock offset='utc'>
+    <timer name='rtc' tickpolicy='catchup'/>
+    <timer name='pit' tickpolicy='delay'/>
+    <timer name='hpet' present='no'/>
+  </clock>
+
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+
+  <devices>
+    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+
+    <!-- UEFI needs SMM; keep this controller present on q35 -->
+    <controller type='usb' index='0' model='qemu-xhci'/>
+
+    <controller type='pci' index='0' model='pcie-root'/>
+    <controller type='pci' index='1' model='pcie-root-port'>
+      <model name='pcie-root-port'/>
+      <target chassis='1' port='0x10'/>
+    </controller>
+    <controller type='pci' index='2' model='pcie-root-port'>
+      <model name='pcie-root-port'/>
+      <target chassis='2' port='0x11'/>
+    </controller>
+    <controller type='pci' index='3' model='pcie-root-port'>
+      <model name='pcie-root-port'/>
+      <target chassis='3' port='0x12'/>
+    </controller>
+
+    <controller type='virtio-serial' index='0'/>
+
+    <!-- Root disk -->
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' cache='none' io='native' discard='unmap'/>
+      <source file='/var/lib/libvirt/images/rhel10-fixed.qcow2'/>
+      <target dev='vda' bus='virtio'/>
+      <boot order='1'/>
+    </disk>
+
+    <!-- Optional: cloud-init seed ISO (attach only if you have it)
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='/var/lib/libvirt/images/rhel10-seed.iso'/>
+      <target dev='sda' bus='sata'/>
+      <readonly/>
+    </disk>
+    -->
+
+    <!-- Network -->
+    <interface type='network'>
+      <source network='default'/>
+      <model type='virtio'/>
+    </interface>
+
+    <!-- Console + serial -->
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+
+    <!-- Guest agent channel (install qemu-guest-agent inside guest) -->
+    <channel type='unix'>
+      <source mode='bind'/>
+      <target type='virtio' name='org.qemu.guest_agent.0'/>
+    </channel>
+
+    <!-- Graphics -->
+    <graphics type='spice' autoport='yes' listen='127.0.0.1'/>
+    <video>
+      <model type='virtio' heads='1'/>
+    </video>
+
+    <!-- Input -->
+    <input type='tablet' bus='usb'/>
+    <input type='keyboard' bus='ps2'/>
+
+    <!-- RNG helps entropy-starved boots -->
+    <rng model='virtio'>
+      <backend model='random'>/dev/urandom</backend>
+    </rng>
+
+    <!-- Basic sound device (optional) -->
+    <sound model='ich9'/>
+
+    <!-- Don’t let libvirt auto-add random devices -->
+    <memballoon model='virtio'/>
+  </devices>
+</domain>

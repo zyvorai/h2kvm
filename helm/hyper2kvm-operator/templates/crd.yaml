@@ -1,0 +1,252 @@
+{{- if .Values.crd.install }}
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: migrationjobs.hyper2kvm.io
+  labels:
+    {{- include "hyper2kvm-operator.labels" . | nindent 4 }}
+  annotations:
+    {{- if .Values.crd.keep }}
+    helm.sh/resource-policy: keep
+    {{- end }}
+    {{- with .Values.crd.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  group: hyper2kvm.io
+  names:
+    kind: MigrationJob
+    listKind: MigrationJobList
+    plural: migrationjobs
+    singular: migrationjob
+    shortNames:
+      - mj
+      - mjob
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - operation
+                - image
+              properties:
+                operation:
+                  type: string
+                  enum:
+                    - inspect
+                    - convert
+                    - offline_fix
+                  description: "Migration operation to perform"
+                image:
+                  type: object
+                  required:
+                    - path
+                    - format
+                  properties:
+                    path:
+                      type: string
+                      description: "Path to the VM disk image"
+                    format:
+                      type: string
+                      enum:
+                        - vmdk
+                        - vdi
+                        - vhd
+                        - vhdx
+                        - qcow2
+                        - raw
+                      description: "Input image format"
+                    checksum:
+                      type: string
+                      pattern: '^sha256:[a-f0-9]{64}$'
+                      description: "SHA256 checksum (sha256:...)"
+                priority:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                  default: 50
+                  description: "Job priority (0-100, higher = more priority)"
+                timeout:
+                  type: string
+                  pattern: '^\d+(s|m|h)$'
+                  default: "2h"
+                  description: "Job timeout (e.g., 30m, 2h, 24h)"
+                retryPolicy:
+                  type: object
+                  properties:
+                    maxRetries:
+                      type: integer
+                      minimum: 0
+                      maximum: 5
+                      default: 2
+                    backoff:
+                      type: string
+                      enum:
+                        - exponential
+                        - linear
+                        - fixed
+                      default: exponential
+                workerSelector:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: "Label selector for worker pods"
+                artifacts:
+                  type: object
+                  properties:
+                    output_dir:
+                      type: string
+                      description: "Output directory path"
+                    output_name:
+                      type: string
+                      description: "Output file name"
+                    output_format:
+                      type: string
+                      enum:
+                        - qcow2
+                        - raw
+                        - vdi
+                        - vhd
+                        - vhdx
+                      default: qcow2
+                      description: "Output image format"
+                    compress:
+                      type: boolean
+                      default: false
+                      description: "Compress output image"
+                    compression_level:
+                      type: integer
+                      minimum: 1
+                      maximum: 9
+                      description: "Compression level (1-9)"
+                conversions:
+                  type: object
+                  properties:
+                    fstab_mode:
+                      type: string
+                      enum:
+                        - preserve
+                        - stabilize
+                        - stabilize-all
+                      description: "Fstab conversion mode"
+                    regen_initramfs:
+                      type: boolean
+                      description: "Regenerate initramfs"
+                    regen_grub:
+                      type: boolean
+                      description: "Regenerate GRUB config"
+            status:
+              type: object
+              properties:
+                state:
+                  type: string
+                  enum:
+                    - CREATED
+                    - QUEUED
+                    - ASSIGNED
+                    - RUNNING
+                    - COMPLETED
+                    - FAILED
+                    - CANCELLED
+                    - RETRY
+                    - TIMEOUT
+                    - UNKNOWN
+                  description: "Current job state"
+                message:
+                  type: string
+                  description: "Human-readable status message"
+                assignedWorker:
+                  type: string
+                  description: "Worker pod name assigned to this job"
+                assignedNode:
+                  type: string
+                  description: "Node name where worker is running"
+                startTime:
+                  type: string
+                  format: date-time
+                  description: "Job start timestamp"
+                completionTime:
+                  type: string
+                  format: date-time
+                  description: "Job completion timestamp"
+                duration:
+                  type: string
+                  description: "Job duration"
+                progress:
+                  type: object
+                  properties:
+                    percent:
+                      type: integer
+                      minimum: 0
+                      maximum: 100
+                    currentPhase:
+                      type: string
+                    estimatedTimeRemaining:
+                      type: string
+                retryCount:
+                  type: integer
+                  minimum: 0
+                  description: "Number of retry attempts"
+                errorDetails:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                    message:
+                      type: string
+                    details:
+                      type: string
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - type
+                      - status
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                          - "True"
+                          - "False"
+                          - "Unknown"
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                      reason:
+                        type: string
+                      message:
+                        type: string
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Operation
+          type: string
+          jsonPath: .spec.operation
+        - name: State
+          type: string
+          jsonPath: .status.state
+        - name: Worker
+          type: string
+          jsonPath: .status.assignedWorker
+        - name: Priority
+          type: integer
+          jsonPath: .spec.priority
+        - name: Progress
+          type: integer
+          jsonPath: .status.progress.percent
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+{{- end }}

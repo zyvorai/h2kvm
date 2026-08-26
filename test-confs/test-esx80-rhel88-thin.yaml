@@ -1,0 +1,12 @@
+command: local
+vmdk: ./esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+output_dir: ./out
+to_output: esx80-rhel88-thin-fixed.qcow2
+out_format: qcow2
+flatten: true
+compress: true
+checksum: true
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+verbose: 1

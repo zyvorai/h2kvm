@@ -1,0 +1,25 @@
+# Parse libvirt domain XML and generate Artifact Manifest v1
+#
+# Use this to create a migration manifest from an existing libvirt VM
+# The manifest can then be used for batch migrations or automation
+
+command: libvirt-xml
+
+# Input: libvirt domain XML file
+libvirt_xml: /etc/libvirt/qemu/production-db.xml
+
+# Output
+output_dir: ./out
+manifest_filename: production-db-manifest.json
+
+# Optional: Compute SHA256 checksums of disk images
+compute_checksums: true
+
+# The generated manifest will include:
+# - VM metadata (name, UUID, memory, vcpus)
+# - Disk information (paths, formats, sizes, checksums)
+# - Network configuration
+# - Device configuration
+#
+# Use the manifest with:
+#   hyper2kvm --manifest ./out/production-db-manifest.json

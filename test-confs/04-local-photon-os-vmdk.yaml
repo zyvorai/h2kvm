@@ -1,0 +1,88 @@
+# ==============================================================================
+# 🌟 VMware Photon OS Local VMDK Conversion
+# ==============================================================================
+#
+# Converts a local VMware Photon OS VMDK to QCOW2 format
+#
+# Usage:
+#   sudo ./h2kvmctl --config test-confs/04-local-photon-os-vmdk.yaml
+#
+# Features:
+#   ✅ UUID-based fstab stabilization
+#   ✅ GRUB root= fixing
+#   ✅ Dracut initramfs regeneration with virtio drivers
+#   ✅ QCOW2 compression
+#   ✅ systemd-networkd compatibility
+#   ✅ Virtio support verified (Photon OS ships with virtio drivers)
+#
+# Requirements:
+#   - guestfs-tools with dracut support
+#   - Photon OS guest (RPM-based)
+#
+# Note: You may see "initramfs rebuild failed: mtime+size unchanged" - this is
+#       NORMAL for Photon OS. It means virtio drivers are already present.
+#
+# Libvirt XML configs for deployment:
+#   - test-confs/photon-virtio.xml (recommended - best performance)
+#   - test-confs/photon-sata.xml (fallback - rarely needed)
+# ==============================================================================
+
+cmd: local
+
+# Source VMDK
+vmdk: /home/ssahani/tt/hyper2kvm/photon.vmdk
+
+# Output Configuration
+output_dir: /home/ssahani/by-path/out
+
+# Flatten snapshot chain first
+flatten: true
+flatten_format: qcow2
+
+# Final output image
+to_output: photon.qcow2
+out_format: qcow2
+compress: false
+checksum: true
+
+# Filesystem + Boot Fixes
+# Show fstab before and after conversion
+print_fstab: true
+
+# Rewrite all entries to stable identifiers
+# Priority: UUID → PARTUUID → LABEL
+fstab_mode: stabilize-all
+
+# Update GRUB root= parameter
+no_grub: false
+
+# Regenerate initramfs (Photon OS uses dracut)
+regen_initramfs: true
+
+# Keep backups inside guest filesystem
+no_backup: false
+
+# Safety & Visibility
+dry_run: false
+
+# Verbosity levels:
+#   0 = INFO
+#   1 = verbose info
+#   2 = DEBUG (recommended for troubleshooting)
+verbose: 2
+
+# Optional logfile
+log_file: /home/ssahani/by-path/out/hyper2kvm.log
+
+# Optional Markdown report
+report: /home/ssahani/by-path/out/hyper2kvm-report.md
+
+# Optional Smoke Tests
+libvirt_test: true
+vm_name: photon
+memory: 2048
+vcpus: 2
+uefi: false
+timeout: 30
+keep_domain: false
+headless: true

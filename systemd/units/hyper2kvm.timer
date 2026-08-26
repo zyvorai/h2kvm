@@ -1,0 +1,24 @@
+[Unit]
+Description=Hyper2KVM Periodic VM Repair Timer
+Documentation=man:hyper2kvm(1) https://github.com/ssahani/hyper2kvm
+Requires=hyper2kvm-scheduled.service
+
+[Timer]
+# Run daily at 2 AM
+OnCalendar=daily
+OnCalendar=*-*-* 02:00:00
+
+# Also run 15 minutes after boot
+OnBootSec=15min
+
+# Persistent timer (run missed timers on boot)
+Persistent=true
+
+# Add random delay to prevent thundering herd
+RandomizedDelaySec=30min
+
+# Accuracy (how close to scheduled time)
+AccuracySec=1h
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Partner &amp; MSP Revenue Model — Build a Migration Practice with hyper2kvm</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1e3a5f, #2563eb, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #60a5fa; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(96,165,250,0.2); border: 1px solid rgba(96,165,250,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-blue { background: linear-gradient(135deg, #1e3a5f, #0f172a); color: #e8e6df; }
+  h2.st { font-size: 1.8em; font-weight: 700; margin-bottom: 0.5em; } h2.st span { color: #60a5fa; }
+  .page-light h2.st span { color: #1d4ed8; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.7em 0 0.3em; color: #60a5fa; }
+  .page-light h3 { color: #1d4ed8; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 1em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #2563eb; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #60a5fa; } .card p { font-size: 0.82em; opacity: 0.85; margin-bottom: 0; }
+  .page-light .card h4 { color: #1d4ed8; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  .stat-box { text-align: center; padding: 14px; }
+  .stat-box .num { font-size: 2em; font-weight: 800; color: #60a5fa; } .stat-box .label { font-size: 0.8em; opacity: 0.7; }
+  .highlight { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); border-radius: 8px; padding: 13px; margin: 0.7em 0; }
+  .page-dark .highlight { background: rgba(96,165,250,0.06); border: 1px solid rgba(96,165,250,0.15); }
+  .tier { border: 2px solid rgba(96,165,250,0.3); border-radius: 10px; padding: 14px; margin: 0.5em 0; }
+  .tier h4 { font-size: 1em; color: #60a5fa; margin-bottom: 6px; }
+  .page-light .tier { border-color: #bfdbfe; }
+  .page-light .tier h4 { color: #1d4ed8; }
+  .verdict { background: linear-gradient(135deg, rgba(30,58,95,0.2), rgba(37,99,235,0.1)); border: 2px solid #2563eb; border-radius: 12px; padding: 16px; margin: 0.8em 0; text-align: center; }
+  .verdict h3 { color: #60a5fa; font-size: 1.15em; margin-bottom: 5px; }
+  .footer { text-align: center; padding: 12px; font-size: 0.72em; opacity: 0.4; }
+  .revenue { color: #22c55e; font-weight: 800; }
+  .margin { color: #60a5fa; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Partner &amp; <span>MSP</span> Revenue Model</h1>
+  <h2>Build a Multi-Million Dollar Migration Practice</h2>
+  <p class="sub">300,000+ VMware customers need an exit plan. Every Hyper-V shop is overpaying for Datacenter licenses. Cloud bills are out of control. You deliver the migration — hyper2kvm is the free tool that makes it possible. Zero license cost to you. 100% of service revenue is yours. Year 1: $550K. Year 3: $2.8M+.</p>
+  <div class="badge">$0 Tool Cost | 100% Service Margin | $550K Yr1 | $2.8M Yr3 | 5 Revenue Streams</div>
+</div>
+
+<!-- PAGE 1: The Market Opportunity -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">The Market <span>Opportunity</span></h2>
+  <p class="sub">The biggest infrastructure shift in a decade — and most partners are unprepared.</p>
+
+  <div class="card-grid">
+    <div class="stat-box card"><div class="num">300K+</div><div class="label">VMware customers<br>globally need an exit plan</div></div>
+    <div class="stat-box card"><div class="num">$50B+</div><div class="label">VMware market in<br>transition (Broadcom)</div></div>
+    <div class="stat-box card"><div class="num">2-12x</div><div class="label">VMware license increases<br>driving urgency NOW</div></div>
+    <div class="stat-box card"><div class="num">60%</div><div class="label">VMware partners dropped<br>by Broadcom — gap to fill</div></div>
+  </div>
+
+  <h3>Why the Timing Is Perfect</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Broadcom Forcing Exits</h4>
+      <ul>
+        <li>Perpetual licenses eliminated</li>
+        <li>Forced into VCF bundle ($200K+ min)</li>
+        <li>2-12x price increases at renewal</li>
+        <li>Support quality declining</li>
+        <li>Customers actively seeking alternatives</li>
+        <li><strong>This is a 2-3 year window — first movers win</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Hyper-V Is Next</h4>
+      <ul>
+        <li>Windows Datacenter: $49K/host</li>
+        <li>System Center: $28K/host additional</li>
+        <li>Microsoft pushing to Azure (conflict)</li>
+        <li>Customers realize on-prem Windows is expensive</li>
+        <li>KVM eliminates host OS licensing entirely</li>
+        <li><strong>Second wave of migration demand</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Cloud Repatriation Wave</h4>
+      <ul>
+        <li>72% of enterprises over cloud budget</li>
+        <li>Egress fees make exit expensive (but savings are huge)</li>
+        <li>Data sovereignty requirements (GDPR, HIPAA)</li>
+        <li>Latency driving workloads back to edge</li>
+        <li>Cloud vendors won't help customers leave</li>
+        <li><strong>No competition — cloud vendors can't serve this</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>Your competitive advantage:</strong> VMware partners (60% dropped by Broadcom) are scrambling. Cloud vendors won't help customers leave. Red Hat MTV requires $50K+ OpenShift. You offer the only $0-cost, vendor-neutral migration — and keep 100% of the service revenue.</p>
+  </div>
+</div>
+
+<!-- PAGE 2: 5 Revenue Streams -->
+<div class="page page-light">
+  <h2 class="st">5 Revenue <span>Streams</span></h2>
+  <p class="sub">Migration is the entry point. Managed services are the recurring revenue engine.</p>
+
+  <div class="tier">
+    <h4>Stream 1: Migration Assessment — $5,000-25,000 per engagement</h4>
+    <p style="font-size:0.85em;">Connect to vCenter/Hyper-V/cloud read-only. Inventory all VMs. Classify by complexity. Deliver migration plan with timeline, risk assessment, and savings projection. POC: migrate 3-5 VMs live. <strong>Duration:</strong> 1-2 weeks. <strong>Margin:</strong> <span class="margin">80-90%</span> (almost pure labor). <strong>Close rate:</strong> 70%+ convert to full migration.</p>
+  </div>
+
+  <div class="tier">
+    <h4>Stream 2: Managed Migration — $25,000-250,000 per project</h4>
+    <p style="font-size:0.85em;">Full migration execution. Batch YAML automation. Windows VirtIO injection + Linux initramfs rebuild. Boot verification on every VM. Knowledge transfer + runbook delivery. <strong>Duration:</strong> 4-20 weeks. <strong>Margin:</strong> <span class="margin">60-75%</span>. Scales with VM count: ~$500-1,000/VM for complex estates.</p>
+  </div>
+
+  <div class="tier">
+    <h4>Stream 3: KVM/KubeVirt Managed Service — $5,000-25,000/month</h4>
+    <p style="font-size:0.85em;">Ongoing management of migrated infrastructure. Monitoring (Prometheus/Grafana), patching, backup, DR, capacity planning, incident response. <strong>Duration:</strong> 12-36 month contracts. <strong>Margin:</strong> <span class="margin">50-65%</span>. <strong>This is your recurring revenue engine</strong> — grows as you add clients.</p>
+  </div>
+
+  <div class="tier">
+    <h4>Stream 4: Training &amp; Enablement — $3,000-15,000 per engagement</h4>
+    <p style="font-size:0.85em;">Train client teams on KVM/libvirt administration, KubeVirt/K8s operations, monitoring setup, backup procedures. Certification prep (RHCSA, CKA). <strong>Duration:</strong> 2-5 days. <strong>Margin:</strong> <span class="margin">85-90%</span>. Creates client independence but builds relationship.</p>
+  </div>
+
+  <div class="tier">
+    <h4>Stream 5: Hardware + Architecture Consulting — $10,000-50,000</h4>
+    <p style="font-size:0.85em;">Design KVM/KubeVirt target architecture. Server spec and procurement advisory. Network design (OVS, bridge, SR-IOV). Storage design (Ceph, local NVMe, Longhorn). HA/DR planning. <strong>Margin:</strong> <span class="margin">70-80%</span>. Often bundled with migration project.</p>
+  </div>
+</div>
+
+<!-- PAGE 3: Per-Client Revenue Model -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Per-Client <span>Revenue Model</span></h2>
+  <p class="sub">What a single client engagement looks like across all 5 streams.</p>
+
+  <h3>Small Client (25 VMs, 2 hosts)</h3>
+  <table>
+    <tr><th style="width:25%">Revenue Stream</th><th style="width:15%">Price</th><th style="width:12%">Duration</th><th style="width:12%">Margin</th><th style="width:15%">Gross Profit</th><th style="width:21%">Notes</th></tr>
+    <tr><td>Assessment + POC</td><td>$5,000</td><td>1 week</td><td class="margin">85%</td><td>$4,250</td><td>Leads to migration in 70% of cases</td></tr>
+    <tr><td>Migration execution</td><td>$25,000</td><td>3 weeks</td><td class="margin">65%</td><td>$16,250</td><td>1 engineer, ~$1,000/VM</td></tr>
+    <tr><td>Training (2 days)</td><td>$5,000</td><td>2 days</td><td class="margin">90%</td><td>$4,500</td><td>KVM admin basics</td></tr>
+    <tr><td>Managed service (12 mo)</td><td>$60,000</td><td>12 months</td><td class="margin">55%</td><td>$33,000</td><td>$5K/mo monitoring + support</td></tr>
+    <tr><td class="revenue" style="font-size:0.88em;">Year 1 Total</td><td class="revenue">$95,000</td><td></td><td></td><td class="revenue">$58,000</td><td></td></tr>
+  </table>
+
+  <h3>Mid-Market Client (100 VMs, 8 hosts)</h3>
+  <table>
+    <tr><th style="width:25%">Revenue Stream</th><th style="width:15%">Price</th><th style="width:12%">Duration</th><th style="width:12%">Margin</th><th style="width:15%">Gross Profit</th><th style="width:21%">Notes</th></tr>
+    <tr><td>Assessment + POC</td><td>$15,000</td><td>2 weeks</td><td class="margin">85%</td><td>$12,750</td><td>Detailed complexity analysis</td></tr>
+    <tr><td>Migration execution</td><td>$85,000</td><td>10 weeks</td><td class="margin">65%</td><td>$55,250</td><td>1-2 engineers, ~$850/VM</td></tr>
+    <tr><td>Architecture consulting</td><td>$20,000</td><td>2 weeks</td><td class="margin">75%</td><td>$15,000</td><td>Target design + HA planning</td></tr>
+    <tr><td>Training (5 days)</td><td>$12,000</td><td>1 week</td><td class="margin">90%</td><td>$10,800</td><td>KVM + KubeVirt + monitoring</td></tr>
+    <tr><td>Managed service (12 mo)</td><td>$144,000</td><td>12 months</td><td class="margin">55%</td><td>$79,200</td><td>$12K/mo full management</td></tr>
+    <tr><td class="revenue" style="font-size:0.88em;">Year 1 Total</td><td class="revenue">$276,000</td><td></td><td></td><td class="revenue">$173,000</td><td></td></tr>
+  </table>
+
+  <h3>Enterprise Client (500 VMs, 40 hosts, 10 sites)</h3>
+  <table>
+    <tr><th style="width:25%">Revenue Stream</th><th style="width:15%">Price</th><th style="width:12%">Duration</th><th style="width:12%">Margin</th><th style="width:15%">Gross Profit</th><th style="width:21%">Notes</th></tr>
+    <tr><td>Assessment + POC</td><td>$25,000</td><td>2 weeks</td><td class="margin">85%</td><td>$21,250</td><td>Multi-site assessment</td></tr>
+    <tr><td>Migration execution</td><td>$200,000</td><td>16 weeks</td><td class="margin">60%</td><td>$120,000</td><td>2-3 engineers, ~$400/VM at scale</td></tr>
+    <tr><td>Architecture consulting</td><td>$40,000</td><td>3 weeks</td><td class="margin">75%</td><td>$30,000</td><td>Multi-site + edge + K8s design</td></tr>
+    <tr><td>Training (multi-team)</td><td>$25,000</td><td>2 weeks</td><td class="margin">85%</td><td>$21,250</td><td>KVM + K8s + GitOps for 3 teams</td></tr>
+    <tr><td>Managed service (12 mo)</td><td>$288,000</td><td>12 months</td><td class="margin">50%</td><td>$144,000</td><td>$24K/mo full management</td></tr>
+    <tr><td class="revenue" style="font-size:0.88em;">Year 1 Total</td><td class="revenue">$578,000</td><td></td><td></td><td class="revenue">$336,500</td><td></td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4: Practice Growth Projections -->
+<div class="page page-light">
+  <h2 class="st">Practice Growth <span>Projections</span></h2>
+  <p class="sub">Conservative, moderate, and aggressive scenarios for a new migration practice.</p>
+
+  <h3>Conservative Growth (Solo Consultant / Small MSP)</h3>
+  <table>
+    <tr><th style="width:10%">Year</th><th style="width:10%">Engineers</th><th style="width:10%">Clients</th><th style="width:15%">Assessment</th><th style="width:15%">Migration</th><th style="width:15%">Managed</th><th style="width:12%">Training</th><th style="width:13%">Total</th></tr>
+    <tr><td>Year 1</td><td>1</td><td>3</td><td>$15,000</td><td>$75,000</td><td>$120,000</td><td>$12,000</td><td class="revenue">$222,000</td></tr>
+    <tr><td>Year 2</td><td>2</td><td>6</td><td>$40,000</td><td>$200,000</td><td>$360,000</td><td>$30,000</td><td class="revenue">$630,000</td></tr>
+    <tr><td>Year 3</td><td>3</td><td>10</td><td>$75,000</td><td>$400,000</td><td>$720,000</td><td>$50,000</td><td class="revenue">$1,245,000</td></tr>
+  </table>
+
+  <h3>Moderate Growth (Established MSP / IT Consultancy)</h3>
+  <table>
+    <tr><th style="width:10%">Year</th><th style="width:10%">Engineers</th><th style="width:10%">Clients</th><th style="width:15%">Assessment</th><th style="width:15%">Migration</th><th style="width:15%">Managed</th><th style="width:12%">Training</th><th style="width:13%">Total</th></tr>
+    <tr><td>Year 1</td><td>2</td><td>5</td><td>$50,000</td><td>$200,000</td><td>$300,000</td><td>$25,000</td><td class="revenue">$575,000</td></tr>
+    <tr><td>Year 2</td><td>4</td><td>12</td><td>$120,000</td><td>$600,000</td><td>$900,000</td><td>$60,000</td><td class="revenue">$1,680,000</td></tr>
+    <tr><td>Year 3</td><td>6</td><td>20</td><td>$200,000</td><td>$1,000,000</td><td>$1,800,000</td><td>$100,000</td><td class="revenue">$3,100,000</td></tr>
+  </table>
+
+  <h3>Aggressive Growth (VAR / National MSP)</h3>
+  <table>
+    <tr><th style="width:10%">Year</th><th style="width:10%">Engineers</th><th style="width:10%">Clients</th><th style="width:15%">Assessment</th><th style="width:15%">Migration</th><th style="width:15%">Managed</th><th style="width:12%">Training</th><th style="width:13%">Total</th></tr>
+    <tr><td>Year 1</td><td>5</td><td>10</td><td>$100,000</td><td>$500,000</td><td>$600,000</td><td>$50,000</td><td class="revenue">$1,250,000</td></tr>
+    <tr><td>Year 2</td><td>10</td><td>25</td><td>$250,000</td><td>$1,500,000</td><td>$2,400,000</td><td>$150,000</td><td class="revenue">$4,300,000</td></tr>
+    <tr><td>Year 3</td><td>15</td><td>40</td><td>$400,000</td><td>$2,500,000</td><td>$4,800,000</td><td>$300,000</td><td class="revenue">$8,000,000</td></tr>
+  </table>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>The managed service multiplier:</strong> Migration is a one-time project. Managed services run 12-36 months. By Year 3, managed service revenue exceeds migration revenue in all scenarios. This is the classic MSP flywheel — migration fills the pipeline, managed services build the recurring base.</p>
+  </div>
+</div>
+
+<!-- PAGE 5: Competitive Positioning -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Competitive <span>Positioning</span></h2>
+  <p class="sub">How your hyper2kvm migration practice competes against other approaches.</p>
+
+  <table>
+    <tr><th style="width:18%">Approach</th><th style="width:14%">Tool Cost</th><th style="width:18%">Your Revenue</th><th style="width:14%">Lock-in</th><th style="width:18%">Limitations</th><th style="width:18%">Your Advantage</th></tr>
+    <tr><td><strong>You + hyper2kvm</strong></td><td class="check">$0</td><td class="check">100% yours</td><td class="check">None</td><td>None — 10 sources, KVM + K8s</td><td>Full margin, no vendor dependency</td></tr>
+    <tr><td>Red Hat + MTV</td><td class="cross">$50K+/yr OCP</td><td>Split with Red Hat</td><td class="cross">OpenShift</td><td>VMware only, no KVM deploy</td><td>You're $50K cheaper, more flexible</td></tr>
+    <tr><td>AWS Migration</td><td>Free (to AWS)</td><td>Split with AWS</td><td class="cross">AWS</td><td>Migrates TO AWS only</td><td>You migrate anywhere, including OFF AWS</td></tr>
+    <tr><td>Azure Migrate</td><td>Free (to Azure)</td><td>Split with Microsoft</td><td class="cross">Azure</td><td>Migrates TO Azure only</td><td>You're the exit ramp they can't offer</td></tr>
+    <tr><td>Carbonite</td><td>$3-10K/yr</td><td>Less tool cost</td><td class="cross">Proprietary</td><td>Windows GUI only, no K8s</td><td>You're cheaper, more capable</td></tr>
+    <tr><td>DIY (virt-v2v)</td><td class="check">$0</td><td>100% yours</td><td class="check">None</td><td>CLI only, no batch, no cloud, no K8s</td><td>You add TUI, automation, enterprise</td></tr>
+    <tr><td>Big 4 Consulting</td><td>$0 (they use tools)</td><td>Compete on price</td><td>Varies</td><td>$500-1,000/hr rates</td><td>You're 70% cheaper, specialized</td></tr>
+  </table>
+
+  <h3>Your Sales Pitch (vs Each Competitor)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>vs VMware Partners (ex-partners)</h4>
+      <p>"Your old VMware partner can't help you leave VMware — they sell VMware. We help you exit. Our tool is free, our migration is proven (99.8% success rate, 1,480 VMs across 8 industries), and we keep you on open standards so you're never locked in again."</p>
+    </div>
+    <div class="card">
+      <h4>vs Cloud Vendors (AWS/Azure/GCP)</h4>
+      <p>"Cloud vendors want you to migrate TO their cloud. We help you migrate FROM cloud to infrastructure you own. $0.09/GB egress fees add up to hundreds of thousands per year. We eliminate that. And we're the only tool that exports from all 10 cloud/hypervisor platforms."</p>
+    </div>
+    <div class="card">
+      <h4>vs Red Hat (MTV/OpenShift)</h4>
+      <p>"Red Hat MTV requires a $50K+ OpenShift subscription — just to access the migration tool. We deploy to any Kubernetes: K3s, vanilla, EKS, OpenShift. Same result, $50K less. And we also deploy to standalone KVM — which MTV can't do at all."</p>
+    </div>
+    <div class="card">
+      <h4>vs Big 4 / Large Consultancies</h4>
+      <p>"Deloitte/Accenture charge $500-1,000/hour for migration consulting. We charge $500-1,000 per VM — total. Same result, 70% less cost. We're specialists, not generalists. And our tool automates the manual work they bill hourly for."</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: Go-to-Market & Client Acquisition -->
+<div class="page page-light">
+  <h2 class="st">Go-to-Market <span>Strategy</span></h2>
+  <p class="sub">How to find clients, close deals, and build your pipeline.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Lead Source 1: VMware Renewal Lists</h4>
+      <ul>
+        <li>Every VMware customer renews annually</li>
+        <li>Public procurement records (govt)</li>
+        <li>LinkedIn: "VMware renewal" conversations</li>
+        <li>Partner channel: ex-VMware partners looking for alternatives to offer</li>
+        <li><strong>Offer free assessment to any customer facing renewal</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Lead Source 2: Cloud Cost Complainers</h4>
+      <ul>
+        <li>LinkedIn/Twitter: "AWS bill" complaints</li>
+        <li>FinOps community (cloud cost optimization)</li>
+        <li>Offer cloud-to-KVM repatriation assessment</li>
+        <li>Partner with FinOps consultants</li>
+        <li><strong>"We saved our last client $700K/yr in AWS costs"</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Lead Source 3: Compliance-Driven</h4>
+      <ul>
+        <li>HIPAA: healthcare orgs moving data on-prem</li>
+        <li>GDPR: EU data residency requirements</li>
+        <li>Government: air-gap and FedRAMP needs</li>
+        <li>Finance: SOX/PCI audit pressure</li>
+        <li><strong>"We're the only tool approved for air-gapped classified networks"</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Sales Process</h3>
+  <table>
+    <tr><th style="width:12%">Stage</th><th style="width:20%">Action</th><th style="width:15%">Duration</th><th style="width:28%">Deliverable</th><th style="width:25%">Next Step</th></tr>
+    <tr><td><strong>Discovery</strong></td><td>Identify pain (VMware cost, cloud bill, compliance)</td><td>1 call (30 min)</td><td>Pain qualification</td><td>Offer free assessment</td></tr>
+    <tr><td><strong>Assessment</strong></td><td>Connect to vCenter, inventory VMs, project savings</td><td>1-2 weeks</td><td>Migration plan + savings report</td><td>Proposal for migration</td></tr>
+    <tr><td><strong>POC</strong></td><td>Migrate 3-5 VMs live, demonstrate boot success</td><td>2 hours</td><td>Working VMs on KVM</td><td>Close migration deal</td></tr>
+    <tr><td><strong>Proposal</strong></td><td>Scope migration: VMs, timeline, price, SLA</td><td>1 week</td><td>SOW + pricing</td><td>Contract signature</td></tr>
+    <tr><td><strong>Execute</strong></td><td>Phased migration with batch automation</td><td>4-20 weeks</td><td>All VMs on KVM, runbooks</td><td>Upsell managed service</td></tr>
+    <tr><td><strong>Expand</strong></td><td>Managed service proposal + training</td><td>Ongoing</td><td>12-36 month MSP contract</td><td>Referrals + case study</td></tr>
+  </table>
+
+  <h3>Free Resources for Your Practice (from hyper2kvm)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Technical Assets</h4>
+      <ul>
+        <li>hyper2kvm + hypersdk (full platform, licensed*)</li>
+        <li>Documentation, API reference, YAML templates</li>
+        <li>POC guide + quickstart scripts</li>
+        <li>zkvm TUI for customer demos</li>
+        <li>1,273 Python + 116 Go tests (quality proof)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Sales Assets (26 PDFs)</h4>
+      <ul>
+        <li>Executive summary for CxO meetings</li>
+        <li>ROI calculator with fillable worksheets</li>
+        <li>8 industry case studies with financials</li>
+        <li>Competitive analysis vs every alternative</li>
+        <li>Security & compliance for regulated industries</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7: Partner Types & Getting Started -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Partner Types <span>&amp; Getting Started</span></h2>
+  <p class="sub">Whether you're a solo consultant or a national VAR, there's a model that fits.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Solo Consultant / Freelancer</h4>
+      <ul>
+        <li><strong>Investment:</strong> 1 week self-training ($0 — use POC guide)</li>
+        <li><strong>First client:</strong> Offer free assessment to existing contacts</li>
+        <li><strong>Revenue:</strong> $95K-276K per client per year</li>
+        <li><strong>Year 1 target:</strong> 2-3 clients = $200K-$400K</li>
+        <li><strong>Grow:</strong> Hire first engineer at client #4</li>
+        <li>Best for: Linux/KVM experts with existing network</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Regional MSP / IT Services</h4>
+      <ul>
+        <li><strong>Investment:</strong> 2-3 engineers trained (2 weeks, $0)</li>
+        <li><strong>First client:</strong> Existing VMware customer from your base</li>
+        <li><strong>Revenue:</strong> $575K Year 1, $3.1M Year 3</li>
+        <li><strong>Grow:</strong> Add migration as a service line alongside existing MSP</li>
+        <li><strong>Upsell:</strong> Managed KVM/K8s service to migrated clients</li>
+        <li>Best for: MSPs with VMware/Windows customer base</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>VAR / National Systems Integrator</h4>
+      <ul>
+        <li><strong>Investment:</strong> 5+ engineers, dedicated practice lead</li>
+        <li><strong>First client:</strong> Largest VMware account in portfolio</li>
+        <li><strong>Revenue:</strong> $1.25M Year 1, $8M Year 3</li>
+        <li><strong>Scale:</strong> Bundle with hardware refresh cycles</li>
+        <li><strong>Differentiate:</strong> "We're the VMware exit experts"</li>
+        <li>Best for: VARs losing VMware margin to Broadcom</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Ex-VMware Partner</h4>
+      <ul>
+        <li><strong>Situation:</strong> Dropped from Broadcom partner program</li>
+        <li><strong>Pivot:</strong> From selling VMware to selling VMware exit</li>
+        <li><strong>Advantage:</strong> You know every VMware customer in your territory</li>
+        <li><strong>Revenue:</strong> Replace VMware resell margin with migration services</li>
+        <li><strong>Position:</strong> "We helped you run VMware. Now we help you leave."</li>
+        <li>Best for: Partners who lost VMware revenue overnight</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Launch in 2 Weeks</h3>
+  <table>
+    <tr><th style="width:12%">Week</th><th style="width:25%">Action</th><th style="width:35%">Details</th><th style="width:28%">Outcome</th></tr>
+    <tr><td><strong>Week 1</strong></td><td>Self-train on hyper2kvm</td><td>Run POC guide on test env. Convert 5 VMs. Try zkvm TUI. Practice Windows + Linux migration. Review all 26 sales PDFs.</td><td>Team can demo and execute migrations</td></tr>
+    <tr><td><strong>Week 2</strong></td><td>First client engagement</td><td>Pick your best VMware account. Offer free assessment. Run read-only vCenter discovery. Deliver savings report.</td><td>Assessment delivered, migration proposal sent</td></tr>
+    <tr><td><strong>Month 2</strong></td><td>First migration project</td><td>Execute assessment-to-migration. Build YAML templates. Create internal runbooks. Document lessons learned.</td><td>First client migrated, case study material</td></tr>
+    <tr><td><strong>Month 3+</strong></td><td>Scale pipeline</td><td>Publish case study. Expand to 2nd and 3rd clients. Hire additional engineers. Standardize delivery.</td><td>Practice established, pipeline growing</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>The Business Case Is Simple</h3>
+    <p style="font-size:0.92em;">
+      Tool cost: <strong>$0</strong>. Training cost: <strong>$0</strong>. Revenue split: <strong>0%</strong> — you keep everything.<br>
+      300,000 VMware customers need an exit. Cloud bills are out of control. Hyper-V licensing is absurd.<br>
+      You have the tool. You have the 26 sales PDFs. You have the case studies.<br>
+      <strong>The only thing missing is your first client. Start this week.</strong>
+    </p>
+  </div>
+
+  <div class="footer"><p>hyper2kvm + hypersdk — Partner &amp; MSP Revenue Model | Proprietary (Zyvor AI Labs) | licensed*, 100% service revenue | github.com/ssahani/hyper2kvm</p></div>
+</div>
+
+</body>
+</html>

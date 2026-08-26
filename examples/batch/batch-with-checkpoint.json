@@ -1,0 +1,79 @@
+{
+  "batch_version": "1.0",
+  "batch_metadata": {
+    "batch_id": "migration-2026-01-22-checkpointed",
+    "parallel_limit": 4,
+    "continue_on_error": true,
+    "description": "Example batch with checkpoint/resume capability"
+  },
+  "vms": [
+    {
+      "id": "web-server-01",
+      "manifest": "/path/to/web-server-01/manifest.json",
+      "priority": 1,
+      "enabled": true
+    },
+    {
+      "id": "web-server-02",
+      "manifest": "/path/to/web-server-02/manifest.json",
+      "priority": 1,
+      "enabled": true
+    },
+    {
+      "id": "database-primary",
+      "manifest": "/path/to/database-primary/manifest.json",
+      "priority": 0,
+      "enabled": true
+    },
+    {
+      "id": "database-replica",
+      "manifest": "/path/to/database-replica/manifest.json",
+      "priority": 2,
+      "enabled": true
+    },
+    {
+      "id": "app-server-01",
+      "manifest": "/path/to/app-server-01/manifest.json",
+      "priority": 1,
+      "enabled": true
+    }
+  ],
+  "shared_config": {
+    "output_directory": "/var/lib/hyper2kvm/converted",
+    "checkpoint_directory": "/var/lib/hyper2kvm/checkpoints"
+  },
+  "__comment": [
+    "Checkpoint/Resume Features:",
+    "- Automatically saves checkpoint after each VM completes",
+    "- Resume from interruption by re-running the same command",
+    "- Checkpoints stored in output_directory/.checkpoints/",
+    "- Already-completed VMs are skipped on resume",
+    "- Failed VMs are tracked and not retried",
+    "- Checkpoint cleaned up on successful batch completion",
+    "",
+    "Usage:",
+    "1. Start batch conversion:",
+    "   sudo hyper2kvm --config batch-with-checkpoint.json batch",
+    "",
+    "2. If interrupted (Ctrl+C, crash, etc.), resume with same command:",
+    "   sudo hyper2kvm --config batch-with-checkpoint.json batch",
+    "",
+    "3. Force restart from beginning (clear checkpoint):",
+    "   rm -rf /var/lib/hyper2kvm/converted/.checkpoints/checkpoint-migration-2026-01-22-checkpointed.json",
+    "",
+    "Checkpoint File Location:",
+    "- {output_directory}/.checkpoints/checkpoint-{batch_id}.json",
+    "- Example: /var/lib/hyper2kvm/converted/.checkpoints/checkpoint-migration-2026-01-22-checkpointed.json",
+    "",
+    "Checkpoint Contents:",
+    "{",
+    "  \"batch_id\": \"migration-2026-01-22-checkpointed\",",
+    "  \"timestamp\": 1737561600.123,",
+    "  \"timestamp_iso\": \"2026-01-22T12:00:00Z\",",
+    "  \"completed_vms\": [\"web-server-01\", \"web-server-02\"],",
+    "  \"failed_vms\": [{\"vm_id\": \"database-primary\", \"error\": \"...\"}],",
+    "  \"total_vms\": 5,",
+    "  \"resume_from\": 3",
+    "}"
+  ]
+}

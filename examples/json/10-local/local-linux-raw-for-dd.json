@@ -1,0 +1,10 @@
+{
+  "command": "local",
+  "vmdk": "/path/to/linux.vmdk",
+  "flatten": true,
+  "flatten_format": "raw",
+  "to_output": "linux.raw",
+  "out_format": "raw",
+  "compress": false,
+  "checksum": true
+}

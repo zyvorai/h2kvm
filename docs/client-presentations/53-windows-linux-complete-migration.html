@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Complete Windows &amp; Linux VM Migration — hyper2kvm Full Feature Guide</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81, #0f172a); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.6em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 .win { color: #38bdf8; } .cover h1 .lin { color: #fb923c; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 0.95em; opacity: 0.6; max-width: 820px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .cover .badge-row { display: flex; gap: 12px; margin-top: 1em; justify-content: center; flex-wrap: wrap; }
+  .cover .stat-pill { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 10px 18px; border-radius: 12px; text-align: center; }
+  .cover .stat-pill .num { font-size: 1.5em; font-weight: 800; color: #a78bfa; } .cover .stat-pill .label { font-size: 0.75em; opacity: 0.6; }
+  .page { min-height: 100vh; padding: 36px 46px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; } .page-light { background: #fafbfc; }
+  .page-blue { background: linear-gradient(135deg, #0c4a6e, #0f172a); color: #e8e6df; }
+  .page-orange { background: linear-gradient(135deg, #7c2d12, #0f172a); color: #e8e6df; }
+  .page-purple { background: linear-gradient(135deg, #1e1b4b, #0f172a); color: #e8e6df; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #a78bfa; }
+  h2.st .win { color: #38bdf8; } h2.st .lin { color: #fb923c; }
+  .page-light h2.st span { color: #6d28d9; } .page-light h2.st .win { color: #0369a1; } .page-light h2.st .lin { color: #c2410c; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.6em 0 0.25em; color: #a78bfa; }
+  .page-light h3 { color: #6d28d9; }
+  h3.win { color: #38bdf8; } h3.lin { color: #fb923c; } .page-light h3.win { color: #0369a1; } .page-light h3.lin { color: #c2410c; }
+  p { margin-bottom: 0.5em; font-size: 0.88em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.76em; }
+  th { background: #6d28d9; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; font-size: 0.82em; }
+  th.win-h { background: #0369a1; } th.lin-h { background: #c2410c; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; } .partial { color: #f59e0b; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0.6em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.9em; font-weight: 600; margin-bottom: 4px; color: #a78bfa; } .card p { font-size: 0.78em; opacity: 0.85; margin-bottom: 0; }
+  .card.win-card h4 { color: #38bdf8; } .card.lin-card h4 { color: #fb923c; }
+  .page-light .card h4 { color: #6d28d9; } .page-light .card.win-card h4 { color: #0369a1; } .page-light .card.lin-card h4 { color: #c2410c; }
+  .card ul { padding-left: 14px; font-size: 0.78em; margin: 0; } .card li { margin-bottom: 2px; }
+  .highlight { background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .page-dark .highlight { background: rgba(139,92,246,0.06); border: 1px solid rgba(139,92,246,0.15); }
+  .alert { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .alert h4 { color: #ef4444; font-size: 0.9em; margin-bottom: 4px; }
+  .stat-box { text-align: center; padding: 12px; }
+  .stat-box .num { font-size: 1.8em; font-weight: 800; color: #a78bfa; } .stat-box .label { font-size: 0.75em; opacity: 0.7; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 0.5em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: 0.8em; }
+  .flow-arrow { font-size: 1.1em; color: #a78bfa; }
+  .flow-src { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); }
+  .flow-fix { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); }
+  .flow-ok { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+  pre { background: #0f172a; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.76em; line-height: 1.45; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  code { background: rgba(139,92,246,0.1); padding: 2px 4px; border-radius: 4px; font-size: 0.85em; }
+  .verdict { background: linear-gradient(135deg, rgba(30,27,75,0.3), rgba(49,46,129,0.15)); border: 2px solid #6d28d9; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #a78bfa; font-size: 1.1em; margin-bottom: 4px; }
+  .page-light .verdict { background: linear-gradient(135deg, rgba(109,40,217,0.06), rgba(139,92,246,0.04)); border-color: #6d28d9; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .os-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.72em; font-weight: 600; margin-right: 4px; }
+  .os-win { background: rgba(56,189,248,0.15); color: #38bdf8; } .os-lin { background: rgba(251,146,60,0.15); color: #fb923c; }
+  .page-light .os-win { background: rgba(3,105,161,0.1); color: #0369a1; } .page-light .os-lin { background: rgba(194,65,12,0.1); color: #c2410c; }
+  .dual-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .col-win { border-left: 3px solid #38bdf8; padding-left: 14px; }
+  .col-lin { border-left: 3px solid #fb923c; padding-left: 14px; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Complete <span class="win">Windows</span> &amp; <span class="lin">Linux</span><br>VM Migration</h1>
+  <h2>The Definitive hyper2kvm Feature Guide</h2>
+  <p class="sub">Every migration capability in one deck: VirtIO driver injection, initramfs rebuild, registry fixes, BSOD prevention, GRUB repair, SELinux relabeling, fstab UUID repair, boot verification, KubeVirt deployment, batch migration, interactive TUI, and more. From VMware, Hyper-V, AWS, Azure, GCP to KVM &mdash; every OS, every source, every workload.</p>
+  <div class="badge-row">
+    <div class="stat-pill"><div class="num">15+</div><div class="label">Linux Distros</div></div>
+    <div class="stat-pill"><div class="num">7</div><div class="label">Windows Versions</div></div>
+    <div class="stat-pill"><div class="num">10</div><div class="label">Source Platforms</div></div>
+    <div class="stat-pill"><div class="num">20+</div><div class="label">Automatic Fixes</div></div>
+    <div class="stat-pill"><div class="num">$0</div><div class="label">License Cost</div></div>
+  </div>
+  <div class="badge">Proprietary (Zyvor AI Labs) | VMCraft Engine | No libguestfs | CLI + TUI + API | KVM + KubeVirt</div>
+</div>
+
+<!-- PAGE 1: Platform Overview -->
+<div class="page page-dark">
+  <h2 class="st">Platform <span>Overview</span></h2>
+  <p class="sub">hyper2kvm is a complete VM migration toolkit: convert, fix, deploy, and verify &mdash; Windows and Linux, any source, any target.</p>
+
+  <div class="card-grid-4">
+    <div class="stat-box card"><div class="num" style="color:#38bdf8;">Windows</div><div class="label">Server 2016-2025<br>Windows 10/11<br>BIOS + UEFI + TPM</div></div>
+    <div class="stat-box card"><div class="num" style="color:#fb923c;">Linux</div><div class="label">RHEL, Ubuntu, Debian<br>SUSE, Fedora, Photon<br>15+ distributions</div></div>
+    <div class="stat-box card"><div class="num" style="color:#a78bfa;">Sources</div><div class="label">VMware, Hyper-V<br>AWS, Azure, GCP<br>+ 5 more clouds</div></div>
+    <div class="stat-box card"><div class="num" style="color:#22c55e;">Targets</div><div class="label">KVM / libvirt<br>KubeVirt / K8s<br>Dual deploy</div></div>
+  </div>
+
+  <h3>Architecture</h3>
+  <div class="flow">
+    <div class="flow-step flow-src">Source VM<br><small>VMware / Hyper-V / Cloud</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Export<br><small>govc / hypersdk</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Convert<br><small>VMDK/VHD &rarr; QCOW2</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Offline Fix<br><small>VMCraft engine</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">Deploy<br><small>libvirt / KubeVirt</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">Verify<br><small>Boot test</small></div>
+  </div>
+
+  <h3>Core Components</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>h2kvmctl (CLI)</h4>
+      <ul>
+        <li>YAML-driven migration pipeline</li>
+        <li>Single command: convert + fix + deploy</li>
+        <li>Windows &amp; Linux auto-detection</li>
+        <li>Batch mode for fleet migration</li>
+        <li>Doctor command for pre-flight checks</li>
+        <li>Verbose/dry-run modes</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>zkvm (Interactive TUI)</h4>
+      <ul>
+        <li>7-tab Bubble Tea interface</li>
+        <li>vSphere VM discovery + browser</li>
+        <li>Guided wizard with auto-detection</li>
+        <li>Live progress streaming</li>
+        <li>File browser with fuzzy search</li>
+        <li>Deploy target toggles (1-4 keys)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>VMCraft Engine</h4>
+      <ul>
+        <li>Pure Python + qemu-nbd (no libguestfs)</li>
+        <li>Offline disk mounting &amp; modification</li>
+        <li>Windows registry hive editing</li>
+        <li>Linux chroot for initramfs/GRUB</li>
+        <li>VirtIO driver injection</li>
+        <li>Works on any Linux host</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>hypersdk (Cloud Export Daemon)</h3>
+  <div class="highlight">
+    <p style="margin-bottom:0;">Go daemon with hexagonal architecture supporting <strong>10 cloud providers</strong>: AWS, Azure, GCP, VMware vSphere, Hyper-V, Oracle Cloud, IBM Cloud, Alibaba Cloud, DigitalOcean, Hetzner. Exports VMs as raw disk images for hyper2kvm to convert and fix. REST API for automation.</p>
+  </div>
+</div>
+
+<!-- PAGE 2: The Boot Problem — Both OS -->
+<div class="page page-light">
+  <h2 class="st">The Boot <span>Problem</span></h2>
+  <p class="sub">Why VMs crash after migration &mdash; and how hyper2kvm prevents every failure for both Windows and Linux.</p>
+
+  <div class="dual-col">
+    <div class="col-win">
+      <h3 class="win">Windows Failures</h3>
+      <table>
+        <tr><th class="win-h" style="width:35%">Failure</th><th class="win-h">hyper2kvm Fix</th></tr>
+        <tr><td><strong>BSOD 0x7B</strong> — boot disk invisible</td><td class="check">Injects viostor/vioscsi from virtio-win ISO</td></tr>
+        <tr><td><strong>No network</strong> — VMXNET3/netvsc gone</td><td class="check">Injects NetKVM VirtIO network driver</td></tr>
+        <tr><td><strong>VMware Tools crash</strong></td><td class="check">Removes services, drivers, tray applet</td></tr>
+        <tr><td><strong>Hyper-V IC conflict</strong></td><td class="check">Removes IC drivers from registry</td></tr>
+        <tr><td><strong>BCD boot config wrong</strong></td><td class="check">Updates BCD for VirtIO controller</td></tr>
+        <tr><td><strong>Wrong HAL</strong> — ACPI mismatch</td><td class="check">Configures HAL for KVM (q35)</td></tr>
+        <tr><td><strong>AWS/Azure agent errors</strong></td><td class="check">Disables cloud agent services</td></tr>
+        <tr><td><strong>Memory pressure</strong></td><td class="check">Injects VirtIO Balloon driver</td></tr>
+        <tr><td><strong>No serial console</strong></td><td class="check">Enables COM1 for headless access</td></tr>
+      </table>
+    </div>
+    <div class="col-lin">
+      <h3 class="lin">Linux Failures</h3>
+      <table>
+        <tr><th class="lin-h" style="width:35%">Failure</th><th class="lin-h">hyper2kvm Fix</th></tr>
+        <tr><td><strong>Kernel panic</strong> — VFS mount fail</td><td class="check">Rebuilds initramfs with VirtIO modules</td></tr>
+        <tr><td><strong>Root mount fail</strong> — /dev/sda gone</td><td class="check">Converts fstab to UUID-based mounts</td></tr>
+        <tr><td><strong>GRUB rescue</strong> — wrong root=</td><td class="check">Regenerates grub.cfg with correct device</td></tr>
+        <tr><td><strong>No network</strong> — vmxnet3 config gone</td><td class="check">Removes old NIC configs, loads virtio_net</td></tr>
+        <tr><td><strong>SELinux denial storm</strong></td><td class="check">Triggers /.autorelabel on first boot</td></tr>
+        <tr><td><strong>open-vm-tools errors</strong></td><td class="check">Removes package and service</td></tr>
+        <tr><td><strong>Hyper-V daemons crash</strong></td><td class="check">Disables hv_kvp/vss/fcopy daemons</td></tr>
+        <tr><td><strong>cloud-init re-provision</strong></td><td class="check">Disables cloud-init reprovisioning</td></tr>
+        <tr><td><strong>LVM not found</strong></td><td class="check">Includes dm-mod + LVM in initramfs</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>All fixes applied offline</strong> &mdash; hyper2kvm mounts the disk via qemu-nbd, modifies the Windows registry / Linux filesystem directly, then unmounts. VMs never boot in a broken state. <strong>20+ failure modes eliminated automatically.</strong></p>
+  </div>
+</div>
+
+<!-- PAGE 3: Supported OS Matrix -->
+<div class="page page-dark">
+  <h2 class="st">Supported <span>Operating Systems</span></h2>
+  <p class="sub">Every modern Windows and Linux version &mdash; tested and verified.</p>
+
+  <h3 class="win">Windows</h3>
+  <table>
+    <tr><th class="win-h" style="width:22%">OS</th><th class="win-h" style="width:20%">Editions</th><th class="win-h" style="width:13%">Boot Mode</th><th class="win-h" style="width:8%">Status</th><th class="win-h" style="width:37%">Notes</th></tr>
+    <tr><td><strong>Windows Server 2025</strong></td><td>Standard, Datacenter</td><td>UEFI, BIOS</td><td class="check">Tested</td><td>Latest VirtIO, Q35 recommended</td></tr>
+    <tr><td><strong>Windows Server 2022</strong></td><td>Standard, Datacenter, Core</td><td>UEFI, BIOS</td><td class="check">Tested</td><td>Primary enterprise target</td></tr>
+    <tr><td><strong>Windows Server 2019</strong></td><td>Standard, Datacenter</td><td>UEFI, BIOS</td><td class="check">Tested</td><td>Most common in VMware estates</td></tr>
+    <tr><td><strong>Windows Server 2016</strong></td><td>Standard, Datacenter</td><td>UEFI, BIOS</td><td class="check">Tested</td><td>Extended support until 2027</td></tr>
+    <tr><td><strong>Windows 11</strong></td><td>Pro, Enterprise</td><td>UEFI + TPM</td><td class="check">Tested</td><td>TPM 2.0 via swtpm on KVM</td></tr>
+    <tr><td><strong>Windows 10</strong></td><td>Pro, Enterprise, LTSC</td><td>UEFI, BIOS</td><td class="check">Tested</td><td>VDI and workstation migrations</td></tr>
+    <tr><td><strong>Windows Server 2012 R2</strong></td><td>Standard, Datacenter</td><td>BIOS</td><td class="check">Tested</td><td>Legacy &mdash; older VirtIO driver set</td></tr>
+  </table>
+
+  <h3 class="lin">Linux</h3>
+  <table>
+    <tr><th class="lin-h" style="width:17%">Distribution</th><th class="lin-h" style="width:17%">Versions</th><th class="lin-h" style="width:10%">Boot</th><th class="lin-h" style="width:12%">Filesystems</th><th class="lin-h" style="width:8%">Status</th><th class="lin-h" style="width:10%">initramfs</th><th class="lin-h" style="width:26%">Notes</th></tr>
+    <tr><td><strong>RHEL</strong></td><td>7, 8, 9, 10</td><td>UEFI/BIOS</td><td>XFS, ext4, LVM</td><td class="check">Tested</td><td>dracut</td><td>Enterprise #1 target</td></tr>
+    <tr><td><strong>Rocky / Alma</strong></td><td>8, 9</td><td>UEFI/BIOS</td><td>XFS, ext4, LVM</td><td class="check">Tested</td><td>dracut</td><td>CentOS replacements</td></tr>
+    <tr><td><strong>Ubuntu</strong></td><td>20.04, 22.04, 24.04</td><td>UEFI/BIOS</td><td>ext4, ZFS, LVM</td><td class="check">Tested</td><td>update-initramfs</td><td>Cloud &amp; server standard</td></tr>
+    <tr><td><strong>Debian</strong></td><td>11, 12</td><td>UEFI/BIOS</td><td>ext4, XFS, LVM</td><td class="check">Tested</td><td>update-initramfs</td><td>Stable server base</td></tr>
+    <tr><td><strong>SUSE SLES</strong></td><td>12 SP5, 15 SP5/SP6</td><td>UEFI/BIOS</td><td>Btrfs, XFS, ext4</td><td class="check">Tested</td><td>dracut</td><td>SAP &amp; enterprise</td></tr>
+    <tr><td><strong>Fedora</strong></td><td>38-41</td><td>UEFI/BIOS</td><td>XFS, Btrfs, ext4</td><td class="check">Tested</td><td>dracut</td><td>Cutting-edge kernel</td></tr>
+    <tr><td><strong>Oracle Linux</strong></td><td>7, 8, 9</td><td>UEFI/BIOS</td><td>XFS, ext4, LVM</td><td class="check">Tested</td><td>dracut</td><td>UEK + RHCK support</td></tr>
+    <tr><td><strong>Photon OS</strong></td><td>3, 4, 5</td><td>UEFI/BIOS</td><td>ext4</td><td class="check">Tested</td><td>dracut</td><td>VMware appliance OS</td></tr>
+    <tr><td><strong>Amazon Linux</strong></td><td>2, 2023</td><td>UEFI/BIOS</td><td>XFS, ext4</td><td class="check">Tested</td><td>dracut</td><td>AWS repatriation</td></tr>
+    <tr><td><strong>openSUSE</strong></td><td>Leap 15.5/15.6, TW</td><td>UEFI/BIOS</td><td>Btrfs, XFS</td><td class="check">Tested</td><td>dracut</td><td>Community SUSE</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 4: Source Platforms -->
+<div class="page page-light">
+  <h2 class="st">Every Source <span>Platform</span></h2>
+  <p class="sub">Migrate from any hypervisor or cloud &mdash; each with source-specific fixes for both Windows and Linux.</p>
+
+  <h3>VMware vSphere &rarr; KVM</h3>
+  <div class="flow">
+    <div class="flow-step flow-src">VMware VMDK<br><small>PVSCSI / vmxnet3 / vmw_pvscsi</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix"><span class="os-win">WIN</span> VirtIO inject + remove VMware Tools<br><span class="os-lin">LIN</span> initramfs rebuild + remove open-vm-tools</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">KVM (VirtIO)</div>
+  </div>
+
+  <h3>Hyper-V &rarr; KVM</h3>
+  <div class="flow">
+    <div class="flow-step flow-src">Hyper-V VHD/VHDX<br><small>storvsc / netvsc / hv_*</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix"><span class="os-win">WIN</span> VirtIO inject + remove Hyper-V IC<br><span class="os-lin">LIN</span> initramfs rebuild + remove hv_* daemons</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">KVM (VirtIO)</div>
+  </div>
+
+  <h3>AWS / Azure / GCP &rarr; KVM</h3>
+  <div class="flow">
+    <div class="flow-step flow-src">Cloud Disk<br><small>Xen / NVMe / ENA / waagent</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix"><span class="os-win">WIN</span> VirtIO inject + disable cloud agents<br><span class="os-lin">LIN</span> initramfs + fstab + disable cloud-init</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">KVM (VirtIO)</div>
+  </div>
+
+  <h3>Unified Fix Matrix &mdash; All Sources &times; Both OS</h3>
+  <table>
+    <tr><th style="width:22%">Fix</th><th style="width:6%">OS</th><th style="width:12%">VMware</th><th style="width:12%">Hyper-V</th><th style="width:12%">AWS</th><th style="width:12%">Azure</th><th style="width:12%">GCP</th><th style="width:12%">OpenStack</th></tr>
+    <tr><td><strong>VirtIO storage driver</strong></td><td><span class="os-win">W</span></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>initramfs + VirtIO</strong></td><td><span class="os-lin">L</span></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>VirtIO network driver</strong></td><td><span class="os-win">W</span></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>fstab UUID repair</strong></td><td><span class="os-lin">L</span></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>BCD / GRUB repair</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Remove VMware Tools</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td class="check">&#10003;</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+    <tr><td><strong>Remove Hyper-V IC</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td>N/A</td><td class="check">&#10003;</td><td>N/A</td><td class="check">&#10003;</td><td>N/A</td><td>N/A</td></tr>
+    <tr><td><strong>Remove cloud agents</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td>N/A</td><td>N/A</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td>N/A</td></tr>
+    <tr><td><strong>SELinux relabel</strong></td><td><span class="os-lin">L</span></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td><strong>Serial console</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 5: Windows Deep Dive — Pipeline & Drivers -->
+<div class="page page-blue">
+  <h2 class="st"><span class="win">Windows</span> Migration Deep Dive</h2>
+  <p class="sub">The complete Windows offline fix pipeline &mdash; every stage explained.</p>
+
+  <div class="card-grid-3">
+    <div class="card win-card">
+      <h4>Stage 1: Bootstrap</h4>
+      <ul>
+        <li>Mount disk offline via qemu-nbd</li>
+        <li>Detect Windows version (2016-2025, 10/11)</li>
+        <li>Detect boot mode (BIOS vs UEFI)</li>
+        <li>Detect storage controller (LSI/PVSCSI/storvsc)</li>
+        <li>Locate registry hives (SYSTEM, SOFTWARE)</li>
+        <li>Map partition layout (EFI, Recovery, C:)</li>
+        <li>Select VirtIO driver version for OS</li>
+        <li>Identify installed hypervisor tools</li>
+      </ul>
+    </div>
+    <div class="card win-card">
+      <h4>Stage 2: Driver Injection</h4>
+      <ul>
+        <li>Extract drivers from virtio-win ISO</li>
+        <li>Copy viostor/vioscsi .sys + .inf to C:\Windows</li>
+        <li>Copy NetKVM (network), Balloon (memory)</li>
+        <li>Load offline SYSTEM hive</li>
+        <li>Add registry entries (Start=0, boot-start)</li>
+        <li>Update CriticalDeviceDatabase for VirtIO PCI</li>
+        <li>Configure UpperFilters/LowerFilters</li>
+        <li>Set correct driver stack ordering</li>
+      </ul>
+    </div>
+    <div class="card win-card">
+      <h4>Stage 3: Cleanup &amp; Verify</h4>
+      <ul>
+        <li>Remove VMware/Hyper-V/cloud services</li>
+        <li>Remove source hypervisor drivers</li>
+        <li>Update BCD for new boot controller</li>
+        <li>Enable serial console (COM1)</li>
+        <li>Generate libvirt XML (Q35 + VirtIO)</li>
+        <li>Generate KubeVirt manifest (optional)</li>
+        <li>Automated boot test (no BSOD check)</li>
+        <li>Webhook notification on result</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="win">Windows YAML Configuration</h3>
+  <pre>
+# windows-migration.yaml
+cmd: vsphere                        # Or: local, hyperv
+vcenter: vcenter.corp.com
+vs_action: export_vm
+vs_vm: win-sql-server-01
+output_dir: ./converted
+out_format: qcow2
+windows: true                        # Enable Windows pipeline
+guest_os: windows
+virtio_win_iso: /usr/share/virtio-win/virtio-win.iso
+emit_domain_xml: true                # libvirt XML
+deploy_k8s: false                    # KubeVirt manifest
+vm_name: win-sql-server-01
+memory: 8192
+vcpus: 4
+machine: q35                         # PCIe chipset
+uefi: true                           # UEFI boot
+boot_test: true                      # Auto boot verification
+  </pre>
+
+  <h3 class="win">VirtIO Driver Components Injected</h3>
+  <table>
+    <tr><th class="win-h" style="width:18%">Driver</th><th class="win-h" style="width:15%">File</th><th class="win-h" style="width:32%">Purpose</th><th class="win-h" style="width:35%">Registry Configuration</th></tr>
+    <tr><td><strong>viostor</strong></td><td>viostor.sys</td><td>VirtIO block storage (boot-critical)</td><td>Start=0, Group=SCSI miniport, CriticalDeviceDatabase</td></tr>
+    <tr><td><strong>vioscsi</strong></td><td>vioscsi.sys</td><td>VirtIO SCSI controller</td><td>Start=0, Group=SCSI miniport</td></tr>
+    <tr><td><strong>NetKVM</strong></td><td>netkvm.sys</td><td>VirtIO network adapter</td><td>Start=3, NDIS miniport registration</td></tr>
+    <tr><td><strong>Balloon</strong></td><td>balloon.sys</td><td>Dynamic memory management</td><td>Start=3, blnsvr service</td></tr>
+    <tr><td><strong>vioserial</strong></td><td>vioser.sys</td><td>Serial port for QEMU guest agent</td><td>Start=3, serial device class</td></tr>
+    <tr><td><strong>viorng</strong></td><td>viorng.sys</td><td>Hardware RNG from KVM host</td><td>Start=3, entropy provider</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 6: Linux Deep Dive — Pipeline & initramfs -->
+<div class="page page-orange">
+  <h2 class="st"><span class="lin">Linux</span> Migration Deep Dive</h2>
+  <p class="sub">The complete Linux offline fix pipeline &mdash; every fix explained.</p>
+
+  <div class="flow">
+    <div class="flow-step flow-src">Source Disk</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">Detect OS</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Fix fstab</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Rebuild initramfs</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Fix GRUB</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">Clean Network</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-fix">SELinux</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">Boot</div>
+  </div>
+
+  <table>
+    <tr><th class="lin-h" style="width:5%">#</th><th class="lin-h" style="width:16%">Fix</th><th class="lin-h" style="width:37%">What It Does</th><th class="lin-h" style="width:42%">Technical Detail</th></tr>
+    <tr><td>1</td><td><strong>OS Detection</strong></td><td>Identifies distro, version, init, boot mode, partitions</td><td>Parses /etc/os-release, EFI presence, GPT/MBR, LVM VGs</td></tr>
+    <tr><td>2</td><td><strong>fstab UUID Repair</strong></td><td>Converts /dev/sdX mounts to UUID-based</td><td>blkid scan, replaces /dev/sdX, /dev/xvdX, /dev/hdX with UUID=</td></tr>
+    <tr><td>3</td><td><strong>initramfs Rebuild</strong></td><td>Injects virtio_blk, virtio_scsi, virtio_net, virtio_pci</td><td>Chroot: dracut (RHEL/Fedora/SUSE) or update-initramfs (Debian/Ubuntu)</td></tr>
+    <tr><td>4</td><td><strong>GRUB Update</strong></td><td>Fixes root= kernel parameter</td><td>Updates GRUB_CMDLINE_LINUX, regenerates grub.cfg via grub2-mkconfig</td></tr>
+    <tr><td>5</td><td><strong>Network Cleanup</strong></td><td>Removes old NIC configs (vmxnet3/hv_netvsc)</td><td>Deletes ifcfg-*, netplan YAML with hardware MACs, 70-persistent-net.rules</td></tr>
+    <tr><td>6</td><td><strong>VMware Tools</strong></td><td>Removes open-vm-tools</td><td>rpm -e / apt remove, disable vmtoolsd.service</td></tr>
+    <tr><td>7</td><td><strong>Hyper-V IC</strong></td><td>Removes Hyper-V daemons</td><td>Disable hv_kvp_daemon, hv_vss_daemon, hv_fcopy_daemon</td></tr>
+    <tr><td>8</td><td><strong>Cloud Agents</strong></td><td>Disables AWS/Azure/GCP agents</td><td>Disable cloud-init, waagent, SSM agent; preserve hostname</td></tr>
+    <tr><td>9</td><td><strong>SELinux Relabel</strong></td><td>Triggers filesystem relabel</td><td>Creates /.autorelabel for restorecon on first boot</td></tr>
+    <tr><td>10</td><td><strong>Serial Console</strong></td><td>Enables ttyS0 for headless access</td><td>console=ttyS0,115200n8 in GRUB, enable serial-getty@ttyS0</td></tr>
+  </table>
+
+  <h3 class="lin">Linux YAML Configuration</h3>
+  <pre>
+# rhel9-webserver.yaml                 # aws-postgres.yaml (KubeVirt target)
+cmd: vsphere                           cmd: local
+vcenter: vcenter.corp.com              raw: ./aws-export/postgres.raw
+vs_action: export_vm                   output_dir: ./converted
+vs_vm: rhel9-web-01                    out_format: qcow2
+output_dir: ./converted                regen_initramfs: true
+out_format: qcow2                      deploy_k8s: true
+regen_initramfs: true                  k8s_namespace: databases
+emit_domain_xml: true                  vm_name: postgres-primary
+vm_name: rhel9-web-01                  memory: 16384
+memory: 4096                           vcpus: 8
+vcpus: 2                               boot_test: true
+machine: q35
+uefi: true
+boot_test: true
+  </pre>
+</div>
+
+<!-- PAGE 7: Enterprise Workloads — Windows -->
+<div class="page page-light">
+  <h2 class="st">Enterprise Workloads &mdash; <span class="win">Windows</span></h2>
+  <p class="sub">Critical Windows applications migrated safely with tested procedures.</p>
+
+  <div class="card-grid-3">
+    <div class="card win-card">
+      <h4>SQL Server</h4>
+      <ul>
+        <li>SQL 2016, 2017, 2019, 2022 &mdash; all tested</li>
+        <li>Database files migrate with disk intact</li>
+        <li>VirtIO SCSI matches PVSCSI performance</li>
+        <li>TempDB, log files, data files preserved</li>
+        <li>KVM vCPU pinning cuts per-core license 20-40%</li>
+        <li>Always-On AG: migrate secondaries first</li>
+      </ul>
+    </div>
+    <div class="card win-card">
+      <h4>Active Directory</h4>
+      <ul>
+        <li>NTDS.dit database migrates with disk</li>
+        <li>SYSVOL/NETLOGON shares preserved</li>
+        <li>AD replication resumes after KVM boot</li>
+        <li>Strategy: secondaries first, verify, then primary</li>
+        <li>DNS zones and records intact</li>
+        <li>Optional MAC address preservation</li>
+      </ul>
+    </div>
+    <div class="card win-card">
+      <h4>Exchange Server</h4>
+      <ul>
+        <li>Exchange 2016, 2019 tested</li>
+        <li>Mailbox databases mount post-migration</li>
+        <li>DAG: migrate passive copies first</li>
+        <li>Certificate stores preserved in registry</li>
+        <li>Transport queues: drain before migration</li>
+        <li>Put in maintenance mode during cutover</li>
+      </ul>
+    </div>
+    <div class="card win-card">
+      <h4>IIS / .NET Web Apps</h4>
+      <ul>
+        <li>Sites, app pools, bindings preserved</li>
+        <li>SSL certificates in cert store intact</li>
+        <li>.NET applications run unchanged</li>
+        <li>Simplest migration &mdash; standard VirtIO injection</li>
+        <li>Load balancer health checks resume</li>
+        <li>Verify URL bindings post-migration</li>
+      </ul>
+    </div>
+    <div class="card win-card">
+      <h4>File Servers (NTFS/ReFS)</h4>
+      <ul>
+        <li>NTFS permissions (ACLs) fully preserved</li>
+        <li>DFS namespaces and replication intact</li>
+        <li>SMB shares auto-start on boot</li>
+        <li>Deduplication volumes migrate correctly</li>
+        <li>Shadow copies preserved with disk</li>
+        <li>FSRM quotas maintained</li>
+      </ul>
+    </div>
+    <div class="card win-card">
+      <h4>Remote Desktop Services</h4>
+      <ul>
+        <li>Session host, broker, gateway roles migrate</li>
+        <li>User profiles and settings preserved</li>
+        <li>RDP certificates intact</li>
+        <li>GPU passthrough for RemoteFX on KVM</li>
+        <li>Connection broker DB migrates with SQL</li>
+        <li>Licensing server: reactivate post-migration</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="win">SQL Server Licensing Savings with KVM</h3>
+  <div class="card-grid">
+    <div class="card win-card">
+      <h4>VMware Problem</h4>
+      <p>VMware reports all physical cores to Microsoft. SQL per-core licensing counts host cores. A 2-socket 16-core host = 32 cores to license. Even 4-vCPU SQL VM may require all 32 cores licensed. <strong>SQL Enterprise: $15,123/core = $483,936/host.</strong></p>
+    </div>
+    <div class="card win-card">
+      <h4>KVM Advantage</h4>
+      <p>KVM with CPU pinning exposes only assigned cores. 4 pinned vCPUs = license only 4 cores. NUMA-aware placement, cgroups enforce isolation (auditor-verifiable). <strong>SQL Enterprise: $15,123 x 4 = $60,492.</strong> Savings: <strong style="color:#22c55e;">$423K per host.</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8: Enterprise Workloads — Linux -->
+<div class="page page-dark">
+  <h2 class="st">Enterprise Workloads &mdash; <span class="lin">Linux</span></h2>
+  <p class="sub">Critical Linux applications migrated safely with tested procedures.</p>
+
+  <div class="card-grid-3">
+    <div class="card lin-card">
+      <h4>PostgreSQL / MySQL / MariaDB</h4>
+      <ul>
+        <li>Data directories migrate with disk</li>
+        <li>InnoDB/WAL files intact on target</li>
+        <li>VirtIO SCSI comparable to PVSCSI I/O</li>
+        <li>Tablespaces on separate partitions via fstab fix</li>
+        <li>Replication resumes (update source IP)</li>
+        <li>Stop DB before export for consistency</li>
+      </ul>
+    </div>
+    <div class="card lin-card">
+      <h4>Docker / Podman Hosts</h4>
+      <ul>
+        <li>Container images in /var/lib/docker intact</li>
+        <li>Overlay2/fuse-overlayfs storage preserved</li>
+        <li>Docker daemon starts, containers resume</li>
+        <li>Podman rootless containers preserved</li>
+        <li>Registry data (Harbor, GitLab) travels with vol</li>
+        <li>docker-compose stacks auto-restart via systemd</li>
+      </ul>
+    </div>
+    <div class="card lin-card">
+      <h4>Kubernetes Nodes</h4>
+      <ul>
+        <li>kubelet, containerd, etcd data migrates</li>
+        <li>Migrate workers first, then control plane</li>
+        <li>etcd snapshot before control plane migration</li>
+        <li>CNI (Calico, Cilium) needs network reconfig</li>
+        <li>PersistentVolumes on local disk travel with VM</li>
+        <li>Cordon + drain node before migration</li>
+      </ul>
+    </div>
+    <div class="card lin-card">
+      <h4>Web Servers (Apache / Nginx)</h4>
+      <ul>
+        <li>Simplest migration &mdash; standard pipeline</li>
+        <li>Virtual hosts, SSL certs, .htaccess preserved</li>
+        <li>Let's Encrypt certs intact</li>
+        <li>PHP-FPM, Python WSGI, Node.js unchanged</li>
+        <li>Load balancer health checks resume</li>
+        <li>Verify DNS/IP bindings post-migration</li>
+      </ul>
+    </div>
+    <div class="card lin-card">
+      <h4>NFS / Samba File Servers</h4>
+      <ul>
+        <li>Exported filesystems migrate with disk</li>
+        <li>NFS /etc/exports preserved</li>
+        <li>Samba smb.conf intact</li>
+        <li>POSIX ACLs + xattrs on ext4/XFS</li>
+        <li>Clients reconnect after DNS/IP update</li>
+        <li>Update exports for new network if IP changes</li>
+      </ul>
+    </div>
+    <div class="card lin-card">
+      <h4>Monitoring / CI-CD</h4>
+      <ul>
+        <li>Prometheus TSDB, Grafana dashboards intact</li>
+        <li>Elasticsearch indices travel with disk</li>
+        <li>GitLab PostgreSQL + Redis data preserved</li>
+        <li>Jenkins workspace/job history intact</li>
+        <li>SSH keys in /home/*/.ssh preserved</li>
+        <li>VirtIO SCSI + NVMe for heavy I/O</li>
+      </ul>
+    </div>
+    <div class="card lin-card">
+      <h4>FreeIPA / LDAP / Kerberos</h4>
+      <ul>
+        <li>389-ds LDAP directory migrates with disk</li>
+        <li>Kerberos keytabs/principal DB preserved</li>
+        <li>CA certificates in /etc/pki intact</li>
+        <li>DNS zones travel with LDAP</li>
+        <li>Replicas first, verify sync, then primary</li>
+        <li>Test kinit + ldapsearch post-migration</li>
+      </ul>
+    </div>
+    <div class="card lin-card">
+      <h4>SAP / Oracle DB on SUSE/RHEL</h4>
+      <ul>
+        <li>SAP HANA: memory-mapped files travel with disk</li>
+        <li>Oracle DB datafiles, redo logs intact</li>
+        <li>Huge pages configured in KVM XML</li>
+        <li>CPU pinning for consistent performance</li>
+        <li>SUSE SLES certified for KVM</li>
+        <li>RHEL certified for KVM virtualization</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 9: Deployment Targets -->
+<div class="page page-light">
+  <h2 class="st">Deployment <span>Targets</span></h2>
+  <p class="sub">Deploy converted VMs to KVM/libvirt, KubeVirt/Kubernetes, or both simultaneously.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>KVM / libvirt</h4>
+      <ul>
+        <li><code>emit_domain_xml: true</code></li>
+        <li>Optimized libvirt domain XML generation</li>
+        <li>Q35 machine type with PCIe</li>
+        <li>VirtIO disk, network, balloon, RNG, serial</li>
+        <li>UEFI (OVMF) or BIOS boot</li>
+        <li>TPM 2.0 via swtpm (Windows 11)</li>
+        <li>CPU pinning, NUMA, huge pages</li>
+        <li>Auto virsh define + optional boot test</li>
+        <li>VNC/Spice console for visual verification</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>KubeVirt / Kubernetes</h4>
+      <ul>
+        <li><code>deploy_k8s: true</code></li>
+        <li>VirtualMachine manifest generation</li>
+        <li>PVC with disk image upload via CDI</li>
+        <li>Works on K3s, vanilla K8s, OpenShift</li>
+        <li>GitOps-ready YAML for fleet deploy</li>
+        <li>kubectl apply to any cluster</li>
+        <li>Resource requests/limits from VM config</li>
+        <li>Network policies, pod affinity</li>
+        <li>Live migration support on KubeVirt</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Dual Target Deploy</h4>
+      <ul>
+        <li>Both outputs from one conversion run</li>
+        <li><code>emit_domain_xml: true</code> + <code>deploy_k8s: true</code></li>
+        <li>KVM for traditional bare-metal hosts</li>
+        <li>KubeVirt for Kubernetes clusters</li>
+        <li>Choose per-site at deploy time</li>
+        <li>Same QCOW2 image for both targets</li>
+        <li>Edge sites: K3s + KubeVirt</li>
+        <li>Data center: libvirt + KVM</li>
+        <li>Hybrid: mix and match per workload</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>libvirt XML Features Generated</h3>
+  <table>
+    <tr><th style="width:20%">Feature</th><th style="width:40%">Configuration</th><th style="width:40%">Benefit</th></tr>
+    <tr><td><strong>Machine type</strong></td><td>Q35 (PCIe) or i440FX (legacy)</td><td>Modern chipset with PCIe for better device passthrough</td></tr>
+    <tr><td><strong>CPU model</strong></td><td>host-passthrough with pinning</td><td>Full host CPU features, NUMA-aware, license compliance</td></tr>
+    <tr><td><strong>Disk</strong></td><td>VirtIO SCSI with write-back cache</td><td>Near-native disk I/O performance</td></tr>
+    <tr><td><strong>Network</strong></td><td>VirtIO-net with multiqueue</td><td>10 Gbps+ throughput with RSS</td></tr>
+    <tr><td><strong>Firmware</strong></td><td>OVMF (UEFI) or SeaBIOS</td><td>Secure Boot, measured boot chain</td></tr>
+    <tr><td><strong>TPM</strong></td><td>swtpm (TPM 2.0 emulation)</td><td>Windows 11, BitLocker, attestation</td></tr>
+    <tr><td><strong>Console</strong></td><td>VNC + serial (ttyS0/COM1)</td><td>Graphical + headless management</td></tr>
+    <tr><td><strong>Memory</strong></td><td>Balloon + huge pages</td><td>Dynamic memory + deterministic performance</td></tr>
+    <tr><td><strong>RNG</strong></td><td>VirtIO RNG from /dev/urandom</td><td>Fast entropy for crypto operations</td></tr>
+    <tr><td><strong>GPU</strong></td><td>VFIO passthrough support</td><td>GPU workloads, VDI, ML/AI</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 10: zkvm TUI & Tooling -->
+<div class="page page-dark">
+  <h2 class="st">zkvm <span>Interactive TUI</span></h2>
+  <p class="sub">A guided, 7-tab terminal interface for interactive migration &mdash; no YAML editing required.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>7 Tabs</h4>
+      <ul>
+        <li><strong>Home</strong> &mdash; welcome, quick start guide</li>
+        <li><strong>Dashboard</strong> &mdash; system status, recent migrations</li>
+        <li><strong>Wizard</strong> &mdash; guided step-by-step migration form</li>
+        <li><strong>Browser</strong> &mdash; vSphere VM discovery + selection</li>
+        <li><strong>Migrations</strong> &mdash; active/completed migration tracking</li>
+        <li><strong>Batch</strong> &mdash; multi-VM queue management</li>
+        <li><strong>Settings</strong> &mdash; configuration preferences</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Wizard Features</h4>
+      <ul>
+        <li><strong>Source auto-detection:</strong> .vmdk/.ova/.vhd/.raw</li>
+        <li><strong>File browser:</strong> fuzzy search, extension filter</li>
+        <li><strong>Category navigation:</strong> j/k keys, Enter to expand</li>
+        <li><strong>Deploy toggles:</strong> keys 1-4 for targets</li>
+        <li><strong>Live execution plan:</strong> shows what will happen</li>
+        <li><strong>Progress streaming:</strong> real-time with ETA</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>vSphere Discovery</h4>
+      <ul>
+        <li>Connects to vCenter via govc</li>
+        <li>Browses datacenter/cluster/host hierarchy</li>
+        <li>Shows VM details: OS, CPU, RAM, disk, power state</li>
+        <li>Multi-select VMs for batch migration</li>
+        <li>Ctrl+R syncs selection to wizard form</li>
+        <li>Auto-sets cmd=vsphere, vs_action=export_vm</li>
+        <li>Environment variables: GOVC_URL, _USERNAME, _PASSWORD</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Progress &amp; Monitoring</h4>
+      <ul>
+        <li>Streaming progress with \r handling</li>
+        <li>govc download: throttled (1 per 3s, dedup)</li>
+        <li>File-size progress with total from vm.info</li>
+        <li>[PROGRESS] lines: pct|current|total|rate|eta</li>
+        <li>5-sample moving average for speed smoothing</li>
+        <li>Progress bar in right panel</li>
+        <li>Auto-sudo when not root</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>CLI Tools</h3>
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>h2kvmctl (CLI)</h4>
+      <pre style="font-size:0.75em; background:rgba(255,255,255,0.04); padding:10px; border-radius:6px;">
+# Convert + fix + deploy
+h2kvmctl -c migration.yaml
+
+# Doctor (pre-flight checks)
+h2kvmctl doctor
+
+# Dry run
+h2kvmctl -c config.yaml --dry-run
+
+# Verbose output
+h2kvmctl -c config.yaml -v</pre>
+    </div>
+    <div class="card">
+      <h4>doctor.sh (System Readiness)</h4>
+      <ul>
+        <li>9 system areas checked with timeouts</li>
+        <li>qemu-nbd, qemu-img availability</li>
+        <li>virtio-win ISO presence (Windows)</li>
+        <li>libvirt/virsh installation</li>
+        <li>Disk space verification</li>
+        <li>KVM kernel module loaded</li>
+        <li>Network bridge configuration</li>
+        <li>KubeVirt/kubectl (if K8s target)</li>
+        <li>Color-coded pass/fail output</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Automation Scripts</h4>
+      <ul>
+        <li><strong>quickstart.sh</strong> &mdash; fresh machine setup</li>
+        <li><strong>run-demo.sh</strong> &mdash; convert + boot + SSH</li>
+        <li><strong>record-demo.sh</strong> &mdash; asciinema recording</li>
+        <li>Webhook integration (Slack/Teams)</li>
+        <li>CI/CD pipeline integration</li>
+        <li>Ansible/Terraform compatible</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 11: Boot Verification & Safety -->
+<div class="page page-light">
+  <h2 class="st">Boot Verification <span>&amp; Safety</span></h2>
+  <p class="sub">Every migration &mdash; Windows and Linux &mdash; verified before production cutover.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Automated Boot Test</h4>
+      <p>After conversion, hyper2kvm starts the VM on KVM, monitors boot progress, and confirms it reaches login (Windows) or shell (Linux). <strong>No human needs to watch.</strong> Fails are reported immediately with the error.</p>
+    </div>
+    <div class="card">
+      <h4>VNC/noVNC Console</h4>
+      <p>Full graphical console for visual verification. See Windows desktop or Linux login prompt. Debug issues in real-time. Browser-based via noVNC &mdash; no client needed.</p>
+    </div>
+    <div class="card">
+      <h4>Post-Boot Health Checks</h4>
+      <ul>
+        <li>Disk I/O: VirtIO SCSI responding</li>
+        <li>Network: IP assigned, ports open</li>
+        <li><span class="os-win">WIN</span> RDP accessible on 3389</li>
+        <li><span class="os-lin">LIN</span> SSH accessible on 22</li>
+        <li>Critical services running (SQL, httpd, etc.)</li>
+        <li>Event log / journal scan for errors</li>
+        <li>Serial console functional</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Zero-Risk Rollback</h4>
+      <ul>
+        <li>Source disk preserved until verification</li>
+        <li>Original VM untouched on source platform</li>
+        <li>Conversion creates a copy &mdash; never modifies source</li>
+        <li>If boot fails: fix and retry, source is safe</li>
+        <li>Webhook alerts on success/failure</li>
+        <li>Auditable pass/fail report per VM</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>8-Point Validation Checklist</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:18%">Check</th><th style="width:12%">OS</th><th style="width:30%">What It Validates</th><th style="width:35%">Why It Matters</th></tr>
+    <tr><td>1</td><td><strong>Pre-flight (doctor)</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td>Disk space, tools, ISO, libvirt</td><td>Don't start if dependencies missing</td></tr>
+    <tr><td>2</td><td><strong>Source disk integrity</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td>VMDK descriptor, partition table</td><td>Catch corrupt disks early</td></tr>
+    <tr><td>3</td><td><strong>OS version detect</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td>Registry / os-release</td><td>Select correct fix strategy</td></tr>
+    <tr><td>4</td><td><strong>Boot mode detect</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td>EFI System Partition present?</td><td>UEFI vs BIOS affects config</td></tr>
+    <tr><td>5</td><td><strong>Driver/initramfs verify</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td>viostor.sys / VirtIO in initramfs</td><td>Confirm driver loads at boot</td></tr>
+    <tr><td>6</td><td><strong>Source tools removed</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td>VMware/Hyper-V services disabled</td><td>Prevent conflicts</td></tr>
+    <tr><td>7</td><td><strong>Boot test</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td>VM reaches login/shell, no BSOD/panic</td><td>Ultimate validation</td></tr>
+    <tr><td>8</td><td><strong>Network test</strong></td><td><span class="os-win">W</span><span class="os-lin">L</span></td><td>IP assigned, RDP/SSH port open</td><td>VM reachable after cutover</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 12: Competitive Comparison -->
+<div class="page page-dark">
+  <h2 class="st">Tool <span>Comparison</span></h2>
+  <p class="sub">hyper2kvm vs. every alternative &mdash; for both Windows and Linux migration.</p>
+
+  <table>
+    <tr><th style="width:22%">Capability</th><th style="width:13%">hyper2kvm</th><th style="width:13%">virt-v2v</th><th style="width:13%">Red Hat MTV</th><th style="width:13%">AWS MGN</th><th style="width:13%">Azure Migrate</th><th style="width:13%">Manual</th></tr>
+    <tr><td><strong>Windows VirtIO injection</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">N/A</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Linux initramfs rebuild</strong></td><td class="check">&#10003; All distros</td><td class="check">&#10003;</td><td class="partial">Limited</td><td class="cross">N/A</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Windows registry fix</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="partial">Basic</td><td class="cross">N/A</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Linux fstab/GRUB fix</strong></td><td class="check">&#10003; Auto</td><td class="check">&#10003;</td><td class="partial">Basic</td><td class="cross">N/A</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Cloud agent removal</strong></td><td class="check">&#10003; AWS/Azure/GCP</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">N/A</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Boot verification</strong></td><td class="check">&#10003; Auto</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Deploy to KVM</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Deploy to KubeVirt</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="check">&#10003; (OCP)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Interactive TUI</strong></td><td class="check">&#10003; zkvm</td><td class="cross">&#10007;</td><td class="cross">Web UI</td><td class="cross">&#10007;</td><td class="cross">Web UI</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Batch migration</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Source: VMware</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Source: Hyper-V</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Source: AWS/Azure/GCP</strong></td><td class="check">&#10003; (10 clouds)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td>AWS only</td><td>Azure only</td><td class="cross">Complex</td></tr>
+    <tr><td><strong>No libguestfs</strong></td><td class="check">&#10003; VMCraft</td><td class="cross">Required</td><td class="cross">Required</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+    <tr><td><strong>15+ Linux distros</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">RHEL-focus</td><td class="partial">Amazon</td><td class="partial">Ubuntu</td><td>Varies</td></tr>
+    <tr><td><strong>TPM emulation (Win11)</strong></td><td class="check">&#10003; swtpm</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="cross">N/A</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
+    <tr><td><strong>Cost</strong></td><td class="check">$0</td><td class="check">$0</td><td class="cross">$50K+ (OCP)</td><td class="partial">Free/90d</td><td class="partial">Free/180d</td><td class="check">$0</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>The Only Tool That Does It All</h3>
+    <p style="font-size:0.9em;">hyper2kvm is the only tool that migrates <strong>both Windows &amp; Linux</strong> from <strong>VMware + Hyper-V + 10 clouds</strong>, deploys to <strong>KVM + KubeVirt</strong>, includes <strong>automated boot verification</strong>, needs <strong>no libguestfs</strong>, has an <strong>interactive TUI</strong>, and costs <strong>$0</strong>.</p>
+  </div>
+</div>
+
+<!-- PAGE 13: Batch Migration & Workflow -->
+<div class="page page-light">
+  <h2 class="st">Batch Migration <span>Workflow</span></h2>
+  <p class="sub">Migrate 10 or 1,000 VMs with the same pipeline &mdash; mixed Windows and Linux.</p>
+
+  <h3>End-to-End Batch Pipeline</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:14%">Step</th><th style="width:10%">Tool</th><th style="width:36%">What Happens</th><th style="width:35%">Output</th></tr>
+    <tr><td>1</td><td><strong>Pre-flight</strong></td><td>h2kvmctl</td><td><code>h2kvmctl doctor</code> &mdash; verifies disk space, tools, ISOs, libvirt, KubeVirt</td><td>Green light to proceed</td></tr>
+    <tr><td>2</td><td><strong>Discover</strong></td><td>zkvm TUI</td><td>Browse vCenter: see OS, CPU, RAM, disk for every VM</td><td>VM selection list</td></tr>
+    <tr><td>3</td><td><strong>Export</strong></td><td>govc / hypersdk</td><td>Streaming download with progress + ETA (3s throttled updates)</td><td>VMDK/VHD/RAW files</td></tr>
+    <tr><td>4</td><td><strong>Convert</strong></td><td>qemu-img</td><td>VMDK/VHD &rarr; QCOW2, flatten snapshots, compress</td><td>Optimized QCOW2 images</td></tr>
+    <tr><td>5</td><td><strong>Detect</strong></td><td>VMCraft</td><td>Auto-detect: Windows or Linux? Version? Boot mode? Filesystem?</td><td>OS-specific fix strategy</td></tr>
+    <tr><td>6</td><td><strong>Fix (Windows)</strong></td><td>VMCraft</td><td>VirtIO inject, registry fix, BCD repair, tools removal</td><td>Boot-ready Windows VM</td></tr>
+    <tr><td>7</td><td><strong>Fix (Linux)</strong></td><td>VMCraft</td><td>initramfs rebuild, fstab, GRUB, network, SELinux</td><td>Boot-ready Linux VM</td></tr>
+    <tr><td>8</td><td><strong>Deploy</strong></td><td>h2kvmctl</td><td>Generate XML + virsh define, or K8s YAML + kubectl apply</td><td>VMs defined on targets</td></tr>
+    <tr><td>9</td><td><strong>Verify</strong></td><td>h2kvmctl</td><td>Automated boot test per VM, health checks</td><td>Pass/fail report</td></tr>
+    <tr><td>10</td><td><strong>Notify</strong></td><td>Webhook</td><td>Slack/Teams notification with per-VM results</td><td>Team informed</td></tr>
+  </table>
+
+  <h3>Real-World Scale Examples</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>VMware Exit: 250 VMs (Mixed OS)</h4>
+      <ul>
+        <li>150 Linux (RHEL 8/9, Ubuntu 22.04) + 100 Windows (2019/2022)</li>
+        <li>Source: vSphere 7, 8 ESXi hosts</li>
+        <li>Target: 12 RHEL 9 KVM hosts</li>
+        <li>Timeline: 6 weeks (40+ VMs/week, off-hours cutover)</li>
+        <li>Savings: $500K/yr VMware + $632K SQL licensing = <strong>$1.13M/yr</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Multi-Cloud Consolidation: 100 VMs</h4>
+      <ul>
+        <li>30 AWS + 25 Azure + 15 GCP + 30 VMware &mdash; mixed Win/Linux</li>
+        <li>Target: centralized KVM cluster + edge K3s (KubeVirt)</li>
+        <li>hypersdk exports from all 4 sources in parallel</li>
+        <li>hyper2kvm applies source-specific + OS-specific fixes</li>
+        <li>Dual-target deploy: libvirt + KubeVirt per workload</li>
+        <li>Savings: <strong>$1.5M/yr</strong> consolidated infrastructure</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Hyper-V to KubeVirt: 60 VMs</h4>
+      <ul>
+        <li>20 Windows Server + 40 Linux (Debian, Ubuntu, RHEL)</li>
+        <li>Source: Hyper-V 2019 cluster</li>
+        <li>Target: K3s + KubeVirt (modernization)</li>
+        <li>KubeVirt manifests generated per VM</li>
+        <li>kubectl apply &mdash; entire fleet running on K8s</li>
+        <li>Savings: $200K/yr Hyper-V + Windows Datacenter</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Azure Repatriation: 40 VMs</h4>
+      <ul>
+        <li>15 Windows (.NET + SQL) + 25 Linux (PostgreSQL, Django)</li>
+        <li>Source: Azure D/E-series VMs</li>
+        <li>Motivation: data sovereignty + cost control</li>
+        <li>hypersdk exports managed disks</li>
+        <li>hyper2kvm removes Azure agent + Hyper-V IC</li>
+        <li>Savings: <strong>$720K/yr</strong> in Azure compute + egress</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 14: Cost Savings & ROI -->
+<div class="page page-purple">
+  <h2 class="st">Cost Savings <span>&amp; ROI</span></h2>
+  <p class="sub">Eliminate hypervisor licensing, reduce cloud spend, cut SQL Server costs &mdash; hyper2kvm pays for itself immediately.</p>
+
+  <div class="card-grid-4">
+    <div class="stat-box card"><div class="num">Licensed*</div><div class="label">hyper2kvm license<br>(Proprietary (Zyvor AI Labs))</div></div>
+    <div class="stat-box card"><div class="num">$0</div><div class="label">KVM hypervisor<br>license cost</div></div>
+    <div class="stat-box card"><div class="num">20-40%</div><div class="label">SQL Server savings<br>with CPU pinning</div></div>
+    <div class="stat-box card"><div class="num">50-80%</div><div class="label">Cloud cost savings<br>on repatriation</div></div>
+  </div>
+
+  <h3>3-Year TCO Comparison: 100 VM Estate (Mixed Win/Linux)</h3>
+  <table>
+    <tr><th style="width:25%">Cost Item</th><th style="width:20%">VMware vSphere</th><th style="width:20%">AWS/Azure Cloud</th><th style="width:20%">KVM (hyper2kvm)</th><th style="width:15%">Best Savings</th></tr>
+    <tr><td><strong>Hypervisor licensing</strong></td><td>$450,000</td><td>N/A</td><td class="check">$0</td><td class="check">$450,000</td></tr>
+    <tr><td><strong>Compute costs</strong></td><td>$180,000 (hardware)</td><td>$2,400,000</td><td>$180,000 (hardware)</td><td class="check">$2,220,000</td></tr>
+    <tr><td><strong>SQL Server (10 VMs)</strong></td><td>$1,263,600</td><td>$1,263,600</td><td>$631,200 (pinned)</td><td class="check">$632,400</td></tr>
+    <tr><td><strong>Windows Server</strong></td><td>$360,000</td><td>$360,000</td><td>$360,000</td><td>$0</td></tr>
+    <tr><td><strong>Migration (one-time)</strong></td><td>N/A</td><td>N/A</td><td>$25,000</td><td>-$25,000</td></tr>
+    <tr><td><strong>Support / operations</strong></td><td>$270,000</td><td>$150,000</td><td>$225,000</td><td class="check">$45,000</td></tr>
+    <tr><td style="font-weight:700;">3-Year Total</td><td style="font-weight:700;">$2,523,600</td><td style="font-weight:700;">$4,173,600</td><td style="font-weight:700; color:#22c55e;">$1,421,200</td><td style="font-weight:800; color:#22c55e;">Up to $2.75M</td></tr>
+  </table>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>VMware Exit Savings</h4>
+      <ul>
+        <li>Eliminate vSphere/vCenter licensing</li>
+        <li>No per-CPU socket fees</li>
+        <li>No vSAN licensing</li>
+        <li>No NSX licensing</li>
+        <li>Community KVM support is free</li>
+        <li><strong>Typical: $5K-15K/host/yr saved</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Cloud Repatriation Savings</h4>
+      <ul>
+        <li>Eliminate compute instance fees</li>
+        <li>Eliminate egress charges</li>
+        <li>Eliminate managed service premiums</li>
+        <li>One-time hardware investment</li>
+        <li>3-year payback typical</li>
+        <li><strong>Typical: 50-80% TCO reduction</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>SQL Server + KVM Savings</h4>
+      <ul>
+        <li>CPU pinning reduces licensed cores</li>
+        <li>NUMA-aware placement</li>
+        <li>cgroups isolation (audit-verifiable)</li>
+        <li>SQL Standard: $3,945/core saved</li>
+        <li>SQL Enterprise: $15,123/core saved</li>
+        <li><strong>Typical: $100K-500K/yr per estate</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 15: Security, Compliance & Advanced Features -->
+<div class="page page-light">
+  <h2 class="st">Security, Compliance <span>&amp; Advanced</span></h2>
+  <p class="sub">Enterprise-grade security features for regulated environments.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Security Features</h4>
+      <ul>
+        <li>Offline processing &mdash; no network during fix</li>
+        <li>Source disks never modified</li>
+        <li>UEFI Secure Boot support</li>
+        <li>TPM 2.0 emulation (swtpm)</li>
+        <li>BitLocker-aware (Windows)</li>
+        <li>LUKS encryption support (Linux)</li>
+        <li>SELinux autorelabel (RHEL/Fedora)</li>
+        <li>No cloud metadata exposure</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Compliance</h4>
+      <ul>
+        <li>Auditable migration reports</li>
+        <li>Checksum verification (SHA256)</li>
+        <li>Air-gap compatible (no internet needed)</li>
+        <li>FedRAMP / HIPAA / SOC2 environments</li>
+        <li>Data sovereignty (on-prem target)</li>
+        <li>Change management audit trail</li>
+        <li>CPU pinning for license compliance</li>
+        <li>Proprietary (Zyvor AI Labs) &mdash; no vendor lock-in</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Advanced Features</h4>
+      <ul>
+        <li>Snapshot flattening on convert</li>
+        <li>QCOW2 compression (qcow2+zlib)</li>
+        <li>Multi-disk VM support</li>
+        <li>GPU passthrough (VFIO)</li>
+        <li>SR-IOV network device passthrough</li>
+        <li>NVMe backend for storage</li>
+        <li>Huge pages for deterministic perf</li>
+        <li>Live migration ready on KubeVirt</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Filesystem &amp; Volume Manager Support</h3>
+  <div class="card-grid">
+    <div class="card win-card">
+      <h4>Windows Filesystems</h4>
+      <ul>
+        <li><strong>NTFS</strong> &mdash; full ACL preservation, dedup support</li>
+        <li><strong>ReFS</strong> &mdash; Storage Spaces Direct volumes</li>
+        <li><strong>FAT32 (EFI)</strong> &mdash; EFI System Partition handling</li>
+        <li><strong>GPT + MBR</strong> &mdash; both partition schemes</li>
+      </ul>
+    </div>
+    <div class="card lin-card">
+      <h4>Linux Filesystems &amp; Volumes</h4>
+      <ul>
+        <li><strong>ext4, XFS, Btrfs, ZFS</strong> &mdash; all major filesystems</li>
+        <li><strong>LVM2</strong> &mdash; VG/LV detection, module injection</li>
+        <li><strong>mdadm RAID</strong> &mdash; software RAID arrays</li>
+        <li><strong>LUKS</strong> &mdash; encrypted root support</li>
+        <li><strong>GRUB2, GRUB Legacy, systemd-boot</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Network Architecture</h3>
+  <table>
+    <tr><th style="width:20%">Feature</th><th style="width:40%">KVM / libvirt</th><th style="width:40%">KubeVirt / K8s</th></tr>
+    <tr><td><strong>Default NIC</strong></td><td>VirtIO-net (virtio_net)</td><td>Multus + bridge / macvlan</td></tr>
+    <tr><td><strong>Performance</strong></td><td>Multiqueue VirtIO-net, 10G+</td><td>SR-IOV passthrough available</td></tr>
+    <tr><td><strong>Bridge</strong></td><td>Linux bridge or Open vSwitch</td><td>CNI bridge plugin</td></tr>
+    <tr><td><strong>VLAN</strong></td><td>802.1Q trunk to VMs</td><td>Multus secondary networks</td></tr>
+    <tr><td><strong>Bonding</strong></td><td>bond0 on host, bridge on top</td><td>K8s node bonding</td></tr>
+    <tr><td><strong>Firewall</strong></td><td>nftables/iptables per host</td><td>NetworkPolicy per namespace</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 16: Summary & Call to Action -->
+<div class="page page-dark">
+  <h2 class="st">Complete Feature <span>Summary</span></h2>
+  <p class="sub">Everything hyper2kvm does &mdash; in one view.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Source Platforms (10)</h4>
+      <ul>
+        <li>VMware vSphere 6.5-8.0</li>
+        <li>Microsoft Hyper-V 2016-2022</li>
+        <li>AWS EC2</li>
+        <li>Microsoft Azure</li>
+        <li>Google Cloud Platform</li>
+        <li>Oracle Cloud Infrastructure</li>
+        <li>IBM Cloud</li>
+        <li>Alibaba Cloud</li>
+        <li>DigitalOcean</li>
+        <li>Hetzner Cloud</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Operating Systems (22+)</h4>
+      <ul>
+        <li>Windows Server 2012 R2 &ndash; 2025</li>
+        <li>Windows 10, Windows 11</li>
+        <li>RHEL 7-10, Rocky 8-9, Alma 8-9</li>
+        <li>Ubuntu 20.04-24.04</li>
+        <li>Debian 11-12</li>
+        <li>SUSE SLES 12-15, openSUSE Leap/TW</li>
+        <li>Fedora 38-41</li>
+        <li>Oracle Linux 7-9</li>
+        <li>Photon OS 3-5, Amazon Linux 2/2023</li>
+        <li>CentOS Stream 8-9, CentOS 7</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Automatic Fixes (20+)</h4>
+      <ul>
+        <li><span class="os-win">W</span> VirtIO driver injection (6 drivers)</li>
+        <li><span class="os-win">W</span> Registry driver stack configuration</li>
+        <li><span class="os-win">W</span> BCD boot repair</li>
+        <li><span class="os-win">W</span> HAL configuration</li>
+        <li><span class="os-lin">L</span> initramfs rebuild (all distros)</li>
+        <li><span class="os-lin">L</span> fstab UUID repair</li>
+        <li><span class="os-lin">L</span> GRUB config regeneration</li>
+        <li><span class="os-lin">L</span> SELinux autorelabel</li>
+        <li>VMware/Hyper-V/cloud tools removal</li>
+        <li>Network cleanup + serial console</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Deployment &amp; Tooling</h4>
+      <ul>
+        <li>KVM / libvirt (XML generation)</li>
+        <li>KubeVirt / K8s (YAML manifests)</li>
+        <li>Dual-target deploy</li>
+        <li>h2kvmctl CLI + YAML config</li>
+        <li>zkvm interactive TUI (7 tabs)</li>
+        <li>hypersdk cloud export daemon</li>
+        <li>Automated boot verification</li>
+        <li>Batch migration (100s of VMs)</li>
+        <li>Webhook notifications</li>
+        <li>CI/CD + Ansible integration</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Migrate Everything. From Anywhere. To KVM.</h3>
+    <p style="font-size:0.95em;">
+      <span class="os-win">Windows</span> + <span class="os-lin">Linux</span> | 10 Source Platforms | 22+ OS Versions | 20+ Automatic Fixes<br>
+      KVM + KubeVirt | Interactive TUI + CLI + API | Automated Boot Verification<br>
+      No libguestfs | No vendor lock-in | <strong>$0 license cost | Proprietary (Zyvor AI Labs)</strong>
+    </p>
+  </div>
+
+  <div class="card-grid-3" style="margin-top:1em;">
+    <div class="stat-box card"><div class="num" style="font-size:1.3em;">github.com/ssahani/hyper2kvm</div><div class="label">Source Code</div></div>
+    <div class="stat-box card"><div class="num" style="font-size:1.3em;">h2kvmctl -c config.yaml</div><div class="label">Get Started</div></div>
+    <div class="stat-box card"><div class="num" style="font-size:1.3em;">zkvm</div><div class="label">Interactive TUI</div></div>
+  </div>
+
+  <div class="footer"><p>hyper2kvm + hypersdk &mdash; Enterprise VM Migration Platform | Version 0.2.2 | Proprietary (Zyvor AI Labs)</p></div>
+</div>
+
+</body>
+</html>

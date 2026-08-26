@@ -1,0 +1,94 @@
+hyper2kvm for Debian
+====================
+
+Configuration
+-------------
+
+The system-wide configuration file is located at:
+  /etc/hyper2kvm/config.yaml
+
+This file is marked as a conffile and will be preserved during package upgrades.
+
+Edit this file to:
+- Add allowed directories for VM image access
+- Configure conversion cache settings
+- Set default libvirt parameters
+- Enable daemon mode (future feature)
+
+Container Isolation
+-------------------
+
+By default, LVM operations (such as volume group activation and logical volume
+scanning) run inside a Podman or Docker container to isolate the host from
+potentially dangerous disk metadata. This prevents rogue LVM labels on migrated
+disks from interfering with the host's own volume groups.
+
+To use container isolation, install podman or docker.io:
+  $ sudo apt install podman
+  or
+  $ sudo apt install docker.io
+
+Container isolation can be disabled per-run with the CLI flag:
+  $ hyper2kvm local --no-container-isolation ...
+
+Or permanently in the system configuration file:
+  /etc/hyper2kvm/config.yaml
+
+Set:
+  container_isolation: false
+
+Migration Templates
+-------------------
+
+Example migration configurations are provided in:
+  /etc/hyper2kvm/migrations/
+
+Copy and customize these templates for your VMs:
+  $ sudo cp /etc/hyper2kvm/migrations/photon-example.yaml \
+            /etc/hyper2kvm/migrations/my-vm.yaml
+  $ sudo vi /etc/hyper2kvm/migrations/my-vm.yaml
+  $ sudo h2kvmctl --config /etc/hyper2kvm/migrations/my-vm.yaml
+
+System User
+-----------
+
+The package automatically creates a system user 'hyper2kvm' for daemon mode
+operation. This user is added to the following groups (if they exist):
+- qemu
+- kvm
+- libvirt
+- disk
+
+Directories
+-----------
+
+The following directories are created and owned by the hyper2kvm user:
+- /var/lib/hyper2kvm - Main data directory
+- /var/lib/hyper2kvm/conversions - Conversion cache
+- /var/log/hyper2kvm - Log files
+
+Systemd Services
+----------------
+
+The package provides systemd service units:
+- hyper2kvm.service - Main daemon service
+- hyper2kvm@.service - Template service for multiple instances
+
+To enable and start the service:
+  $ sudo systemctl enable --now hyper2kvm.service
+
+Documentation
+-------------
+
+Full documentation is available in:
+  /usr/share/doc/hyper2kvm/
+
+Man pages:
+  $ man hyper2kvm
+  $ man hyper2kvm-local
+  $ man hyper2kvm-vsphere
+  $ man hyper2kvm-hyperv
+  $ man hyper2kvm-azure
+  $ man hyper2kvm.conf
+
+ -- ZyvorAI Labs Private Limited <ssahani@zyvor.dev>  Tue, 18 Feb 2025 19:30:00 +0530

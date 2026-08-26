@@ -1,0 +1,200 @@
+# Hostname and /etc/hosts Configuration Examples
+
+cmd: local
+vmdk: /path/to/vm.vmdk
+output_dir: ./out
+
+# Example 1: Basic Hostname Setup
+# Set hostname only
+hostname_config_inject:
+  hostname: webserver
+
+verbose: 2
+
+---
+
+# Example 2: Hostname with Domain
+# Set FQDN (webserver01.example.com)
+cmd: local
+vmdk: /path/to/vm.vmdk
+output_dir: ./out
+
+hostname_config_inject:
+  hostname: webserver01
+  domain: example.com
+
+---
+
+# Example 3: Custom /etc/hosts Entries
+# Add database servers to hosts file
+cmd: local
+vmdk: /path/to/vm.vmdk
+output_dir: ./out
+
+hostname_config_inject:
+  hosts:
+    192.168.1.10: "db1.local db1"
+    192.168.1.11: "db2.local db2"
+    192.168.1.12: "db3.local db3"
+    192.168.1.100: "loadbalancer.local lb"
+
+---
+
+# Example 4: Complete Server Identity
+# Set hostname, domain, and internal service hosts
+cmd: local
+vmdk: /path/to/web-server.vmdk
+output_dir: ./out
+
+hostname_config_inject:
+  hostname: web01
+  domain: prod.example.com
+  hosts:
+    192.168.1.10: "db.prod.example.com postgres"
+    192.168.1.20: "cache.prod.example.com redis"
+    192.168.1.30: "queue.prod.example.com rabbitmq"
+    192.168.1.100: "monitor.prod.example.com prometheus grafana"
+
+---
+
+# Example 5: Kubernetes Cluster Node
+# Hostname and cluster node hosts entries
+cmd: local
+vmdk: /path/to/k8s-worker01.vmdk
+output_dir: ./out
+
+hostname_config_inject:
+  hostname: k8s-worker01
+  domain: cluster.local
+  hosts:
+    192.168.10.10: "k8s-master01.cluster.local k8s-master01"
+    192.168.10.11: "k8s-master02.cluster.local k8s-master02"
+    192.168.10.12: "k8s-master03.cluster.local k8s-master03"
+    192.168.10.20: "k8s-worker02.cluster.local k8s-worker02"
+    192.168.10.21: "k8s-worker03.cluster.local k8s-worker03"
+
+---
+
+# Example 6: Development Environment
+# Local development server with service hosts
+cmd: local
+vmdk: /path/to/dev-server.vmdk
+output_dir: ./out
+
+hostname_config_inject:
+  hostname: devbox
+  domain: dev.local
+  hosts:
+    127.0.0.1: "api.dev.local"
+    127.0.0.1: "app.dev.local"
+    127.0.0.1: "admin.dev.local"
+    192.168.1.50: "shared-db.dev.local"
+
+---
+
+# Example 7: High Availability Setup
+# Load balancer with backend server hosts
+cmd: local
+vmdk: /path/to/haproxy-lb.vmdk
+output_dir: ./out
+
+hostname_config_inject:
+  hostname: lb01
+  domain: ha.example.com
+  hosts:
+    192.168.100.10: "web01.ha.example.com web01"
+    192.168.100.11: "web02.ha.example.com web02"
+    192.168.100.12: "web03.ha.example.com web03"
+    192.168.100.20: "db-master.ha.example.com db-master"
+    192.168.100.21: "db-replica.ha.example.com db-replica"
+    192.168.100.100: "vip.ha.example.com vip"  # Virtual IP
+
+---
+
+# Example 8: Multi-Region Architecture
+# Application server with cross-region service discovery
+cmd: local
+vmdk: /path/to/app-server.vmdk
+output_dir: ./out
+
+hostname_config_inject:
+  hostname: app-us-east-01
+  domain: prod.example.com
+  hosts:
+    # US East region
+    10.1.0.10: "db-us-east.prod.example.com"
+    10.1.0.20: "cache-us-east.prod.example.com"
+    # US West region (fallback)
+    10.2.0.10: "db-us-west.prod.example.com"
+    10.2.0.20: "cache-us-west.prod.example.com"
+    # EU region (global services)
+    10.3.0.100: "cdn.prod.example.com"
+
+---
+
+# Example 9: Lab Environment
+# Test server with multiple service endpoints
+cmd: local
+vmdk: /path/to/lab-server.vmdk
+output_dir: ./out
+
+hostname_config_inject:
+  hostname: testbed
+  domain: lab.internal
+  hosts:
+    192.168.99.10: "jenkins.lab.internal ci"
+    192.168.99.20: "gitlab.lab.internal git"
+    192.168.99.30: "nexus.lab.internal artifacts"
+    192.168.99.40: "sonar.lab.internal sonarqube"
+    192.168.99.50: "vault.lab.internal secrets"
+
+---
+
+# Example 10: Combined Full Stack Configuration
+# Complete application stack with all components
+cmd: local
+vmdk: /path/to/app-stack.vmdk
+output_dir: ./out
+
+hostname_config_inject:
+  hostname: app-frontend01
+  domain: stack.example.com
+  hosts:
+    # Application tier
+    192.168.200.10: "api.stack.example.com api backend"
+    192.168.200.11: "api2.stack.example.com"
+
+    # Data tier
+    192.168.200.20: "postgres.stack.example.com db database"
+    192.168.200.21: "redis.stack.example.com cache"
+    192.168.200.22: "elasticsearch.stack.example.com search es"
+
+    # Message queue
+    192.168.200.30: "rabbitmq.stack.example.com mq queue"
+
+    # Monitoring
+    192.168.200.100: "prometheus.stack.example.com metrics"
+    192.168.200.101: "grafana.stack.example.com dashboard"
+    192.168.200.102: "alertmanager.stack.example.com alerts"
+
+    # Logging
+    192.168.200.110: "elasticsearch-logs.stack.example.com logs"
+    192.168.200.111: "kibana.stack.example.com"
+
+user_config_inject:
+  users:
+    - name: deploy
+      uid: 2000
+      groups: [docker]
+      ssh_keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... deploy@ci-server"
+
+service_config_inject:
+  enable:
+    - nginx
+    - node_exporter  # Prometheus metrics
+  disable:
+    - bluetooth
+    - cups
+
+verbose: 2

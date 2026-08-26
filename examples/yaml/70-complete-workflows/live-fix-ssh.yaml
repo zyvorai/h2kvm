@@ -1,0 +1,51 @@
+# ============================================
+# Live-Fix: Prepare running VM for KVM (zero downtime)
+# ============================================
+# Connects to a running VM via SSH and applies fixes in-place:
+# - Stabilizes fstab (UUID-based mounts)
+# - Rebuilds initramfs with VirtIO drivers
+# - Removes VMware Tools
+#
+# After live-fix, the VM is ready for a quick export+import
+# with minimal downtime (just the disk copy time).
+#
+# Pipeline:
+#   SSH to running VM → inspect → fix fstab → rebuild initramfs
+#   → remove vmware-tools → report
+#
+# Prerequisites:
+#   - SSH access to the VM (root or sudo)
+#   - ssh-copy-id root@vm-ip (passwordless SSH recommended)
+#
+# Usage:
+#   # Preview changes first (dry-run)
+#   sudo h2kvmctl --config examples/yaml/70-complete-workflows/live-fix-ssh.yaml --dry-run
+#
+#   # Apply fixes
+#   sudo h2kvmctl --config examples/yaml/70-complete-workflows/live-fix-ssh.yaml
+# ============================================
+
+cmd: live-fix
+
+# ── SSH connection to running VM ──
+host: 192.168.1.100
+user: root
+port: 22
+# identity: ~/.ssh/id_ed25519
+# sudo: true                     # Use sudo on remote (if not root)
+
+# ── Fixes to apply ──
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+
+# ── Safety ──
+no_backup: false                  # Keep backups of modified files
+dry_run: false                    # Set true to preview changes without applying
+
+# ── Output ──
+output_dir: ./live-fix-reports
+report: ./live-fix-reports/live-fix-report.md
+
+verbose: 2
+log_file: ./live-fix-reports/live-fix.log

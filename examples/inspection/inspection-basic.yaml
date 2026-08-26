@@ -1,0 +1,25 @@
+# Basic Disk Inspection Pipeline
+# Uses existing hyper2kvm NBD infrastructure with auto-detection
+
+# Source disk to inspect
+image: /path/to/disk.vmdk
+
+# Inspection settings
+inspection:
+  # LVM detection
+  check_lvm: true              # Detect LVM structures
+  activate_lvm: false          # Don't activate (basic inspection)
+
+  # Filesystem checks
+  run_fsck: false              # Skip filesystem checks (faster)
+
+# Output
+output:
+  report: inspection-basic-report.json
+  format: json
+
+# This configuration inspects:
+# - Partition table
+# - LVM physical volumes
+# - LVM volume groups
+# - Does NOT activate LVM or run fsck (fastest option)

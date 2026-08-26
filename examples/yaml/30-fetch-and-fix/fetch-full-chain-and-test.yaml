@@ -1,0 +1,22 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 30-fetch-and-fix/fetch-full-chain-and-test.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 30-fetch-and-fix/fetch-full-chain-and-test.yaml
+
+command: fetch-and-fix
+host: esxi-host
+identity: ~/.ssh/esxi_key
+remote: /path/to/snapshot-vm.vmdk
+fetch_all: true
+flatten: true
+resize: 50G
+regen_initramfs: true
+libvirt_test: true
+vm_name: esxi-test-vm
+uefi: true
+timeout: 120
+keep_domain: false
+headless: true
+report: esxi-report.md
+verbose: 2

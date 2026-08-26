@@ -1,0 +1,63 @@
+# ovftool-rhel10-ova-export.yaml
+# Goal: Export VM as an OVA using OVF Tool (ovftool) (stable exporter; NO virt-v2v, NO inspection)
+#
+# Notes:
+# - This uses your VsphereMode action: ovftool_export
+# - OVF Tool source is vi://user:pass@vcenter/DC/vm/<path>
+# - If you have a thumbprint, prefer it over no_ssl_verify for better safety.
+# - You can set ovftool_path if ovftool isn't in PATH.
+#
+# Typical run:
+#   sudo ./hyper2kvm.py --config ovftool-rhel10-ova-export.yaml
+
+command: vsphere
+
+# vCenter connection (used by VsphereMode + for building vi:// URL)
+vcenter: 10.73.213.134
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+vc_insecure: true          # your code currently maps this to no_ssl_verify default behavior
+dc_name: data
+
+# Action: OVF Tool export
+vs_action: ovftool_export
+vm_name: esx8.0-rhel10.0beta-x86_64-efi
+
+# Output
+output_dir: ./exports/ovftool/esx8.0-rhel10.0beta-x86_64-efi
+
+# OVF Tool location (optional)
+# If omitted, find_ovftool() tries PATH/common install locations.
+ovftool_path: null
+# Examples:
+# ovftool_path: /usr/local/bin/ovftool
+# ovftool_path: /opt/ovftool/ovftool
+
+# OVF Tool TLS behavior
+ovftool_no_ssl_verify: true        # set false if you provide thumbprint and want verification
+ovftool_thumbprint: null           # e.g. "AA:BB:CC:...:FF" (SHA1 format ovftool expects)
+
+# OVF Tool behavior
+ovftool_accept_all_eulas: true
+ovftool_overwrite: true            # overwrite existing .ova if present
+ovftool_quiet: false
+ovftool_verbose: true              # ovftool prints progress; leave true while debugging
+
+# Disk format mode (optional; depends on what ovftool supports for your environment)
+# Examples seen in practice: thin, thick, eagerZeroedThick (varies by target)
+ovftool_disk_mode: null
+
+# Retries around ovftool execution (your wrapper supports this)
+ovftool_retries: 2
+ovftool_retry_backoff_s: 3.0
+
+# Extra raw args passed to ovftool (repeatable in CLI, list in YAML)
+# Common useful ones:
+#  - "--X:logFile=/tmp/ovftool.log" (if supported in your ovftool build)
+#  - "--X:logLevel=verbose"
+ovftool_extra_args: []
+
+# Logging / output
+verbose: 2
+json: false
+

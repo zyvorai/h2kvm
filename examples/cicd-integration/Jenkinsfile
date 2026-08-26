@@ -1,0 +1,389 @@
+// Jenkinsfile for automated VM migration with hyper2kvm
+//
+// Pipeline: Migrate VMs from VMware to KVM in a CI/CD workflow
+//
+// Features:
+// - Automated migration triggered by Git commits
+// - Parallel processing of multiple VMs
+// - Automated testing and validation
+// - Rollback on failure
+// - Slack/email notifications
+//
+// Prerequisites:
+// - Jenkins with Pipeline plugin
+// - hyper2kvm installed on Jenkins agent
+// - Credentials stored in Jenkins (vCenter, SSH keys)
+// - Shared storage accessible to Jenkins agents
+
+@Library('shared-pipeline-library') _
+
+pipeline {
+    agent {
+        label 'kvm-migration-agent'  // Jenkins agent with hyper2kvm + libvirt
+    }
+
+    parameters {
+        choice(
+            name: 'MIGRATION_BATCH',
+            choices: ['dev', 'test', 'staging', 'production'],
+            description: 'Which batch of VMs to migrate'
+        )
+        booleanParam(
+            name: 'DRY_RUN',
+            defaultValue: true,
+            description: 'Perform dry-run (validation only, no actual migration)'
+        )
+        booleanParam(
+            name: 'AUTO_ROLLBACK',
+            defaultValue: true,
+            description: 'Automatically rollback on failure'
+        )
+    }
+
+    environment {
+        VCENTER_HOST = 'vcenter.example.com'
+        VCENTER_USER = credentials('vcenter-readonly')
+        MIGRATION_BASE = "/data/migrations/${env.BUILD_NUMBER}"
+        SLACK_CHANNEL = '#infrastructure-migrations'
+        EMAIL_RECIPIENTS = 'infrastructure@example.com'
+    }
+
+    options {
+        // Only one migration job at a time
+        disableConcurrentBuilds()
+
+        // Keep build logs for 30 days
+        buildDiscarder(logRotator(daysToKeepStr: '30', numToKeepStr: '100'))
+
+        // Timeout after 4 hours
+        timeout(time: 4, unit: 'HOURS')
+
+        // Add timestamps to console output
+        timestamps()
+
+        // Colorize console output
+        ansiColor('xterm')
+    }
+
+    stages {
+        stage('Preparation') {
+            steps {
+                script {
+                    echo "=== Migration Pipeline Started ==="
+                    echo "Build Number: ${env.BUILD_NUMBER}"
+                    echo "Migration Batch: ${params.MIGRATION_BATCH}"
+                    echo "Dry Run: ${params.DRY_RUN}"
+
+                    // Create migration workspace
+                    sh """
+                        mkdir -p ${MIGRATION_BASE}/{configs,logs,reports,backups}
+                        echo "${env.BUILD_NUMBER}" > ${MIGRATION_BASE}/build_number
+                        echo "${params.MIGRATION_BATCH}" > ${MIGRATION_BASE}/batch_name
+                    """
+
+                    // Slack notification
+                    slackSend(
+                        channel: env.SLACK_CHANNEL,
+                        color: 'good',
+                        message: "Migration pipeline started: ${params.MIGRATION_BATCH} (Build #${env.BUILD_NUMBER})"
+                    )
+                }
+            }
+        }
+
+        stage('Pre-Migration Checks') {
+            steps {
+                script {
+                    echo "=== Pre-Migration Validation ==="
+
+                    // Check hyper2kvm version
+                    sh """
+                        python -m hyper2kvm --version | tee ${MIGRATION_BASE}/logs/version.log
+                    """
+
+                    // Check KVM host resources
+                    sh """
+                        echo "=== KVM Host Resources ===" | tee -a ${MIGRATION_BASE}/logs/preflight.log
+                        free -h | tee -a ${MIGRATION_BASE}/logs/preflight.log
+                        df -h | tee -a ${MIGRATION_BASE}/logs/preflight.log
+                        virsh list --all | tee -a ${MIGRATION_BASE}/logs/preflight.log
+                    """
+
+                    // Verify vCenter connectivity
+                    sh """
+                        govc about -u ${VCENTER_USER}@${VCENTER_HOST} | \
+                            tee ${MIGRATION_BASE}/logs/vcenter-connectivity.log
+                    """
+
+                    // Load VM list for this batch
+                    def vmList = readYaml file: "jenkins/vm-batches/${params.MIGRATION_BATCH}.yaml"
+                    env.VM_COUNT = vmList.vms.size()
+                    echo "VMs to migrate: ${env.VM_COUNT}"
+                }
+            }
+        }
+
+        stage('Backup VMware VMs') {
+            when {
+                expression { params.DRY_RUN == false }
+            }
+            steps {
+                script {
+                    echo "=== Creating VMware Snapshots ==="
+
+                    def vmList = readYaml file: "jenkins/vm-batches/${params.MIGRATION_BATCH}.yaml"
+
+                    vmList.vms.each { vm ->
+                        echo "Creating snapshot for: ${vm.name}"
+                        sh """
+                            govc snapshot.create \
+                                -u ${VCENTER_USER}@${VCENTER_HOST} \
+                                -vm ${vm.name} \
+                                -m "Pre-migration snapshot (Build ${env.BUILD_NUMBER})" \
+                                "migration-backup-${env.BUILD_NUMBER}"
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Migrate VMs') {
+            when {
+                expression { params.DRY_RUN == false }
+            }
+            steps {
+                script {
+                    echo "=== Starting VM Migration ==="
+
+                    def vmList = readYaml file: "jenkins/vm-batches/${params.MIGRATION_BATCH}.yaml"
+
+                    // Parallel migration (max 3 concurrent)
+                    def migrationSteps = [:]
+
+                    vmList.vms.each { vm ->
+                        migrationSteps[vm.name] = {
+                            stage("Migrate ${vm.name}") {
+                                try {
+                                    sh """
+                                        python -m hyper2kvm vsphere \
+                                            --vcenter ${VCENTER_HOST} \
+                                            --username ${VCENTER_USER} \
+                                            --password-file /secure/vcenter.pass \
+                                            --vs-action export-vm \
+                                            --vs-vm-name ${vm.name} \
+                                            --output-dir ${MIGRATION_BASE}/vms/${vm.name} \
+                                            --out-format qcow2 \
+                                            --compress \
+                                            --regen-initramfs \
+                                            --fstab-mode stabilize-all \
+                                            --fix-grub \
+                                            --verbose 2 \
+                                            --log-file ${MIGRATION_BASE}/logs/${vm.name}.log \
+                                            --report ${MIGRATION_BASE}/reports/${vm.name}.md
+                                    """
+
+                                    echo "✓ ${vm.name}: Migration successful"
+
+                                } catch (Exception e) {
+                                    echo "✗ ${vm.name}: Migration failed: ${e.message}"
+
+                                    if (params.AUTO_ROLLBACK) {
+                                        echo "Auto-rollback enabled, reverting snapshot..."
+                                        sh """
+                                            govc snapshot.revert \
+                                                -u ${VCENTER_USER}@${VCENTER_HOST} \
+                                                -vm ${vm.name} \
+                                                "migration-backup-${env.BUILD_NUMBER}"
+                                        """
+                                    }
+
+                                    throw e
+                                }
+                            }
+                        }
+                    }
+
+                    // Execute migrations in parallel (max 3 at once)
+                    parallel migrationSteps
+                }
+            }
+        }
+
+        stage('Post-Migration Tests') {
+            when {
+                expression { params.DRY_RUN == false }
+            }
+            steps {
+                script {
+                    echo "=== Post-Migration Validation ==="
+
+                    def vmList = readYaml file: "jenkins/vm-batches/${params.MIGRATION_BATCH}.yaml"
+
+                    vmList.vms.each { vm ->
+                        echo "Testing ${vm.name}..."
+
+                        // Boot test
+                        sh """
+                            virt-install \
+                                --name ${vm.name}-test \
+                                --memory ${vm.memory ?: 4096} \
+                                --vcpus ${vm.vcpus ?: 2} \
+                                --disk path=${MIGRATION_BASE}/vms/${vm.name}/${vm.name}.qcow2,bus=virtio \
+                                --network bridge=br-test,model=virtio \
+                                --import \
+                                --noautoconsole
+
+                            # Wait for boot
+                            sleep 60
+
+                            # Check if running
+                            virsh dominfo ${vm.name}-test | tee ${MIGRATION_BASE}/logs/${vm.name}-boot-test.log
+
+                            # Cleanup
+                            virsh destroy ${vm.name}-test
+                            virsh undefine ${vm.name}-test
+                        """
+
+                        // Smoke tests (if configured)
+                        if (vm.smoke_tests) {
+                            sh """
+                                # Run smoke test suite
+                                ./tests/smoke-tests.sh ${vm.name} | \
+                                    tee ${MIGRATION_BASE}/logs/${vm.name}-smoke-tests.log
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Generate Reports') {
+            steps {
+                script {
+                    echo "=== Generating Migration Report ==="
+
+                    sh """
+                        # Aggregate individual VM reports
+                        cat > ${MIGRATION_BASE}/reports/summary.md <<EOF
+# Migration Report - Build ${env.BUILD_NUMBER}
+
+**Batch:** ${params.MIGRATION_BATCH}
+**Date:** $(date)
+**Build:** #${env.BUILD_NUMBER}
+**Status:** ${currentBuild.result ?: 'SUCCESS'}
+
+## VMs Migrated
+
+EOF
+
+                        # Add each VM report
+                        for report in ${MIGRATION_BASE}/reports/*.md; do
+                            [ -f "\$report" ] || continue
+                            echo "---" >> ${MIGRATION_BASE}/reports/summary.md
+                            cat "\$report" >> ${MIGRATION_BASE}/reports/summary.md
+                        done
+
+                        # Add resource usage
+                        cat >> ${MIGRATION_BASE}/reports/summary.md <<EOF
+
+## Resource Usage
+
+### Disk Space
+\`\`\`
+$(df -h ${MIGRATION_BASE})
+\`\`\`
+
+### Migration Duration
+Build start: ${env.BUILD_TIMESTAMP}
+Build end: $(date)
+EOF
+                    """
+
+                    // Archive reports
+                    archiveArtifacts artifacts: "${MIGRATION_BASE}/reports/*.md", fingerprint: true
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                def message = """
+Migration Successful! ✅
+
+Batch: ${params.MIGRATION_BATCH}
+VMs: ${env.VM_COUNT}
+Build: #${env.BUILD_NUMBER}
+Duration: ${currentBuild.durationString}
+
+Reports: ${env.BUILD_URL}artifact/
+                """.trim()
+
+                // Slack notification
+                slackSend(
+                    channel: env.SLACK_CHANNEL,
+                    color: 'good',
+                    message: message
+                )
+
+                // Email notification
+                emailext(
+                    to: env.EMAIL_RECIPIENTS,
+                    subject: "Migration Successful: ${params.MIGRATION_BATCH} (Build #${env.BUILD_NUMBER})",
+                    body: message,
+                    attachmentsPattern: "${MIGRATION_BASE}/reports/summary.md"
+                )
+            }
+        }
+
+        failure {
+            script {
+                def message = """
+Migration Failed! ❌
+
+Batch: ${params.MIGRATION_BATCH}
+Build: #${env.BUILD_NUMBER}
+Error: ${currentBuild.result}
+
+Logs: ${env.BUILD_URL}console
+                """.trim()
+
+                // Slack notification with @channel mention
+                slackSend(
+                    channel: env.SLACK_CHANNEL,
+                    color: 'danger',
+                    message: "@channel ${message}"
+                )
+
+                // Email notification
+                emailext(
+                    to: env.EMAIL_RECIPIENTS,
+                    subject: "Migration FAILED: ${params.MIGRATION_BATCH} (Build #${env.BUILD_NUMBER})",
+                    body: message,
+                    attachLog: true
+                )
+            }
+        }
+
+        always {
+            // Clean up old builds (keep disk space under control)
+            script {
+                sh """
+                    # Keep only last 10 builds
+                    ls -1dt /data/migrations/* | tail -n +11 | xargs rm -rf || true
+                """
+            }
+
+            // Publish test results
+            junit allowEmptyResults: true, testResults: "${MIGRATION_BASE}/test-results/**/*.xml"
+
+            // Publish HTML reports
+            publishHTML([
+                reportDir: "${MIGRATION_BASE}/reports",
+                reportFiles: 'summary.md',
+                reportName: 'Migration Report'
+            ])
+        }
+    }
+}

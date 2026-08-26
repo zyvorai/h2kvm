@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>v9s Operations Guide — Day-2 VM Management</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f0c29, #1a1a4e, #24243e); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; position: relative; overflow: hidden; }
+  .cover::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 50%, rgba(59,130,246,0.15) 0%, transparent 50%); }
+  .cover h1 { font-size: 3em; font-weight: 800; position: relative; margin-bottom: 0.3em; }
+  .cover h1 span { color: #3b82f6; }
+  .cover h2 { font-size: 1.4em; font-weight: 300; opacity: 0.9; margin-bottom: 1.5em; position: relative; }
+  .cover .tagline { font-size: 1.1em; opacity: 0.7; max-width: 600px; position: relative; }
+  .cover .badge { display: inline-block; background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 2em; position: relative; }
+  .page { min-height: 100vh; padding: 60px 80px; page-break-after: always; }
+  .page-dark { background: #0f111a; color: #e8e6df; }
+  .page-light { background: #fafbfc; }
+  .page-accent { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #e8e6df; }
+  h2.section-title { font-size: 2.2em; font-weight: 700; margin-bottom: 0.8em; }
+  h2.section-title span { color: #3b82f6; }
+  h3 { font-size: 1.3em; font-weight: 600; margin: 1.2em 0 0.5em; }
+  p { margin-bottom: 1em; font-size: 1.05em; }
+  .subtitle { font-size: 1.1em; opacity: 0.7; margin-bottom: 2em; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin: 1.5em 0; }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 28px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .card .icon { font-size: 2em; margin-bottom: 12px; }
+  .card h4 { font-size: 1.15em; font-weight: 600; margin-bottom: 8px; }
+  .card p { font-size: 0.95em; opacity: 0.85; margin-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.95em; }
+  th { background: #3b82f6; color: #fff; padding: 14px 18px; text-align: left; font-weight: 600; }
+  td { padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+  .page-light tr:nth-child(even) td { background: #f9fafb; }
+  ul { margin: 0.5em 0 1em 1.5em; }
+  li { margin-bottom: 0.4em; font-size: 1em; }
+  .step-box { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); border-radius: 12px; padding: 20px 24px; margin: 1em 0; }
+  .step-box h4 { color: #3b82f6; margin-bottom: 8px; }
+  .step-box p { margin-bottom: 0; font-size: 0.95em; }
+  .cta-box { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 40px; border-radius: 16px; text-align: center; margin: 2em 0; }
+  .cta-box h3 { font-size: 1.5em; margin-bottom: 0.5em; }
+  .cta-box p { opacity: 0.9; }
+  .footer { text-align: center; padding: 20px; font-size: 0.85em; opacity: 0.5; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>v<span>9</span>s Operations Guide</h1>
+  <h2>Day-2 KubeVirt VM Management</h2>
+  <p class="tagline">Practical guide for managing KubeVirt VMs after migration &mdash; console access, monitoring, snapshots, storage, network, and host administration.</p>
+  <div class="badge">For System Administrators &amp; Platform Engineers</div>
+</div>
+
+<!-- PAGE 2: CONSOLE OPERATIONS -->
+<div class="page page-dark">
+  <h2 class="section-title">Console <span>Operations</span></h2>
+  <p class="subtitle">Access VMs directly from the browser &mdash; no SSH keys or VPN needed.</p>
+
+  <h3>VNC Graphical Console</h3>
+  <div class="step-box">
+    <h4>How to Access</h4>
+    <p>Navigate to VMs &rarr; click VM row &rarr; Console tab &rarr; select "VNC Console"</p>
+  </div>
+  <p>Full graphical desktop access with mouse and keyboard. The VNC connection goes through a WebSocket proxy via virtctl. HTTPS is required for VNC.</p>
+
+  <h3>Sendkey Toolbar</h3>
+  <p>Click the keyboard icon in the VNC toolbar to reveal sendkey buttons. These send key combinations that the browser normally intercepts:</p>
+  <table>
+    <tr><th>Button</th><th>Keysym</th><th>Use Case</th></tr>
+    <tr><td>Ctrl+Alt+Del</td><td>0xffe3 + 0xffe9 + 0xffff</td><td>Windows login, Linux SysRq, task manager</td></tr>
+    <tr><td>Ctrl+Alt+F1</td><td>0xffe3 + 0xffe9 + 0xffbe</td><td>Switch to text console (TTY1)</td></tr>
+    <tr><td>Ctrl+Alt+F2</td><td>0xffe3 + 0xffe9 + 0xffbf</td><td>Open second terminal (TTY2)</td></tr>
+    <tr><td>Ctrl+Alt+F7</td><td>0xffe3 + 0xffe9 + 0xffc4</td><td>Return to graphical desktop</td></tr>
+  </table>
+
+  <h3>Serial Console</h3>
+  <div class="step-box">
+    <h4>When to Use</h4>
+    <p>Headless VMs, boot troubleshooting, GRUB access, kernel panic debugging, VMs without graphical desktop.</p>
+  </div>
+
+  <h3>SSH Console</h3>
+  <div class="step-box">
+    <h4>When to Use</h4>
+    <p>VMs with network connectivity and SSH server running. Fastest for command-line administration.</p>
+  </div>
+</div>
+
+<!-- PAGE 3: MONITORING -->
+<div class="page page-light">
+  <h2 class="section-title">Monitoring &amp; <span>Metrics</span></h2>
+  <p class="subtitle">Real-time performance data without Prometheus or Grafana setup.</p>
+
+  <h3>Per-VM Metrics (WebSocket)</h3>
+  <p>Navigate to VMs &rarr; click VM &rarr; Metrics tab. Charts update in real-time via WebSocket connection.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>CPU Usage</h4>
+      <p>Green area chart. Shows utilization percentage over time. 60-point rolling history. Useful for sizing and capacity planning.</p>
+    </div>
+    <div class="card">
+      <h4>Memory Usage</h4>
+      <p>Blue area chart. Tracks allocation vs actual usage. Identifies memory leaks or over-provisioning.</p>
+    </div>
+    <div class="card">
+      <h4>Network I/O</h4>
+      <p>Dual-line: RX (purple) and TX (amber) in KB/s. Monitor bandwidth usage and detect anomalies.</p>
+    </div>
+    <div class="card">
+      <h4>Disk I/O</h4>
+      <p>Dual-line: Read (cyan) and Write (red) in KB/s. Identify storage bottlenecks and I/O spikes.</p>
+    </div>
+  </div>
+
+  <h3>Host-Level Monitoring</h3>
+  <p>Navigate to Host &rarr; Overview tab for real-time host resource usage:</p>
+  <ul>
+    <li><strong>CPU:</strong> Usage percentage with load average (1m, 5m, 15m)</li>
+    <li><strong>Memory:</strong> Used/total with swap usage</li>
+    <li><strong>Disk:</strong> Used/total with color-coded percentage bar</li>
+    <li><strong>Uptime:</strong> Host uptime and process count</li>
+  </ul>
+  <p>All metrics auto-refresh every 10 seconds.</p>
+</div>
+
+<!-- PAGE 4: SNAPSHOT & STORAGE -->
+<div class="page page-dark">
+  <h2 class="section-title">Snapshots &amp; <span>Storage</span></h2>
+  <p class="subtitle">Point-in-time backups and disk management.</p>
+
+  <h3>Creating a Snapshot</h3>
+  <div class="step-box">
+    <h4>Steps</h4>
+    <p>VMs &rarr; click VM &rarr; Snapshots tab &rarr; "Create Snapshot" button &rarr; confirm</p>
+  </div>
+  <p>Snapshots are created via the KubeVirt VirtualMachineSnapshot API. Auto-generated name format: <code>vm-name-snapshot-timestamp</code>. The API version (v1beta1 or v1alpha1) is auto-detected.</p>
+
+  <h3>Deleting a Snapshot</h3>
+  <div class="step-box">
+    <h4>Steps</h4>
+    <p>Click the trash icon next to any snapshot &rarr; confirm deletion. Loading indicator shown per item.</p>
+  </div>
+
+  <h3>Mounting an ISO</h3>
+  <div class="step-box">
+    <h4>Steps</h4>
+    <p>VMs &rarr; click VM &rarr; Storage tab &rarr; "Mount ISO" &rarr; enter disk name and container image URL &rarr; Mount</p>
+  </div>
+  <p>ISOs are mounted as CDROM devices via containerDisk volumes. The mount operation modifies the VM spec with a SATA CDROM device. Duplicate disk names are automatically replaced.</p>
+
+  <h3>Adding a Network Interface</h3>
+  <div class="step-box">
+    <h4>Steps</h4>
+    <p>VMs &rarr; click VM &rarr; Network tab &rarr; "Add Network" &rarr; choose name, type (pod/multus), binding (bridge/masquerade/SR-IOV) &rarr; Add</p>
+  </div>
+  <p>Network interfaces are added by patching the VM spec. Duplicate network names are prevented with validation. The VM may need a restart for new interfaces to take effect.</p>
+</div>
+
+<!-- PAGE 5: HOST ADMIN -->
+<div class="page page-light">
+  <h2 class="section-title">Host <span>Administration</span></h2>
+  <p class="subtitle">Five-tab host dashboard for complete system visibility.</p>
+
+  <table>
+    <tr><th>Tab</th><th>Data Source</th><th>What You See</th></tr>
+    <tr><td>Overview</td><td>/proc, /sys, os-release</td><td>Hostname, OS, kernel, CPU, BIOS, vendor. CPU/memory/disk gauges with load average.</td></tr>
+    <tr><td>Hardware</td><td>lspci, dmidecode</td><td>RAM modules (slot, size, speed, type, vendor). PCI devices (slot, class, vendor, device).</td></tr>
+    <tr><td>Partitions</td><td>df, /proc/mounts</td><td>All filesystems: device, mount point, type, size, used, available. Color-coded usage bars.</td></tr>
+    <tr><td>Network</td><td>/sys/class/net</td><td>All interfaces: state, MAC, IPs, RX/TX bytes, speed, MTU.</td></tr>
+    <tr><td>Services</td><td>systemctl</td><td>All systemd services: name, status (running/exited/failed), description.</td></tr>
+  </table>
+
+  <h3>Common Host Checks</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Disk Space Running Low?</h4>
+      <p>Partitions tab &rarr; check usage bars. Red (>90%) means action needed. Check /var/lib/kubelet and /var/lib/containerd.</p>
+    </div>
+    <div class="card">
+      <h4>Memory Pressure?</h4>
+      <p>Overview tab &rarr; memory gauge. Check swap usage. If swap is heavily used, VMs may need memory limits adjusted.</p>
+    </div>
+    <div class="card">
+      <h4>Service Failures?</h4>
+      <p>Services tab &rarr; look for red "failed" badges. Common: libvirtd, k3s, v9s-web. Check with journalctl.</p>
+    </div>
+    <div class="card">
+      <h4>Network Issues?</h4>
+      <p>Network tab &rarr; check interface state (up/down), IP assignments, and error counters in RX/TX.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: TROUBLESHOOTING + CTA -->
+<div class="page page-accent">
+  <h2 class="section-title">Troubleshooting <span>Guide</span></h2>
+  <p class="subtitle">Common issues and how to resolve them with v9s.</p>
+
+  <table>
+    <tr><th>Issue</th><th>Where to Look</th><th>Resolution</th></tr>
+    <tr><td>VM won't start</td><td>Events tab</td><td>Check for scheduling failures, resource limits, PVC issues</td></tr>
+    <tr><td>VM boots to GRUB</td><td>Serial console</td><td>Bootloader misconfigured &mdash; re-run hyper2kvm with --regen-initramfs</td></tr>
+    <tr><td>No network after migration</td><td>Network tab + console</td><td>Check interface binding, cloud-init network config</td></tr>
+    <tr><td>High CPU usage</td><td>Metrics tab</td><td>Identify the process via SSH/serial console, adjust CPU limits</td></tr>
+    <tr><td>Disk full on host</td><td>Host &rarr; Partitions</td><td>Clean up old images, PVCs, or snapshots</td></tr>
+    <tr><td>Console black screen</td><td>VNC + serial</td><td>Try serial console for headless VMs. Check VM is running.</td></tr>
+    <tr><td>Snapshot stuck "Pending"</td><td>Snapshots tab + Events</td><td>Check VolumeSnapshot CRDs, CSI driver status</td></tr>
+  </table>
+
+  <h3>Logs for Debugging</h3>
+  <div class="step-box">
+    <h4>VM Logs</h4>
+    <p>VMs &rarr; click VM &rarr; Logs tab &rarr; select "Console Log" for guest output or "Compute Log" for QEMU/libvirt messages.</p>
+  </div>
+
+  <div class="cta-box">
+    <h3>v9s makes KubeVirt VM management accessible</h3>
+    <p>No kubectl required. No YAML editing for daily operations.<br>Console, metrics, snapshots, and host info &mdash; all in one place.</p>
+  </div>
+
+  <div class="footer">
+    <p>v9s Operations Guide &mdash; Day-2 KubeVirt VM Management<br>
+    Part of the hyper2kvm ecosystem<br>
+    github.com/ssahani/hyper2kvm</p>
+  </div>
+</div>
+
+</body>
+</html>

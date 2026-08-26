@@ -1,0 +1,17 @@
+# Photon OS Migration - Minimal Libvirt Export
+# Converts to qcow2 and creates libvirt domain (no auto-test)
+
+command: local
+vmdk: ./photon.vmdk
+output_dir: /var/lib/libvirt/images
+to_output: photon-os.qcow2
+out_format: qcow2
+compress: false
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Libvirt - Define domain only (no test)
+emit_domain_xml: true
+virsh_define: true
+vm_name: photon-os
+libvirt_network: default

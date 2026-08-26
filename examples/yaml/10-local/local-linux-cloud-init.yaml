@@ -1,0 +1,11 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 10-local/local-linux-cloud-init.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 10-local/local-linux-cloud-init.yaml
+
+command: local
+vmdk: /path/to/linux.vmdk
+cloud_init_config: /path/to/cloud-config.yaml
+to_output: linux-cloudinit.qcow2
+report: local-linux-cloudinit.md

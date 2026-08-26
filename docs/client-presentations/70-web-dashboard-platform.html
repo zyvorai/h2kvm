@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>h2kweb — Enterprise Migration Dashboard — hyper2kvm</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #e2e8f0; background: #0f172a; line-height: 1.5; }
+
+  .cover { height: 100vh; background: linear-gradient(135deg, #0f172a, #1e293b); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; background: linear-gradient(135deg, #22c55e, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .cover h2 { font-size: 1.3em; color: #94a3b8; margin: 0.3em 0 1.5em; }
+  .cover .badge { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); padding: 6px 20px; border-radius: 16px; font-size: 0.85em; color: #22c55e; }
+  .cover .url { color: #3b82f6; font-family: monospace; font-size: 1.1em; margin-top: 1em; }
+  .cover .date { color: #475569; margin-top: 0.5em; font-size: 0.85em; }
+
+  .page { min-height: 100vh; padding: 36px 46px; page-break-after: always; position: relative; }
+  .page-dark { background: #0f172a; }
+  .page-slate { background: #1e293b; }
+
+  h2.title { font-size: 1.8em; font-weight: 700; margin-bottom: 0.2em; }
+  h2.title span { color: #22c55e; }
+  .desc { font-size: 0.9em; color: #64748b; margin-bottom: 1.2em; }
+  h3 { font-size: 1.02em; font-weight: 600; margin: 0.8em 0 0.25em; color: #3b82f6; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0.6em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 13px; }
+  .card h4 { font-size: 0.9em; font-weight: 600; margin-bottom: 4px; color: #22c55e; }
+  .card ul { padding-left: 14px; font-size: 0.78em; margin: 0; } .card li { margin-bottom: 2px; }
+  .card p { font-size: 0.78em; opacity: 0.85; margin-bottom: 0; }
+
+  .flow { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 0.7em 0; flex-wrap: wrap; }
+  .flow-step { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: 0.8em; }
+  .flow-arrow { font-size: 1.1em; color: #22c55e; }
+  .flow-blue { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); }
+  .flow-ok { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+
+  .features { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1em; }
+  .feat { background: rgba(51,65,85,0.5); border: 1px solid rgba(51,65,85,0.8); border-radius: 8px; padding: 6px 12px; font-size: 0.78em; color: #94a3b8; }
+  .feat-green { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #22c55e; }
+  .feat-blue { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: #3b82f6; }
+
+  .highlight { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  pre { background: rgba(255,255,255,0.04); color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.74em; line-height: 1.45; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  code { background: rgba(34,197,94,0.1); padding: 2px 4px; border-radius: 4px; font-size: 0.85em; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.76em; }
+  th { background: #15803d; color: #fff; padding: 5px 8px; text-align: left; font-weight: 600; font-size: 0.82em; }
+  td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); vertical-align: top; }
+  .check { color: #22c55e; font-weight: 700; }
+
+  .verdict { background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(59,130,246,0.1)); border: 2px solid #22c55e; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #22c55e; font-size: 1.1em; margin-bottom: 4px; }
+
+  .stat-box { text-align: center; padding: 12px; }
+  .stat-box .num { font-size: 1.8em; font-weight: 800; color: #22c55e; }
+  .stat-box .label { font-size: 0.75em; opacity: 0.7; }
+
+  .footer { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-size: 0.65em; color: #334155; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>h2kweb<br>Enterprise Migration Dashboard</h1>
+  <h2>Browser-Based VM Migration, Monitoring &amp; Management</h2>
+  <div class="badge">Go Backend | React Frontend | PAM Auth | WebSocket | Libvirt | Proprietary (Zyvor AI Labs)</div>
+  <div class="url">github.com/ssahani/hyper2kvm</div>
+  <div class="date">April 2026 &mdash; v0.3.0</div>
+</div>
+
+<!-- PAGE 1: Architecture -->
+<div class="page page-dark">
+  <h2 class="title"><span>1.</span> Architecture</h2>
+  <p class="desc">Full-stack web platform with Go backend, React/TypeScript frontend, and real-time WebSocket communication.</p>
+
+  <div class="flow">
+    <div class="flow-step">Browser<br><small>React + TypeScript</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-blue">REST API<br><small>chi router</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-blue">WebSocket<br><small>real-time logs</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">h2kvmctl<br><small>subprocess</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">libvirt<br><small>domain mgmt</small></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Go Backend (h2kweb)</h4>
+      <ul>
+        <li>chi router with middleware (CORS, auth, logging)</li>
+        <li>PAM authentication &mdash; system-level credentials</li>
+        <li>HttpOnly cookies with SameSite=Strict</li>
+        <li>32-byte random session tokens</li>
+        <li>WebSocket hub for real-time log streaming</li>
+        <li>libvirt integration via go-libvirt bindings</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>React/TypeScript Frontend</h4>
+      <ul>
+        <li>Vite build system with hot module replacement</li>
+        <li>TailwindCSS + shadcn/ui component library</li>
+        <li>Dark and light theme support</li>
+        <li>Responsive layout (desktop + tablet)</li>
+        <li>WebSocket client for live migration logs</li>
+        <li>noVNC integration for VM console access</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>API Endpoints</h4>
+      <ul>
+        <li><code>POST /api/auth/login</code></li>
+        <li><code>GET /api/dashboard</code></li>
+        <li><code>GET /api/vms</code></li>
+        <li><code>POST /api/migrate</code></li>
+        <li><code>GET /api/jobs/:id/logs</code></li>
+        <li><code>WS /api/ws</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Security</h4>
+      <ul>
+        <li>PAM auth (same as SSH credentials)</li>
+        <li>Session-based with secure cookies</li>
+        <li>CSRF protection via SameSite</li>
+        <li>No default passwords</li>
+        <li>Optional API key for automation</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Integration</h4>
+      <ul>
+        <li>libvirt: domain CRUD, screenshots</li>
+        <li>h2kvmctl: migration subprocess</li>
+        <li>govc: VMware vSphere discovery</li>
+        <li>KubeVirt: Kubernetes VM deploy</li>
+        <li>systemd: service management</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="features">
+    <span class="feat feat-green">Go chi router</span>
+    <span class="feat feat-blue">React + TypeScript</span>
+    <span class="feat feat-green">PAM authentication</span>
+    <span class="feat">WebSocket real-time</span>
+    <span class="feat feat-blue">libvirt integration</span>
+    <span class="feat">Dark/Light themes</span>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 1</div>
+</div>
+
+<!-- PAGE 2: Dashboard Overview -->
+<div class="page page-slate">
+  <h2 class="title"><span>2.</span> Dashboard <span>Overview</span></h2>
+  <p class="desc">Single-pane view of migration pipeline, host resources, readiness checks, and recent activity.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Migration Pipeline</h4>
+      <ul>
+        <li>Active migrations with real-time progress bars</li>
+        <li>Queued, running, completed, and failed job counts</li>
+        <li>Per-job elapsed time and ETA</li>
+        <li>Click-through to full job logs</li>
+        <li>Cancel in-progress migrations</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Host Resources</h4>
+      <ul>
+        <li>CPU: model, cores, current load average</li>
+        <li>Memory: total, used, available with percentage</li>
+        <li>Disk: per-mount usage with warnings at 90%+</li>
+        <li>QEMU version and KVM status</li>
+        <li>libvirt connection state</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Readiness Checks (19 Items)</h4>
+      <ul>
+        <li>KVM hardware acceleration available</li>
+        <li>QEMU binary found and executable</li>
+        <li>libvirt daemon running and accessible</li>
+        <li>qemu-nbd and nbd kernel module loaded</li>
+        <li>virtio-win ISO present and valid</li>
+        <li>OVMF firmware files found</li>
+        <li>hivex Python bindings available</li>
+        <li>Sufficient disk space for conversions</li>
+        <li>Network bridge or NAT configured</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Disk Images Inventory</h4>
+      <ul>
+        <li>Scan configured directories for VMDK, OVA, QCOW2</li>
+        <li>File size, format, and modification date</li>
+        <li>Quick-action: migrate selected image</li>
+        <li>Delete or move completed conversions</li>
+        <li>Storage usage summary per directory</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p style="margin-bottom:0;"><strong>All 19 readiness checks must pass</strong> before migrations can start. The dashboard shows a clear green/amber/red status for each check, with remediation hints for any failures.</p>
+  </div>
+
+  <div class="features">
+    <span class="feat feat-green">19 readiness checks</span>
+    <span class="feat feat-blue">Real-time CPU/RAM/disk</span>
+    <span class="feat">Pipeline status</span>
+    <span class="feat feat-green">Disk image inventory</span>
+    <span class="feat">Recent activity feed</span>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 2</div>
+</div>
+
+<!-- PAGE 3: VM Management -->
+<div class="page page-dark">
+  <h2 class="title"><span>3.</span> VM <span>Management</span></h2>
+  <p class="desc">Full libvirt domain management with live screenshots, VNC console, and guest agent integration.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>VM Information</h4>
+      <ul>
+        <li>OS type detection (Linux/Windows)</li>
+        <li>Disk bus and format (virtio/sata, qcow2/raw)</li>
+        <li>vCPU count and memory allocation</li>
+        <li>Network interfaces with MAC addresses</li>
+        <li>Firmware type (UEFI/BIOS)</li>
+        <li>Autostart and persistent status</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Guest Agent Status</h4>
+      <ul>
+        <li>Agent ping: connected or disconnected</li>
+        <li>Guest OS version from agent</li>
+        <li>IP addresses reported by agent</li>
+        <li>Filesystem usage from agent</li>
+        <li>Hostname and timezone</li>
+        <li>User sessions active</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Console &amp; Screenshots</h4>
+      <ul>
+        <li>noVNC in-browser console (no client needed)</li>
+        <li>Live screenshots via libvirt API</li>
+        <li>Screenshot refresh on demand</li>
+        <li>Full-screen console mode</li>
+        <li>Clipboard sharing (with agent)</li>
+        <li>Ctrl+Alt+Del send button</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>VM Actions</h3>
+  <table>
+    <tr><th style="width:20%">Action</th><th style="width:25%">API</th><th style="width:55%">Description</th></tr>
+    <tr><td><strong>Start</strong></td><td><code>POST /api/vms/:id/start</code></td><td>Boot the VM, wait for guest agent ping confirmation</td></tr>
+    <tr><td><strong>Shutdown</strong></td><td><code>POST /api/vms/:id/shutdown</code></td><td>ACPI shutdown signal, graceful guest OS shutdown</td></tr>
+    <tr><td><strong>Force Off</strong></td><td><code>POST /api/vms/:id/destroy</code></td><td>Immediate power-off (like pulling the plug)</td></tr>
+    <tr><td><strong>Reboot</strong></td><td><code>POST /api/vms/:id/reboot</code></td><td>ACPI reboot via guest agent or reset</td></tr>
+    <tr><td><strong>Delete</strong></td><td><code>DELETE /api/vms/:id</code></td><td>Undefine domain, optionally remove disk images</td></tr>
+    <tr><td><strong>Console</strong></td><td><code>WS /api/vms/:id/console</code></td><td>WebSocket proxy to VNC for noVNC client</td></tr>
+  </table>
+
+  <div class="features">
+    <span class="feat feat-green">noVNC console</span>
+    <span class="feat feat-blue">Live screenshots</span>
+    <span class="feat">Guest agent integration</span>
+    <span class="feat feat-green">CPU/memory stats</span>
+    <span class="feat">OS type detection</span>
+    <span class="feat">Disk bus/format info</span>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 3</div>
+</div>
+
+<!-- PAGE 4: Migration Workflow -->
+<div class="page page-slate">
+  <h2 class="title"><span>4.</span> Migration <span>Workflow</span></h2>
+  <p class="desc">Browser-based file upload, 3-step migration wizard, and live log streaming with auto-scroll.</p>
+
+  <div class="flow">
+    <div class="flow-step">Upload / Select<br><small>drag-drop or browse</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-blue">Configure<br><small>3-step wizard</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-blue">Convert<br><small>h2kvmctl subprocess</small></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step flow-ok">Deploy<br><small>libvirt + boot</small></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>File Upload</h4>
+      <ul>
+        <li>Drag-and-drop zone for VMDK, OVA, VHD files</li>
+        <li>Up to 50 GB upload size supported</li>
+        <li>Real-time upload progress bar with percentage</li>
+        <li>Cancel upload mid-transfer</li>
+        <li>Chunked upload for reliability over slow connections</li>
+        <li>Server-side directory browse for local files</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>3-Step Wizard</h4>
+      <ul>
+        <li><strong>Step 1:</strong> Source &mdash; file path, format auto-detect</li>
+        <li><strong>Step 2:</strong> Options &mdash; output dir, flatten, compress, fixes</li>
+        <li><strong>Step 3:</strong> Deploy &mdash; libvirt XML, virsh define, boot test</li>
+        <li>YAML preview panel shows generated config</li>
+        <li>All h2kvmctl options exposed in advanced section</li>
+        <li>Save and reuse migration templates</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Live Logs</h4>
+      <ul>
+        <li>WebSocket streaming of h2kvmctl stdout/stderr</li>
+        <li>Auto-scroll follows latest output</li>
+        <li>Progress bar with percentage, speed, and ETA</li>
+        <li>Color-coded: info (blue), warning (amber), error (red)</li>
+        <li>Search within log output</li>
+        <li>Download full log as text file</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Report Export</h4>
+      <ul>
+        <li>Migration summary report (JSON and text)</li>
+        <li>Source and destination details</li>
+        <li>Duration, disk sizes, conversion ratio</li>
+        <li>Fixes applied (drivers, initramfs, GRUB)</li>
+        <li>Deploy result: domain name, IP address</li>
+        <li>Shareable link to migration result page</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="features">
+    <span class="feat feat-green">Drag-drop upload (50GB)</span>
+    <span class="feat feat-blue">3-step wizard</span>
+    <span class="feat">WebSocket live logs</span>
+    <span class="feat feat-green">Progress + ETA</span>
+    <span class="feat">YAML preview</span>
+    <span class="feat">Report export</span>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 4</div>
+</div>
+
+<!-- PAGE 5: Network & Infrastructure -->
+<div class="page page-dark">
+  <h2 class="title"><span>5.</span> Network &amp; <span>Infrastructure</span></h2>
+  <p class="desc">Network topology visualization, libvirt domain management, and KubeVirt integration.</p>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>Network Topology</h4>
+      <ul>
+        <li>Visual map of libvirt networks</li>
+        <li>VMs grouped by network (default, bridge, NAT)</li>
+        <li>IP addresses per VM (from guest agent)</li>
+        <li>MAC addresses and interface names</li>
+        <li>Network type and DHCP range display</li>
+        <li>Bridge device mapping</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Libvirt Management</h4>
+      <ul>
+        <li>Domain list with state and resource usage</li>
+        <li>Storage pool management (dir, LVM, NFS)</li>
+        <li>Network management (create, edit, delete)</li>
+        <li>Snapshot management per VM</li>
+        <li>Domain XML editor with syntax highlighting</li>
+        <li>Bulk operations on selected VMs</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>KubeVirt Integration</h4>
+      <ul>
+        <li>Deploy migrated VMs to Kubernetes clusters</li>
+        <li>VirtualMachine manifest generation</li>
+        <li>PVC-backed disk configuration</li>
+        <li>Network attachment definitions</li>
+        <li>kubectl apply from dashboard</li>
+        <li>K3s single-node support</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Provider Integration</h3>
+  <table>
+    <tr><th style="width:20%">Provider</th><th style="width:20%">Protocol</th><th style="width:30%">Discovery</th><th style="width:30%">Migration</th></tr>
+    <tr><td><strong>VMware vSphere</strong></td><td>govmomi / govc</td><td>Datacenter, cluster, VM listing</td><td>OVA export + convert + deploy</td></tr>
+    <tr><td><strong>Microsoft Azure</strong></td><td>az CLI</td><td>Subscription, resource group, VM listing</td><td>VHD download + convert + deploy</td></tr>
+    <tr><td><strong>AWS EC2</strong></td><td>aws CLI</td><td>Region, VPC, instance listing</td><td>AMI export + convert + deploy</td></tr>
+    <tr><td><strong>Local File</strong></td><td>filesystem</td><td>Directory browse, file picker</td><td>Direct convert + deploy</td></tr>
+  </table>
+
+  <div class="features">
+    <span class="feat feat-green">Network topology view</span>
+    <span class="feat feat-blue">3 cloud providers</span>
+    <span class="feat">Libvirt domain management</span>
+    <span class="feat feat-green">KubeVirt deploy</span>
+    <span class="feat">Storage pool management</span>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 5</div>
+</div>
+
+<!-- PAGE 6: Deployment -->
+<div class="page page-slate">
+  <h2 class="title"><span>6.</span> Deployment</h2>
+  <p class="desc">One-command remote deployment, systemd service, watch directory daemon, and theme support.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>deploy-remote.sh</h4>
+      <pre>
+# One-command setup on any Linux host
+curl -sL https://raw.githubusercontent.com/
+  ssahani/hyper2kvm/main/scripts/
+  deploy-remote.sh | bash -s -- \
+    --host 10.0.1.50 \
+    --user root
+      </pre>
+      <ul>
+        <li>rsync project files to remote host</li>
+        <li>pip install with dependency resolution</li>
+        <li>hivex source rebuild for Python 3.12</li>
+        <li>virtio-win ISO auto-download</li>
+        <li>systemd service installation</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Daemon Service</h4>
+      <pre>
+# Watch directory for auto-conversion
+[Service]
+ExecStart=/usr/local/sbin/h2kvmctl \
+  --daemon \
+  --watch-dir /var/lib/hyper2kvm/incoming \
+  --output-dir /var/lib/hyper2kvm/converted \
+  --auto-deploy
+      </pre>
+      <ul>
+        <li>inotify watch on incoming directory</li>
+        <li>Auto-convert dropped VMDK/OVA/VHD files</li>
+        <li>Auto-deploy to libvirt after conversion</li>
+        <li>Configurable concurrency (default: 1)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card">
+      <h4>h2kweb systemd</h4>
+      <ul>
+        <li>Unit: <code>h2kweb.service</code></li>
+        <li>Default port: 5070</li>
+        <li>Auto-restart on failure</li>
+        <li>Journal logging integration</li>
+        <li>Socket activation support</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Dark / Light Theme</h4>
+      <ul>
+        <li>System preference auto-detection</li>
+        <li>Manual toggle in header</li>
+        <li>Persistent via localStorage</li>
+        <li>All components themed</li>
+        <li>Chart colors adapt</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Configuration</h4>
+      <ul>
+        <li><code>--binary</code>: h2kvmctl path (auto-detect)</li>
+        <li><code>--addr</code>: listen address (:5070)</li>
+        <li><code>--api-key</code>: optional API auth</li>
+        <li><code>--static-dir</code>: frontend assets</li>
+        <li><code>--tls-cert/key</code>: HTTPS</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Enterprise-Ready Web Dashboard</h3>
+    <p style="font-size:0.9em;">
+      One-command deployment. Browser-based migration. Real-time monitoring. Zero desktop software required.<br>
+      <strong>PAM auth + WebSocket logs + libvirt integration + KubeVirt deploy = complete migration platform.</strong>
+    </p>
+  </div>
+  <div class="footer">hyper2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/hyper2kvm &mdash; Page 6</div>
+</div>
+
+</body>
+</html>

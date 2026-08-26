@@ -1,0 +1,8 @@
+{
+  "command": "ovf",
+  "ovf": "/path/to/appliance.ovf",
+  "flatten": true,
+  "to_output": "appliance.qcow2",
+  "out_format": "qcow2",
+  "compress": true
+}

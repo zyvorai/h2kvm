@@ -1,0 +1,14 @@
+# Test configuration with custom conversion directory
+command: local
+vmdk: /vm-library/centos10/CentOS 10 Server (64bit).vmdk
+output_dir: ./out/centos10-custom-conversion
+to_output: centos10.qcow2
+out_format: qcow2
+
+# Custom conversion directory (avoids /var/tmp space issues)
+conversion_dir: ~/tmp/vmcraft-conversions
+
+# Fixes
+fstab_mode: stabilize-all
+regen_initramfs: true
+compress: true

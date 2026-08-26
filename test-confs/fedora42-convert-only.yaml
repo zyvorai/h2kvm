@@ -1,0 +1,27 @@
+# Fedora 42 Server - Conversion Only (Skip Offline Fixes)
+# Just convert VMDK → QCOW2 to test the conversion pipeline
+
+cmd: local
+
+# Source VMDK
+vmdk: /home/ssahani/Downloads/VMs/extracted/fedora/64bit/fedora42-server.vmdk
+
+# Output Configuration
+output_dir: /home/ssahani/tt/hyper2kvm/out/fedora42-test
+to_output: /home/ssahani/tt/hyper2kvm/out/fedora42-test/fedora42-server.qcow2
+out_format: qcow2
+compress: true
+
+# Skip offline fixes (they require mount, which fails with LVM)
+skip_offline_fixes: true
+
+# Libvirt XML generation
+libvirt_xml_generate: true
+libvirt_vm_name: fedora42-server
+libvirt_memory_mb: 4096
+libvirt_vcpus: 2
+
+# Reporting
+report: /home/ssahani/tt/hyper2kvm/out/fedora42-test/migration-report.md
+verbose: 2
+dry_run: false

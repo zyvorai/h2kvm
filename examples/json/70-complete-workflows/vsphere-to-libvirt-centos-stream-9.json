@@ -1,0 +1,110 @@
+# ============================================
+# Complete Workflow: vSphere → libvirt (CentOS Stream 9)
+# ============================================
+# Description: Export CentOS Stream 9 VM from vSphere and prepare for libvirt/KVM
+# Use Case: Enterprise CentOS Stream deployment migration
+# Prerequisites:
+#   - govc installed
+#   - vCenter credentials
+#   - CentOS Stream 9 VM
+# ============================================
+{
+  "cmd": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "username": "administrator@vsphere.local",
+  "password_file": "~/.vcenter_password",
+  "datacenter": "Production-DC",
+  "cluster": "CentOS-Cluster",
+  "vm_name": "centos-stream-9-server",
+  "vs_action": "export",
+  "export_method": "govc",
+  "export_format": "ova",
+  "create_snapshot": true,
+  "snapshot_name": "kvm-migration-$(date +%Y%m%d-%H%M%S)",
+  "snapshot_description": "Pre-migration snapshot for KVM",
+  "snapshot_memory": false,
+  "snapshot_quiesce": true,
+  "delete_snapshot_after": true,
+  "flatten": true,
+  "compress": true,
+  "disk_format": "qcow2",
+  "fix_fstab": true,
+  "fix_grub": true,
+  "fix_initramfs": true,
+  "fix_network": true,
+  "remove_vmware_tools": true,
+  "network_config_type": "networkmanager",
+  "network_fix_level": "full",
+  "remove_mac_binding": true,
+  "setup_dhcp": true,
+  "preserve_static_ip": false,
+  "remove_vmware_network_files": true,
+  "bootloader_type": "grub2",
+  "firmware_type": "uefi",
+  "regenerate_grub": true,
+  "update_grub_config": true,
+  "grub_timeout": 5,
+  "grubby_update": true,
+  "update_initramfs": true,
+  "dracut_force_rebuild": true,
+  "install_virtio_modules": true,
+  "dracut_add_drivers": [
+    "virtio",
+    "virtio_blk",
+    "virtio_scsi",
+    "virtio_net",
+    "virtio_pci"
+  ],
+  "dracut_add_modules": [
+    "network-manager",
+    "network-legacy"
+  ],
+  "selinux_relabel": true,
+  "selinux_mode": "enforcing",
+  "clean_ssh_keys": false,
+  "clean_machine_id": true,
+  "preserve_hostname": true,
+  "timezone": "UTC",
+  "to_output": "/data/kvm/centos-stream-9-server.qcow2",
+  "output_format": "qcow2",
+  "output_dir": "/data/kvm/",
+  "generate_libvirt_xml": true,
+  "libvirt_xml_path": "/data/kvm/centos-stream-9-server.xml",
+  "libvirt_domain_name": "centos-stream-9-server",
+  "memory_mb": 8192,
+  "vcpus": 8,
+  "cpu_mode": "host-passthrough",
+  "cpu_topology": {
+    "sockets": 1,
+    "cores": 4,
+    "threads": 2
+  },
+  "machine_type": "q35",
+  "uefi_loader": "/usr/share/edk2/ovmf/OVMF_CODE.fd",
+  "uefi_nvram_template": "/usr/share/edk2/ovmf/OVMF_VARS.fd",
+  "secure_boot": true,
+  "disk_bus": "virtio",
+  "disk_cache": "none",
+  "disk_io": "native",
+  "disk_discard": "unmap",
+  "network_type": "bridge",
+  "network_bridge": "br0",
+  "network_model": "virtio",
+  "enable_serial_console": true,
+  "enable_vnc": true,
+  "vnc_listen": "127.0.0.1",
+  "qemu_guest_agent": true,
+  "libvirt_test": true,
+  "boot_timeout": 300,
+  "validate_network": true,
+  "validate_services": [
+    "sshd",
+    "firewalld"
+  ],
+  "report": "/var/log/migrations/centos-stream-9-$(date +%Y%m%d-%H%M%S).md",
+  "log_level": "INFO",
+  "verbose": true,
+  "enable_recovery": true,
+  "recovery_checkpoint_dir": "/tmp/hyper2kvm-checkpoints",
+  "post_migration_script": "#!/bin/bash\nset -e\n\n# Import domain\nvirsh define /data/kvm/centos-stream-9-server.xml\n\n# Set autostart\nvirsh autostart centos-stream-9-server\n\n# Start VM\nvirsh start centos-stream-9-server\n\n# Wait for boot\necho \"Waiting for CentOS Stream to boot...\"\nsleep 60\n\n# Check VM status\nvirsh list | grep centos-stream-9-server\n\n# SELinux relabel on first boot\necho \"SELinux relabeling will occur automatically on first boot\"\n\necho \"CentOS Stream 9 migration complete\"\necho \"Next steps:\"\necho \"1. Connect: virsh console centos-stream-9-server\"\necho \"2. Verify services: systemctl status sshd firewalld\"\necho \"3. Check network: ip addr show\"\n"
+}

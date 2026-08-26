@@ -1,0 +1,215 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "hyper2kvm-worker.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "hyper2kvm-worker.labels" . | nindent 4 }}
+    component: worker-daemon
+spec:
+  selector:
+    matchLabels:
+      {{- include "hyper2kvm-worker.selectorLabels" . | nindent 6 }}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        {{- include "hyper2kvm-worker.selectorLabels" . | nindent 8 }}
+        component: worker-daemon
+      {{- if .Values.monitoring.metrics.enabled }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.monitoring.metrics.port | quote }}
+        prometheus.io/path: {{ .Values.monitoring.metrics.path }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "hyper2kvm-worker.serviceAccountName" . }}
+      {{- with .Values.worker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.worker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.worker.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.worker.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.worker.terminationGracePeriodSeconds }}
+      
+      {{- if .Values.initContainer.enabled }}
+      initContainers:
+      - name: nbd-module-loader
+        image: {{ .Values.initContainer.image }}
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          echo "Loading NBD kernel module..."
+          if command -v modprobe &> /dev/null; then
+            if lsmod | grep -q nbd; then
+              echo "NBD module already loaded"
+            else
+              modprobe nbd max_part=16 nbds_max=16 || echo "WARNING: modprobe failed"
+            fi
+          else
+            echo "WARNING: modprobe not available"
+          fi
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: lib-modules
+          mountPath: /lib/modules
+          readOnly: true
+      {{- end }}
+      
+      containers:
+      - name: worker
+        image: "{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag }}"
+        imagePullPolicy: {{ .Values.worker.image.pullPolicy }}
+        env:
+        - name: HYPER2KVM_MODE
+          value: "worker"
+        - name: WORKER_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: HYPER2KVM_STATE_DIR
+          value: {{ .Values.config.worker.state_dir }}
+        - name: HYPER2KVM_EVENT_DIR
+          value: {{ .Values.config.worker.event_dir }}
+        - name: HYPER2KVM_QUEUE_DIR
+          value: {{ .Values.config.worker.queue_dir }}
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        {{- if .Values.monitoring.metrics.enabled }}
+        - name: PROMETHEUS_PORT
+          value: {{ .Values.monitoring.metrics.port | quote }}
+        {{- end }}
+        
+        command:
+        - /usr/local/bin/docker-entrypoint.sh
+        
+        {{- with .Values.worker.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        
+        {{- with .Values.worker.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        
+        volumeMounts:
+        - name: config
+          mountPath: /etc/hyper2kvm
+          readOnly: true
+        {{- if .Values.storage.state.enabled }}
+        - name: worker-state
+          mountPath: {{ .Values.config.worker.state_dir }}
+        {{- end }}
+        {{- if .Values.storage.events.enabled }}
+        - name: worker-events
+          mountPath: {{ .Values.config.worker.event_dir }}
+        {{- end }}
+        - name: dev
+          mountPath: /dev
+          mountPropagation: Bidirectional
+        {{- if .Values.storage.input.enabled }}
+        - name: vmdk-input
+          mountPath: /data/input
+          readOnly: true
+        {{- end }}
+        {{- if .Values.storage.output.enabled }}
+        - name: qcow2-output
+          mountPath: /data/output
+        {{- end }}
+        {{- if .Values.storage.temp.enabled }}
+        - name: conversion-temp
+          mountPath: /tmp/conversion
+        {{- end }}
+        - name: lib-modules
+          mountPath: /lib/modules
+          readOnly: true
+        
+        {{- if .Values.monitoring.metrics.enabled }}
+        ports:
+        - name: metrics
+          containerPort: {{ .Values.monitoring.metrics.port }}
+          protocol: TCP
+        {{- end }}
+        
+        {{- if .Values.worker.livenessProbe.enabled }}
+        livenessProbe:
+          exec:
+            command:
+            - python3
+            - -c
+            - |
+              import sys, os
+              sys.exit(0 if os.path.exists('/var/lib/hyper2kvm/worker.pid') else 1)
+          initialDelaySeconds: {{ .Values.worker.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.worker.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.worker.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.worker.livenessProbe.failureThreshold }}
+        {{- end }}
+        
+        {{- if .Values.worker.readinessProbe.enabled }}
+        readinessProbe:
+          exec:
+            command:
+            - python3
+            - -m
+            - hyper2kvm.worker.cli
+            - capabilities
+            - --json-output
+          initialDelaySeconds: {{ .Values.worker.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.worker.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.worker.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.worker.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.worker.readinessProbe.failureThreshold }}
+        {{- end }}
+      
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "hyper2kvm-worker.fullname" . }}-config
+      {{- if .Values.storage.state.enabled }}
+      - name: worker-state
+        persistentVolumeClaim:
+          claimName: {{ include "hyper2kvm-worker.fullname" . }}-state
+      {{- end }}
+      {{- if .Values.storage.events.enabled }}
+      - name: worker-events
+        persistentVolumeClaim:
+          claimName: {{ include "hyper2kvm-worker.fullname" . }}-events
+      {{- end }}
+      {{- if .Values.storage.input.enabled }}
+      - name: vmdk-input
+        persistentVolumeClaim:
+          claimName: {{ include "hyper2kvm-worker.fullname" . }}-input
+      {{- end }}
+      {{- if .Values.storage.output.enabled }}
+      - name: qcow2-output
+        persistentVolumeClaim:
+          claimName: {{ include "hyper2kvm-worker.fullname" . }}-output
+      {{- end }}
+      {{- if .Values.storage.temp.enabled }}
+      - name: conversion-temp
+        persistentVolumeClaim:
+          claimName: {{ include "hyper2kvm-worker.fullname" . }}-temp
+      {{- end }}
+      - name: dev
+        hostPath:
+          path: /dev
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules

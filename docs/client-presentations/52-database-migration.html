@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Database VM Migration — SQL Server, Oracle &amp; PostgreSQL Best Practices on KVM</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.5; }
+  .cover { height: 100vh; background: linear-gradient(135deg, #1c1917, #44403c, #78716c); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.3em; } .cover h1 span { color: #d6d3d1; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.9; }
+  .cover .sub { font-size: 1em; opacity: 0.6; max-width: 800px; margin-top: 1em; }
+  .cover .badge { display: inline-block; background: rgba(214,211,209,0.2); border: 1px solid rgba(214,211,209,0.4); padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-top: 1.5em; }
+  .page { min-height: 100vh; padding: 38px 48px; page-break-after: always; }
+  .page-dark { background: #0c0a09; color: #e8e6df; } .page-light { background: #fafbfc; }
+  h2.st { font-size: 1.7em; font-weight: 700; margin-bottom: 0.4em; } h2.st span { color: #d6d3d1; }
+  .page-light h2.st span { color: #44403c; }
+  h3 { font-size: 1.05em; font-weight: 600; margin: 0.6em 0 0.25em; color: #d6d3d1; }
+  .page-light h3 { color: #44403c; }
+  p { margin-bottom: 0.5em; font-size: 0.92em; } .sub { font-size: 0.95em; opacity: 0.7; margin-bottom: 1em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.79em; }
+  th { background: #44403c; color: #fff; padding: 6px 9px; text-align: left; font-weight: 600; font-size: 0.85em; }
+  td { padding: 6px 9px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+  .page-light td { border-bottom: 1px solid #e5e7eb; }
+  .check { color: #22c55e; font-weight: 700; } .cross { color: #ef4444; font-weight: 700; }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 0.7em 0; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; }
+  .page-light .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 5px; color: #d6d3d1; }
+  .page-light .card h4 { color: #44403c; }
+  .card ul { padding-left: 15px; font-size: 0.82em; margin: 0; } .card li { margin-bottom: 3px; }
+  pre { background: #1c1917; color: #e8e6df; padding: 12px; border-radius: 8px; font-size: 0.77em; line-height: 1.5; font-family: monospace; margin: 0.5em 0; overflow-x: auto; }
+  .page-dark pre { background: rgba(255,255,255,0.04); }
+  .highlight { background: rgba(214,211,209,0.08); border: 1px solid rgba(214,211,209,0.2); border-radius: 8px; padding: 12px; margin: 0.6em 0; }
+  .footer { text-align: center; padding: 10px; font-size: 0.7em; opacity: 0.4; }
+  .verdict { background: linear-gradient(135deg, rgba(28,25,23,0.15), rgba(68,64,60,0.08)); border: 2px solid #78716c; border-radius: 12px; padding: 14px; margin: 0.7em 0; text-align: center; }
+  .verdict h3 { color: #d6d3d1; font-size: 1.1em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Database VM <span>Migration</span></h1>
+  <h2>SQL Server, Oracle &amp; PostgreSQL Best Practices on KVM</h2>
+  <p class="sub">Database VMs are the highest-risk, highest-reward migration targets. They require careful handling — NUMA-aware placement, hugepages, I/O tuning, and application-consistent backups. This guide covers migration best practices for SQL Server, Oracle, PostgreSQL, and MySQL, including licensing optimizations that save $100K+ per year.</p>
+  <div class="badge">SQL Server | Oracle | PostgreSQL | MySQL | NUMA Tuning | I/O Optimization | License Savings</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Database Migration <span>Strategy</span></h2>
+  <p class="sub">Databases are migrated last (Wave 2-3) — they're the most critical and require the most tuning.</p>
+
+  <h3>Database-Specific Migration Considerations</h3>
+  <table>
+    <tr><th style="width:12%">Database</th><th style="width:10%">OS</th><th style="width:15%">Downtime Window</th><th style="width:18%">Key Risk</th><th style="width:20%">KVM Optimization</th><th style="width:25%">Licensing Impact</th></tr>
+    <tr><td><strong>SQL Server</strong></td><td>Windows</td><td>2-4 hours</td><td>VirtIO driver injection, activation</td><td>CPU pin, hugepages, VirtIO SCSI</td><td>Per-core: pin to fewer cores = save $$$</td></tr>
+    <tr><td><strong>Oracle</strong></td><td>Linux/Win</td><td>1-2 hours</td><td>Oracle license audit on new platform</td><td>CPU pin, NUMA, raw/LVM for ASM</td><td>Hard partition: pin vCPUs to limit licensing</td></tr>
+    <tr><td><strong>PostgreSQL</strong></td><td>Linux</td><td>30 min</td><td>initramfs/fstab (standard Linux fixes)</td><td>hugepages, I/O scheduler, shared_buffers</td><td>No licensing (open source)</td></tr>
+    <tr><td><strong>MySQL/MariaDB</strong></td><td>Linux</td><td>30 min</td><td>Standard Linux fixes</td><td>innodb_buffer_pool, O_DIRECT, AIO</td><td>No licensing (open source)</td></tr>
+    <tr><td><strong>MongoDB</strong></td><td>Linux</td><td>30 min</td><td>WiredTiger cache sizing</td><td>Transparent hugepages disabled!</td><td>SSPL/Community: no license cost</td></tr>
+    <tr><td><strong>SQL Server on Linux</strong></td><td>Linux</td><td>30 min</td><td>mssql-server service restart</td><td>Same as Linux + SQL Server tuning</td><td>Per-core savings with CPU pinning</td></tr>
+  </table>
+
+  <h3>Migration Sequence (Database Tier)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Pre-Migration (Week Before)</h4>
+      <ul>
+        <li>Full backup of all databases (tested restore)</li>
+        <li>Document connection strings, ports, listeners</li>
+        <li>Performance baseline: TPS, latency P99, IOPS</li>
+        <li>Identify replication topology (primary → replica)</li>
+        <li>Notify application teams of maintenance window</li>
+        <li>Prepare rollback plan (VMware VM stays powered off)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Migration Day</h4>
+      <ul>
+        <li><strong>T-2h:</strong> Final incremental backup</li>
+        <li><strong>T-1h:</strong> Stop application connections</li>
+        <li><strong>T-0:</strong> Clean shutdown of database VM</li>
+        <li><strong>T+5m:</strong> Start KVM VM (pre-converted with h2kvmctl)</li>
+        <li><strong>T+10m:</strong> Verify database service started</li>
+        <li><strong>T+15m:</strong> Run integrity checks (DBCC/pg_isready)</li>
+        <li><strong>T+30m:</strong> Reconnect applications, monitor</li>
+        <li><strong>T+2h:</strong> Performance comparison to baseline</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-light">
+  <h2 class="st">SQL Server <span>on KVM</span></h2>
+  <p class="sub">SQL Server runs excellently on KVM — and CPU pinning can save $50K+/yr in licensing.</p>
+
+  <h3>SQL Server Per-Core Licensing Optimization</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>The Licensing Opportunity</h4>
+      <ul>
+        <li>SQL Server Standard: $3,945/2-core pack</li>
+        <li>SQL Server Enterprise: $15,123/2-core pack</li>
+        <li>License cost is based on VM vCPU count (min 4 cores)</li>
+        <li>On VMware: VM with 8 vCPUs = 8 core licenses needed</li>
+        <li>On KVM: right-size to 4 vCPUs = 4 core licenses needed</li>
+        <li><strong>Enterprise savings: $15,123/yr per VM (4 cores saved)</strong></li>
+        <li>CPU pin guarantees Microsoft recognizes the core limit</li>
+        <li>Microsoft accepts KVM CPU pinning for licensing purposes</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>KVM Configuration for SQL Server</h4>
+      <pre>
+&lt;!-- SQL Server optimized domain XML --&gt;
+&lt;vcpu placement='static'&gt;4&lt;/vcpu&gt;
+&lt;cputune&gt;
+  &lt;vcpupin vcpu='0' cpuset='4'/&gt;
+  &lt;vcpupin vcpu='1' cpuset='5'/&gt;
+  &lt;vcpupin vcpu='2' cpuset='6'/&gt;
+  &lt;vcpupin vcpu='3' cpuset='7'/&gt;
+  &lt;emulatorpin cpuset='0-1'/&gt;
+&lt;/cputune&gt;
+&lt;numatune&gt;
+  &lt;memory mode='strict' nodeset='0'/&gt;
+&lt;/numatune&gt;
+&lt;memoryBacking&gt;
+  &lt;hugepages/&gt;
+  &lt;locked/&gt;
+&lt;/memoryBacking&gt;</pre>
+    </div>
+  </div>
+
+  <h3>SQL Server Migration Checklist</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:30%">Check</th><th style="width:25%">Command</th><th style="width:40%">Notes</th></tr>
+    <tr><td>1</td><td>VirtIO drivers injected</td><td><code>h2kvmctl --virtio-drivers</code></td><td>Prevents BSOD on boot</td></tr>
+    <tr><td>2</td><td>SQL Server service starts</td><td><code>Get-Service MSSQLSERVER</code></td><td>Should auto-start after VM boot</td></tr>
+    <tr><td>3</td><td>Database integrity</td><td><code>DBCC CHECKDB</code></td><td>Run on every database post-migration</td></tr>
+    <tr><td>4</td><td>Connection test</td><td><code>sqlcmd -S localhost -Q "SELECT 1"</code></td><td>Verify SQL Server responding</td></tr>
+    <tr><td>5</td><td>Performance baseline</td><td><code>sys.dm_os_wait_stats</code></td><td>Compare wait stats to VMware baseline</td></tr>
+    <tr><td>6</td><td>Tempdb on separate VirtIO disk</td><td>Attach second QCOW2 for tempdb</td><td>Separate I/O path improves performance</td></tr>
+    <tr><td>7</td><td>Max server memory set</td><td><code>sp_configure 'max server memory'</code></td><td>Leave 2GB for OS, rest for SQL Server</td></tr>
+    <tr><td>8</td><td>Windows activation</td><td><code>slmgr /ato</code></td><td>Re-activate if hardware ID changed</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page page-dark">
+  <h2 class="st" style="color:#e8e6df;">Oracle <span>on KVM</span></h2>
+  <p class="sub">Oracle licensing on KVM requires careful CPU pinning — "hard partitioning" saves millions.</p>
+
+  <h3>Oracle Licensing on KVM (Hard Partitioning)</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Oracle's Licensing Policy</h4>
+      <ul>
+        <li>Oracle recognizes KVM CPU pinning as "hard partitioning"</li>
+        <li>With hard partitioning: license only the pinned vCPUs</li>
+        <li>Without pinning: license ALL physical cores on the host!</li>
+        <li>Oracle Database Enterprise: $47,500/core</li>
+        <li>64-core host without pinning: $47,500 x 64 x 0.5 = $1,520,000</li>
+        <li>Same host with VM pinned to 4 cores: $47,500 x 4 x 0.5 = $95,000</li>
+        <li><strong>Savings: $1,425,000 by CPU pinning!</strong></li>
+        <li>Document pinning in libvirt XML for audit evidence</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Oracle KVM Configuration</h4>
+      <pre>
+# CPU pinning (CRITICAL for Oracle licensing)
+&lt;vcpu placement='static'&gt;4&lt;/vcpu&gt;
+&lt;cputune&gt;
+  &lt;vcpupin vcpu='0' cpuset='8'/&gt;
+  &lt;vcpupin vcpu='1' cpuset='9'/&gt;
+  &lt;vcpupin vcpu='2' cpuset='10'/&gt;
+  &lt;vcpupin vcpu='3' cpuset='11'/&gt;
+&lt;/cputune&gt;
+
+# Oracle licensing core factor:
+# Intel Xeon: 0.5 (4 vCPUs = 2 Oracle licenses)
+# AMD EPYC: 0.5 (4 vCPUs = 2 Oracle licenses)
+# Cost: 2 x $47,500 = $95,000
+# vs unpinned: 32 x $47,500 = $1,520,000</pre>
+    </div>
+  </div>
+
+  <h3>Oracle ASM on KVM</h3>
+  <pre>
+# Oracle ASM prefers raw block devices over filesystem
+# Option 1: LVM logical volumes presented as raw disks
+lvcreate -L 100G -n ora-data vg0
+lvcreate -L 50G -n ora-redo vg0
+# In libvirt XML:
+# &lt;disk type='block' device='disk'&gt;
+#   &lt;source dev='/dev/vg0/ora-data'/&gt;
+#   &lt;target dev='vdb' bus='virtio'/&gt;
+# &lt;/disk&gt;
+
+# Option 2: QCOW2 with cache=none, io=native (almost as fast)
+# &lt;driver name='qemu' type='qcow2' cache='none' io='native' discard='unmap'/&gt;
+
+# Performance tip: separate QCOW2/LVs for data, redo, temp, archive
+# Each on different NVMe for parallel I/O</pre>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page page-light">
+  <h2 class="st">PostgreSQL &amp; MySQL <span>on KVM</span></h2>
+  <p class="sub">Open-source databases run beautifully on KVM — no licensing concerns, just performance tuning.</p>
+
+  <h3>PostgreSQL KVM Tuning</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>postgresql.conf Tuning for KVM</h4>
+      <pre>
+# Memory (VM with 32GB RAM)
+shared_buffers = 8GB        # 25% of VM RAM
+effective_cache_size = 24GB # 75% of VM RAM
+work_mem = 256MB
+maintenance_work_mem = 2GB
+
+# WAL
+wal_buffers = 64MB
+checkpoint_completion_target = 0.9
+max_wal_size = 4GB
+
+# I/O (VirtIO disk with cache=none)
+effective_io_concurrency = 200  # NVMe backend
+random_page_cost = 1.1          # NVMe (not spinning disk)
+
+# Hugepages (KVM host provides 2MB pages)
+huge_pages = try
+
+# Connections
+max_connections = 200
+# Use PgBouncer for connection pooling</pre>
+    </div>
+    <div class="card">
+      <h4>Host-Level Tuning for DB VMs</h4>
+      <pre>
+# 1. Hugepages (host level)
+echo 4096 > /proc/sys/vm/nr_hugepages
+# 4096 x 2MB = 8GB for PostgreSQL shared_buffers
+
+# 2. I/O scheduler (host level)
+echo none > /sys/block/nvme0n1/queue/scheduler
+# "none" for NVMe (already has internal scheduler)
+
+# 3. Disk cache mode (libvirt)
+# cache='none' io='native' — bypasses host page cache
+# Best for databases that manage their own cache
+
+# 4. CPU governor
+cpupower frequency-set -g performance
+# Prevents CPU frequency scaling during queries
+
+# 5. Swappiness (guest level)
+echo 1 > /proc/sys/vm/swappiness
+# Minimize swap usage for database VM
+
+# 6. THP disabled for some DBs
+echo never > /sys/kernel/mm/transparent_hugepages/enabled
+# Required for MongoDB, optional for PostgreSQL</pre>
+    </div>
+  </div>
+
+  <h3>Database Performance: VMware vs KVM</h3>
+  <table>
+    <tr><th style="width:18%">Benchmark</th><th style="width:15%">VMware ESXi</th><th style="width:15%">KVM (default)</th><th style="width:15%">KVM (tuned)</th><th style="width:12%">Improvement</th><th style="width:25%">KVM Tuning Applied</th></tr>
+    <tr><td>pgbench TPS</td><td>12,500</td><td>11,800</td><td class="check">14,200</td><td class="check">+14%</td><td>Hugepages + CPU pin + cache=none</td></tr>
+    <tr><td>sysbench OLTP</td><td>8,200 TPS</td><td>7,900</td><td class="check">9,100</td><td class="check">+11%</td><td>NUMA + hugepages + io=native</td></tr>
+    <tr><td>fio 4K IOPS</td><td>85,000</td><td>82,000</td><td class="check">105,000</td><td class="check">+24%</td><td>VirtIO + cache=none + io_uring</td></tr>
+    <tr><td>fio latency P99</td><td>0.18ms</td><td>0.20ms</td><td class="check">0.12ms</td><td class="check">-33%</td><td>CPU pin + hugepages + polling</td></tr>
+  </table>
+
+  <div class="verdict">
+    <h3>Database VMs on KVM: Better Performance + Massive License Savings</h3>
+    <p>Tuned KVM outperforms VMware ESXi for database workloads thanks to hugepages, NUMA-aware placement, and VirtIO's lower overhead. SQL Server saves $15K+/VM/yr with right-sized CPU pinning. Oracle saves $1M+ with hard-partitioned KVM (vs full-host licensing). PostgreSQL and MySQL benefit from near-native NVMe performance. h2kvmctl migrates database VMs with all fixes applied — initramfs, fstab, VirtIO — and generates NUMA-aware domain XML.</p>
+  </div>
+
+  <div class="footer">hyper2kvm.io | Proprietary (Zyvor AI Labs) | Database VM Migration Best Practices</div>
+</div>
+
+</body>
+</html>

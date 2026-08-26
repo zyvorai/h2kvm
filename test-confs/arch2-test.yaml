@@ -1,0 +1,47 @@
+# Arch Linux 2024 - Universal Filesystem Test
+# Tests: Different Arch build for additional validation
+
+cmd: local
+
+# Source VMDK
+vmdk: /home/ssahani/Downloads/Projects/arch-64bit/64bit/ArchLinux 20240601 (64bit).vmdk
+
+# Output Configuration
+output_dir: /home/ssahani/tt/hyper2kvm/out/arch2-test
+to_output: /home/ssahani/tt/hyper2kvm/out/arch2-test/arch-2024.qcow2
+out_format: qcow2
+compress: true
+workdir: /home/ssahani/tt/hyper2kvm/out/arch2-test/work
+
+# Core Linux Fixes
+fstab_fixes_enable: true
+fstab_mode: stabilize-all
+fstab_prefer_partuuid: false
+fstab_optimize_options: true
+
+grub_fixes_enable: true
+initramfs_regen_enable: true
+initramfs_regen_force: true
+
+# VirtIO modules for initramfs
+initramfs_modules:
+  - virtio_blk
+  - virtio_scsi
+  - virtio_net
+  - virtio_pci
+
+# Network fixes
+network_fixes_enable: true
+
+# Libvirt XML generation
+libvirt_xml_generate: true
+libvirt_vm_name: arch-2024
+libvirt_memory_mb: 2048
+libvirt_vcpus: 2
+libvirt_disk_bus: virtio
+
+# Reporting
+report: /home/ssahani/tt/hyper2kvm/out/arch2-test/migration-report.md
+log_file: /home/ssahani/tt/hyper2kvm/out/arch2-test/migration.log
+verbose: 2
+dry_run: false

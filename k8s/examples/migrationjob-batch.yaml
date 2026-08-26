@@ -1,0 +1,88 @@
+# Batch Migration Example
+# Migrate multiple VMs at once (GitOps-friendly)
+
+---
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: migrate-web-01
+  namespace: prod-migrations
+spec:
+  source:
+    type: vmdk-url
+    vmdk:
+      url: "https://storage.example.com/web-01.vmdk"
+  migration:
+    offlineFixes:
+      fstabMode: stabilize-all
+    conversion:
+      format: qcow2
+      compress: true
+  destination:
+    storageClass: ceph-block
+    size: 50Gi
+  createVM:
+    enabled: true
+    name: web-server-01
+    cpu: "8"
+    memory: 16Gi
+    autoStart: true
+  cleanupPolicy: OnSuccess
+
+---
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: migrate-web-02
+  namespace: prod-migrations
+spec:
+  source:
+    type: vmdk-url
+    vmdk:
+      url: "https://storage.example.com/web-02.vmdk"
+  migration:
+    offlineFixes:
+      fstabMode: stabilize-all
+    conversion:
+      format: qcow2
+      compress: true
+  destination:
+    storageClass: ceph-block
+    size: 50Gi
+  createVM:
+    enabled: true
+    name: web-server-02
+    cpu: "8"
+    memory: 16Gi
+    autoStart: true
+  cleanupPolicy: OnSuccess
+
+---
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: migrate-db-01
+  namespace: prod-migrations
+spec:
+  source:
+    type: vmdk-url
+    vmdk:
+      url: "https://storage.example.com/db-01.vmdk"
+  migration:
+    offlineFixes:
+      fstabMode: stabilize-all
+    conversion:
+      format: qcow2
+      compress: true
+    nodeSelector:
+      storage: high-performance  # Select specific nodes
+  destination:
+    storageClass: ceph-block
+    size: 200Gi  # Larger disk for database
+  createVM:
+    enabled: true
+    name: database-01
+    cpu: "16"
+    memory: 64Gi
+    autoStart: false  # Don't auto-start databases
+  cleanupPolicy: OnSuccess

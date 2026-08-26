@@ -1,0 +1,25 @@
+# hyper2kvm migration configuration
+# Backend: namespace_engine (namespace + OverlayFS + chroot)
+cmd: local
+
+# Input
+vmdk: ./esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+
+# Output
+output_dir: ./output
+to_output: rhel8.8-namespace-fixed.qcow2
+out_format: qcow2
+compress: true
+
+# Conversion options
+flatten: true
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Backend selection: namespace_engine for maximum safety + performance
+# This uses:
+# - Unshare namespace isolation (mount/PID/net/IPC/UTS)
+# - OverlayFS copy-on-write (protects original disk)
+# - Isolated chroot (safe guest command execution)
+# - Isolated LVM (strict device filtering)
+backend: namespace_engine

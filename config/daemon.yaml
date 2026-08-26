@@ -1,0 +1,43 @@
+# hyper2kvm Daemon Configuration
+# This file is used by the daemon service to watch a directory and automatically
+# process VM disk files (VMDK, OVA, VHD, etc.) as they appear.
+
+command: daemon
+daemon: true
+workflow_mode: true
+
+# Directory to watch for incoming VM disk files
+workflow_dir: /data/incoming
+
+# Output directory for converted qcow2 images
+output_dir: /data/output
+
+# Maximum concurrent migration jobs
+max_concurrent_jobs: 3
+
+# Output format (qcow2, raw, vdi)
+out_format: qcow2
+
+# Enable qcow2 compression (reduces size by 30-50%)
+compress: true
+
+# Fstab stabilization mode (stabilize-all recommended for production)
+fstab_mode: stabilize-all
+
+# Regenerate initramfs with virtio drivers
+regen_initramfs: true
+
+# Update GRUB configuration
+update_grub: true
+
+# Log file location
+log_file: /var/log/hyper2kvm/daemon.log
+
+# Verbosity level (0-3)
+verbose: 1
+
+# Enable recovery/rollback support
+enable_recovery: false
+
+# Automatically remove source VMDK after successful conversion
+auto_remove_source: false

@@ -1,0 +1,37 @@
+# ovftool-rhel10-ovfdir-export.yaml
+# Goal: Export VM as an OVF *directory* (not OVA) using OVF Tool.
+#
+# IMPORTANT:
+# - Your current VsphereMode._ovftool_export_vm() calls export_to_ova() and writes <vm>.ova.
+# - Use this YAML only if you also add an "export_to_ovf_dir" path in your ovftool_client + vsphere_mode.
+# - I’m including it because you asked “OVF Tool YAML”, and OVF Tool can do OVF-dir exports.
+
+command: vsphere
+
+vcenter: 10.73.213.134
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+vc_insecure: true
+dc_name: data
+
+vs_action: ovftool_export
+vm_name: esx8.0-rhel10.0beta-x86_64-efi
+
+# Output directory (OVF dir export would write multiple files here)
+output_dir: ./exports/ovftool-ovfdir/esx8.0-rhel10.0beta-x86_64-efi
+
+ovftool_path: null
+ovftool_no_ssl_verify: true
+ovftool_thumbprint: null
+ovftool_accept_all_eulas: true
+ovftool_overwrite: true
+ovftool_quiet: false
+ovftool_verbose: true
+ovftool_disk_mode: null
+ovftool_retries: 2
+ovftool_retry_backoff_s: 3.0
+ovftool_extra_args: []
+
+verbose: 2
+json: false
+

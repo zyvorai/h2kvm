@@ -1,0 +1,248 @@
+# Docker Compose configuration for hyper2kvm
+# Supports development, testing, and production deployments
+# For production migrations, use cli/daemon/batch services with proper device access
+version: '3.8'
+
+services:
+  # ========================================
+  # Production Services (VM Migration)
+  # ========================================
+
+  # CLI - One-shot VM migrations
+  cli:
+    build:
+      context: .
+      target: cli
+    image: hyper2kvm:cli
+    container_name: hyper2kvm-cli
+    privileged: true  # Required for NBD, mount, LVM operations
+    devices:
+      - /dev/nbd0:/dev/nbd0
+      - /dev/nbd1:/dev/nbd1
+      - /dev/nbd2:/dev/nbd2
+      - /dev/nbd3:/dev/nbd3
+      - /dev/kvm:/dev/kvm  # Optional: KVM acceleration for testing
+    volumes:
+      # Source VMDK files (read-only)
+      - ${VMDK_DIR:-./test-data}:/data/vmware:ro
+      # Output qcow2 files (read-write)
+      - ${OUTPUT_DIR:-./output}:/data/kvm:rw
+      # Conversion temp space (fast SSD recommended)
+      - ${CONVERSION_DIR:-/var/lib/hyper2kvm/conversions}:/conversions:rw
+    environment:
+      - HYPER2KVM_MODE=cli
+      - PYTHONUNBUFFERED=1
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+        reservations:
+          cpus: '2.0'
+          memory: 4G
+    networks:
+      - hyper2kvm-net
+    # Command can be overridden: docker-compose run cli --cmd local --vmdk /data/vmware/test.vmdk
+
+  # Daemon - Continuous file watching and processing
+  daemon:
+    build:
+      context: .
+      target: daemon
+    image: hyper2kvm:daemon
+    container_name: hyper2kvm-daemon
+    privileged: true  # Required for NBD, mount, LVM operations
+    restart: unless-stopped
+    devices:
+      - /dev/nbd0:/dev/nbd0
+      - /dev/nbd1:/dev/nbd1
+      - /dev/nbd2:/dev/nbd2
+      - /dev/nbd3:/dev/nbd3
+      - /dev/kvm:/dev/kvm
+    volumes:
+      # Watch directory for incoming VMDKs
+      - ${WATCH_DIR:-./incoming}:/data/incoming:rw
+      # Output directory
+      - ${OUTPUT_DIR:-./output}:/data/output:rw
+      # Daemon state and metadata
+      - ${DAEMON_STATE:-/var/lib/hyper2kvm}:/var/lib/hyper2kvm:rw
+      # Configuration
+      - ${DAEMON_CONFIG:-./config/daemon.yaml}:/etc/hyper2kvm/daemon.yaml:ro
+    environment:
+      - HYPER2KVM_MODE=daemon
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "hyper2kvm.*daemon"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '6.0'
+          memory: 12G
+        reservations:
+          cpus: '2.0'
+          memory: 4G
+    networks:
+      - hyper2kvm-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # Batch - Parallel multi-VM processing
+  batch:
+    build:
+      context: .
+      target: batch
+    image: hyper2kvm:batch
+    container_name: hyper2kvm-batch
+    privileged: true
+    devices:
+      - /dev/nbd0:/dev/nbd0
+      - /dev/nbd1:/dev/nbd1
+      - /dev/nbd2:/dev/nbd2
+      - /dev/nbd3:/dev/nbd3
+      - /dev/nbd4:/dev/nbd4
+      - /dev/nbd5:/dev/nbd5
+      - /dev/kvm:/dev/kvm
+    volumes:
+      # Batch input VMDKs
+      - ${BATCH_INPUT:-./batch}:/data/batch:ro
+      # Output directory
+      - ${OUTPUT_DIR:-./output}:/data/output:rw
+      # Batch configuration
+      - ${BATCH_CONFIG:-./config/batch.yaml}:/etc/hyper2kvm/batch.yaml:ro
+      # Batch manifest
+      - ${BATCH_MANIFEST:-./config/manifest.json}:/etc/hyper2kvm/manifest.json:ro
+    environment:
+      - HYPER2KVM_MODE=batch
+      - BATCH_PARALLEL=${BATCH_PARALLEL:-4}
+      - PYTHONUNBUFFERED=1
+    deploy:
+      resources:
+        limits:
+          cpus: '12.0'
+          memory: 24G
+        reservations:
+          cpus: '8.0'
+          memory: 16G
+    networks:
+      - hyper2kvm-net
+
+  # zkvm - Interactive terminal UI
+  zkvm:
+    build:
+      context: .
+      target: zkvm
+    image: hyper2kvm:zkvm
+    container_name: hyper2kvm-zkvm
+    privileged: true
+    stdin_open: true
+    tty: true
+    devices:
+      - /dev/nbd0:/dev/nbd0
+      - /dev/nbd1:/dev/nbd1
+      - /dev/nbd2:/dev/nbd2
+      - /dev/nbd3:/dev/nbd3
+      - /dev/kvm:/dev/kvm
+    volumes:
+      - ${VMDK_DIR:-./test-data}:/data/vmware:ro
+      - ${OUTPUT_DIR:-./output}:/data/kvm:rw
+      # zkvm config persistence
+      - ${ZKVM_CONFIG:-~/.config/hyper2kvm}:/home/hyper2kvm/.config/hyper2kvm:rw
+    environment:
+      - HYPER2KVM_MODE=zkvm
+      - TERM=xterm-256color
+      - PYTHONUNBUFFERED=1
+    networks:
+      - hyper2kvm-net
+    # Run with: docker-compose run --rm zkvm
+
+  # ========================================
+  # Development and Testing Services
+  # ========================================
+
+  # Development environment
+  dev:
+    build:
+      context: .
+      target: development
+      args:
+        - PYTHON_VERSION=3.12
+    image: hyper2kvm:dev
+    container_name: hyper2kvm-dev
+    volumes:
+      # Mount source code for live editing
+      - .:/app
+      # Persist Python packages
+      - pip-cache:/root/.cache/pip
+      # Persist pre-commit hooks
+      - pre-commit-cache:/root/.cache/pre-commit
+    working_dir: /app
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+    environment:
+      - PYTHONPATH=/app
+      - TERM=xterm-256color
+    networks:
+      - hyper2kvm-net
+
+  # Testing environment
+  test:
+    build:
+      context: .
+      target: testing
+    image: hyper2kvm:test
+    container_name: hyper2kvm-test
+    volumes:
+      - .:/app
+      - pip-cache:/root/.cache/pip
+    working_dir: /app
+    command: hatch run ci
+    networks:
+      - hyper2kvm-net
+
+  # Production environment for testing
+  prod:
+    build:
+      context: .
+      target: production
+    image: hyper2kvm:prod
+    container_name: hyper2kvm-prod
+    volumes:
+      # Mount directories for VM disk operations
+      - ./test-data:/data:ro
+      - ./output:/output
+    working_dir: /data
+    user: hyper2kvm
+    networks:
+      - hyper2kvm-net
+
+  # Documentation server
+  docs:
+    build:
+      context: .
+      target: development
+    image: hyper2kvm:docs
+    container_name: hyper2kvm-docs
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: hatch run docs-serve
+    ports:
+      - "8000:8000"
+    networks:
+      - hyper2kvm-net
+
+networks:
+  hyper2kvm-net:
+    driver: bridge
+
+volumes:
+  pip-cache:
+  pre-commit-cache:

@@ -1,0 +1,43 @@
+# Pod Security Policy for hyper2kvm
+# NOTE: PSP is deprecated in Kubernetes 1.25+
+# Consider using Pod Security Admission (PSA) or a policy engine like Kyverno/OPA
+
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: hyper2kvm-privileged
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
+spec:
+  privileged: true
+  allowPrivilegeEscalation: true
+  allowedCapabilities:
+    - SYS_ADMIN
+    - SYS_MODULE
+    - MKNOD
+    - SYS_CHROOT
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+    - 'hostPath'
+  allowedHostPaths:
+    - pathPrefix: "/dev"
+      readOnly: false
+    - pathPrefix: "/lib/modules"
+      readOnly: true
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+  readOnlyRootFilesystem: false

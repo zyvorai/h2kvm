@@ -1,0 +1,40 @@
+# MigrationJob from existing PVC
+# Use this when you've already uploaded VMDK to a PVC
+
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: migrate-photon
+  namespace: migrations
+spec:
+  # Source: VMDK already in PVC
+  source:
+    type: vmdk-pvc
+    vmdk:
+      pvcName: photon-source-vmdk
+      path: disk.vmdk  # Path within PVC
+
+  # Migration options (minimal - use defaults)
+  migration:
+    offlineFixes:
+      initramfsModules:
+        - virtio_blk
+        - virtio_scsi
+        - virtio_net
+    conversion:
+      format: qcow2
+      compress: true
+
+  # Destination
+  destination:
+    storageClass: longhorn  # Production storage class
+    size: 10Gi
+
+  # Create VM automatically
+  createVM:
+    enabled: true
+    cpu: "2"
+    memory: 2Gi
+    autoStart: true
+
+  cleanupPolicy: OnSuccess

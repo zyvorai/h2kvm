@@ -1,0 +1,457 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  name: hyper2kvm-operator.v0.3.0
+  namespace: placeholder
+  annotations:
+    # Operator capabilities level
+    capabilities: Full Lifecycle
+    # Categories for OperatorHub UI
+    categories: "Modernization & Migration,Storage"
+    # Certified level
+    certified: "false"
+    # Creation date
+    createdAt: "2026-01-30T00:00:00Z"
+    # Description
+    description: Kubernetes operator for automated VM migration from VMware to KVM/OpenShift Virtualization
+    # Container image
+    containerImage: ghcr.io/ssahani/hyper2kvm:0.3.0
+    # Support
+    support: Hyper2KVM Project
+    # Repository
+    repository: https://github.com/ssahani/hyper2kvm
+    # OLM skip range (allow upgrading from any 1.x version)
+    olm.skipRange: ">=1.0.0 <2.0.0"
+    # Operator SDK annotations
+    operators.operatorframework.io/builder: operator-sdk-v1.34.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    # OpenShift version compatibility
+    "operatorframework.io/suggested-namespace": hyper2kvm-system
+    "operatorframework.io/cluster-monitoring": "true"
+    # Disconnected/air-gapped support
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "false"
+    features.operators.openshift.io/proxy-aware: "true"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+spec:
+  displayName: Hyper2KVM Operator
+  description: |
+    # Hyper2KVM - VM Migration Operator
+
+    Kubernetes operator for automated migration of virtual machines from VMware vSphere to KVM/OpenShift Virtualization.
+
+    ## Key Features
+
+    - **Automated Migration**: Convert VMDKs to QCOW2 with automated VirtIO driver injection
+    - **Intelligent Scheduling**: Priority-based job scheduling with preemption support
+    - **High Availability**: Leader election for multi-replica operator deployments
+    - **Job Dependencies**: DAG-based job orchestration with dependency management
+    - **Cost Tracking**: Resource cost monitoring and SLA compliance checking
+    - **Auto-scaling**: Horizontal Pod Autoscaler integration for worker scaling
+    - **Advanced Retry Logic**: Exponential backoff with failure threshold tracking
+    - **Job Templating**: Reusable job templates with parameter validation
+    - **Backup/Restore**: Operator state backup for disaster recovery
+
+    ## Supported Operations
+
+    1. **Inspect**: Analyze VMDK structure, detect issues, risk assessment
+    2. **Convert**: VMDK → QCOW2 conversion with format optimization
+    3. **Offline Fix**: Inject VirtIO drivers into Windows VMs offline
+
+    ## Worker Job Protocol
+
+    - 10-state job lifecycle (Created → Validated → Queued → Assigned → Running → Completed)
+    - Persistent state storage with PVCs
+    - Real-time progress tracking via JSONL events
+    - Prometheus metrics and Grafana dashboards
+
+    ## Prerequisites
+
+    - OpenShift 4.10+ or Kubernetes 1.24+
+    - Persistent storage (RWO for worker state)
+    - Workers require privileged access for NBD/LVM operations
+
+    ## Documentation
+
+    - [GitHub Repository](https://github.com/ssahani/hyper2kvm)
+    - [Quick Start Guide](https://github.com/ssahani/hyper2kvm/blob/main/docs/worker/QUICKSTART.md)
+    - [Operator Guide](https://github.com/ssahani/hyper2kvm/blob/main/docs/deployment/v2.0.0-comprehensive-features.md)
+
+  version: 0.3.0
+  maturity: stable
+  minKubeVersion: 1.24.0
+
+  keywords:
+    - migration
+    - vmware
+    - kvm
+    - virtualization
+    - vmdk
+    - qcow2
+    - openshift-virtualization
+
+  maintainers:
+    - name: Hyper2KVM Project
+      email: noreply@github.com
+
+  provider:
+    name: Hyper2KVM Project
+    url: https://github.com/ssahani/hyper2kvm
+
+  links:
+    - name: Documentation
+      url: https://github.com/ssahani/hyper2kvm/tree/main/docs
+    - name: GitHub
+      url: https://github.com/ssahani/hyper2kvm
+    - name: Issue Tracker
+      url: https://github.com/ssahani/hyper2kvm/issues
+
+  icon:
+    - base64data: iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==
+      mediatype: image/png
+
+  # Install modes
+  installModes:
+    - type: OwnNamespace
+      supported: true
+    - type: SingleNamespace
+      supported: true
+    - type: MultiNamespace
+      supported: false
+    - type: AllNamespaces
+      supported: true
+
+  # Custom Resource Definitions
+  customresourcedefinitions:
+    owned:
+      - name: migrationjobs.hyper2kvm.io
+        displayName: Migration Job
+        kind: MigrationJob
+        version: v1alpha1
+        description: Represents a VM migration job
+        resources:
+          - kind: Pod
+            version: v1
+          - kind: ConfigMap
+            version: v1
+          - kind: Event
+            version: v1
+        specDescriptors:
+          - path: operation
+            displayName: Operation
+            description: Type of migration operation (inspect, convert, offline_fix)
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:select:inspect'
+              - 'urn:alm:descriptor:com.tectonic.ui:select:convert'
+              - 'urn:alm:descriptor:com.tectonic.ui:select:offline_fix'
+          - path: image.path
+            displayName: Image Path
+            description: Path to the source VM disk image
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - path: image.format
+            displayName: Image Format
+            description: Source image format
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:select:vmdk'
+              - 'urn:alm:descriptor:com.tectonic.ui:select:vdi'
+              - 'urn:alm:descriptor:com.tectonic.ui:select:vhd'
+              - 'urn:alm:descriptor:com.tectonic.ui:select:vhdx'
+          - path: priority
+            displayName: Priority
+            description: Job priority (0-100, higher = more important)
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:number'
+          - path: timeout
+            displayName: Timeout
+            description: Job timeout (e.g., 2h, 30m)
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+        statusDescriptors:
+          - path: state
+            displayName: State
+            description: Current job state
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes.phase'
+          - path: worker
+            displayName: Assigned Worker
+            description: Worker pod assigned to this job
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - path: progress
+            displayName: Progress
+            description: Job progress percentage
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:podCount'
+          - path: startTime
+            displayName: Start Time
+            description: Job start timestamp
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - path: completionTime
+            displayName: Completion Time
+            description: Job completion timestamp
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+
+      - name: jobtemplates.hyper2kvm.io
+        displayName: Job Template
+        kind: JobTemplate
+        version: v1alpha1
+        description: Reusable migration job template
+        specDescriptors:
+          - path: template
+            displayName: Template
+            description: Job template specification
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:hidden'
+          - path: parameters
+            displayName: Parameters
+            description: Template parameters
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:hidden'
+
+  # API services provided by this operator
+  apiservicedefinitions: {}
+
+  # Permissions required
+  install:
+    strategy: deployment
+    spec:
+      clusterPermissions:
+        - serviceAccountName: hyper2kvm-operator
+          rules:
+            # MigrationJob CRD
+            - apiGroups:
+                - hyper2kvm.io
+              resources:
+                - migrationjobs
+                - migrationjobs/status
+                - migrationjobs/finalizers
+                - jobtemplates
+                - jobtemplates/status
+              verbs:
+                - '*'
+            # Worker pod discovery
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+                - pods/status
+              verbs:
+                - get
+                - list
+                - watch
+            # ConfigMaps for state
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+            # Events
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+            # Namespaces
+            - apiGroups:
+                - ""
+              resources:
+                - namespaces
+              verbs:
+                - get
+                - list
+                - watch
+            # Nodes
+            - apiGroups:
+                - ""
+              resources:
+                - nodes
+              verbs:
+                - get
+                - list
+                - watch
+            # Leases for leader election
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            # OpenShift SecurityContextConstraints
+            - apiGroups:
+                - security.openshift.io
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+              resourceNames:
+                - hyper2kvm-worker-scc
+            # OpenShift Routes
+            - apiGroups:
+                - route.openshift.io
+              resources:
+                - routes
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+
+      deployments:
+        - name: hyper2kvm-operator
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app.kubernetes.io/name: hyper2kvm-operator
+                app.kubernetes.io/component: operator
+            template:
+              metadata:
+                labels:
+                  app.kubernetes.io/name: hyper2kvm-operator
+                  app.kubernetes.io/component: operator
+              spec:
+                serviceAccountName: hyper2kvm-operator
+                securityContext:
+                  runAsNonRoot: true
+                  runAsUser: 1000
+                  fsGroup: 1000
+                containers:
+                  - name: operator
+                    image: ghcr.io/ssahani/hyper2kvm:0.3.0
+                    imagePullPolicy: IfNotPresent
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                      readOnlyRootFilesystem: true
+                    command:
+                      - python3
+                      - -m
+                      - hyper2kvm.operator.cli
+                    env:
+                      - name: OPERATOR_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+                      - name: OPERATOR_POD_NAME
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.name
+                      - name: RECONCILE_INTERVAL
+                        value: "30"
+                      - name: LOG_LEVEL
+                        value: "INFO"
+                      - name: WORKER_DISCOVERY_INTERVAL
+                        value: "60"
+                      - name: LEADER_ELECTION_ENABLED
+                        value: "true"
+                    ports:
+                      - name: http
+                        containerPort: 8080
+                        protocol: TCP
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8080
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    readinessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8080
+                      initialDelaySeconds: 10
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 512Mi
+                      requests:
+                        cpu: 100m
+                        memory: 128Mi
+                    volumeMounts:
+                      - name: tmp
+                        mountPath: /tmp
+                volumes:
+                  - name: tmp
+                    emptyDir: {}
+
+  # Webhook definitions
+  webhookdefinitions:
+    - type: ValidatingAdmissionWebhook
+      admissionReviewVersions:
+        - v1
+      containerPort: 8443
+      targetPort: 8443
+      deploymentName: hyper2kvm-webhook
+      failurePolicy: Fail
+      generateName: vmigrationjob.hyper2kvm.io
+      rules:
+        - apiGroups:
+            - hyper2kvm.io
+          apiVersions:
+            - v1alpha1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - migrationjobs
+      sideEffects: None
+      webhookPath: /validate-hyper2kvm-io-v1alpha1-migrationjob
+
+    - type: MutatingAdmissionWebhook
+      admissionReviewVersions:
+        - v1
+      containerPort: 8443
+      targetPort: 8443
+      deploymentName: hyper2kvm-webhook
+      failurePolicy: Ignore
+      generateName: mmigrationjob.hyper2kvm.io
+      rules:
+        - apiGroups:
+            - hyper2kvm.io
+          apiVersions:
+            - v1alpha1
+          operations:
+            - CREATE
+          resources:
+            - migrationjobs
+      sideEffects: None
+      webhookPath: /mutate-hyper2kvm-io-v1alpha1-migrationjob
+
+  # Related images (for disconnected/air-gapped environments)
+  relatedImages:
+    - name: hyper2kvm-operator
+      image: ghcr.io/ssahani/hyper2kvm:0.3.0
+    - name: hyper2kvm-worker
+      image: ghcr.io/ssahani/hyper2kvm:0.3.0
+    - name: hyper2kvm-webhook
+      image: ghcr.io/ssahani/hyper2kvm:0.3.0
+    - name: oauth-proxy
+      image: quay.io/openshift/origin-oauth-proxy:4.14
+
+  # Upgrade strategy
+  replaces: hyper2kvm-operator.v1.9.0

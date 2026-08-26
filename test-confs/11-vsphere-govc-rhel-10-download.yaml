@@ -1,0 +1,60 @@
+# ==============================================================================
+# ☁️ vSphere govc Download - RHEL 10.1
+# ==============================================================================
+#
+# Downloads RHEL 10.1 VM files from vSphere using govc/govmomi
+#
+# Usage:
+#   hyper2kvm --config 11-vsphere-govc-rhel-10-download.yaml vsphere
+#
+# Features:
+#   ✅ govc-based download (alternative to pyvmomi)
+#   ✅ Concurrent downloads (4 parallel)
+#   ✅ Selective file patterns
+#   ✅ Async HTTP support
+#
+# Requirements:
+#   - govc binary installed
+#   - vCenter credentials in VC_PASSWORD environment variable
+# ==============================================================================
+
+cmd: vsphere
+vs_action: download_only_vm
+
+# vCenter Connection
+vcenter: 10.73.213.134
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+vc_insecure: true
+dc_name: data
+
+# govc Configuration
+govc_bin: govc
+no_govmomi: false
+govc_url: "https://10.73.213.134/sdk"
+govc_insecure: true
+govc_datacenter: "data"
+
+# Target VM & Output
+vm_name: "esx8.0-rhel10.1-x86_64-efi"
+output_dir: "./downloads/esx8.0-rhel10.1-x86_64-efi"
+
+# File Selection Patterns
+vs_include_glob:
+  - "*"
+vs_exclude_glob:
+  - "*.lck"
+  - "*.log"
+  - "*.vswp"
+  - "*.vmem"
+  - "*.vmsn"
+
+# Download Performance
+vs_concurrency: 4
+vs_max_files: 5000
+vs_use_async_http: true
+vs_fail_on_missing: false
+
+# Output
+verbose: 2
+json: false

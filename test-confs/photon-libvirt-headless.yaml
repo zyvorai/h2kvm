@@ -1,0 +1,24 @@
+# Photon OS Migration - Headless Server Export
+# For server VMs without graphics console
+
+command: local
+vmdk: ./photon.vmdk
+output_dir: /var/lib/libvirt/images
+to_output: photon-os.qcow2
+out_format: qcow2
+compress: false
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Libvirt - Headless configuration
+emit_domain_xml: true
+virsh_define: true
+vm_name: photon-os
+libvirt_network: default
+machine: q35
+headless: true
+guest_os: linux
+
+# Resource allocation (optional)
+# vcpus: 2
+# memory: 2048

@@ -1,0 +1,32 @@
+# hyper2kvm Batch Processing Configuration
+# This file is used by the batch service to process multiple VMs in parallel
+
+command: local
+batch_manifest: /etc/hyper2kvm/manifest.json
+
+# Number of parallel workers (adjust based on available CPU/memory)
+batch_parallel: 4
+
+# Continue processing remaining VMs even if some fail
+batch_continue_on_error: true
+
+# Output directory for all converted images
+output_dir: /data/output
+
+# Output format
+out_format: qcow2
+
+# Enable compression
+compress: true
+
+# Fstab stabilization
+fstab_mode: stabilize-all
+
+# Regenerate initramfs
+regen_initramfs: true
+
+# Update GRUB
+update_grub: true
+
+# Verbosity
+verbose: 1

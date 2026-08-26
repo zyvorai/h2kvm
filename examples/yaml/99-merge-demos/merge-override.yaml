@@ -1,0 +1,10 @@
+# Run with primary command (recommended):
+#   h2kvmctl --config 99-merge-demos/merge-override.yaml
+#
+# Or using legacy command:
+#   hyper2kvm --config 99-merge-demos/merge-override.yaml
+
+verbose: 2
+dry_run: true
+flatten: false
+regen_initramfs: false

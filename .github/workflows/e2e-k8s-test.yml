@@ -1,0 +1,81 @@
+name: Kubernetes E2E Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        k3s-version:
+          - v1.28.15-k3s1
+          - v1.30.14-k3s2
+          - v1.31.14-k3s1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up k3d
+        run: |
+          curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+          k3d version
+
+      - name: Create k3d cluster (K8s ${{ matrix.k3s-version }})
+        run: |
+          k3d cluster create hyper2kvm-test \
+            --image rancher/k3s:${{ matrix.k3s-version }} \
+            --agents 1 \
+            --k3s-arg "--disable=traefik@server:0" \
+            --wait
+
+      - name: Verify cluster
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Run E2E test script
+        env:
+          SKIP_BUILD: "false"
+          SKIP_IMAGE_LOAD: "false"
+          CLUSTER_NAME: hyper2kvm-test
+          CENTOS9_VMDK: ""  # Skip actual VM migration in CI
+        run: |
+          bash scripts/test-centos9-e2e-k8s.sh
+
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          echo "=== Operator Logs ==="
+          kubectl logs -n hyper2kvm-system -l app=hyper2kvm-operator --tail=100 || true
+          echo "=== Worker Logs ==="
+          kubectl logs -n hyper2kvm-workers -l app=hyper2kvm-worker --tail=100 || true
+          echo "=== Pod Status ==="
+          kubectl get pods -A || true
+          echo "=== Events ==="
+          kubectl get events -A --sort-by='.lastTimestamp' || true
+
+      - name: Cleanup
+        if: always()
+        run: |
+          k3d cluster delete hyper2kvm-test || true

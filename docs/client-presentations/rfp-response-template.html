@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RFP Response Template — VMware to KVM Migration Services</title>
+<style>
+  @page { size: A4; margin: 20mm; }
+  :root { --accent: #2563eb; --accent2: #3b82f6; --green: #16a34a; --text: #1e293b; --text2: #475569; --text3: #94a3b8; --bg: #ffffff; --border: #e2e8f0; --light-bg: #f8fafc; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: var(--text); background: var(--bg); line-height: 1.7; font-size: 10.5pt; }
+
+  .cover { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 50%, #3b82f6 100%); color: #fff; page-break-after: always; padding: 60px 40px; }
+  .cover h1 { font-size: 2.8em; font-weight: 800; margin-bottom: 0.2em; letter-spacing: -0.02em; }
+  .cover h1 span { color: #93c5fd; }
+  .cover h2 { font-size: 1.3em; font-weight: 300; opacity: 0.85; margin-bottom: 1.5em; }
+  .cover .meta { font-size: 0.95em; opacity: 0.7; line-height: 2; }
+  .cover .meta strong { opacity: 1; }
+  .cover .logo-area { margin-top: 2em; padding: 16px 32px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 0.85em; opacity: 0.5; }
+  .editable { background: rgba(255,255,255,0.08); border: 1px dashed rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 4px; min-width: 180px; display: inline-block; }
+  .page-editable { background: #fffbeb; border: 1px dashed #fbbf24; padding: 2px 8px; border-radius: 4px; min-width: 120px; display: inline-block; }
+
+  /* Page layout */
+  .page { padding: 0 40px; max-width: 900px; margin: 0 auto; }
+  .section { margin-bottom: 32px; page-break-inside: avoid; }
+  .section h2 { font-size: 1.4em; font-weight: 700; color: var(--accent); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid var(--accent); }
+  .section h3 { font-size: 1.05em; font-weight: 600; color: var(--text); margin: 16px 0 6px; }
+  .section p { margin-bottom: 10px; font-size: 0.95em; color: var(--text2); }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.88em; }
+  th { background: var(--accent); color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: var(--light-bg); }
+
+  .rfp-q { font-weight: 600; color: var(--text); margin-bottom: 4px; font-size: 0.95em; }
+  .rfp-a { color: var(--text2); margin-bottom: 16px; padding-left: 16px; border-left: 3px solid var(--accent2); font-size: 0.92em; }
+  .rfp-a strong { color: var(--text); }
+  .rfp-a ul { padding-left: 20px; margin: 4px 0; }
+
+  .highlight-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 14px 18px; margin: 12px 0; font-size: 0.9em; }
+  .highlight-box.green { background: #f0fdf4; border-color: #86efac; }
+
+  .toc { list-style: none; }
+  .toc li { padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.95em; }
+  .toc li span:last-child { color: var(--text3); }
+
+  .edit-note { background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 10px 14px; font-size: 0.82em; color: #92400e; margin: 16px 0; }
+  .edit-note::before { content: '✏️ '; }
+
+  .footer { text-align: center; padding: 20px; font-size: 0.78em; color: var(--text3); border-top: 1px solid var(--border); margin-top: 40px; }
+  .footer a { color: var(--accent); text-decoration: none; }
+
+  @media screen {
+    body { background: #f1f5f9; }
+    .page { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; padding: 40px; margin: 20px auto; }
+    .cover { border-radius: 8px; margin: 20px auto; max-width: 900px; min-height: auto; padding: 60px 40px; }
+  }
+  @media print { .edit-note { display: none; } .page-editable { background: transparent; border: none; } }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>RFP <span>Response</span></h1>
+  <h2>VMware to KVM Migration Services</h2>
+  <div class="meta">
+    <strong>Prepared for:</strong> <span class="editable" contenteditable="true">[Customer Organization Name]</span><br>
+    <strong>Prepared by:</strong> <span class="editable" contenteditable="true">[Your Company Name]</span><br>
+    <strong>Date:</strong> <span class="editable" contenteditable="true">[Date]</span><br>
+    <strong>RFP Reference:</strong> <span class="editable" contenteditable="true">[RFP-2026-XXX]</span><br>
+    <strong>Valid Until:</strong> <span class="editable" contenteditable="true">[Date + 90 days]</span>
+  </div>
+  <div class="logo-area">[Insert Your Company Logo Here]</div>
+</div>
+
+<!-- CONTENT -->
+<div class="page">
+
+  <div class="edit-note">This template contains pre-written responses based on hyper2kvm capabilities. Yellow highlighted fields are customizable — click to edit. Print or save as PDF when ready to submit.</div>
+
+  <!-- TOC -->
+  <div class="section">
+    <h2>Table of Contents</h2>
+    <ul class="toc">
+      <li><span>1. Executive Summary</span><span>Section 1</span></li>
+      <li><span>2. Company Qualifications</span><span>Section 2</span></li>
+      <li><span>3. Technical Approach</span><span>Section 3</span></li>
+      <li><span>4. Migration Methodology</span><span>Section 4</span></li>
+      <li><span>5. Tooling & Automation</span><span>Section 5</span></li>
+      <li><span>6. Security & Compliance</span><span>Section 6</span></li>
+      <li><span>7. Support & SLA</span><span>Section 7</span></li>
+      <li><span>8. Timeline & Milestones</span><span>Section 8</span></li>
+      <li><span>9. Pricing</span><span>Section 9</span></li>
+      <li><span>10. References & Case Studies</span><span>Section 10</span></li>
+      <li><span>Appendix A: Detailed Technical Q&A</span><span>Appendix</span></li>
+    </ul>
+  </div>
+
+  <!-- 1. Executive Summary -->
+  <div class="section">
+    <h2>1. Executive Summary</h2>
+    <p><span class="page-editable" contenteditable="true">[Your Company]</span> is pleased to respond to <span class="page-editable" contenteditable="true">[Customer]</span>'s Request for Proposal for VMware to KVM migration services. We propose a comprehensive migration of <span class="page-editable" contenteditable="true">[N]</span> virtual machines from VMware vSphere to KVM-based infrastructure using our proven methodology and the hyper2kvm migration toolkit.</p>
+
+    <div class="highlight-box green">
+      <strong>Key Value Proposition:</strong>
+      <ul>
+        <li>Eliminate VMware/Broadcom licensing costs: estimated <span class="page-editable" contenteditable="true">$XXX,XXX</span>/year savings</li>
+        <li>Licensed migration tooling (hyper2kvm — Proprietary (Zyvor AI Labs))</li>
+        <li>Proven methodology with automated conversion, testing, and rollback</li>
+        <li>Target completion: <span class="page-editable" contenteditable="true">[X]</span> weeks with less than 4 hours downtime per VM</li>
+        <li>Post-migration support and knowledge transfer included</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 2. Company Qualifications -->
+  <div class="section">
+    <h2>2. Company Qualifications</h2>
+    <div class="edit-note">Customize this section with your company's actual credentials, certifications, and experience.</div>
+
+    <div class="rfp-q">Q: Describe your company's experience with virtualization migration projects.</div>
+    <div class="rfp-a">
+      <span class="page-editable" contenteditable="true">[Your Company]</span> has completed <span class="page-editable" contenteditable="true">[N]</span> virtualization migration projects over the past <span class="page-editable" contenteditable="true">[N]</span> years, migrating a total of <span class="page-editable" contenteditable="true">[N]</span> virtual machines across industries including <span class="page-editable" contenteditable="true">[industries]</span>. Our team holds certifications including <span class="page-editable" contenteditable="true">[RHCSA, CKA, VCP, etc.]</span>.
+    </div>
+
+    <div class="rfp-q">Q: What migration tools do you use?</div>
+    <div class="rfp-a">
+      We use <strong>hyper2kvm</strong> (h2kvmctl), a proprietary migration toolkit licensed under Proprietary (Zyvor AI Labs). Key capabilities:
+      <ul>
+        <li><strong>10 source formats:</strong> VMware VMDK, OVA, OVF, Hyper-V VHD/VHDX, AWS AMI, Azure VHD, GCP images, and raw disk images</li>
+        <li><strong>Automated fixes:</strong> VirtIO driver injection (Windows), initramfs rebuild (Linux), fstab UUID conversion, GRUB repair</li>
+        <li><strong>Dual deployment:</strong> libvirt/KVM and KubeVirt (Kubernetes) in a single workflow</li>
+        <li><strong>YAML-driven:</strong> Declarative batch migration configs with dependency ordering</li>
+        <li><strong>Zero cost:</strong> No per-VM fees, no license keys, no vendor lock-in</li>
+      </ul>
+    </div>
+
+    <div class="rfp-q">Q: What certifications does your team hold?</div>
+    <div class="rfp-a">
+      <table>
+        <tr><th>Certification</th><th>Team Members</th><th>Relevance</th></tr>
+        <tr><td class="page-editable" contenteditable="true">RHCSA / RHCE</td><td class="page-editable" contenteditable="true">[N]</td><td>Linux system administration</td></tr>
+        <tr><td class="page-editable" contenteditable="true">CKA / CKAD</td><td class="page-editable" contenteditable="true">[N]</td><td>Kubernetes administration</td></tr>
+        <tr><td class="page-editable" contenteditable="true">VCP-DCV</td><td class="page-editable" contenteditable="true">[N]</td><td>VMware source environment expertise</td></tr>
+        <tr><td class="page-editable" contenteditable="true">AWS SAA / Azure AZ-104</td><td class="page-editable" contenteditable="true">[N]</td><td>Cloud-to-KVM repatriation</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 3. Technical Approach -->
+  <div class="section">
+    <h2>3. Technical Approach</h2>
+
+    <div class="rfp-q">Q: Describe your technical approach to converting VMware VMs to KVM format.</div>
+    <div class="rfp-a">
+      Our conversion pipeline uses hyper2kvm's VMCraft engine (pure Python + qemu-nbd), which processes each VM through these stages:
+      <ul>
+        <li><strong>Export:</strong> govc-based vSphere export with streaming progress monitoring</li>
+        <li><strong>Convert:</strong> VMDK/OVA → QCOW2 with optional compression (40-60% space savings)</li>
+        <li><strong>Fix:</strong> Automated offline modifications — VirtIO drivers (Windows), initramfs rebuild (Linux), fstab UUID conversion, GRUB update, network configuration</li>
+        <li><strong>Deploy:</strong> Generate libvirt domain XML with NUMA-aware CPU pinning, hugepages, VirtIO devices, and correct UEFI/BIOS firmware detection</li>
+        <li><strong>Validate:</strong> Automated boot test, service verification, and performance baseline comparison</li>
+      </ul>
+      <strong>No manual intervention required</strong> for standard Linux and Windows VMs. Custom handling documented for edge cases (vendor appliances, legacy OS).
+    </div>
+
+    <div class="rfp-q">Q: How do you handle Windows VMs and prevent BSOD?</div>
+    <div class="rfp-a">
+      Windows BSOD (0x7B INACCESSIBLE_BOOT_DEVICE) is the #1 migration failure mode. h2kvmctl prevents this by:
+      <ul>
+        <li>Mounting the guest disk offline using qemu-nbd</li>
+        <li>Loading the Windows SYSTEM registry hive</li>
+        <li>Injecting VirtIO storage drivers (viostor/vioscsi) as boot-critical</li>
+        <li>Injecting VirtIO network drivers (NetKVM) and balloon drivers</li>
+        <li>Supporting Windows Server 2012 R2 through 2025, and Windows 10/11</li>
+      </ul>
+      We carry the latest <strong>virtio-win.iso</strong> (from Fedora) with pre-tested drivers for all supported Windows versions. <strong>Zero BSOD guarantee</strong> with our process.
+    </div>
+
+    <div class="rfp-q">Q: What target KVM platforms do you support?</div>
+    <div class="rfp-a">
+      <table>
+        <tr><th>Platform</th><th>Use Case</th><th>Scale</th></tr>
+        <tr><td>KVM + libvirt (RHEL/Rocky/Ubuntu)</td><td>Traditional VM hosting, direct VMware replacement</td><td>Any</td></tr>
+        <tr><td>KubeVirt on K3s</td><td>Edge, small deployments, container+VM convergence</td><td>1-50 VMs</td></tr>
+        <tr><td>KubeVirt on RKE2/Vanilla K8s</td><td>Enterprise Kubernetes with VM support</td><td>50-500 VMs</td></tr>
+        <tr><td>OpenShift Virtualization</td><td>Enterprise with Red Hat support</td><td>100+ VMs</td></tr>
+        <tr><td>oVirt / OLVM</td><td>VMware-like management experience</td><td>50-500 VMs</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. Methodology -->
+  <div class="section">
+    <h2>4. Migration Methodology</h2>
+
+    <div class="rfp-q">Q: Describe your migration methodology and phases.</div>
+    <div class="rfp-a">
+      Our proven 5-phase methodology:
+      <table>
+        <tr><th>Phase</th><th>Duration</th><th>Activities</th><th>Deliverables</th></tr>
+        <tr><td><strong>1. Discover</strong></td><td>1-2 weeks</td><td>VM inventory, dependency mapping, risk assessment, workload classification</td><td>Migration plan, VM matrix, risk register</td></tr>
+        <tr><td><strong>2. Design</strong></td><td>1 week</td><td>Target architecture, network design, storage sizing, HA/DR planning</td><td>Architecture document, sizing calculator output</td></tr>
+        <tr><td><strong>3. Build</strong></td><td>1-2 weeks</td><td>Deploy KVM hosts, configure networking/storage, install monitoring</td><td>Production-ready KVM infrastructure</td></tr>
+        <tr><td><strong>4. Migrate</strong></td><td>2-6 weeks</td><td>Wave-based migration: convert, test, cutover, validate per wave</td><td>Migrated VMs, test results, sign-off per wave</td></tr>
+        <tr><td><strong>5. Optimize</strong></td><td>2 weeks</td><td>Performance tuning, documentation, knowledge transfer, VMware decommission</td><td>Runbooks, training, PIR report</td></tr>
+      </table>
+    </div>
+
+    <div class="rfp-q">Q: How do you handle rollback if a migration fails?</div>
+    <div class="rfp-a">
+      <strong>Rollback is immediate and zero-risk:</strong>
+      <ul>
+        <li>Source VMware VMs are <strong>never modified or deleted</strong> during migration</li>
+        <li>VMware VMs remain powered off (not deleted) for 48 hours after cutover</li>
+        <li>Rollback = power on VMware VM, power off KVM VM (2-minute process)</li>
+        <li>MAC addresses are preserved, so network/DHCP/DNS require no changes</li>
+        <li>Decision deadline: 2 hours after go-live per wave</li>
+        <li>We have achieved <strong>0% rollback rate</strong> across our last <span class="page-editable" contenteditable="true">[N]</span> migration projects due to thorough pre-testing</li>
+      </ul>
+    </div>
+
+    <div class="rfp-q">Q: What is the expected downtime per VM during migration?</div>
+    <div class="rfp-a">
+      <strong>Typical downtime: 5-15 minutes per VM.</strong> Our process pre-converts VMs while they are still running on VMware. The cutover window involves only: (1) clean shutdown of VMware VM, (2) boot KVM VM. The conversion itself runs hours or days before the cutover, so it does not contribute to downtime. For large databases requiring consistency, we recommend a 2-4 hour window that includes final backup verification.
+    </div>
+  </div>
+
+  <!-- 5. Tooling -->
+  <div class="section">
+    <h2>5. Tooling & Automation</h2>
+
+    <div class="rfp-q">Q: What licensing costs are associated with your migration tools?</div>
+    <div class="rfp-a">
+      <strong>Contact for pricing.*</strong> hyper2kvm (h2kvmctl) is licensed under Proprietary (Zyvor AI Labs) with no per-VM fees and no usage limits. The customer retains the tool post-migration for future use. All underlying components (QEMU, libvirt, KVM) are included in standard Linux distributions.
+    </div>
+
+    <div class="rfp-q">Q: Can the migration be automated for large-scale environments?</div>
+    <div class="rfp-a">
+      Yes. h2kvmctl supports:
+      <ul>
+        <li><strong>YAML batch configuration:</strong> Define all VMs in a single file with dependency ordering</li>
+        <li><strong>CI/CD integration:</strong> GitLab CI, Jenkins, and GitHub Actions pipeline templates included</li>
+        <li><strong>Ansible playbooks:</strong> Inventory-driven migration across multiple hosts</li>
+        <li><strong>Parallel execution:</strong> Convert 10+ VMs simultaneously (limited by I/O bandwidth)</li>
+        <li><strong>JSON output:</strong> Machine-readable results for custom dashboards and reporting</li>
+        <li><strong>Dry-run mode:</strong> Validate everything before touching production</li>
+      </ul>
+      For a 500-VM environment, automated batch processing reduces per-VM effort from 2 hours (manual) to 6 minutes (automated).
+    </div>
+  </div>
+
+  <!-- 6. Security -->
+  <div class="section">
+    <h2>6. Security & Compliance</h2>
+
+    <div class="rfp-q">Q: How do you ensure data integrity during migration?</div>
+    <div class="rfp-a">
+      <ul>
+        <li><strong>SHA-256 checksums:</strong> Source and destination images are checksummed and compared</li>
+        <li><strong>Audit logging:</strong> Every operation logged with timestamp, operator, action, and result (JSON structured)</li>
+        <li><strong>No data traversal:</strong> Conversion happens locally on the target host — VM data never leaves the data center</li>
+        <li><strong>Encryption:</strong> Optional AES-256-GCM encryption for media transfer in air-gapped environments</li>
+        <li><strong>Evidence packages:</strong> Automated generation of compliance-ready evidence for SOX, HIPAA, PCI-DSS</li>
+      </ul>
+    </div>
+
+    <div class="rfp-q">Q: What compliance frameworks have you supported in previous migrations?</div>
+    <div class="rfp-a">
+      <table>
+        <tr><th>Framework</th><th>Support Level</th><th>Key Controls</th></tr>
+        <tr><td>SOX (ITGC)</td><td>Full</td><td>Change management, separation of duties, audit trail</td></tr>
+        <tr><td>HIPAA</td><td>Full</td><td>ePHI protection, access controls, encryption, BAA-compatible</td></tr>
+        <tr><td>PCI-DSS v4.0</td><td>Full</td><td>Change control (6.4), audit trail (10.2), vulnerability scanning (11.2)</td></tr>
+        <tr><td>SOC 2 Type II</td><td>Full</td><td>Change management (CC8.1), monitoring, logical access</td></tr>
+        <tr><td>FedRAMP / NIST 800-53</td><td>Full</td><td>Configuration management (CM-3), access control (AC-2)</td></tr>
+        <tr><td>FIPS 140-2</td><td>Full</td><td>FIPS-validated crypto for air-gapped environments</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 7. Support -->
+  <div class="section">
+    <h2>7. Support & SLA</h2>
+
+    <div class="rfp-q">Q: What post-migration support do you provide?</div>
+    <div class="rfp-a">
+      <table>
+        <tr><th>Support Tier</th><th>Duration</th><th>Coverage</th><th>Response Time</th></tr>
+        <tr><td>Hypercare</td><td>First 2 weeks post-migration</td><td>24/7 on-call, dedicated engineer</td><td>15 min (critical), 1 hr (high)</td></tr>
+        <tr><td>Standard</td><td>Months 1-3</td><td>Business hours, remote support</td><td>1 hr (critical), 4 hr (high)</td></tr>
+        <tr><td>Extended (optional)</td><td>Months 4-12</td><td>Business hours, advisory</td><td>4 hr (critical), 1 day (standard)</td></tr>
+      </table>
+    </div>
+
+    <div class="rfp-q">Q: What knowledge transfer is included?</div>
+    <div class="rfp-a">
+      <ul>
+        <li><strong>Documentation:</strong> Complete runbooks for KVM administration (virsh commands, networking, storage, backup, troubleshooting)</li>
+        <li><strong>Training:</strong> <span class="page-editable" contenteditable="true">[N]</span> days of hands-on training for your team (VM lifecycle, monitoring, Pacemaker HA)</li>
+        <li><strong>Lab exercises:</strong> 10 guided labs covering all Day-2 operations</li>
+        <li><strong>Video recordings:</strong> All training sessions recorded for future reference</li>
+        <li><strong>Office hours:</strong> Weekly 1-hour Q&A sessions during first month</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 8. Timeline -->
+  <div class="section">
+    <h2>8. Timeline & Milestones</h2>
+
+    <div class="rfp-q">Q: Provide a proposed project timeline.</div>
+    <div class="rfp-a">
+      <table>
+        <tr><th>Milestone</th><th>Target Date</th><th>Deliverable</th><th>Gate</th></tr>
+        <tr><td>Project kickoff</td><td>Week 1</td><td>Kick-off meeting, access granted</td><td>SOW signed</td></tr>
+        <tr><td>Discovery complete</td><td>Week 2</td><td>VM inventory, migration plan</td><td>Plan approved</td></tr>
+        <tr><td>Infrastructure ready</td><td>Week 4</td><td>KVM hosts deployed, tested</td><td>Doctor checks pass</td></tr>
+        <tr><td>POC complete (5 VMs)</td><td>Week 5</td><td>5 VMs migrated, validated</td><td>POC sign-off</td></tr>
+        <tr><td>Wave 1 (dev/test)</td><td>Week 7</td><td>Dev/test VMs migrated</td><td>All boot tests pass</td></tr>
+        <tr><td>Wave 2 (databases)</td><td>Week 9</td><td>Database VMs migrated</td><td>App owner sign-off</td></tr>
+        <tr><td>Wave 3 (production)</td><td>Week 11</td><td>All production VMs migrated</td><td>All smoke tests pass</td></tr>
+        <tr><td>VMware decommission</td><td>Week 13</td><td>ESXi hosts powered off</td><td>48-hour soak complete</td></tr>
+        <tr><td>Project close</td><td>Week 14</td><td>PIR, runbooks, training complete</td><td>Customer sign-off</td></tr>
+      </table>
+      <p><em>Timeline assumes <span class="page-editable" contenteditable="true">[N]</span> VMs. Adjust proportionally for larger environments.</em></p>
+    </div>
+  </div>
+
+  <!-- 9. Pricing -->
+  <div class="section">
+    <h2>9. Pricing</h2>
+    <div class="edit-note">Customize pricing based on your rates and the customer's scope. Contact info@lilotechnologies.com or call +91 9999379738 for hyper2kvm software pricing.</div>
+
+    <div class="rfp-q">Q: Provide a detailed cost breakdown.</div>
+    <div class="rfp-a">
+      <table>
+        <tr><th>Line Item</th><th>Unit</th><th>Quantity</th><th>Unit Price</th><th>Total</th></tr>
+        <tr><td>Discovery & Assessment</td><td>Fixed</td><td>1</td><td class="page-editable" contenteditable="true">$X,XXX</td><td class="page-editable" contenteditable="true">$X,XXX</td></tr>
+        <tr><td>Architecture Design</td><td>Fixed</td><td>1</td><td class="page-editable" contenteditable="true">$X,XXX</td><td class="page-editable" contenteditable="true">$X,XXX</td></tr>
+        <tr><td>Infrastructure Build</td><td>Per host</td><td class="page-editable" contenteditable="true">[N]</td><td class="page-editable" contenteditable="true">$X,XXX</td><td class="page-editable" contenteditable="true">$XX,XXX</td></tr>
+        <tr><td>VM Migration (conversion + testing)</td><td>Per VM</td><td class="page-editable" contenteditable="true">[N]</td><td class="page-editable" contenteditable="true">$XXX</td><td class="page-editable" contenteditable="true">$XX,XXX</td></tr>
+        <tr><td>Cutover Support (weekend windows)</td><td>Per wave</td><td class="page-editable" contenteditable="true">[N]</td><td class="page-editable" contenteditable="true">$X,XXX</td><td class="page-editable" contenteditable="true">$XX,XXX</td></tr>
+        <tr><td>Knowledge Transfer & Training</td><td>Fixed</td><td>1</td><td class="page-editable" contenteditable="true">$X,XXX</td><td class="page-editable" contenteditable="true">$X,XXX</td></tr>
+        <tr><td>Hypercare Support (2 weeks)</td><td>Included</td><td>1</td><td>Included</td><td>$0</td></tr>
+        <tr><td>hyper2kvm Software License</td><td>Per project</td><td>1</td><td>Contact for pricing*</td><td><strong>Contact for pricing*</strong></td></tr>
+        <tr style="font-weight:700; background:#f0fdf4;"><td>TOTAL PROJECT COST</td><td></td><td></td><td></td><td class="page-editable" contenteditable="true">$XXX,XXX</td></tr>
+      </table>
+    </div>
+
+    <div class="highlight-box green">
+      <strong>Customer ROI Summary:</strong><br>
+      Annual VMware licensing eliminated: <span class="page-editable" contenteditable="true">$XXX,XXX</span>/yr<br>
+      Migration project investment: <span class="page-editable" contenteditable="true">$XXX,XXX</span> (one-time)<br>
+      <strong>Payback period: <span class="page-editable" contenteditable="true">[N]</span> months</strong><br>
+      5-year net savings: <span class="page-editable" contenteditable="true">$X.XM</span>
+    </div>
+  </div>
+
+  <!-- 10. References -->
+  <div class="section">
+    <h2>10. References & Case Studies</h2>
+    <div class="edit-note">Add your actual customer references here. Below are templates based on hyper2kvm documented case studies.</div>
+
+    <table>
+      <tr><th>Customer</th><th>Industry</th><th>VMs Migrated</th><th>Annual Savings</th><th>Contact</th></tr>
+      <tr><td class="page-editable" contenteditable="true">[Reference 1]</td><td class="page-editable" contenteditable="true">[Industry]</td><td class="page-editable" contenteditable="true">[N]</td><td class="page-editable" contenteditable="true">$XXX,XXX</td><td class="page-editable" contenteditable="true">[Name, Title, Email]</td></tr>
+      <tr><td class="page-editable" contenteditable="true">[Reference 2]</td><td class="page-editable" contenteditable="true">[Industry]</td><td class="page-editable" contenteditable="true">[N]</td><td class="page-editable" contenteditable="true">$XXX,XXX</td><td class="page-editable" contenteditable="true">[Name, Title, Email]</td></tr>
+      <tr><td class="page-editable" contenteditable="true">[Reference 3]</td><td class="page-editable" contenteditable="true">[Industry]</td><td class="page-editable" contenteditable="true">[N]</td><td class="page-editable" contenteditable="true">$XXX,XXX</td><td class="page-editable" contenteditable="true">[Name, Title, Email]</td></tr>
+    </table>
+  </div>
+
+  <!-- Appendix A -->
+  <div class="section" style="page-break-before: always;">
+    <h2>Appendix A: Detailed Technical Q&A</h2>
+
+    <div class="rfp-q">Q: What disk formats are supported for conversion?</div>
+    <div class="rfp-a">VMDK (all sub-formats: monolithic sparse, monolithic flat, split sparse, stream-optimized), OVA, OVF+VMDK, VHD, VHDX, RAW, QCOW2. Source format is auto-detected.</div>
+
+    <div class="rfp-q">Q: How are VM network configurations preserved?</div>
+    <div class="rfp-a">MAC addresses are preserved from OVF metadata, ensuring DHCP leases, license servers, and monitoring continue without changes. Network topology (VLAN assignments) is mapped to Linux bridge or OVS configurations. h2kvmctl auto-generates libvirt network XML from OVF NetworkSection.</div>
+
+    <div class="rfp-q">Q: Can you migrate VMs with snapshots?</div>
+    <div class="rfp-a">Yes. VMware snapshot chains are consolidated during export (govc export produces a flat image). The resulting image contains the latest state including all snapshots. We recommend consolidating snapshots in VMware before export for fastest processing.</div>
+
+    <div class="rfp-q">Q: How do you handle UEFI vs BIOS boot VMs?</div>
+    <div class="rfp-a">h2kvmctl auto-detects firmware type by examining the partition table (GPT = UEFI, MBR = BIOS) and OVF metadata. UEFI VMs use OVMF firmware (edk2-ovmf package). Secure Boot is supported with enrolled keys. Windows 11 VMs additionally get a virtual TPM 2.0 (swtpm).</div>
+
+    <div class="rfp-q">Q: What monitoring replaces vCenter after migration?</div>
+    <div class="rfp-a">We deploy Prometheus + Grafana + Alertmanager (all open-source, $0 cost) with pre-built dashboards for KVM host metrics, per-VM resource usage, capacity forecasting, and alerting. Optional: Loki for log aggregation (replaces vRealize Log Insight). Web-based management via Cockpit (included with RHEL/Rocky).</div>
+
+    <div class="rfp-q">Q: How does KVM high availability compare to vSphere HA?</div>
+    <div class="rfp-a">Pacemaker + Corosync provides equivalent automatic VM restart on host failure. With shared storage (Ceph or NFS), VMs are restarted on surviving hosts within 30-60 seconds. Live migration (virsh migrate --live) provides vMotion-equivalent functionality with sub-100ms downtime. Both 2-node (with quorum device) and 3+ node clusters are supported.</div>
+
+    <div class="rfp-q">Q: Can you migrate to KubeVirt (Kubernetes) instead of standalone KVM?</div>
+    <div class="rfp-a">Yes. h2kvmctl supports direct deployment to KubeVirt via the CDI (Containerized Data Importer). Converted QCOW2 images are uploaded as PersistentVolumeClaims, and VirtualMachine resources are created in the target namespace. This enables running VMs and containers on the same Kubernetes cluster with unified kubectl management, monitoring, and networking.</div>
+
+    <div class="rfp-q">Q: What is the ongoing cost of running KVM vs VMware?</div>
+    <div class="rfp-a">KVM (kernel module) and libvirt are included in every Linux distribution at no cost. Optional: RHEL subscription ($799/host/year) for vendor support, or use Rocky Linux / AlmaLinux for $0. There are no per-VM fees, no per-core fees, no per-socket fees, and no forced bundles. Hardware upgrades (more cores, more RAM) never increase software costs.</div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>Template powered by <a href="https://hyper2kvm.io">hyper2kvm</a> &bull; Proprietary (Zyvor AI Labs) &bull; Customize yellow fields, then print/save as PDF</p>
+  <p style="margin-top:4px;">All editable fields (yellow-highlighted) can be clicked and modified directly in the browser before printing.</p>
+</div>
+
+</body>
+</html>

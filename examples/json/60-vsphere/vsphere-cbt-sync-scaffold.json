@@ -1,0 +1,14 @@
+{
+  "command": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "vc_user": "administrator@vsphere.local",
+  "vc_password_env": "VC_PASSWORD",
+  "vc_insecure": true,
+  "vs_action": "cbt_sync",
+  "vm_name": "myVM",
+  "disk": 0,
+  "local_path": "./downloads/myVM-disk0.vmdk",
+  "enable_cbt": true,
+  "snapshot_name": "hyper2kvm-cbt",
+  "json": true
+}

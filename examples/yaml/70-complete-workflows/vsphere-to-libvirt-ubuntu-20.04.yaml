@@ -1,0 +1,85 @@
+# ============================================
+# Complete Workflow: vSphere → libvirt (Ubuntu 20.04 LTS)
+# ============================================
+# Description: Export Ubuntu 20.04 VM from vSphere and prepare for libvirt/KVM
+# Use Case: Production migration of Ubuntu 20.04 VMs from VMware to KVM
+#
+# Prerequisites:
+#   - govc or ovftool installed
+#   - pyvmomi: pip install pyvmomi
+#   - qemu-img: apt install qemu-utils
+#   - libguestfs: apt install libguestfs-tools
+#
+# Environment variables:
+#   export VC_PASSWORD='your-vcenter-password'
+#
+# Run:
+#   sudo -E h2kvmctl --config examples/yaml/70-complete-workflows/vsphere-to-libvirt-ubuntu-20.04.yaml
+# ============================================
+
+cmd: vsphere
+
+# vSphere Connection
+vcenter: vcenter.example.com
+vc_user: administrator@vsphere.local
+vc_password_env: VC_PASSWORD
+vc_insecure: true
+dc_name: Production-DC
+
+# VM Selection
+vm_name: ubuntu-2004-web-server
+
+# vSphere Export
+vs_action: export_vm
+export_mode: ovf_export
+vs_control_plane: govc
+govc_url: "https://vcenter.example.com/sdk"
+govc_password_env: VC_PASSWORD
+govc_insecure: true
+govc_datacenter: Production-DC
+govc_export_remove_cdroms: true
+
+# Snapshot before export
+vs_create_snapshot: true
+snapshot_name: pre-kvm-migration
+snapshot_memory: false
+
+# Disk Processing
+flatten: true
+to_output: ubuntu-2004-web-server.qcow2
+out_format: qcow2
+compress: true
+output_dir: /data/kvm
+
+# Guest Fixes
+regen_initramfs: true
+fstab_mode: stabilize-all
+remove_vmware_tools: true
+
+# libvirt Domain XML
+emit_domain_xml: true
+uefi: true
+ovmf_code: /usr/share/OVMF/OVMF_CODE.fd
+ovmf_vars_template: /usr/share/OVMF/OVMF_VARS.fd
+memory: 4096
+vcpus: 4
+machine: q35
+disk_bus: virtio
+disk_cache: none
+disk_io: native
+net_model: virtio
+libvirt_network: bridge:virbr0
+serial_console: true
+graphics: vnc
+graphics_listen: 127.0.0.1
+guest_os: linux
+
+# Validation
+libvirt_test: true
+timeout: 300
+dry_run: false
+
+# Reporting
+report: /var/log/migrations/ubuntu-2004.md
+enable_recovery: true
+verbose: 1

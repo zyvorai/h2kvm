@@ -1,0 +1,60 @@
+command: local
+vmdk: /home/ssahani/vmware/win10/win10.vmdk
+to_output: win10.qcow2
+out_format: qcow2
+compress: true
+
+# Windows VM indicator
+windows: true
+guest_os: windows
+
+# Note: VirtIO drivers will be skipped (not available)
+# They can be installed manually after migration or via Windows Update
+
+# Windows enterprise features
+windows_config:
+  # Phase 1: License Management
+  license:
+    extract: true
+    reactivate: true
+
+  # Phase 1: Active Directory (if domain-joined)
+  activedirectory:
+    extract_domain_info: true
+    rejoin_method: manual
+
+  # Phase 2: Application Compatibility Scanning
+  appcompat:
+    detect_hardware_apps: true
+    detect_license_services: true
+    detect_dongle_drivers: true
+    detect_sql_server: true
+    generate_report: true
+
+  # Phase 3: Performance Optimization
+  performance:
+    balloon:
+      enable: false  # Disabled (no VirtIO drivers)
+    trim:
+      enable: true
+      schedule_optimization: true
+    msi:
+      enable: false  # Disabled (no VirtIO drivers)
+    hyperv:
+      cleanup: false  # Auto-detect
+
+# Libvirt export options
+libvirt_test: true
+keep_domain: true
+vm_name: win10-vm
+memory: 4096
+vcpus: 2
+emit_domain_xml: true
+
+# Windows-specific libvirt options
+disk_bus: sata  # Use SATA instead of VirtIO (no drivers)
+net_model: e1000  # Use e1000 instead of VirtIO
+graphics: vnc
+graphics_listen: 0.0.0.0
+video: qxl
+win_localtime_clock: true

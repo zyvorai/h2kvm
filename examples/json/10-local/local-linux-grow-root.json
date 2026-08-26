@@ -1,0 +1,9 @@
+{
+  "command": "local",
+  "vmdk": "/path/to/linux.vmdk",
+  "resize": "+20G",
+  "to_output": "linux-grown.qcow2",
+  "compress": true,
+  "compress_level": 6,
+  "report": "local-linux-grow-report.md"
+}

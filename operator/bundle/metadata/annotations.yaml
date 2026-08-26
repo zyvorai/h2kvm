@@ -1,0 +1,27 @@
+annotations:
+  # Core bundle annotations
+  operators.operatorframework.io.bundle.mediatype.v1: registry+v1
+  operators.operatorframework.io.bundle.manifests.v1: manifests/
+  operators.operatorframework.io.bundle.metadata.v1: metadata/
+  operators.operatorframework.io.bundle.package.v1: hyperconversion-operator
+  operators.operatorframework.io.bundle.channels.v1: stable,alpha
+  operators.operatorframework.io.bundle.channel.default.v1: stable
+  operators.operatorframework.io.metrics.builder: operator-sdk-v1.34.1
+  operators.operatorframework.io.metrics.mediatype.v1: metrics+v1
+  operators.operatorframework.io.metrics.project_layout: go.kubebuilder.io/v4
+
+  # Annotations for OpenShift Container Platform
+  com.redhat.openshift.versions: "v4.12-v4.15"
+
+  # Operator maturity
+  operators.operatorframework.io/operator-type: standalone
+
+  # Infrastructure features
+  operators.operatorframework.io/arch.amd64: supported
+  operators.operatorframework.io/arch.arm64: supported
+  operators.operatorframework.io/arch.ppc64le: supported
+  operators.operatorframework.io/arch.s390x: supported
+  operators.operatorframework.io/os.linux: supported
+
+  # Disconnected support
+  operators.operatorframework.io/valid-subscription: '["OpenShift Container Platform", "OpenShift Kubernetes Engine", "Kubernetes"]'

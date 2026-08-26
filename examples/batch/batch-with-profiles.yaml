@@ -1,0 +1,38 @@
+# Batch manifest with profile-based conversions
+# Shows how to use different profiles for different VMs
+
+batch_version: "1.0"
+
+batch_metadata:
+  batch_id: "profile-demo-batch"
+  parallel_limit: 3
+  continue_on_error: true
+
+vms:
+  # Production server - use production profile for safety
+  - id: "prod-web-01"
+    manifest: "/work/prod-web-01/manifest.json"
+    priority: 0
+    overrides:
+      profile: "production"
+
+  # Development server - use testing profile for speed
+  - id: "dev-app-01"
+    manifest: "/work/dev-app-01/manifest.json"
+    priority: 1
+    overrides:
+      profile: "testing"
+
+  # Archived VM - use archive profile for max compression
+  - id: "archive-old-vm"
+    manifest: "/work/archive/manifest.json"
+    priority: 2
+    overrides:
+      profile: "archive"
+
+shared_config:
+  output_directory: "/converted"
+  network_mapping:
+    source_networks:
+      "VM Network": "br0"
+    mac_address_policy: "preserve"

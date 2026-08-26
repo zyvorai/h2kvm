@@ -1,0 +1,97 @@
+# Multi-Disk MigrationJob Example
+# Migrates a VM with multiple disks (OS + data disks)
+
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: migrate-multi-disk-vm
+  namespace: migrations
+spec:
+  # Multi-disk source
+  source:
+    type: multi-disk
+    disks:
+      # OS disk
+      - name: os-disk
+        type: vmdk-url
+        vmdk:
+          url: "https://storage.example.com/vm-os.vmdk"
+        bootOrder: 1
+        bus: virtio
+
+      # Data disk 1
+      - name: data-disk-1
+        type: vmdk-url
+        vmdk:
+          url: "https://storage.example.com/vm-data1.vmdk"
+        bus: virtio
+
+      # Data disk 2 (already in PVC)
+      - name: data-disk-2
+        type: vmdk-pvc
+        vmdk:
+          pvcName: existing-data-disk-2
+          path: disk.vmdk
+        bus: virtio
+
+  # Migration options (applied to all disks)
+  migration:
+    offlineFixes:
+      enabled: true
+      fstabMode: stabilize-all
+      grubFixes: true
+      initramfsRegen: true
+      initramfsModules:
+        - virtio_blk
+        - virtio_scsi
+        - virtio_net
+    conversion:
+      format: qcow2
+      compress: true
+
+  # Multiple destination PVCs
+  destination:
+    pvcs:
+      - name: multi-disk-vm-os
+        diskName: os-disk
+        storageClass: fast-ssd
+        size: 50Gi
+
+      - name: multi-disk-vm-data-1
+        diskName: data-disk-1
+        storageClass: standard
+        size: 100Gi
+
+      - name: multi-disk-vm-data-2
+        diskName: data-disk-2
+        storageClass: standard
+        size: 200Gi
+
+  # Create VM with all disks attached
+  createVM:
+    enabled: true
+    name: multi-disk-vm
+    cpu: "8"
+    memory: 16Gi
+    autoStart: true
+    evictionStrategy: LiveMigrate
+
+    # CPU topology
+    cpuConfig:
+      cores: 4
+      sockets: 2
+      threads: 1
+
+    # Additional disks beyond root disk
+    disks:
+      - name: data-disk-1
+        pvcName: multi-disk-vm-data-1
+        bootOrder: 2
+        bus: virtio
+
+      - name: data-disk-2
+        pvcName: multi-disk-vm-data-2
+        bootOrder: 3
+        bus: virtio
+
+  cleanupPolicy: OnSuccess

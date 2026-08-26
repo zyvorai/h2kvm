@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hyper2kvm - Enterprise VM Migration Toolkit</title>
+<style>
+  @page {
+    size: landscape;
+    margin: 0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    color: #1a1a1a;
+    background: white;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .slide {
+    width: 100vw;
+    height: 100vh;
+    padding: 50px 70px;
+    page-break-after: always;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .slide:last-child {
+    page-break-after: auto;
+  }
+
+  /* Title slide */
+  .slide.title-slide {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .slide.title-slide h1 {
+    font-size: 64pt;
+    color: #ff6600;
+    border: none;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+  }
+
+  .slide.title-slide .subtitle {
+    font-size: 22pt;
+    color: #ffb74d;
+    margin-bottom: 8px;
+    font-weight: 300;
+  }
+
+  .slide.title-slide .tagline {
+    font-size: 15pt;
+    color: #90a4ae;
+    margin-bottom: 40px;
+  }
+
+  .slide.title-slide .author {
+    font-size: 14pt;
+    color: #b0bec5;
+    margin-top: 20px;
+  }
+
+  .slide.title-slide .meta {
+    font-size: 11pt;
+    color: #78909c;
+    margin-top: 8px;
+  }
+
+  /* Section slides */
+  .slide.section-slide {
+    background: linear-gradient(135deg, #e65100 0%, #ff6600 100%);
+    color: white;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .slide.section-slide h2 {
+    font-size: 42pt;
+    color: white;
+    border: none;
+  }
+
+  .slide.section-slide p {
+    font-size: 16pt;
+    color: rgba(255,255,255,0.85);
+    margin-top: 15px;
+  }
+
+  /* End slide */
+  .slide.end-slide {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .slide.end-slide h2 {
+    font-size: 36pt;
+    color: #ff6600;
+    border: none;
+    margin-bottom: 15px;
+  }
+
+  .slide.end-slide .tagline {
+    font-size: 20pt;
+    color: #ffb74d;
+    font-style: italic;
+    margin-bottom: 40px;
+  }
+
+  .slide.end-slide .links {
+    font-size: 13pt;
+    color: #90a4ae;
+    line-height: 2;
+  }
+
+  .slide.end-slide .links strong {
+    color: #ff8a65;
+  }
+
+  /* Regular content slides */
+  h2 {
+    font-size: 26pt;
+    color: #e65100;
+    border-bottom: 3px solid #ff8a65;
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-size: 16pt;
+    color: #bf360c;
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  ul {
+    font-size: 14pt;
+    line-height: 1.8;
+    padding-left: 30px;
+  }
+
+  ul li {
+    margin-bottom: 4px;
+  }
+
+  li strong {
+    color: #d84315;
+  }
+
+  p {
+    font-size: 14pt;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 10px 0;
+    font-size: 12pt;
+  }
+
+  th {
+    background-color: #e65100;
+    color: white;
+    padding: 10px 16px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 9px 16px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  tr:nth-child(even) {
+    background-color: #fff3e0;
+  }
+
+  pre {
+    background-color: #1e1e2e;
+    color: #cdd6f4;
+    padding: 16px 22px;
+    border-radius: 8px;
+    font-size: 11pt;
+    line-height: 1.5;
+    border-left: 4px solid #ff6600;
+    overflow: hidden;
+    margin: 10px 0;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  }
+
+  .two-col {
+    display: flex;
+    gap: 40px;
+    flex: 1;
+  }
+
+  .two-col .col {
+    flex: 1;
+  }
+
+  .three-col {
+    display: flex;
+    gap: 25px;
+    flex: 1;
+  }
+
+  .three-col .col {
+    flex: 1;
+  }
+
+  .highlight-box {
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    border-left: 5px solid #ff6600;
+    padding: 18px 22px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+    font-size: 14pt;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin: 15px 0;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    border-top: 4px solid #ff6600;
+  }
+
+  .stat-card .number {
+    font-size: 28pt;
+    font-weight: 700;
+    color: #e65100;
+    display: block;
+  }
+
+  .stat-card .label {
+    font-size: 10pt;
+    color: #5d4037;
+    margin-top: 5px;
+    display: block;
+  }
+
+  .pipeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0;
+  }
+
+  .pipeline-step {
+    background: linear-gradient(135deg, #e65100, #ff6600);
+    color: white;
+    padding: 16px 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 11pt;
+    font-weight: 600;
+    min-width: 140px;
+  }
+
+  .pipeline-step .step-num {
+    font-size: 9pt;
+    opacity: 0.8;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .pipeline-arrow {
+    font-size: 24pt;
+    color: #ff6600;
+    font-weight: bold;
+  }
+
+  .source-box, .target-box {
+    background: #1a1a2e;
+    color: white;
+    padding: 16px 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 11pt;
+    min-width: 110px;
+  }
+
+  .target-box {
+    background: #2e7d32;
+  }
+
+  .badge {
+    display: inline-block;
+    background: #ff6600;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 10pt;
+    font-weight: 600;
+    margin: 2px;
+  }
+
+  .badge.green { background: #2e7d32; }
+  .badge.blue { background: #1565c0; }
+  .badge.purple { background: #6a1b9a; }
+
+  .slide-number {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+    font-size: 10pt;
+    color: #bdbdbd;
+  }
+
+  .logo-footer {
+    position: absolute;
+    bottom: 20px;
+    left: 40px;
+    font-size: 10pt;
+    color: #bdbdbd;
+  }
+
+  .perf-bar-container {
+    margin: 6px 0;
+  }
+  .perf-label {
+    font-size: 11pt;
+    margin-bottom: 3px;
+    color: #333;
+  }
+  .perf-bar {
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    font-size: 10pt;
+    font-weight: 600;
+    color: white;
+  }
+  .perf-bar.old { background: #90a4ae; }
+  .perf-bar.new { background: linear-gradient(90deg, #e65100, #ff6600); }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title -->
+<div class="slide title-slide">
+  <h1>hyper2kvm</h1>
+  <div class="subtitle">Enterprise-Grade VM Migration Toolkit</div>
+  <div class="tagline">Any Hypervisor &rarr; KVM with Zero-Downtime &amp; Automated Fixes</div>
+  <div class="author">ZyvorAI Labs Private Limited</div>
+  <div class="meta">Python 3.10+ &nbsp;|&nbsp; Proprietary (Zyvor AI Labs) &nbsp;|&nbsp; PyPI: hyper2kvm</div>
+</div>
+
+<!-- SLIDE 2: The Problem -->
+<div class="slide">
+  <h2>The Problem</h2>
+  <div class="content">
+    <p style="font-size:16pt; margin-bottom: 20px;">Migrating VMs between hypervisors is <strong>painful and error-prone</strong>:</p>
+    <div class="two-col">
+      <div class="col">
+        <ul>
+          <li><strong>Disk format incompatibility</strong> &mdash; VMDK, VHDX, VHD, OVA all need conversion</li>
+          <li><strong>Boot failures</strong> &mdash; wrong drivers, broken GRUB, stale fstab entries</li>
+          <li><strong>Manual intervention</strong> &mdash; trial-and-error fixing after each attempt</li>
+          <li><strong>No Windows support</strong> &mdash; VirtIO drivers must be injected manually</li>
+          <li><strong>No automation</strong> &mdash; each VM is a one-off effort</li>
+        </ul>
+      </div>
+      <div class="col" style="display:flex; align-items:center; justify-content:center;">
+        <div class="highlight-box" style="font-size:18pt; text-align:center; padding: 30px;">
+          Traditional approach:<br><br>
+          <span style="font-size: 28pt; color: #e65100;">Convert &rarr; Boot &rarr; Hope</span><br><br>
+          <span style="font-size: 12pt; color: #888;">&#10060; ~40% first-boot failure rate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hyper2kvm</div>
+  <div class="slide-number">2</div>
+</div>
+
+<!-- SLIDE 3: The Solution -->
+<div class="slide">
+  <h2>The Solution: hyper2kvm</h2>
+  <div class="content">
+    <div class="highlight-box" style="font-size: 16pt; text-align: center; margin-bottom: 20px;">
+      <strong>Deterministic offline fixes</strong> ensure <strong>first-boot success</strong> &mdash; every time.
+    </div>
+    <table>
+      <tr><th style="width:50%">Traditional Tools</th><th>hyper2kvm</th></tr>
+      <tr><td>&#10060; Convert disk format only</td><td>&#9989; Convert + deep inspection + repair</td></tr>
+      <tr><td>&#10060; "Boot and hope"</td><td>&#9989; Deterministic first-boot success</td></tr>
+      <tr><td>&#10060; Manual fixes required</td><td>&#9989; Automated bootloader, fstab, driver fixes</td></tr>
+      <tr><td>&#10060; Trial and error</td><td>&#9989; Validated pipeline with smoke tests</td></tr>
+      <tr><td>&#10060; Linux only</td><td>&#9989; Linux + Windows (35+ OS versions)</td></tr>
+      <tr><td>&#10060; Single VM at a time</td><td>&#9989; Batch processing + K8s deployment</td></tr>
+    </table>
+  </div>
+  <div class="logo-footer">hyper2kvm</div>
+  <div class="slide-number">3</div>
+</div>
+
+<!-- SLIDE 4: At a Glance -->
+<div class="slide">
+  <h2>At a Glance</h2>
+  <div class="content">
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="number">480+</span>
+        <span class="label">VMCraft APIs</span>
+      </div>
+      <div class="stat-card">
+        <span class="number">8</span>
+        <span class="label">Input Formats</span>
+      </div>
+      <div class="stat-card">
+        <span class="number">35+</span>
+        <span class="label">OS Versions</span>
+      </div>
+      <div class="stat-card">
+        <span class="number">380+</span>
+        <span class="label">Test Suite</span>
+      </div>
+      <div class="stat-card">
+        <span class="number">5-7x</span>
+        <span class="label">Faster Performance</span>
+      </div>
+      <div class="stat-card">
+        <span class="number">0.71s</span>
+        <span class="label">LVM Activation</span>
+      </div>
+      <div class="stat-card">
+        <span class="number">100%</span>
+        <span class="label">Host Protection</span>
+      </div>
+      <div class="stat-card">
+        <span class="number">0</span>
+        <span class="label">C Dependencies</span>
+      </div>
+    </div>
+    <div style="margin-top: 20px; text-align: center;">
+      <span class="badge">VMDK</span>
+      <span class="badge">OVA</span>
+      <span class="badge">OVF</span>
+      <span class="badge">VHD</span>
+      <span class="badge">VHDX</span>
+      <span class="badge">AMI</span>
+      <span class="badge">Azure VHD</span>
+      <span class="badge">Raw</span>
+      &nbsp;&nbsp;&rarr;&nbsp;&nbsp;
+      <span class="badge green">KVM</span>
+      <span class="badge green">libvirt</span>
+      <span class="badge green">KubeVirt</span>
+      <span class="badge green">OpenShift</span>
+      <span class="badge green">k3s</span>
+    </div>
+  </div>
+  <div class="logo-footer">hyper2kvm</div>
+  <div class="slide-number">4</div>
+</div>
+
+<!-- SLIDE 5: Architecture -->
+<div class="slide">
+  <h2>Architecture &amp; Pipeline</h2>
+  <div class="content" style="justify-content: center;">
+    <div class="pipeline">
+      <div class="source-box">
+        <strong>Source</strong><br>
+        VMware<br>Hyper-V<br>Azure<br>Raw/OVA
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <span class="step-num">STEP 1</span>
+        Disk<br>Conversion
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <span class="step-num">STEP 2</span>
+        VMCraft<br>Inspection
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <span class="step-num">STEP 3</span>
+        Offline<br>Fixes
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <span class="step-num">STEP 4</span>
+        Driver<br>Injection
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step" style="background: linear-gradient(135deg, #2e7d32, #43a047);">
+        <span class="step-num">STEP 5</span>
+        Validate<br>&amp; Test
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="target-box">
+        <strong>Target</strong><br>
+        KVM<br>libvirt<br>KubeVirt<br>OpenShift
+      </div>
+    </div>
+    <div style="margin-top: 30px;">
+      <h3>What Happens in Offline Fixes</h3>
+      <div class="three-col" style="margin-top: 10px;">
+        <div class="col">
+          <div class="highlight-box" style="font-size: 11pt; padding: 14px;">
+            <strong>Bootloader</strong><br>
+            GRUB/GRUB2 repair for VirtIO disk controllers. Ensures kernel boots with correct root device.
+          </div>
+        </div>
+        <div class="col">
+          <div class="highlight-box" style="font-size: 11pt; padding: 14px;">
+            <strong>Filesystem</strong><br>
+            fstab stabilization (UUID/PARTUUID), initramfs regeneration with VirtIO drivers.
+          </div>
+        </div>
+        <div class="col">
+          <div class="highlight-box" style="font-size: 11pt; padding: 14px;">
+            <strong>Networking</strong><br>
+            Interface config adaptation, udev rules cleanup, NetworkManager/systemd-networkd setup.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hyper2kvm</div>
+  <div class="slide-number">5</div>
+</div>
+
+<!-- SLIDE 6: VMCraft Engine -->
+<div class="slide">
+  <h2>VMCraft Engine</h2>
+  <div class="content">
+    <p><strong>Pure Python</strong> VM manipulation engine &mdash; 480+ API methods, zero C dependencies.</p>
+    <div class="two-col" style="margin-top: 10px;">
+      <div class="col">
+        <h3>Performance vs libguestfs</h3>
+        <div style="margin-top: 12px;">
+          <div class="perf-bar-container">
+            <div class="perf-label">Launch Time</div>
+            <div class="perf-bar old" style="width: 95%;">libguestfs: 9.7s</div>
+          </div>
+          <div class="perf-bar-container">
+            <div class="perf-bar new" style="width: 19%;">VMCraft: 1.9s</div>
+          </div>
+          <div class="perf-bar-container" style="margin-top: 12px;">
+            <div class="perf-label">Memory Usage</div>
+            <div class="perf-bar old" style="width: 95%;">libguestfs: 280 MB</div>
+          </div>
+          <div class="perf-bar-container">
+            <div class="perf-bar new" style="width: 33%;">VMCraft: 95 MB</div>
+          </div>
+          <div class="perf-bar-container" style="margin-top: 12px;">
+            <div class="perf-label">System Calls</div>
+            <div class="perf-bar old" style="width: 95%;">libguestfs: 14,200</div>
+          </div>
+          <div class="perf-bar-container">
+            <div class="perf-bar new" style="width: 57%;">VMCraft: 8,500</div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <h3>Code Example</h3>
+        <pre><code>from hyper2kvm.core.vmcraft import VMCraft
+
+with VMCraft() as g:
+    g.add_disk("/vms/server.qcow2")
+    g.launch()  # ~1.9 seconds
+
+    # Inspect OS
+    os_info = g.inspect_os()
+    print(f"OS: {os_info.product_name}")
+
+    # Read/write files
+    g.write("/etc/motd",
+            "Migrated to KVM!\n")
+
+    # Partition & LVM management
+    parts = g.list_partitions()
+    vgs = g.vglist()</code></pre>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hyper2kvm</div>
+  <div class="slide-number">6</div>
+</div>
+
+<!-- SLIDE 7: Key Features -->
+<div class="slide">
+  <h2>Key Features</h2>
+  <div class="content">
+    <div class="three-col">
+      <div class="col">
+        <h3>Automated Offline Fixes</h3>
+        <ul style="font-size: 12pt;">
+          <li><strong>GRUB/GRUB2</strong> bootloader repair</li>
+          <li><strong>fstab</strong> UUID stabilization</li>
+          <li><strong>initramfs</strong> regeneration with VirtIO</li>
+          <li><strong>Network</strong> interface adaptation</li>
+          <li><strong>SELinux</strong> relabeling</li>
+          <li><strong>LVM</strong> sandboxed activation</li>
+        </ul>
+        <h3 style="margin-top: 18px;">Live Fix (Zero Downtime)</h3>
+        <ul style="font-size: 12pt;">
+          <li>SSH-based remote fixes</li>
+          <li>No shutdown required</li>
+          <li>All fix types supported</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3>Windows Migration</h3>
+        <ul style="font-size: 12pt;">
+          <li><strong>VirtIO injection</strong> &mdash; storage, network, balloon, serial</li>
+          <li><strong>Registry</strong> &mdash; boot-critical driver registration</li>
+          <li><strong>License</strong> &mdash; OEM, Retail, MAK, KMS</li>
+          <li><strong>Active Directory</strong> &mdash; domain rejoin</li>
+          <li><strong>App compat</strong> &mdash; SQL Server, hardware-dependent apps</li>
+        </ul>
+        <p style="font-size: 11pt; margin-top: 12px;">
+          <span class="badge blue">Win 7-11</span>
+          <span class="badge blue">Server 2008 R2-2025</span><br>
+          <span class="badge blue" style="margin-top: 4px;">x64</span>
+          <span class="badge blue">x86</span>
+        </p>
+      </div>
+      <div class="col">
+        <h3>Validation & Testing</h3>
+        <ul style="font-size: 12pt;">
+          <li><strong>QEMU smoke test</strong> &mdash; automated boot verification</li>
+          <li><strong>libvirt test</strong> &mdash; full VM lifecycle test</li>
+          <li><strong>Health checks</strong> &mdash; post-migration validation</li>
+          <li><strong>Checksum</strong> &mdash; SHA256 integrity</li>
+        </ul>
+        <h3 style="margin-top: 18px;">Batch Processing</h3>
+        <ul style="font-size: 12pt;">
+          <li>Parallel multi-VM migration</li>
+          <li>Manifest-based orchestration</li>
+          <li>Progress tracking &amp; reporting</li>
+          <li>Rollback support</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hyper2kvm</div>
+  <div class="slide-number">7</div>
+</div>
+
+<!-- SLIDE 8: Supported Platforms -->
+<div class="slide">
+  <h2>Supported Platforms</h2>
+  <div class="content">
+    <div class="two-col">
+      <div class="col">
+        <h3>Linux Distributions</h3>
+        <table style="font-size: 11pt;">
+          <tr><th>Family</th><th>Versions</th></tr>
+          <tr><td>RHEL / CentOS</td><td>7, 8, 9</td></tr>
+          <tr><td>Fedora</td><td>Latest releases</td></tr>
+          <tr><td>Ubuntu</td><td>18.04 &ndash; 24.04</td></tr>
+          <tr><td>Debian</td><td>10, 11, 12</td></tr>
+          <tr><td>SUSE / openSUSE</td><td>15.x, Tumbleweed</td></tr>
+          <tr><td>Rocky / Alma Linux</td><td>8, 9</td></tr>
+          <tr><td>Oracle Linux</td><td>7, 8, 9</td></tr>
+          <tr><td>Amazon Linux</td><td>2, 2023</td></tr>
+          <tr><td>Photon OS</td><td>3, 4, 5</td></tr>
+          <tr><td>Flatcar / CoreOS</td><td>Latest</td></tr>
+        </table>
+      </div>
+      <div class="col">
+        <h3>Windows Versions</h3>
+        <table style="font-size: 11pt;">
+          <tr><th>Edition</th><th>Versions</th></tr>
+          <tr><td>Windows Desktop</td><td>7, 8, 8.1, 10, 11</td></tr>
+          <tr><td>Windows Server</td><td>2008 R2 &ndash; 2025</td></tr>
+          <tr><td>Architecture</td><td>x64 and x86</td></tr>
+        </table>
+        <h3 style="margin-top: 25px;">Deployment Targets</h3>
+        <div style="margin-top: 10px;">
+          <span class="badge green" style="font-size: 12pt; padding: 6px 14px;">libvirt / KVM</span>
+          <span class="badge green" style="font-size: 12pt; padding: 6px 14px;">KubeVirt</span><br>
+          <span class="badge green" style="font-size: 12pt; padding: 6px 14px; margin-top: 6px;">Kubernetes</span>
+          <span class="badge green" style="font-size: 12pt; padding: 6px 14px;">OpenShift</span>
+          <span class="badge green" style="font-size: 12pt; padding: 6px 14px;">k3s</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hyper2kvm</div>
+  <div class="slide-number">8</div>
+</div>
+
+<!-- SLIDE 9: Migration Workflow -->
+<div class="slide">
+  <h2>Migration Workflow</h2>
+  <div class="content">
+    <div class="three-col">
+      <div class="col">
+        <h3>Step 1: Configure (YAML)</h3>
+        <pre><code>cmd: local
+vmdk: /path/to/server.vmdk
+output_dir: /output
+to_output: server.qcow2
+out_format: qcow2
+fstab_mode: stabilize-all
+regen_initramfs: true
+no_grub: false
+libvirt_test: true</code></pre>
+      </div>
+      <div class="col">
+        <h3>Step 2: Run</h3>
+        <pre><code># One command migration
+sudo h2kvmctl \
+  --config migration.yaml</code></pre>
+        <h3 style="margin-top: 15px;">Step 3: Deploy</h3>
+        <pre><code># Deploy to libvirt
+sudo virsh define server.xml
+sudo virsh start server
+
+# Verify
+sudo virsh domifaddr server</code></pre>
+      </div>
+      <div class="col">
+        <h3>Or: Direct to K8s</h3>
+        <pre><code># One-command K8s deploy
+sudo h2kvmctl \
+  --config migration.yaml \
+  --deploy-k8s \
+  --k8s-namespace prod \
+  --k8s-vm-name web-01 \
+  --k8s-auto-start</code></pre>
+        <div class="highlight-box" style="font-size: 11pt; margin-top: 12px;">
+          <strong>Automated:</strong><br>
+          1. Convert + fix<br>
+          2. Upload to PVC<br>
+          3. Create KubeVirt VM<br>
+          4. Start &amp; verify
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hyper2kvm</div>
+  <div class="slide-number">9</div>
+</div>
+
+<!-- SLIDE 10: Enterprise Features -->
+<div class="slide">
+  <h2>Enterprise Features</h2>
+  <div class="content">
+    <div class="two-col">
+      <div class="col">
+        <h3>Security</h3>
+        <ul style="font-size: 12pt;">
+          <li><strong>LUKS / TPM2</strong> encryption support</li>
+          <li><strong>Host VG protection</strong> &mdash; 100% sandboxed LVM</li>
+          <li><strong>Secure boot</strong> compatibility</li>
+          <li><strong>SELinux</strong> relabeling on migration</li>
+        </ul>
+
+        <h3 style="margin-top: 18px;">LVM Safety</h3>
+        <div class="highlight-box" style="font-size: 11pt; padding: 12px;">
+          <strong>Problem:</strong> LVM activation can corrupt host VGs<br>
+          <strong>Solution:</strong> Sandboxed activation with auto host-exclusion<br>
+          <strong>Result:</strong> 0.71s activation, 7x faster, 100% safe
+        </div>
+
+        <h3 style="margin-top: 18px;">Daemon Mode</h3>
+        <ul style="font-size: 12pt;">
+          <li>systemd service integration</li>
+          <li>REST API for automation</li>
+          <li>Metrics and monitoring</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3>Kubernetes / OpenShift</h3>
+        <ul style="font-size: 12pt;">
+          <li>One-command K8s deployment</li>
+          <li>PVC creation &amp; upload</li>
+          <li>KubeVirt VM provisioning</li>
+          <li>OperatorHub integration</li>
+          <li>SecurityContextConstraints</li>
+          <li>Routes &amp; OAuth</li>
+          <li>OLM bundle packaging</li>
+        </ul>
+
+        <h3 style="margin-top: 18px;">Observability</h3>
+        <ul style="font-size: 12pt;">
+          <li><strong>TUI dashboard</strong> &mdash; Textual / Curses / CLI</li>
+          <li><strong>Progress bars</strong> with ETA tracking</li>
+          <li><strong>Debug bundles</strong> for troubleshooting</li>
+          <li><strong>Analytics</strong> &amp; reporting</li>
+        </ul>
+
+        <h3 style="margin-top: 18px;">Systemd Integration</h3>
+        <ul style="font-size: 12pt;">
+          <li>20 integrated systemd tools</li>
+          <li>Platform detection, disk inspection</li>
+          <li>Resource control, multi-stage testing</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hyper2kvm</div>
+  <div class="slide-number">10</div>
+</div>
+
+<!-- SLIDE 11: Getting Started -->
+<div class="slide">
+  <h2>Getting Started</h2>
+  <div class="content">
+    <div class="two-col">
+      <div class="col">
+        <h3>Installation</h3>
+        <pre><code># Install with all features
+pip install "hyper2kvm[full]"
+
+# Or minimal install
+pip install hyper2kvm</code></pre>
+
+        <h3 style="margin-top: 15px;">System Dependencies (Optional)</h3>
+        <pre><code># Fedora / RHEL
+sudo dnf install -y \
+  qemu-img qemu-system-x86
+
+# Ubuntu / Debian
+sudo apt-get install -y \
+  qemu-utils qemu-system-x86
+
+# Windows migration support
+sudo dnf install -y \
+  ntfs-3g libhivex-bin</code></pre>
+      </div>
+      <div class="col">
+        <h3>CLI Commands</h3>
+        <pre><code># Interactive CLI (recommended)
+h2kvmctl --version
+
+# Daemon / systemd mode
+hyper2kvm --version
+
+# Both are identical</code></pre>
+
+        <h3 style="margin-top: 15px;">Project Structure</h3>
+        <pre><code>hyper2kvm/
+  cli/           # Click-based CLI
+  core/          # VMCraft engine
+  converters/    # qemu-img wrappers
+  fixers/        # Offline fix modules
+    bootloader/  #   GRUB repair
+    windows/     #   VirtIO, registry
+    live/        #   SSH-based fixes
+  providers/     # VMware, Azure
+  orchestration/ # Batch, manifest
+  infrastructure/# K8s deployers
+  systemd/       # systemd tools
+  luks/          # Encryption</code></pre>
+      </div>
+    </div>
+  </div>
+  <div class="logo-footer">hyper2kvm</div>
+  <div class="slide-number">11</div>
+</div>
+
+<!-- SLIDE 12: Summary / End -->
+<div class="slide end-slide">
+  <h2>hyper2kvm</h2>
+  <div class="tagline">"Migrate Once, Boot Right."</div>
+  <table style="width: 70%; margin: 0 auto; font-size: 14pt; margin-bottom: 40px;">
+    <tr><td style="border-bottom: 1px solid #334; color: #ccc; padding: 10px;"><strong style="color: #ff8a65;">Deterministic</strong></td><td style="border-bottom: 1px solid #334; color: #aaa;">No more "boot and hope"</td></tr>
+    <tr><td style="border-bottom: 1px solid #334; color: #ccc;"><strong style="color: #ff8a65;">Comprehensive</strong></td><td style="border-bottom: 1px solid #334; color: #aaa;">35+ OS versions, 8 input formats</td></tr>
+    <tr><td style="border-bottom: 1px solid #334; color: #ccc;"><strong style="color: #ff8a65;">Fast</strong></td><td style="border-bottom: 1px solid #334; color: #aaa;">5-7x faster than traditional tools</td></tr>
+    <tr><td style="border-bottom: 1px solid #334; color: #ccc;"><strong style="color: #ff8a65;">Safe</strong></td><td style="border-bottom: 1px solid #334; color: #aaa;">100% host protection, sandboxed ops</td></tr>
+    <tr><td style="border-bottom: 1px solid #334; color: #ccc;"><strong style="color: #ff8a65;">Automated</strong></td><td style="border-bottom: 1px solid #334; color: #aaa;">One command: source &rarr; running VM</td></tr>
+    <tr><td style="border-bottom: 1px solid #334; color: #ccc;"><strong style="color: #ff8a65;">Cloud-native</strong></td><td style="border-bottom: 1px solid #334; color: #aaa;">Kubernetes, OpenShift, KubeVirt</td></tr>
+    <tr><td style="color: #ccc;"><strong style="color: #ff8a65;">Pure Python</strong></td><td style="color: #aaa;">Zero C dependencies, runs anywhere</td></tr>
+  </table>
+  <div class="links">
+    <strong>PyPI:</strong> pypi.org/project/hyper2kvm &nbsp;&nbsp;|&nbsp;&nbsp;
+    <strong>GitHub:</strong> github.com/ssahani/hyper2kvm &nbsp;&nbsp;|&nbsp;&nbsp;
+    <strong>License:</strong> Proprietary (Zyvor AI Labs)
+  </div>
+</div>
+
+</body>
+</html>

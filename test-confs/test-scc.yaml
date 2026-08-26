@@ -1,0 +1,55 @@
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: hyper2kvm-operator-scc
+  annotations:
+    kubernetes.io/description: "SCC for hyper2kvm operator allowing non-root with specific UID"
+# Allow specific user ID for operator
+allowPrivilegedContainer: false
+allowHostNetwork: false
+allowHostPorts: false
+allowHostPID: false
+allowHostIPC: false
+
+# Required capabilities drop
+requiredDropCapabilities:
+  - ALL
+
+# No additional capabilities
+allowedCapabilities: []
+defaultAddCapabilities: []
+
+# SELinux
+seLinuxContext:
+  type: MustRunAs
+
+# Run as user - allow any UID (OpenShift will assign from namespace range)
+runAsUser:
+  type: MustRunAsRange
+
+# FS Group
+fsGroup:
+  type: MustRunAs
+
+# Supplemental groups
+supplementalGroups:
+  type: RunAsAny
+
+# Read-only root filesystem
+readOnlyRootFilesystem: true
+
+# Volumes
+volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - persistentVolumeClaim
+  - projected
+  - secret
+
+# Users and groups - grant to operator ServiceAccount
+users:
+  - system:serviceaccount:hyper2kvm-test:hyper2kvm-operator
+groups: []
+
+priority: 10

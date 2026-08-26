@@ -1,0 +1,102 @@
+# Windows Enterprise Migration with License and Active Directory Support
+#
+# This example demonstrates the advanced Windows features introduced in v0.3.0:
+#   - License preservation and reactivation (MAK, KMS, Retail, OEM)
+#   - Active Directory domain rejoin automation
+#   - Comprehensive Windows enterprise migration workflow
+#
+# Run with:
+#   h2kvmctl --config 10-local/local-windows-enterprise.yaml
+
+# Basic migration settings
+command: local
+vmdk: /path/to/windows-server-2022.vmdk
+to_output: windows-server-2022-kvm.qcow2
+compress: true
+checksum: true
+report: windows-enterprise-report.md
+verbose: 2
+
+# VirtIO driver injection
+# optional — auto-discovered at /var/lib/hyper2kvm/virtio-win.iso
+virtio_drivers_dir: /path/to/virtio-win
+enable_virtio_gpu: false
+enable_virtio_input: false
+enable_virtio_fs: false
+enable_virtio_serial: false
+enable_virtio_rng: true
+
+# Windows-specific configuration
+windows:
+  # License management (v0.3.0+)
+  license:
+    # Extract and preserve license information
+    preserve: true
+
+    # Automatically reactivate license on first boot
+    reactivate: true
+
+    # Optional: Override detected license type
+    # Options: KMS, MAK, Retail, OEM, null (auto-detect)
+    force_type: null
+
+    # Optional: Override KMS server for KMS licenses
+    # kms_server: kms.example.com
+    # kms_port: 1688
+
+  # Active Directory integration (v0.3.0+)
+  active_directory:
+    # Enable AD domain rejoin automation
+    enabled: true
+
+    # Domain rejoin configuration
+    rejoin:
+      # Rejoin method: 'credential', 'unattended', 'manual'
+      # - credential: Automated rejoin with stored credentials (requires credentials.xml)
+      # - unattended: Offline domain join using djoin.exe (requires pre-provisioned join file)
+      # - manual: Create desktop instructions for manual rejoin (safe default)
+      method: manual
+
+      # Optional: Override detected domain name
+      # domain: example.com
+
+      # Optional: Specify OU path for computer object
+      # ou_path: "OU=Migrated,OU=Servers,DC=example,DC=com"
+
+      # Optional: Credential source for 'credential' method
+      # Options: 'vault', 'config', 'prompt'
+      # credential_source: vault
+      # vault_path: "secret/windows/domain-join"
+
+    # Offline domain join configuration (alternative to credential-based)
+    unattended_join:
+      enabled: false
+      # Path to djoin.exe output file (from domain controller)
+      # Pre-migration step: Run on DC: djoin.exe /provision /domain example.com /machine SERVER01 /savefile server01-join.txt
+      # file: /path/to/server01-join.txt
+
+    # Manual rejoin options
+    manual:
+      # Create desktop reminder with instructions
+      create_reminder: true
+
+# Offline fixing options
+no_grub: false
+regen_initramfs: true
+remove_vmware_tools: true
+fstab_mode: stabilize-all
+
+# Output format
+flatten: true
+flatten_format: qcow2
+out_format: qcow2
+compress_level: 6
+
+# Testing (post-conversion validation)
+qemu_test: false
+libvirt_test: false
+timeout: 120
+
+# Recovery options
+enable_recovery: true
+no_backup: false

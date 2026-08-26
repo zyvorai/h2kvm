@@ -1,0 +1,6 @@
+{
+  "command": "local",
+  "vmdk": "/path/to/linux.vmdk",
+  "to_output": "linux-fixed.qcow2",
+  "report": "local-linux-report.md"
+}

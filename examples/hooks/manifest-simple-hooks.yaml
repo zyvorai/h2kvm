@@ -1,0 +1,64 @@
+manifest_version: "1.0"
+description: "Simple example with script-based hooks for notifications"
+
+source:
+  provider: "vmware-workstation"
+  vm_name: "dev-vm"
+
+disks:
+  - id: "boot"
+    source_format: "vmdk"
+    local_path: "/data/vms/dev-vm/boot.vmdk"
+    bytes: 21474836480
+    boot_order_hint: 0
+    disk_type: "boot"
+
+firmware:
+  type: "bios"
+
+os_hint: "ubuntu22"
+
+# Simple notification hooks
+hooks:
+  pre_extraction:
+    - type: script
+      path: /usr/local/bin/notify-migration-start.sh
+      env:
+        VM_NAME: "{{ vm_name }}"
+        STAGE: "{{ stage }}"
+      timeout: 60
+      continue_on_error: true
+
+  post_convert:
+    - type: script
+      path: /usr/local/bin/notify-migration-complete.sh
+      env:
+        VM_NAME: "{{ vm_name }}"
+        OUTPUT_PATH: "{{ output_path }}"
+      timeout: 60
+      continue_on_error: true
+
+  post_validate:
+    - type: script
+      path: /usr/local/bin/migration-cleanup.sh
+      args:
+        - "{{ vm_name }}"
+        - "{{ output_dir }}"
+      working_directory: /tmp
+      timeout: 120
+      continue_on_error: true
+
+pipeline:
+  fix:
+    enabled: true
+    backup: false
+    regen_initramfs: true
+  convert:
+    enabled: true
+    compress: false
+  validate:
+    enabled: true
+
+output:
+  directory: /converted
+  format: qcow2

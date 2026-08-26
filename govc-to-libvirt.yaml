@@ -1,0 +1,94 @@
+# ============================================
+# End-to-End: vCenter → govc export → libvirt
+# ============================================
+# Single-command pipeline using govc (no ovftool needed):
+#
+#   vCenter VM
+#     ↓  govc export.ovf (NFC streaming)
+#   OVF + VMDK
+#     ↓  qemu-img convert (flatten + compress)
+#   qcow2
+#     ↓  libguestfs offline fixes
+#   Fixed qcow2 (fstab, initramfs + virtio, vmware-tools removed)
+#     ↓  emit libvirt domain XML + virsh define
+#   libvirt VM
+#     ↓  boot test
+#   Running VM on KVM
+#
+# The entire pipeline runs in a single command — govc export
+# automatically chains into conversion, guest fixes, and libvirt import.
+#
+# Prerequisites:
+#   curl -L https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x86_64.tar.gz \
+#     | sudo tar xzf - -C /usr/local/bin govc
+#   pip install pyvmomi
+#   dnf install qemu-img libguestfs-tools edk2-ovmf libvirt-daemon
+#
+# Or install everything at once:
+#   sudo ./scripts/install-deps.sh
+#
+# Discover VMs:
+#   export GOVC_URL='https://10.73.213.134/sdk'
+#   export GOVC_USERNAME='administrator@vsphere.local'
+#   export GOVC_PASSWORD='VCENTER@redhat2025'
+#   export GOVC_INSECURE=1 GOVC_DATACENTER='data'
+#   govc ls /data/vm/
+#
+# Usage:
+#   sudo ./h2kvmctl --config govc-to-libvirt.yaml
+# ============================================
+
+cmd: vsphere
+
+# ── vCenter connection ──
+vcenter: 10.73.213.134
+vc_user: administrator@vsphere.local
+vc_password: VCENTER@redhat2025
+vc_insecure: true
+dc_name: data
+
+# ── govc export (NFC) ──
+vs_action: export_vm
+export_mode: ovf_export
+vs_control_plane: govc
+govc_url: "https://10.73.213.134/sdk"
+govc_insecure: true
+govc_datacenter: data
+govc_export_remove_cdroms: true
+
+# ── VM to export (edit this) ──
+vm_name: esx8.0-rhel10.2-x86_64-efi
+
+# ── Disk processing ──
+output_dir: ./output-govc-e2e
+flatten: true
+to_output: govc-vm.qcow2
+out_format: qcow2
+compress: true
+
+# ── Guest fixes ──
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+
+# ── libvirt domain XML ──
+emit_domain_xml: true
+virsh_define: true
+memory: 2048
+vcpus: 2
+uefi: true
+machine: q35
+disk_bus: virtio
+disk_cache: none
+net_model: virtio
+libvirt_network: default
+serial_console: true
+graphics: vnc
+guest_os: linux
+
+# ── Boot test ──
+libvirt_test: true
+keep_domain: true
+timeout: 120
+
+verbose: 1

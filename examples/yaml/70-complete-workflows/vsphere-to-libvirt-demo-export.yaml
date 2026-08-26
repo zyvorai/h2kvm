@@ -1,0 +1,93 @@
+# ============================================
+# Demo: vSphere Export → libvirt
+# ============================================
+#
+# Prerequisites:
+#
+#   1. Install govc (VMware govmomi CLI):
+#      # Fedora/RHEL/CentOS
+#      curl -L -o /usr/local/bin/govc \
+#        https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x86_64.tar.gz
+#      # Or extract from tarball:
+#      curl -L https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x86_64.tar.gz \
+#        | tar xzf - -C /usr/local/bin govc
+#      chmod +x /usr/local/bin/govc
+#
+#   2. (Optional) Install OVF Tool for ovftool_export mode:
+#      Download from https://developer.broadcom.com/tools/open-virtualization-format-ovf-tool/latest
+#      export PATH=/opt/ovftool:$PATH
+#
+#   3. Install pyvmomi (vSphere Python SDK):
+#      pip install pyvmomi
+#      # Or install hyper2kvm with vSphere support:
+#      pip install hyper2kvm[vsphere]
+#
+#   4. Install qemu-img (for VMDK → qcow2 conversion):
+#      # Fedora/RHEL
+#      dnf install qemu-img
+#      # Debian/Ubuntu
+#      apt install qemu-utils
+#
+#   5. Install libguestfs (for offline guest fixes):
+#      # Fedora/RHEL
+#      dnf install libguestfs-tools
+#      # Debian/Ubuntu
+#      apt install libguestfs-tools
+#
+# Configuration via environment variables:
+#
+#   export VCENTER_HOST=vcenter.example.com
+#   export VCENTER_USERNAME=administrator@vsphere.local
+#   export VCENTER_PASSWORD=your-password
+#   export VCENTER_DATACENTER=Production-DC
+#   export VCENTER_VM_NAME=production-web
+#
+# Run:
+#   h2kvmctl --config examples/yaml/70-complete-workflows/vsphere-to-libvirt-demo-export.yaml
+#
+# ============================================
+
+cmd: vsphere
+
+# vSphere Connection (from environment variables)
+vcenter: ${VCENTER_HOST}
+vc_user: ${VCENTER_USERNAME}
+vc_password_env: VCENTER_PASSWORD
+vc_insecure: true
+
+# Datacenter and VM selection
+dc_name: ${VCENTER_DATACENTER}
+vm_name: ${VCENTER_VM_NAME}
+
+# vSphere Action — uses govc for OVF export (recommended)
+# Alternative: vs_action: ovftool_export (requires OVF Tool installed)
+vs_action: export_vm
+export_mode: ovf_export
+vs_control_plane: govc
+govc_url: "https://${VCENTER_HOST}/sdk"
+govc_password_env: VCENTER_PASSWORD
+govc_insecure: true
+govc_datacenter: ${VCENTER_DATACENTER}
+govc_export_remove_cdroms: true
+
+# Disk Processing
+flatten: true
+to_output: ${VCENTER_VM_NAME}.qcow2
+out_format: qcow2
+compress: true
+output_dir: /data/exports
+
+# Guest Fixes
+regen_initramfs: true
+fstab_mode: stabilize-all
+
+# libvirt domain XML generation
+emit_domain_xml: true
+uefi: true
+memory: 4096
+vcpus: 4
+
+# Validation
+dry_run: false
+
+verbose: 1

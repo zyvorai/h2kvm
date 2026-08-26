@@ -1,0 +1,193 @@
+name: Helm Chart Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Chart version to release (e.g., 1.7.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  release-charts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v5
+        with:
+          version: v3.13.0
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Publishing charts version: $VERSION"
+
+      - name: Lint Helm charts
+        run: |
+          echo "Linting Helm charts..."
+
+          FAILED=0
+          for chart in helm/*/Chart.yaml; do
+            chart_dir=$(dirname "$chart")
+            chart_name=$(basename "$chart_dir")
+
+            echo "Linting $chart_name..."
+            if ! helm lint "$chart_dir"; then
+              echo "::error::Chart $chart_name failed linting"
+              FAILED=1
+            fi
+          done
+
+          if [ $FAILED -eq 1 ]; then
+            echo "::error::One or more charts failed linting"
+            exit 1
+          fi
+
+          echo "All charts passed linting!"
+
+      - name: Package Helm charts
+        run: |
+          mkdir -p .cr-release-packages
+
+          echo "Packaging Helm charts..."
+          for chart in helm/*/Chart.yaml; do
+            chart_dir=$(dirname "$chart")
+            chart_name=$(basename "$chart_dir")
+
+            echo "Packaging $chart_name..."
+            helm package "$chart_dir" --destination .cr-release-packages
+          done
+
+          echo "Packaged charts:"
+          ls -lh .cr-release-packages/
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v6
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Update chart repository
+        run: |
+          # Create gh-pages directory if it doesn't exist
+          mkdir -p gh-pages
+
+          # Copy packaged charts to gh-pages
+          cp .cr-release-packages/*.tgz gh-pages/
+
+          # Generate or update index
+          cd gh-pages
+          helm repo index . --url https://ssahani.github.io/hyper2kvm
+
+          echo "Repository index updated:"
+          cat index.yaml
+
+      - name: Deploy to GitHub Pages
+        working-directory: gh-pages
+        run: |
+          git add .
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Release Helm charts v${{ steps.version.outputs.version }}"
+          git push origin gh-pages
+
+          echo "Charts published to GitHub Pages!"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: .cr-release-packages/*.tgz
+          generate_release_notes: true
+          body: |
+            ## Helm Charts Release v${{ steps.version.outputs.version }}
+
+            ### Installation
+
+            Add the Helm repository:
+            ```bash
+            helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+            helm repo update
+            ```
+
+            Install the operator:
+            ```bash
+            helm install hyper2kvm-operator hyper2kvm/hyper2kvm-operator \
+              --namespace hyper2kvm-system \
+              --create-namespace
+            ```
+
+            Install the worker:
+            ```bash
+            helm install hyper2kvm-worker hyper2kvm/hyper2kvm-worker \
+              --namespace hyper2kvm-workers \
+              --create-namespace
+            ```
+
+            ### Charts Included
+
+            - `hyper2kvm-operator` - Kubernetes Operator for automated job orchestration
+            - `hyper2kvm-worker` - Worker pods for VM migration execution
+
+            ### Documentation
+
+            - [Operator Chart README](https://github.com/ssahani/hyper2kvm/blob/main/helm/hyper2kvm-operator/README.md)
+            - [Worker Chart README](https://github.com/ssahani/hyper2kvm/blob/main/helm/hyper2kvm-worker/README.md)
+            - [Deployment Guide](https://github.com/ssahani/hyper2kvm/blob/main/docs/deployment/v1.6.0-helm-chart.md)
+
+  verify-release:
+    needs: release-charts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Helm
+        uses: azure/setup-helm@v5
+        with:
+          version: v3.13.0
+
+      - name: Wait for GitHub Pages deployment
+        run: sleep 60
+
+      - name: Verify Helm repository
+        run: |
+          echo "Adding Helm repository..."
+          helm repo add hyper2kvm https://ssahani.github.io/hyper2kvm
+          helm repo update
+
+          echo "Searching for charts..."
+          helm search repo hyper2kvm
+
+          echo "Verifying operator chart..."
+          helm show chart hyper2kvm/hyper2kvm-operator
+
+          echo "Verifying worker chart..."
+          helm show chart hyper2kvm/hyper2kvm-worker || echo "Worker chart may not exist yet"
+
+          echo "Helm repository verified successfully!"

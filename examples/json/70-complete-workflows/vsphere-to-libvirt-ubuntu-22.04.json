@@ -1,0 +1,91 @@
+# ============================================
+# Complete Workflow: vSphere → libvirt (Ubuntu 22.04 LTS)
+# ============================================
+# Description: Export Ubuntu 22.04 VM from vSphere and prepare for libvirt/KVM
+# Use Case: Modern Ubuntu LTS migration with cloud-init support
+# Prerequisites:
+#   - govc installed
+#   - vCenter/ESXi access
+#   - Sufficient disk space for conversion
+# ============================================
+{
+  "cmd": "vsphere",
+  "vcenter": "vcenter.example.com",
+  "username": "administrator@vsphere.local",
+  "password_file": "~/.vcenter_password",
+  "datacenter": "Production-DC",
+  "vm_name": "ubuntu-2204-app-server",
+  "vs_action": "export",
+  "export_method": "govc",
+  "export_format": "ova",
+  "create_snapshot": true,
+  "snapshot_name": "migration-snapshot-$(date +%Y%m%d)",
+  "snapshot_memory": false,
+  "snapshot_quiesce": true,
+  "delete_snapshot_after": true,
+  "flatten": true,
+  "compress": true,
+  "fix_fstab": true,
+  "fix_grub": true,
+  "fix_initramfs": true,
+  "fix_network": true,
+  "remove_vmware_tools": true,
+  "network_config_type": "netplan",
+  "network_renderer": "networkd",
+  "network_fix_level": "full",
+  "remove_mac_binding": true,
+  "setup_dhcp": true,
+  "preserve_network_config": false,
+  "bootloader_type": "grub2",
+  "firmware_type": "uefi",
+  "regenerate_grub": true,
+  "update_grub_config": true,
+  "grub_timeout": 5,
+  "update_initramfs": true,
+  "install_virtio_modules": true,
+  "initramfs_tools_config": true,
+  "cloud_init_support": true,
+  "clean_cloud_init": false,
+  "cloud_init_datasource": "NoCloud",
+  "clean_ssh_keys": false,
+  "clean_machine_id": true,
+  "preserve_hostname": true,
+  "to_output": "/data/kvm/ubuntu-2204-app-server.qcow2",
+  "output_format": "qcow2",
+  "generate_libvirt_xml": true,
+  "libvirt_xml_path": "/data/kvm/ubuntu-2204-app-server.xml",
+  "libvirt_domain_name": "ubuntu-2204-app-server",
+  "memory_mb": 8192,
+  "vcpus": 8,
+  "cpu_mode": "host-passthrough",
+  "cpu_topology": {
+    "sockets": 1,
+    "cores": 4,
+    "threads": 2
+  },
+  "uefi_loader": "/usr/share/OVMF/OVMF_CODE.fd",
+  "uefi_nvram_template": "/usr/share/OVMF/OVMF_VARS.fd",
+  "secure_boot": false,
+  "disk_bus": "virtio",
+  "disk_cache": "writeback",
+  "disk_io": "threads",
+  "disk_discard": "unmap",
+  "network_type": "bridge",
+  "network_bridge": "br0",
+  "network_model": "virtio",
+  "network_mtu": 1500,
+  "enable_serial_console": true,
+  "enable_vnc": true,
+  "vnc_password": false,
+  "qemu_guest_agent": true,
+  "libvirt_test": true,
+  "boot_timeout": 300,
+  "dry_run": false,
+  "report": "/var/log/migrations/ubuntu-2204-app-$(date +%Y%m%d-%H%M%S).md",
+  "log_level": "INFO",
+  "post_migration_commands": [
+    "virsh define /data/kvm/ubuntu-2204-app-server.xml",
+    "virsh start ubuntu-2204-app-server",
+    "virsh console ubuntu-2204-app-server"
+  ]
+}

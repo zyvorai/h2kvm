@@ -1,0 +1,50 @@
+---
+apiVersion: hyper2kvm.io/v1alpha1
+kind: MigrationJob
+metadata:
+  name: centos9-with-live-migrate
+  namespace: default
+spec:
+  source:
+    type: vmdk-url
+    vmdk:
+      url: "https://example.com/centos9.vmdk"
+
+  destination:
+    pvcName: centos9-disk
+    storageClass: local-path
+    size: 20Gi
+
+  migration:
+    conversion:
+      format: qcow2
+      compress: true
+    offlineFixes:
+      enabled: true
+      fstabMode: stabilize-all
+      grubFixes: true
+      initramfsRegen: true
+
+  # Create VM with LiveMigrate eviction strategy
+  createVM:
+    enabled: true
+    name: centos9
+    cpu: "4"
+    memory: 4Gi
+    autoStart: true
+    networkType: masquerade
+
+    # Enable automatic live migration on node eviction
+    evictionStrategy: LiveMigrate
+
+    # Reference migration policy
+    migrationPolicyRef: default-migration-policy
+
+    # Resource requests and limits
+    resources:
+      requests:
+        cpu: "2"
+        memory: 4Gi
+      limits:
+        cpu: "4"
+        memory: 8Gi

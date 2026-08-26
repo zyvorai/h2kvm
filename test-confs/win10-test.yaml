@@ -1,0 +1,14 @@
+command: local
+vmdk: /home/ssahani/vmware/win10/win10.vmdk
+output_dir: ./out
+to_output: win10-test.qcow2
+out_format: qcow2
+compress: true
+windows: true
+guest_os: windows
+disk_bus: sata
+net_model: e1000
+vm_name: win10-test
+emit_domain_xml: true
+win_localtime_clock: true
+verbose: true

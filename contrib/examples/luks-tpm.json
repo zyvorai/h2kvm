@@ -1,0 +1,9 @@
+{
+  "$schema": "https://hyper2kvm.io/schemas/luks-config.json",
+  "description": "TPM2-only LUKS auto-unlock configuration",
+
+  "tpm_handle": "0x81000010",
+
+  "comment": "This configuration uses TPM2 for automatic unlock.",
+  "comment2": "The key must be sealed to the TPM using: hyper2kvm-luks seal <keyfile>"
+}

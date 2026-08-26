@@ -1,0 +1,287 @@
+# SPDX-License-Identifier: Apache-2.0
+# hyper2kvm Windows YAML examples: VirtIO drivers + Windows network override variants
+#
+# These are *examples* of the shapes you can support. Your orchestrator can:
+#  - read `windows_virtio` (drivers + PNP IDs) and build the injection plan
+#  - accept Windows network override in THREE ways:
+#       (1) win_net_override: /path/to/file.json
+#       (2) win_net_json: '{"schema":1,...}' inline JSON string
+#       (3) win_net: {schema: 1, ...} native YAML object (preferred)
+#
+# ------------------------------------------------------------------------------------
+# 0) COMMON BASE (Windows local VMDK)
+# ------------------------------------------------------------------------------------
+cmd: local
+vmdk: /images/windows.vmdk
+output_dir: ./out
+flatten: true
+to_output: windows-kvm.qcow2
+out_format: qcow2
+compress: true
+checksum: true
+guest_os: windows
+virtio_drivers_dir: /opt/virtio-win   # unpacked virtio-win driver tree
+verbose: 2
+
+# ------------------------------------------------------------------------------------
+# 1) WINDOWS VIRTIO DRIVERS: MINIMAL (storage + net only)
+# ------------------------------------------------------------------------------------
+windows_virtio:
+  default_os_bucket: win11
+
+  # OS bucket mapping by build numbers (Windows 8.1+)
+  os_buckets:
+    win11:
+      min_build: 22000
+    win10:
+      min_build: 10240
+      max_build: 21999
+    win2019:
+      min_build: 17763
+      max_build: 17763
+
+  # Roles are the *capabilities* your code knows how to install + registry-enable.
+  # Each role provides INF discovery + PNP IDs for CriticalDeviceDatabase.
+  roles:
+    storage_virtio_scsi:
+      inf_globs:
+        - "vioscsi\\**\\*.inf"
+      pnp_ids:
+        - "PCI\\VEN_1AF4&DEV_1004"
+    storage_virtio_blk:
+      inf_globs:
+        - "viostor\\**\\*.inf"
+      pnp_ids:
+        - "PCI\\VEN_1AF4&DEV_1001"
+    net_virtio:
+      inf_globs:
+        - "NetKVM\\**\\*.inf"
+      pnp_ids:
+        - "PCI\\VEN_1AF4&DEV_1000"
+
+# ------------------------------------------------------------------------------------
+# 2) WINDOWS VIRTIO DRIVERS: FULL "TYPICAL" SET (storage + net + balloon + rng + serial)
+# ------------------------------------------------------------------------------------
+# (Use when you want a “fully virtio-ed” guest from day 1.)
+#
+# Tip: keep this list data-driven; vendors differ; Windows versions differ.
+#
+windows_virtio:
+  default_os_bucket: win11
+  os_buckets:
+    win11: { min_build: 22000 }
+    win10: { min_build: 10240, max_build: 21999 }
+    win2016: { min_build: 14393, max_build: 14393 }
+    win2019: { min_build: 17763, max_build: 17763 }
+    win2022: { min_build: 20348, max_build: 20348 }
+
+  roles:
+    # --- storage ---
+    storage_virtio_scsi:
+      inf_globs: ["vioscsi\\**\\*.inf"]
+      pnp_ids: ["PCI\\VEN_1AF4&DEV_1004"]
+    storage_virtio_blk:
+      inf_globs: ["viostor\\**\\*.inf"]
+      pnp_ids: ["PCI\\VEN_1AF4&DEV_1001"]
+
+    # --- network ---
+    net_virtio:
+      inf_globs: ["NetKVM\\**\\*.inf"]
+      pnp_ids: ["PCI\\VEN_1AF4&DEV_1000"]
+
+    # --- “quality of life” virtio-ish devices ---
+    balloon:
+      inf_globs: ["Balloon\\**\\*.inf"]
+      pnp_ids: ["PCI\\VEN_1AF4&DEV_1002"]   # example (balloon)
+
+    rng:
+      inf_globs: ["viorng\\**\\*.inf"]
+      pnp_ids: ["PCI\\VEN_1AF4&DEV_1005"]   # example (rng)
+
+    serial:
+      inf_globs: ["vioserial\\**\\*.inf"]
+      pnp_ids: ["PCI\\VEN_1AF4&DEV_1003"]   # example (virtio-serial)
+
+# ------------------------------------------------------------------------------------
+# 3) WINDOWS VIRTIO DRIVERS: OEM/VENDOR OVERRIDES (custom PNP IDs)
+# ------------------------------------------------------------------------------------
+# Some vendors ship different SUBSYS values or even different DEV IDs.
+# This example shows a "vendor profile" that overrides just the NIC IDs.
+#
+windows_virtio:
+  default_os_bucket: win11
+  os_buckets:
+    win11: { min_build: 22000 }
+    win10: { min_build: 10240, max_build: 21999 }
+
+  roles:
+    storage_virtio_scsi:
+      inf_globs: ["vioscsi\\**\\*.inf"]
+      pnp_ids: ["PCI\\VEN_1AF4&DEV_1004"]
+    storage_virtio_blk:
+      inf_globs: ["viostor\\**\\*.inf"]
+      pnp_ids: ["PCI\\VEN_1AF4&DEV_1001"]
+    net_virtio:
+      inf_globs: ["NetKVM\\**\\*.inf"]
+      # baseline IDs (Red Hat)
+      pnp_ids:
+        - "PCI\\VEN_1AF4&DEV_1000"
+
+  vendors:
+    acme-oem:
+      roles:
+        net_virtio:
+          # override/add PNP IDs for the OEM NIC
+          pnp_ids:
+            - "PCI\\VEN_1AF4&DEV_1000&SUBSYS_00000001"
+            - "PCI\\VEN_1AF4&DEV_1000&SUBSYS_12345678"
+
+  # Which vendor profile to apply (optional):
+  active_vendor: acme-oem
+
+# ------------------------------------------------------------------------------------
+# 4) WINDOWS VIRTIO DRIVERS: PER-VM OVERRIDE (multi-VM batch)
+# ------------------------------------------------------------------------------------
+parallel_processing: true
+vms:
+  - vmdk: /images/win-a.vmdk
+    to_output: win-a.qcow2
+    windows_virtio:
+      default_os_bucket: win11
+      roles:
+        storage_virtio_scsi:
+          inf_globs: ["vioscsi\\**\\*.inf"]
+          pnp_ids: ["PCI\\VEN_1AF4&DEV_1004"]
+        net_virtio:
+          inf_globs: ["NetKVM\\**\\*.inf"]
+          pnp_ids: ["PCI\\VEN_1AF4&DEV_1000"]
+
+  - vmdk: /images/win-b.vmdk
+    to_output: win-b.qcow2
+    windows_virtio:
+      default_os_bucket: win10
+      roles:
+        storage_virtio_blk:
+          inf_globs: ["viostor\\**\\*.inf"]
+          pnp_ids: ["PCI\\VEN_1AF4&DEV_1001"]
+        net_virtio:
+          inf_globs: ["NetKVM\\**\\*.inf"]
+          pnp_ids:
+            - "PCI\\VEN_1AF4&DEV_1000&SUBSYS_12345678"
+
+# ====================================================================================
+# WINDOWS NETWORK OVERRIDE VARIANTS
+# ====================================================================================
+# The goal is: “retain or set networking on first boot”, and do it YAML-friendly.
+#
+# You can support all of these simultaneously:
+#   A) win_net_override: host path -> staged into guest
+#   B) win_net_json: inline JSON string -> materialized into workdir -> staged
+#   C) win_net: native YAML object -> materialized to JSON -> staged
+#
+# ------------------------------------------------------------------------------------
+# A) Network override via host JSON file path
+# ------------------------------------------------------------------------------------
+cmd: local
+vmdk: /images/windows.vmdk
+output_dir: ./out
+virtio_drivers_dir: /opt/virtio-win
+win_net_override: ./net/network_override.json  # host file
+# Example file contents (JSON):
+# {
+#   "schema": 1,
+#   "mode": "dhcp",
+#   "dhcp": { "dns_servers": ["10.0.0.53"] }
+# }
+verbose: 2
+
+# ------------------------------------------------------------------------------------
+# B) Network override via inline JSON string (systemd-friendly)
+# ------------------------------------------------------------------------------------
+cmd: local
+vmdk: /images/windows.vmdk
+output_dir: ./out
+virtio_drivers_dir: /opt/virtio-win
+win_net_json: >-
+  {"schema":1,"mode":"static",
+   "static":{"address":"192.168.1.50/24","gateway":"192.168.1.1",
+             "dns_servers":["1.1.1.1","8.8.8.8"]}}
+verbose: 2
+
+# ------------------------------------------------------------------------------------
+# C) Network override via YAML object (preferred)
+# ------------------------------------------------------------------------------------
+cmd: local
+vmdk: /images/windows.vmdk
+output_dir: ./out
+virtio_drivers_dir: /opt/virtio-win
+
+win_net:
+  schema: 1
+  mode: static            # dhcp | static
+  static:
+    address: 192.168.1.50/24
+    gateway: 192.168.1.1
+    dns_servers: ["1.1.1.1", "8.8.8.8"]
+  # optional:
+  # interface:
+  #   match:
+  #     mac: "52:54:00:12:34:56"
+  #   rename_to: "Ethernet0"
+  # optional advanced knobs your first-boot applier can support:
+  # mtu: 1500
+  # routes:
+  #   - to: "10.10.0.0/16"
+  #     via: "192.168.1.254"
+verbose: 2
+
+# ------------------------------------------------------------------------------------
+# D) YAML object for DHCP + DNS only
+# ------------------------------------------------------------------------------------
+cmd: local
+vmdk: /images/windows.vmdk
+output_dir: ./out
+virtio_drivers_dir: /opt/virtio-win
+win_net:
+  schema: 1
+  mode: dhcp
+  dhcp:
+    dns_servers: ["10.0.0.53", "10.0.0.54"]
+verbose: 2
+
+# ------------------------------------------------------------------------------------
+# E) BOTH set: win_net_override path + win_net_json/YAML
+# Rule: win_net_override path wins (it’s explicit and stable)
+# ------------------------------------------------------------------------------------
+cmd: local
+vmdk: /images/windows.vmdk
+output_dir: ./out
+virtio_drivers_dir: /opt/virtio-win
+win_net_override: ./net/override.json
+win_net:
+  schema: 1
+  mode: dhcp
+  dhcp:
+    dns_servers: ["8.8.8.8"]
+verbose: 2
+
+# ====================================================================================
+# OPTIONAL: tie network override to bootstrap domain stage (if you do 2-stage boot)
+# ====================================================================================
+# If your pipeline emits a Windows "bootstrap" domain (SATA) then later "final" (VirtIO),
+# you can still stage the network override during offline fix phase; it gets applied
+# on first boot of the guest regardless of stage.
+#
+cmd: local
+vmdk: /images/windows.vmdk
+output_dir: ./out
+virtio_drivers_dir: /opt/virtio-win
+emit_domain_xml: true
+win_stage: bootstrap
+win_driver_iso: /isos/virtio-win.iso
+win_net:
+  schema: 1
+  mode: dhcp
+  dhcp:
+    dns_servers: ["10.0.0.53"]
+verbose: 2

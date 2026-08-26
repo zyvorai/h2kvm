@@ -1,0 +1,116 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hyper2kvm-batch-nightly
+  namespace: vm-migration
+  labels:
+    app: hyper2kvm-batch
+    app.kubernetes.io/name: hyper2kvm
+    app.kubernetes.io/component: batch
+spec:
+  # Run at 2 AM daily
+  schedule: "0 2 * * *"
+
+  # Prevent overlapping runs
+  concurrencyPolicy: Forbid
+
+  # Keep history for troubleshooting
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+
+  jobTemplate:
+    metadata:
+      labels:
+        app: hyper2kvm-batch
+        app.kubernetes.io/name: hyper2kvm
+        app.kubernetes.io/component: batch
+        app.kubernetes.io/part-of: hyper2kvm
+    spec:
+      backoffLimit: 1
+
+      template:
+        spec:
+          serviceAccountName: hyper2kvm
+          restartPolicy: OnFailure
+
+          initContainers:
+            - name: nbd-loader
+              image: fedora:43
+              command: ['modprobe', 'nbd', 'max_part=16', 'nbds_max=16']
+              securityContext:
+                privileged: true
+              volumeMounts:
+                - name: lib-modules
+                  mountPath: /lib/modules
+                  readOnly: true
+
+          containers:
+            - name: batch
+              image: ghcr.io/ssahani/hyper2kvm-batch:0.3.0
+              imagePullPolicy: IfNotPresent
+
+              env:
+                - name: HYPER2KVM_MODE
+                  value: "batch"
+                - name: BATCH_PARALLEL
+                  value: "4"
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+
+              securityContext:
+                privileged: true
+
+              volumeMounts:
+                - name: batch-config
+                  mountPath: /etc/hyper2kvm/batch.yaml
+                  subPath: batch.yaml
+                - name: batch-manifest
+                  mountPath: /etc/hyper2kvm/manifest.json
+                  subPath: manifest.json
+                - name: vmdk-storage
+                  mountPath: /data/vmdk
+                  readOnly: true
+                - name: output-storage
+                  mountPath: /data/output
+                - name: dev
+                  mountPath: /dev
+                  mountPropagation: HostToContainer
+
+              resources:
+                limits:
+                  cpu: "12"
+                  memory: "24Gi"
+                requests:
+                  cpu: "8"
+                  memory: "16Gi"
+
+          volumes:
+            - name: batch-config
+              configMap:
+                name: hyper2kvm-batch-config
+            - name: batch-manifest
+              configMap:
+                name: hyper2kvm-batch-manifest
+            - name: vmdk-storage
+              persistentVolumeClaim:
+                claimName: vmdk-batch-pvc
+            - name: output-storage
+              persistentVolumeClaim:
+                claimName: output-batch-pvc
+            - name: dev
+              hostPath:
+                path: /dev
+            - name: lib-modules
+              hostPath:
+                path: /lib/modules
+
+          nodeSelector:
+            hyper2kvm-enabled: "true"
+
+          tolerations:
+            - key: "privileged-workload"
+              operator: "Exists"
+              effect: "NoSchedule"
+
+          # Allow up to 2 hours for batch processing
+          terminationGracePeriodSeconds: 7200
