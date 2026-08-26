@@ -34,7 +34,7 @@ author: "h2kvm Migration Team"
 
 ## 2. Migration Config
 
-**File:** `govc-to-libvirt.yaml`
+**File:** `test-confs/govc-to-libvirt.yaml`
 
 ```yaml
 cmd: vsphere
@@ -87,7 +87,7 @@ verbose: 1
 
 **Command:**
 ```bash
-sudo ./h2kvmctl --config govc-to-libvirt.yaml
+sudo ./h2kvmctl --config test-confs/govc-to-libvirt.yaml
 ```
 
 ---

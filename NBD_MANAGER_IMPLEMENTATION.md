@@ -383,14 +383,14 @@ cat /sys/module/nbd/parameters/nbds_max     # Should be 128
 
 ### Test Script
 
-**File:** `test_nbd_manager.py`
+**File:** `scripts/test_nbd_manager.py`
 
 ```bash
 # Apply system configuration first
 sudo ./scripts/setup-system-limits.sh
 
 # Run test
-sudo python3 test_nbd_manager.py
+sudo python3 scripts/test_nbd_manager.py
 ```
 
 **Test demonstrates:**
@@ -433,7 +433,7 @@ sudo python3 test_nbd_manager.py
   * Best practices
 
 ### Tests
-- `test_nbd_manager.py`
+- `scripts/test_nbd_manager.py`
   * Production NBD manager test
   * ESX thin VMDK test
 
@@ -443,7 +443,7 @@ sudo python3 test_nbd_manager.py
 
 ### Immediate Actions
 1. ✅ Apply system configuration: `sudo ./scripts/setup-system-limits.sh`
-2. ✅ Test with NBD manager: `sudo python3 test_nbd_manager.py`
+2. ✅ Test with NBD manager: `sudo python3 scripts/test_nbd_manager.py`
 3. ✅ Verify no errors
 
 ### Future Enhancements

@@ -269,7 +269,7 @@ run_demo() {
 
     if [ -z "$demo_image" ] || [ ! -f "$demo_image" ]; then
         warn "No qcow2 image found. Convert one first:"
-        echo "  sudo h2kvmctl --config photon-to-libvirt.yaml"
+        echo "  sudo h2kvmctl --config test-confs/photon-to-libvirt.yaml"
         return
     fi
 

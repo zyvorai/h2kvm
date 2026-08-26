@@ -33,7 +33,7 @@ author: "h2kvm Migration Team"
 
 ## 2. Migration Config
 
-**File:** `ubuntu-vcenter-to-libvirt.yaml`
+**File:** `test-confs/ubuntu-vcenter-to-libvirt.yaml`
 
 ```yaml
 cmd: vsphere
@@ -86,7 +86,7 @@ verbose: 1
 
 **Command:**
 ```bash
-sudo ./h2kvmctl --config ubuntu-vcenter-to-libvirt.yaml
+sudo ./h2kvmctl --config test-confs/ubuntu-vcenter-to-libvirt.yaml
 ```
 
 ---

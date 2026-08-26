@@ -474,10 +474,10 @@ Then run a test migration:
 
 ```bash
 # Export from vCenter and convert to libvirt (end-to-end)
-sudo ./h2kvmctl --config photon-vcenter-to-libvirt.yaml
+sudo ./h2kvmctl --config test-confs/photon-vcenter-to-libvirt.yaml
 
 # Or convert a local VMDK
-sudo ./h2kvmctl --config photon-to-libvirt.yaml
+sudo ./h2kvmctl --config test-confs/photon-to-libvirt.yaml
 ```
 
 See [vSphere Export Tutorial](../tutorials/05-vsphere-export-tools.md) for detailed usage.

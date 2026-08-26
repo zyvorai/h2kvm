@@ -63,12 +63,12 @@ govc ls /data/vm/
 ### Test 2: RHEL 10.2 Export via govc (End-to-End)
 
 **VM:** esx8.0-rhel10.2-x86_64-efi
-**Config:** `govc-to-libvirt.yaml`
+**Config:** `test-confs/govc-to-libvirt.yaml`
 **Method:** govc export.ovf (NFC streaming)
 
 **Command:**
 ```bash
-sudo ./h2kvmctl --config govc-to-libvirt.yaml
+sudo ./h2kvmctl --config test-confs/govc-to-libvirt.yaml
 ```
 
 **Pipeline:**
@@ -129,11 +129,11 @@ sudo ./h2kvmctl --config output-rhel10/export-rhel10.yaml
 ### Test 4: Photon OS Local VMDK → libvirt
 
 **Source:** photon.vmdk (8 GiB virtual, 994 MiB actual)
-**Config:** `photon-to-libvirt.yaml`
+**Config:** `test-confs/photon-to-libvirt.yaml`
 
 **Command:**
 ```bash
-sudo ./h2kvmctl --config photon-to-libvirt.yaml
+sudo ./h2kvmctl --config test-confs/photon-to-libvirt.yaml
 ```
 
 | Metric | Value |
@@ -153,12 +153,12 @@ sudo ./h2kvmctl --config photon-to-libvirt.yaml
 ### Test 5: Photon OS → K3s/KubeVirt
 
 **Source:** photon.vmdk
-**Config:** `photon-to-k3s.yaml`
+**Config:** `test-confs/photon-to-k3s.yaml`
 **Target:** K3s v1.31.5 + KubeVirt v1.4.0
 
 **Command:**
 ```bash
-sudo ./h2kvmctl --config photon-to-k3s.yaml
+sudo ./h2kvmctl --config test-confs/photon-to-k3s.yaml
 ```
 
 | Metric | Value |
@@ -177,11 +177,11 @@ sudo ./h2kvmctl --config photon-to-k3s.yaml
 ### Test 6: Dual Deploy — libvirt + KubeVirt (Single Command)
 
 **Source:** photon.vmdk
-**Config:** `photon-to-libvirt-and-k3s.yaml`
+**Config:** `test-confs/photon-to-libvirt-and-k3s.yaml`
 
 **Command:**
 ```bash
-sudo ./h2kvmctl --config photon-to-libvirt-and-k3s.yaml
+sudo ./h2kvmctl --config test-confs/photon-to-libvirt-and-k3s.yaml
 ```
 
 | Target | VM Name | Status |
@@ -196,12 +196,12 @@ sudo ./h2kvmctl --config photon-to-libvirt-and-k3s.yaml
 ### Test 7: Ubuntu 22.04 LVM Export (End-to-End)
 
 **VM:** esx8.0-ubuntu22.04.5-x64-with-lvm-partitions
-**Config:** `ubuntu-vcenter-to-libvirt.yaml`
+**Config:** `test-confs/ubuntu-vcenter-to-libvirt.yaml`
 **Method:** govc export.ovf (NFC streaming)
 
 **Command:**
 ```bash
-sudo ./h2kvmctl --config ubuntu-vcenter-to-libvirt.yaml
+sudo ./h2kvmctl --config test-confs/ubuntu-vcenter-to-libvirt.yaml
 ```
 
 | Metric | Value |
@@ -243,7 +243,7 @@ $ sudo ./scripts/install-deps.sh --verify
 
 ## 7. Migration Configs Used
 
-### RHEL 10.2 govc Export (`govc-to-libvirt.yaml`)
+### RHEL 10.2 govc Export (`test-confs/govc-to-libvirt.yaml`)
 
 ```yaml
 cmd: vsphere
@@ -293,7 +293,7 @@ timeout: 120
 verbose: 1
 ```
 
-### Photon OS Local (`photon-to-libvirt.yaml`)
+### Photon OS Local (`test-confs/photon-to-libvirt.yaml`)
 
 ```yaml
 cmd: local
@@ -329,7 +329,7 @@ timeout: 120
 verbose: 1
 ```
 
-### Photon OS → K3s/KubeVirt (`photon-to-k3s.yaml`)
+### Photon OS → K3s/KubeVirt (`test-confs/photon-to-k3s.yaml`)
 
 ```yaml
 cmd: local
@@ -353,7 +353,7 @@ k8s_cpu: 2
 verbose: 1
 ```
 
-### Dual Deploy — libvirt + KubeVirt (`photon-to-libvirt-and-k3s.yaml`)
+### Dual Deploy — libvirt + KubeVirt (`test-confs/photon-to-libvirt-and-k3s.yaml`)
 
 ```yaml
 cmd: local
@@ -393,7 +393,7 @@ k8s_cpu: 2
 verbose: 1
 ```
 
-### Ubuntu 22.04 LVM (`ubuntu-vcenter-to-libvirt.yaml`)
+### Ubuntu 22.04 LVM (`test-confs/ubuntu-vcenter-to-libvirt.yaml`)
 
 ```yaml
 cmd: vsphere

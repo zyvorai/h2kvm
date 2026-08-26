@@ -16,7 +16,7 @@ set -euo pipefail
 #
 # After setup:
 #   1. Access Cockpit: https://<machine-ip>:9090
-#   2. Run a migration: sudo h2kvmctl --config govc-to-libvirt.yaml
+#   2. Run a migration: sudo h2kvmctl --config test-confs/govc-to-libvirt.yaml
 #   3. See the VM running in Cockpit → Virtual Machines
 # ============================================
 
@@ -116,10 +116,10 @@ echo "     https://${MACHINE_IP:-<machine-ip>}:9090"
 echo "     Login with your system credentials"
 echo ""
 echo "  2. Run a local migration (fast, uses photon.vmdk):"
-echo "     sudo h2kvmctl --config photon-to-libvirt.yaml"
+echo "     sudo h2kvmctl --config test-confs/photon-to-libvirt.yaml"
 echo ""
 echo "  3. Run a vCenter migration (govc export → libvirt):"
-echo "     sudo h2kvmctl --config govc-to-libvirt.yaml"
+echo "     sudo h2kvmctl --config test-confs/govc-to-libvirt.yaml"
 echo ""
 echo "  4. Check running VMs:"
 echo "     virsh list"

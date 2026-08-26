@@ -751,7 +751,7 @@ verify_install() {
 
     echo ""
     echo "Next:"
-    echo "    sudo h2kvmctl --config photon-to-libvirt.yaml"
+    echo "    sudo h2kvmctl --config test-confs/photon-to-libvirt.yaml"
     echo "    sudo ./scripts/run-demo.sh"
     echo ""
 

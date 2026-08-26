@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 # Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from h2kvm.vmcraft.nbd_manager import NBDDevice, cleanup_all_nbd_devices
 from h2kvm.vmcraft.safe_namespace_engine import SafeNamespaceEngine
