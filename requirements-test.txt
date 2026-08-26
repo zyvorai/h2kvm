@@ -9,7 +9,7 @@ pytest-benchmark>=4.0.0
 # Code quality
 ruff>=0.15.11
 mypy>=1.7.0
-types-PyYAML>=6.0.12
+types-PyYAML>=6.0.12.20260815
 
 # Test utilities
 coverage[toml]>=7.3.0
