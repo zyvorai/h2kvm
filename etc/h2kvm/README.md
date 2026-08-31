@@ -25,7 +25,7 @@ This file contains:
 - **Container isolation** (`container_isolation: true` by default) -- runs LVM activation inside Podman/Docker for safe VG scanning without touching host LVM metadata
 - **Allowed directories** for VM image access (security)
 - **Conversion settings** (cache directory, size limits)
-- **Offline fix backend** (`backend: vmcraft` by default) -- pure Python engine for VM manipulation
+- **Offline fix backend** (`backend: guestkit` by default) — GuestKit disk inspect and repair via `hypersdk-guestkit`
 - **Default libvirt settings** (network, machine type, resources)
 - **Logging configuration**
 - **Daemon mode settings** (future feature)
@@ -37,8 +37,8 @@ Example:
 # Runs LVM discovery inside a hardened Podman/Docker container
 container_isolation: true
 
-# Offline fix backend (default: vmcraft)
-backend: vmcraft
+# Offline fix backend (default: guestkit)
+backend: guestkit
 
 allowed_dirs:
   - /var/lib/libvirt/images

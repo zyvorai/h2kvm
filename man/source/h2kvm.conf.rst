@@ -98,8 +98,8 @@ These fields are available across all modes:
     CLI equivalent: ``--container-isolation`` / ``--no-container-isolation``
 
 **backend** (*string*)
-    Offline fix backend engine: ``vmcraft`` (pure Python, fast, no C dependencies)
-    or ``guestfs`` (libguestfs-based) (default: ``vmcraft``).
+    Offline fix backend engine: ``guestkit`` (GuestKit PyO3, default),
+    ``guestfs`` (libguestfs-based), or ``auto`` (default: ``guestkit``).
 
 **verbose** (*integer*)
     Logging level: 0 (INFO), 1 (verbose), 2 (DEBUG) (default: ``0``).

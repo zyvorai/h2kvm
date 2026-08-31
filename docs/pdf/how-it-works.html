@@ -94,7 +94,7 @@
     │   │  ┌─────────┐ ┌────────────┐  │     │
     │   │  │ Disk     │ │  Guest     │  │     │
     │   │  │ Convert  │ │  Fixer     │  │     │
-    │   │  │ (qemu)   │ │ (VMCraft)  │  │     │
+    │   │  │ (qemu)   │ │ (GuestKit)  │  │     │
     │   │  └─────────┘ └────────────┘  │     │
     │   │  ┌─────────┐ ┌────────────┐  │     │
     │   │  │ Libvirt  │ │ KubeVirt   │  │     │
@@ -112,7 +112,7 @@
 
   <div class="card-grid">
     <div class="card"><span class="lang-tag go-tag">Go</span><h4>hypersdk — Control Plane</h4><p>Multi-cloud VM discovery and export. REST API, job scheduling, RBAC, cost estimation, carbon-aware scheduling. Hexagonal architecture with 13+ port interfaces.</p></div>
-    <div class="card"><span class="lang-tag py-tag">Python</span><h4>h2kvm — Data Plane</h4><p>Disk conversion, offline guest OS repair, libvirt XML generation, KubeVirt deployment. 1,273 tests. VMCraft engine for filesystem manipulation.</p></div>
+    <div class="card"><span class="lang-tag py-tag">Python</span><h4>h2kvm — Data Plane</h4><p>Disk conversion, offline guest OS repair, libvirt XML generation, KubeVirt deployment. 1,273 tests. GuestKit engine for filesystem manipulation.</p></div>
   </div>
 </div>
 
@@ -233,7 +233,7 @@ h2kvm/
 
 <!-- PAGE: GUEST FIX ENGINE -->
 <div class="page page-py">
-  <h2 class="st">VMCraft: <span>Guest Fix Engine</span></h2>
+  <h2 class="st">GuestKit: <span>Guest Fix Engine</span></h2>
   <p class="sub2">The critical differentiator — why VMs boot on first try.</p>
 
   <div class="card-grid">
@@ -251,7 +251,7 @@ h2kvm/
       <p>Removes VMware Tools (open-vm-tools). Removes Hyper-V integration services. Clears stale network configs (VMXNET3 MAC bindings). Reduces attack surface.</p></div>
   </div>
 
-  <h3>How VMCraft Works (Under the Hood)</h3>
+  <h3>How GuestKit Works (Under the Hood)</h3>
   <pre>
 # 1. Connect to disk via qemu-nbd (no libguestfs needed)
 sudo qemu-nbd --connect=/dev/nbd0 disk.qcow2
@@ -332,7 +332,7 @@ qemu-nbd --disconnect /dev/nbd0
 
   <h3>Data Flow</h3>
   <pre style="text-align: center; font-size: 0.8em;">
-vCenter ──govc──→ VMDK file ──qemu-img──→ qcow2 ──VMCraft──→ fixed qcow2
+vCenter ──govc──→ VMDK file ──qemu-img──→ qcow2 ──GuestKit──→ fixed qcow2
                                                                     │
                                           ┌─────────────────────────┤
                                           │                         │

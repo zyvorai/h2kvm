@@ -139,7 +139,7 @@ sudo dnf install libguestfs-tools python3-libguestfs    # Fedora/RHEL
 sudo apt install libguestfs-tools python3-guestfs       # Ubuntu/Debian
 ```
 
-libguestfs is auto-detected. If not installed, h2kvm falls back to VMCraft
+libguestfs is auto-detected. If not installed, h2kvm falls back to GuestKit
 with host-based `cryptsetup` (works but less robust).
 
 ## Tested Configurations

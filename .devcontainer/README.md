@@ -97,8 +97,8 @@ pytest tests/unit/
 # With coverage
 pytest --cov=h2kvm --cov-report=html
 
-# Specific test
-pytest tests/unit/test_vmcraft/test_block_device.py -v
+# Specific test (GuestKit client / offline fixer)
+pytest tests/unit/fixers/test_offline_fixer.py -v
 
 # Parallel execution
 pytest -n auto

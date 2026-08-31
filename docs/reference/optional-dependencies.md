@@ -18,7 +18,7 @@ This installs only core dependencies:
 
 **What works with minimal installation:**
 - ✅ Local VMDK/VHD/QCOW2 conversion
-- ✅ Offline guest OS fixes (using VMCraft - pure Python)
+- ✅ Offline guest OS fixes (using GuestKit via `hypersdk-guestkit`)
 - ✅ All core migration functionality
 - ❌ Progress bars (fallback to simple logging)
 - ❌ vSphere integration (requires optional vsphere extras)
@@ -111,7 +111,7 @@ pip install h2kvm[ui,vsphere,azure]
 
 ## System Dependencies
 
-h2kvm uses **VMCraft** (pure Python) as the default guestfs backend.
+h2kvm uses **GuestKit** (`hypersdk-guestkit>=1.1.0`) as the default guestfs backend.
 
 ### Required
 - `qemu-img` - Disk format conversion (VMDK→QCOW2)
@@ -471,7 +471,7 @@ pip install h2kvm[azure]  # Includes all Azure SDKs
 
 **Option 1: Minimal (Most Restrictive Environment)**
 ```bash
-# System packages only (VMCraft backend)
+# System packages only (GuestKit backend)
 sudo dnf install -y \
     qemu-img \
     qemu-kvm-core \
@@ -487,7 +487,7 @@ pip install --user h2kvm
 
 # Works for:
 # ✅ Local VMDK/VHD/QCOW2 conversion
-# ✅ All offline guest fixes (VMCraft backend)
+# ✅ All offline guest fixes (GuestKit backend)
 # ✅ All core functionality
 # ❌ No progress bars (logs instead)
 # ❌ No vSphere direct integration
@@ -496,7 +496,7 @@ pip install --user h2kvm
 
 **Option 2: With UI (Recommended)**
 ```bash
-# System packages (VMCraft backend)
+# System packages (GuestKit backend)
 sudo dnf install -y \
     qemu-img \
     qemu-kvm-core \

@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # Final Test Summary: LVM Safety Improvements ✅
 
 **Test Completed**: February 14, 2026, 17:05:06
@@ -72,7 +74,7 @@ $ sudo dmsetup ls | wc -l
 |-----------|------|------------|
 | NBD Connection | 1.34s | Fast |
 | Storage Stack Activation | 0.68s | **Enterprise-grade speed** |
-| Total VMCraft Startup | 2.07s | **Sub-3s total startup** |
+| Total GuestKit Startup | 2.07s | **Sub-3s total startup** |
 
 **Result**: ✅ **EXCEPTIONAL PERFORMANCE**
 
@@ -98,7 +100,7 @@ $ sudo dmsetup ls | wc -l
 
 **Analysis**:
 - This is a **separate bug** unrelated to LVM improvements
-- Missing imports/service implementations in VMCraft backend
+- Missing imports/service implementations in GuestKit backend
 - **Does not affect LVM safety** - cleanup still executed properly
 - Needs fix: Add imports for `LVMActivator`, `run_sudo`, `svc_list_partitions_cached`
 
@@ -132,7 +134,7 @@ $ sudo dmsetup ls | wc -l
 - Higher memory usage
 - Less control over LVM
 
-### After (VMCraft + Improvements)
+### After (GuestKit + Improvements)
 - Storage activation: **0.68 seconds** 🚀
 - Lower memory footprint
 - **100% safe** device filtering
@@ -153,7 +155,7 @@ $ sudo dmsetup ls | wc -l
    - Added NBD locking with `acquire_nbd_lock()`
    - Enhanced mount_root_partition to prioritize LVM
 
-2. **`h2kvm/core/vmcraft/storage.py`**
+2. **`h2kvm/core/guestkit_client.pystorage.py`**
    - Added NBD device filtering to `LVMActivator.activate()`
    - Added dmsetup fallback for busy LV cleanup
    - Added warning logs when falling back to unsafe activation
@@ -184,7 +186,7 @@ $ sudo dmsetup ls | wc -l
    - VG tracking allows safe cleanup of exactly what we activated
 
 2. **Performance Gains**
-   - VMCraft backend provides excellent performance
+   - GuestKit backend provides excellent performance
    - NBD direct attachment avoids FUSE overhead
    - Parallel operations speed up multi-kernel systems
 
@@ -196,9 +198,9 @@ $ sudo dmsetup ls | wc -l
 ### What Needs Improvement
 
 1. **Import Dependencies** (Mount Failure)
-   - VMCraft backend needs service implementations
+   - GuestKit backend needs service implementations
    - Missing: `svc_list_partitions_cached`, `run_sudo`, `LVMActivator`
-   - **Action**: Add proper imports or VMCraft-native implementations
+   - **Action**: Add proper imports or GuestKit-native implementations
 
 2. **Testing Coverage**
    - Add integration tests for LVM-based VMs
@@ -291,7 +293,7 @@ $ sudo dmsetup ls | wc -l
 ### Integration Guides
 
 - LVM activation API: See `h2kvm/daemon/nbd_prep.py:activate_lvm()`
-- VMCraft storage: See `h2kvm/core/vmcraft/storage.py:LVMActivator`
+- GuestKit storage: See `h2kvm/core/guestkit_client.pystorage.py:LVMActivator`
 - Parallel initramfs: See `h2kvm/fixers/offline_vm/fix_initramfs.py`
 
 ---
@@ -309,7 +311,7 @@ The enterprise-grade LVM improvements are:
 ### ⚠️ Known Issue: Mount Code Imports
 
 Separate bug preventing full conversion:
-- Missing service implementations in VMCraft backend
+- Missing service implementations in GuestKit backend
 - **Does not affect LVM safety** - cleanup still works
 - Needs fix before full end-to-end testing
 

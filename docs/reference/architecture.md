@@ -53,12 +53,7 @@
   - [Linux Domain (`linux_domain.py`)](#linux-domain-linux_domainpy)
   - [Windows Domain (`windows_domain.py`)](#windows-domain-windows_domainpy)
 - [Core Utilities](#core-utilities)
-- [VMCraft - VM Manipulation Engine](#vmcraft---vm-manipulation-engine)
-  - [Architecture](#architecture)
-  - [Key Capabilities](#key-capabilities)
-  - [Integration with Pipeline](#integration-with-pipeline)
-  - [Performance](#performance)
-  - [Usage in h2kvm](#usage-in-h2kvm)
+- [GuestKit - Disk Inspection & Repair](#guestkit---disk-inspection--repair)
   - [Essential Utilities](#essential-utilities)
     - [Guest Identity (`guest_identity.py`)](#guest-identity-guest_identitypy)
     - [Recovery Manager (`recovery_manager.py`)](#recovery-manager-recovery_managerpy)
@@ -169,7 +164,7 @@ Transform complex disk chains into single-image files:
 **Output:** Clean, single-file disk images ready for inspection.
 
 #### INSPECT
-Offline deep-dive using the guestfs backend (VMCraft by default) to extract ground truth:
+Offline deep-dive using GuestKit (default) or libguestfs to extract ground truth:
 - OS family detection (Linux vs Windows)
 - Firmware type (BIOS vs UEFI)
 - Partition layouts and mount points
@@ -191,7 +186,7 @@ Strategic planning before execution:
 
 #### FIX
 Apply deterministic patches to ensure bootability:
-- **Offline fixes** (default): guestfs-based disk mutations (VMCraft by default), no boot required
+- **Offline fixes** (default): GuestKit migrate_repair and h2kvm fixers, no boot required
 - **Live fixes** (opt-in): SSH-based corrections on running guests
 - fstab rewriting (UUID/PARTUUID over by-path)
 - Bootloader regeneration (GRUB config, initramfs)
@@ -640,7 +635,7 @@ VMware integration enforces strict separation between **what to do** (control) a
 
 **Philosophy:** Modify disk images without booting. No runtime dependencies.
 
-**Technology:** Guestfs backend (VMCraft by default)
+**Technology:** GuestKit (default) or libguestfs via `guestfs_factory`
 
 **Advantages:**
 - No systemd/init requirements
@@ -861,115 +856,57 @@ The foundational layer providing infrastructure for all other modules.
 
 ---
 
-## VMCraft - VM Manipulation Engine
+## GuestKit - Disk Inspection & Repair
 
-**Module:** `core/vmcraft/`
+**Modules:** `h2kvm/core/guestfs_factory.py`, `h2kvm/core/guestkit_client.py`
 
-**Version:** v9.0
+**Package:** `hypersdk-guestkit>=1.1.0`
 
-VMCraft is h2kvm's pure Python disk image manipulation platform, serving as the primary VM inspection and modification engine.
+GuestKit is the default offline disk backend. It provides GuestFS-compatible access plus high-level inspect and repair pipelines used by h2kvm. The former VMCraft pure-Python engine was removed.
 
 ### Architecture
 
-VMCraft consists of **57 specialized modules** organized into focused categories:
-
 ```
-core/vmcraft/
-├── main.py                    # Orchestrator
-├── Core Infrastructure (4 modules)
-│   ├── nbd.py                 # NBD device management
-│   ├── storage.py             # LVM/LUKS/RAID/ZFS
-│   ├── mount.py               # Filesystem mounting
-│   └── file_ops.py            # File operations (70+ methods)
-├── OS Detection (3 modules)
-│   ├── inspection.py          # Orchestration
-│   ├── linux_detection.py     # 15+ Linux distros
-│   └── windows_detection.py   # 20+ Windows versions
-├── Windows Support (6 modules)
-│   ├── windows_registry.py    # Registry operations
-│   ├── windows_drivers.py     # Driver injection
-│   ├── windows_users.py       # User management
-│   ├── windows_services.py    # Service control
-│   ├── windows_applications.py # App detection
-│   └── scheduled_tasks.py     # Task Scheduler
-├── Linux Support (1 module)
-│   └── linux_services.py      # Systemd/init services
-├── Enterprise Intelligence (5 modules)
-│   ├── ml_analyzer.py         # AI/ML analytics
-│   ├── cloud_optimizer.py     # Cloud migration
-│   ├── disaster_recovery.py   # DR planning
-│   ├── audit_trail.py         # Compliance logging
-│   └── resource_orchestrator.py # Auto-scaling
-└── Operational Tools (5 modules)
-    ├── backup.py              # Backup/restore
-    ├── security.py            # Security auditing
-    ├── optimization.py        # Disk optimization
-    ├── advanced_analysis.py   # Forensics
-    └── export.py              # VM export
+h2kvm pipeline
+    │
+    ├─ guestfs_factory.create_guestfs(backend="guestkit")
+    │       └─ guestkit.Guestfs()          # PyO3 bindings
+    │
+    └─ guestkit_client
+            ├─ doctor() / boot_inspect()
+            ├─ migrate_plan()
+            └─ migrate_repair()  ◄── offline_fixer
 ```
 
 ### Key Capabilities
 
-**Core Operations:**
-- **Fast launch:** ~1.9s (NBD connection + storage activation)
-- **OS detection:** 15+ Linux distros, 20+ Windows versions
-- **File operations:** 70+ methods for comprehensive file manipulation
-- **Storage stack:** LVM, LUKS, RAID, ZFS support
-
-**Cross-Platform:**
-- **Linux:** Package management, service control, driver analysis
-- **Windows:** Registry operations, driver injection, user/service management
-
-**Enterprise Intelligence (v9.0):**
-- **AI/ML Analytics:** Anomaly detection, behavior prediction, workload classification
-- **Cloud Optimization:** Multi-cloud migration planning (AWS, Azure, GCP)
-- **Disaster Recovery:** RTO/RPO planning, backup strategies
-- **Audit Trail:** Multi-standard compliance (SOC2, PCI-DSS, HIPAA, GDPR)
-- **Resource Orchestration:** Auto-scaling, workload balancing
+- **Doctor:** Bootability analysis for target hypervisor (KVM, etc.)
+- **Migrate repair:** fstab, GRUB, initramfs, and related offline fixes
+- **GuestFS compatibility:** Existing h2kvm call sites use `create_guestfs()`
+- **Disk conversion:** `DiskConverter` for format conversion
 
 ### Integration with Pipeline
 
-VMCraft integrates into the migration pipeline at these stages:
+GuestKit integrates at these stages:
 
-1. **INSPECT:** OS detection and filesystem analysis
-2. **FIX:** Offline file modifications, registry edits, driver injection
-3. **VALIDATE:** Pre-migration verification
-
-### Performance
-
-| Operation | Time | Notes |
-|-----------|------|-------|
-| Launch | ~1.9s | NBD + storage |
-| OS Inspection | ~0.3s | Linux/Windows detection |
-| File Read | <50ms | Direct filesystem access |
-| Registry Read | ~150ms | Windows offline registry |
+1. **INSPECT:** `doctor()` / `boot_inspect()` for OS and boot analysis
+2. **PLAN:** `migrate_plan()` for hypervisor-aware fix planning
+3. **FIX:** `migrate_repair()` via `offline_fixer`
 
 ### Usage in h2kvm
 
 ```python
-from h2kvm.vmcraft import VMCraft
+from h2kvm.core import guestkit_client
 
-with VMCraft() as g:
-    g.add_drive_opts("/path/to/disk.vmdk", readonly=False)
-    g.launch()
+report = guestkit_client.doctor("/path/to/disk.vmdk", target="kvm")
+result = guestkit_client.migrate_repair("/path/to/disk.vmdk", target="kvm", apply=True)
 
-    # OS detection
-    roots = g.inspect_os()
-
-    # File operations
-    g.write("/etc/motd", "Migrated to KVM\n")
-
-    # Windows registry (if Windows)
-    g.win_registry_write("SOFTWARE", r"Microsoft\...", "Key", "Value")
-
-    # AI/ML analytics (v9.0)
-    anomalies = g.ml_detect_anomalies(metrics, "cpu")
-
-    # Cloud optimization (v9.0)
-    readiness = g.cloud_analyze_readiness(system_info)
+g = guestkit_client.open_guest("/path/to/disk.vmdk")
+roots = g.inspect_os()
+g.shutdown()
 ```
 
-**Documentation:** See [VMCraft Platform Guide](09-VMCraft.md) for complete reference (307+ methods).
+**Documentation:** See [GuestKit Integration Guide](../architecture/GUESTKIT.md).
 
 ---
 
@@ -982,7 +919,7 @@ These principles are **non-negotiable**. Violating them leads to unreliable migr
 Unless explicitly marked `live`, all fixers assume:
 - **No systemd** or init systems running
 - **No kernel modules** can be loaded
-- **Only guestfs backend** disk access (VMCraft by default)
+- **Only GuestKit/libguestfs** disk access
 
 **Runtime dependencies belong in `fixers/live/`.**
 
@@ -1261,7 +1198,7 @@ Real-time progress tracking and performance metrics.
 
 ## Glossary
 
-**guestfs backend:** Abstraction for accessing and modifying virtual machine disk images offline. VMCraft is the default backend.
+**guestfs backend:** Abstraction for accessing and modifying virtual machine disk images offline. GuestKit is the default backend via `hypersdk-guestkit`.
 
 **VDDK:** VMware Virtual Disk Development Kit - high-performance API for disk access.
 
@@ -1365,7 +1302,7 @@ When proposing architectural changes:
 h2kvm's architecture achieves **reliable, repeatable VM migrations** through:
 
 1. **Deterministic pipeline** (FETCH → FLATTEN → INSPECT → PLAN → FIX → CONVERT → TEST)
-2. **Offline-first fixing** (guestfs backend via VMCraft, no runtime dependencies)
+2. **Offline-first fixing** (GuestKit disk backend, no runtime dependencies)
 3. **Strict separation** (control-plane vs data-plane, offline vs live, Windows vs Linux)
 4. **Modular components** (Single Responsibility Principle)
 5. **Inspection over assumption** (derive facts, never guess)

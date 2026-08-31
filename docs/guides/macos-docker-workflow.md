@@ -1,6 +1,6 @@
 # macOS Docker Workflow
 
-h2kvm requires Linux for guest fixes (VMCraft uses qemu-nbd). On macOS,
+h2kvm requires Linux for guest fixes (GuestKit uses qemu-nbd). On macOS,
 use Docker to run the full pipeline.
 
 ## Setup

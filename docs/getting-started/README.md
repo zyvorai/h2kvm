@@ -198,7 +198,7 @@ regen_initramfs: true
 - qemu-img (for conversion)
 
 # Optional tools
-- qemu-nbd, qemu-img (used by VMCraft, the default backend)
+- qemu-nbd, qemu-img (used by GuestKit, the default backend)
 - ntfs-3g (for Windows support)
 - libhivex (for Windows registry)
 ```
@@ -231,7 +231,7 @@ sudo h2kvmctl --config migration.yaml
 
 3. **Explore Features**
    - [Windows Support](../os-support/windows/guide.md) - Windows-specific features
-   - [VMCraft Guide](../features/vmcraft/complete-guide.md) - Advanced VM manipulation
+   - [GuestKit Guide](../features/architecture/GUESTKIT.md) - Advanced VM manipulation
 
 ## Common Installation Issues
 

@@ -91,11 +91,11 @@ sudo h2kvmctl --config your-config.yaml
 sudo h2kvmctl --config config.yaml -v 2>&1 | grep -E "bucket|Found driver|Driver not"
 ```
 
-### "VMCraft has no attribute 'hivex_open'"
+### "GuestKit has no attribute 'hivex_open'"
 
-**Cause**: Old code called guestfs hivex API on VMCraft backend.
+**Cause**: Old code called guestfs hivex API on GuestKit backend.
 
-**Fixed in**: Commit `0119554`. VMCraft now provides a hivex API shim that downloads the hive and uses python-hivex directly.
+**Fixed in**: Commit `0119554`. GuestKit now provides a hivex API shim that downloads the hive and uses python-hivex directly.
 
 **Verify**: Check python-hivex is installed:
 
@@ -174,5 +174,5 @@ The VM will boot with emulated hardware (slower but universally compatible). Vir
 ## See Also
 
 - [Windows Migration Tutorial](../../tutorials/06-windows-migration.md)
-- [VirtIO Config Reference](../../reference/api/vmcraft.md)
+- [VirtIO Config Reference](../../architecture/GUESTKIT.md)
 - [Test Config: Windows 10](../../../test-confs/win10-migration.yaml)

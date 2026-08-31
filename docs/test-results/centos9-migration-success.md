@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # CentOS Stream 9 Migration Test - SUCCESS
 
 **Date**: January 28, 2026
@@ -85,7 +87,7 @@ libvirt_import: true
 
 ---
 
-### ✅ Phase 2: VMCraft Backend Launch (PASSED)
+### ✅ Phase 2: GuestKit Backend Launch (PASSED)
 
 **NBD Connection**:
 - **Device**: /dev/nbd6
@@ -243,7 +245,7 @@ Used memory:    4194304 KiB
 | Phase | Duration | Status |
 |-------|----------|--------|
 | VMDK → QCOW2 conversion | 23s | ✅ |
-| VMCraft backend launch | 26s | ✅ |
+| GuestKit backend launch | 26s | ✅ |
 | XFS UUID regeneration | 3s | ✅ |
 | fstab fixes | 1s | ✅ |
 | Network fixes | 1s | ✅ |
@@ -253,7 +255,7 @@ Used memory:    4194304 KiB
 | **Total Migration Time** | **~3 minutes** | ✅ |
 
 ### Resource Utilization
-- **Peak Memory**: ~500 MiB (VMCraft + qemu-img)
+- **Peak Memory**: ~500 MiB (GuestKit + qemu-img)
 - **Disk I/O**: Minimal (sparse conversion)
 - **CPU**: Moderate (compression phase)
 - **Network**: None (local migration)

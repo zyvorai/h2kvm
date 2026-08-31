@@ -139,7 +139,7 @@ h2kvm implements several security measures:
 
 ### 1. System Dependencies
 
-h2kvm uses VMCraft by default (with `qemu-img` and `qemu-nbd`). These tools run with elevated privileges:
+h2kvm uses GuestKit by default (with `qemu-img` and `qemu-nbd`). These tools run with elevated privileges:
 
 - **Risk**: Potential privilege escalation
 - **Mitigation**: Only use trusted disk images, validate inputs

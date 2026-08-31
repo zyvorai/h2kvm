@@ -503,5 +503,5 @@ class VMDKInspectionResult:
 
 - [Migration Guide](../guides/migration/)
 - [Troubleshooting](../guides/troubleshooting.md)
-- [VMCraft Inspection](vmcraft-inspection.md)
+- [GuestKit Inspection](guestkit-inspection.md)
 - [Validation Framework](validation-framework.md)

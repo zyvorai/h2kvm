@@ -224,61 +224,53 @@ This ensures the guest can boot with virtio disk and network controllers.
 
 ## Backend Options
 
-### 1. **vmcraft** (Default)
+LVM activation during offline fixes runs through the selected disk backend. **GuestKit** is the default.
+
+### 1. **guestkit** (Default)
 
 ```yaml
-backend: vmcraft
+backend: guestkit
 ```
 
-Pure Python backend using `qemu-nbd` + native Linux tools. Fastest startup, minimal memory. Supports container isolation for LVM operations.
+GuestKit (`hypersdk-guestkit`) provides GuestFS-compatible disk access via Rust + PyO3. LVM discovery and activation use GuestKit's storage stack with optional container-isolated VG scanning (see above).
 
 **Performance:**
 - Startup: < 1 second
 - LVM activation: 1-2 seconds (with container isolation)
 - Mount operations: < 1 second
 
-**Architecture:**
+---
 
+### 2. **guestfs** (Optional)
+
+```yaml
+backend: guestfs
 ```
-h2kvm/vmcraft/lvm.py
-├── Core command runner (_run, udev_settle)
-├── Caching layer (_cache_get/set, invalidate)
-├── List operations (pvs, vgs, lvs)
-├── Activation (vg_activate, vg_activate_all)
-└── Advanced operations (scan, canonical_lv, create/remove/resize)
-```
+
+Native libguestfs backend. Use when GuestKit is unavailable or libguestfs is required for compatibility.
 
 ---
 
-### 2. **namespace** (Experimental)
+### 3. **auto**
 
 ```yaml
-backend: namespace
+backend: auto
 ```
 
-Uses Linux `unshare` to create isolated mount/PID namespace. Maximum security — completely isolated `/dev` prevents host contamination.
-
-**Architecture:**
-
-```
-h2kvm/vmcraft/namespace_lvm.py
-├── NBD Manager (device pooling, connection monitoring)
-├── Namespace LVM (strict filtering, unshare execution)
-└── Engine (context manager, start/mount/stop)
-```
+Try GuestKit first; fall back to libguestfs when the appliance is available.
 
 ---
 
 ## Backend Comparison Matrix
 
-| Feature | vmcraft | namespace |
-|---------|---------|-----------|
-| **Reliability** | Production | Experimental |
-| **Speed** | < 1s startup | 1-2s startup |
-| **Security** | Container + device filter | Namespace isolation |
-| **Memory** | ~50 MB | ~50 MB |
-| **Container Isolation** | Podman/Docker | N/A (uses unshare) |
-| **Host Isolation** | Strict device filter | Isolated /dev |
+| Feature | guestkit | guestfs |
+|---------|----------|---------|
+| **Reliability** | Production | Production |
+| **Speed** | < 1s startup | 3-6s startup (appliance) |
+| **Security** | Container + device filter | libguestfs isolation |
+| **Memory** | ~50 MB | ~200+ MB |
+| **Container Isolation** | Podman/Docker (LVM scan) | N/A |
+| **Host Isolation** | Strict device filter | Appliance-based |
 
 ---
 
@@ -292,7 +284,7 @@ vmdk: ./disk.vmdk
 output_dir: ./output
 to_output: migrated.qcow2
 
-backend: vmcraft
+backend: guestkit
 container_isolation: true   # default; set false to disable
 
 fstab_mode: stabilize-all
@@ -307,7 +299,7 @@ from h2kvm.fixers.offline_fixer import OfflineFixConfig, OfflineFSFix
 
 config = OfflineFixConfig(
     image=Path("disk.qcow2"),
-    backend="vmcraft",
+    backend="guestkit",
     container_isolation=True,
     fstab_mode="stabilize-all",
     regen_initramfs=True,
@@ -360,7 +352,7 @@ sudo modprobe nbd max_part=16
 
 ## See Also
 
-- [h2kvm/vmcraft/storage.py](../../h2kvm/vmcraft/storage.py) - LVMActivator with container isolation
-- [h2kvm/vmcraft/lvm_executor.py](../../h2kvm/vmcraft/lvm_executor.py) - _PodmanWorker and container runtime detection
-- [h2kvm/vmcraft/lvm.py](../../h2kvm/vmcraft/lvm.py) - Pure Python LVM operations
-- [h2kvm/vmcraft/namespace_lvm.py](../../h2kvm/vmcraft/namespace_lvm.py) - Namespace isolation
+- [GUESTKIT.md](GUESTKIT.md) - GuestKit integration guide
+- [BACKENDS.md](BACKENDS.md) - Backend selection
+- [guestfs_factory.py](../../h2kvm/core/guestfs_factory.py) - Backend factory
+- [guestkit_client.py](../../h2kvm/core/guestkit_client.py) - GuestKit facade

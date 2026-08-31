@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # CentOS 9 OpenShift Test - Quick Start
 
 **Date:** 2026-01-31

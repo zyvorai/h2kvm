@@ -31,7 +31,7 @@ The **h2kvm ecosystem** is a comprehensive VM migration solution consisting of t
 Production-grade VM migration toolkit that converts hypervisor disks (VMware, Hyper-V, AWS AMI, etc.) to KVM-compatible formats with automatic guest OS fixes.
 
 **Key Features:**
-- Offline VM repairs using VMCraft (default backend)
+- Offline VM repairs using GuestKit (default backend)
 - Windows VirtIO driver injection
 - Linux bootloader (GRUB/GRUB2) regeneration
 - Network configuration stabilization

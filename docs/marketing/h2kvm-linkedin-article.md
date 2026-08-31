@@ -100,9 +100,9 @@ Transparency. Confidence. Repeatability.
 
 ---
 
-## The Technology: VMCraft
+## The Technology: GuestKit
 
-At the core of h2kvm is **VMCraft**—a pure Python VM manipulation engine that's 5-7x faster than traditional tools.
+At the core of h2kvm is **GuestKit**—a pure Python VM manipulation engine that's 5-7x faster than traditional tools.
 
 **480+ API methods** for:
 - Filesystem operations (read, write, edit)
@@ -115,7 +115,7 @@ At the core of h2kvm is **VMCraft**—a pure Python VM manipulation engine that'
 
 ### Example: Automatic fstab Stabilization
 
-VMware VMs often have UUID-based fstab entries that break on KVM. VMCraft detects and fixes them:
+VMware VMs often have UUID-based fstab entries that break on KVM. GuestKit detects and fixes them:
 
 ```
 Before: /dev/disk/by-uuid/abc123 /boot xfs defaults 0 0
@@ -347,7 +347,7 @@ h2kvmctl wizard
 ## About the Technology Stack
 
 - **Language**: Python 3.10+
-- **Core Engine**: VMCraft (pure Python, no C dependencies)
+- **Core Engine**: GuestKit (pure Python, no C dependencies)
 - **Guest Manipulation**: Native qemu-nbd integration
 - **Configuration**: Augeas for safe config editing
 - **Validation**: Comprehensive test suite (176 test files)

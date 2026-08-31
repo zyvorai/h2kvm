@@ -4,6 +4,18 @@ Track major changes to H2KVM documentation.
 
 ---
 
+## Version 0.3.0 - August 2026
+
+### August 2026 - VMCraft Removal, GuestKit as Default Backend
+
+- **Deleted** obsolete VMCraft documentation: `docs/features/vmcraft-*.md` (4 files), `docs/architecture/vmcraft-architecture.md`, `SAFE_NAMESPACE_ARCHITECTURE.md`, `NAMESPACE_ENGINE.md`, `PARALLEL_CONVERSION_COMPARISON.md`, root `NBD_MANAGER_IMPLEMENTATION.md`, `ENTERPRISE_PARALLEL_MANAGER.md`, `docs/client-presentations/31-vmcraft-engine.html`
+- **Added** `docs/architecture/GUESTKIT.md` — GuestKit integration guide (`guestfs_factory`, `guestkit_client`, install, pipeline)
+- **Rewrote** `BACKENDS.md`, `ARCHITECTURE_SUMMARY.md`, `LVM_BACKENDS.md`, `IMPLEMENTATION_STATUS.md` for GuestKit-first architecture
+- **Updated** getting-started guides, API docs (`validation-api.md`, `api/README.md`), glossary, FAQ, CLI reference, config samples, test-confs (`backend: guestkit`)
+- **Bulk-updated** 100+ docs (test-results, client-presentations, marketing, development) — VMCraft → GuestKit for current product; historical test reports carry a banner noting the backend change
+
+---
+
 ## Version 0.3.0 - April 2026
 
 ### April 2026 - OVF Hardware Parsing & Multi-NIC/Disk/Secure Boot
@@ -49,7 +61,7 @@ Track major changes to H2KVM documentation.
 - ✨ **tutorials/README.md** (9.4 KB, 240 lines) - Tutorials navigation with 4-level progression
 - ✨ **recipes/README.md** (5.9 KB, 180 lines) - Quick recipes with 10 copy-paste examples
 - ✨ **guides/README.md** (13 KB, 394 lines) - User guides comprehensive index
-- ✨ **features/README.md** (15 KB, 465 lines) - Features documentation with VMCraft overview
+- ✨ **features/README.md** (15 KB, 465 lines) - Features documentation with GuestKit overview
 - ✨ **os-support/README.md** (11 KB, 382 lines) - OS support matrix for 15+ operating systems
 - ✨ **reference/README.md** (16 KB, 501 lines) - Technical reference index
 - ✨ **deployment/README.md** (4.2 KB, 140 lines) - Deployment methods overview
@@ -214,7 +226,7 @@ Track major changes to H2KVM documentation.
 
 ### Enhanced Features
 
-- VMCraft documentation expansion
+- GuestKit documentation expansion
 - Windows support guides
 - Performance optimization docs
 

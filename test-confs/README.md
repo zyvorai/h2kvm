@@ -1,6 +1,6 @@
 # 📁 h2kvm Configuration Examples
 
-This directory contains production-ready configuration examples for various migration scenarios, utilizing **h2kvm v0.3.0** with **VMCraft v9.0** capabilities.
+This directory contains production-ready configuration examples for various migration scenarios, utilizing **h2kvm v0.3.0** with **GuestKit** capabilities.
 
 ## 📑 Table of Contents
 
@@ -343,7 +343,7 @@ For detailed documentation, see:
 - **[docs/04-CLI-Reference.md](../docs/04-CLI-Reference.md)** - All CLI options
 - **[docs/05-YAML-Examples.md](../docs/05-YAML-Examples.md)** - Configuration examples
 - **[docs/06-Cookbook.md](../docs/06-Cookbook.md)** - Common recipes
-- **[docs/09-VMCraft.md](../docs/09-VMCraft.md)** - VMCraft Platform (307+ methods) ⭐ NEW
+- **[docs/09-GuestKit.md](../docs/09-GuestKit.md)** - GuestKit (307+ methods) ⭐ NEW
 
 ---
 
@@ -399,5 +399,5 @@ If you encounter issues:
 
 **Last Updated:** 2026-02-08
 **h2kvm Version:** v0.3.0
-**VMCraft Version:** v9.0
+**GuestKit Version:** v9.0
 **Maintained by:** ZyvorAI Labs Private Limited <ssahani@zyvor.dev>

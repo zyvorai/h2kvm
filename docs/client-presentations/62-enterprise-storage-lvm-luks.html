@@ -112,7 +112,7 @@ LVM/LUKS found? --yes--> Supermin appliance boots
                           mount()            --> mount decrypted root
                           command(dracut)    --> rebuild initramfs (non-LUKS only)
 
-                --no---> VMCraft (fast path, no appliance)
+                --no---> GuestKit (fast path, no appliance)
                          qemu-nbd --> host mount --> chroot dracut
   </pre>
   <div class="highlight">
@@ -233,7 +233,7 @@ Domain 'rhel8.8-migrated' defined + started
         <li>Quick probe: qemu-nbd + blkid</li>
         <li>Scans partitions for LVM2_member / crypto_LUKS</li>
         <li>Auto-switches backend before opening disk</li>
-        <li>Falls back to VMCraft for simple disks</li>
+        <li>Falls back to GuestKit for simple disks</li>
         <li>Zero user configuration needed</li>
       </ul>
     </div>

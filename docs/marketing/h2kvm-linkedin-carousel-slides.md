@@ -95,7 +95,7 @@ Boots on first try ✓
 
 ## Slide 6: The Technology
 ```
-⚡ VMCraft Engine
+⚡ GuestKit engine
 
 480+ API Methods
 Pure Python

@@ -1,252 +1,58 @@
 # H2KVM Architecture Summary
 
-## Complete Backend Ecosystem
+## Disk / Inspect / Repair Layer
 
-H2KVM now provides **three backend options** for VM conversion, each optimized for different use cases:
+Offline disk access is provided by **GuestKit** (`hypersdk-guestkit>=1.1.0`), integrated through:
+
+| Component | Role |
+|-----------|------|
+| `h2kvm/core/guestfs_factory.py` | Backend selection (`guestkit`, `guestfs`, `auto`) |
+| `h2kvm/core/guestkit_client.py` | Thin facade over GuestKit Python bindings |
+| `h2kvm/fixers/offline_fixer.py` | Delegates repair to `guestkit.run_migrate_repair()` |
+| `scripts/guestkit_inspect.py` | CLI disk inspection (replaces `vmcraft_inspect.py`) |
+
+Legacy backend names `vmcraft` and `namespace` in YAML or `H2KVM_GUESTFS_BACKEND` map to `guestkit`.
 
 ### Backend Options
 
-| Backend | Speed | Safety | Capabilities | Use Case |
-|---------|-------|--------|--------------|----------|
-| **vmcraft** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | Fast LVM operations | Batch migrations |
-| **namespace** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | **Complete pipeline** | **Best of both worlds** |
+| Backend | Role | Status |
+|---------|------|--------|
+| **guestkit** | Default offline inspect + repair | Production |
+| **guestfs** | libguestfs compatibility | Optional |
+| **auto** | GuestKit → libguestfs fallback | Production |
 
 ---
 
-## 1. VMCraft Backend (Fast Pure-Python)
+## Migration Pipeline
 
-**What it is:** Pure Python implementation with native LVM handling
-
-**Architecture:**
 ```
-Host → Python LVM module → Direct NBD → LVM operations
-```
-
-**Implementation:**
-- `h2kvm/vmcraft/lvm.py` (466 lines)
-- Direct subprocess calls
-- Production-grade semantics
-- Caching + timeout protection
-
-**Pros:**
-- ✅ Fast startup with low overhead
-- ✅ Minimal memory (~50MB)
-- ✅ No appliance needed
-- ✅ Proven LVM algorithms
-
-**Cons:**
-- ❌ No disk modification protection
-- ❌ Cannot run guest commands
-- ❌ Linux-only
-
-**When to use:**
-- Batch migrations (speed critical)
-- Standard RHEL/CentOS/Fedora guests
-- Development iterations
-- Resource-constrained hosts
-
----
-
-## 2. Namespace Backend ⭐ **NEW** (Complete Pipeline)
-
-**What it is:** Complete conversion engine with namespace + OverlayFS + chroot
-
-**Architecture:**
-```
-Host
- └─> Namespace (unshare --mount --pid --net --ipc --uts)
-      ├─> Private /dev (tmpfs)
-      ├─> NBD device (/dev/nbd0)
-      ├─> Isolated LVM (filtered activation)
-      ├─> OverlayFS (copy-on-write protection)
-      │    ├─> lowerdir: guest root (read-only)
-      │    ├─> upperdir: modifications (read-write)
-      │    └─> merged: workspace
-      └─> Chroot environment
-           ├─> /proc, /sys, /dev mounted
-           └─> Guest command execution
-                ├─> dracut --force
-                ├─> grub2-mkconfig
-                ├─> yum remove vmware-tools
-                └─> yum install qemu-guest-agent
+FETCH → FLATTEN → INSPECT → PLAN → FIX → CONVERT → VALIDATE
+                         ↑              ↑
+                    GuestKit        GuestKit
+                    doctor/         migrate_repair
+                    boot_inspect
 ```
 
-**Implementation:**
-- `h2kvm/vmcraft/namespace_engine.py` (697 lines)
-- 6 core components
-- Complete isolation stack
-- Enterprise-grade safety
+### INSPECT / FIX (GuestKit)
 
-**Components:**
+- **doctor** — bootability analysis for target hypervisor
+- **boot_inspect** — boot-related guest state summary
+- **migrate_plan** — hypervisor-aware migration plan
+- **migrate_repair** — apply fstab, GRUB, initramfs, and related fixes
 
-1. **NBDManager** - qemu-nbd connection
-2. **NamespaceManager** - Complete isolation (mount/PID/net/IPC/UTS)
-3. **IsolatedLVMManager** - Strict device filtering
-4. **OverlayFSManager** - Copy-on-write layer
-5. **ChrootManager** - Safe guest execution
-6. **NamespaceEngine** - Orchestration
-
-**Pros:**
-- ✅ **Original disk NEVER modified (OverlayFS)**
-- ✅ **Can run guest commands (dracut, grub, yum)**
-- ✅ Fastest startup (<500ms)
-- ✅ Container-level isolation
-- ✅ Memory efficient (~50MB)
-- ✅ Parallel conversion support
-- ✅ Rollback capability
-
-**Cons:**
-- ❌ New implementation (less battle-tested)
-- ❌ Linux-only
-- ❌ Requires kernel features (namespaces, OverlayFS)
-
-**When to use:**
-- **Best default choice for Linux guests**
-- Production conversions (safety + speed)
-- Custom driver installation needed
-- Configuration modifications required
-- Testing/development (rollback)
-
-**Unique capabilities:**
 ```python
-engine.chroot.run("dracut --force")
-engine.chroot.run("grub2-mkconfig -o /boot/grub2/grub.cfg")
-engine.chroot.run("yum remove vmware-tools")
-engine.chroot.run("rpm -qa > /tmp/packages.txt")
+from h2kvm.core import guestkit_client
+
+report = guestkit_client.doctor("guest.qcow2", target="kvm")
+plan = guestkit_client.migrate_plan("guest.qcow2", target="kvm")
+result = guestkit_client.migrate_repair("guest.qcow2", target="kvm", apply=True)
 ```
-
----
-
-## Performance Comparison
-
-RHEL 8.8 migration (16GB disk, LVM root):
-
-| Backend | Startup | Memory | Total Time |
-|---------|---------|--------|------------|
-| vmcraft | 0.5s | 50MB | 2.0s |
-| **namespace** | **0.3s** | **50MB** | **1.6s** |
-
----
-
-## Safety Comparison
-
-| Feature | vmcraft | namespace |
-|---------|---------|-----------|
-| **Original disk protected** | ❌ | ✅ OverlayFS |
-| **Host VG isolation** | ⚠️ Filter | ✅ |
-| **Process isolation** | ❌ | ✅ |
-| **Guest commands** | ❌ | ✅ |
-| **Rollback support** | ❌ | ✅ |
-| **Concurrent safe** | ⚠️ | ✅ |
-
----
-
-## Decision Tree
-
-```
-Need to run guest commands (dracut, yum, etc.)?
-├─ YES → namespace ⭐
-└─ NO
-    └─ Need maximum speed for simple migrations?
-        └─ YES → vmcraft
-```
-
----
-
-## Recommended Defaults
-
-### Production Migrations:
-```yaml
-# Best balance of safety + speed + capabilities
-backend: namespace
-```
-
-### Batch Processing:
-```yaml
-# Maximum speed for simple migrations
-backend: vmcraft
-```
-
-### Multi-Tenant:
-```yaml
-# Maximum isolation for untrusted guests
-backend: namespace
-```
-
----
-
-## Implementation Status
-
-| Backend | Lines | Status | Documentation |
-|---------|-------|--------|---------------|
-| vmcraft | 466 | ✅ Stable | [LVM_BACKENDS.md](LVM_BACKENDS.md) |
-| namespace | 697 | 🆕 New | [NAMESPACE_ENGINE.md](NAMESPACE_ENGINE.md) |
-
-**Total implementation:** 1,863 lines of production-grade backend code
-
----
-
-## Migration Example
-
-### Simple Migration (vmcraft):
-```python
-config = OfflineFixConfig(
-    image=Path("guest.qcow2"),
-    backend="vmcraft",
-    fstab_mode="by-uuid"
-)
-```
-
-### Advanced Migration (namespace):
-```python
-from h2kvm.vmcraft.namespace_engine import NamespaceEngine
-
-engine = NamespaceEngine(image="guest.qcow2")
-try:
-    engine.start()
-
-    # Custom operations
-    engine.remove_vmware_tools()
-    engine.install_virtio_drivers()
-    engine.regenerate_initramfs()
-    engine.update_grub()
-
-    # Custom package installation
-    engine.chroot.run("yum install -y custom-driver.rpm")
-
-    # Verify changes
-    packages = engine.chroot.run("rpm -qa | grep custom")
-
-finally:
-    engine.stop()  # Automatic cleanup
-```
-
----
-
-## Architecture Evolution
-
-### Phase 1: VMCraft Foundation
-```
-Host → Python LVM → NBD → Guest
-```
-- Faster execution
-- Lower resources
-- No guest commands
-
-### Phase 2: Namespace ⭐ (Current)
-```
-Host → unshare → NBD + LVM + OverlayFS + chroot → Guest commands
-```
-- Complete solution
-- Best performance
-- Maximum safety
-- Full capabilities
 
 ---
 
 ## OVF Hardware Parsing & Domain XML Generation
 
-The pipeline now extracts hardware resources from OVF/OVA metadata and vSphere VM info, propagating them through to libvirt domain XML generation:
+The pipeline extracts hardware resources from OVF/OVA metadata and vSphere VM info, propagating them to libvirt domain XML:
 
 ### Data Flow
 ```
@@ -268,43 +74,37 @@ govc vm.info -json → _fetch_vm_hardware_info() → spec.vm_hardware_info
 | **Guest EFI scan** | Secure Boot shim detection (shimx64.efi) |
 | **Guest fstab** | Swap partition size (memory estimation fallback) |
 
-### Domain XML Features
-- **Multi-NIC**: `nic_count` generates N `<interface>` elements
-- **Multi-disk**: `additional_disks` generates extra `<disk>` elements (vdb, vdc, ...)
-- **Secure Boot**: Resolves `.secboot.fd` OVMF firmware, adds `secure='yes'` to `<loader>`
+---
+
+## Recommended Defaults
+
+### Production Migrations
+```yaml
+backend: guestkit
+fstab_mode: stabilize-all
+regen_initramfs: true
+```
+
+### libguestfs Environments
+```yaml
+backend: guestfs
+```
 
 ---
 
-## Future Enhancements
+## Architecture Evolution
 
-Planned improvements:
+### Previous: VMCraft (removed)
+Pure-Python disk engine with namespace/LVM subsystems — **removed** (~96 files). Capabilities moved to GuestKit.
 
-- [ ] Automatic backend selection based on guest OS
-- [ ] Hybrid backends (namespace for LVM, vmcraft for guest ops)
-- [ ] Windows support in namespace
-- [ ] Real-time conversion progress monitoring
-- [ ] Parallel multi-VM processing framework
-- [ ] Kubernetes operator with backend selection
-- [ ] Change tracking (OverlayFS upper layer analysis)
-- [ ] Performance profiling and optimization
-
----
-
-## Summary
-
-H2KVM now provides a **complete backend ecosystem** with options for every use case:
-
-- **Production:** namespace (safety + speed + capabilities)
-- **Batch:** vmcraft (maximum speed)
-- **Compatibility:** vmcraft (proven reliability)
-
-The addition of **namespace** provides enterprise-grade safety with container-level performance, enabling true production-grade VM conversions at scale.
+### Current: GuestKit
+Rust Guestfs + repair pipelines exposed to h2kvm via PyO3. h2kvm orchestrates migration; GuestKit owns disk inspect/repair semantics.
 
 ---
 
 ## See Also
 
-- [BACKENDS.md](BACKENDS.md) - General backend comparison
-- [LVM_BACKENDS.md](LVM_BACKENDS.md) - LVM-specific backends
-- [NAMESPACE_ENGINE.md](NAMESPACE_ENGINE.md) - Complete namespace engine guide
-- [Migration Guide](MIGRATION_GUIDE.md) - End-to-end migration workflow
+- [BACKENDS.md](BACKENDS.md) — Backend comparison and configuration
+- [GUESTKIT.md](GUESTKIT.md) — Integration guide
+- [LVM_BACKENDS.md](LVM_BACKENDS.md) — LVM activation during offline fixes
+- [Full Architecture](../reference/architecture.md)

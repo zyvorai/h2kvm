@@ -2,7 +2,7 @@
 
 **Status**: ✅ Production Ready (v0.1.0+)
 **Platforms**: openSUSE, SUSE, Fedora, RHEL, Ubuntu, Debian
-**Component**: VMCraft Offline Fixer
+**Component**: GuestKit Offline Fixer
 
 ---
 
@@ -71,7 +71,7 @@ The enhanced chroot implementation (`command_with_mounts()` method) follows this
 
 ### Implementation Details
 
-**Location**: `h2kvm/vmcraft/main.py`
+**Location**: `h2kvm/core/main.py`
 
 **Key Features**:
 - ✅ **Automatic bind mounting**: Creates `/proc`, `/dev`, `/sys` bind mounts
@@ -115,7 +115,7 @@ The implementation is fully backward compatible:
 
 1. Using `--regen-initramfs` or `--update-grub` flags
 2. Running `OfflineFSFix` with bootloader regeneration enabled
-3. Any bootloader command is executed via VMCraft
+3. Any bootloader command is executed via GuestKit
 
 **Example**:
 ```bash
@@ -128,12 +128,12 @@ h2kvm migrate vm.vmdk \
 
 ### Programmatic (API)
 
-For custom scripts using VMCraft directly:
+For custom scripts using GuestKit directly:
 
 ```python
-from h2kvm.vmcraft.main import VMCraft
+from h2kvm.guestkit.main import guestkit_client
 
-with VMCraft() as g:
+with GuestKit() as g:
     g.add_drive_opts("/path/to/disk.qcow2", readonly=False)
     g.launch()
 
@@ -293,12 +293,12 @@ finally:
 
 ### Symptom: GRUB regeneration fails with "/dev not found"
 
-**Cause**: Enhanced chroot not being used (possible VMCraft version issue)
+**Cause**: Enhanced chroot not being used (possible GuestKit version issue)
 
 **Solution**:
 ```bash
-# Verify VMCraft version
-python3 -c "from h2kvm.vmcraft.main import VMCraft; print(hasattr(VMCraft, 'command_with_mounts'))"
+# Verify GuestKit version
+python3 -c "from h2kvm.guestkit.main import guestkit_client; print(hasattr(GuestKit, 'command_with_mounts'))"
 # Should print: True
 
 # If False, update h2kvm:
@@ -333,11 +333,11 @@ cat /tmp/migration-report.json | jq '.analysis.timings.regen_initramfs_and_bootl
 
 ### Testing
 
-**Unit Tests**: `tests/unit/test_vmcraft_enhanced_chroot.py` (13 tests)
+**Unit Tests**: `tests/unit/fixers/test_offline_fixer.py` (offline fix / GuestKit integration)
 
 Run tests:
 ```bash
-pytest tests/unit/test_vmcraft_enhanced_chroot.py -v
+pytest tests/unit/fixers/test_offline_fixer.py -v
 ```
 
 **Test Coverage**:
@@ -350,7 +350,7 @@ pytest tests/unit/test_vmcraft_enhanced_chroot.py -v
 
 ### API Reference
 
-#### `VMCraft.command_with_mounts(cmd: list[str], quiet: bool = False) -> str`
+#### `GuestKit.command_with_mounts(cmd: list[str], quiet: bool = False) -> str`
 
 Execute command in guest filesystem with pseudo-filesystems bind-mounted.
 
@@ -406,7 +406,7 @@ output = g.command_with_mounts(["grub2-probe", "/"], quiet=True)
 
 ## See Also
 
-- [VMCraft Documentation](09-VMCraft.md)
+- [GuestKit Documentation](09-GuestKit.md)
 - [SUSE Migration Guide](23-SUSE.md)
 - [Architecture Overview](01-Architecture.md)
 - [Fstab Stabilization](11-Fstab-Stabilization.md)

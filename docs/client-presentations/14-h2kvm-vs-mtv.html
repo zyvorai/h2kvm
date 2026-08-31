@@ -106,7 +106,7 @@
     <tr><td><strong>Target: OpenShift</strong></td><td class="check">&#10003; Supported</td><td class="check">&#10003; Native</td></tr>
     <tr><td><strong>Interactive TUI</strong></td><td class="check">&#10003; zkvm (Bubble Tea)</td><td class="cross">&#10007; Web UI only</td></tr>
     <tr><td><strong>CLI automation</strong></td><td class="check">&#10003; h2kvmctl + YAML</td><td class="partial">kubectl + CRDs</td></tr>
-    <tr><td><strong>Offline guest OS fixes</strong></td><td class="check">&#10003; VMCraft engine</td><td class="partial">Limited (virt-v2v subset)</td></tr>
+    <tr><td><strong>Offline guest OS fixes</strong></td><td class="check">&#10003; GuestKit engine</td><td class="partial">Limited (virt-v2v subset)</td></tr>
     <tr><td><strong>Windows VirtIO injection</strong></td><td class="check">&#10003; Full pipeline</td><td class="check">&#10003;</td></tr>
     <tr><td><strong>Boot verification</strong></td><td class="check">&#10003; Automated test</td><td class="cross">&#10007;</td></tr>
     <tr><td><strong>Live progress streaming</strong></td><td class="check">&#10003; Real-time + ETA</td><td class="partial">Web UI progress only</td></tr>
@@ -115,7 +115,7 @@
     <tr><td><strong>Carbon-aware scheduling</strong></td><td class="check">&#10003; Green migration</td><td class="cross">&#10007;</td></tr>
     <tr><td><strong>Cost estimation</strong></td><td class="check">&#10003; Per-VM cost calc</td><td class="cross">&#10007;</td></tr>
     <tr><td><strong>Air-gap / offline</strong></td><td class="check">&#10003; Fully offline</td><td class="partial">Partial (needs OCP)</td></tr>
-    <tr><td><strong>No libguestfs required</strong></td><td class="check">&#10003; VMCraft = Python + qemu-nbd</td><td class="cross">&#10007; Uses libguestfs</td></tr>
+    <tr><td><strong>No libguestfs required</strong></td><td class="check">&#10003; GuestKit = Python + qemu-nbd</td><td class="cross">&#10007; Uses libguestfs</td></tr>
     <tr><td><strong>Hexagonal architecture</strong></td><td class="check">&#10003; 13+ port interfaces</td><td class="cross">&#10007; Monolithic operator</td></tr>
     <tr><td><strong>Webhook notifications</strong></td><td class="check">&#10003; Slack, Teams, custom</td><td class="cross">&#10007;</td></tr>
     <tr><td><strong>RBAC + audit trail</strong></td><td class="check">&#10003; Built-in</td><td>Inherits from OpenShift</td></tr>
@@ -181,7 +181,7 @@
       <h4>h2kvm + hypersdk: Two-Layer Platform</h4>
       <ul>
         <li><strong>hypersdk (Go daemon):</strong> Cloud API abstraction, 10 providers, hexagonal architecture with 13+ port interfaces</li>
-        <li><strong>h2kvmctl (Python):</strong> Disk conversion, VMCraft guest fixes, libvirt XML generation, KubeVirt manifests</li>
+        <li><strong>h2kvmctl (Python):</strong> Disk conversion, GuestKit guest fixes, libvirt XML generation, KubeVirt manifests</li>
         <li><strong>zkvm (Go TUI):</strong> Interactive terminal UI, vSphere discovery, live progress, file browser</li>
         <li><strong>Clean separation:</strong> Each layer can be used independently or together</li>
         <li><strong>Extensible:</strong> Add a new cloud provider by implementing one Go interface</li>
@@ -265,7 +265,7 @@
       <p><code>h2kvmctl doctor</code> checks 9 system areas: disk space, dependencies, permissions, network, libvirt, KubeVirt readiness. MTV discovers issues at runtime.</p>
     </div>
     <div class="card">
-      <h4>VMCraft Engine</h4>
+      <h4>GuestKit engine</h4>
       <p>Pure Python + qemu-nbd for offline guest fixes. No libguestfs appliance boot (~30s overhead). Works on minimal Linux, containers, edge devices. MTV depends on libguestfs.</p>
     </div>
     <div class="card">
@@ -415,7 +415,7 @@
 
   <h3>Conversion Engine Comparison</h3>
   <table>
-    <tr><th style="width:25%">Aspect</th><th style="width:37%">h2kvm (VMCraft)</th><th style="width:38%">MTV (virt-v2v)</th></tr>
+    <tr><th style="width:25%">Aspect</th><th style="width:37%">h2kvm (GuestKit)</th><th style="width:38%">MTV (virt-v2v)</th></tr>
     <tr><td><strong>Implementation</strong></td><td>Pure Python + qemu-nbd</td><td>OCaml + libguestfs + supermin</td></tr>
     <tr><td><strong>Startup overhead</strong></td><td class="check">~0s (direct mount)</td><td class="cross">~30s (appliance boot per VM)</td></tr>
     <tr><td><strong>Dependencies</strong></td><td class="check">Python 3, qemu-utils</td><td class="cross">libguestfs, supermin, kernel modules</td></tr>

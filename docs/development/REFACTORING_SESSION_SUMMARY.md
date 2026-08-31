@@ -55,7 +55,7 @@ This session completed a major refactoring effort focused on improving code qual
    - After: Depth 2-3
    - Helpers: 11 command handlers via dispatch pattern
 
-6. **deactivate_all()** (vmcraft/storage.py)
+6. **deactivate_all()** (guestkit/storage.py)
    - Before: Depth 11, 165 lines
    - After: Depth 2-3
    - Helpers: 13 focused methods
@@ -110,7 +110,7 @@ TEMP_DIR = "/tmp"
 4. quality/testing/libvirt_tester.py (1 location)
 5. providers/vmware/utils/datastore.py (1 location)
 6. runtime/worker/metrics.py (1 location)
-7. vmcraft/nbd.py (1 location)
+7. guestkit/nbd.py (1 location)
 
 **Outcome**: Consistent delay handling across codebase
 
@@ -129,7 +129,7 @@ TEMP_DIR = "/tmp"
 9. **818efa1** - Drop backward compatibility (BREAKING)
 10. **6cce487** - Reduce nesting depth (guest_inspector.py, 3 functions)
 11. **3489207** - Reduce nesting depth (disk_discovery.py + guest_inspector.py)
-12. **97415c9** - Reduce nesting depth (vmcraft/storage.py)
+12. **97415c9** - Reduce nesting depth (guestkit/storage.py)
 13. **0d66fc9** - Add comprehensive code metrics report
 
 ## Breaking Changes
@@ -206,9 +206,9 @@ emit_linux_domain(config)
 - `runtime/daemon/*.py` - DELAY_STATUS_POLL
 - `runtime/worker/metrics.py` - DELAY_STATUS_POLL
 
-### VMCraft
-- `vmcraft/nbd.py` - DELAY_STATUS_POLL
-- `vmcraft/storage.py` - Deactivation methods
+### GuestKit
+- `guestkit/nbd.py` - DELAY_STATUS_POLL
+- `guestkit/storage.py` - Deactivation methods
 
 ## Documentation Deliverables
 

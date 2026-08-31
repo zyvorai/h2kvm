@@ -1,7 +1,7 @@
 command: local
 vmdk: /home/ssahani/Downloads/centos/CentOS_Stream_9_VMM_LinuxVMImages.COM.vmdk
 output_dir: ./output
-backend: vmcraft
+backend: guestkit
 flatten: true
 to_output: centos9-fixed.qcow2
 out_format: qcow2

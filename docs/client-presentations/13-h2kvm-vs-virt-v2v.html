@@ -83,8 +83,8 @@
     <tr><td><strong>VMware vSphere export</strong></td><td class="check">&#10003; Built-in govc integration</td><td class="partial">Requires manual export or libvirt URI</td></tr>
     <tr><td><strong>Hyper-V / VHD(X) support</strong></td><td class="check">&#10003; Native</td><td class="check">&#10003;</td></tr>
     <tr><td><strong>Cloud VM import (AWS, Azure, GCP...)</strong></td><td class="check">&#10003; 10 cloud providers via hypersdk</td><td class="cross">&#10007; Not supported</td></tr>
-    <tr><td><strong>Disk conversion (VMDK, QCOW2, RAW)</strong></td><td class="check">&#10003; VMCraft + qemu-img</td><td class="check">&#10003; libguestfs</td></tr>
-    <tr><td><strong>Offline guest OS fixes</strong></td><td class="check">&#10003; VMCraft (pure Python + qemu-nbd)</td><td class="check">&#10003; libguestfs (C + appliance)</td></tr>
+    <tr><td><strong>Disk conversion (VMDK, QCOW2, RAW)</strong></td><td class="check">&#10003; GuestKit + qemu-img</td><td class="check">&#10003; libguestfs</td></tr>
+    <tr><td><strong>Offline guest OS fixes</strong></td><td class="check">&#10003; GuestKit (pure Python + qemu-nbd)</td><td class="check">&#10003; libguestfs (C + appliance)</td></tr>
     <tr><td><strong>Windows VirtIO injection</strong></td><td class="check">&#10003; Registry + driver install</td><td class="check">&#10003;</td></tr>
     <tr><td><strong>fstab / initramfs repair</strong></td><td class="check">&#10003; Automatic detection</td><td class="check">&#10003;</td></tr>
     <tr><td><strong>Libvirt domain XML generation</strong></td><td class="check">&#10003; Automatic, customizable</td><td class="cross">&#10007; Manual post-step</td></tr>
@@ -96,7 +96,7 @@
     <tr><td><strong>Live progress streaming</strong></td><td class="check">&#10003; Real-time with ETA</td><td class="cross">&#10007; Minimal output</td></tr>
     <tr><td><strong>Pre-flight validation</strong></td><td class="check">&#10003; h2kvmctl doctor</td><td class="cross">&#10007; Not available</td></tr>
     <tr><td><strong>Air-gap / offline operation</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
-    <tr><td><strong>No libguestfs dependency</strong></td><td class="check">&#10003; VMCraft is pure Python</td><td class="cross">&#10007; Requires libguestfs appliance</td></tr>
+    <tr><td><strong>No libguestfs dependency</strong></td><td class="check">&#10003; GuestKit is pure Python</td><td class="cross">&#10007; Requires libguestfs appliance</td></tr>
   </table>
 </div>
 
@@ -133,7 +133,7 @@
     </div>
     <div class="card">
       <h4>6. Edge / Remote Site Deployment</h4>
-      <p><strong>h2kvm:</strong> Lightweight — no libguestfs appliance needed. VMCraft engine is pure Python + qemu-nbd. Works on minimal Linux installs at edge locations.</p>
+      <p><strong>h2kvm:</strong> Lightweight — no libguestfs appliance needed. GuestKit engine is pure Python + qemu-nbd. Works on minimal Linux installs at edge locations.</p>
       <p><strong>virt-v2v:</strong> Requires libguestfs + supermin appliance (500MB+). Difficult to install on minimal or hardened edge systems. Package dependency chain is heavy.</p>
     </div>
   </div>
@@ -149,7 +149,7 @@
       <h4 style="color:#22c55e;">h2kvm Architecture</h4>
       <ul>
         <li><strong>Two-layer design:</strong> h2kvmctl (converter) + hypersdk (orchestrator)</li>
-        <li><strong>VMCraft engine:</strong> Pure Python + qemu-nbd — no C dependencies, no appliance boot</li>
+        <li><strong>GuestKit engine:</strong> Pure Python + qemu-nbd — no C dependencies, no appliance boot</li>
         <li><strong>Modular pipeline:</strong> Export &rarr; Convert &rarr; Fix &rarr; Deploy &rarr; Verify</li>
         <li><strong>YAML-driven:</strong> Declarative configs, version-controlled, CI/CD ready</li>
         <li><strong>Dual target:</strong> Same pipeline outputs libvirt XML and/or KubeVirt manifests</li>
@@ -175,7 +175,7 @@
 
   <div class="highlight">
     <h3 style="margin-top:0;">The libguestfs Problem</h3>
-    <p>virt-v2v depends on libguestfs, which boots a small Linux appliance (supermin) to mount guest filesystems. This adds <strong>~30 seconds overhead per VM</strong>, requires <strong>500MB+ of packages</strong>, and breaks on hardened systems with restricted kernel modules. h2kvm's VMCraft engine uses <strong>qemu-nbd</strong> to mount disks directly — no appliance, no boot, no overhead. Works on minimal Linux installs including edge devices and containers.</p>
+    <p>virt-v2v depends on libguestfs, which boots a small Linux appliance (supermin) to mount guest filesystems. This adds <strong>~30 seconds overhead per VM</strong>, requires <strong>500MB+ of packages</strong>, and breaks on hardened systems with restricted kernel modules. h2kvm's GuestKit engine uses <strong>qemu-nbd</strong> to mount disks directly — no appliance, no boot, no overhead. Works on minimal Linux installs including edge devices and containers.</p>
   </div>
 </div>
 

@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # CentOS 9 Migration Testing Results
 
 **Date:** 2026-01-31
@@ -262,7 +264,7 @@ sudo h2kvmctl \
 
 **Test 2 - Full Offline Fixes:**
 - Inspection: ~49 seconds
-- VMCraft initialization: ~39 seconds
+- GuestKit initialization: ~39 seconds
 - Offline fixes: ~2.5 minutes
   - fstab: <1 second
   - Network fixes: <1 second
@@ -621,7 +623,7 @@ Failed to pull image: toomanyrequests: rate limit exceeded
 
 **Symptom:**
 ```
-Error: container has runAsNonRoot and image has non-numeric user (vmcraft)
+Error: container has runAsNonRoot and image has non-numeric user (guestkit)
 ```
 
 **Root Cause:**
@@ -774,7 +776,7 @@ spec:
 
 **Logs:**
 - Full conversion log available in terminal output
-- VMCraft backend logs: successful NBD operations
+- GuestKit backend logs: successful NBD operations
 - No errors in final output
 
 ---

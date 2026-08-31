@@ -8,7 +8,7 @@ Comprehensive glossary of terms, concepts, and technologies used in H2KVM.
 
 - [Core Concepts](#core-concepts)
 - [Migration Terms](#migration-terms)
-- [VMCraft Terms](#vmcraft-terms)
+- [GuestKit Terms](#guestkit-terms)
 - [Virtualization Technologies](#virtualization-technologies)
 - [File Systems & Storage](#file-systems--storage)
 - [Networking](#networking)
@@ -60,8 +60,8 @@ The original virtualization platform (VMware ESXi, vSphere, Hyper-V) from which 
 ### Target Platform
 The destination virtualization platform (KVM, QEMU, OpenStack, oVirt) to which VMs are being migrated.
 
-### VMCraft
-H2KVM's native Python VM manipulation engine with 480+ APIs for guest filesystem operations.
+### GuestKit
+H2KVM's default offline disk backend (`hypersdk-guestkit`). Provides doctor, migrate plan/repair, and GuestFS-compatible disk access via `guestfs_factory` and `guestkit_client`.
 
 ---
 
@@ -108,40 +108,43 @@ Fixing duplicate XFS filesystem UUIDs that occur when VMware VMs are cloned.
 
 ---
 
-## VMCraft Terms
+## GuestKit Terms
 
-### API Count
-VMCraft provides 480+ APIs for guest manipulation, covering filesystem, packages, services, and configuration.
+### doctor
+GuestKit bootability analysis for a target hypervisor (e.g. KVM). Exposed via `guestkit_client.doctor()`.
 
-### Augeas
-Configuration file editing library integrated into VMCraft for safe manipulation of system configuration files.
+### migrate_repair
+GuestKit hypervisor-aware offline repair pipeline (fstab, GRUB, initramfs, etc.). Used by `offline_fixer`.
+
+### guestfs_factory
+h2kvm module that creates GuestFS-compatible handles (`guestkit`, `guestfs`, or `auto` backends).
+
+### guestkit_client
+Thin h2kvm facade over `hypersdk-guestkit` Python bindings.
 
 ### Guest Inspection
-Analyzing a VM disk to detect OS type, installed packages, services, and configuration.
+Analyzing a VM disk to detect OS type, boot configuration, and migration readiness.
 
 ### guestfish
-Legacy command-line tool for manual VM manipulation. VMCraft provides similar capabilities natively.
+Legacy libguestfs CLI for manual disk manipulation. GuestKit provides a faster alternative for h2kvm workflows.
 
 ### LVM Support
-Logical Volume Manager support in VMCraft for accessing LVM-based filesystems within VMs.
+Logical Volume Manager activation during offline fixes, with optional container-isolated VG scanning.
 
 ### NBD (Network Block Device)
-Protocol for accessing block devices over a network. Used by VMCraft to mount QCOW2 images.
+Protocol for accessing block devices over the network. GuestKit uses `qemu-nbd` to attach disk images.
 
 ### OS Detection
 Automatic identification of the guest operating system (distribution, version, architecture).
 
-### Package Management
-VMCraft's ability to query and manipulate packages using yum, dnf, apt, zypper within guest filesystems.
-
-### Registry Manipulation
-VMCraft's capability to read and modify Windows Registry hives for driver injection and configuration.
+### VirtIO Drivers
+GuestKit's capability to read and modify Windows Registry hives for driver injection and configuration.
 
 ### Service Management
-VMCraft APIs for enabling/disabling systemd services or SysV init scripts within guests.
+GuestKit APIs for enabling/disabling systemd services or SysV init scripts within guests.
 
 ### VirtIO Drivers
-Paravirtualized drivers for optimal performance on KVM. VMCraft can inject these into Windows VMs.
+Paravirtualized drivers for optimal performance on KVM. GuestKit can inject these into Windows VMs.
 
 ---
 
@@ -433,7 +436,7 @@ Use your browser's search function (Ctrl+F / Cmd+F) to quickly locate terms in t
 For more detailed information about specific topics:
 
 - **Migration concepts**: See [Tutorials](tutorials/)
-- **VMCraft APIs**: See [Features Documentation](features/vmcraft/)
+- **GuestKit APIs**: See [GuestKit Integration Guide](../architecture/GUESTKIT.md)
 - **Technical details**: See [Reference Documentation](reference/)
 - **Troubleshooting**: See [FAQ](FAQ.md)
 

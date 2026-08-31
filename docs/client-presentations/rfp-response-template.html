@@ -154,7 +154,7 @@
 
     <div class="rfp-q">Q: Describe your technical approach to converting VMware VMs to KVM format.</div>
     <div class="rfp-a">
-      Our conversion pipeline uses h2kvm's VMCraft engine (pure Python + qemu-nbd), which processes each VM through these stages:
+      Our conversion pipeline uses h2kvm's GuestKit engine (pure Python + qemu-nbd), which processes each VM through these stages:
       <ul>
         <li><strong>Export:</strong> govc-based vSphere export with streaming progress monitoring</li>
         <li><strong>Convert:</strong> VMDK/OVA → QCOW2 with optional compression (40-60% space savings)</li>

@@ -43,7 +43,7 @@ Detect and extract Windows license information:
 class WindowsLicenseManager:
     """Manages Windows licensing during migration."""
 
-    def detect_license_type(self, g: VMCraft) -> dict:
+    def detect_license_type(self, g: GuestKit) -> dict:
         """
         Detect Windows license type and status.
 
@@ -88,7 +88,7 @@ class WindowsLicenseManager:
 
         return license_info
 
-    def _is_kms_activated(self, g: VMCraft) -> bool:
+    def _is_kms_activated(self, g: GuestKit) -> bool:
         """Check if Windows is KMS-activated."""
         # Check registry: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform
         # KeyManagementServiceMachine value
@@ -99,7 +99,7 @@ class WindowsLicenseManager:
         except:
             return False
 
-    def _get_kms_server(self, g: VMCraft) -> str | None:
+    def _get_kms_server(self, g: GuestKit) -> str | None:
         """Get KMS server address from registry."""
         try:
             key_path = "Microsoft\\Windows NT\\CurrentVersion\\SoftwareProtectionPlatform"
@@ -107,7 +107,7 @@ class WindowsLicenseManager:
         except:
             return None
 
-    def _get_partial_key(self, g: VMCraft) -> str:
+    def _get_partial_key(self, g: GuestKit) -> str:
         """Get last 5 characters of product key (for reference)."""
         # Read from registry (encoded)
         # HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\DigitalProductId
@@ -226,7 +226,7 @@ cscript //nologo C:\\Windows\\System32\\slmgr.vbs /ato
 
         return script
 
-    def inject_reactivation_script(self, g: VMCraft, script: str):
+    def inject_reactivation_script(self, g: GuestKit, script: str):
         """
         Inject reactivation script into Windows VM.
 
@@ -264,7 +264,7 @@ Handle enterprise volume licensing scenarios:
 class VolumeLicensingManager:
     """Handle Windows Volume Licensing (VAMT, KMS, MAK)."""
 
-    def handle_volume_activation(self, g: VMCraft, license_info: dict):
+    def handle_volume_activation(self, g: GuestKit, license_info: dict):
         """
         Configure volume activation for enterprise environments.
 
@@ -279,7 +279,7 @@ class VolumeLicensingManager:
         elif license_info['type'] == 'MAK':
             self._configure_mak_client(g)
 
-    def _configure_kms_client(self, g: VMCraft, kms_server: str):
+    def _configure_kms_client(self, g: GuestKit, kms_server: str):
         """Configure KMS client settings."""
 
         # Set KMS server in registry
@@ -323,7 +323,7 @@ class VolumeLicensingManager:
 class ActiveDirectoryManager:
     """Manage Active Directory integration during Windows VM migration."""
 
-    def detect_domain_membership(self, g: VMCraft) -> dict:
+    def detect_domain_membership(self, g: GuestKit) -> dict:
         """
         Detect if Windows is domain-joined and gather AD information.
 
@@ -375,7 +375,7 @@ class ActiveDirectoryManager:
 
         return domain_info
 
-    def _get_machine_sid(self, g: VMCraft) -> str:
+    def _get_machine_sid(self, g: GuestKit) -> str:
         """Extract machine SID from SAM database."""
         # Machine SID is in SAM\SAM\Domains\Account\V key
         # This is binary data that needs parsing
@@ -538,7 +538,7 @@ try {{
 ```python
 class ActiveDirectoryManager:
 
-    def regenerate_machine_sid(self, g: VMCraft):
+    def regenerate_machine_sid(self, g: GuestKit):
         """
         Regenerate machine SID to avoid conflicts.
 
@@ -603,7 +603,7 @@ if ($confirm -eq "yes") {
 class SQLServerManager:
     """Manage SQL Server migrations."""
 
-    def detect_sql_server(self, g: VMCraft) -> dict:
+    def detect_sql_server(self, g: GuestKit) -> dict:
         """
         Detect SQL Server installations.
 
@@ -662,7 +662,7 @@ class SQLServerManager:
 
         return sql_info
 
-    def _get_instance_details(self, g: VMCraft, instance_name: str) -> dict:
+    def _get_instance_details(self, g: GuestKit, instance_name: str) -> dict:
         """Get detailed information about SQL Server instance."""
 
         # Get instance registry key
@@ -697,7 +697,7 @@ class SQLServerManager:
 ```python
 class SQLServerManager:
 
-    def migrate_sql_configuration(self, g: VMCraft, sql_info: dict):
+    def migrate_sql_configuration(self, g: GuestKit, sql_info: dict):
         """
         Migrate SQL Server configuration to new VM.
 
@@ -713,7 +713,7 @@ class SQLServerManager:
             self._update_network_config(g, instance)
             self._verify_file_paths(g, instance)
 
-    def _update_network_config(self, g: VMCraft, instance: dict):
+    def _update_network_config(self, g: GuestKit, instance: dict):
         """Update SQL Server network configuration."""
 
         # Ensure TCP/IP is enabled
@@ -838,7 +838,7 @@ Download VirtIO drivers from Windows Update before migration.
 class WindowsUpdateDriverManager:
     """Integrate with Windows Update for VirtIO driver download."""
 
-    def stage_virtio_drivers(self, g: VMCraft):
+    def stage_virtio_drivers(self, g: GuestKit):
         """
         Pre-stage VirtIO drivers in Windows DriverStore.
 

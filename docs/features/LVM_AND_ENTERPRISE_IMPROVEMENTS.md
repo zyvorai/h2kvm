@@ -95,7 +95,7 @@ def deactivate_lvm(self):
     subprocess.run(["udevadm", "settle"])
 ```
 
-### 2. `/h2kvm/core/vmcraft/storage.py`
+### 2. `/h2kvm/core/guestkit_client.pystorage.py`
 
 **Changes**:
 - Added NBD device filtering to `LVMActivator.activate()`
@@ -196,7 +196,7 @@ def acquire_nbd_lock(self, nbd_device: str):
 
 ### 3. **Enhanced LVM Cleanup**
 
-**File**: `/h2kvm/core/vmcraft/storage.py`
+**File**: `/h2kvm/core/guestkit_client.pystorage.py`
 
 **Deactivation Strategy**:
 
@@ -269,7 +269,7 @@ python3 -c "from nbd_prep import NBDPrepDaemon; d = NBDPrepDaemon('node1'); d.at
 
 ```python
 # Old (unsafe)
-from h2kvm.vmcraft.storage import LVMActivator
+from h2kvm.core import guestkit_client
 LVMActivator.activate(logger)  # ❌ Activates ALL VGs
 
 # New (safe)
@@ -355,7 +355,7 @@ fixer = InitramfsFixer(
 
 - Enterprise RHEL VM Boot Repair Tool (provided by user)
 - LVM2 man pages: `man vgchange`, `man pvs`, `man dmsetup`
-- VMCraft approach: Uses `--devicesfile ""` for safety
+- GuestKit approach: Uses `--devicesfile ""` for safety
 - NBD kernel module: `modprobe nbd max_part=16`
 
 ---

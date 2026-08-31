@@ -254,7 +254,7 @@ def activate_lvm(
     Notes
     -----
     This function uses PID-based isolated LVM directories for concurrent
-    safety. See vmcraft/storage.py for implementation details.
+    safety. See guestkit/storage.py for implementation details.
     """
     ...
 ```
@@ -459,15 +459,15 @@ class DiskInfo:
 Use when behavior is more important than data:
 
 ```python
-class VMCraft:
+class GuestKit:
     """VM disk image manipulation."""
 
     def __init__(self, disk_path: Path):
-        """Initialize VMCraft instance."""
+        """Initialize GuestKit guest handle."""
         self.disk_path = disk_path
         self._device: str | None = None
 
-    def __enter__(self) -> "VMCraft":
+    def __enter__(self) -> "GuestKit":
         """Context manager entry."""
         self.launch()
         return self
@@ -587,7 +587,7 @@ from guestfs import GuestFS
 
 # Local
 from h2kvm.core import exceptions
-from h2kvm.vmcraft import VMCraft
+from h2kvm.core import guestkit_client
 ```
 
 ### Import Style
@@ -702,7 +702,7 @@ class TestLVMActivation:
 ```python
 from unittest.mock import Mock, patch
 
-@patch("h2kvm.vmcraft.storage.run_sudo")
+@patch("h2kvm.guestkit.storage.run_sudo")
 def test_activate_lvm_success(mock_run_sudo):
     """Should activate VG successfully."""
     # Arrange

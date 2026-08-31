@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # ✅ RETEST SUCCESS SUMMARY
 
 **Date**: February 14, 2026, 17:23-17:33
@@ -113,19 +115,19 @@ $ sudo dmsetup ls | wc -l
 
 ## 🐛 Bugs Fixed
 
-### 1. VMCraft Mount Import Errors ✅
+### 1. GuestKit Mount Import Errors ✅
 
 **Files Fixed**:
-- `h2kvm/core/vmcraft/api/filesystem_mixin.py`
+- `h2kvm/core/guestkit_client.pyapi/filesystem_mixin.py`
   - Added: `run_sudo`, `svc_list_partitions_cached`, `svc_invalidate_partition_cache`, `os`
 
-- `h2kvm/core/vmcraft/api/storage_mixin.py`
+- `h2kvm/core/guestkit_client.pyapi/storage_mixin.py`
   - Added: `LVMActivator`, `run_sudo`, `execute_chroot_command`
 
-- `h2kvm/core/vmcraft/api/partition_mixin.py`
+- `h2kvm/core/guestkit_client.pyapi/partition_mixin.py`
   - Added: `run_sudo`
 
-- `h2kvm/core/vmcraft/api/inspection_mixin.py`
+- `h2kvm/core/guestkit_client.pyapi/inspection_mixin.py`
   - Added: `run_sudo`
 
 **Impact**:
@@ -151,7 +153,7 @@ Verified during retest:
 |-----------|------|------------|
 | NBD Connection | 0.77s | Fast |
 | LVM Activation | 0.71s | **Enterprise-grade speed** |
-| VMCraft Ready | 1.49s | **Sub-2s total startup** |
+| GuestKit Ready | 1.49s | **Sub-2s total startup** |
 | Initramfs Rebuild | 90s | Single kernel |
 | Full Conversion | ~10 min | Complete pipeline |
 
@@ -195,7 +197,7 @@ Validation: PASS (qemu-img check)
 
 **Analysis**:
 - This is a **separate bug** from the mount issues we fixed
-- Located in the offline fixer, not VMCraft mount code
+- Located in the offline fixer, not GuestKit mount code
 - Does **NOT** block conversion - guestfs fallback worked
 - Initramfs and GRUB were successfully regenerated using guestfs
 
@@ -325,7 +327,7 @@ Validation: PASS (qemu-img check)
 
 ### ✅ RETEST: COMPLETE SUCCESS
 
-The enterprise LVM improvements and VMCraft mount bug fixes are:
+The enterprise LVM improvements and GuestKit mount bug fixes are:
 
 - ✅ **Working correctly** - Full end-to-end conversion succeeds
 - ✅ **Safe** - Host VGs protected (100% verified)

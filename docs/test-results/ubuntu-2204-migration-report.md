@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 ---
 title: "h2kvm — Ubuntu 22.04 LVM vCenter Migration Report"
 date: "March 19, 2026"
@@ -102,7 +104,7 @@ OVF + VMDK (5.4 GB)
   │
   │  Auto-chained (no manual step)
   ▼
-VMCraft offline fixes
+GuestKit offline fixes
   ├── fstab stabilized (UUID-based mounts)
   ├── initramfs rebuilt (virtio_blk, virtio_scsi, virtio_net, nvme)
   ├── LVM volumes activated and fixed
@@ -139,7 +141,7 @@ VM RUNNING on KVM ✓
 
 | Metric | Value |
 |--------|-------|
-| Backend | VMCraft (pure Python + qemu-nbd) |
+| Backend | GuestKit (pure Python + qemu-nbd) |
 | Input | 5.4 GB VMDK |
 | Output | ubuntu-2204.qcow2 (5.4 GB compressed) |
 | Format | qcow2 |
@@ -210,7 +212,7 @@ $ ls -lh output-ubuntu/libvirt/*.xml
 | qemu-img | 10.1.4 |
 | libvirt | 11.6.0 |
 | OVMF | OVMF_CODE.fd |
-| Backend | VMCraft (pure Python) |
+| Backend | GuestKit (pure Python) |
 
 ---
 

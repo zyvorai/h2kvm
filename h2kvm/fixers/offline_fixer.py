@@ -3752,11 +3752,11 @@ WantedBy=multi-user.target
         """True when h2kvm-specific injectors are configured."""
         return bool(
             self.inject_cloud_init_data
-            or self.firstboot_scripts_data
-            or self.network_config_inject_data
-            or self.user_config_inject_data
-            or self.service_config_inject_data
-            or self.hostname_config_inject_data
+            or self.firstboot_config
+            or self.network_config_inject
+            or self.user_config_inject
+            or self.service_config_inject
+            or self.hostname_config_inject
         )
 
     def _apply_injectors_only(self, g: Any) -> dict[str, Any]:

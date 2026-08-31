@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 ---
 title: "h2kvm — vCenter End-to-End Migration Test Report"
 date: "March 18-19, 2026"
@@ -78,7 +80,7 @@ vCenter VM (20 GB thin, UEFI)
 OVF + VMDK (2.8 GB)
   ↓  qemu-img convert + compress
 qcow2 (3.2 GB)
-  ↓  VMCraft offline fixes
+  ↓  GuestKit offline fixes
 Fixed qcow2 (fstab, initramfs + virtio, vmware-tools removed)
   ↓  emit libvirt domain XML + virsh define
 libvirt VM (UEFI, q35, virtio)
@@ -142,7 +144,7 @@ sudo ./h2kvmctl --config test-confs/photon-to-libvirt.yaml
 | Output | photon-os.qcow2 (435 MiB compressed) |
 | Guest OS | Photon OS 5.0 |
 | Fixes applied | fstab stabilized, dracut initramfs rebuilt (virtio_blk, virtio_scsi, virtio_net, nvme), auto-grow configured |
-| Backend | VMCraft (pure Python + qemu-nbd) |
+| Backend | GuestKit (pure Python + qemu-nbd) |
 | Boot test | PASSED — domain RUNNING |
 | Total time | ~30 seconds |
 
@@ -452,7 +454,7 @@ verbose: 1
 | VM Discovery | vCenter | — | govc ls | PASS |
 | RHEL 10.2 E2E | vCenter | libvirt | govc NFC | PASS |
 | RHEL 10.2 ovftool | vCenter | — | ovftool | PASS (partial) |
-| Photon OS local | VMDK | libvirt | VMCraft | PASS |
+| Photon OS local | VMDK | libvirt | GuestKit | PASS |
 | Photon OS K3s | VMDK | KubeVirt | CDI upload | PASS |
 | Dual deploy | VMDK | libvirt + KubeVirt | Both | PASS |
 | Ubuntu 22.04 LVM | vCenter | libvirt | govc NFC | PASS |

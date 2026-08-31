@@ -89,7 +89,7 @@ dracut -f --add "lvm dm" --add-drivers "virtio_blk ..."
 
 ## Why It Works
 
-At the core: **VMCraft**—a pure Python VM manipulation engine with **480+ API methods**
+At the core: **GuestKit**—a pure Python VM manipulation engine with **480+ API methods**
 
 - Filesystem operations
 - Partition management

@@ -127,7 +127,7 @@ keep_domain: true
 18:58:41 &#10004; Flattened: working-flattened.qcow2 (15 GiB virtual, 13.1 GiB actual)
   </pre>
 
-  <div class="step">STEP 3c &mdash; Offline Guest Fixes (VMCraft Engine)</div>
+  <div class="step">STEP 3c &mdash; Offline Guest Fixes (GuestKit engine)</div>
   <pre>
 18:58:42 Opening offline image via qemu-nbd
 18:58:42 Connected to /dev/nbd0
@@ -254,7 +254,7 @@ out-win11-demo/
     <tr><th style="width:5%">#</th><th style="width:20%">Step</th><th style="width:25%">Action</th><th style="width:15%">Duration</th><th style="width:35%">Result</th></tr>
     <tr><td>1</td><td>Sanity checks</td><td>Tools, disk space, permissions</td><td>&lt;1s</td><td class="check">5/5 passed</td></tr>
     <tr><td>2</td><td>Flatten</td><td>Split VMDK (4 extents) &rarr; QCOW2</td><td>~70s</td><td class="check">working-flattened.qcow2 (15 GiB)</td></tr>
-    <tr><td>3</td><td>Offline fixes</td><td>OS detect, VMCraft engine</td><td>~4s</td><td class="check">Windows 11 Home detected</td></tr>
+    <tr><td>3</td><td>Offline fixes</td><td>OS detect, GuestKit engine</td><td>~4s</td><td class="check">Windows 11 Home detected</td></tr>
     <tr><td>4</td><td>Convert</td><td>Working &rarr; final QCOW2</td><td>~40s</td><td class="check">win11.qcow2 (14 GB)</td></tr>
     <tr><td>5</td><td>Emit XML</td><td>Windows bootstrap domain XML</td><td>&lt;1s</td><td class="check">Q35, SATA, OVMF, Hyper-V, virtio-win CDROM</td></tr>
     <tr><td>6</td><td>Boot test</td><td>virsh define + start (emitted XML)</td><td>&lt;1s</td><td class="check">RUNNING state confirmed</td></tr>

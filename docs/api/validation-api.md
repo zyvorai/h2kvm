@@ -24,41 +24,29 @@ The Validation API provides comprehensive post-migration validation to ensure mi
 
 ```python
 from h2kvm.validation import ValidationOrchestrator
-from h2kvm.vmcraft import VMCraft
+from h2kvm.core.guestfs_factory import create_guestfs
 import logging
 
-# Setup
 logger = logging.getLogger(__name__)
-vmcraft = VMCraft(logger)
 
-# Launch VMCraft with migrated disk
-vmcraft.add_disk("/vms/migrated/server.qcow2")
-vmcraft.launch()
+# Open migrated disk with GuestKit (default backend)
+g = create_guestfs(backend="guestkit")
+g.add_drive_ro("/vms/migrated/server.qcow2")
+g.launch()
 
-# Create orchestrator and run validation
 orchestrator = ValidationOrchestrator(logger)
 report = orchestrator.validate_migration(
-    vmcraft,
+    g,
     check_services=True,
     check_network=True,
     check_databases=True,
-    check_performance=True
+    check_performance=True,
 )
 
-# Check results
 if report.overall_status == "PASS":
     print("✓ Validation passed!")
-else:
-    print(f"✗ Validation failed: {len(report.failed_checks)} failures")
 
-# Save reports
-from pathlib import Path
-reports = orchestrator.save_report(report, Path("/reports"))
-print(f"JSON report: {reports['json']}")
-print(f"Markdown report: {reports['markdown']}")
-
-# Cleanup
-vmcraft.shutdown()
+g.shutdown()
 ```
 
 ---
@@ -92,7 +80,7 @@ Run comprehensive migration validation.
 ```python
 def validate_migration(
     self,
-    vmcraft_instance,
+    guest_handle,
     *,
     check_services: bool = True,
     check_network: bool = True,
@@ -102,7 +90,7 @@ def validate_migration(
 ```
 
 **Parameters**:
-- `vmcraft_instance`: Launched VMCraft instance with mounted filesystems
+- `guest_handle`: Launched GuestKit guest handle with mounted filesystems
 - `check_services`: Enable service validation (default: True)
 - `check_network`: Enable network validation (default: True)
 - `check_databases`: Enable database validation (default: True)
@@ -113,7 +101,7 @@ def validate_migration(
 **Example**:
 ```python
 report = orchestrator.validate_migration(
-    vmcraft,
+    guestkit,
     check_services=True,
     check_network=True,
     check_databases=False,  # Skip database checks
@@ -245,7 +233,7 @@ Verify boot configuration is valid for KVM.
 
 **Signature**:
 ```python
-def check_system_boot(self, vmcraft_instance) -> HealthCheckResult
+def check_system_boot(self, guest_handle) -> HealthCheckResult
 ```
 
 **Returns**: `HealthCheckResult` with status and details
@@ -253,7 +241,7 @@ def check_system_boot(self, vmcraft_instance) -> HealthCheckResult
 **Example**:
 ```python
 checker = HealthChecker(logger)
-result = checker.check_system_boot(vmcraft)
+result = checker.check_system_boot(guestkit)
 
 if result.status == HealthCheckStatus.PASS:
     print("✓ Boot configuration valid")
@@ -269,14 +257,14 @@ Validate fstab entries are accessible.
 
 **Signature**:
 ```python
-def check_fstab_valid(self, vmcraft_instance) -> HealthCheckResult
+def check_fstab_valid(self, guest_handle) -> HealthCheckResult
 ```
 
 **Returns**: `HealthCheckResult` with fstab validation status
 
 **Example**:
 ```python
-result = checker.check_fstab_valid(vmcraft)
+result = checker.check_fstab_valid(guestkit)
 
 if result.status == HealthCheckStatus.PASS:
     print("✓ All fstab UUIDs found")
@@ -295,13 +283,13 @@ Check required kernel modules are available.
 ```python
 def check_kernel_modules(
     self,
-    vmcraft_instance,
+    guest_handle,
     required_modules: list[str] | None = None
 ) -> HealthCheckResult
 ```
 
 **Parameters**:
-- `vmcraft_instance`: VMCraft instance
+- `guest_handle`: GuestKit guest handle
 - `required_modules`: List of required modules (default: virtio modules)
 
 **Returns**: `HealthCheckResult` with module availability
@@ -309,7 +297,7 @@ def check_kernel_modules(
 **Example**:
 ```python
 result = checker.check_kernel_modules(
-    vmcraft,
+    guestkit,
     required_modules=["virtio_net", "virtio_blk", "virtio_scsi"]
 )
 
@@ -343,13 +331,13 @@ Validate critical services are enabled.
 ```python
 def validate_critical_services(
     self,
-    vmcraft_instance,
+    guest_handle,
     services: list[str] | None = None
 ) -> HealthCheckResult
 ```
 
 **Parameters**:
-- `vmcraft_instance`: VMCraft instance
+- `guest_handle`: GuestKit guest handle
 - `services`: List of service names (default: sshd, NetworkManager)
 
 **Returns**: `HealthCheckResult` with service status
@@ -358,7 +346,7 @@ def validate_critical_services(
 ```python
 validator = ServiceValidator(logger)
 result = validator.validate_critical_services(
-    vmcraft,
+    guestkit,
     services=["sshd", "NetworkManager", "firewalld"]
 )
 
@@ -378,20 +366,20 @@ Check if specific service is enabled.
 ```python
 def check_service_enabled(
     self,
-    vmcraft_instance,
+    guest_handle,
     service_name: str
 ) -> ServiceCheckResult
 ```
 
 **Parameters**:
-- `vmcraft_instance`: VMCraft instance
+- `guest_handle`: GuestKit guest handle
 - `service_name`: Service name to check
 
 **Returns**: `ServiceCheckResult` with detailed service status
 
 **Example**:
 ```python
-result = validator.check_service_enabled(vmcraft, "postgresql")
+result = validator.check_service_enabled(guestkit, "postgresql")
 
 print(f"Enabled: {result.enabled}")
 print(f"Active: {result.active}")
@@ -422,7 +410,7 @@ Validate network interfaces are configured.
 
 **Signature**:
 ```python
-def check_network_interfaces(self, vmcraft_instance) -> HealthCheckResult
+def check_network_interfaces(self, guest_handle) -> HealthCheckResult
 ```
 
 **Returns**: `HealthCheckResult` with interface configuration
@@ -430,7 +418,7 @@ def check_network_interfaces(self, vmcraft_instance) -> HealthCheckResult
 **Example**:
 ```python
 validator = NetworkValidator(logger)
-result = validator.check_network_interfaces(vmcraft)
+result = validator.check_network_interfaces(guestkit)
 
 if result.status == HealthCheckStatus.PASS:
     print(f"✓ Interfaces: {result.details['interfaces']}")
@@ -445,14 +433,14 @@ Validate DNS nameservers are configured.
 
 **Signature**:
 ```python
-def check_dns_configuration(self, vmcraft_instance) -> HealthCheckResult
+def check_dns_configuration(self, guest_handle) -> HealthCheckResult
 ```
 
 **Returns**: `HealthCheckResult` with DNS configuration
 
 **Example**:
 ```python
-result = validator.check_dns_configuration(vmcraft)
+result = validator.check_dns_configuration(guestkit)
 
 if result.status == HealthCheckStatus.PASS:
     print(f"✓ DNS: {result.details['nameservers']}")
@@ -482,7 +470,7 @@ Validate PostgreSQL installation.
 
 **Signature**:
 ```python
-def validate_postgresql(self, vmcraft_instance) -> HealthCheckResult
+def validate_postgresql(self, guest_handle) -> HealthCheckResult
 ```
 
 **Returns**: `HealthCheckResult` with PostgreSQL status
@@ -490,7 +478,7 @@ def validate_postgresql(self, vmcraft_instance) -> HealthCheckResult
 **Example**:
 ```python
 validator = DatabaseValidator(logger)
-result = validator.validate_postgresql(vmcraft)
+result = validator.validate_postgresql(guestkit)
 
 if result.status == HealthCheckStatus.PASS:
     print(f"✓ PostgreSQL version: {result.details['version']}")
@@ -506,14 +494,14 @@ Validate MySQL/MariaDB installation.
 
 **Signature**:
 ```python
-def validate_mysql(self, vmcraft_instance) -> HealthCheckResult
+def validate_mysql(self, guest_handle) -> HealthCheckResult
 ```
 
 **Returns**: `HealthCheckResult` with MySQL status
 
 **Example**:
 ```python
-result = validator.validate_mysql(vmcraft)
+result = validator.validate_mysql(guestkit)
 
 if result.status == HealthCheckStatus.PASS:
     print(f"✓ MySQL version: {result.details['version']}")
@@ -546,13 +534,13 @@ Benchmark disk I/O performance.
 ```python
 def benchmark_disk_io(
     self,
-    vmcraft_instance,
+    guest_handle,
     test_size_mb: int = 100
 ) -> HealthCheckResult
 ```
 
 **Parameters**:
-- `vmcraft_instance`: VMCraft instance
+- `guest_handle`: GuestKit guest handle
 - `test_size_mb`: Size of test file in MB (default: 100)
 
 **Returns**: `HealthCheckResult` with performance metrics
@@ -560,7 +548,7 @@ def benchmark_disk_io(
 **Example**:
 ```python
 validator = PerformanceValidator(logger)
-result = validator.benchmark_disk_io(vmcraft, test_size_mb=500)
+result = validator.benchmark_disk_io(guestkit, test_size_mb=500)
 
 if result.status == HealthCheckStatus.PASS:
     print(f"✓ Write speed: {result.details['write_speed_mbps']} MB/s")
@@ -649,7 +637,7 @@ class ValidationReport:
 ```python
 import logging
 from pathlib import Path
-from h2kvm.vmcraft import VMCraft
+from h2kvm.core import guestkit_client
 from h2kvm.validation import ValidationOrchestrator
 
 # Setup logging
@@ -660,10 +648,10 @@ logger = logging.getLogger(__name__)
 def validate_vm(disk_path: str, output_dir: str) -> bool:
     """Validate migrated VM and generate reports."""
 
-    # Launch VMCraft
-    vmcraft = VMCraft(logger)
-    vmcraft.add_disk(disk_path)
-    vmcraft.launch()
+    # Launch GuestKit
+    guestkit = GuestKit(logger)
+    guestkit.add_disk(disk_path)
+    guestkit.launch()
 
     try:
         # Create orchestrator
@@ -672,7 +660,7 @@ def validate_vm(disk_path: str, output_dir: str) -> bool:
         # Run validation
         logger.info("Running validation checks...")
         report = orchestrator.validate_migration(
-            vmcraft,
+            guestkit,
             check_services=True,
             check_network=True,
             check_databases=True,
@@ -703,8 +691,8 @@ def validate_vm(disk_path: str, output_dir: str) -> bool:
         return report.overall_status == "PASS"
 
     finally:
-        # Always shutdown VMCraft
-        vmcraft.shutdown()
+        # Always shutdown GuestKit
+        guestkit.shutdown()
 
 # Example usage
 if __name__ == "__main__":
@@ -725,7 +713,7 @@ if __name__ == "__main__":
 
 - **[Migration Validation Guide](../features/migration-validation.md)**: Feature documentation
 - **[Rollback API](rollback-api.md)**: Rollback failed migrations
-- **[VMCraft API](vmcraft-api.md)**: Guest filesystem manipulation
+- **[GuestKit API](guestkit-api.md)**: Guest filesystem manipulation
 - **[Troubleshooting Guide](../guides/troubleshooting.md)**: Resolve validation failures
 
 ---

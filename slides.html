@@ -593,7 +593,7 @@
       </div>
       <div class="col">
         <h3>Code Example</h3>
-        <pre><code>from h2kvm.core.vmcraft import VMCraft
+        <pre><code>from guestkit import Guestfs as VMCraft  # legacy slides — use GuestKit
 
 with VMCraft() as g:
     g.add_disk("/vms/server.qcow2")
@@ -874,7 +874,7 @@ h2kvm --version
         <h3 style="margin-top: 15px;">Project Structure</h3>
         <pre><code>h2kvm/
   cli/           # Click-based CLI
-  core/          # VMCraft engine
+  core/          # GuestKit engine
   converters/    # qemu-img wrappers
   fixers/        # Offline fix modules
     bootloader/  #   GRUB repair

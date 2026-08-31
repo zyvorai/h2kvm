@@ -20,7 +20,7 @@ Welcome to the comprehensive documentation for H2KVM, a production-ready VM migr
 ### March 2026 - Security & Robustness
 - ✅ **70+ Bug Fixes** - Security, crashes, correctness across entire codebase
 - ✅ **Windows VirtIO Driver Injection** - Cached ISO extraction with Rock Ridge support, all 4 drivers found
-- ✅ **VMCraft Hivex API Shim** - Windows registry access (RDP, firewall, network) without guestfs
+- ✅ **GuestKit disk backend** — offline inspect and repair via `hypersdk-guestkit` (replaces VMCraft)
 - ✅ **Remote Deployment** - `deploy-remote.sh` — one command to fully set up any server
 - ✅ **AWS EC2 Provider** - Production-grade EC2 → KVM with boto3, retry, resume, multi-disk, 51 tests
 - ✅ **AMI to KVM Migration** - Download cloud images, convert, fix, deploy in one command
@@ -133,9 +133,8 @@ Welcome to the comprehensive documentation for H2KVM, a production-ready VM migr
 |-----------|---------------|
 | **Overview** | [Architecture Summary](architecture/ARCHITECTURE_SUMMARY.md) |
 | **Backends** | [Backend Comparison](architecture/BACKENDS.md) |
-| **VMCraft** | [VMCraft Architecture](architecture/vmcraft-architecture.md) |
+| **GuestKit** | [GuestKit Integration](architecture/GUESTKIT.md) |
 | **LVM** | [LVM Backends](architecture/LVM_BACKENDS.md) |
-| **Namespace** | [Namespace Engine](architecture/NAMESPACE_ENGINE.md) |
 | **Reference** | [Full Architecture](reference/architecture.md) |
 
 ### 🎯 Features & Capabilities
@@ -143,7 +142,7 @@ Welcome to the comprehensive documentation for H2KVM, a production-ready VM migr
 
 | Feature | Documentation |
 |---------|---------------|
-| **VMCraft Engine** | [VMCraft Guide](features/vmcraft-lvm-guide.md) |
+| **GuestKit** | [GuestKit Integration](architecture/GUESTKIT.md) |
 | **Live Migration** | [Live Migration](features/LIVE_MIGRATION.md) |
 | **LVM Safety** | [Enterprise LVM](features/LVM_AND_ENTERPRISE_IMPROVEMENTS.md) |
 | **Systemd Integration** | [Systemd Tools](features/SYSTEMD_INTEGRATION_SUMMARY.md) |
@@ -156,9 +155,6 @@ Welcome to the comprehensive documentation for H2KVM, a production-ready VM migr
 | **Daemon Mode** | [Daemon Architecture](features/daemon-architecture.md) |
 | **Cloud Integration** | [Configuration Injection](features/configuration-injection.md) |
 | **vSphere** | [vSphere Export](features/vsphere-export.md) |
-| **VMCraft** | [Performance Guide](features/vmcraft-performance-guide.md) |
-| **Augeas** | [Config Management](features/vmcraft-augeas-guide.md) |
-| **Partitions** | [Partition Management](features/vmcraft-partition-management.md) |
 | **Windows Firstboot** | [Windows Integration](features/WINDOWS_FIRSTBOOT_INTEGRATION.md) |
 | **Enhanced Chroot** | [Chroot Safety](features/enhanced-chroot.md) |
 | **systemd-vmspawn** | [VMSPAWN Guide](features/SYSTEMD_VMSPAWN_GUIDE.md) |
@@ -190,8 +186,7 @@ Welcome to the comprehensive documentation for H2KVM, a production-ready VM migr
 
 | API | Documentation |
 |-----|---------------|
-| **VMCraft** | [VMCraft API](reference/api/vmcraft.md) - 480+ methods |
-| **VMCraft Hivex** | [Hivex API Shim](reference/api/vmcraft-hivex.md) - Windows registry access |
+| **GuestKit** | [GuestKit Integration](../architecture/GUESTKIT.md) |
 | **API Reference** | [API Reference](reference/API_REFERENCE.md) |
 | **Library API** | [Library Usage](reference/api/library-api.md) |
 | **Quick Reference** | [API Quick Ref](reference/api/quick-reference.md) |
@@ -343,7 +338,7 @@ Welcome to the comprehensive documentation for H2KVM, a production-ready VM migr
 ### By Task
 - **First-time user?** → [Quick Start](getting-started/02-Quick-Start.md)
 - **Planning migration?** → [Decision Tree](guides/decision-support/MIGRATION_DECISION_TREE.md)
-- **Need API docs?** → [VMCraft API](reference/api/vmcraft.md)
+- **Need API docs?** → [GuestKit Integration](architecture/GUESTKIT.md)
 - **Troubleshooting?** → [Troubleshooting Guide](guides/troubleshooting.md)
 - **Production deployment?** → [Production Guide](deployment/PRODUCTION_DEPLOYMENT_GUIDE.md)
 
@@ -354,7 +349,7 @@ Welcome to the comprehensive documentation for H2KVM, a production-ready VM migr
 - **Cloud (AWS/Azure)** → [Cloud-Native Guide](guides/cloud-native-distros.md)
 
 ### By Component
-- **VMCraft Engine** → [Features](features/)
+- **GuestKit** → [Architecture](architecture/GUESTKIT.md)
 - **CLI Tools** → [Guides/CLI](guides/cli/)
 - **TUI Dashboard** → [Guides/TUI](guides/tui/)
 - **Worker System** → [Worker Protocol](worker/)

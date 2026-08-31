@@ -480,16 +480,16 @@ sudo chown $(whoami) /path/to/output/directory
 #### Issue: Guest disk mount fails
 
 **Symptoms:**
-- Error: "guestfs_mount: failed" or VMCraft mount error
+- Error: "guestfs_mount: failed" or GuestKit mount error
 - Cannot inspect guest OS
 
 **Solution:**
 ```bash
-# VMCraft is the default backend; check NBD availability
+# GuestKit is the default backend; check NBD availability
 sudo modprobe nbd
 ls /dev/nbd0
 
-# Verify VMCraft backend dependencies
+# Verify GuestKit backend dependencies
 qemu-nbd --version
 qemu-img --version
 

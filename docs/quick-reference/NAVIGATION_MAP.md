@@ -52,7 +52,7 @@ Visual guide to navigating H2KVM documentation.
 
 4. Features Deep Dive
    ├─→ [Features Hub](features/)
-   ├─→ [VMCraft Guide](features/vmcraft/complete-guide.md)
+   ├─→ [GuestKit Guide](features/architecture/GUESTKIT.md)
    └─→ [VMDK Inspector](features/vmdk-inspector.md)
 ```
 
@@ -75,7 +75,7 @@ Visual guide to navigating H2KVM documentation.
 
 3. Advanced Features
    ├─→ [Advanced Tutorial](tutorials/03-advanced-features.md)
-   ├─→ [VMCraft Advanced](features/vmcraft/advanced-features.md)
+   ├─→ [GuestKit Advanced](features/architecture/GUESTKIT.md)
    └─→ [Worker Protocol](worker/PROTOCOL_SPEC.md)
 
 4. Architecture Understanding
@@ -93,7 +93,7 @@ Visual guide to navigating H2KVM documentation.
 ```
 1. API Documentation
    ├─→ [API Reference](reference/api/API-Reference.md)
-   ├─→ [VMCraft API](reference/api/vmcraft.md) - 480+ methods
+   ├─→ [GuestKit API](architecture/GUESTKIT.md) - 480+ methods
    ├─→ [Library API](reference/api/library-api.md)
    └─→ [REST API](worker/REST_API.md)
 
@@ -200,7 +200,7 @@ Troubleshooting Path:
 Architecture Path:
 └─→ [Glossary](GLOSSARY.md) - Learn terminology first
     └─→ [Architecture](reference/architecture.md)
-        └─→ [VMCraft Complete Guide](features/vmcraft/complete-guide.md)
+        └─→ [GuestKit integration guide](features/architecture/GUESTKIT.md)
             └─→ [Features Hub](features/)
                 └─→ [API Reference](reference/api/API-Reference.md)
 ```
@@ -243,7 +243,7 @@ API Documentation Path:
 └─→ [Quick Reference](reference/api/quick-reference.md) - Start here
     └─→ [Library API](reference/api/library-api.md) - Python usage
         └─→ [API Reference](reference/api/API-Reference.md) - Complete reference
-            └─→ [VMCraft API](reference/api/vmcraft.md) - 480+ methods
+            └─→ [GuestKit API](architecture/GUESTKIT.md) - 480+ methods
 ```
 
 ---
@@ -280,7 +280,7 @@ migration/
 ```
 features/
 ├── Core Features
-│   ├─→ [VMCraft Engine](features/vmcraft/complete-guide.md)
+│   ├─→ [GuestKit engine](features/architecture/GUESTKIT.md)
 │   ├─→ [fstab Stabilization](features/fstab-stabilization.md)
 │   ├─→ [Enhanced Chroot](features/enhanced-chroot.md)
 │   └─→ [XFS UUID Regeneration](features/xfs-uuid-regeneration.md)
@@ -295,13 +295,13 @@ features/
 │   ├─→ [Daemon Architecture](features/daemon-architecture.md)
 │   └─→ [Systemd Integration](features/systemd-integration.md)
 │
-└── VMCraft Advanced
-    ├─→ [Advanced Features](features/vmcraft/advanced-features.md)
-    ├─→ [OS Detection](features/vmcraft/os-detection.md)
-    ├─→ [Windows Support](features/vmcraft/windows-support.md)
-    ├─→ [Augeas Guide](features/vmcraft-augeas-guide.md)
-    ├─→ [LVM Guide](features/vmcraft-lvm-guide.md)
-    └─→ [Performance Guide](features/vmcraft-performance-guide.md)
+└── GuestKit Advanced
+    ├─→ [Advanced Features](features/architecture/GUESTKIT.md)
+    ├─→ [OS Detection](features/architecture/GUESTKIT.md)
+    ├─→ [Windows Support](features/os-support/windows/README.md)
+    ├─→ [Augeas Guide](features/architecture/GUESTKIT.md)
+    ├─→ [LVM Guide](features/architecture/LVM_BACKENDS.md)
+    └─→ [Performance Guide](features/architecture/GUESTKIT.md)
 ```
 
 ---
@@ -397,7 +397,7 @@ docs/
 │
 ├── 🔧 features/ ............................ Features
 │   ├── README.md ........................... Hub
-│   ├── vmcraft/ ............................ VMCraft engine
+│   ├── guestkit/ ............................ GuestKit engine
 │   ├── vmdk-inspector.md ................... VMDK analysis
 │   ├── xfs-uuid-regeneration.md ............ UUID fixes
 │   ├── fstab-stabilization.md .............. fstab repair

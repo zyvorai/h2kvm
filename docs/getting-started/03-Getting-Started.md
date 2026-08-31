@@ -50,7 +50,7 @@ sudo zypper install -y \
 
 ### Optional: Additional Backend Tools
 
-> **Note**: VMCraft is the default backend and uses qemu-nbd and qemu-img. No additional packages are required for the default backend.
+> **Note**: GuestKit is the default backend and uses qemu-nbd and qemu-img. No additional packages are required for the default backend.
 
 ### Optional Packages (for advanced features)
 
@@ -96,7 +96,7 @@ export PATH="$PATH:$(pwd)/examples"
 python3 --version  # Should be 3.10+
 
 # Test import
-python3 -c "from h2kvm.vmcraft.main import VMCraft; print('✓ Installation successful')"
+python3 -c "from h2kvm.core import guestkit_client; print('✓ Installation successful')"
 
 # Run quick validation
 cd examples
@@ -641,7 +641,7 @@ Most tools support these common options:
 
 #### 1. "RuntimeError: Not launched"
 
-**Cause**: VMCraft couldn't access the disk image
+**Cause**: GuestKit couldn't access the disk image
 
 **Solution**:
 ```bash
@@ -689,7 +689,7 @@ timeout 600 python3 systemd_forensic_analysis.py /path/to/large-vm.vmdk
 
 #### 4. "No module named 'guestfs'"
 
-**Cause**: Missing guestfs Python bindings. This is only needed if you are using an alternative guestfs backend instead of the default VMCraft backend.
+**Cause**: Missing guestfs Python bindings. This is only needed if you are using an alternative guestfs backend instead of the default GuestKit backend.
 
 **Solution**:
 ```bash

@@ -61,7 +61,7 @@
     <tr><td><strong>Multi-cloud source</strong></td><td class="check">&#10003; (10)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Azure</td><td class="partial">AWS</td><td class="partial">Limited</td></tr>
     <tr><td><strong>Target: KVM/libvirt</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
     <tr><td><strong>Target: KubeVirt</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
-    <tr><td><strong>Offline guest fixes</strong></td><td class="check">&#10003; VMCraft</td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
+    <tr><td><strong>Offline guest fixes</strong></td><td class="check">&#10003; GuestKit</td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
     <tr><td><strong>Windows VirtIO 3-layer</strong></td><td class="check">&#10003;</td><td class="partial">Basic</td><td class="partial">Basic</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
     <tr><td><strong>Web dashboard</strong></td><td class="check">&#10003; (20+ panels)</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="check">Portal</td><td class="check">Portal</td><td class="check">Console</td><td class="check">&#10003;</td></tr>
     <tr><td><strong>Guest agent insights</strong></td><td class="check">&#10003;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td class="partial">Partial</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td></tr>
@@ -98,7 +98,7 @@
       <div style="background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:12px; font-family:monospace; font-size:0.75em; line-height:1.7;">
         VMware / Hyper-V / 10 Clouds<br>
         &nbsp;&nbsp;&darr;<br>
-        h2kvmctl + VMCraft <em style="color:#16a34a;">[offline fixes]</em><br>
+        h2kvmctl + GuestKit <em style="color:#16a34a;">[offline fixes]</em><br>
         &nbsp;&nbsp;&darr;<br>
         KVM/libvirt + KubeVirt <em style="color:#16a34a;">[your servers]</em><br>
         &nbsp;&nbsp;&darr;<br>
@@ -122,7 +122,7 @@
 <!-- PAGE 4: vs virt-v2v -->
 <div class="page page-dark">
   <h2 class="st">vs <span>virt-v2v</span></h2>
-  <p class="sub">Next-generation VMCraft engine vs legacy libguestfs appliance.</p>
+  <p class="sub">Next-generation GuestKit engine vs legacy libguestfs appliance.</p>
 
   <div class="cols">
     <div class="col col-bad" style="border-color:rgba(245,158,11,0.3);">
@@ -137,7 +137,7 @@
       <h3 style="color:#4ade80;">h2kvm Architecture</h3>
       <div style="font-family:monospace; font-size:0.75em; line-height:1.7; padding:8px;">
         Source (10 clouds) &rarr; govc &rarr; qemu-nbd <em style="color:#4ade80;">[no kernel]</em><br>
-        &rarr; VMCraft fixes &rarr; <em style="color:#4ade80;">auto define + start + dashboard</em>
+        &rarr; GuestKit fixes &rarr; <em style="color:#4ade80;">auto define + start + dashboard</em>
       </div>
       <p style="font-size:0.8em; color:#4ade80;">~50MB install, any Linux distro, 20+ panel dashboard, KubeVirt deploy, 3-layer Windows</p>
     </div>
@@ -145,7 +145,7 @@
 
   <table>
     <tr><th style="width:25%">Aspect</th><th style="width:37%">h2kvm</th><th style="width:38%">virt-v2v</th></tr>
-    <tr><td><strong>Engine</strong></td><td class="check">VMCraft (qemu-nbd, no kernel)</td><td>libguestfs (boots kernel appliance)</td></tr>
+    <tr><td><strong>Engine</strong></td><td class="check">GuestKit (qemu-nbd, no kernel)</td><td>libguestfs (boots kernel appliance)</td></tr>
     <tr><td><strong>Install size</strong></td><td class="check">~50MB pip</td><td class="cross">~500MB + kernel</td></tr>
     <tr><td><strong>Cloud sources</strong></td><td class="check">10 providers</td><td class="cross">VMware + Hyper-V only</td></tr>
     <tr><td><strong>Windows VirtIO</strong></td><td class="check">3-layer firstboot + SATA default</td><td class="partial">Basic injection</td></tr>

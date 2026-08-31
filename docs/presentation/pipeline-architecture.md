@@ -107,7 +107,7 @@ graph TD
 ### Stage 3: INSPECT
 **Purpose:** Detect guest OS and configuration
 
-**Technology:** Guestfs backend (VMCraft by default; offline disk mounting)
+**Technology:** Guestfs backend (GuestKit by default; offline disk mounting)
 
 **Detects:**
 - OS type (Linux distro, Windows version)
@@ -206,7 +206,7 @@ graph TD
 
 | Mode | When | How |
 |------|------|-----|
-| **Offline** | Default | Mount disk with guestfs backend (VMCraft by default), modify files directly |
+| **Offline** | Default | Mount disk with guestfs backend (GuestKit by default), modify files directly |
 | **Live** | Opt-in | SSH to running guest, execute commands |
 
 **Offline is safer** → No runtime dependencies, works on broken VMs

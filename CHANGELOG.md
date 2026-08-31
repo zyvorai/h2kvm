@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Removed
+
+- **VMCraft** — entire `h2kvm/vmcraft/` package (~96 modules), examples, API docs, and unit tests. Disk I/O, inspection, and offline repair now delegate to **GuestKit** (`hypersdk-guestkit>=1.1.0`) via `h2kvm/core/guestkit_client.py`.
+- VMCraft-only architecture docs (namespace engine, parallel manager, NBD manager guides).
+
+### Changed
+
+- Default offline backend is **`guestkit`**; CLI choices are `guestkit`, `guestfs`, `auto`. Legacy YAML aliases `vmcraft` / `namespace` still map to GuestKit with a deprecation warning.
+- `OfflineFSFix` primary path calls `guestkit.run_migrate_repair()`; legacy Python fixer remains as fallback.
+- Documentation updated across `docs/` for GuestKit-first architecture. See `docs/architecture/GUESTKIT.md`.
+
+### Added
+
+- `h2kvm/core/guestkit_client.py` — thin facade over GuestKit Python API.
+- `scripts/guestkit_inspect.py` — replaces `vmcraft_inspect.py`.
+- GuestKit 1.1.0 Python bindings: `run_doctor`, `run_boot_inspect`, `run_migrate_plan`, `run_repair_plan`, `run_migrate_repair`.
+
 ## [0.2.2] - 2025-02-25
 
 ### Added

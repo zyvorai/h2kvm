@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # LVM Enterprise Improvements - Complete Test Results
 
 **Test Date**: February 14, 2026
@@ -8,7 +10,7 @@
 
 ## Executive Summary
 
-The enterprise LVM safety improvements and VMCraft mount bug fixes have been **successfully tested and validated** with real-world ESXi VMDK images. All improvements are production-ready.
+The enterprise LVM safety improvements and GuestKit mount bug fixes have been **successfully tested and validated** with real-world ESXi VMDK images. All improvements are production-ready.
 
 ### Key Achievements
 
@@ -67,7 +69,7 @@ The enterprise LVM safety improvements and VMCraft mount bug fixes have been **s
 |-----------|----------|------------|
 | NBD Connection | 0.77s | Fast |
 | LVM Activation | **0.71s** | **Enterprise-grade speed** |
-| VMCraft Ready | 1.49s | **Sub-2s total startup** |
+| GuestKit Ready | 1.49s | **Sub-2s total startup** |
 
 ### Full Conversion Performance
 
@@ -120,19 +122,19 @@ luks-... (252:0)  # Only host LUKS device
 
 ## Bugs Fixed
 
-### 1. VMCraft Mount Import Errors ✅
+### 1. GuestKit Mount Import Errors ✅
 
 **Files Fixed**:
-- `h2kvm/core/vmcraft/api/filesystem_mixin.py`
+- `h2kvm/core/guestkit_client.pyapi/filesystem_mixin.py`
   - Added: `run_sudo`, `svc_list_partitions_cached`, `svc_invalidate_partition_cache`, `os`
 
-- `h2kvm/core/vmcraft/api/storage_mixin.py`
+- `h2kvm/core/guestkit_client.pyapi/storage_mixin.py`
   - Added: `LVMActivator`, `run_sudo`, `execute_chroot_command`
 
-- `h2kvm/core/vmcraft/api/partition_mixin.py`
+- `h2kvm/core/guestkit_client.pyapi/partition_mixin.py`
   - Added: `run_sudo`
 
-- `h2kvm/core/vmcraft/api/inspection_mixin.py`
+- `h2kvm/core/guestkit_client.pyapi/inspection_mixin.py`
   - Added: `run_sudo`
 
 **Before Fix**:
@@ -274,7 +276,7 @@ All 11 btrfs subvolumes correctly handled and hardened with `nofail` flags.
    - NBD locking with fcntl
    - Retry logic with exponential backoff
 
-2. `h2kvm/core/vmcraft/storage.py` (+100 lines)
+2. `h2kvm/core/guestkit_client.pystorage.py` (+100 lines)
    - Safe VG activation with device filtering
    - dmsetup fallback for busy LVs
    - VG enumeration improvements
@@ -283,17 +285,17 @@ All 11 btrfs subvolumes correctly handled and hardened with `nofail` flags.
    - Parallel initramfs regeneration
    - ThreadPoolExecutor for multi-kernel VMs
 
-**VMCraft Mount Bug Fixes**:
-4. `h2kvm/core/vmcraft/api/filesystem_mixin.py`
+**GuestKit Mount Bug Fixes**:
+4. `h2kvm/core/guestkit_client.pyapi/filesystem_mixin.py`
    - Added missing imports: `run_sudo`, `svc_list_partitions_cached`, `svc_invalidate_partition_cache`, `os`
 
-5. `h2kvm/core/vmcraft/api/storage_mixin.py`
+5. `h2kvm/core/guestkit_client.pyapi/storage_mixin.py`
    - Added missing imports: `LVMActivator`, `run_sudo`, `execute_chroot_command`
 
-6. `h2kvm/core/vmcraft/api/partition_mixin.py`
+6. `h2kvm/core/guestkit_client.pyapi/partition_mixin.py`
    - Added missing import: `run_sudo`
 
-7. `h2kvm/core/vmcraft/api/inspection_mixin.py`
+7. `h2kvm/core/guestkit_client.pyapi/inspection_mixin.py`
    - Added missing import: `run_sudo`
 
 **Import Script**:
@@ -379,7 +381,7 @@ sudo virsh domstate rhel88-test     # Should show "running"
 
 **Analysis**:
 - This is a **separate bug** from the mount issues we fixed
-- Located in the offline fixer, not VMCraft mount code
+- Located in the offline fixer, not GuestKit mount code
 - Does **NOT** block conversion - guestfs fallback worked
 - Initramfs and GRUB were successfully regenerated using guestfs
 
@@ -410,7 +412,7 @@ sudo virsh domstate rhel88-test     # Should show "running"
 
 ### ✅ COMPLETE SUCCESS
 
-The enterprise LVM improvements and VMCraft mount bug fixes are:
+The enterprise LVM improvements and GuestKit mount bug fixes are:
 
 - ✅ **Working correctly** - Full end-to-end conversion succeeds (2 different distros)
 - ✅ **Safe** - Host VGs protected (100% verified)

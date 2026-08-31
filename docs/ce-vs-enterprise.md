@@ -44,7 +44,7 @@ Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **
 | 8+ input formats · 35+ guest OS | ✅ | ✅ Validated matrices |
 | Custom SAN / Ceph / NetApp pipelines | — | ✅ |
 
-### Offline guest-fix engine (VMCraft)
+### Offline guest-fix engine (GuestKit)
 
 | Capability | Community | Enterprise |
 | --- | --- | --- |

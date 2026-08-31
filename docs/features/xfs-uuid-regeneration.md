@@ -127,7 +127,7 @@ def _rebuild_fstab_from_disk_layout(g, uuid_changes):
     2. Map new UUIDs to expected mountpoints
     3. Preserve mount options (defaults, nofail, etc.)
     4. Generate new fstab with correct UUIDs
-    5. Write with sudo (VMCraft mounts are root-owned)
+    5. Write with sudo (GuestKit mounts are root-owned)
     """
     # Build UUID mapping
     device_to_uuid = {
@@ -245,7 +245,7 @@ def _update_fstab_with_new_uuids(g, uuid_changes):
 
 ### Sudo-Based File Writes
 
-VMCraft mounts are owned by root, requiring sudo for writes:
+GuestKit mounts are owned by root, requiring sudo for writes:
 
 ```python
 # Standard write fails
@@ -397,9 +397,9 @@ INFO: ✓ Mount succeeded with nouuid: /dev/nbd4p2
 
 **Note**: xfs_admin is I/O bound, runs on host (not in VM), scales linearly
 
-### VMCraft Performance
+### GuestKit Performance
 
-| Operation | VMCraft | Notes |
+| Operation | GuestKit | Notes |
 |-----------|---------|-------|
 | Backend launch | 2.4s | NBD-based |
 | XFS UUID regen | 7s (3 fs) | I/O bound |
@@ -440,14 +440,14 @@ INFO: ✓ Mount succeeded with nouuid: /dev/nbd4p2
 - ✅ **fstab Stabilization** - Converts all device specs to stable UUIDs
 - ✅ **Initramfs Regeneration** - Rebuilds boot images with new UUIDs
 - ✅ **GRUB Fixes** - Updates kernel cmdline with new root UUID
-- ✅ **VMCraft Backend** - Fast offline manipulation without full VM boot
+- ✅ **GuestKit Backend** - Fast offline manipulation without full VM boot
 - ✅ **Batch Migration** - Parallel UUID regeneration for multiple VMs
 
 ### Dependencies
 
 **Required**:
 - `xfs_admin` - XFS filesystem administration tool
-- VMCraft backend - Fast disk manipulation
+- GuestKit backend - Fast disk manipulation
 - `dracut` - Initramfs regeneration (RHEL/CentOS/Fedora)
 
 **Optional**:
@@ -479,7 +479,7 @@ INFO: ✓ Mount succeeded with nouuid: /dev/nbd4p2
 ### Documentation
 
 - [fstab Stabilization Guide](fstab-stabilization.md) - Related fstab fixing
-- [VMCraft API](../api/vmcraft-api.md) - Complete API reference
+- [GuestKit API](../api/guestkit-api.md) - Complete API reference
 - [Offline Fixer Architecture](../development/offline-fixer-design.md) - Implementation details
 
 ### External Resources
@@ -493,7 +493,7 @@ INFO: ✓ Mount succeeded with nouuid: /dev/nbd4p2
 - `h2kvm/fixers/offline_fixer.py::_regenerate_xfs_uuids()` - UUID regeneration logic
 - `h2kvm/fixers/offline_fixer.py::_rebuild_fstab_from_disk_layout()` - fstab rebuild
 - `h2kvm/fixers/offline_fixer.py::_update_fstab_with_new_uuids()` - fstab update with fallback
-- `h2kvm/core/vmcraft/mount.py` - XFS duplicate UUID detection and nouuid retry
+- `h2kvm/core/guestkit_client.pymount.py` - XFS duplicate UUID detection and nouuid retry
 
 ---
 

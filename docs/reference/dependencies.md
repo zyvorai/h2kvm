@@ -15,7 +15,7 @@ h2kvm has two types of dependencies:
 
 These **MUST** be installed via your system package manager before installing Python dependencies.
 
-**Note:** h2kvm uses the **VMCraft engine** (pure Python) for VM manipulation. Native VMCraft engine - no C dependencies.
+**Note:** h2kvm uses **GuestKit** (`hypersdk-guestkit`) for offline disk inspect and repair. Install with `pip install hypersdk-guestkit`. Optional `python3-libguestfs` for `backend: guestfs`.
 
 ### Required System Packages
 

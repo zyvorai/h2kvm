@@ -419,9 +419,9 @@ python -m json.tool 91-h2kvm-full-config.json
 - Verify VMDK file exists: `ls -lh /path/to/file.vmdk`
 - Check permissions: must be readable by h2kvm user
 
-**"backend failed" error (VMCraft is the default backend):**
+**"backend failed" error (GuestKit is the default backend):**
 - Increase verbosity: `"verbose": 2`
-- For VMCraft: ensure `qemu-nbd` and `nbd` kernel module are available
+- For GuestKit: ensure `qemu-nbd` and `nbd` kernel module are available
 - Review log file for detailed error messages
 
 ### Getting Help

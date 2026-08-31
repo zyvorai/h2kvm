@@ -112,7 +112,7 @@ This single YAML creates:
 - ConfigMap with migration.yaml config
 - PVCs for input (10Gi) and output (25Gi)
 - Job: copy VMDK from node hostPath into input PVC
-- Job: run h2kvmctl migration (privileged, NBD, VMCraft)
+- Job: run h2kvmctl migration (privileged, NBD, GuestKit)
 - KubeVirt VM definition (Manual runStrategy)
 - SSH NodePort service
 

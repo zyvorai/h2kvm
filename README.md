@@ -112,7 +112,7 @@ Hypervisor exit fails when VirtIO is missing, GRUB is wrong, or Windows registry
 | Before h2kvm | With h2kvm |
 |------------------|----------------|
 | 18-month “migration project” | One pipeline: browse → migrate → deploy |
-| Guest drivers break on first KVM boot | **VMCraft** offline fix for 35+ OS versions |
+| Guest drivers break on first KVM boot | **GuestKit** offline fix for 35+ OS versions |
 | Windows needs a war room of tribal scripts | Automated VirtIO / hivex / RDP path |
 | No visibility mid-conversion | **h2kweb** progress · webhooks · email |
 | K8s teams stuck on libvirt YAML | Libvirt → **KubeVirt** one-click path |
@@ -163,11 +163,11 @@ CE is for labs and single-cluster PoC. Moving a Windows estate, SAN-backed waves
 | | Community / public CE *(this repo)* | **[Enterprise](https://zyvor.dev/h2kvm?utm_source=github&utm_medium=h2kvm)** |
 |---|---|---|
 | **Who it is for** | Labs · DIY pipelines | Migration leads · **multi-wave cutovers** |
-| **Convert + VMCraft offline fix** | ✅ | ✅ + validated fleet playbooks |
+| **Convert + GuestKit offline fix** | ✅ | ✅ + validated fleet playbooks |
 | **CLI · h2kweb · zkvm · operator** | ✅ Eval / single-cluster | ✅ **HA** · multi-namespace tenancy |
 | **Windows path** | Automated VirtIO / registry | ✅ + **war-room / PS runbooks** |
 | **Storage pipelines** | Local / libvirt / KubeVirt / Glance | ✅ + **SAN / Ceph / NetApp** |
-| **Pre-flight** | VMCraft planner | ✅ + **GuestKit fleet risk scoring** |
+| **Pre-flight** | GuestKit planner | ✅ + **GuestKit fleet risk scoring** |
 | **First-boot** | Strong offline fix | **96.8%** automated path + PS |
 | **Support** | Community | **SLA · LTS · CVE** · hypervisor-exit programs |
 | **Day-2** | Hand off to **Zeus OS** | ✅ Licensed suite path |

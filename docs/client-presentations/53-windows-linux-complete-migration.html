@@ -83,7 +83,7 @@
     <div class="stat-pill"><div class="num">20+</div><div class="label">Automatic Fixes</div></div>
     <div class="stat-pill"><div class="num">$0</div><div class="label">License Cost</div></div>
   </div>
-  <div class="badge">Proprietary (Zyvor AI Labs) | VMCraft Engine | No libguestfs | CLI + TUI + API | KVM + KubeVirt</div>
+  <div class="badge">Proprietary (Zyvor AI Labs) | GuestKit engine | No libguestfs | CLI + TUI + API | KVM + KubeVirt</div>
 </div>
 
 <!-- PAGE 1: Platform Overview -->
@@ -106,7 +106,7 @@
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step">Convert<br><small>VMDK/VHD &rarr; QCOW2</small></div>
     <div class="flow-arrow">&rarr;</div>
-    <div class="flow-step flow-fix">Offline Fix<br><small>VMCraft engine</small></div>
+    <div class="flow-step flow-fix">Offline Fix<br><small>GuestKit engine</small></div>
     <div class="flow-arrow">&rarr;</div>
     <div class="flow-step flow-ok">Deploy<br><small>libvirt / KubeVirt</small></div>
     <div class="flow-arrow">&rarr;</div>
@@ -138,7 +138,7 @@
       </ul>
     </div>
     <div class="card">
-      <h4>VMCraft Engine</h4>
+      <h4>GuestKit engine</h4>
       <ul>
         <li>Pure Python + qemu-nbd (no libguestfs)</li>
         <li>Offline disk mounting &amp; modification</li>
@@ -841,7 +841,7 @@ h2kvmctl -c config.yaml -v</pre>
     <tr><td><strong>Source: VMware</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">Manual</td></tr>
     <tr><td><strong>Source: Hyper-V</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">Partial</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">Manual</td></tr>
     <tr><td><strong>Source: AWS/Azure/GCP</strong></td><td class="check">&#10003; (10 clouds)</td><td class="cross">&#10007;</td><td class="cross">&#10007;</td><td>AWS only</td><td>Azure only</td><td class="cross">Complex</td></tr>
-    <tr><td><strong>No libguestfs</strong></td><td class="check">&#10003; VMCraft</td><td class="cross">Required</td><td class="cross">Required</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+    <tr><td><strong>No libguestfs</strong></td><td class="check">&#10003; GuestKit</td><td class="cross">Required</td><td class="cross">Required</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
     <tr><td><strong>15+ Linux distros</strong></td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="partial">RHEL-focus</td><td class="partial">Amazon</td><td class="partial">Ubuntu</td><td>Varies</td></tr>
     <tr><td><strong>TPM emulation (Win11)</strong></td><td class="check">&#10003; swtpm</td><td class="cross">&#10007;</td><td class="check">&#10003;</td><td class="cross">N/A</td><td class="cross">N/A</td><td class="partial">Manual</td></tr>
     <tr><td><strong>Cost</strong></td><td class="check">$0</td><td class="check">$0</td><td class="cross">$50K+ (OCP)</td><td class="partial">Free/90d</td><td class="partial">Free/180d</td><td class="check">$0</td></tr>
@@ -865,9 +865,9 @@ h2kvmctl -c config.yaml -v</pre>
     <tr><td>2</td><td><strong>Discover</strong></td><td>zkvm TUI</td><td>Browse vCenter: see OS, CPU, RAM, disk for every VM</td><td>VM selection list</td></tr>
     <tr><td>3</td><td><strong>Export</strong></td><td>govc / hypersdk</td><td>Streaming download with progress + ETA (3s throttled updates)</td><td>VMDK/VHD/RAW files</td></tr>
     <tr><td>4</td><td><strong>Convert</strong></td><td>qemu-img</td><td>VMDK/VHD &rarr; QCOW2, flatten snapshots, compress</td><td>Optimized QCOW2 images</td></tr>
-    <tr><td>5</td><td><strong>Detect</strong></td><td>VMCraft</td><td>Auto-detect: Windows or Linux? Version? Boot mode? Filesystem?</td><td>OS-specific fix strategy</td></tr>
-    <tr><td>6</td><td><strong>Fix (Windows)</strong></td><td>VMCraft</td><td>VirtIO inject, registry fix, BCD repair, tools removal</td><td>Boot-ready Windows VM</td></tr>
-    <tr><td>7</td><td><strong>Fix (Linux)</strong></td><td>VMCraft</td><td>initramfs rebuild, fstab, GRUB, network, SELinux</td><td>Boot-ready Linux VM</td></tr>
+    <tr><td>5</td><td><strong>Detect</strong></td><td>GuestKit</td><td>Auto-detect: Windows or Linux? Version? Boot mode? Filesystem?</td><td>OS-specific fix strategy</td></tr>
+    <tr><td>6</td><td><strong>Fix (Windows)</strong></td><td>GuestKit</td><td>VirtIO inject, registry fix, BCD repair, tools removal</td><td>Boot-ready Windows VM</td></tr>
+    <tr><td>7</td><td><strong>Fix (Linux)</strong></td><td>GuestKit</td><td>initramfs rebuild, fstab, GRUB, network, SELinux</td><td>Boot-ready Linux VM</td></tr>
     <tr><td>8</td><td><strong>Deploy</strong></td><td>h2kvmctl</td><td>Generate XML + virsh define, or K8s YAML + kubectl apply</td><td>VMs defined on targets</td></tr>
     <tr><td>9</td><td><strong>Verify</strong></td><td>h2kvmctl</td><td>Automated boot test per VM, health checks</td><td>Pass/fail report</td></tr>
     <tr><td>10</td><td><strong>Notify</strong></td><td>Webhook</td><td>Slack/Teams notification with per-VM results</td><td>Team informed</td></tr>

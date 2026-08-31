@@ -117,7 +117,7 @@ subprocess.run(["qemu-nbd", "--disconnect", "/dev/nbd0"])  # Often fails!
 #### New Code (Production-Grade):
 
 ```python
-from h2kvm.vmcraft.nbd_manager import NBDDevice
+from h2kvm.guestkit.nbd_manager import NBDDevice
 
 # Automatic allocation, connection, and cleanup
 with NBDDevice("disk.vmdk") as nbd:
@@ -158,7 +158,7 @@ done
 **Using Python:**
 
 ```python
-from h2kvm.vmcraft.nbd_manager import cleanup_all_nbd_devices
+from h2kvm.guestkit.nbd_manager import cleanup_all_nbd_devices
 
 # Cleanup all NBD devices
 cleaned = cleanup_all_nbd_devices()
@@ -324,7 +324,7 @@ sudo udevadm settle
 ### 1. Always Use NBDDevice Class
 
 ```python
-from h2kvm.vmcraft.nbd_manager import NBDDevice
+from h2kvm.guestkit.nbd_manager import NBDDevice
 
 with NBDDevice("disk.vmdk") as nbd:
     # Safe, automatic cleanup
@@ -376,7 +376,7 @@ with NBDDevice(
 ### 5. Cleanup Orphans at Startup
 
 ```python
-from h2kvm.vmcraft.nbd_manager import NBDDevice
+from h2kvm.guestkit.nbd_manager import NBDDevice
 
 # At application startup
 NBDDevice.cleanup_orphaned_nbd()
@@ -390,7 +390,7 @@ with NBDDevice("disk.vmdk") as nbd:
 
 ## 📚 Related Files
 
-- **NBD Manager**: [h2kvm/vmcraft/nbd_manager.py](../../h2kvm/vmcraft/nbd_manager.py)
+- **NBD Manager**: [h2kvm/core/nbd_manager.py](../../h2kvm/core/nbd_manager.py)
 - **System Configuration**: [etc/sysctl.d/99-h2kvm-nbd.conf](../../etc/sysctl.d/99-h2kvm-nbd.conf)
 - **NBD Module Config**: [etc/modprobe.d/nbd.conf](../../etc/modprobe.d/nbd.conf)
 - **Systemd Limits**: [etc/systemd/system.conf.d/h2kvm-limits.conf](../../etc/systemd/system.conf.d/h2kvm-limits.conf)

@@ -2,13 +2,15 @@
 
 Quick reference guide for the most commonly used APIs in h2kvm.
 
-## VMCraft - Disk Image Analysis
+## GuestKit - Disk Image Analysis
 
 ### Basic Usage
 ```python
-from h2kvm.vmcraft.main import VMCraft
+from h2kvm.guestkit.main import guestkit_client
 
-g = VMCraft()
+from h2kvm.core import guestkit_client
+
+g = guestkit_client.open_guest("disk.qcow2")
 g.add_drive_opts('/path/to/disk.vmdk', readonly=True)
 g.launch()
 
@@ -164,7 +166,7 @@ used_gb = total_gb - free_gb
 usage_percent = (used_gb / total_gb) * 100
 ```
 
-## VMCraft - Systemd Integration
+## GuestKit - Systemd Integration
 
 ### Service Management (15 APIs)
 
@@ -497,5 +499,5 @@ for root in roots:
 
 For complete API documentation, see:
 - `docs/IMPLEMENTATION_COMPLETE.md` - Full implementation summary
-- `examples/vmcraft_filesystem_apis.py` - Filesystem API examples
+- `scripts/guestkit_inspect.py` - Filesystem API examples
 - `examples/demo_systemd_apis.py` - Systemd API examples

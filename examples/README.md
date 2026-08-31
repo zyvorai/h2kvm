@@ -33,7 +33,7 @@ python3 benchmark_systemd_tools.py vm1.vmdk vm2.vmdk
 python3 analytics_report_generator.py --format html
 
 # View all filesystem APIs (37+ methods)
-python3 vmcraft_filesystem_apis.py /path/to/disk.qcow2
+python3 scripts/guestkit_inspect.py /path/to/disk.qcow2
 
 # Complete migration workflow
 python3 complete_migration_workflow.py /vmware/vm.vmdk /output/kvm
@@ -325,7 +325,7 @@ Complete reference for all 46 systemd APIs with code examples.
 
 Interactive demonstration of systemd APIs with real VM analysis.
 
-### 9. Filesystem API Reference (`vmcraft_filesystem_apis.py`)
+### 9. GuestKit Disk Inspection (`scripts/guestkit_inspect.py`)
 
 Comprehensive demonstration of all 37+ filesystem detection and manipulation APIs.
 
@@ -341,7 +341,7 @@ Comprehensive demonstration of all 37+ filesystem detection and manipulation API
 
 **Usage:**
 ```bash
-python3 vmcraft_filesystem_apis.py /path/to/disk.vmdk
+python3 scripts/guestkit_inspect.py /path/to/disk.vmdk
 
 # Demonstrates:
 # - OS detection and version information
@@ -586,7 +586,7 @@ jq -s 'map({name: .vm_name, score: .overall_score})' /tmp/security_audit_*.json
 → Try `complete_migration_workflow.py` for end-to-end migration
 
 ### 📚 I want to learn the APIs
-→ Explore `systemd_api_reference.py` and `vmcraft_filesystem_apis.py`
+→ Explore `systemd_api_reference.py` and `scripts/guestkit_inspect.py`
 
 ## YAML Configuration Examples
 

@@ -37,7 +37,7 @@ Files: `kubernetes.go`, `kubevirt.go`, `kube_client.go`, `standalone.go`, `help.
 | 6 | Version management | `make version` target showing all component versions |
 | 7 | Webhook cert automation | `make operator-webhook-certs` — auto-detects cert-manager, falls back to openssl script |
 | 8 | Deploy automation | Kustomize overlays (dev/production) replace manual steps |
-| 9 | VMCraft multi-drive | Documented limitation (existing NotImplementedError) |
+| 9 | GuestKit multi-drive | Documented limitation (existing NotImplementedError) |
 | 10 | Veeam extraction | Documented limitation (requires external utility) |
 | 11 | Database migrations | MongoDB `fsyncLock/Unlock`, PostgreSQL `CHECKPOINT`, Redis `BGSAVE` with polling |
 | 12 | Security scanning | `make security-scan` — bandit + pip-audit + detect-secrets |

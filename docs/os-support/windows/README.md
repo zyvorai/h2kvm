@@ -298,7 +298,7 @@ docs/guides/operations/MIGRATION_RUNBOOK_TEMPLATE.md
 **Problem**: When to inject drivers - offline or online?
 
 **Solutions**:
-- **Offline Injection**: Before first boot (requires VMCraft access to Windows registry)
+- **Offline Injection**: Before first boot (requires GuestKit access to Windows registry)
 - **Online Installation**: After booting with SATA (safer, recommended)
 
 **Documentation**: [Driver Injection](driver-injection.md)
@@ -469,7 +469,7 @@ h2kvm local \
 
 ### General Features
 - **[VMDK Inspector](../../features/vmdk-inspector.md)** - Analyze Windows VMDKs
-- **[VMCraft](../../features/vmcraft/complete-guide.md)** - Low-level Windows manipulation
+- **[GuestKit](../../features/architecture/GUESTKIT.md)** - Low-level Windows manipulation
 
 ---
 

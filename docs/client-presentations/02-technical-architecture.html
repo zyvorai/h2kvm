@@ -72,7 +72,7 @@
    +-----v-----------+
    |    h2kvm     |   Python — disk conversion + guest fixes
    |                  |   Format conversion (qcow2/raw)
-   |  VMCraft engine  |   Offline OS repair (fstab, initramfs, drivers)
+   |  GuestKit engine  |   Offline OS repair (fstab, initramfs, drivers)
    |  libguestfs      |   Libvirt domain generation
    |  Guest fixes     |   KubeVirt deployment
    +-----+------------+
@@ -219,7 +219,7 @@ type Provider interface {
     <tr><td><strong>Deploy</strong></td><td>Generate libvirt XML, virsh define, or create KubeVirt VirtualMachine + PVC upload</td><td>VM is ready to start — no manual XML editing or kubectl gymnastics</td></tr>
   </table>
 
-  <h3>Guest Fix Engine (VMCraft)</h3>
+  <h3>Guest Fix Engine (GuestKit)</h3>
   <div class="card-grid">
     <div class="card">
       <h4>Linux Fixes</h4>

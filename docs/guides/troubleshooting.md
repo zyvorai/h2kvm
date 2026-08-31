@@ -220,7 +220,7 @@ ImageInspectionError: guestfs_launch failed
 # Check if KVM is available
 ls -l /dev/kvm
 
-# Test VMCraft backend
+# Test GuestKit backend
 sudo modprobe nbd
 ls /dev/nbd0
 

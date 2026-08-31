@@ -6,34 +6,35 @@ Comprehensive API documentation for all H2KVM modules and features.
 
 ## Core APIs
 
-### VMCraft API
-**[Complete Documentation](vmcraft-api.md)**
+### GuestKit Integration
+**[Integration Guide](../architecture/GUESTKIT.md)**
 
-Guest filesystem manipulation API with 480+ comprehensive methods for VM manipulation.
+GuestKit (`hypersdk-guestkit`) provides offline disk inspection and repair via PyO3 bindings.
 
 **Key Features**:
-- Filesystem operations (mount, read, write, edit)
-- Partition management (create, delete, resize)
-- LVM operations (create, manage volumes)
-- Package management (install, update, query)
-- Configuration editing (Augeas integration)
-- Archive operations (tar, compression)
+- Bootability doctor and boot inspect
+- Hypervisor-aware migrate plan and repair
+- GuestFS-compatible disk handle via `guestfs_factory`
+- Disk conversion via `DiskConverter`
 
 **Quick Example**:
 ```python
-from h2kvm.vmcraft import VMCraft
+from h2kvm.core import guestkit_client
 
-vmcraft = VMCraft(logger)
-vmcraft.add_disk("/vms/server.qcow2")
-vmcraft.launch()
+# Inspect bootability
+report = guestkit_client.doctor("/vms/server.qcow2", target="kvm")
 
-# Read file
-content = vmcraft.read_file("/etc/fstab")
+# Apply migration repairs
+result = guestkit_client.migrate_repair(
+    "/vms/server.qcow2",
+    target="kvm",
+    apply=True,
+)
 
-# Edit configuration
-vmcraft.write_file("/etc/hostname", "new-hostname")
-
-vmcraft.shutdown()
+# GuestFS-compatible handle for low-level access
+g = guestkit_client.open_guest("/vms/server.qcow2")
+roots = g.inspect_os()
+g.shutdown()
 ```
 
 ---
@@ -57,7 +58,7 @@ from h2kvm.validation import ValidationOrchestrator
 
 orchestrator = ValidationOrchestrator(logger)
 report = orchestrator.validate_migration(
-    vmcraft,
+    guestkit,
     check_services=True,
     check_network=True,
     check_databases=True
@@ -201,7 +202,7 @@ source.restore_vm(
 
 | API | Methods | Status | Use Cases |
 |-----|---------|--------|-----------|
-| **VMCraft** | 480+ | ✅ Production | Guest filesystem manipulation |
+| **GuestKit** | 480+ | ✅ Production | Guest filesystem manipulation |
 | **Validation** | 15+ | ✅ Production | Post-migration validation |
 | **Rollback** | 20+ | ✅ Production | Rollback and recovery |
 | **CLI** | 10+ | ✅ Production | Interactive workflows |
@@ -218,59 +219,59 @@ source.restore_vm(
 
 ```python
 import logging
-from h2kvm.vmcraft import VMCraft
+from h2kvm.core import guestkit_client
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize VMCraft (required for most operations)
-vmcraft = VMCraft(logger)
-vmcraft.add_disk("/vms/server.qcow2")
-vmcraft.launch()
+# Initialize GuestKit (required for most operations)
+guestkit = GuestKit(logger)
+guestkit.add_disk("/vms/server.qcow2")
+guestkit.launch()
 
 try:
     # Perform operations...
     pass
 finally:
     # Always cleanup
-    vmcraft.shutdown()
+    guestkit.shutdown()
 ```
 
 ### Error Handling
 
 ```python
-from h2kvm.vmcraft import VMCraft
+from h2kvm.core import guestkit_client
 
 try:
-    vmcraft = VMCraft(logger)
-    vmcraft.add_disk("/vms/server.qcow2")
-    vmcraft.launch()
+    guestkit = GuestKit(logger)
+    guestkit.add_disk("/vms/server.qcow2")
+    guestkit.launch()
 
     # Operations that might fail
-    content = vmcraft.read_file("/etc/config")
+    content = guestkit.read_file("/etc/config")
 
 except FileNotFoundError as e:
     logger.error(f"File not found: {e}")
 except RuntimeError as e:
     logger.error(f"Runtime error: {e}")
 finally:
-    if vmcraft:
-        vmcraft.shutdown()
+    if guestkit:
+        guestkit.shutdown()
 ```
 
 ### Context Manager (Recommended)
 
 ```python
-from h2kvm.vmcraft import VMCraft
+from h2kvm.core import guestkit_client
 
 # Using context manager for automatic cleanup
-with VMCraft(logger) as vmcraft:
-    vmcraft.add_disk("/vms/server.qcow2")
-    vmcraft.launch()
+with GuestKit(logger) as guestkit:
+    guestkit.add_disk("/vms/server.qcow2")
+    guestkit.launch()
 
     # Operations...
-    content = vmcraft.read_file("/etc/fstab")
+    content = guestkit.read_file("/etc/fstab")
 
 # Automatic shutdown when exiting context
 ```
@@ -301,7 +302,7 @@ All APIs follow semantic versioning (SemVer):
 
 See the [examples directory](../../examples/) for complete, runnable examples:
 
-- `examples/vmcraft/` - VMCraft API examples
+- `examples/guestkit/` - GuestKit API examples
 - `examples/validation/` - Validation API examples
 - `examples/rollback/` - Rollback API examples
 - `examples/batch/` - Batch migration examples

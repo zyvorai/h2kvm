@@ -36,7 +36,7 @@ data:
     to_output: rhel8.8-fixed.qcow2
     out_format: qcow2
     compress: true
-    backend: vmcraft
+    backend: guestkit
     flatten: true
     fstab_mode: stabilize-all
     regen_initramfs: true

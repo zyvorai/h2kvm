@@ -23,7 +23,7 @@ Integration with systemd for service management and boot configuration:
 ```python
 from h2kvm.infrastructure.systemd import SystemdManager
 
-mgr = SystemdManager(vmcraft_instance)
+mgr = SystemdManager(guest_handle)
 mgr.enable_service("sshd")
 mgr.create_firstboot_service(script="/usr/local/bin/setup.sh")
 ```
@@ -46,7 +46,7 @@ SSH client and key management:
 from h2kvm.infrastructure.ssh import inject_ssh_keys
 
 inject_ssh_keys(
-    vmcraft_instance,
+    guest_handle,
     username="admin",
     keys=["ssh-rsa AAAAB3..."]
 )
@@ -156,7 +156,7 @@ deployer.deploy(
 from h2kvm.infrastructure.systemd.boot import create_firstboot_service
 
 create_firstboot_service(
-    vmcraft_instance,
+    guest_handle,
     service_name="initial-setup",
     exec_start="/usr/local/bin/setup.sh",
     description="Initial VM setup"

@@ -1,122 +1,107 @@
 # H2KVM Backend Options
 
-H2KVM supports multiple backends for offline guest fixes, each with different trade-offs between speed, security, and reliability.
+H2KVM supports multiple backends for offline guest inspection, disk repair, and filesystem access. **GuestKit** is the default; **libguestfs** remains available for compatibility.
 
 ## Overview
 
-| Backend | Speed | Security | Maturity | Use Case |
-|---------|-------|----------|----------|----------|
-| **vmcraft** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | Default backend |
-| **namespace** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | Maximum isolation (experimental) |
+| Backend | Speed | Maturity | Use Case |
+|---------|-------|----------|----------|
+| **guestkit** | Fast (Rust + PyO3) | Production | Default — inspect, plan, repair |
+| **guestfs** | Moderate (appliance) | Battle-tested | Maximum libguestfs compatibility |
+| **auto** | — | — | Try GuestKit first, fall back to libguestfs |
+
+Legacy YAML/CLI values `vmcraft` and `namespace` map to `guestkit` with a deprecation warning.
 
 ## Backend Descriptions
 
-### 1. VMCraft (Fast Pure-Python)
+### 1. GuestKit (Default)
 
 **Architecture:**
-- Pure Python implementation
-- Native LVM module
-- Direct NBD + device mapper operations
-- No appliance overhead
+- Rust Guestfs implementation via `hypersdk-guestkit` PyO3 bindings
+- Selected by `h2kvm/core/guestfs_factory.py`
+- Facade in `h2kvm/core/guestkit_client.py`
+- Offline fixer delegates migration repair to `guestkit.run_migrate_repair()`
 
 **Pros:**
-- ✅ Fast startup with low overhead
-- ✅ Lower memory footprint
-- ✅ No appliance dependencies
-- ✅ Native Python integration
+- Fast startup, low memory footprint
+- GuestFS-compatible API for existing h2kvm call sites
+- Integrated doctor, boot inspect, migrate plan, and repair pipelines
+- No libguestfs supermin appliance required
 
 **Cons:**
-- ❌ Newer codebase (less battle-tested)
-- ❌ Limited to Linux guests
-- ❌ Requires root for NBD/LVM operations
+- Requires `hypersdk-guestkit>=1.1.0` and host tools (`qemu-nbd`, `qemu-img`)
+- Linux guests are the primary focus for offline repair
 
 **When to use:**
-- Bulk migrations (speed critical)
-- Development/testing
-- Modern Linux guests (RHEL 8+, Ubuntu 20+)
-- When you have root access
+- All new migrations (default)
+- Production offline inspect and repair
+- When you want GuestKit doctor/migrate-plan output
 
 **Configuration:**
 ```yaml
-backend: vmcraft
+backend: guestkit
 ```
 
 **Example:**
 ```python
+from pathlib import Path
+from h2kvm.fixers.offline_fixer import OfflineFixConfig, OfflineFSFix
+
 config = OfflineFixConfig(
     image=Path("guest.qcow2"),
-    backend="vmcraft",
+    backend="guestkit",
     fstab_mode="stabilize-all",
-    conversion_dir="/var/tmp/h2kvm",  # VMCraft working directory
+    regen_initramfs=True,
 )
 
 fixer = OfflineFSFix(logger, config)
 result = fixer.fix()
 ```
 
+**CLI inspection:**
+```bash
+python3 scripts/guestkit_inspect.py guest.qcow2
+python3 scripts/guestkit_inspect.py guest.qcow2 --boot
+```
+
 ---
 
-### 2. Namespace (Maximum Isolation) - **EXPERIMENTAL**
+### 2. libguestfs (Optional)
 
 **Architecture:**
-- Unshare-based namespace isolation
-- Isolated mount namespace for /dev
-- Separate PID namespace for LVM
-- No host LVM cache pollution
+- Native `python3-guestfs` bindings
+- libguestfs supermin appliance on the host
 
 **Pros:**
-- ✅ Maximum security guarantees
-- ✅ Complete isolation from host LVM
-- ✅ Safe concurrent operations
-- ✅ No host state modification
+- Long track record in virt-v2v-style workflows
+- Broad filesystem and guest format support
 
 **Cons:**
-- ❌ Experimental (new code)
-- ❌ Requires CAP_SYS_ADMIN
-- ❌ Requires unshare command
-- ❌ Linux-only
+- Slower startup (appliance build/load)
+- Higher memory use than GuestKit
 
 **When to use:**
-- Multi-tenant environments
-- Security-critical scenarios
-- Concurrent guest processing
-- Development/testing new isolation approaches
+- Environments that already standardize on libguestfs
+- Troubleshooting GuestKit compatibility issues
 
-**Requirements:**
+**Configuration:**
+```yaml
+backend: guestfs
+```
+
+**Environment override:**
 ```bash
-# Check if unshare is available
-which unshare
-
-# Check capabilities (when not root)
-getcap $(which unshare)
+export H2KVM_GUESTFS_BACKEND=guestfs
 ```
 
-**Direct Usage (Standalone):**
-```python
-from h2kvm.vmcraft.namespace_lvm import H2KVM
+---
 
-# Use context manager for automatic cleanup
-with H2KVM(image="guest.qcow2") as engine:
-    volumes = engine.start()
+### 3. auto
 
-    for vol in volumes:
-        engine.mount(vol, f"/mnt/{vol.replace('/', '_')}")
-        # ... process mounted filesystem ...
-        engine.unmount(f"/mnt/{vol.replace('/', '_')}")
-```
+Tries GuestKit first; falls back to libguestfs when GuestKit is not installed but the libguestfs appliance is available.
 
-**Via Storage Activator:**
-```python
-from h2kvm.vmcraft.storage import LVMActivator
-
-audit = LVMActivator.activate_namespace(
-    logger,
-    image_path="/path/to/guest.qcow2"
-)
-
-if audit["ok"]:
-    for volume in audit["volumes"]:
-        print(f"Activated: {volume}")
+```yaml
+backend: auto
 ```
 
 ---
@@ -126,147 +111,81 @@ if audit["ok"]:
 ### Decision Tree
 
 ```
-┌─────────────────────────────────────┐
-│   Need maximum speed?                │
-│   (Bulk migration, modern guests)    │
-└──────────────┬──────────────────────┘
-               │ YES
-               ├──> Use: vmcraft
-               │
-               │ NO
-┌──────────────┴──────────────────────┐
-│   Need maximum isolation?            │
-│   (Multi-tenant, security-critical)  │
-└──────────────┬──────────────────────┘
-               │ YES
-               └──> Use: namespace (experimental)
+Need libguestfs-specific behavior or appliance already deployed?
+├─ YES → guestfs
+└─ NO  → guestkit (default)
 ```
 
-### Performance Comparison
+### CLI
 
-Typical migration times (RHEL 8.8, 16GB disk, LVM root):
-
-| Backend | Launch | Mount | Total |
-|---------|--------|-------|-------|
-| vmcraft | 2s | 3s | 5s |
-| namespace | 3s | 4s | 7s |
-
-*Note: Actual performance depends on disk size, storage complexity, and system resources.*
+```bash
+h2kvmctl --config migration.yaml --backend guestkit
+h2kvmctl --config migration.yaml --backend guestfs
+h2kvmctl --config migration.yaml --backend auto
+```
 
 ---
 
 ## Configuration Examples
 
-### Production Migration (Reliability)
+### Production Migration
 ```yaml
-backend: vmcraft
+backend: guestkit
 fstab_mode: stabilize-all
 regen_initramfs: true
-# grub is auto-handled
 filesystem_repair_enable: true
 ```
 
-### Bulk Migration (Speed)
+### libguestfs Fallback
 ```yaml
-backend: vmcraft
-fstab_mode: by-uuid
-regen_initramfs: true
-conversion_dir: /mnt/fast-ssd/h2kvm
-```
-
-### Security-Hardened (Isolation)
-```yaml
-backend: namespace
+backend: guestfs
 fstab_mode: stabilize-all
-dry_run: true  # Read-only inspection
-```
-
----
-
-## Fallback Strategy
-
-H2KVM automatically falls back to more reliable backends on failure:
-
-```
-namespace → vmcraft
-   ↓          ↓
- (isolated)  (fast)
-```
-
-**Example with automatic fallback:**
-```python
-backends_to_try = ["namespace", "vmcraft"]
-
-for backend in backends_to_try:
-    try:
-        config = OfflineFixConfig(image=image_path, backend=backend)
-        fixer = OfflineFSFix(logger, config)
-        result = fixer.fix()
-
-        if result.get("status") == "success":
-            logger.info(f"✅ Success with {backend} backend")
-            break
-    except Exception as e:
-        logger.warning(f"⚠️  {backend} backend failed: {e}")
-        continue
-else:
-    logger.error("❌ All backends failed")
+regen_initramfs: true
 ```
 
 ---
 
 ## Troubleshooting
 
-### VMCraft Backend Issues
+### GuestKit Not Installed
 
-**Problem:** LVM activation fails
 ```
-Solution: Ensure proper udev settling
+ImportError: GuestKit backend requested but the 'guestkit' Python module is not installed.
 ```
 
-**Problem:** Permission denied on NBD
+**Solution:**
+```bash
+pip install hypersdk-guestkit
+# or from source:
+pip install -e /path/to/guestkit
 ```
-Solution: Run with sudo or adjust permissions
+
+Ensure `qemu-nbd` and `qemu-img` are on `PATH`.
+
+### libguestfs Appliance Missing
+
+**Solution:**
+```bash
+# Fedora/RHEL
+sudo dnf install libguestfs python3-libguestfs
+
+# Debian/Ubuntu
+sudo apt install libguestfs-tools python3-guestfs
+```
+
+### Permission Denied on NBD
+
+**Solution:** Run with appropriate privileges for block-device access:
+```bash
 sudo h2kvmctl --config config.yaml
 ```
-
-### Namespace Backend Issues
-
-**Problem:** unshare: Operation not permitted
-```
-Solution: Run with CAP_SYS_ADMIN or as root
-sudo h2kvmctl --config config.yaml --backend namespace
-```
-
-**Problem:** No volumes found
-```
-Solution: Verify NBD connection and LVM setup
-lsblk -o NAME,SIZE,TYPE,MOUNTPOINT
-```
-
----
-
-## Best Practices
-
-1. **Start with vmcraft** for production workloads (default)
-2. **Experiment with namespace** in isolated environments
-4. **Always test** with dry_run=True first
-5. **Monitor logs** for backend-specific warnings
-6. **Have fallback** configured for reliability
-
----
-
-## Future Enhancements
-
-- [ ] Automatic backend selection based on image complexity
-- [ ] Hybrid mode: namespace isolation with vmcraft speed
-- [ ] Benchmark tool for backend comparison
-- [ ] Cloud-optimized backends (S3, Azure Blob, etc.)
 
 ---
 
 ## See Also
 
-- [LVM Implementation](../h2kvm/vmcraft/lvm.py) - Native Python LVM
-- [Namespace LVM](../h2kvm/vmcraft/namespace_lvm.py) - Unshare-based isolation
-- [Backend Comparison Example](../examples/backend_comparison.py) - Demo script
+- [GuestKit Integration Guide](GUESTKIT.md)
+- [Architecture Summary](ARCHITECTURE_SUMMARY.md)
+- [LVM Backends](LVM_BACKENDS.md)
+- [guestfs_factory.py](../../h2kvm/core/guestfs_factory.py)
+- [guestkit_client.py](../../h2kvm/core/guestkit_client.py)

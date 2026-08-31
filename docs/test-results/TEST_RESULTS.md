@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # Test Results - H2KVM OpenShift Operator
 
 **Date:** 2026-01-30

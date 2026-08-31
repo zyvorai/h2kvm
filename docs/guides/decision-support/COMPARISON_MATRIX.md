@@ -290,7 +290,7 @@ kubectl apply -f migrationjob.yaml
 
 | Feature | Status | Complexity | Use Case |
 |---------|--------|------------|----------|
-| **VMCraft Engine** | ✅ Production | ⭐⭐ Moderate | Guest manipulation (480+ APIs) |
+| **GuestKit engine** | ✅ Production | ⭐⭐ Moderate | Guest manipulation (480+ APIs) |
 | **Live Fix** | ✅ Production | ⭐⭐⭐⭐ Expert | < 5 sec downtime |
 | **Batch Processing** | ✅ Production | ⭐⭐ Moderate | Multiple VMs parallel |
 | **Daemon Mode** | ✅ Production | ⭐⭐⭐ Advanced | Queue management |
@@ -332,7 +332,7 @@ kubectl apply -f migrationjob.yaml
 ### Detailed Tool Comparison
 
 **H2KVM**:
-- ✅ 480+ VMCraft APIs
+- ✅ 480+ GuestKit APIs
 - ✅ Pure Python (portable)
 - ✅ Kubernetes-native
 - ✅ Automatic boot fixes
@@ -380,7 +380,7 @@ kubectl apply -f migrationjob.yaml
 | **Local Conversion** | High | Medium | Very High | None |
 | **Remote Fetch** | Medium | Medium | High | High |
 | **Compression** | Very High | Medium | High | None |
-| **VMCraft Operations** | Low | Low | Medium | None |
+| **GuestKit Operations** | Low | Low | Medium | None |
 | **Batch (4 parallel)** | Very High | High | Very High | Varies |
 
 ---

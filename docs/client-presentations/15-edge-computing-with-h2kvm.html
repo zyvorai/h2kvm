@@ -324,7 +324,7 @@ sudo h2kvmctl --config edge.yaml</pre>
     <tr><td>1</td><td><strong>Discovery</strong></td><td>zkvm TUI connects to vCenter, discovers all VMs across 50 sites. Shows CPU, RAM, disk, power state per VM.</td><td>Complete inventory of 250+ VMs</td></tr>
     <tr><td>2</td><td><strong>Assessment</strong></td><td><code>h2kvmctl doctor</code> validates edge hardware readiness. Checks disk space, KVM support, network, libvirt.</td><td>Pre-flight green light per site</td></tr>
     <tr><td>3</td><td><strong>Batch Export</strong></td><td>hypersdk batch-exports VMs from vSphere via govc. Streaming progress with ETA. Handles VMDK, OVA, OVF.</td><td>All disk images downloaded</td></tr>
-    <tr><td>4</td><td><strong>Convert + Fix</strong></td><td>VMCraft engine: VMDK &rarr; QCOW2, rebuild initramfs, fix fstab, remove VMware tools, inject VirtIO (Windows).</td><td>Boot-ready QCOW2 images</td></tr>
+    <tr><td>4</td><td><strong>Convert + Fix</strong></td><td>GuestKit engine: VMDK &rarr; QCOW2, rebuild initramfs, fix fstab, remove VMware tools, inject VirtIO (Windows).</td><td>Boot-ready QCOW2 images</td></tr>
     <tr><td>5</td><td><strong>Deploy</strong></td><td>Generate libvirt XML or KubeVirt manifests. Ship images to edge sites. <code>virsh define</code> or <code>kubectl apply</code>.</td><td>VMs running on edge KVM/K3s</td></tr>
     <tr><td>6</td><td><strong>Verify</strong></td><td>Automated boot test per VM. Webhook notification to Slack/Teams on success or failure.</td><td>Confirmed working at every site</td></tr>
     <tr><td>7</td><td><strong>Decommission</strong></td><td>Cancel vSphere licenses site by site as migration completes.</td><td>$0 VMware cost from day 1</td></tr>
@@ -519,7 +519,7 @@ boot_test: true                 # Verify VM boots before shipping
   <div class="card-grid-3">
     <div class="card">
       <h4>Lightweight Engine</h4>
-      <p>VMCraft = pure Python + qemu-nbd. No libguestfs appliance (500MB+). No supermin boot. Runs on minimal Linux installs, containers, even ARM. <strong>~5MB footprint.</strong></p>
+      <p>GuestKit = pure Python + qemu-nbd. No libguestfs appliance (500MB+). No supermin boot. Runs on minimal Linux installs, containers, even ARM. <strong>~5MB footprint.</strong></p>
     </div>
     <div class="card">
       <h4>Air-Gap Ready</h4>

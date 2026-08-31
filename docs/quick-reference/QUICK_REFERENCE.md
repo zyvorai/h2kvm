@@ -129,7 +129,7 @@ regen_initramfs: true         # Rebuild initramfs for new drivers
 ### Advanced Options
 
 ```yaml
-enable_vmcraft: true          # Use VMCraft engine (default)
+backend: guestkit              # Offline disk backend (default)
 network_retry: 3              # Network operation retries
 timeout: 3600                 # Operation timeout (seconds)
 keep_original: true           # Keep original VMDK (default)

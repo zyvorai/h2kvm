@@ -102,7 +102,7 @@ docs/
 │
 ├── features/                # Feature documentation
 │   ├── README.md           # Features hub
-│   └── vmcraft/           # VMCraft engine docs
+│   └── guestkit/           # GuestKit engine docs
 │
 ├── os-support/             # OS-specific guides
 │   ├── README.md           # OS support hub
@@ -138,7 +138,7 @@ docs/
 | **Feature Documentation** | `features/` | "VMDK Inspector" feature |
 | **OS-Specific** | `os-support/` | "Windows Migration" guide |
 | **Deployment** | `deployment/` | "OpenShift Deployment" |
-| **API Reference** | `reference/api/` | "VMCraft API" reference |
+| **API Reference** | `reference/api/` | "GuestKit API" reference |
 | **Test Results** | `test-results/` | "CentOS 9 Test Results" |
 | **Worker Protocol** | `worker/` | "REST API Specification" |
 
@@ -757,7 +757,7 @@ For deprecated features:
 - [Getting Started Guide](getting-started/README.md) - Clear navigation and progression
 - [Quick Reference](QUICK_REFERENCE.md) - Concise and scannable
 - [Glossary](GLOSSARY.md) - Comprehensive and organized
-- [VMCraft Complete Guide](features/vmcraft/complete-guide.md) - Thorough feature documentation
+- [GuestKit integration guide](features/architecture/GUESTKIT.md) - Thorough feature documentation
 
 ### Study These for Style
 

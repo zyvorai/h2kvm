@@ -42,7 +42,7 @@ The mirror will automatically pull changes every 5 minutes.
 - **Operating System**: Linux (Fedora/RHEL recommended), macOS, or Windows (WSL)
 - **System Dependencies**:
   - qemu-img
-  - qemu-nbd (for VMCraft, the default backend)
+  - qemu-nbd (for GuestKit, the default backend)
 
 ### Development Setup
 
@@ -52,7 +52,7 @@ git clone https://github.com/ssahani/h2kvm.git
 cd h2kvm
 
 # Install system dependencies (Fedora/RHEL)
-# VMCraft is the default backend
+# GuestKit is the default backend
 sudo dnf install -y qemu-img qemu-nbd python3-hivex
 
 # Install Python dependencies

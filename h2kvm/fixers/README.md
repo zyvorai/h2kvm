@@ -105,9 +105,9 @@ result = fixer.run()
 ```python
 from h2kvm.fixers.injectors import hostname_config_injector
 
-# Use individual injector with launched VMCraft instance
+# Use individual injector with launched GuestKit guest handle
 result = hostname_config_injector.inject_hostname_config(
-    vmcraft_instance,
+    guest_handle,
     guestfs_instance
 )
 ```
@@ -131,7 +131,7 @@ All fixers should inherit from this base:
 from h2kvm.fixers.base import BaseFixer
 
 class CustomFixer(BaseFixer):
-    def run(self, vmcraft_instance):
+    def run(self, guest_handle):
         # Implementation
         pass
 ```

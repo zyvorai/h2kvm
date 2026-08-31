@@ -12,7 +12,7 @@ Complete API reference for using H2KVM programmatically as a Python library.
 
 ### 📚 Complete References
 - **[API Reference](API-Reference.md)** - Full API documentation (core, converters, fixers, orchestrator)
-- **[VMCraft API](vmcraft.md)** - Advanced disk manipulation (395+ methods, 62 modules)
+- **[GuestKit Integration](../../architecture/GUESTKIT.md)** — disk inspect, doctor, and offline repair (external `hypersdk-guestkit` package)
 
 ---
 
@@ -24,7 +24,7 @@ Complete API reference for using H2KVM programmatically as a Python library.
 **Best for**: Quick lookups, copy-paste examples, frequently used APIs
 
 **Content**:
-- VMCraft disk image analysis (8 OS detection APIs, 4 filesystem APIs)
+- GuestKit disk image analysis (8 OS detection APIs, 4 filesystem APIs)
 - File operations (70+ methods)
 - Package management (RPM, DEB, Zypper)
 - System configuration (systemd, network, users)
@@ -43,7 +43,7 @@ Complete API reference for using H2KVM programmatically as a Python library.
 **Content**:
 - **Level 1: High-Level API** (Recommended) - Simple orchestration
 - **Level 2: Mid-Level API** - Component-level control
-- **Level 3: Low-Level API** - Direct VMCraft access
+- **Level 3: Low-Level API** - Direct GuestKit access
 - Usage examples (local VMDK, vSphere, Azure, guest fixing, boot testing)
 - Batch migration APIs
 - Hook system and validation framework
@@ -73,8 +73,8 @@ Complete API reference for using H2KVM programmatically as a Python library.
 
 ---
 
-### VMCraft Platform API
-**File**: [vmcraft.md](vmcraft.md)
+### GuestKit Integration
+**File**: [guestkit.md](../../architecture/GUESTKIT.md)
 
 **Best for**: Advanced disk manipulation, low-level operations, maximum control
 
@@ -97,7 +97,7 @@ Complete API reference for using H2KVM programmatically as a Python library.
 
 ## API Level Comparison
 
-| Feature | Quick Reference | Library API | API Reference | VMCraft API |
+| Feature | Quick Reference | Library API | API Reference | GuestKit Integration |
 |---------|----------------|-------------|---------------|-------------|
 | **Audience** | All users | Library users | Library users | Advanced users |
 | **Depth** | Essential only | Complete | Complete | Deep technical |
@@ -133,7 +133,7 @@ Complete API reference for using H2KVM programmatically as a Python library.
 **Goal**: Build custom VM manipulation workflows
 
 1. Read **[Library API](library-api.md)** for architecture
-2. Study **[VMCraft API](vmcraft.md)** for available methods
+2. Study **[GuestKit Integration](../../architecture/GUESTKIT.md)** for available methods
 3. Design custom workflow using low-level APIs
 4. Use **[API Reference](API-Reference.md)** for integration points
 5. Refer to **[Quick Reference](quick-reference.md)** for common patterns
@@ -177,12 +177,13 @@ orchestrator.execute()
 ---
 
 ### Custom VM Inspection
-**Recommended**: [VMCraft API](vmcraft.md) - OS Detection
+**Recommended**: [GuestKit Integration](../../architecture/GUESTKIT.md) - OS Detection
 
 ```python
-from h2kvm.vmcraft.main import VMCraft
+from h2kvm.guestkit.main import guestkit_client
 
-g = VMCraft()
+from h2kvm.core import guestkit_client
+g = guestkit_client.open_guest("disk.qcow2")
 g.add_drive_opts('/path/to/disk.vmdk', readonly=True)
 g.launch()
 
@@ -200,12 +201,13 @@ g.shutdown()
 ---
 
 ### Custom Fixer Implementation
-**Recommended**: [VMCraft API](vmcraft.md) - File Operations + Boot Management
+**Recommended**: [GuestKit Integration](../../architecture/GUESTKIT.md) - File Operations + Boot Management
 
 ```python
-from h2kvm.vmcraft.main import VMCraft
+from h2kvm.guestkit.main import guestkit_client
 
-g = VMCraft()
+from h2kvm.core import guestkit_client
+g = guestkit_client.open_guest("disk.qcow2")
 g.add_drive_opts('/path/to/disk.vmdk', readonly=False)
 g.launch()
 
@@ -220,13 +222,13 @@ g.command(['dracut', '-f'])
 g.shutdown()
 ```
 
-**Reference**: [VMCraft API](vmcraft.md) - File Operations, Boot Management
+**Reference**: [GuestKit Integration](../../architecture/GUESTKIT.md) - File Operations, Boot Management
 
 ---
 
 ## API Feature Matrix
 
-| Capability | Quick Ref | Library API | API Ref | VMCraft |
+| Capability | Quick Ref | Library API | API Ref | GuestKit |
 |------------|-----------|-------------|---------|---------|
 | **VM Conversion** | ✅ Basic | ✅ Complete | ✅ Complete | ❌ N/A |
 | **Batch Migration** | ❌ | ✅ Complete | ✅ Complete | ❌ N/A |
@@ -256,7 +258,7 @@ g.shutdown()
 3. Implement error handling and validation
 
 **Advanced** (Custom automation and workflows):
-1. Study [VMCraft API](vmcraft.md) - Architecture and all modules
+1. Study [GuestKit Integration](../../architecture/GUESTKIT.md) - Architecture and all modules
 2. Use [API Reference](API-Reference.md) for integration
 3. Design custom fixers and workflows
 
@@ -273,12 +275,12 @@ g.shutdown()
 - [API Reference](API-Reference.md) - Orchestrator, error handling
 
 **Custom Automation**:
-- [VMCraft API](vmcraft.md) - All available methods
+- [GuestKit Integration](../../architecture/GUESTKIT.md) - All available methods
 - [API Reference](API-Reference.md) - Integration points
 
 **Troubleshooting**:
 - [API Reference](API-Reference.md) - Error handling section
-- [VMCraft API](vmcraft.md) - Debugging and logging
+- [GuestKit Integration](../../architecture/GUESTKIT.md) - Debugging and logging
 
 ---
 
@@ -295,7 +297,7 @@ g.shutdown()
 - **[Best Practices](../../guides/operations/BEST_PRACTICES.md)** - Proven practices
 
 ### Features
-- **[VMCraft Complete Guide](../../features/vmcraft/complete-guide.md)** - VMCraft platform overview
+- **[GuestKit Integration Guide](../../architecture/GUESTKIT.md)** - GuestKit platform overview
 - **[Windows Support](../../os-support/windows/guide.md)** - Windows migration APIs
 
 ### Examples
@@ -310,12 +312,12 @@ g.shutdown()
 - **Core API**: 15+ high-level methods
 - **Converters**: 8 platform-specific converters
 - **Fixers**: 12 automated fix operations
-- **VMCraft**: 395+ low-level methods across 62 modules
+- **GuestKit**: doctor, migrate_repair, and GuestFS-compatible disk access
 - **Batch APIs**: 10+ orchestration methods
 
 **Code Size**:
 - Core library: ~15,000 lines
-- VMCraft platform: ~30,000 lines
+- GuestKit: external hypersdk-guestkit package
 - Total: ~45,000 lines of Python code
 
 **Test Coverage**: 100% (114 systemd tests, comprehensive integration tests)
@@ -325,7 +327,7 @@ g.shutdown()
 ## Version Information
 
 **API Version**: v1.0
-**VMCraft Version**: v9.2
+**Package**: hypersdk-guestkit>=1.1.0
 **H2KVM Version**: v0.3.1
 **Last Updated**: March 2026
 

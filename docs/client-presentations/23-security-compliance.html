@@ -314,7 +314,7 @@ AuditEventConfigChange    // System configuration changed
   ┌──────────────┐                    ┌──────────────┐                   ┌──────────────┐
   │ vSphere /     │   TLS 1.2+        │ h2kvm    │                   │ KVM / libvirt│
   │ Hyper-V /     │ ──────────────►   │              │   Local only      │              │
-  │ Cloud API     │   Encrypted        │ VMCraft      │ ──────────────►  │ virsh define │
+  │ Cloud API     │   Encrypted        │ GuestKit      │ ──────────────►  │ virsh define │
   │              │   export           │ engine       │   QCOW2 +        │              │
   └──────────────┘                    │              │   libvirt XML     └──────────────┘
                                       │ qemu-nbd     │

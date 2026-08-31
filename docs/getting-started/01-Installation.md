@@ -31,7 +31,7 @@ This single command installs:
 | Component | What |
 |-----------|------|
 | Python 3, pip | Runtime |
-| qemu-img, qemu-nbd | Disk conversion and VMCraft backend |
+| qemu-img, qemu-nbd | Disk conversion and GuestKit backend |
 | libguestfs, python3-libguestfs | LVM/LUKS support (supermin appliance) |
 | libvirt, KVM, virt-install | VM management and hypervisor |
 | OVMF/edk2 | UEFI firmware |
@@ -135,7 +135,7 @@ h2kvm requires these kernel modules:
 
 | Module | Purpose | Required |
 |--------|---------|----------|
-| `nbd` | Network Block Device — VMCraft mounts disks via qemu-nbd | **Yes** |
+| `nbd` | Network Block Device — GuestKit mounts disks via qemu-nbd | **Yes** |
 | `kvm` | KVM hypervisor | Yes (for libvirt_test/boot testing) |
 | `kvm_intel` or `kvm_amd` | CPU-specific KVM acceleration | Yes (auto-detected) |
 | `vhost_net` | Virtio network performance | Recommended |
@@ -267,7 +267,7 @@ Available flags:
 
 ### System dependencies by OS
 
-`h2kvm` is Python with a pure Python VMCraft engine for VM manipulation.
+`h2kvm` is Python with **GuestKit** (`hypersdk-guestkit`) for offline disk inspect and repair.
 
 **Core dependencies** (required):
 
@@ -486,7 +486,7 @@ See [vSphere Export Tutorial](../tutorials/05-vsphere-export-tools.md) for detai
 
 ## macOS
 
-macOS support works with the VMCraft engine. For best performance, use Docker option below for full Linux environment.
+macOS support works with GuestKit. For best performance, use the Docker option below for a full Linux environment.
 
 ### Option 1: Using Homebrew
 
@@ -504,7 +504,7 @@ pip install -r requirements.txt
 pip install -e .
 ```bash
 
-**Note:** macOS support works with VMCraft engine. Docker option below provides full Linux environment.
+**Note:** macOS support works with GuestKit. The Docker option below provides a full Linux environment.
 
 ### Option 2: Using Docker (Recommended for macOS)
 
@@ -724,7 +724,7 @@ After installation, the system-wide configuration file is at `/etc/h2kvm/config.
 Key settings:
 - `container_isolation: true` (default) -- runs LVM activation inside Podman/Docker for isolation
 - `allowed_dirs` -- directories where VM images can be accessed
-- `backend: vmcraft` -- offline fix backend (vmcraft is the fast default)
+- `backend: guestkit` -- offline fix backend (guestkit is the fast default)
 
 To disable container isolation:
 ```yaml

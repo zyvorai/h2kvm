@@ -29,7 +29,7 @@
 ## 📊 At a Glance
 
 ```
-🎯 480+ VMCraft APIs      │  🚀 0.71s LVM Activation  │  ✅ 1390+ Test Suite
+🎯 480+ GuestKit APIs      │  🚀 0.71s LVM Activation  │  ✅ 1390+ Test Suite
 📦 8 Input Formats        │  ⚡ 5-7x Faster           │  🔒 100% Host Protection
 🌐 35+ OS Versions        │  🐍 Pure Python           │  📈 10K+ Downloads
 🔧 Offline Fixes          │  ☁️ K8s Native            │  🏆 Production Ready
@@ -119,7 +119,7 @@ Production-tested with Windows 10 Pro (20H2) and Windows 11 Pro (22H2).
 - **March 2026**: 🔒 **Security & Robustness Overhaul** - 70+ bug fixes, deep exception handling, command injection fixes ✨
   - 🛡️ Fixed command injection in password handling, dracut args, SSH password exposure
   - 🪟 **Windows VirtIO driver injection** - cached ISO extraction (bsdtar + Rock Ridge), all 4 drivers found
-  - 🪟 **Windows registry access on VMCraft** - hivex API shim for RDP, firewall, network snapshot
+  - 🪟 **Windows registry access on GuestKit** - hivex API shim for RDP, firewall, network snapshot
   - 🚀 **Remote deployment** - `deploy-remote.sh` — one command to rsync + install on any server
   - ☁️ **AWS EC2 provider** - production-grade EC2 → KVM with boto3, retry, resume, multi-disk, state files
   - ☁️ **AMI migration** - Photon OS 5.0 AMI → KVM (download, convert, fix, deploy in one command)
@@ -137,7 +137,7 @@ Production-tested with Windows 10 Pro (20H2) and Windows 11 Pro (22H2).
   - 📊 **[Test Results](docs/test-results/LVM_ENTERPRISE_IMPROVEMENTS_TEST_RESULTS.md)** - Production validation
 - **v0.2.2**: 🎯 **Adaptive Worker System** - Three-tier capability detection automatically adapts from basic conversion to full offline fixes based on environment
 - **v0.2.1**: ☁️ **OpenShift Platform** - Complete OCP support with OperatorHub, SecurityContextConstraints, Routes, OAuth
-- **v0.2.0**: 🚀 **VMCraft Engine** - Native Python VM manipulation with 480+ APIs, 5-7x faster performance
+- **v0.2.0**: 🚀 **GuestKit engine** - Native Python VM manipulation with 480+ APIs, 5-7x faster performance
 
 ---
 
@@ -149,7 +149,7 @@ Production-tested with Windows 10 Pro (20H2) and Windows 11 Pro (22H2).
   - [Installation](#one-command-installation)
   - [First Migration](#your-first-migration-5-minutes)
 - [Feature Highlights](#feature-highlights)
-  - [VMCraft Engine](#-vmcraft---native-vm-manipulation-engine)
+  - [GuestKit engine](#-guestkit---native-vm-manipulation-engine)
   - [Live Migration](#-live-fix-ssh-based)
   - [Automated Testing](#-post-migration-testing)
   - [Batch Processing](#-batch-migrations)
@@ -169,7 +169,7 @@ Production-tested with Windows 10 Pro (20H2) and Windows 11 Pro (22H2).
 
 | Feature Category | Capabilities |
 |-----------------|--------------|
-| **🎯 VMCraft Engine** | 480+ APIs • Pure Python • 5-7x faster • 0.71s LVM activation |
+| **🎯 GuestKit engine** | 480+ APIs • Pure Python • 5-7x faster • 0.71s LVM activation |
 | **📦 Input Formats** | VMDK • OVA • OVF • VHD • VHDX • AMI • Azure VHD • Raw |
 | **🔧 Automated Fixes** | GRUB/GRUB2 • fstab stabilization • initramfs regeneration • Network config • SELinux autorelabel |
 | **🌐 Remote Operations** | SSH-based fetch • ESXi integration • Live-fix (zero downtime) • VDS network support |
@@ -390,7 +390,7 @@ curl -L https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x8
 
 > **Note:** `libguestfs` is **recommended** — when LVM or LUKS is detected on the guest disk,
 > h2kvm auto-switches to the libguestfs backend (supermin appliance) for full device visibility.
-> Without it, VMCraft handles LVM via container isolation (works but less robust for complex setups).
+> Without it, GuestKit handles LVM via container isolation (works but less robust for complex setups).
 
 ---
 
@@ -402,7 +402,7 @@ curl -L https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x8
 ┌──────────────┐      ┌──────────────┐      ┌──────────────┐      ┌──────────────┐
 │   Source     │      │   Convert    │      │  Offline     │      │    Boot      │
 │   VMDK/OVA   │  →   │   to QCOW2   │  →   │    Fixes     │  →   │   on KVM     │
-│  (VMware)    │      │   (qemu-img) │      │   (VMCraft)  │      │  (libvirt)   │
+│  (VMware)    │      │   (qemu-img) │      │   (GuestKit)  │      │  (libvirt)   │
 └──────────────┘      └──────────────┘      └──────────────┘      └──────────────┘
 ```
 
@@ -564,7 +564,7 @@ See [K8s Automated Deployment Guide](docs/guides/k8s-automated-deployment.md) fo
 
 ## Feature Highlights
 
-### 🚀 VMCraft - Native VM Manipulation Engine
+### 🚀 GuestKit - Native VM Manipulation Engine
 
 **480+ API methods** providing comprehensive VM inspection and modification
 
@@ -574,7 +574,7 @@ See [K8s Automated Deployment Guide](docs/guides/k8s-automated-deployment.md) fo
 Launch Time         Memory Usage        System Calls
 ────────────        ────────────        ────────────
 Traditional: 9.7s   Traditional: 280MB  Traditional: 14,200
-VMCraft:     1.9s   VMCraft:     95MB   VMCraft:     8,500
+GuestKit:     1.9s   GuestKit:     95MB   GuestKit:     8,500
 ────────────        ────────────        ────────────
 ↓ 5-7x faster       ↓ 66% less memory   ↓ 40% fewer calls
 ```
@@ -592,9 +592,9 @@ VMCraft:     1.9s   VMCraft:     95MB   VMCraft:     8,500
 #### 💻 Quick Example
 
 ```python
-from h2kvm.vmcraft import VMCraft
+from h2kvm.core import guestkit_client
 
-with VMCraft() as g:
+with GuestKit() as g:
     g.add_disk("/vms/server.qcow2")
     g.launch()  # ⚡ ~1.9 seconds
 
@@ -607,7 +607,7 @@ with VMCraft() as g:
     print(f"Detected: {os_info.product_name}")
 ```
 
-📖 **Learn More:** [VMCraft Complete Guide](docs/features/vmcraft/complete-guide.md)
+📖 **Learn More:** [GuestKit integration guide](docs/features/architecture/GUESTKIT.md)
 
 ---
 
@@ -927,7 +927,7 @@ h2kvmctl --config batch.yaml
 
 ### 🔧 Features & Capabilities
 
-- **[VMCraft Complete Guide](docs/features/vmcraft/complete-guide.md)** - Native VM manipulation
+- **[GuestKit integration guide](docs/features/architecture/GUESTKIT.md)** - Native VM manipulation
 - **[VMDK Inspector](docs/features/vmdk-inspector.md)** - Analyze VMDK files
 - **[XFS UUID Regeneration](docs/features/xfs-uuid-regeneration.md)** - Fix cloned VMs
 - **[fstab Stabilization](docs/features/fstab-stabilization.md)** - Automatic fstab repair
@@ -935,12 +935,12 @@ h2kvmctl --config batch.yaml
 - **[Windows VirtIO Troubleshooting](docs/guides/troubleshooting-windows-virtio.md)** - Driver injection, ISO cache, registry
 - **[AMI & Cloud Migration](docs/guides/migration/ami-cloud-repatriation.md)** - AWS, Azure, GCP repatriation
 - **[Remote Deployment](scripts/deploy-remote.sh)** - One-command deploy/redeploy/uninstall to any server
-- **[VMCraft Hivex API](docs/reference/api/vmcraft-hivex.md)** - Windows registry shim
+- **[GuestKit Hivex API](docs/reference/api/guestkit integration)** - Windows registry shim
 - **[Features Index](docs/features/README.md)** - All features
 
 ### 📖 API Reference
 
-- **[VMCraft API](docs/reference/api/vmcraft.md)** - 480+ guest manipulation methods
+- **[GuestKit API](docs/architecture/GUESTKIT.md)** - 480+ guest manipulation methods
 - **[API Reference](docs/reference/api/API-Reference.md)** - Comprehensive API docs
 - **[Library API](docs/reference/api/library-api.md)** - Python library usage
 
@@ -982,7 +982,7 @@ h2kvmctl --config batch.yaml
         │                     │                     │
         ▼                     ▼                     ▼
 ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│   VMCraft    │    │  Validation  │    │   Rollback   │
+│   GuestKit    │    │  Validation  │    │   Rollback   │
 │   (480 APIs) │    │  Framework   │    │  Framework   │
 │   ~1.9s      │    │              │    │              │
 └──────────────┘    └──────────────┘    └──────────────┘
@@ -1008,7 +1008,7 @@ h2kvmctl --config batch.yaml
 | Metric | Value | Comparison |
 |--------|-------|------------|
 | **Migration Speed** | 178 MB/s avg | Industry: 120 MB/s |
-| **VMCraft Launch** | ~1.9s | Traditional: ~10-13s |
+| **GuestKit Launch** | ~1.9s | Traditional: ~10-13s |
 | **Parallel Speedup** | 2.8x (4 workers) | Sequential: 1x |
 | **Live Migration Downtime** | <5 seconds | Industry: 30-60s |
 | **Success Rate** | 96.8% | - |
@@ -1220,7 +1220,7 @@ h2kvmctl --cmd live-fix \
 
 ### Core Features (2025-2026)
 
-- ✅ **VMCraft Native Engine** - 480+ API methods, pure Python implementation
+- ✅ **GuestKit Native Engine** - 480+ API methods, pure Python implementation
 - ✅ **Multiple Input Formats** - VMDK, OVA, OVF, VHD, AMI support
 - ✅ **Automated Fixes** - fstab, GRUB, initramfs, virtio injection
 - ✅ **Remote Operations** - SSH fetch, live-fix capabilities
@@ -1530,7 +1530,7 @@ kubectl get migrationjob example-conversion -w
 **Current Version**: 0.3.0
 **Status**: Production-Ready ✅
 
-- **API Coverage**: 480+ VMCraft methods
+- **API Coverage**: 480+ GuestKit methods
 - **Test Coverage**: 90%+ for core features
 - **Test Suite**: 1367 Python + 139 Go tests (including web API tests)
 - **Success Rate**: 96.8% overall
@@ -1626,7 +1626,7 @@ h2kvmctl --config migration.yaml
 
 - **[LVM Enterprise Improvements](docs/features/LVM_AND_ENTERPRISE_IMPROVEMENTS.md)** - 7x faster LVM, 100% host protection
 - **[LVM Test Results](docs/test-results/LVM_ENTERPRISE_IMPROVEMENTS_TEST_RESULTS.md)** - Production validation with RHEL 8.8 and openSUSE
-- **[VMCraft Engine](docs/features/vmcraft/complete-guide.md)** - 480+ VM manipulation APIs
+- **[GuestKit engine](docs/features/architecture/GUESTKIT.md)** - 480+ VM manipulation APIs
 
 ### Getting Started
 

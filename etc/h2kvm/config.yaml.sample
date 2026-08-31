@@ -24,8 +24,8 @@ conversion:
   max_cache_size_gb: 100
 
 # Backend settings
-# Backend for offline guest fixes: vmcraft (fast pure-Python, default), guestfs (proven), namespace (experimental, isolated)
-backend: vmcraft
+# Backend for offline guest fixes: guestkit (default), guestfs, auto
+backend: guestkit
 
 # Container isolation for LVM operations
 # Runs LVM activation inside a Podman/Docker container for stronger isolation.

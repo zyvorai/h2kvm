@@ -90,7 +90,7 @@ sudo apt-get install -y \
 
 ### Verify Backend (Optional)
 
-> **Note**: VMCraft is the default backend and requires qemu-nbd and qemu-img.
+> **Note**: GuestKit is the default backend and requires qemu-nbd and qemu-img.
 
 ```bash
 # Verify qemu-nbd is available
@@ -523,12 +523,12 @@ sudo chown $(whoami) /path/to/output/directory
 #### Issue: Guest disk mount fails
 
 **Symptoms:**
-- Error: "guestfs_mount: failed" or VMCraft mount error
+- Error: "guestfs_mount: failed" or GuestKit mount error
 - Cannot inspect guest OS
 
 **Solution:**
 ```bash
-# VMCraft is the default backend; check NBD availability
+# GuestKit is the default backend; check NBD availability
 sudo modprobe nbd
 ls /dev/nbd0
 

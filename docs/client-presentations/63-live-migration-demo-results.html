@@ -120,7 +120,7 @@
     <div class="card">
       <div class="icon">🔧</div>
       <h4>Migration Tool</h4>
-      <p>h2kvm v0.3.0<br>VMCraft backend (Python + qemu-nbd)<br>Offline guest fixes: fstab, network, initramfs<br>Auto libvirt domain XML + virsh define</p>
+      <p>h2kvm v0.3.0<br>GuestKit backend (Python + qemu-nbd)<br>Offline guest fixes: fstab, network, initramfs<br>Auto libvirt domain XML + virsh define</p>
     </div>
     <div class="card">
       <div class="icon">📦</div>
@@ -135,7 +135,7 @@
     <div class="flow-arrow">&#x2192;</div>
     <div class="flow-step">qemu-img flatten</div>
     <div class="flow-arrow">&#x2192;</div>
-    <div class="flow-step">VMCraft offline fixes</div>
+    <div class="flow-step">GuestKit offline fixes</div>
     <div class="flow-arrow">&#x2192;</div>
     <div class="flow-step">qcow2 compress</div>
     <div class="flow-arrow">&#x2192;</div>
@@ -395,7 +395,7 @@
     <div class="timeline-item">
       <div class="timeline-dot">2</div>
       <div class="timeline-content">
-        <h4>Offline Guest Fixes (VMCraft)</h4>
+        <h4>Offline Guest Fixes (GuestKit)</h4>
         <p>Mounts guest filesystem via qemu-nbd. Fixes fstab (UUID stabilization), removes VMware tools, fixes NetworkManager configs (ens33 removal, autoconnect, MAC unpinning).</p>
       </div>
     </div>

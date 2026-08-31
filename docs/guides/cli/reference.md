@@ -649,7 +649,7 @@ sudo h2kvmctl --config vs-dl.yaml
 ## Dependency Notes (practical)
 
 * Needs Python 3
-* Conversion pipeline typically expects: `qemu-img`, `qemu-nbd` (VMCraft, default)
+* Conversion pipeline typically expects: `qemu-img`, `qemu-nbd` (GuestKit, default)
 * YAML configs require PyYAML
 * vSphere mode requires pyvmomi (and any HTTP libs your implementation uses)
 
@@ -677,12 +677,12 @@ sudo chown $(whoami) /path/to/output/directory
 #### Issue: Guest disk mount fails
 
 **Symptoms:**
-- Error: "guestfs_mount: failed" or VMCraft mount error
+- Error: "guestfs_mount: failed" or GuestKit mount error
 - Cannot inspect guest OS
 
 **Solution:**
 ```bash
-# VMCraft is the default backend; check NBD availability
+# GuestKit is the default backend; check NBD availability
 sudo modprobe nbd
 ls /dev/nbd0
 

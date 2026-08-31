@@ -15,8 +15,8 @@ flatten: true
 fstab_mode: stabilize-all
 regen_initramfs: true
 
-# Backend selection (guestfs, vmcraft, namespace)
-backend: vmcraft
+# Backend selection (guestfs, guestkit, namespace)
+backend: guestkit
 
 # Libvirt integration
 emit_domain_xml: true

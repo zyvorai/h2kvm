@@ -411,7 +411,7 @@ If missing, ensure `regen_initramfs: true` in config.
 - ✅ **Initramfs Rebuild** (dracut with --add-drivers virtio_*)
 - ✅ **Fstab Stabilization** (UUID-based mounting)
 - ✅ **GRUB Updates** (root= parameter fixes)
-- ✅ **Offline Guest Fixes** (all VMCraft operations)
+- ✅ **Offline Guest Fixes** (all GuestKit operations)
 
 ### Conflicts With
 
@@ -492,7 +492,7 @@ VM may not boot, but you'll get a migration report with details.
 
 - [VMDK Inspector](vmdk-inspector.md) - Pre-migration VMDK validation
 - [Virtio Driver Injection](../guides/virtio-injection.md) - Guest driver preparation
-- [Offline Guest Fixes](../architecture/vmcraft.md) - Filesystem manipulation
+- [Offline Guest Fixes](../architecture/guestkit.md) - Filesystem manipulation
 
 ### External Resources
 

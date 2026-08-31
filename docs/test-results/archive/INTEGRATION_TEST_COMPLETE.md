@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # Integration Test Complete ✅
 
 **Test Date**: February 14, 2026
@@ -72,7 +74,7 @@ for vg in nbd_vgs_only:
 |-----------|------|---------------|
 | NBD Connection | 1.34s | Same |
 | Storage Activation | **0.68s** | **7x faster** ⚡ |
-| Total VMCraft Ready | **2.07s** | **2-5x faster** ⚡ |
+| Total GuestKit Ready | **2.07s** | **2-5x faster** ⚡ |
 | Image Flattening | 91s | Same |
 
 **Key Improvement**: Storage stack activation is **7x faster** while being **100% safer**!
@@ -130,7 +132,7 @@ $ sudo dmsetup ls | wc -l
 
 **Impact**: ✅ **100% safe LVM operations**
 
-### 2. h2kvm/core/vmcraft/storage.py (+100 lines)
+### 2. h2kvm/core/guestkit_client.pystorage.py (+100 lines)
 
 **Changes**:
 - NBD device filtering in `LVMActivator.activate()`
@@ -158,7 +160,7 @@ $ sudo dmsetup ls | wc -l
 ```
 
 **Analysis**:
-- Separate bug in VMCraft backend (missing service implementations)
+- Separate bug in GuestKit backend (missing service implementations)
 - **Does NOT affect LVM safety** - cleanup still executed perfectly
 - Blocks full conversion but proves LVM improvements work
 
@@ -236,7 +238,7 @@ from .services.device_metadata import svc_list_partitions_cached
 
 **Code Changes**:
 - NBD daemon: `h2kvm/daemon/nbd_prep.py`
-- Storage layer: `h2kvm/core/vmcraft/storage.py`
+- Storage layer: `h2kvm/core/guestkit_client.pystorage.py`
 - Initramfs: `h2kvm/fixers/offline_vm/fix_initramfs.py`
 
 ---

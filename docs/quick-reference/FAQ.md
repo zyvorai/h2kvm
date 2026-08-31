@@ -51,7 +51,7 @@ H2KVM is an enterprise-grade VM migration toolkit that converts virtual machines
 
 **Key Features:**
 - **Automated Fixes**: Bootloader, fstab, initramfs regeneration
-- **VMCraft Engine**: 480+ native Python APIs for VM manipulation
+- **GuestKit engine**: 480+ native Python APIs for VM manipulation
 - **Multi-Format Support**: VMDK, OVA, OVF, VHD, AMI, raw
 - **Windows Support**: VirtIO driver injection, registry modification
 - **Batch Processing**: Parallel multi-VM migrations
@@ -76,7 +76,7 @@ Unlike traditional migration tools that "boot and hope," H2KVM applies **determi
 | **Native Python** | No (C) | Varies | Yes |
 | **Kubernetes** | No | No | Yes |
 
-**Key Differentiator**: **VMCraft** - Native Python VM manipulation engine with 480+ APIs.
+**Key Differentiator**: **GuestKit** - Native Python VM manipulation engine with 480+ APIs.
 
 ---
 

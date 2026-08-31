@@ -15,7 +15,7 @@ Completed comprehensive exception handling improvements across the h2kvm codebas
 
 **Changes:**
 1. **Fixed Critical Bare Except** (1 file)
-   - `h2kvm/vmcraft/storage_enhanced.py:539`
+   - `h2kvm/core/storage_enhanced.py:539`
    - Replaced dangerous bare `except:` with specific exception types
 
 2. **Updated Systemd Wrappers** (19 files)
@@ -101,11 +101,11 @@ Completed comprehensive exception handling improvements across the h2kvm codebas
 Based on comprehensive review, these areas have improvement opportunities but are **not blocking**:
 
 #### HIGH Priority (Should address in next iteration)
-1. **`vmcraft/augeas_mgr.py`** - 15 RuntimeError instances
+1. **`guestkit/augeas_mgr.py`** - 15 RuntimeError instances
    - Low-level Augeas config editing errors
    - Could benefit from user-facing guidance
 
-2. **`vmcraft/nbd.py`** - 20 RuntimeError instances
+2. **`guestkit/nbd.py`** - 20 RuntimeError instances
    - NBD disk mounting errors
    - Add context about what operation failed
 

@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # Local Testing Report - OpenShift Deployment
 
 **Date:** 2026-01-30

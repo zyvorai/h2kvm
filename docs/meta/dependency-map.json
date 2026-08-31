@@ -136,74 +136,74 @@
     "h2kvm.core.user_activity",
     "h2kvm.core.utils",
     "h2kvm.core.validation_suite",
-    "h2kvm.core.vmcraft",
-    "h2kvm.core.vmcraft._utils",
-    "h2kvm.core.vmcraft.advanced_analysis",
-    "h2kvm.core.vmcraft.analyze",
-    "h2kvm.core.vmcraft.app_framework_detector",
-    "h2kvm.core.vmcraft.audit_trail",
-    "h2kvm.core.vmcraft.augeas_mgr",
-    "h2kvm.core.vmcraft.automated_remediation",
-    "h2kvm.core.vmcraft.backup",
-    "h2kvm.core.vmcraft.backup_analysis",
-    "h2kvm.core.vmcraft.certificate_manager",
-    "h2kvm.core.vmcraft.cloud_detector",
-    "h2kvm.core.vmcraft.cloud_optimizer",
-    "h2kvm.core.vmcraft.compliance_checker",
-    "h2kvm.core.vmcraft.config_tracker",
-    "h2kvm.core.vmcraft.container_analyzer",
-    "h2kvm.core.vmcraft.data_discovery",
-    "h2kvm.core.vmcraft.database_detector",
-    "h2kvm.core.vmcraft.dependency_mapper",
-    "h2kvm.core.vmcraft.disaster_recovery",
-    "h2kvm.core.vmcraft.enhanced_inspection",
-    "h2kvm.core.vmcraft.export",
-    "h2kvm.core.vmcraft.file_ops",
-    "h2kvm.core.vmcraft.firewall_analyzer",
-    "h2kvm.core.vmcraft.forensic_analyzer",
-    "h2kvm.core.vmcraft.hardware_detector",
-    "h2kvm.core.vmcraft.inspection",
-    "h2kvm.core.vmcraft.integration_hub",
-    "h2kvm.core.vmcraft.journalctl",
-    "h2kvm.core.vmcraft.license_detector",
-    "h2kvm.core.vmcraft.linux_detection",
-    "h2kvm.core.vmcraft.linux_services",
-    "h2kvm.core.vmcraft.log_analyzer",
-    "h2kvm.core.vmcraft.main",
-    "h2kvm.core.vmcraft.migration_planner",
-    "h2kvm.core.vmcraft.ml_analyzer",
-    "h2kvm.core.vmcraft.monitoring_detector",
-    "h2kvm.core.vmcraft.mount",
-    "h2kvm.core.vmcraft.nbd",
-    "h2kvm.core.vmcraft.network_config",
-    "h2kvm.core.vmcraft.network_topology",
-    "h2kvm.core.vmcraft.optimization",
-    "h2kvm.core.vmcraft.performance_analyzer",
-    "h2kvm.core.vmcraft.predictive_analytics",
-    "h2kvm.core.vmcraft.realtime_monitoring",
-    "h2kvm.core.vmcraft.resource_orchestrator",
-    "h2kvm.core.vmcraft.scheduled_tasks",
-    "h2kvm.core.vmcraft.security",
-    "h2kvm.core.vmcraft.ssh_analyzer",
-    "h2kvm.core.vmcraft.storage",
-    "h2kvm.core.vmcraft.storage_analyzer",
-    "h2kvm.core.vmcraft.sysconfig",
-    "h2kvm.core.vmcraft.systemctl",
-    "h2kvm.core.vmcraft.systemd",
-    "h2kvm.core.vmcraft.systemd_journal",
-    "h2kvm.core.vmcraft.systemd_mgr",
-    "h2kvm.core.vmcraft.systemd_networkd",
-    "h2kvm.core.vmcraft.systemd_units",
-    "h2kvm.core.vmcraft.threat_intelligence",
-    "h2kvm.core.vmcraft.user_activity",
-    "h2kvm.core.vmcraft.vulnerability_scanner",
-    "h2kvm.core.vmcraft.webserver_analyzer",
-    "h2kvm.core.vmcraft.windows_applications",
-    "h2kvm.core.vmcraft.windows_detection",
-    "h2kvm.core.vmcraft.windows_drivers",
-    "h2kvm.core.vmcraft.windows_registry",
-    "h2kvm.core.vmcraft.windows_services",
-    "h2kvm.core.vmcraft.windows_users",
+    "h2kvm.core.guestkit",
+    "h2kvm.core.guestkit._utils",
+    "h2kvm.core.guestkit.advanced_analysis",
+    "h2kvm.core.guestkit.analyze",
+    "h2kvm.core.guestkit.app_framework_detector",
+    "h2kvm.core.guestkit.audit_trail",
+    "h2kvm.core.guestkit.augeas_mgr",
+    "h2kvm.core.guestkit.automated_remediation",
+    "h2kvm.core.guestkit.backup",
+    "h2kvm.core.guestkit.backup_analysis",
+    "h2kvm.core.guestkit.certificate_manager",
+    "h2kvm.core.guestkit.cloud_detector",
+    "h2kvm.core.guestkit.cloud_optimizer",
+    "h2kvm.core.guestkit.compliance_checker",
+    "h2kvm.core.guestkit.config_tracker",
+    "h2kvm.core.guestkit.container_analyzer",
+    "h2kvm.core.guestkit.data_discovery",
+    "h2kvm.core.guestkit.database_detector",
+    "h2kvm.core.guestkit.dependency_mapper",
+    "h2kvm.core.guestkit.disaster_recovery",
+    "h2kvm.core.guestkit.enhanced_inspection",
+    "h2kvm.core.guestkit.export",
+    "h2kvm.core.guestkit.file_ops",
+    "h2kvm.core.guestkit.firewall_analyzer",
+    "h2kvm.core.guestkit.forensic_analyzer",
+    "h2kvm.core.guestkit.hardware_detector",
+    "h2kvm.core.guestkit.inspection",
+    "h2kvm.core.guestkit.integration_hub",
+    "h2kvm.core.guestkit.journalctl",
+    "h2kvm.core.guestkit.license_detector",
+    "h2kvm.core.guestkit.linux_detection",
+    "h2kvm.core.guestkit.linux_services",
+    "h2kvm.core.guestkit.log_analyzer",
+    "h2kvm.core.guestkit.main",
+    "h2kvm.core.guestkit.migration_planner",
+    "h2kvm.core.guestkit.ml_analyzer",
+    "h2kvm.core.guestkit.monitoring_detector",
+    "h2kvm.core.guestkit.mount",
+    "h2kvm.core.guestkit.nbd",
+    "h2kvm.core.guestkit.network_config",
+    "h2kvm.core.guestkit.network_topology",
+    "h2kvm.core.guestkit.optimization",
+    "h2kvm.core.guestkit.performance_analyzer",
+    "h2kvm.core.guestkit.predictive_analytics",
+    "h2kvm.core.guestkit.realtime_monitoring",
+    "h2kvm.core.guestkit.resource_orchestrator",
+    "h2kvm.core.guestkit.scheduled_tasks",
+    "h2kvm.core.guestkit.security",
+    "h2kvm.core.guestkit.ssh_analyzer",
+    "h2kvm.core.guestkit.storage",
+    "h2kvm.core.guestkit.storage_analyzer",
+    "h2kvm.core.guestkit.sysconfig",
+    "h2kvm.core.guestkit.systemctl",
+    "h2kvm.core.guestkit.systemd",
+    "h2kvm.core.guestkit.systemd_journal",
+    "h2kvm.core.guestkit.systemd_mgr",
+    "h2kvm.core.guestkit.systemd_networkd",
+    "h2kvm.core.guestkit.systemd_units",
+    "h2kvm.core.guestkit.threat_intelligence",
+    "h2kvm.core.guestkit.user_activity",
+    "h2kvm.core.guestkit.vulnerability_scanner",
+    "h2kvm.core.guestkit.webserver_analyzer",
+    "h2kvm.core.guestkit.windows_applications",
+    "h2kvm.core.guestkit.windows_detection",
+    "h2kvm.core.guestkit.windows_drivers",
+    "h2kvm.core.guestkit.windows_registry",
+    "h2kvm.core.guestkit.windows_services",
+    "h2kvm.core.guestkit.windows_users",
     "h2kvm.core.vulnerability_scanner",
     "h2kvm.core.webserver_analyzer",
     "h2kvm.core.windows_applications",
@@ -989,7 +989,7 @@
     },
     {
       "from": "h2kvm.core.guestfs_factory",
-      "to": "h2kvm.core.vmcraft"
+      "to": "h2kvm.core.guestkit"
     },
     {
       "from": "h2kvm.core.logger",
@@ -1024,620 +1024,620 @@
       "to": "h2kvm.core.exceptions"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.advanced_analysis"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.app_framework_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.audit_trail"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.automated_remediation"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.backup_analysis"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.certificate_manager"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.cloud_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.cloud_optimizer"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.compliance_checker"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.config_tracker"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.container_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.data_discovery"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.database_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.dependency_mapper"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.disaster_recovery"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.export"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.firewall_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.forensic_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.hardware_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.integration_hub"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.license_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.linux_services"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.log_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.main"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.migration_planner"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.ml_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.monitoring_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.network_config"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.network_topology"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.performance_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.predictive_analytics"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.realtime_monitoring"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.resource_orchestrator"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.scheduled_tasks"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.ssh_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.storage_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.threat_intelligence"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.user_activity"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.vulnerability_scanner"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.webserver_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.windows_applications"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.windows_services"
     },
     {
-      "from": "h2kvm.core.vmcraft",
+      "from": "h2kvm.core.guestkit",
       "to": "h2kvm.core.windows_users"
     },
     {
-      "from": "h2kvm.core.vmcraft._utils",
+      "from": "h2kvm.core.guestkit._utils",
       "to": "h2kvm.core.utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.advanced_analysis",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.advanced_analysis",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.app_framework_detector",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.app_framework_detector",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.backup_analysis",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.backup_analysis",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.certificate_manager",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.certificate_manager",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.cloud_detector",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.cloud_detector",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.compliance_checker",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.compliance_checker",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.config_tracker",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.config_tracker",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.container_analyzer",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.container_analyzer",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.data_discovery",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.data_discovery",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.database_detector",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.database_detector",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.dependency_mapper",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.dependency_mapper",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.firewall_analyzer",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.firewall_analyzer",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.forensic_analyzer",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.forensic_analyzer",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.hardware_detector",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.hardware_detector",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.inspection",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.inspection",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.license_detector",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.license_detector",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.linux_services",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.linux_services",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.log_analyzer",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.log_analyzer",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.advanced_analysis"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.advanced_analysis"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.app_framework_detector"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.app_framework_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.audit_trail"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.audit_trail"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.augeas_mgr"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.augeas_mgr"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.automated_remediation"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.automated_remediation"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.backup"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.backup"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.backup_analysis"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.backup_analysis"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.certificate_manager"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.certificate_manager"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.cloud_detector"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.cloud_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.cloud_optimizer"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.cloud_optimizer"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.compliance_checker"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.compliance_checker"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.config_tracker"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.config_tracker"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.container_analyzer"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.container_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.data_discovery"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.data_discovery"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.database_detector"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.database_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.dependency_mapper"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.dependency_mapper"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.disaster_recovery"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.disaster_recovery"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.enhanced_inspection"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.enhanced_inspection"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.export"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.export"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.firewall_analyzer"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.firewall_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.forensic_analyzer"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.forensic_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.hardware_detector"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.hardware_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.inspection"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.inspection"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.integration_hub"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.integration_hub"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.license_detector"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.license_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.linux_detection"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.linux_detection"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.linux_services"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.linux_services"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.log_analyzer"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.log_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.migration_planner"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.migration_planner"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.ml_analyzer"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.ml_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.monitoring_detector"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.monitoring_detector"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.mount"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.mount"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.nbd"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.nbd"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.network_config"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.network_config"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.network_topology"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.network_topology"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.optimization"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.optimization"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.performance_analyzer"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.performance_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.predictive_analytics"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.predictive_analytics"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.realtime_monitoring"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.realtime_monitoring"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.resource_orchestrator"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.resource_orchestrator"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.scheduled_tasks"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.scheduled_tasks"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.security"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.security"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.ssh_analyzer"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.ssh_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.storage"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.storage"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.storage_analyzer"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.storage_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.systemd"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.systemd"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.systemd_journal"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.systemd_journal"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.systemd_mgr"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.systemd_mgr"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.systemd_networkd"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.systemd_networkd"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.systemd_units"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.systemd_units"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.threat_intelligence"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.threat_intelligence"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.user_activity"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.user_activity"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.vulnerability_scanner"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.vulnerability_scanner"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.webserver_analyzer"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.webserver_analyzer"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.windows_applications"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.windows_applications"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.windows_detection"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.windows_detection"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.windows_drivers"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.windows_drivers"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.windows_registry"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.windows_registry"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.windows_services"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.windows_services"
     },
     {
-      "from": "h2kvm.core.vmcraft.main",
-      "to": "h2kvm.core.vmcraft.windows_users"
+      "from": "h2kvm.core.guestkit.main",
+      "to": "h2kvm.core.guestkit.windows_users"
     },
     {
-      "from": "h2kvm.core.vmcraft.migration_planner",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.migration_planner",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.monitoring_detector",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.monitoring_detector",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.mount",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.mount",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.nbd",
+      "from": "h2kvm.core.guestkit.nbd",
       "to": "h2kvm.core.retry"
     },
     {
-      "from": "h2kvm.core.vmcraft.nbd",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.nbd",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.network_config",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.network_config",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.network_topology",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.network_topology",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.performance_analyzer",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.performance_analyzer",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.scheduled_tasks",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.scheduled_tasks",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.security",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.security",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.ssh_analyzer",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.ssh_analyzer",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.storage",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.storage",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.storage_analyzer",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.storage_analyzer",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.systemd",
-      "to": "h2kvm.core.vmcraft.analyze"
+      "from": "h2kvm.core.guestkit.systemd",
+      "to": "h2kvm.core.guestkit.analyze"
     },
     {
-      "from": "h2kvm.core.vmcraft.systemd",
-      "to": "h2kvm.core.vmcraft.journalctl"
+      "from": "h2kvm.core.guestkit.systemd",
+      "to": "h2kvm.core.guestkit.journalctl"
     },
     {
-      "from": "h2kvm.core.vmcraft.systemd",
-      "to": "h2kvm.core.vmcraft.sysconfig"
+      "from": "h2kvm.core.guestkit.systemd",
+      "to": "h2kvm.core.guestkit.sysconfig"
     },
     {
-      "from": "h2kvm.core.vmcraft.systemd",
-      "to": "h2kvm.core.vmcraft.systemctl"
+      "from": "h2kvm.core.guestkit.systemd",
+      "to": "h2kvm.core.guestkit.systemctl"
     },
     {
-      "from": "h2kvm.core.vmcraft.systemd_journal",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.systemd_journal",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.systemd_mgr",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.systemd_mgr",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.systemd_networkd",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.systemd_networkd",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.systemd_units",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.systemd_units",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.user_activity",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.user_activity",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.vulnerability_scanner",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.vulnerability_scanner",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.webserver_analyzer",
-      "to": "h2kvm.core.vmcraft.file_ops"
+      "from": "h2kvm.core.guestkit.webserver_analyzer",
+      "to": "h2kvm.core.guestkit.file_ops"
     },
     {
-      "from": "h2kvm.core.vmcraft.windows_applications",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.windows_applications",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.windows_detection",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.windows_detection",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.windows_registry",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.windows_registry",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.windows_services",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.windows_services",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
-      "from": "h2kvm.core.vmcraft.windows_users",
-      "to": "h2kvm.core.vmcraft._utils"
+      "from": "h2kvm.core.guestkit.windows_users",
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
       "from": "h2kvm.daemon",
@@ -2045,7 +2045,7 @@
     },
     {
       "from": "h2kvm.fixers.offline_fixer",
-      "to": "h2kvm.core.vmcraft._utils"
+      "to": "h2kvm.core.guestkit._utils"
     },
     {
       "from": "h2kvm.fixers.offline_fixer",
@@ -3637,15 +3637,15 @@
     },
     {
       "from": "h2kvm.windows.active_directory",
-      "to": "h2kvm.core.vmcraft.main"
+      "to": "h2kvm.core.guestkit.main"
     },
     {
       "from": "h2kvm.windows.license",
-      "to": "h2kvm.core.vmcraft.main"
+      "to": "h2kvm.core.guestkit.main"
     },
     {
       "from": "h2kvm.windows.orchestrator",
-      "to": "h2kvm.core.vmcraft.main"
+      "to": "h2kvm.core.guestkit.main"
     },
     {
       "from": "h2kvm.windows.orchestrator",
@@ -3665,11 +3665,11 @@
     },
     {
       "from": "h2kvm.windows.sql_server",
-      "to": "h2kvm.core.vmcraft.main"
+      "to": "h2kvm.core.guestkit.main"
     },
     {
       "from": "h2kvm.windows.windows_update",
-      "to": "h2kvm.core.vmcraft.main"
+      "to": "h2kvm.core.guestkit.main"
     },
     {
       "from": "h2kvm.worker",

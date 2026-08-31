@@ -7,7 +7,7 @@ h2kvm converts sparse VMDK files to QCOW2 format during migration for reliabilit
 ## Default Behavior
 
 **Before (hardcoded)**:
-- Conversion directory: `/var/tmp/vmcraft-conversions/`
+- Conversion directory: `/var/tmp/guestkit-conversions/`
 - Issues: System-wide location, permission conflicts, disk space constraints
 
 **After (configurable)**:
@@ -25,7 +25,7 @@ h2kvm converts sparse VMDK files to QCOW2 format during migration for reliabilit
 h2kvmctl --conversion-dir /path/to/conversions --config migration.yaml
 
 # Example: Use large disk for conversions
-h2kvmctl --conversion-dir /mnt/large-disk/vmcraft-temp --config centos.yaml
+h2kvmctl --conversion-dir /mnt/large-disk/guestkit-temp --config centos.yaml
 ```
 
 ### 2. YAML Configuration File
@@ -37,7 +37,7 @@ vmdk: /path/to/vm.vmdk
 output_dir: /path/to/output
 
 # Conversion directory configuration
-conversion_dir: ~/large-disk/vmcraft-conversions
+conversion_dir: ~/large-disk/guestkit-conversions
 
 # Other settings...
 fstab_mode: stabilize-all
@@ -289,7 +289,7 @@ sudo systemctl enable --now h2kvm-cleanup.timer
 
 ### Permission Denied
 
-**Error**: `Permission denied: /var/tmp/vmcraft-conversions`
+**Error**: `Permission denied: /var/tmp/guestkit-conversions`
 
 **Solution**:
 ```bash
@@ -409,7 +409,7 @@ h2kvmctl --config migration.yaml
 **Option 2: Explicit configuration**
 ```bash
 # Preserve old behavior
-h2kvmctl --conversion-dir /var/tmp/vmcraft-conversions --config migration.yaml
+h2kvmctl --conversion-dir /var/tmp/guestkit-conversions --config migration.yaml
 ```
 
 ## Summary

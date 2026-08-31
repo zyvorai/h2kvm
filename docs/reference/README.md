@@ -6,7 +6,7 @@ Technical reference materials including API documentation, architecture, install
 
 ### 📖 API Reference
 - **[API Reference](api/API-Reference.md)** - Complete API documentation
-- **[VMCraft API](api/vmcraft.md)** - VMCraft 480+ APIs
+- **[GuestKit API](api/guestkit.md)** - GuestKit 480+ APIs
 - **[Library API](api/library-api.md)** - Python library usage
 - **[Quick Reference](api/quick-reference.md)** - Essential API patterns
 
@@ -64,7 +64,7 @@ Technical reference materials including API documentation, architecture, install
 
 **[API Reference](api/API-Reference.md)** - Comprehensive API documentation covering:
 - Core migration APIs
-- VMCraft filesystem APIs
+- GuestKit filesystem APIs
 - Configuration APIs
 - Validation APIs
 - Rollback APIs
@@ -74,9 +74,9 @@ Technical reference materials including API documentation, architecture, install
 
 ---
 
-### VMCraft API (480+ Methods)
+### GuestKit API (480+ Methods)
 
-**[VMCraft API](api/vmcraft.md)** - Complete VMCraft guest manipulation API:
+**[GuestKit API](api/guestkit.md)** - Complete GuestKit guest manipulation API:
 - Filesystem operations (read, write, chmod, chown)
 - Package management (yum, dnf, apt, zypper)
 - Service management (systemd, init.d)
@@ -129,7 +129,7 @@ result = migration.run()
 - Component architecture
 - Data flow diagrams
 - Module organization
-- VMCraft engine design
+- GuestKit engine design
 - Daemon architecture
 - Worker protocol design
 - Integration points
@@ -203,7 +203,7 @@ result = migration.run()
 - qemu-system-x86
 
 **Optional Dependencies**:
-- VMCraft (default guestfs backend)
+- GuestKit (default guestfs backend)
 - ntfs-3g (Windows support)
 - libhivex (Windows registry)
 
@@ -244,7 +244,7 @@ result = migration.run()
 ### Native GuestFS
 
 **[Native GuestFS](native-guestfs.md)** - GuestFS backend guide:
-- VMCraft as the default backend
+- GuestKit as the default backend
 - Backend comparison and selection
 - Hybrid approach
 - Performance considerations
@@ -365,7 +365,7 @@ jsonschema -i manifest.json artifact-manifest-v1.0.schema.json
 ### For Advanced Development
 
 **Start Here**:
-1. [VMCraft API](api/vmcraft.md) - Deep filesystem access
+1. [GuestKit API](api/guestkit.md) - Deep filesystem access
 2. [Architecture](architecture.md) - System internals
 3. [HyperCtl Integration](HYPERCTL_INTEGRATION.md) - Advanced integration
 
@@ -391,7 +391,7 @@ jsonschema -i manifest.json artifact-manifest-v1.0.schema.json
 | Component | Python | qemu-img |
 |-----------|--------|----------|
 | **Core** | 3.10+ | 6.0+ |
-| **VMCraft** | 3.10+ | 6.0+ |
+| **GuestKit** | 3.10+ | 6.0+ |
 | **Windows** | 3.10+ | 6.0+ |
 
 ---
@@ -464,7 +464,7 @@ All code examples are:
 - **REST API Design**: https://restfulapi.net/
 
 ### Related Projects
-- **VMCraft**: See [VMCraft API](api/vmcraft.md)
+- **GuestKit**: See [GuestKit API](api/guestkit.md)
 - **qemu**: https://www.qemu.org/
 - **libvirt**: https://libvirt.org/
 

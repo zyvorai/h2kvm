@@ -84,7 +84,7 @@ except ImportError:
 ✅ CLI commands work (including `--help`)
 ✅ VMDK inspection completes
 ✅ qemu-img conversion works (VMDK → RAW → qcow2)
-✅ VMCraft backend launches
+✅ GuestKit backend launches
 ❌ NBD device connection blocked by sudo permission issue
 
 ## ✅ RESOLVED: Sudo and Root Detection
@@ -95,7 +95,7 @@ except ImportError:
 3. ✅ Implemented root detection in `run_sudo()` function
 
 ### Changes Made
-**File:** `h2kvm/core/vmcraft/_utils.py`
+**File:** `h2kvm/core/guestkit_client.py_utils.py`
 ```python
 # Only prepend sudo if we're not already running as root
 if os.geteuid() == 0:
@@ -133,7 +133,7 @@ qemu-nbd: Failed to open /dev/nbd0: Permission denied
 ✅ Import fixes work (no guestfs/hivex errors)
 ✅ VMDK inspection completes
 ✅ qemu-img conversion succeeds (VMDK → qcow2)
-✅ VMCraft backend initializes
+✅ GuestKit backend initializes
 ✅ Root detection works
 ❌ NBD device mount blocked by container runtime
 
@@ -185,14 +185,14 @@ qemu-nbd: Failed to open /dev/nbd0: Permission denied
 ### Immediate (Code Fix)
 1. Make all guestfs imports conditional/lazy
 2. Check imports only when Windows features are used
-3. Gracefully fall back to VMCraft when guestfs unavailable
+3. Gracefully fall back to GuestKit when guestfs unavailable
 
 ### Short-term (Container)
 1. Create separate image variant without Windows support
-2. Document VMCraft requirement for Windows guests
+2. Document GuestKit requirement for Windows guests
 
 ### Long-term (Architecture)
-1. Full VMCraft migration (remove guestfs dependency)
+1. Full GuestKit migration (remove guestfs dependency)
 2. Plugin-based fixer architecture
 3. Runtime feature detection
 
@@ -206,7 +206,7 @@ qemu-nbd: Failed to open /dev/nbd0: Permission denied
 - ✅ Passwordless sudo configured
 - ✅ Root detection implemented in `run_sudo()`
 - ✅ Container builds successfully (CLI: 1.41GB, Prod: 1.57GB)
-- ✅ VMCraft backend fully functional
+- ✅ GuestKit backend fully functional
 - ✅ **qcow2 conversion works perfectly** (VMDK → RAW → QCOW2)
 - ✅ Pre-migration validation complete
 - ✅ Risk analysis functional

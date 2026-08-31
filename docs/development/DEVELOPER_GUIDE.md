@@ -202,7 +202,7 @@ H2KvmError (base)
 │   ├── WorkerError
 │   ├── OperatorError
 │   └── HookExecutionError
-├── VMCraftError
+├── GuestBackendError (alias: VMCraftError, deprecated)
 │   ├── MountError
 │   └── InspectionError
 ├── InfrastructureError

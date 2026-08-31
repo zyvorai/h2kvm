@@ -140,7 +140,7 @@ Then create PR on GitHub.
 ```text
 h2kvm/
 ├── core/              # Foundation (utilities, logging, validation)
-├── vmcraft/           # VM analysis/modification API
+├── guestkit/           # VM analysis/modification API
 │   ├── block_device.py   # Loop device + NBD manager
 │   ├── storage.py        # LVM activation with isolation
 │   └── ...
@@ -181,10 +181,10 @@ pytest tests/unit/
 pytest tests/integration/
 
 # Specific module
-pytest tests/unit/test_vmcraft/
+pytest tests/unit/fixers/
 
 # Specific test
-pytest tests/unit/test_vmcraft/test_block_device.py::TestLoopDevice::test_attach_success
+pytest tests/unit/fixers/test_offline_fixer.py -v
 
 # With coverage
 pytest --cov=h2kvm --cov-report=html
@@ -276,7 +276,7 @@ ruff check .
 ruff check --fix .
 
 # Check specific file
-ruff check h2kvm/vmcraft/storage.py
+ruff check h2kvm/core/storage.py
 ```
 
 Configuration: `ruff.toml`
@@ -290,7 +290,7 @@ Type hints are required:
 mypy h2kvm/
 
 # Check specific file
-mypy h2kvm/vmcraft/storage.py
+mypy h2kvm/core/storage.py
 
 # Show error codes
 mypy --show-error-codes h2kvm/

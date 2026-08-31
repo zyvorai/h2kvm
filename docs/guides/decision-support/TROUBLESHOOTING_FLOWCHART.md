@@ -326,12 +326,12 @@ Migration Too Slow?
 │           qemu-img convert -O raw vm.qcow2 vm.raw
 │           ```
 │
-└─ VMCraft operations slow?
+└─ GuestKit operations slow?
    │
    └─→ Enable caching
       ```python
       # In custom code
-      vmcraft.enable_cache()
+      guestkit.enable_cache()
       ```
 ```
 
@@ -593,8 +593,8 @@ qemu-img info /path/to/vm.vmdk
 ping -c 4 <remote-host>
 ssh user@host "echo test"
 
-# Test VMCraft
-python3 -c "from h2kvm.vmcraft import VMCraft; print('OK')"
+# Test GuestKit
+python3 -c "from h2kvm.core import guestkit_client; print('OK')"
 ```
 
 ### Step 4: Minimal Test Case

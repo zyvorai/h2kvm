@@ -1,5 +1,7 @@
 # Documentation Reorganization Summary
 
+> **Update (2026-08):** VMCraft docs removed; see `docs/architecture/GUESTKIT.md` and `docs/architecture/BACKENDS.md` for the current disk layer.
+
 **Date:** February 19, 2026
 **Commit:** ac1fd99
 **Status:** ✅ Complete

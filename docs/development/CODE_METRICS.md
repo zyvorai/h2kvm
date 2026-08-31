@@ -1,5 +1,7 @@
 # Code Quality Metrics Report
 
+> **Note (2026-08):** The `h2kvm/vmcraft/` package and `tests/unit/vmcraft/` were removed. Disk operations now use GuestKit (`hypersdk-guestkit`). Historical metrics below that reference VMCraft paths are archived context only.
+
 **Generated**: 2026-02-16  
 **Repository**: h2kvm  
 **Analysis Date**: Post-refactoring phase
@@ -30,7 +32,7 @@ This document tracks code quality metrics for the h2kvm project following a comp
 ```
 h2kvm/
 ├── core/              # Foundation (utilities, logging, validation)
-├── vmcraft/           # VM analysis/modification API
+├── guestkit/           # VM analysis/modification API
 │   ├── block_device.py   # Loop device + smart NBD fallback manager
 │   ├── storage.py        # LVM activation with isolation & filtering
 │   └── ...
@@ -140,7 +142,7 @@ h2kvm/
 1. `fixers/offline_fixer.py` - 2,416 lines (reduced from 2,808)
 2. `core/guest_inspector.py` - 1,900+ lines
 3. `orchestration/orchestrator.py` - 1,500+ lines
-4. `vmcraft/main.py` - 1,200+ lines
+4. `guestkit/main.py` - 1,200+ lines
 5. `libvirt/libvirt_xml.py` - 1,100+ lines
 
 **Note**: Large files have been refactored with clear internal structure and helper functions.
@@ -173,7 +175,7 @@ h2kvm/
 | orchestration | 2,938 | 1,038 | 35.3% | ⚠️ Low |
 | infrastructure | 3,221 | 1,130 | 35.1% | ⚠️ Low |
 | runtime | 4,854 | 1,568 | 32.3% | ⚠️ Low |
-| vmcraft | 14,071 | 4,170 | 29.6% | ⚠️ Low |
+| guestkit | 14,071 | 4,170 | 29.6% | ⚠️ Low |
 | libvirt | 890 | 259 | 29.1% | ⚠️ Low |
 | config | 687 | 181 | 26.3% | 🚨 Critical |
 | tui | 2,155 | 525 | 24.4% | 🚨 Critical |
@@ -185,7 +187,7 @@ h2kvm/
 ### Priority Improvements
 
 **Immediate** (largest code bases with low coverage):
-1. **vmcraft/** - 14,071 statements, 29.6% coverage
+1. **guestkit/** - 14,071 statements, 29.6% coverage
 2. **fixers/** - 14,697 statements, 20.4% coverage
 3. **providers/** - 5,380 statements, 21.5% coverage
 4. **core/** - 5,333 statements, 21.7% coverage
@@ -213,8 +215,8 @@ h2kvm/
 - **Mock coverage**: Complete mocking for partition operations, chroot, BitLocker detection, TPM operations, Vault operations, NBD attachment, LUKS encryption, filesystem migration, CLI interface, loop devices, LVM isolation, device filters, device settlement
 
 **Core Module** (tests/unit/test_core/):
-- **VMCraft partition tests**: ✅ 15 tests converted to proper unit tests (with correct mocking)
-- **VMCraft enhanced chroot tests**: ✅ 8 tests converted to proper unit tests
+- **GuestKit partition tests**: ✅ 15 tests converted to proper unit tests (with correct mocking)
+- **GuestKit enhanced chroot tests**: ✅ 8 tests converted to proper unit tests
 - **Pure unit tests**: 100% pass rate 🎯
 
 **Test Improvements**:
@@ -227,8 +229,8 @@ h2kvm/
 
 **Recently Added** (2026-02-17 to 2026-02-18 - LUKS + Pipeline + CLI + NBD/LVM Enhancements):
 - ✅ **NBD/LVM Core Enhancements**: Complete GuestKit feature parity (57 tests, 100% passing)
-  - h2kvm/vmcraft/block_device.py: Loop device fallback for RAW/IMG/ISO (358 lines)
-  - h2kvm/vmcraft/storage.py: LVM isolation, device filters, settlement timing (+139 lines)
+  - h2kvm/core/block_device.py: Loop device fallback for RAW/IMG/ISO (358 lines)
+  - h2kvm/core/storage.py: LVM isolation, device filters, settlement timing (+139 lines)
   - tests/unit/test_vmcraft/test_block_device.py: 29 comprehensive tests
   - tests/unit/test_vmcraft/test_storage_lvm_isolation.py: 8 isolation tests
   - tests/unit/test_vmcraft/test_storage_lvm_filters.py: 10 filter tests
@@ -300,10 +302,10 @@ h2kvm/
 **Action Items**:
 - ✅ ~~Fix test collection errors~~ (COMPLETE)
 - ✅ ~~Fix manifest/checkpoint exception type mismatches~~ (COMPLETE)
-- Fix 24 VMCraft analysis dispatch wrapper tests (need proper mocking for "Not launched" errors)
+- Fix 24 GuestKit analysis dispatch wrapper tests (need proper mocking for "Not launched" errors)
 - Fix 6 Windows platform tests (disk quota exceeded - environment/infrastructure issue)
 - Fix 2 libvirt manager tests (skip when libvirt IS available - wrong test condition)
-- Mark integration tests with @pytest.mark.integration (14 VMCraft partition/chroot tests)
+- Mark integration tests with @pytest.mark.integration (14 GuestKit partition/chroot tests)
 - Skip integration tests in CI without guestfs environment
 - Add unit tests for 40 new helper methods from refactoring
 - Improve test coverage for low-coverage modules (converters 13.2%, fixers 20.4%)
@@ -637,14 +639,14 @@ pytest --cov=h2kvm --cov-report=html
 - ✅ Feature parity with GuestKit (Rust reference implementation)
 
 **Files Created** (5 total):
-1. `h2kvm/vmcraft/block_device.py` - Loop device + smart manager (358 lines)
+1. `h2kvm/core/block_device.py` - Loop device + smart manager (358 lines)
 2. `tests/unit/test_vmcraft/test_block_device.py` - Loop/NBD tests (455 lines)
 3. `tests/unit/test_vmcraft/test_storage_lvm_isolation.py` - Isolation tests (310 lines)
 4. `tests/unit/test_vmcraft/test_storage_lvm_filters.py` - Filter tests (279 lines)
 5. `tests/unit/test_vmcraft/test_storage_device_settlement.py` - Settlement tests (335 lines)
 
 **Files Modified** (1 total):
-1. `h2kvm/vmcraft/storage.py` - Added 3 helper methods (+139 lines):
+1. `h2kvm/core/storage.py` - Added 3 helper methods (+139 lines):
    - `_create_isolated_lvm_env()` - Creates isolated LVM metadata directory
    - `_get_lvm_device_filter()` - Generates regex-based device filter config
    - `_settle_devices()` - Enhanced device settlement with dmsetup + udevadm + sleep
@@ -685,13 +687,13 @@ pytest --cov=h2kvm --cov-report=html
 
 **Use Case Example**:
 ```python
-from h2kvm.vmcraft import VMCraft
+from h2kvm.core import guestkit_client
 
 # Automatically uses loop device for RAW (P0)
 # Isolated LVM metadata (P1)
 # Explicit device filters (P2)
 # Enhanced settlement timing (P3)
-vm = VMCraft("/vms/disk.raw")
+vm = GuestKit("/vms/disk.raw")
 vm.launch()  # All enhancements active automatically
 vm.shutdown()
 ```
@@ -756,14 +758,14 @@ After:
    - **Root cause**: urllib HTTPError objects contain file-like objects that must be closed
 
 5. **test_vmcraft_partition_mgmt.py** - Integration→Unit conversion (15 tests):
-   - Fixed mock patch path: `h2kvm.vmcraft.api.partition_mixin.run_sudo`
+   - Fixed mock patch path: `h2kvm.guestkit.api.partition_mixin.run_sudo`
    - Removed `@pytest.mark.integration` markers (now true unit tests)
    - Added proper mock return values: `Mock(returncode=0, stdout="", stderr="")`
    - **Tests**: part_init (3), part_add (2), part_del (1), part_disk (2), part_set_name (1), part_set_gpt_type (1), part_get_parttype (4), workflows (2)
    - **Impact**: Can now run without /dev/nbd0 block device
 
 6. **test_vmcraft_enhanced_chroot.py** - Integration→Unit conversion (8 tests):
-   - Fixed mock patch path: `h2kvm.vmcraft.api.storage_mixin.run_sudo`
+   - Fixed mock patch path: `h2kvm.guestkit.api.storage_mixin.run_sudo`
    - Removed `@pytest.mark.integration` markers
    - **Tests**: command_with_mounts operations (bind mounts, cleanup, error handling)
    - **Impact**: Can now run without mount capabilities
@@ -807,7 +809,7 @@ Final:          1962 passed,  0 failed, 42 skipped (100% pass rate) ✅
 2. **augeas_mixin.py** - Fixed method dispatch patterns:
    - Changed `aug_close()` from `_augeas_call` to `_dispatch_manager_attr_call`
    - Changed `aug_save()` from `_augeas_call` to `_dispatch_manager_attr_call`
-   - Fixed AttributeError: 'VMCraft' object has no attribute '_augeas_call'
+   - Fixed AttributeError: 'GuestKit' object has no attribute '_augeas_call'
    - Impact: +5 passing tests (all 29 augeas tests now pass)
 
 3. **storage_mixin.py** - Fixed LVM import paths:
@@ -819,8 +821,8 @@ Final:          1962 passed,  0 failed, 42 skipped (100% pass rate) ✅
 **Test Fixes** (1 commit, 30 lines):
 4. **test_vmcraft_blkid.py & test_vmcraft_caching.py** - Corrected mock paths:
    - Issue: run_sudo imported into file_ops_mixin creates local reference
-   - Changed: `@patch('h2kvm.vmcraft.main.run_sudo')`
-   - To: `@patch('h2kvm.vmcraft.api.file_ops_mixin.run_sudo')`
+   - Changed: `@patch('h2kvm.guestkit.main.run_sudo')`
+   - To: `@patch('h2kvm.guestkit.api.file_ops_mixin.run_sudo')`
    - Reason: Must mock at the import location, not the original definition
    - Impact: +12 passing tests
    - All 8 blkid tests now passing ✅
@@ -927,7 +929,7 @@ Final:          1962 passed,  0 failed, 42 skipped (100% pass rate) ✅
 
 ### 2026-02-17 (Evening): Integration Test Markers & More Exception Fixes
 
-**Integration Test Organization**: Marked VMCraft tests requiring hardware/guestfs
+**Integration Test Organization**: Marked GuestKit tests requiring hardware/guestfs
 
 **Test Markers Added** (21 tests):
 1. `tests/unit/test_core/test_vmcraft_partition_mgmt.py`:
@@ -958,14 +960,14 @@ Final:          1962 passed,  0 failed, 42 skipped (100% pass rate) ✅
 - Enables testing without guestfs environment
 
 **Commits**:
-- `test: mark VMCraft partition and chroot tests as integration tests`
+- `test: mark GuestKit partition and chroot tests as integration tests`
 - `fix: convert batch_loader and profile_loader exceptions to dataclass format`
 
 ### 2026-02-17 (Late Afternoon): Missing Import Fix
 
 **Issue**: NameError in systemd_mixin.py due to missing logging import
 
-**Fix**: Added `import logging` to vmcraft/api/systemd_mixin.py
+**Fix**: Added `import logging` to guestkit/api/systemd_mixin.py
 - Line 510 used `logging.DEBUG` without importing logging module
 - Test `test_run_sudo_stdout_uses_dynamic_run_command_resolver` now passing
 
@@ -1149,12 +1151,12 @@ This session achieved complete elimination of high-complexity code:
 - Fixed IndentationError in `providers/vmware/utils/datastore.py`
 - Identified test issues:
   - 6 collection errors (missing exception imports)
-  - 467 failing tests (mostly VMCraft integration)
+  - 467 failing tests (mostly GuestKit integration)
 
 **Coverage Highlights**:
 - Best: database_migration (75.8%), quality (66.3%), platforms (64.6%)
 - Needs work: converters (13.2%), fixers (20.4%), providers (21.5%)
-- Large modules needing tests: vmcraft (14K statements, 29.6%), fixers (14K statements, 20.4%)
+- Large modules needing tests: guestkit (14K statements, 29.6%), fixers (14K statements, 20.4%)
 
 **Impact**:
 - Clear baseline for tracking coverage improvements

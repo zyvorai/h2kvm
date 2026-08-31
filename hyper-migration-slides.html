@@ -252,7 +252,7 @@
         <div class="highlight-box" style="font-size: 11pt; padding: 12px 16px;">
           <strong style="color: #e65100;">h2kvm</strong> (Python) handles <em>deterministic operations</em>:<br>
           &bull; Consumes manifest, never talks to providers<br>
-          &bull; Deep OS inspection via VMCraft engine<br>
+          &bull; Deep OS inspection via GuestKit engine<br>
           &bull; Bootloader, fstab, initramfs, driver fixes<br>
           &bull; Windows VirtIO injection + registry mods<br>
           &bull; Validation &amp; smoke testing
@@ -350,7 +350,7 @@
           <tr><td>System Calls</td><td>14,200</td><td><strong>8,500</strong></td></tr>
         </table>
         <h3>Code Example</h3>
-        <pre><code>from h2kvm.core.vmcraft import VMCraft
+        <pre><code>from guestkit import Guestfs as VMCraft  # legacy slides — use GuestKit
 
 with VMCraft() as g:
     g.add_disk("/vms/server.qcow2")

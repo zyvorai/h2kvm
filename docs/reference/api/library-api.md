@@ -739,7 +739,7 @@ class OVF:
 
 #### `OfflineFSFix`
 
-Offline guest OS fixer (guestfs-based; VMCraft by default).
+Offline guest OS fixer (guestfs-based; GuestKit by default).
 
 ```python
 class OfflineFSFix:

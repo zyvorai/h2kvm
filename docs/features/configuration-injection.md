@@ -4,7 +4,7 @@
 
 ## Overview
 
-h2kvm provides powerful configuration injection capabilities that allow you to customize VM settings **before first boot**. Unlike traditional cloud-init approaches that run on boot, these injectors work offline using the guestfs backend (VMCraft by default) to modify the VM disk image directly.
+h2kvm provides powerful configuration injection capabilities that allow you to customize VM settings **before first boot**. Unlike traditional cloud-init approaches that run on boot, these injectors work offline using the guestfs backend (GuestKit by default) to modify the VM disk image directly.
 
 **Why Pre-Boot Injection?**
 - ✅ **Deterministic:** Changes applied offline, guaranteed before boot

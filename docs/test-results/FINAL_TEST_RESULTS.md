@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # ✅ Migration Pipeline Test - COMPLETE SUCCESS
 
 ## Executive Summary

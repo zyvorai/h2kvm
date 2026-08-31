@@ -14,7 +14,7 @@ Comprehensive documentation for all H2KVM features and capabilities.
 ## Quick Navigation
 
 ### 🔧 Core Features
-- **[VMCraft Engine](vmcraft/complete-guide.md)** - Native VM manipulation (480+ APIs)
+- **[GuestKit Integration](../architecture/GUESTKIT.md)** - Offline disk inspect and repair
 - **[XFS UUID Regeneration](xfs-uuid-regeneration.md)** - Fix cloned VMware VMs
 - **[fstab Stabilization](fstab-stabilization.md)** - Automatic fstab repair
 - **[Enhanced Chroot](enhanced-chroot.md)** - Advanced filesystem access
@@ -38,15 +38,11 @@ Comprehensive documentation for all H2KVM features and capabilities.
 - **[vSphere Export](vsphere-export.md)** - VMware vSphere integration
 - **[vSphere Design](vsphere-design.md)** - vSphere architecture
 
-### 📦 VMCraft Specialized Guides
-- **[VMCraft Complete Guide](vmcraft/complete-guide.md)** - Full VMCraft documentation
-- **[VMCraft Advanced Features](vmcraft/advanced-features.md)** - Expert usage
-- **[VMCraft OS Detection](vmcraft/os-detection.md)** - OS identification
-- **[VMCraft Windows Support](vmcraft/windows-support.md)** - Windows features
-- **[VMCraft Augeas Guide](vmcraft-augeas-guide.md)** - Configuration editing
-- **[VMCraft LVM Guide](vmcraft-lvm-guide.md)** - Logical volume management
-- **[VMCraft Partition Management](vmcraft-partition-management.md)** - Disk partitioning
-- **[VMCraft Performance Guide](vmcraft-performance-guide.md)** - Optimization
+### 📦 GuestKit
+
+- **[GuestKit Integration Guide](../architecture/GUESTKIT.md)** — install, configure, pipeline integration
+- **[LVM Backends](../architecture/LVM_BACKENDS.md)** — LVM activation during offline fixes
+- **[Backends](../architecture/BACKENDS.md)** — `guestkit`, `guestfs`, `auto`
 
 ---
 
@@ -56,7 +52,7 @@ Comprehensive documentation for all H2KVM features and capabilities.
 
 | Feature | Description | Status | Difficulty |
 |---------|-------------|--------|------------|
-| **[VMCraft Engine](vmcraft/complete-guide.md)** | Native Python VM manipulation | ✅ Production | ⭐⭐ |
+| **[GuestKit Integration](../architecture/GUESTKIT.md)** | Offline disk inspect and repair | ✅ Production | ⭐⭐ |
 | **[fstab Stabilization](fstab-stabilization.md)** | Automatic fstab repair | ✅ Production | ⭐ |
 | **[Enhanced Chroot](enhanced-chroot.md)** | Advanced filesystem access | ✅ Production | ⭐⭐ |
 | **[VMDK Inspector](vmdk-inspector.md)** | Pre-migration analysis | ✅ Production | ⭐ |
@@ -101,11 +97,11 @@ Comprehensive documentation for all H2KVM features and capabilities.
 
 ---
 
-## VMCraft Engine
+## GuestKit engine
 
 ### Overview
 
-VMCraft is H2KVM's native Python VM manipulation engine and the default guestfs backend, with **480+ APIs** for guest filesystem operations without requiring external C dependencies.
+GuestKit is H2KVM's native Python VM manipulation engine and the default guestfs backend, with **480+ APIs** for guest filesystem operations without requiring external C dependencies.
 
 **Key Capabilities:**
 - ✅ **Direct filesystem access** - Native Python, no C dependencies
@@ -118,16 +114,16 @@ VMCraft is H2KVM's native Python VM manipulation engine and the default guestfs 
 - ✅ **Performance optimized** - Caching, lazy loading
 
 **Documentation:**
-- **[Complete Guide](vmcraft/complete-guide.md)** - Full VMCraft documentation
-- **[Advanced Features](vmcraft/advanced-features.md)** - Expert-level usage
-- **[OS Detection](vmcraft/os-detection.md)** - OS identification system
-- **[Windows Support](vmcraft/windows-support.md)** - Windows-specific features
+- **[Complete Guide](architecture/GUESTKIT.md)** - Full GuestKit documentation
+- **[Advanced Features](architecture/GUESTKIT.md)** - Expert-level usage
+- **[OS Detection](architecture/GUESTKIT.md)** - OS identification system
+- **[Windows Support](os-support/windows/README.md)** - Windows-specific features
 
 **Specialized Guides:**
-- **[Augeas Guide](vmcraft-augeas-guide.md)** - Configuration file editing
-- **[LVM Guide](vmcraft-lvm-guide.md)** - Logical volume management
-- **[Partition Management](vmcraft-partition-management.md)** - Disk partitioning
-- **[Performance Guide](vmcraft-performance-guide.md)** - Optimization techniques
+- **[Augeas Guide](architecture/GUESTKIT.md)** - Configuration file editing
+- **[LVM Guide](architecture/LVM_BACKENDS.md)** - Logical volume management
+- **[Partition Management](architecture/GUESTKIT.md)** - Disk partitioning
+- **[Performance Guide](architecture/GUESTKIT.md)** - Optimization techniques
 
 ---
 
@@ -247,9 +243,9 @@ h2kvm daemon status
 
 ## Feature Comparison
 
-### VMCraft Highlights
+### GuestKit Highlights
 
-| Feature | VMCraft |
+| Feature | GuestKit |
 |---------|---------|
 | **Language** | Pure Python |
 | **Dependencies** | Minimal (qemu-nbd, qemu-img) |
@@ -338,7 +334,7 @@ EOF
 
 | Feature | Version | Status |
 |---------|---------|--------|
-| VMCraft Engine | 1.0+ | ✅ Stable |
+| GuestKit engine | 1.0+ | ✅ Stable |
 | fstab Stabilization | 1.0+ | ✅ Stable |
 | XFS UUID Regen | 1.0+ | ✅ Stable |
 | Enhanced Chroot | 1.0+ | ✅ Stable |
@@ -359,7 +355,7 @@ EOF
 
 ## Performance Characteristics
 
-### VMCraft Performance
+### GuestKit Performance
 
 | Operation | Speed | Notes |
 |-----------|-------|-------|
@@ -397,7 +393,7 @@ EOF
 
 ### Performance Features
 
-⚡ **VMCraft Caching**: Enabled by default
+⚡ **GuestKit Caching**: Enabled by default
 ⚡ **Lazy Loading**: Reduces memory usage
 ⚡ **Parallel Processing**: Use batch mode for multiple VMs
 
@@ -450,8 +446,8 @@ Have an idea for a new feature?
 
 Choose your area of interest:
 
-### 🔧 I want to use VMCraft
-→ Read [VMCraft Complete Guide](vmcraft/complete-guide.md)
+### 🔧 I want to use GuestKit
+→ Read [GuestKit integration guide](architecture/GUESTKIT.md)
 
 ### 🔍 I want to inspect VMDKs
 → See [VMDK Inspector](vmdk-inspector.md)
@@ -474,5 +470,5 @@ Choose your area of interest:
 **Version**: 0.3.0
 **Total Features**: 20+
 **Production Ready**: 15+
-**VMCraft APIs**: 480+
+**GuestKit APIs**: 480+
 **LVM Performance**: 7x faster with 100% host protection

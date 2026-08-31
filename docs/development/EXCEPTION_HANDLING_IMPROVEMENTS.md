@@ -16,7 +16,7 @@ All exception handling has been systematically improved across **50+ files** to 
 ### 1. Critical Fixes (1 file)
 
 #### Fixed Bare Except Clause
-**File:** `h2kvm/vmcraft/storage_enhanced.py:539`
+**File:** `h2kvm/core/storage_enhanced.py:539`
 
 **Before:**
 ```python
@@ -180,7 +180,7 @@ raise AttributeError(fn_name)  # Just the function name
 raise AttributeError(
     f"Windows registry access failed: guestfs method '{fn_name}' not found. "
     f"This may indicate an incompatible guestfs backend version. "
-    f"Please check your guestfs backend configuration or install VMCraft dependencies: apt install qemu-utils python3-guestfs"
+    f"Please check your guestfs backend configuration or install GuestKit dependencies: apt install qemu-utils python3-guestfs"
 )
 ```
 

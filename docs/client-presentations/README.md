@@ -25,7 +25,7 @@ All presentations available as HTML (viewable in browser) and PDF (printable).
 | 02 | Technical Architecture | 8 | Full platform architecture |
 | 19 | hypersdk Architecture | 6 | Cloud export daemon (10 providers) |
 | 20 | zkvm TUI Architecture | 6 | Interactive terminal UI |
-| 31 | VMCraft Engine | 6 | Pure Python + qemu-nbd backend |
+| 31 | GuestKit engine | 6 | Pure Python + qemu-nbd backend |
 | 32 | Performance Optimization | 6 | I/O tuning, CPU pinning, NUMA |
 | 33 | Storage Architecture | 6 | LVM, LUKS, Btrfs, ZFS, mdadm |
 | 35 | Network Architecture | 6 | VirtIO-net, bridges, VLANs, SR-IOV |

@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # Test Results & Validation
 
 This directory contains test results, validation reports, and migration success stories from various environments and operating systems.
@@ -10,12 +12,12 @@ This directory contains test results, validation reports, and migration success 
 
 **Status**: ✅ **PRODUCTION READY**
 
-Comprehensive validation of enterprise LVM safety improvements and VMCraft enhancements:
+Comprehensive validation of enterprise LVM safety improvements and GuestKit enhancements:
 - **RHEL 8.8** (ESXi 8.0 VMDK, LVM on XFS) - ✅ SUCCESS
 - **openSUSE Leap 15.4** (btrfs multi-subvolume) - ✅ SUCCESS
 - **Performance**: 7x faster LVM activation (0.71s vs 5-10s)
 - **Safety**: 100% host VG protection verified
-- **Bugs Fixed**: All VMCraft mount import errors resolved
+- **Bugs Fixed**: All GuestKit mount import errors resolved
 
 ---
 

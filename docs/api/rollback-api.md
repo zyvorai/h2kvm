@@ -795,7 +795,7 @@ if __name__ == "__main__":
 
 - **[Rollback Framework Guide](../features/rollback-framework.md)**: Feature documentation
 - **[Validation API](validation-api.md)**: Post-migration validation
-- **[VMCraft API](vmcraft-api.md)**: Guest filesystem manipulation
+- **[GuestKit API](guestkit-api.md)**: Guest filesystem manipulation
 - **[Troubleshooting Guide](../guides/troubleshooting.md)**: Rollback troubleshooting
 
 ---

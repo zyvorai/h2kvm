@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 ---
 title: "h2kvm — RHEL 10.2 vCenter Migration Report"
 date: "March 18-19, 2026"
@@ -108,7 +110,7 @@ OVF + VMDK (2.8 GB)
   │
   │  Auto-chained pipeline (no manual step)
   ▼
-VMCraft offline fixes
+GuestKit offline fixes
   ├── fstab stabilized (UUID-based mounts)
   ├── initramfs rebuilt (virtio_blk, virtio_scsi, virtio_net, nvme)
   ├── Kernel cmdline: root=UUID=311182bd-f262-4081-8a2d-56624799dbad
@@ -148,8 +150,8 @@ VM RUNNING on KVM ✓
 
 | Metric | Value |
 |--------|-------|
-| Backend | VMCraft (pure Python + qemu-nbd) |
-| VMCraft startup | 1.61s (1 drive) |
+| Backend | GuestKit (pure Python + qemu-nbd) |
+| GuestKit startup | 1.61s (1 drive) |
 | Input | 2.8 GB VMDK (20 GB virtual, thin) |
 | Output | govc-vm.qcow2 (3.2 GB compressed) |
 | Format | qcow2 |
@@ -242,7 +244,7 @@ $ ls -lh output-govc-e2e/libvirt/*.xml
 | qemu-img | 10.1.4 |
 | libvirt | 11.6.0 |
 | OVMF | OVMF_CODE.fd |
-| Backend | VMCraft (pure Python) |
+| Backend | GuestKit (pure Python) |
 
 ---
 

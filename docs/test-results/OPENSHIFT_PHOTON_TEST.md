@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # OpenShift Photon VMDK Test Plan
 
 **Date:** 2026-01-31

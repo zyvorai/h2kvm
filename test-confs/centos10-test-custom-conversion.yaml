@@ -6,7 +6,7 @@ to_output: centos10.qcow2
 out_format: qcow2
 
 # Custom conversion directory (avoids /var/tmp space issues)
-conversion_dir: ~/tmp/vmcraft-conversions
+conversion_dir: ~/tmp/guestkit-conversions
 
 # Fixes
 fstab_mode: stabilize-all

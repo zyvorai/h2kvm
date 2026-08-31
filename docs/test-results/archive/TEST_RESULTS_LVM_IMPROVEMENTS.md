@@ -1,3 +1,5 @@
+> Historical report — disk backend was VMCraft; now GuestKit.
+
 # Test Results: LVM Safety Improvements
 
 **Test Date**: February 14, 2026, 17:00-17:10
@@ -56,12 +58,12 @@
 
 ### Root Cause
 
-VMCraft mount code in `fixers/offline/mount.py` is calling:
-- `svc_list_partitions_cached()` - Undefined in VMCraft context
-- `run_sudo()` - Undefined in VMCraft context (imports not included)
+GuestKit mount code in `fixers/offline/mount.py` is calling:
+- `svc_list_partitions_cached()` - Undefined in GuestKit context
+- `run_sudo()` - Undefined in GuestKit context (imports not included)
 - `LVMActivator` - Not imported in the mount context
 
-These are likely import/dependency issues where the VMCraft backend is missing service implementations that are expected by the mount code.
+These are likely import/dependency issues where the GuestKit backend is missing service implementations that are expected by the mount code.
 
 ### Impact
 
@@ -123,7 +125,7 @@ These are likely import/dependency issues where the VMCraft backend is missing s
 17:05:06 ✅ INFO    All filesystems unmounted
 17:05:06 ✅ INFO    Storage stack deactivated
 17:05:06 ✅ INFO Disconnected /dev/nbd0
-17:05:06 ✅ INFO VMCraft shut down successfully
+17:05:06 ✅ INFO GuestKit shut down successfully
 ```
 
 ---
@@ -172,11 +174,11 @@ for vg in ['rhel']:  # Only VGs from NBD device
 
 ## Bugs to Fix
 
-### 1. Missing Service Functions in VMCraft
+### 1. Missing Service Functions in GuestKit
 
-**File**: `h2kvm/core/vmcraft/mount.py` or similar
+**File**: `h2kvm/core/guestkit_client.pymount.py` or similar
 
-**Issue**: VMCraft backend doesn't implement:
+**Issue**: GuestKit backend doesn't implement:
 - `svc_list_partitions_cached()`
 - `run_sudo()` import missing
 - `LVMActivator` import missing
@@ -192,9 +194,9 @@ from .services.device_metadata import svc_list_partitions_cached
 
 **File**: `h2kvm/fixers/offline/mount.py`
 
-**Issue**: Code expects guestfs interface but VMCraft backend uses different APIs
+**Issue**: Code expects guestfs interface but GuestKit backend uses different APIs
 
-**Fix Needed**: Add compatibility layer or use VMCraft-native device listing
+**Fix Needed**: Add compatibility layer or use GuestKit-native device listing
 
 ---
 
@@ -245,9 +247,9 @@ $ sudo vgs
 
 ### Immediate Fixes
 
-1. **Fix VMCraft imports** in mount code
+1. **Fix GuestKit imports** in mount code
    - Add missing imports for `LVMActivator`, `run_sudo`, `svc_list_partitions_cached`
-   - Or create VMCraft-specific implementations
+   - Or create GuestKit-specific implementations
 
 2. **Test mount code path**
    - Verify mount works after imports are fixed
@@ -285,7 +287,7 @@ The **LVM safety improvements are working correctly**:
 
 ### ❌ Blocker
 
-**Mount code has import/dependency issues** that prevent the conversion from completing. This is a separate bug from the LVM improvements and needs to be fixed by adding proper imports or implementing VMCraft-native device listing.
+**Mount code has import/dependency issues** that prevent the conversion from completing. This is a separate bug from the LVM improvements and needs to be fixed by adding proper imports or implementing GuestKit-native device listing.
 
 ### Overall Assessment
 

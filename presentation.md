@@ -84,7 +84,7 @@ The core of h2kvm — a **pure Python** VM manipulation engine.
 ### Quick Example
 
 ```python
-from h2kvm.core.vmcraft import VMCraft
+from guestkit import Guestfs as VMCraft  # legacy slides — use GuestKit
 
 with VMCraft() as g:
     g.add_disk("/vms/server.qcow2")
