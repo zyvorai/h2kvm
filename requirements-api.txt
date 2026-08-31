@@ -5,7 +5,7 @@
 fastapi>=0.136.1
 
 # ASGI server
-uvicorn[standard]>=0.24.0
+uvicorn[standard]>=0.52.4
 
 # Server-Sent Events support
 sse-starlette>=1.8.2
