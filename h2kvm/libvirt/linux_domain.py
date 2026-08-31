@@ -132,6 +132,13 @@ def _default_libvirt_images_dir() -> Path:
     return _DEFAULT_IMAGES_DIR
 
 
+def _libvirt_disk_owner() -> tuple[str, str]:
+    """Return (user, group) for libvirt-accessible disk images on this host."""
+    if Path("/etc/debian_version").exists():
+        return "libvirt-qemu", "kvm"
+    return "qemu", "qemu"
+
+
 def _run_sudo(args: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
     # NOTE: keep as simple as possible; user wants deterministic sudo behavior.
     return subprocess.run(["sudo", *args], check=check, text=True, capture_output=True)
@@ -175,7 +182,7 @@ def copy_disk_for_libvirt(
     Keeps your prior policy:
       - sudo rm (optional overwrite)
       - sudo cp
-      - sudo chown qemu:qemu
+      - sudo chown libvirt-qemu:kvm (Debian/Ubuntu) or qemu:qemu (RHEL-family)
       - sudo chmod 0640
       - restorecon best-effort
     """
@@ -201,7 +208,8 @@ def copy_disk_for_libvirt(
             dst = dest_dir / f"{safe}-{datetime.now().strftime('%Y%m%d-%H%M%S')}{suffix}"
 
     _run_sudo(["cp", str(src), str(dst)], check=True)
-    _run_sudo(["chown", "qemu:qemu", str(dst)], check=True)
+    owner_user, owner_group = _libvirt_disk_owner()
+    _run_sudo(["chown", f"{owner_user}:{owner_group}", str(dst)], check=True)
     _run_sudo(["chmod", "0640", str(dst)], check=True)
     _restorecon_best_effort(dst)
     return dst

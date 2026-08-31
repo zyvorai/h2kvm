@@ -25,7 +25,7 @@ Usage as a library:
 See docs/08-Library-API.md for detailed usage examples.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 
 # Use lazy imports to avoid initialization errors
