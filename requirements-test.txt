@@ -17,4 +17,4 @@ faker>=20.0.0
 
 # Profiling
 memory-profiler>=0.61.0
-py-spy>=0.4.1
+py-spy>=0.4.2
