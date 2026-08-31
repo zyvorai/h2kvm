@@ -7,7 +7,7 @@ pytest-mock>=3.15.1
 pytest-benchmark>=4.0.0
 
 # Code quality
-ruff>=0.15.11
+ruff>=0.16.4
 mypy>=1.7.0
 types-PyYAML>=6.0.12
 
