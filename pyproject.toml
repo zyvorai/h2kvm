@@ -100,6 +100,11 @@ daemon = [
 # No Python TUI dependencies required.
 tui = []
 
+# GuestKit guest-disk engine (required for offline fix / inspect)
+guestkit = [
+    "hypersdk-guestkit>=1.1.0",
+]
+
 # Kubernetes client — required for h2kvmctl --deploy-k8s / KubeVirt PVC upload
 kubernetes = [
     "kubernetes>=28.0.0",
@@ -145,6 +150,7 @@ full = [
     "httpx[http2]>=0.24.0",
     "cryptography>=41.0.0",
     "hvac>=1.1.0",
+    "hypersdk-guestkit>=1.1.0",
     "kubernetes>=28.0.0",
     "openstacksdk>=1.5.0",
 ]

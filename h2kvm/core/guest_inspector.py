@@ -301,8 +301,8 @@ class ComprehensiveGuestInspector:  # pylint: disable=too-few-public-methods
             raise RuntimeError(
                 "Guest inspection backend is not available.\n"
                 "    Try: pip install python3-guestfs\n"
-                "    Or set backend to VMCraft in your config: backend: vmcraft\n"
-                "    VMCraft is the default and does not require libguestfs."
+                "    Or set backend to GuestKit in your config: backend: guestkit\n"
+                "    GuestKit is the default and does not require libguestfs."
             )
 
         img_path = Path(img_path)
@@ -339,7 +339,7 @@ class ComprehensiveGuestInspector:  # pylint: disable=too-few-public-methods
             )
 
             # Now mount and extract detailed information
-            g = create_guestfs(python_return_dict=True, backend="vmcraft")
+            g = create_guestfs(python_return_dict=True, backend="guestkit")
 
             try:
                 g.add_drive_opts(str(img_path), readonly=1 if readonly else 0)

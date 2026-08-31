@@ -209,7 +209,7 @@ def get_default_settings() -> dict[str, Any]:
         },
         # Advanced
         "advanced": {
-            "guestfs_backend": "vmcraft",
+            "guestfs_backend": "guestkit",
             "debug_mode": False,
             "verbose_output": False,
         },

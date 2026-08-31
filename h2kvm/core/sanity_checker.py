@@ -352,18 +352,19 @@ class SanityChecker:
             # which most sanity-check runs (guestfs not needed) should not have to import.
             from .guestfs_factory import create_guestfs  # pylint: disable=import-outside-toplevel
 
-            g = create_guestfs(python_return_dict=True, backend="vmcraft")
+            g = create_guestfs(python_return_dict=True, backend="guestkit")
             g.set_trace(0)
             g.close()
-            self.report.notes["guestfs"] = "OK (VMCraft implementation)"
+            self.report.notes["guestfs"] = "OK (GuestKit backend)"
         except Exception as e:  # pylint: disable=broad-exception-caught
             # Backend init can fail in many ways (import, subprocess, runtime); this is a
             # best-effort sanity check that must report a clean error, not crash the run.
             self._add_err(
                 ErrorKind.GUESTFS,
                 f"Disk inspection backend initialization failed: {e!s}\n"
-                f"    The VMCraft backend requires qemu-img and qemu-nbd.\n"
-                f"    Install with: dnf install qemu-img  (Fedora/RHEL)\n"
+                f"    The GuestKit backend requires qemu-img and qemu-nbd "
+                f"(and pip install hypersdk-guestkit or pip install -e ~/tt/guestkit).\n"
+                f"    Install host tools: dnf install qemu-img qemu-nbd  (Fedora/RHEL)\n"
                 f"    If offline fixes are not needed, use: --skip-guestfs-check",
             )
 

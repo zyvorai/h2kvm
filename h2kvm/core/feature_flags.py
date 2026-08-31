@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 # Default flag states (False = disabled, True = enabled)
 _DEFAULTS: dict[str, bool] = {
     # Stable features (enabled by default)
-    "vmcraft_backend": True,
+    "vmcraft_backend": False,
     "fstab_stabilize": True,
     "initramfs_regen": True,
     "serial_console": True,

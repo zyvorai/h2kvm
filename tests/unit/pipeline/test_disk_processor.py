@@ -45,7 +45,7 @@ def _make_processor(mock_logger, **overrides):
         luks_passphrase_env=None,
         luks_keyfile=None,
         luks_mapper_prefix="h2kvm-crypt",
-        backend="vmcraft",
+        backend="guestkit",
         container_isolation=True,
         conversion_dir=None,
         allowed_dirs=None,

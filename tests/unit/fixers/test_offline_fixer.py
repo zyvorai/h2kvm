@@ -133,7 +133,7 @@ class TestOfflineFixConfigDefaults:
 
     def test_backend_default(self):
         cfg = OfflineFixConfig(image=Path("/x"))
-        assert cfg.backend == "vmcraft"
+        assert cfg.backend == "guestkit"
 
     def test_container_isolation_default(self):
         cfg = OfflineFixConfig(image=Path("/x"))

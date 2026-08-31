@@ -640,7 +640,7 @@ class GuestDetector:
         """
         g = None
         try:
-            g = create_guestfs(python_return_dict=True, backend="vmcraft")
+            g = create_guestfs(python_return_dict=True, backend="guestkit")
             g.add_drive_opts(str(img_path), readonly=bool(readonly))
             g.launch()
 

@@ -113,7 +113,7 @@ type ExportAllDoneMsg struct {
 var (
 	reProgress  = regexp.MustCompile(`(?i)progress:\s*([\d.]+)%`)
 	reConvert   = regexp.MustCompile(`(?i)convert|conversion|qemu-img`)
-	reFix       = regexp.MustCompile(`(?i)offline fix|initramfs|fstab|vmcraft`)
+	reFix       = regexp.MustCompile(`(?i)offline fix|initramfs|fstab|guestkit`)
 	reExport    = regexp.MustCompile(`(?i)export|nfc|govc|ovftool`)
 	reTest      = regexp.MustCompile(`(?i)libvirt|boot test|smoke test|domain.*running`)
 	reSpeed     = regexp.MustCompile(`(\d+\.?\d*)\s*MB/s`)

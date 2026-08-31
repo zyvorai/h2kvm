@@ -17,7 +17,6 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from h2kvm.vmcraft.main import VMCraft
 
 
 class ActiveDirectoryManager:
@@ -32,7 +31,7 @@ class ActiveDirectoryManager:
         """
         self.logger = logger or logging.getLogger(__name__)
 
-    def detect_domain_membership(self, g: VMCraft) -> dict[str, Any]:
+    def detect_domain_membership(self, g: Any) -> dict[str, Any]:
         """
         Detect Active Directory domain membership status.
 
@@ -124,7 +123,7 @@ class ActiveDirectoryManager:
 
     def inject_domain_rejoin_script(
         self,
-        g: VMCraft,
+        g: Any,
         script_content: str,
         run_on_boot: bool = True,
     ) -> dict[str, Any]:
@@ -259,7 +258,7 @@ try {{
 
     # Private helper methods
 
-    def _get_computer_name(self, g: VMCraft) -> str | None:
+    def _get_computer_name(self, g: Any) -> str | None:
         """Extract computer name from Windows registry."""
         try:
             # In production, extract from:
@@ -269,7 +268,7 @@ try {{
         except Exception:
             return None
 
-    def _check_domain_membership(self, g: VMCraft) -> dict[str, Any]:
+    def _check_domain_membership(self, g: Any) -> dict[str, Any]:
         """Check if Windows VM is domain-joined."""
         try:
             # Check for domain membership indicators:
@@ -485,7 +484,7 @@ try {{
 }}
 """
 
-    def _add_to_startup_scripts(self, g: VMCraft, script_path: str) -> None:
+    def _add_to_startup_scripts(self, g: Any, script_path: str) -> None:
         """Add script to Windows startup scripts via Group Policy."""
         try:
             scripts_ini = "/Windows/System32/GroupPolicy/Machine/Scripts/scripts.ini"

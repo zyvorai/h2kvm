@@ -72,10 +72,6 @@ def __getattr__(name):
         from .core import GuestType
 
         return GuestType
-    if name == "VMCraft":
-        from .vmcraft import VMCraft
-
-        return VMCraft
     if name == "AIOrchestrator":
         # pylint: disable=no-name-in-module
         # AIOrchestrator is itself re-exported lazily via ai.__getattr__
@@ -104,8 +100,6 @@ __all__ = [
     "GuestType",
     # Orchestration
     "Orchestrator",
-    # VMCraft API
-    "VMCraft",
     "VMwareClient",
     # Version
     "__version__",

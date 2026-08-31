@@ -427,7 +427,7 @@ echo ""
 echo "  ── Modules ──"
 $PYTHON -c 'from h2kvm.providers.aws_ec2 import AWSConfig; print("  📍 AWS provider: OK")' 2>/dev/null || echo "  ⚠️  AWS provider: not available"
 $PYTHON -c 'from h2kvm.providers.azure import AzureConfig; print("  📍 Azure provider: OK")' 2>/dev/null || echo "  ⚠️  Azure provider: not available"
-$PYTHON -c 'from h2kvm.vmcraft.main import VMCraft; print("  📍 VMCraft: OK")' 2>/dev/null || echo "  ⚠️  VMCraft: not available"
+$PYTHON -c 'import guestkit; print("  📍 GuestKit: OK")' 2>/dev/null || echo "  ⚠️  GuestKit: not available (pip install hypersdk-guestkit)"
 $PYTHON -c 'import hivex; print("  📍 python-hivex: OK")' 2>/dev/null || echo "  ⚠️  python-hivex: not installed"
 $PYTHON -c 'import boto3; print("  📍 boto3: OK")' 2>/dev/null || echo "  ⚠️  boto3: not installed"
 

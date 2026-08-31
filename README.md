@@ -44,7 +44,7 @@ Hypervisor exit fails when VirtIO is missing, GRUB is wrong, or Windows registry
               ▼
   ┌─────────────────────────────────┐
   │  h2kvm                      │──►  convert → qcow2 / raw
-  │  h2kvmctl · h2kweb · zkvm       │──►  VMCraft offline guest fix
+  │  h2kvmctl · h2kweb · zkvm       │──►  GuestKit offline inspect + repair
   │  K8s / OLM operator             │──►  deploy · validate · rollback
   └─────────────────────────────────┘
               │

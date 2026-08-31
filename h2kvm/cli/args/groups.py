@@ -171,9 +171,12 @@ def _add_fixing_behavior(p: argparse.ArgumentParser) -> None:
     p.add_argument(
         "--backend",
         dest="backend",
-        default="vmcraft",
-        choices=["guestfs", "vmcraft", "namespace"],
-        help="Offline guest fix backend: vmcraft (fast pure-Python, default), namespace (experimental, isolated).",
+        default="guestkit",
+        choices=["guestkit", "guestfs", "auto"],
+        help=(
+            "Offline guest fix backend: guestkit (default, GuestKit PyO3 Guestfs), "
+            "guestfs (libguestfs), auto (guestkit then guestfs)."
+        ),
     )
     p.add_argument(
         "--container-isolation",

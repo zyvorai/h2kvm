@@ -604,19 +604,27 @@ class HookTimeoutError(HookExecutionError):
     """Hook execution timed out."""
 
 
-# VMCraft Errors
+# Guest disk backend errors
 # ============================================================================
 
 
-class VMCraftError(H2KvmError):
-    """Base class for VMCraft (VM analysis/manipulation) errors."""
+class GuestBackendError(H2KvmError):
+    """Base class for guest-disk backend (GuestKit / libguestfs) errors."""
 
 
-class MountError(VMCraftError):
+# Backward-compatible alias (VMCraft demoted to GuestKit)
+VMCraftError = GuestBackendError
+
+
+class DeviceError(GuestBackendError):
+    """Block device / privileged host command failed."""
+
+
+class MountError(GuestBackendError):
     """VM disk mounting failed."""
 
 
-class InspectionError(VMCraftError):
+class InspectionError(GuestBackendError):
     """VM inspection/analysis failed."""
 
 

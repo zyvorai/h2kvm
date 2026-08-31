@@ -17,7 +17,6 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from h2kvm.vmcraft.main import VMCraft
 
 
 class SQLServerManager:
@@ -48,7 +47,7 @@ class SQLServerManager:
         """
         self.logger = logger or logging.getLogger(__name__)
 
-    def detect_sql_server(self, g: VMCraft) -> dict[str, Any]:
+    def detect_sql_server(self, g: Any) -> dict[str, Any]:
         """
         Detect SQL Server instances on Windows VM.
 
@@ -123,7 +122,7 @@ class SQLServerManager:
 
     def migrate_sql_configuration(
         self,
-        g: VMCraft,
+        g: Any,
         sql_info: dict[str, Any],
         target_ip: str | None = None,
         target_hostname: str | None = None,
@@ -197,7 +196,7 @@ class SQLServerManager:
 
     # Private helper methods
 
-    def _detect_instances(self, g: VMCraft) -> list[dict[str, Any]]:
+    def _detect_instances(self, g: Any) -> list[dict[str, Any]]:
         """Detect SQL Server instances."""
         instances = []
 
@@ -230,7 +229,7 @@ class SQLServerManager:
 
         return instances
 
-    def _detect_databases(self, g: VMCraft, instance_name: str) -> list[dict[str, Any]]:
+    def _detect_databases(self, g: Any, instance_name: str) -> list[dict[str, Any]]:
         """Detect databases for a SQL Server instance."""
         databases = []
 
@@ -408,14 +407,14 @@ try {{
 
     def validate_databases(
         self,
-        g: VMCraft,
+        g: Any,
         sql_info: dict[str, Any],
     ) -> dict[str, Any]:
         """
         Generate database validation script.
 
         Args:
-            g: VMCraft instance
+            g: Any instance
             sql_info: SQL Server information
 
         Returns:

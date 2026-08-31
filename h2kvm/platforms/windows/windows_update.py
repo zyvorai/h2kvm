@@ -16,7 +16,6 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from h2kvm.vmcraft.main import VMCraft
 
 
 class WindowsUpdateManager:
@@ -42,7 +41,7 @@ class WindowsUpdateManager:
         """
         self.logger = logger or logging.getLogger(__name__)
 
-    def enable_windows_update(self, g: VMCraft) -> dict[str, Any]:
+    def enable_windows_update(self, g: Any) -> dict[str, Any]:
         """
         Enable Windows Update service.
 
@@ -83,14 +82,14 @@ class WindowsUpdateManager:
 
     def stage_virtio_drivers(
         self,
-        g: VMCraft,
+        g: Any,
         driver_source_path: str | None = None,
     ) -> dict[str, Any]:
         """
         Stage VirtIO drivers for Windows installation.
 
         Args:
-            g: VMCraft instance
+            g: Any instance
             driver_source_path: Optional path to VirtIO driver ISO/directory on host
 
         Returns:
@@ -165,7 +164,7 @@ class WindowsUpdateManager:
 
     def inject_driver_installation_script(
         self,
-        g: VMCraft,
+        g: Any,
         script_content: str,
         run_on_boot: bool = True,
     ) -> dict[str, Any]:
@@ -173,7 +172,7 @@ class WindowsUpdateManager:
         Inject driver installation script into Windows VM.
 
         Args:
-            g: VMCraft instance
+            g: Any instance
             script_content: PowerShell script
             run_on_boot: Schedule for first boot
 
@@ -416,7 +415,7 @@ try {{
 }}
 """
 
-    def _add_to_startup_scripts(self, g: VMCraft, script_path: str) -> None:
+    def _add_to_startup_scripts(self, g: Any, script_path: str) -> None:
         """Add script to Windows startup."""
         try:
             scripts_ini = "/Windows/System32/GroupPolicy/Machine/Scripts/scripts.ini"

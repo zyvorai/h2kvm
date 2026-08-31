@@ -255,7 +255,7 @@ func NewFormData(pf Prefill) *FormData {
 			Name:     "Step 3: Fixes",
 			Expanded: false,
 			Fields: []Field{
-				{Label: "backend", Flag: "--backend", Type: FieldSelect, Options: []string{"guestfs", "vmcraft", "namespace"}, SelectedIdx: 0},
+				{Label: "backend", Flag: "--backend", Type: FieldSelect, Options: []string{"guestkit", "guestfs", "auto"}, SelectedIdx: 0},
 				{Label: "fstab_mode", Flag: "--fstab-mode", Type: FieldSelect, Options: []string{"stabilize-all", "bypath-only", "noop"}, SelectedIdx: 0},
 				{Label: "regen_initramfs", Flag: "--regen-initramfs", Type: FieldToggle, BoolValue: true},
 				{Label: "no_grub", Flag: "--no-grub", Type: FieldToggle, BoolValue: false},

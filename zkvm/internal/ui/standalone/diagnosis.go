@@ -58,7 +58,7 @@ func DiagnoseFailure(exitCode int, logs string) *DiagnosisResult {
 			Fixes: []string{
 				"Enable --fstab-mode stabilize-all (converts to UUID)",
 				"Enable --regen-initramfs (adds virtio + LVM modules)",
-				"Check if disk has LVM: use --backend vmcraft",
+				"Check if disk has LVM: use --backend guestkit",
 			},
 		}
 	}

@@ -7,9 +7,9 @@
 Factory for creating GuestFS instances with backend selection.
 
 Supports:
-- 'auto': Try native guestfs first, fall back to VMCraft
-- 'guestfs': Force native guestfs backend (raise if unavailable)
-- 'vmcraft': Force VMCraft implementation (default)
+- 'guestkit': GuestKit Rust Guestfs via PyO3 (default)
+- 'guestfs': Native libguestfs (python3-guestfs)
+- 'auto': Try GuestKit first, fall back to libguestfs
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ class BackendType(str, Enum):
 
     AUTO = "auto"
     GUESTFS = "guestfs"
-    VMCRAFT = "vmcraft"
+    GUESTKIT = "guestkit"
 
 
 def _auto_detect_libguestfs_path() -> None:
@@ -104,6 +104,19 @@ except ImportError:
     GUESTFS_AVAILABLE = False
 
 
+def _guestkit_available() -> bool:
+    """Return True if the GuestKit Python module is importable."""
+    try:
+        import guestkit  # type: ignore  # pylint: disable=import-outside-toplevel,unused-import
+
+        return True
+    except ImportError:
+        return False
+
+
+GUESTKIT_AVAILABLE = _guestkit_available()
+
+
 def _guestfs_appliance_available() -> bool:
     """Check that libguestfs supermin appliance is usable, not just importable."""
     if not GUESTFS_AVAILABLE:
@@ -119,6 +132,32 @@ def _guestfs_appliance_available() -> bool:
         return False
 
 
+def _create_guestkit() -> Any:
+    """Instantiate GuestKit Guestfs (PyO3 bindings)."""
+    try:
+        from guestkit import Guestfs  # type: ignore  # pylint: disable=import-outside-toplevel
+    except ImportError as e:
+        raise ImportError(
+            "GuestKit backend requested but the 'guestkit' Python module is not installed.\n"
+            "    Install from the GuestKit checkout:\n"
+            "      pip install -e /path/to/guestkit\n"
+            "    Or from PyPI:\n"
+            "      pip install hypersdk-guestkit\n"
+            "    Host tools required: qemu-nbd, qemu-img.\n"
+            "    Or switch to libguestfs: backend: guestfs / --backend guestfs"
+        ) from e
+    return Guestfs()
+
+
+def _normalize_backend(backend: str) -> str:
+    """Map legacy backend names to supported values."""
+    legacy = {
+        "vmcraft": "guestkit",
+        "namespace": "guestkit",
+    }
+    return legacy.get(backend, backend)
+
+
 def create_guestfs(
     *,
     python_return_dict: bool = True,
@@ -131,100 +170,92 @@ def create_guestfs(
     Create a GuestFS instance with backend selection.
 
     Args:
-        python_return_dict: Return dicts instead of tuples (default: True)
+        python_return_dict: Return dicts instead of tuples (libguestfs only; ignored by GuestKit).
         backend: Backend to use:
-            - 'auto': Try native guestfs, fall back to VMCraft
-            - 'guestfs': Force native guestfs backend (raise if unavailable)
-            - 'vmcraft': Force VMCraft implementation (default)
-            - None: Defaults to 'vmcraft'
-        conversion_dir: Directory for VMDK conversion temp files (VMCraft only).
-                       Defaults to ~/.cache/h2kvm/conversions
-        allowed_dirs: Additional directories allowed for VM image access (security).
-                     Only applies to VMCraft backend.
+            - 'guestkit': GuestKit Rust Guestfs via PyO3 (default)
+            - 'guestfs': Force native libguestfs backend
+            - 'auto': Try GuestKit first, fall back to libguestfs
+            - None: Defaults to 'guestkit'
+            Legacy aliases 'vmcraft' and 'namespace' map to 'guestkit'.
+        conversion_dir: Unused (kept for call-site compatibility).
+        allowed_dirs: Unused (kept for call-site compatibility).
+        container_isolation: Unused (kept for call-site compatibility).
 
     Returns:
-        GuestFS instance (either guestfs.GuestFS or VMCraft)
+        GuestFS-compatible instance (guestkit.Guestfs or guestfs.GuestFS)
 
     Raises:
         RuntimeError: If requested backend is unavailable
-        ImportError: If guestfs backend requested but not available
+        ImportError: If backend requested but not installed
 
     Environment Variables:
-        H2KVM_GUESTFS_BACKEND: Override backend selection (auto, guestfs, vmcraft)
+        H2KVM_GUESTFS_BACKEND: Override backend selection (auto, guestfs, guestkit)
 
     Examples:
-        # Use VMCraft (default)
+        # Use GuestKit (default)
         g = create_guestfs()
-
-        # Explicit VMCraft
-        g = create_guestfs(backend='vmcraft')
 
         # Force native guestfs backend
         g = create_guestfs(backend='guestfs')
 
-        # Auto-select (tries native guestfs, falls back to VMCraft)
+        # Auto-select (GuestKit, then libguestfs)
         g = create_guestfs(backend='auto')
     """
+    del conversion_dir, allowed_dirs, container_isolation  # API compatibility only
+
     # Check environment variable override
     env_backend = os.environ.get("H2KVM_GUESTFS_BACKEND")
     if env_backend:
         backend = env_backend.lower()
+        if backend in ("vmcraft", "namespace"):
+            import warnings
 
-    # Default to 'vmcraft'
+            warnings.warn(
+                f"backend '{backend}' is deprecated; use 'guestkit'",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
+    # Default to GuestKit
     if backend is None:
-        backend = "vmcraft"
+        backend = "guestkit"
 
-    backend = backend.lower()
+    backend = _normalize_backend(backend.lower())
 
     # Validate backend
-    if backend not in ("auto", "guestfs", "vmcraft"):
+    if backend not in ("auto", "guestfs", "guestkit"):
         raise ValueError(
-            f"Invalid backend '{backend}'. Must be 'auto', 'guestfs', or 'vmcraft'.\n"
-            f"    Set via: backend: vmcraft (in YAML) or --backend vmcraft (CLI)\n"
-            f"    Or set environment variable: H2KVM_GUESTFS_BACKEND=vmcraft"
+            f"Invalid backend '{backend}'. Must be 'auto', 'guestfs', or 'guestkit'.\n"
+            f"    Set via: backend: guestkit (in YAML) or --backend guestkit (CLI)\n"
+            f"    Or set environment variable: H2KVM_GUESTFS_BACKEND=guestkit"
         )
 
-    # Try native guestfs backend
     if backend == "guestfs":
         if not GUESTFS_AVAILABLE:
             raise ImportError(
                 "Native guestfs backend requested but python3-guestfs is not installed.\n"
                 "    Install: dnf install python3-libguestfs  (Fedora/RHEL)\n"
                 "             apt install python3-guestfs     (Debian/Ubuntu)\n"
-                "    Or switch to VMCraft (no native dependencies): backend: vmcraft"
+                "    Or switch to GuestKit: backend: guestkit"
             )
         return guestfs.GuestFS(python_return_dict=python_return_dict)
 
-    # Try auto (native guestfs first, then VMCraft)
     if backend == "auto":
+        if GUESTKIT_AVAILABLE or _guestkit_available():
+            return _create_guestkit()
         if _guestfs_appliance_available():
             return guestfs.GuestFS(python_return_dict=python_return_dict)
-        # Fall back to VMCraft
-        # VMCraft is heavy (480+ methods); keep lazy to avoid the cost when native guestfs is used
-        from h2kvm.vmcraft import VMCraft  # pylint: disable=import-outside-toplevel
-
-        return VMCraft(
-            python_return_dict=python_return_dict,
-            conversion_dir=conversion_dir,
-            allowed_dirs=allowed_dirs,
-            container_isolation=container_isolation,
+        raise RuntimeError(
+            "No guest disk backend available.\n"
+            "    Install GuestKit: pip install hypersdk-guestkit  (or pip install -e ~/tt/guestkit)\n"
+            "    Or install libguestfs: dnf install python3-libguestfs"
         )
 
-    # VMCraft backend
-    if backend == "vmcraft":
-        # VMCraft is heavy (480+ methods); keep lazy to avoid the cost when native guestfs is used
-        from h2kvm.vmcraft import VMCraft  # pylint: disable=import-outside-toplevel
+    if backend == "guestkit":
+        return _create_guestkit()
 
-        return VMCraft(
-            python_return_dict=python_return_dict,
-            conversion_dir=conversion_dir,
-            allowed_dirs=allowed_dirs,
-            container_isolation=container_isolation,
-        )
-
-    # Should not reach here
     raise RuntimeError(
         f"Unknown disk inspection backend '{backend}'. "
-        f"Supported backends: 'vmcraft' (default), 'guestfs'. "
+        f"Supported backends: 'guestkit' (default), 'guestfs', 'auto'. "
         f"Set via --backend or the 'backend:' YAML key."
     )

@@ -775,7 +775,7 @@ _ssh "
     cd /tmp
     $REMOTE_PY -c 'from h2kvm.providers.aws_ec2 import AWSConfig; print(\"📍 AWS EC2 provider: OK\")'
     $REMOTE_PY -c 'from h2kvm.providers.azure import AzureConfig; print(\"📍 Azure provider:   OK\")'
-    $REMOTE_PY -c 'from h2kvm.vmcraft.main import VMCraft; print(\"📍 VMCraft hivex:     OK\")'
+    $REMOTE_PY -c 'import guestkit; print(\"📍 GuestKit:         OK\")' 2>/dev/null || echo "  ⚠️  GuestKit: not available"
     $REMOTE_PY -c 'from h2kvm.fixers.windows.virtio.core import _VIRTIO_CACHE_DIR; print(\"📍 VirtIO cache:     OK\")'
     $REMOTE_PY -c 'from h2kvm.fixers.offline_fixer import OfflineFSFix; print(\"📍 Offline fixer:    OK\")'
 

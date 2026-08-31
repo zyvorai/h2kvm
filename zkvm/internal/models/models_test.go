@@ -29,8 +29,8 @@ func TestDefaultConfig(t *testing.T) {
 	if !cfg.OfflineFixes.RegenInitramfs {
 		t.Error("expected initramfs regen enabled")
 	}
-	if cfg.Advanced.GuestfsBackend != "vmcraft" {
-		t.Errorf("expected vmcraft backend, got %s", cfg.Advanced.GuestfsBackend)
+	if cfg.Advanced.GuestfsBackend != "guestkit" {
+		t.Errorf("expected guestkit backend, got %s", cfg.Advanced.GuestfsBackend)
 	}
 	if cfg.Performance.MaxConcurrentOps != 4 {
 		t.Errorf("expected 4 max concurrent ops, got %d", cfg.Performance.MaxConcurrentOps)

@@ -206,7 +206,7 @@ func (m *Model) buildFields() {
 
 	// Advanced
 	m.fields[catAdvanced] = []field{
-		{label: "GuestFS Backend", kind: "select", options: []string{"vmcraft", "libguestfs", "direct"},
+		{label: "GuestFS Backend", kind: "select", options: []string{"guestkit", "guestfs", "auto"},
 			getValue: func(c models.TUIConfig) string { return c.Advanced.GuestfsBackend }},
 		{label: "Debug Mode", kind: "toggle",
 			getBool: func(c models.TUIConfig) bool { return c.Advanced.DebugMode }},

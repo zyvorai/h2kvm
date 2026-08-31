@@ -64,7 +64,7 @@ for mod in h2kvm.orchestration.orchestrator \
            h2kvm.orchestration.manifest.orchestrator \
            h2kvm.orchestration.manifest.loader \
            h2kvm.runtime.daemon.manifest_workflow_daemon \
-           h2kvm.vmcraft.nbd \
+           h2kvm.core.guestkit_client \
            h2kvm.fixers.offline_fixer \
            h2kvm.providers.aws_ec2 \
            h2kvm.providers.azure; do

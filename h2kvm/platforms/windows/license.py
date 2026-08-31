@@ -17,7 +17,6 @@ import re
 from pathlib import Path
 from typing import Any
 
-from h2kvm.vmcraft.main import VMCraft
 
 
 class WindowsLicenseManager:
@@ -45,7 +44,7 @@ class WindowsLicenseManager:
         """
         self.logger = logger or logging.getLogger(__name__)
 
-    def detect_license_type(self, g: VMCraft) -> dict[str, Any]:
+    def detect_license_type(self, g: Any) -> dict[str, Any]:
         """
         Detect Windows license type and configuration.
 
@@ -177,7 +176,7 @@ class WindowsLicenseManager:
 
     def inject_reactivation_script(
         self,
-        g: VMCraft,
+        g: Any,
         script_path: str,
         run_on_boot: bool = True,
     ) -> dict[str, Any]:
@@ -226,7 +225,7 @@ class WindowsLicenseManager:
 
     # Private helper methods
 
-    def _is_windows_vm(self, g: VMCraft) -> bool:
+    def _is_windows_vm(self, g: Any) -> bool:
         """Check if VM is Windows by checking for registry."""
         try:
             # Check for Windows registry hives
@@ -234,7 +233,7 @@ class WindowsLicenseManager:
         except Exception:
             return False
 
-    def _get_product_name(self, g: VMCraft) -> str | None:
+    def _get_product_name(self, g: Any) -> str | None:
         """Extract Windows product name from registry."""
         try:
             # Try to read ProductName from SOFTWARE hive
@@ -244,7 +243,7 @@ class WindowsLicenseManager:
         except Exception:
             return None
 
-    def _detect_license_type_from_registry(self, g: VMCraft) -> str:
+    def _detect_license_type_from_registry(self, g: Any) -> str:
         """Detect license type from Windows registry."""
         try:
             # Check for KMS indicators
@@ -264,7 +263,7 @@ class WindowsLicenseManager:
         except Exception:
             return self.LICENSE_TYPE_UNKNOWN
 
-    def _get_partial_product_key(self, g: VMCraft) -> str | None:
+    def _get_partial_product_key(self, g: Any) -> str | None:
         """Get last 5 characters of product key."""
         try:
             # In production, extract from SOFTWARE registry hive
@@ -273,7 +272,7 @@ class WindowsLicenseManager:
         except Exception:
             return None
 
-    def _get_kms_server_info(self, g: VMCraft) -> dict[str, Any]:
+    def _get_kms_server_info(self, g: Any) -> dict[str, Any]:
         """Get KMS server configuration."""
         try:
             # In production, parse from registry:
@@ -286,7 +285,7 @@ class WindowsLicenseManager:
         except Exception:
             return {}
 
-    def _get_activation_status(self, g: VMCraft) -> dict[str, Any]:
+    def _get_activation_status(self, g: Any) -> dict[str, Any]:
         """Get Windows activation status."""
         try:
             # In production, run: slmgr /dli or check registry
@@ -499,7 +498,7 @@ try {{
 }}
 """
 
-    def _create_startup_task(self, g: VMCraft, script_path: str, log_path: str) -> None:
+    def _create_startup_task(self, g: Any, script_path: str, log_path: str) -> None:
         """Create Windows startup task to run reactivation script."""
         try:
             # Create GPO startup script configuration

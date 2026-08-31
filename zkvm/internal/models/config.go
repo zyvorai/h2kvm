@@ -96,7 +96,7 @@ func DefaultConfig() TUIConfig {
 			NetworkTimeout:   300,
 		},
 		Advanced: AdvancedConfig{
-			GuestfsBackend: "vmcraft",
+			GuestfsBackend: "guestkit",
 		},
 	}
 }

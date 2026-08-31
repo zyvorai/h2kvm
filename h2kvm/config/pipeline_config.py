@@ -93,7 +93,7 @@ class DiskProcessingConfig:  # pylint: disable=too-many-instance-attributes
     luks_mapper_prefix: str = "h2kvm-crypt"
 
     # Backend
-    backend: str = "vmcraft"
+    backend: str = "guestkit"
     container_isolation: bool = DEFAULT_CONTAINER_ISOLATION
     conversion_dir: str | None = None
     allowed_dirs: list[str] | None = None
@@ -148,7 +148,7 @@ class DiskProcessingConfig:  # pylint: disable=too-many-instance-attributes
             luks_passphrase_env=getattr(args, "luks_passphrase_env", None),
             luks_keyfile=getattr(args, "luks_keyfile", None),
             luks_mapper_prefix=getattr(args, "luks_mapper_prefix", "h2kvm-crypt"),
-            backend=getattr(args, "backend", "vmcraft"),
+            backend=getattr(args, "backend", "guestkit"),
             container_isolation=getattr(args, "container_isolation", DEFAULT_CONTAINER_ISOLATION),
             conversion_dir=getattr(args, "conversion_dir", None),
             allowed_dirs=getattr(args, "allowed_dirs", None),

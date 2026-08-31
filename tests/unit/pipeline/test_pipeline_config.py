@@ -59,7 +59,7 @@ class TestDiskProcessingConfigDefaults:
 
     def test_backend_default(self):
         cfg = DiskProcessingConfig()
-        assert cfg.backend == "vmcraft"
+        assert cfg.backend == "guestkit"
 
     def test_out_format_default(self):
         cfg = DiskProcessingConfig()
@@ -134,7 +134,7 @@ class TestDiskProcessingConfigFromArgsMinimal:
         assert cfg.regen_initramfs is True
         assert cfg.fstab_mode == "stabilize-all"
         assert cfg.serial_console is True
-        assert cfg.backend == "vmcraft"
+        assert cfg.backend == "guestkit"
         assert cfg.out_format == "qcow2"
         assert cfg.compress is False
         assert cfg.compress_level is None
@@ -154,7 +154,7 @@ class TestDiskProcessingConfigFromArgsPartial:
         cfg = DiskProcessingConfig.from_args(args)
         assert cfg.workdir == "/my/dir"
         assert cfg.flatten is False
-        assert cfg.backend == "vmcraft"
+        assert cfg.backend == "guestkit"
 
     def test_partial_only_flatten(self):
         args = types.SimpleNamespace(flatten=True, flatten_format="raw")

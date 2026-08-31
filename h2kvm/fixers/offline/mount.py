@@ -263,7 +263,7 @@ class OfflineMountEngine:
                 continue
             name = f"{self.luks_mapper_prefix}{idx}"
             try:
-                g.cryptsetup_open(dev, name, key_bytes)
+                g.cryptsetup_open(dev, key_str, name)
                 mapped = f"/dev/mapper/{name}"
                 self._luks_opened[dev] = mapped
                 audit["opened"].append({"device": dev, "mapped": mapped})

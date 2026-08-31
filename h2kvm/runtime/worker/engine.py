@@ -23,7 +23,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable
 
-from ...vmcraft.nbd import NBDDeviceManager
+from ...core.guestfs_factory import create_guestfs
 from .capabilities import CapabilityDetector, CapabilityLevel, get_detector
 from .schemas import (
     ErrorInfo,
@@ -719,11 +719,10 @@ class WorkerEngine:
             )
         )
 
-        # Perform NBD-based disk inspection
+        # Perform GuestKit/libguestfs disk inspection
         inspection_report = None
         try:
             output_image = Path(result["outputs"].fixed_image)
-            nbd_manager = NBDDeviceManager(logger=self.logger)
 
             self._emit_event(
                 ProgressEvent(
@@ -734,12 +733,7 @@ class WorkerEngine:
                 )
             )
 
-            inspection_report = nbd_manager.inspect_disk(
-                image_path=output_image,
-                check_lvm=True,
-                activate_lvm=True,
-                run_fsck=False,  # Don't modify disk during inspection
-            )
+            inspection_report = self._inspect_disk_with_guestfs(output_image)
 
             self._emit_event(
                 ProgressEvent(
@@ -761,7 +755,7 @@ class WorkerEngine:
         except Exception as e:
             self.logger.warning(f"⚠️  Disk inspection failed: {e}")
             self.logger.debug(f"Inspection error details: {traceback.format_exc()}")
-            result["warnings"].append(f"NBD inspection failed: {e!s}")
+            result["warnings"].append(f"GuestFS inspection failed: {e!s}")
 
         # Add inspection report to result
         if inspection_report:
@@ -773,26 +767,64 @@ class WorkerEngine:
 
         return result
 
+    def _inspect_disk_with_guestfs(self, image_path: Path) -> dict:
+        """Inspect a disk image via GuestKit/libguestfs (replaces VMCraft NBD manager)."""
+        g = create_guestfs(backend="guestkit")
+        try:
+            g.add_drive_ro(str(image_path))
+            g.launch()
+            partitions = list(g.list_partitions() or [])
+            filesystems: list[dict] = []
+            for part in partitions:
+                entry: dict = {"device": part}
+                try:
+                    entry["fstype"] = g.vfs_type(part)
+                except Exception:  # pylint: disable=broad-exception-caught
+                    entry["fstype"] = None
+                try:
+                    entry["uuid"] = g.vfs_uuid(part)
+                except Exception:  # pylint: disable=broad-exception-caught
+                    entry["uuid"] = None
+                filesystems.append(entry)
+
+            lvm = {
+                "physical_volumes": [],
+                "volume_groups": [],
+                "logical_volumes": [],
+            }
+            try:
+                g.vgscan()
+                lvm["physical_volumes"] = list(g.pvs() or [])
+                lvm["volume_groups"] = list(g.vgs() or [])
+                lvm["logical_volumes"] = list(g.lvs() or [])
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                self.logger.debug("LVM probe skipped: %s", e)
+
+            return {
+                "partitions": [{"device": p} for p in partitions],
+                "filesystems": filesystems,
+                "lvm": lvm,
+            }
+        finally:
+            try:
+                g.shutdown()
+            except Exception:  # pylint: disable=broad-exception-caught
+                pass
+            try:
+                g.close()
+            except Exception:  # pylint: disable=broad-exception-caught
+                pass
+
     def _execute_full_migration(
         self, job_spec: JobSpec, state_machine: JobStateMachine, capability_report: dict
     ) -> dict:
         """
         Execute full migration with offline fixes (Level 3).
 
-        This is the complete VMCraft workflow with all guest modifications.
-
         Workflow:
         1. Basic conversion
-        2. NBD attachment with partition devices
-        3. Mount partitions
-        4. Apply offline fixes:
-           - fstab stabilization (UUID-based)
-           - Initramfs rebuild with virtio drivers
-           - GRUB regeneration
-           - Network configuration
-           - VMware tools removal
-        5. Unmount and disconnect
-        6. Return KVM-ready image
+        2. GuestKit/libguestfs offline fixes (fstab, initramfs, GRUB, network, tools)
+        3. Return KVM-ready image
         """
         self.logger.info("🔧 Executing FULL OFFLINE FIXES migration")
         self.logger.info("   Strategy: Complete migration with guest modifications")

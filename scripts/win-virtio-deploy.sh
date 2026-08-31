@@ -305,8 +305,8 @@ sys.path.insert(0, '.')
 
 # Mount the QCOW2 and check Windows registry for VirtIO services
 try:
-    from h2kvm.vmcraft import VMCraft
-    vm = VMCraft()
+    from guestkit import Guestfs
+    vm = Guestfs()
     vm.add_drive_opts('$QCOW2', readonly=True)
     vm.launch()
 

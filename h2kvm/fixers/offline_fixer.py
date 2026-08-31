@@ -57,7 +57,7 @@ from h2kvm.core.constants import DEFAULT_CONTAINER_ISOLATION
 from h2kvm.core.guestfs_factory import create_guestfs
 from h2kvm.core.structured_log import PhaseTimer, TraceContext, log_event
 from h2kvm.core.utils import U
-from h2kvm.vmcraft._utils import run_sudo
+from h2kvm.core.sudo import run_sudo
 
 from . import network_fixer  # type: ignore
 from .bootloader import grub as grub_fixer  # type: ignore
@@ -156,12 +156,12 @@ class OfflineFixConfig:  # pylint: disable=too-many-instance-attributes
     # Filesystem repair
     filesystem_repair_enable: bool = False
 
-    # VMCraft
+    # VMCraft demoted — GuestKit is the disk/inspect/repair layer
     conversion_dir: str | Path | None = None
     allowed_dirs: list[str] | None = None  # Additional allowed directories for security
 
     # Backend selection (see BackendType enum in core.guestfs_factory)
-    backend: str = "vmcraft"
+    backend: str = "guestkit"
 
     # Container isolation for LVM (default: enabled)
     container_isolation: bool = DEFAULT_CONTAINER_ISOLATION
@@ -449,38 +449,12 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         Open guestfs with configured backend.
 
         Backend options:
-        - "vmcraft" (default): Fast pure-Python backend with native LVM handling
-        - "guestfs": Native libguestfs with supermin appliance (full LUKS/TPM support)
-        - "namespace": Unshare-based isolation for maximum security (experimental)
-
-        Auto-switches to "guestfs" when LUKS is enabled, because libguestfs's
-        supermin appliance provides full device visibility for cryptsetup_open,
-        clevis_luks_unlock, and LVM-inside-LUKS activation.
+        - "guestkit" (default): GuestKit Rust Guestfs (qemu-nbd + LVM/LUKS)
+        - "guestfs": Native libguestfs with supermin appliance
+        - "auto": GuestKit first, then libguestfs
+        Legacy aliases "vmcraft" / "namespace" map to guestkit in create_guestfs().
         """
         backend = self.backend
-
-        # Auto-switch to libguestfs when LVM or LUKS is detected.
-        # libguestfs boots a supermin appliance with full device visibility —
-        # LVM activation, cryptsetup_open, and dracut all run inside the VM.
-        # Same technique as virt-v2v.
-        if backend == "vmcraft" and (self.luks_enable or self._quick_probe_lvm_luks()):
-            # pylint: disable=import-outside-toplevel  # lazy import: optional dependency or avoids a circular import
-            from h2kvm.core.guestfs_factory import _guestfs_appliance_available
-
-            if _guestfs_appliance_available():
-                backend = "guestfs"
-                self.logger.info(
-                    "Auto-switched to libguestfs backend (LVM/LUKS detected — "
-                    "supermin appliance provides full device visibility)"
-                )
-            else:
-                self.logger.warning(
-                    "LVM/LUKS detected but libguestfs supermin appliance not available — "
-                    "staying on VMCraft backend. "
-                    "Install: dnf install -y libguestfs libguestfs-tools supermin python3-libguestfs  "
-                    "(Debian/Ubuntu: apt install -y libguestfs-tools supermin python3-guestfs). "
-                    "Re-run `h2kvm doctor` or `libguestfs-test-tool` after installing."
-                )
 
         self.logger.debug(f"Using backend: {backend}")
 
@@ -3770,6 +3744,109 @@ WantedBy=multi-user.target
         self.report["analysis"]["timings"] = dict(self._timings)
         self.report["timestamps"]["end"] = _dt.datetime.now().isoformat()
 
+    def _uses_guestkit_repair(self) -> bool:
+        """True when GuestKit should own fstab/grub/initramfs/virtio repair."""
+        return self.backend in ("guestkit", "auto", "vmcraft", "namespace", None, "")
+
+    def _has_injectors(self) -> bool:
+        """True when h2kvm-specific injectors are configured."""
+        return bool(
+            self.inject_cloud_init_data
+            or self.firstboot_scripts_data
+            or self.network_config_inject_data
+            or self.user_config_inject_data
+            or self.service_config_inject_data
+            or self.hostname_config_inject_data
+        )
+
+    def _apply_injectors_only(self, g: Any) -> dict[str, Any]:
+        """Run h2kvm-only config injectors (GuestKit handles boot/fstab/grub repair)."""
+        not_attempted: dict[str, Any] = {"injected": False, "reason": "not_attempted"}
+        cloud_init = self._run_stage(
+            "inject_cloud_init",
+            lambda: self.inject_cloud_init(g) if hasattr(self, "inject_cloud_init") else {"enabled": False},
+            default={"enabled": False},
+        )
+        firstboot = self._run_stage(
+            "inject_firstboot",
+            lambda: firstboot_injector.inject_firstboot(self, g),
+            default=not_attempted,
+        )
+        network_config = self._run_stage(
+            "inject_network_config",
+            lambda: network_config_injector.inject_network_config(self, g),
+            default=not_attempted,
+        )
+        user_config = self._run_stage(
+            "inject_user_config",
+            lambda: user_config_injector.inject_user_config(self, g),
+            default=not_attempted,
+        )
+        service_config = self._run_stage(
+            "inject_service_config",
+            lambda: service_config_injector.inject_service_config(self, g),
+            default=not_attempted,
+        )
+        hostname_config = self._run_stage(
+            "inject_hostname_config",
+            lambda: hostname_config_injector.inject_hostname_config(self, g),
+            default=not_attempted,
+        )
+        return {
+            "cloud_init": cloud_init,
+            "firstboot": firstboot,
+            "network_config": network_config,
+            "user_config": user_config,
+            "service_config": service_config,
+            "hostname_config": hostname_config,
+        }
+
+    def _run_guestkit_pipeline(self) -> None:
+        """Delegate boot/fstab/grub/virtio repair to GuestKit; run injectors locally."""
+        from h2kvm.core import guestkit_client
+
+        gk = guestkit_client.migrate_repair(
+            self.image,
+            apply=not self.dry_run,
+            include_destructive=self.remove_vmware_tools,
+            virtio_win=self.virtio_drivers_dir,
+            verbose=self.logger.isEnabledFor(10),  # DEBUG
+        )
+        self.report["guestkit"] = gk
+        self.report["analysis"]["guestkit"] = {
+            "applied": gk.get("applied"),
+            "dry_run": gk.get("dry_run"),
+            "score": gk.get("assessment_score"),
+            "message": gk.get("message"),
+            "notes": gk.get("notes", []),
+        }
+        self.logger.info("GuestKit migration repair: %s", gk.get("message", ""))
+
+        if self._has_injectors():
+            g = self.open()
+            try:
+                with PhaseTimer(
+                    "storage_activation_start", "storage_activation_complete", phase="storage_activation"
+                ):
+                    self._activate_storage(g)
+                with PhaseTimer(
+                    "guest_validation_start", "guest_validation_complete", phase="guest_validation"
+                ):
+                    self._validate_guest(g)
+                inject_results = self._apply_injectors_only(g)
+                self.report["analysis"]["injectors"] = inject_results
+                if not self.dry_run:
+                    self._run_stage("guestfs_sync", g.sync, default=None)
+                self._safe_umount_all(g)
+            finally:
+                with contextlib.suppress(Exception):
+                    self._safe_umount_all(g)
+                with contextlib.suppress(Exception):
+                    g.close()
+
+        self.report["timestamps"]["end"] = _dt.datetime.now().isoformat()
+        self.write_report()
+
     # ── Main entry point ─────────────────────────────────────────────
 
     def run(self) -> None:
@@ -3784,6 +3861,17 @@ WantedBy=multi-user.target
 
         if self.recovery_manager:
             self.recovery_manager.save_checkpoint("start", {"image": str(self.image)})
+
+        if self._uses_guestkit_repair():
+            try:
+                self._run_guestkit_pipeline()
+                return
+            except ImportError as exc:
+                self.logger.warning("GuestKit unavailable (%s); falling back to legacy offline fixer", exc)
+            except Exception as exc:  # pylint: disable=broad-exception-caught
+                if self.backend == "guestkit":
+                    raise
+                self.logger.exception("GuestKit repair failed (%s); falling back to legacy offline fixer", exc)
 
         if self.resize:
             self.report["analysis"]["image_resize"] = self._run_stage(

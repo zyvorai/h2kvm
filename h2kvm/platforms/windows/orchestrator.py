@@ -17,7 +17,6 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from h2kvm.vmcraft.main import VMCraft
 
 from .active_directory import ActiveDirectoryManager
 from .license import WindowsLicenseManager
@@ -49,7 +48,7 @@ class WindowsMigrationOrchestrator:
         self.sql_mgr = SQLServerManager(logger)
         self.wu_mgr = WindowsUpdateManager(logger)
 
-    def detect_windows_configuration(self, g: VMCraft) -> dict[str, Any]:
+    def detect_windows_configuration(self, g: Any) -> dict[str, Any]:
         """
         Detect Windows configuration including license, domain, SQL Server.
 
@@ -98,7 +97,7 @@ class WindowsMigrationOrchestrator:
 
     def prepare_windows_migration(
         self,
-        g: VMCraft,
+        g: Any,
         config: dict[str, Any],
         output_dir: Path,
     ) -> dict[str, Any]:
@@ -106,7 +105,7 @@ class WindowsMigrationOrchestrator:
         Prepare Windows VM for migration (inject scripts, stage drivers).
 
         Args:
-            g: VMCraft instance
+            g: Any instance
             config: Windows configuration from detect_windows_configuration()
             output_dir: Output directory for scripts and artifacts
 
@@ -192,7 +191,7 @@ class WindowsMigrationOrchestrator:
 
     def _prepare_license_reactivation(
         self,
-        g: VMCraft,
+        g: Any,
         license_info: dict[str, Any],
         scripts_dir: Path,
         audit: dict[str, Any],
@@ -230,7 +229,7 @@ class WindowsMigrationOrchestrator:
 
     def _prepare_domain_rejoin(
         self,
-        g: VMCraft,
+        g: Any,
         domain_info: dict[str, Any],
         scripts_dir: Path,
         audit: dict[str, Any],
@@ -277,7 +276,7 @@ class WindowsMigrationOrchestrator:
 
     def _prepare_sql_server(
         self,
-        g: VMCraft,
+        g: Any,
         sql_info: dict[str, Any],
         scripts_dir: Path,
         audit: dict[str, Any],
