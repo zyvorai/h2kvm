@@ -5,10 +5,10 @@ GuestKit is the default disk inspection and offline repair backend for h2kvm. It
 ## Installation
 
 ```bash
-# PyPI (recommended when 1.1.0+ is published)
+# PyPI (recommended) — 1.1.0+ includes assurance + migrate_repair bindings
 pip install "hypersdk-guestkit>=1.1.0"
 
-# From source (lab / pre-release)
+# From source (development only)
 cd /path/to/guestkit
 pip install maturin
 PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 maturin build \
@@ -176,8 +176,8 @@ h2kvmctl local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
 
 | Issue | Fix |
 |-------|-----|
-| `guestkit` import error | `pip install hypersdk-guestkit>=1.1.0` or build wheel from source |
-| `hypersdk-guestkit>=1.1.0` not on PyPI | Build maturin wheel on target; see [deploy-remote.md](../deployment/deploy-remote.md) |
+| `guestkit` import error | `pip install "hypersdk-guestkit>=1.1.0"` |
+| Wrong / old wheel | `pip install -U "hypersdk-guestkit>=1.1.0"`; verify `guestkit.__version__` |
 | NBD permission denied | Run with `sudo` or `H2KVM_USE_SUDO=1` |
 | Need libguestfs | Set `backend: guestfs` or install supermin appliance |
 | `'OfflineFSFix' object has no attribute ...` | Upgrade h2kvm (injector attribute fix in offline_fixer) |

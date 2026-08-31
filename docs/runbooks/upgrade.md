@@ -221,10 +221,11 @@ git pull origin main
 pip uninstall -y h2kvm
 
 # Install new version (editable mode for development)
-pip install -e .
+pip install -e ".[full]"
 
-# Or install from PyPI (when published)
-pip install --upgrade h2kvm
+# Or from GitHub Release wheel
+pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
+pip install -U "hypersdk-guestkit>=1.1.0"
 
 # Verify version
 h2kvmctl --version

@@ -296,7 +296,8 @@ Both commands are functionally identical.
 
 ### Links
 
-- **PyPI:** https://pypi.org/project/h2kvm/
+- **Release:** https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0
+- **GuestKit:** https://pypi.org/project/hypersdk-guestkit/
 - **GitHub:** https://github.com/ssahani/h2kvm
 - **License:** Proprietary (Zyvor AI Labs)
 

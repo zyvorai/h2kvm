@@ -25,7 +25,7 @@ The **h2kvm ecosystem** is a comprehensive VM migration solution consisting of t
 
 ### 1. **h2kvm** (Python)
 **Repository:** https://github.com/ssahani/h2kvm
-**PyPI:** https://pypi.org/project/h2kvm/
+**Release:** https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0
 **Language:** Python 3.10+
 
 Production-grade VM migration toolkit that converts hypervisor disks (VMware, Hyper-V, AWS AMI, etc.) to KVM-compatible formats with automatic guest OS fixes.
@@ -318,29 +318,30 @@ Features:
 
 ### Install h2kvm (Python)
 
-#### Method 1: From PyPI
+#### Method 1: From GitHub Release (v1.1.0)
 
 ```bash
 # Install system dependencies
 sudo dnf install -y qemu-img qemu-system-x86  # Fedora/RHEL
 sudo apt install -y qemu-utils               # Ubuntu/Debian
 
-# Install h2kvm
-pip install h2kvm
+# GuestKit Python bindings (PyPI)
+pip install "hypersdk-guestkit>=1.1.0"
 
-# Full installation with all optional dependencies
-pip install 'h2kvm[full]'
+# h2kvm wheel from GitHub Release (PyPI project pending)
+pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
 
-# Install specific providers
-pip install 'h2kvm[vsphere]'  # VMware support
-pip install 'h2kvm[azure]'    # Azure support
-pip install 'h2kvm[ui]'       # Rich UI enhancements
+# Or from a clone with extras
+# pip install '.[full]'
+# pip install '.[vsphere]'  # VMware support
+# pip install '.[azure]'    # Azure support
+# pip install '.[ui]'       # Rich UI enhancements
 ```
 
 #### Method 2: From Source
 
 ```bash
-git clone https://github.com/ssahani/h2kvm
+git clone https://github.com/zyvorai/h2kvm
 cd h2kvm
 
 # Install in development mode

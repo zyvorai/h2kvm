@@ -56,27 +56,26 @@ h2kvm can be used both as a **command-line tool** and as a **Python library**. T
 
 ## Installation
 
-### From PyPI (Recommended)
-
-h2kvm is published on PyPI and can be installed with pip:
+### From GitHub Release (Recommended for v1.1.0)
 
 ```bash
-pip install h2kvm
+pip install "hypersdk-guestkit>=1.1.0"
+pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
 ```
 
-**PyPI Package:** https://pypi.org/project/h2kvm/
+**Release:** https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0
 
 ### From Source
 
 For development or to get the latest unreleased features:
 
 ```bash
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
-pip install -e .
+pip install -e ".[full]"
 ```
 
-**GitHub Repository:** https://github.com/ssahani/h2kvm
+**GitHub Repository:** https://github.com/zyvorai/h2kvm
 
 ### Dependencies
 

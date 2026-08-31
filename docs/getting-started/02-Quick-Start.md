@@ -12,7 +12,7 @@ Get started with h2kvm in 5 minutes ⚡
   - [Verify Backend (Optional)](#verify-backend-optional)
 - [2. Install h2kvm](#2-install-h2kvm)
   - [Option A: Install from Source (Recommended for Development)](#option-a-install-from-source-recommended-for-development)
-  - [Option B: Install from PyPI (When Available)](#option-b-install-from-pypi-when-available)
+  - [Option B: Install from GitHub Release](#option-b-install-from-github-release-v110)
 - [3. Your First Migration 🎯](#3-your-first-migration)
   - [Scenario: Convert a Local VMDK to QCOW2 💫](#scenario-convert-a-local-vmdk-to-qcow2)
     - [Step 1: Locate Your VMDK](#step-1-locate-your-vmdk)
@@ -124,12 +124,15 @@ pip install -e .
 h2kvmctl --help
 ```
 
-### Option B: Install from PyPI (When Available)
+### Option B: Install from GitHub Release (v1.1.0)
 
 ```bash
-pip install h2kvm
-h2kvm --help
+pip install "hypersdk-guestkit>=1.1.0"
+pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
+h2kvmctl --help
 ```
+
+> **Note:** The `h2kvm` PyPI project is not published yet. Use the release wheel or install from source (Option A). Legacy package name [`hyper2kvm`](https://pypi.org/project/hyper2kvm/) is unrelated to this 1.1.0 line.
 
 ---
 

@@ -173,7 +173,7 @@ What it does:
 2. Auto-detect container/orchestration runtime (k3s, k8s, docker, podman, libvirt)
 3. Run quickstart.sh (system packages) — full mode only
 4. Run install-deps.sh (hivex, boto3, virtio-win) — full mode only
-5. `pip install .[full]` — requires **`hypersdk-guestkit>=1.1.0`** (build maturin wheel from GuestKit source if PyPI lags)
+5. `pip install .[full]` — pulls **`hypersdk-guestkit>=1.1.0`** from PyPI
 6. Copy h2kvmctl to `/usr/local/bin/`, install h2kweb + systemd daemon
 7. Verify installation
 

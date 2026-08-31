@@ -59,7 +59,8 @@
 ## Remote Deployment (August 2026)
 
 - **Script:** `scripts/deploy-remote.sh` — rsync checkout, pip install, h2kweb, systemd daemon
-- **GuestKit dependency:** `hypersdk-guestkit>=1.1.0`; build maturin wheel from source when PyPI lags
+- **GuestKit dependency:** `hypersdk-guestkit>=1.1.0` on [PyPI](https://pypi.org/project/hypersdk-guestkit/1.1.0/)
+- **h2kvm 1.1.0:** [GitHub Release](https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0) (wheel + sdist); PyPI project pending trusted publisher
 - **Docs:** [deploy-remote.md](../deployment/deploy-remote.md), [GUESTKIT.md](../architecture/GUESTKIT.md)
 - **Validated:** Ubuntu 24.04 lab host — osboxes VMDK → qcow2 → libvirt (`ubuntu-test`)
 
@@ -67,7 +68,8 @@
 
 | Topic | Status | Notes |
 |-------|--------|-------|
-| PyPI `hypersdk-guestkit` 1.1.0 | Pending publish | Remote deploy: maturin wheel from GuestKit checkout |
+| PyPI `hypersdk-guestkit` 1.1.0 | **Published** | `pip install "hypersdk-guestkit>=1.1.0"` |
+| h2kvm 1.1.0 install | GitHub Release wheel | See README; PyPI `h2kvm` not yet configured |
 | libvirt qcow2 ownership | Documented | Debian/Ubuntu: `libvirt-qemu:kvm`; RHEL: `qemu:qemu` |
 | NBD permissions | Documented | `H2KVM_USE_SUDO=1` or run as root |
 | offline_fixer injectors | Fixed | `_has_injectors()` uses correct injector attribute names |

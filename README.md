@@ -11,10 +11,10 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 
 <br/>
 
-[![PyPI](https://img.shields.io/pypi/v/h2kvm.svg?color=F97316)](https://pypi.org/project/h2kvm/)
-[![PyPI downloads](https://img.shields.io/pypi/dm/h2kvm.svg)](https://pypi.org/project/h2kvm/)
+[![Release](https://img.shields.io/github/v/release/zyvorai/h2kvm?color=F97316)](https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0)
+[![GuestKit](https://img.shields.io/pypi/v/hypersdk-guestkit.svg)](https://pypi.org/project/hypersdk-guestkit/)
 [![Python](https://img.shields.io/badge/python-3.10+-3776AB.svg)](https://www.python.org/)
-[![Stars](https://img.shields.io/github/stars/hypersdk/h2kvm?style=social)](https://github.com/hypersdk/h2kvm/stargazers)
+[![Stars](https://img.shields.io/github/stars/zyvorai/h2kvm?style=social)](https://github.com/zyvorai/h2kvm/stargazers)
 
 <br/>
 
@@ -71,7 +71,10 @@ Hypervisor exit fails when VirtIO is missing, GRUB is wrong, or Windows registry
 Offline inspect and repair run through **[GuestKit](https://github.com/hypersdk/guestkit)** (`hypersdk-guestkit>=1.1.0`) — not a pure-Python fix engine. h2kvm delegates fstab, GRUB, initramfs, and hypervisor-aware fixes to `guestkit.run_migrate_repair()`.
 
 ```bash
-pip install h2kvm "hypersdk-guestkit>=1.1.0"
+pip install "hypersdk-guestkit>=1.1.0"
+# h2kvm 1.1.0 — GitHub Release wheel (PyPI project pending)
+pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
+# or: git clone https://github.com/zyvorai/h2kvm.git && pip install '.[full]'
 
 # VMDK → qcow2 with GuestKit offline repair (default backend)
 h2kvmctl local --vmdk ubuntu.vmdk --to-output ubuntu.qcow2 --backend guestkit
@@ -109,7 +112,7 @@ cd /path/to/guestkit
 GUESTKIT_ZYVOR_ACCEPT=1 ./scripts/deploy-remote.sh 175.110.122.71 sus --quick --key
 ```
 
-If `hypersdk-guestkit` 1.1.0 is not on PyPI yet, build the wheel on the target from the GuestKit checkout before re-running pip install. Full guide: **[docs/deployment/deploy-remote.md](docs/deployment/deploy-remote.md)**.
+GuestKit **1.1.0** installs from PyPI during deploy. Full guide: **[docs/deployment/deploy-remote.md](docs/deployment/deploy-remote.md)**.
 
 ```bash
 # End-to-end demo on target (osboxes Ubuntu VMDK)
@@ -178,7 +181,8 @@ sudo bash ~/.deployments/h2kvm/scripts/demo-libvirt.sh \
 ## 60-second quick start
 
 ```bash
-pip install h2kvm "hypersdk-guestkit>=1.1.0"
+pip install "hypersdk-guestkit>=1.1.0"
+pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
 
 # CLI migration
 h2kvmctl migrate --source vmware --vm web-prod-01 --target kvm

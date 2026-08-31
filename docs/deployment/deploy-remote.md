@@ -21,31 +21,27 @@ cd h2kvm
 |-----------|--------|
 | System packages | qemu, libvirt, KVM, OVMF, nbdkit, guestfs-tools, hivex, virtio-win ISO |
 | **h2kvm** | `pip install .[full]` → `/usr/local/bin/h2kvmctl` |
-| **GuestKit Python** | `hypersdk-guestkit>=1.1.0` from PyPI when published; otherwise build from [GuestKit](https://github.com/hypersdk/guestkit) source |
+| **GuestKit Python** | `hypersdk-guestkit>=1.1.0` from [PyPI](https://pypi.org/project/hypersdk-guestkit/) |
 | **h2kweb** | Go binary + React dashboard on port **5070** (HTTPS, auto TLS cert) |
 | **h2kvm daemon** | systemd unit watching `/var/lib/h2kvm/queue` |
 | Runtime dirs | `/run/h2kvm`, `/var/lib/h2kvm` (mode **755** for QEMU read access) |
 
 ## Deploy GuestKit CLI alongside h2kvm
 
-h2kvm depends on the **Python** package `hypersdk-guestkit`. The standalone **GuestKit CLI** (`guestkit` binary) is deployed separately:
+h2kvm depends on the **Python** package `hypersdk-guestkit` (**1.1.0+** on PyPI). The standalone **GuestKit CLI** (`guestkit` binary) is deployed separately:
 
 ```bash
 cd /path/to/guestkit
 GUESTKIT_ZYVOR_ACCEPT=1 ./scripts/deploy-remote.sh 175.110.122.71 sus --quick --key
 ```
 
-When `hypersdk-guestkit` 1.1.0 is not yet on PyPI, build the wheel on the target:
+Optional: install GuestKit Python alone:
 
 ```bash
-ssh sus@HOST 'cd ~/.deployments/guestkit && \
-  python3.12 -m pip install maturin && \
-  PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 python3.12 -m maturin build \
-    --release --features python-bindings --out /tmp/guestkit-wheels && \
-  sudo pip install /tmp/guestkit-wheels/hypersdk_guestkit-*.whl'
+pip install "hypersdk-guestkit>=1.1.0"
 ```
 
-Then re-run h2kvm pip install or use `pip install .[full] --no-deps` after the wheel is present.
+For development wheels, build with maturin from a GuestKit checkout (see [GUESTKIT.md](../architecture/GUESTKIT.md)).
 
 ## Script options
 
