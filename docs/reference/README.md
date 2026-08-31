@@ -6,7 +6,7 @@ Technical reference materials including API documentation, architecture, install
 
 ### 📖 API Reference
 - **[API Reference](api/API-Reference.md)** - Complete API documentation
-- **[GuestKit API](api/guestkit.md)** - GuestKit 480+ APIs
+- **[GuestKit API](api/guestkit.md)** - GuestKit Python assurance + Guestfs API (h2kvm facade)
 - **[Library API](api/library-api.md)** - Python library usage
 - **[Quick Reference](api/quick-reference.md)** - Essential API patterns
 
@@ -74,19 +74,15 @@ Technical reference materials including API documentation, architecture, install
 
 ---
 
-### GuestKit API (480+ Methods)
+### GuestKit Python API
 
-**[GuestKit API](api/guestkit.md)** - Complete GuestKit guest manipulation API:
-- Filesystem operations (read, write, chmod, chown)
-- Package management (yum, dnf, apt, zypper)
-- Service management (systemd, init.d)
-- OS detection and identification
-- Configuration file editing (Augeas)
-- Windows registry manipulation
-- LVM and partition management
+**[GuestKit API](api/guestkit.md)** - GuestKit assurance bindings and h2kvm facade:
+- `run_doctor`, `run_boot_inspect`, `run_migrate_plan`, `run_migrate_repair`
+- GuestFS-compatible handle for custom inspection
+- Offline fstab, GRUB, initramfs repair (Rust engine via PyO3)
 
-**Audience**: Advanced developers, custom fixers
-**Complexity**: ⭐⭐⭐ Advanced
+**Audience**: Migration automation, custom pipelines, h2kvm integrators
+**Complexity**: ⭐⭐ Intermediate
 
 ---
 

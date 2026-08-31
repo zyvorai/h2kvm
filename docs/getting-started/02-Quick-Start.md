@@ -357,12 +357,25 @@ sudo modprobe kvm_intel  # or kvm_amd
 
 **Solution:**
 ```bash
-# Run with sudo
-sudo h2kvmctl ...
+# NBD / loop operations — use sudo or wrapper
+export H2KVM_USE_SUDO=1
+sudo h2kvmctl local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
 
-# Or adjust permissions
-sudo chown $(whoami) /var/lib/libvirt/images/
+# Output directory must be readable by QEMU (mode 755)
+sudo chmod 755 /var/lib/h2kvm
 ```
+
+**libvirt import:** after conversion, qcow2 ownership must match the hypervisor user:
+
+```bash
+# Debian/Ubuntu
+sudo chown libvirt-qemu:kvm /var/lib/h2kvm/demo/myvm/myvm.qcow2
+
+# RHEL/Alma/Rocky
+sudo chown qemu:qemu /var/lib/h2kvm/demo/myvm/myvm.qcow2
+```
+
+See [GUESTKIT.md](../architecture/GUESTKIT.md#permissions-and-ownership) and [troubleshooting](../guides/troubleshooting.md#permissions-and-ownership).
 
 ### Issue: VMDK not found
 

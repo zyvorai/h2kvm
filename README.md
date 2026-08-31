@@ -23,6 +23,8 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 [![Watch the demo](https://img.shields.io/badge/Watch_the_demo-22C55E?style=for-the-badge)](https://www.youtube.com/watch?v=lQP1sd5Ftkc)
 
 **[Quick start](#60-second-quick-start)** ·
+**[GuestKit](#guestkit-integration)** ·
+**[Remote deploy](#remote-lab-deploy)** ·
 **[Demos](#see-it-in-action)** ·
 **[CE vs Enterprise](#community-vs-enterprise)** ·
 **[Docs](docs/README.md)** ·
@@ -57,10 +59,63 @@ Hypervisor exit fails when VirtIO is missing, GRUB is wrong, or Windows registry
 
 | | | | |
 |:---:|:---:|:---:|:---:|
-| **480+** APIs | **8+** input formats | **35+** guest OS | **1390+** tests |
-| CLI · TUI · Web | K8s operator | Windows path | **10K+** PyPI downloads |
+| **GuestKit** offline fix | **8+** input formats | **35+** guest OS | **1390+** tests |
+| CLI · h2kweb · zkvm | K8s operator | Windows path | **10K+** PyPI downloads |
 
-**Export with [HyperSDK](https://github.com/hypersdk/hypersdk) → convert with h2kvm → assure with [GuestKit](https://github.com/hypersdk/guestkit) → operate on [Zeus OS](https://zyvor.dev/zeus-os).**
+**Export with [HyperSDK](https://github.com/hypersdk/hypersdk) → assure with [GuestKit](https://github.com/hypersdk/guestkit) → convert & deploy with h2kvm → operate on [Zeus OS](https://zyvor.dev/zeus-os).**
+
+---
+
+## GuestKit integration
+
+Offline inspect and repair run through **[GuestKit](https://github.com/hypersdk/guestkit)** (`hypersdk-guestkit>=1.1.0`) — not a pure-Python fix engine. h2kvm delegates fstab, GRUB, initramfs, and hypervisor-aware fixes to `guestkit.run_migrate_repair()`.
+
+```bash
+pip install h2kvm "hypersdk-guestkit>=1.1.0"
+
+# VMDK → qcow2 with GuestKit offline repair (default backend)
+h2kvmctl local --vmdk ubuntu.vmdk --to-output ubuntu.qcow2 --backend guestkit
+
+# Pre-flight bootability (GuestKit CLI or Python)
+guestkit doctor ubuntu.vmdk --target kvm --explain
+```
+
+```python
+from h2kvm.core import guestkit_client
+
+report = guestkit_client.doctor("ubuntu.qcow2", target="kvm", explain=True)
+result = guestkit_client.migrate_repair("ubuntu.qcow2", target="kvm", apply=True)
+```
+
+| Doc | Description |
+|-----|-------------|
+| [GuestKit architecture](docs/architecture/GUESTKIT.md) | Backend wiring, permissions, libvirt ownership |
+| [GuestKit API](docs/reference/api/guestkit.md) | Python facade + assurance APIs |
+| [GuestKit repo](https://github.com/hypersdk/guestkit) | Doctor, Passport, fleet tools |
+
+**libvirt note (Debian/Ubuntu):** after convert, `chown libvirt-qemu:kvm` on output qcow2 before `virsh start`. See [troubleshooting](docs/guides/troubleshooting.md#permissions-and-ownership).
+
+---
+
+## Remote lab deploy
+
+Deploy h2kvm + system deps + h2kweb to a Linux host over SSH:
+
+```bash
+./scripts/deploy-remote.sh 175.110.122.71 sus --keep-sources
+
+# GuestKit CLI (separate repo)
+cd /path/to/guestkit
+GUESTKIT_ZYVOR_ACCEPT=1 ./scripts/deploy-remote.sh 175.110.122.71 sus --quick --key
+```
+
+If `hypersdk-guestkit` 1.1.0 is not on PyPI yet, build the wheel on the target from the GuestKit checkout before re-running pip install. Full guide: **[docs/deployment/deploy-remote.md](docs/deployment/deploy-remote.md)**.
+
+```bash
+# End-to-end demo on target (osboxes Ubuntu VMDK)
+sudo bash ~/.deployments/h2kvm/scripts/demo-libvirt.sh \
+  ~/demo/ubuntu2404.vmdk ubuntu-test --memory 4096 --vcpus 2
+```
 
 ---
 
@@ -123,7 +178,7 @@ Hypervisor exit fails when VirtIO is missing, GRUB is wrong, or Windows registry
 ## 60-second quick start
 
 ```bash
-pip install h2kvm
+pip install h2kvm "hypersdk-guestkit>=1.1.0"
 
 # CLI migration
 h2kvmctl migrate --source vmware --vm web-prod-01 --target kvm
@@ -143,11 +198,13 @@ kubectl apply -f operator/deploy/
 | **TUI** | zkvm terminal UI |
 | **Operator** | K8s / OpenShift — `operator/`, `olm/` |
 | **Helm** | Production charts — `helm/` |
-| **Fix engine** | Offline guest OS repairs — pure Python |
+| **Fix engine** | Offline guest OS repairs — **GuestKit** (`run_migrate_repair`) + h2kvm injectors |
 
 | You want… | Go here |
 |-----------|---------|
 | Full command reference | [docs/README.md](docs/README.md) |
+| Remote SSH deploy | [docs/deployment/deploy-remote.md](docs/deployment/deploy-remote.md) |
+| GuestKit integration | [docs/architecture/GUESTKIT.md](docs/architecture/GUESTKIT.md) |
 | Examples | [examples/](examples/) |
 | CE vs Enterprise matrix | [docs/ce-vs-enterprise.md](docs/ce-vs-enterprise.md) |
 | User stories | [docs/USER_STORIES.md](docs/USER_STORIES.md) |
@@ -199,9 +256,9 @@ CE is for labs and single-cluster PoC. Moving a Windows estate, SAN-backed waves
 
 ```mermaid
 flowchart LR
-    H["HyperSDK<br/>export"] --> K["<b>h2kvm</b><br/>convert · fix"]
-    K --> G["GuestKit<br/>assure"]
-    G --> T["KVM · KubeVirt"]
+    H["HyperSDK<br/>export"] --> G["GuestKit<br/>assure"]
+    G --> K["<b>h2kvm</b><br/>convert · fix · deploy"]
+    K --> T["KVM · KubeVirt"]
     T --> Z["Zeus OS<br/>day-2"]
 
     classDef accent fill:#F97316,stroke:#EA580C,color:#fff;
@@ -213,8 +270,8 @@ flowchart LR
 | Product | Role |
 |---------|------|
 | [HyperSDK](https://github.com/hypersdk/hypersdk) | Multi-cloud / vSphere · Nutanix export |
-| **h2kvm** *(this repo)* | Convert + offline guest fix + deploy |
-| [GuestKit](https://github.com/hypersdk/guestkit) | Offline disk doctor + Passport |
+| [GuestKit](https://github.com/hypersdk/guestkit) | Offline disk doctor + Passport + `run_migrate_repair` |
+| **h2kvm** *(this repo)* | Convert + GuestKit offline fix + libvirt/KubeVirt deploy |
 | [Zeus OS](https://zyvor.dev/zeus-os) | Day-2 KubeVirt / cloud control plane |
 | [Machina](https://zyvor.dev/machina) | Physical hypervisor OS (libvirt/KVM) |
 | [PacketWolf](https://zyvor.dev/packetwolf) | Kernel-native network intelligence |

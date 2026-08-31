@@ -14,6 +14,7 @@ This directory contains guides for deploying H2KVM in various environments, from
 ## Quick Links
 
 ### 🚀 Getting Started
+- **[Remote deploy (`deploy-remote.sh`)](deploy-remote.md)** ⭐ - SSH deploy to lab/bare-metal (h2kvm + GuestKit + h2kweb)
 - **[Production Deployment Guide](PRODUCTION_DEPLOYMENT_GUIDE.md)** - Comprehensive production deployment
 - **[Deployment Quickref](DEPLOYMENT_QUICKREF.md)** - Quick reference card
 - **[Deployment Status](DEPLOYMENT_STATUS.md)** - Current deployment capabilities

@@ -161,33 +161,30 @@ What it does:
 
 ### `deploy-remote.sh` - Remote Server Deployment
 
-Full deployment to a remote server via SSH/rsync.
+Full deployment to a remote server via SSH/rsync. **Full guide:** [docs/deployment/deploy-remote.md](../docs/deployment/deploy-remote.md)
 
 ```bash
-./scripts/deploy-remote.sh <host> [user] [password] [--quick|--uninstall]
-./scripts/deploy-remote.sh 185.165.240.5 sus            # SSH key auth
-./scripts/deploy-remote.sh 185.165.240.5 root mypass     # password auth
-./scripts/deploy-remote.sh 185.165.240.5 sus --quick     # skip system deps
-./scripts/deploy-remote.sh 185.165.240.5 sus --uninstall # remove h2kvm
+./scripts/deploy-remote.sh <host> [user] [password] [options]
+./scripts/deploy-remote.sh 175.110.122.71 sus --keep-sources --quick --skip-dashboard
 ```
 
 What it does:
-1. Rsync repo to `~/.deployments` on remote
+1. Rsync repo to `~/.deployments/h2kvm` on remote
 2. Auto-detect container/orchestration runtime (k3s, k8s, docker, podman, libvirt)
 3. Run quickstart.sh (system packages) — full mode only
 4. Run install-deps.sh (hivex, boto3, virtio-win) — full mode only
-5. pip install h2kvm + copy h2kvmctl to `/usr/local/bin/`
-6. Install systemd services (h2kvm daemon + h2kweb), restart daemon  
-   - **h2kweb:** builds automatically on your machine (`cd web && make build`) when `go` and `npm` are available; otherwise build once locally and re-run deploy
+5. `pip install .[full]` — requires **`hypersdk-guestkit>=1.1.0`** (build maturin wheel from GuestKit source if PyPI lags)
+6. Copy h2kvmctl to `/usr/local/bin/`, install h2kweb + systemd daemon
 7. Verify installation
 
+**Deploy GuestKit CLI separately** from the GuestKit repo (`./scripts/deploy-remote.sh`).
+
 Features:
-- Deploys to `~/.deployments` (hidden dir, keeps home clean)
-- Auto-detects k3s, k8s, docker, podman, containerd, CRI-O, OpenShift, libvirt
-- Supports non-root users (uses `sudo` automatically)
-- SSH key or password authentication
-- `--quick` mode skips system deps
-- Auto-links libguestfs for the target Python version
+- `--keep-sources` — retain checkout for maturin rebuilds
+- `--skip-dashboard` — skip h2kweb when only CLI needed
+- `--quick` — skip system deps
+- `--uninstall` — remove pip package and checkout
+- Sets `/var/lib/h2kvm` mode **755** for QEMU read access
 
 Environment variables: `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_PASS`, `DEPLOY_DIR`
 

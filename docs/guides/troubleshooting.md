@@ -12,6 +12,7 @@ Comprehensive troubleshooting guide for common issues and their solutions.
 6. [Boot Problems](#boot-problems)
 7. [Network Configuration](#network-configuration)
 8. [Debugging Tools](#debugging-tools)
+9. [Permissions and Ownership](#permissions-and-ownership)
 
 ---
 
@@ -685,6 +686,54 @@ qemu-img convert -f vmdk -O qcow2 input.vmdk output.qcow2 -p
 # Test driver injection only
 virt-customize -a output.qcow2 --run-command 'dracut -f'
 ```
+
+---
+
+## Permissions and Ownership
+
+GuestKit and h2kvm attach disk images via NBD or loop devices. Most hosts require **root** or passwordless **sudo**.
+
+### NBD / loop permission denied
+
+```bash
+# Option A: run migration as root
+sudo h2kvmctl local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
+
+# Option B: sudo wrapper for non-root operators
+export H2KVM_USE_SUDO=1
+h2kvmctl local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
+```
+
+Ensure `/var/lib/h2kvm` exists and is mode **755** so QEMU can read output images after conversion.
+
+### libvirt import: wrong qcow2 owner
+
+Symptom: domain defined but fails to start; logs mention permission denied on qcow2.
+
+| OS family | libvirt QEMU user | Group |
+|-----------|-------------------|-------|
+| Debian / Ubuntu | `libvirt-qemu` | `kvm` |
+| RHEL / Alma / Rocky | `qemu` | `qemu` |
+
+```bash
+# Debian/Ubuntu
+sudo chown libvirt-qemu:kvm /var/lib/h2kvm/demo/myvm/myvm.qcow2
+sudo virsh define /path/to/myvm.xml
+sudo virsh start myvm
+```
+
+See [GUESTKIT.md](../architecture/GUESTKIT.md#permissions-and-ownership) for the full matrix.
+
+### GuestKit Python not found
+
+```bash
+pip install "hypersdk-guestkit>=1.1.0"
+# Pre-release: build wheel from GuestKit source — see deploy-remote.md
+```
+
+### GuestKit import works but repair fails mid-pipeline
+
+Upgrade h2kvm if you see `OfflineFSFix` attribute errors after GuestKit repair — injector attribute names were corrected in recent releases.
 
 ---
 

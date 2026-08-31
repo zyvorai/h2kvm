@@ -101,29 +101,21 @@ Comprehensive documentation for all H2KVM features and capabilities.
 
 ### Overview
 
-GuestKit is H2KVM's native Python VM manipulation engine and the default guestfs backend, with **480+ APIs** for guest filesystem operations without requiring external C dependencies.
+GuestKit is h2kvm's default offline inspect/repair backend — a **Rust/PyO3 engine** exposed as `hypersdk-guestkit` on PyPI. h2kvm delegates fstab, GRUB, initramfs, and hypervisor-aware fixes to `guestkit.run_migrate_repair()`.
 
 **Key Capabilities:**
-- ✅ **Direct filesystem access** - Native Python, no C dependencies
-- ✅ **480+ APIs** - Comprehensive guest manipulation
-- ✅ **OS detection** - Automatic operating system identification
-- ✅ **Package management** - yum, dnf, apt, zypper support
-- ✅ **Configuration editing** - Augeas integration
-- ✅ **Windows support** - Registry, driver injection
-- ✅ **LVM support** - Logical volume management
-- ✅ **Performance optimized** - Caching, lazy loading
+- ✅ **Assurance APIs** — `run_doctor`, `run_migrate_plan`, `run_migrate_repair`
+- ✅ **GuestFS-compatible handle** — custom inspection via `Guestfs` class
+- ✅ **Offline repair** — no guest power-on required
+- ✅ **Hypervisor-aware plans** — kvm, proxmox, aws, azure, kubevirt targets
+- ✅ **Windows support** — VirtIO, registry (via GuestKit + h2kvm windows fixers)
+- ✅ **h2kvm injectors** — cloud-init, network, firstboot layered on repair
 
 **Documentation:**
-- **[Complete Guide](architecture/GUESTKIT.md)** - Full GuestKit documentation
-- **[Advanced Features](architecture/GUESTKIT.md)** - Expert-level usage
-- **[OS Detection](architecture/GUESTKIT.md)** - OS identification system
-- **[Windows Support](os-support/windows/README.md)** - Windows-specific features
-
-**Specialized Guides:**
-- **[Augeas Guide](architecture/GUESTKIT.md)** - Configuration file editing
-- **[LVM Guide](architecture/LVM_BACKENDS.md)** - Logical volume management
-- **[Partition Management](architecture/GUESTKIT.md)** - Disk partitioning
-- **[Performance Guide](architecture/GUESTKIT.md)** - Optimization techniques
+- **[GuestKit Integration](../architecture/GUESTKIT.md)** — architecture, permissions, deployment
+- **[GuestKit API Reference](../reference/api/guestkit.md)** — Python facade + assurance APIs
+- **[Remote deploy](../deployment/deploy-remote.md)** — lab/bare-metal SSH deploy
+- **[Windows Support](os-support/windows/README.md)** — Windows-specific features
 
 ---
 
@@ -249,7 +241,7 @@ h2kvm daemon status
 |---------|---------|
 | **Language** | Pure Python |
 | **Dependencies** | Minimal (qemu-nbd, qemu-img) |
-| **APIs** | 480+ |
+| **Assurance APIs** | 5 (`run_doctor`, `run_boot_inspect`, `run_migrate_plan`, `run_repair_plan`, `run_migrate_repair`) |
 | **Windows Support** | Native |
 | **Performance** | Optimized (NBD-based) |
 | **Installation** | pip install |
@@ -470,5 +462,5 @@ Choose your area of interest:
 **Version**: 0.3.0
 **Total Features**: 20+
 **Production Ready**: 15+
-**GuestKit APIs**: 480+
+**GuestKit**: Rust engine via `hypersdk-guestkit` — assurance + offline repair
 **LVM Performance**: 7x faster with 100% host protection

@@ -93,7 +93,7 @@ Visual guide to navigating H2KVM documentation.
 ```
 1. API Documentation
    ├─→ [API Reference](reference/api/API-Reference.md)
-   ├─→ [GuestKit API](architecture/GUESTKIT.md) - 480+ methods
+   ├─→ [GuestKit API](../architecture/GUESTKIT.md) - assurance + repair integration
    ├─→ [Library API](reference/api/library-api.md)
    └─→ [REST API](worker/REST_API.md)
 
@@ -243,7 +243,7 @@ API Documentation Path:
 └─→ [Quick Reference](reference/api/quick-reference.md) - Start here
     └─→ [Library API](reference/api/library-api.md) - Python usage
         └─→ [API Reference](reference/api/API-Reference.md) - Complete reference
-            └─→ [GuestKit API](architecture/GUESTKIT.md) - 480+ methods
+            └─→ [GuestKit API](../architecture/GUESTKIT.md) - assurance + repair integration
 ```
 
 ---
