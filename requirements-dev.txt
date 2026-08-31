@@ -6,7 +6,7 @@ pytest-mock>=3.15.1
 
 # AWS EC2 provider tests
 boto3>=1.26.0
-moto[ec2]>=5.0.0
+moto[ec2]>=5.2.3
 
 # Code quality
 ruff>=0.15.11
