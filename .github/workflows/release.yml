@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to publish (e.g. v1.1.0)'
+        required: true
+        type: string
 
 env:
   PYTHON_VERSION: "3.11"
@@ -16,6 +22,9 @@ jobs:
   publish-python:
     name: Publish Python Package
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/h2kvm
     permissions:
       contents: write
       id-token: write
@@ -23,6 +32,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -46,10 +57,11 @@ jobs:
           fail_on_unmatched_files: false
 
       - name: Publish to PyPI
-        continue-on-error: true
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true
+          verbose: true
 
       - name: Build DEB package
         continue-on-error: true
@@ -127,12 +139,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.ref }}
+          fetch-depth: 0
 
       - name: Generate changelog
         id: changelog
         run: |
-          git fetch --tags
-          PREV_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
+          git fetch origin '+refs/tags/*:refs/tags/*' --force
+          PREV_TAG=$(git tag -l 'v*' --sort=-v:refname | sed -n '2p')
           if [ -z "$PREV_TAG" ]; then
             CHANGELOG=$(git log --pretty=format:"- %s" --no-merges)
           else
@@ -145,6 +160,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
           body: |
             ## Changes
             ${{ steps.changelog.outputs.changelog }}
