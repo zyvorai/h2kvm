@@ -20,12 +20,8 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install hatch
-        pip install "hypersdk-guestkit>=1.0.1" || true
-
     - name: Run pylint via hatch
       run: |
-        hatch run run-pylint --disable=import-error,import-outside-toplevel,unused-import
+        pip install "hypersdk-guestkit>=1.0.1"
+        hatch run run-pylint --disable=import-error,import-outside-toplevel,unused-import || \
+          hatch run run-pylint -- --disable=import-error,import-outside-toplevel,unused-import
