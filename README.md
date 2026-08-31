@@ -14,7 +14,7 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 [![Release](https://img.shields.io/github/v/release/zyvorai/h2kvm?color=F97316)](https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0)
 [![GuestKit](https://img.shields.io/pypi/v/hypersdk-guestkit.svg)](https://pypi.org/project/hypersdk-guestkit/)
 [![Python](https://img.shields.io/badge/python-3.10+-3776AB.svg)](https://www.python.org/)
-[![Stars](https://img.shields.io/github/stars/zyvorai/h2kvm?style=social)](https://github.com/zyvorai/h2kvm/stargazers)
+[![License](https://img.shields.io/badge/license-see_LICENSE-111827.svg)](LICENSE)
 
 <br/>
 
@@ -22,8 +22,9 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 [![30-day PoC](https://img.shields.io/badge/30--day_PoC-111827?style=for-the-badge)](https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)
 [![Watch the demo](https://img.shields.io/badge/Watch_the_demo-22C55E?style=for-the-badge)](https://www.youtube.com/watch?v=lQP1sd5Ftkc)
 
-**[Quick start](#60-second-quick-start)** ·
-**[GuestKit](#guestkit-integration)** ·
+**[Install](#install)** ·
+**[Quick start](#quick-start)** ·
+**[GuestKit](#guestkit)** ·
 **[Remote deploy](#remote-lab-deploy)** ·
 **[Demos](#see-it-in-action)** ·
 **[CE vs Enterprise](#community-vs-enterprise)** ·
@@ -36,52 +37,100 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 
 ## The cutover problem — fixed before power-on
 
-Hypervisor exit fails when VirtIO is missing, GRUB is wrong, or Windows registry still points at the old hypervisor — **after** you cut over.
+Hypervisor exit fails when VirtIO is missing, GRUB is wrong, or Windows still points at the old hypervisor — **after** you cut over.
 
-**h2kvm converts the disk offline, injects drivers, and deploys to libvirt / KubeVirt / OpenStack** so first boot is a plan, not a prayer.
+**h2kvm** converts the disk offline, runs GuestKit repair, and deploys to libvirt / KubeVirt / OpenStack so first boot is planned, not guessed.
 
 ```text
   VMware · Hyper-V · cloud disks · …
               │
               ▼
-  ┌─────────────────────────────────┐
-  │  h2kvm                      │──►  convert → qcow2 / raw
-  │  h2kvmctl · h2kweb · zkvm       │──►  GuestKit offline inspect + repair
-  │  K8s / OLM operator             │──►  deploy · validate · rollback
-  └─────────────────────────────────┘
+     ┌──────────────────────────┐
+     │  h2kvm                   │──►  convert → qcow2 / raw
+     │  h2kvmctl · h2kweb       │──►  GuestKit inspect + repair
+     │  K8s / OLM operator      │──►  deploy · validate · rollback
+     └──────────────────────────┘
               │
               ▼
-       libvirt · KubeVirt · OpenShift · Glance/Nova
+       libvirt · KubeVirt · Glance/Nova
               │
               ▼
             Zeus OS (day-2)
 ```
 
-| | | | |
+| GuestKit offline fix | 8+ disk formats | 35+ guest OS | CLI · web · operator |
 |:---:|:---:|:---:|:---:|
-| **GuestKit** offline fix | **8+** input formats | **35+** guest OS | **1390+** tests |
-| CLI · h2kweb · zkvm | K8s operator | Windows path | **10K+** PyPI downloads |
 
-**Export with [HyperSDK](https://github.com/hypersdk/hypersdk) → assure with [GuestKit](https://github.com/hypersdk/guestkit) → convert & deploy with h2kvm → operate on [Zeus OS](https://zyvor.dev/zeus-os).**
+**Suite path:** [HyperSDK](https://github.com/hypersdk/hypersdk) export → [GuestKit](https://github.com/hypersdk/guestkit) assure → **h2kvm** convert & deploy → [Zeus OS](https://zyvor.dev/zeus-os) day-2.
 
 ---
 
-## GuestKit integration
+## Install
 
-Offline inspect and repair run through **[GuestKit](https://github.com/hypersdk/guestkit)** (`hypersdk-guestkit>=1.1.0`) — not a pure-Python fix engine. h2kvm delegates fstab, GRUB, initramfs, and hypervisor-aware fixes to `guestkit.run_migrate_repair()`.
+**v1.1.0** — GuestKit from PyPI; h2kvm from the GitHub Release wheel.
 
 ```bash
 pip install "hypersdk-guestkit>=1.1.0"
-# h2kvm 1.1.0 — GitHub Release wheel (PyPI project pending)
 pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
-# or: git clone https://github.com/zyvorai/h2kvm.git && pip install '.[full]'
+```
 
-# VMDK → qcow2 with GuestKit offline repair (default backend)
+From source (extras / development):
+
+```bash
+git clone https://github.com/zyvorai/h2kvm.git
+cd h2kvm
+pip install -e ".[full]"
+```
+
+Host needs Linux with `qemu-img`, `qemu-nbd`, and `losetup`. Repair and NBD mounts often need root or `H2KVM_USE_SUDO=1`.
+
+| Artifact | Where |
+|----------|--------|
+| **h2kvm 1.1.0** | [GitHub Release](https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0) (wheel + sdist) |
+| **hypersdk-guestkit ≥ 1.1.0** | [PyPI](https://pypi.org/project/hypersdk-guestkit/) |
+| **Operator image** | `ghcr.io/zyvorai/h2kvm/operator:v1.1.0` |
+
+---
+
+## Quick start
+
+```bash
+# Local VMDK → qcow2 (GuestKit repair is the default backend)
 h2kvmctl local --vmdk ubuntu.vmdk --to-output ubuntu.qcow2 --backend guestkit
 
-# Pre-flight bootability (GuestKit CLI or Python)
-guestkit doctor ubuntu.vmdk --target kvm --explain
+# Live migration from vSphere
+h2kvmctl migrate --source vmware --vm web-prod-01 --target kvm
+
+# Web dashboard
+h2kweb
+# → https://localhost:5070
+
+# Kubernetes operator
+kubectl apply -f operator/deploy/
 ```
+
+| Surface | What you get |
+|---------|----------------|
+| **CLI** | `h2kvmctl` / `h2k` |
+| **Web** | h2kweb dashboard — `web/` |
+| **TUI** | zkvm terminal UI |
+| **Operator** | K8s / OpenShift — `operator/`, `olm/` |
+| **Helm** | Production charts — `helm/` |
+| **Fix engine** | GuestKit `run_migrate_repair` + h2kvm injectors |
+
+| You want… | Go here |
+|-----------|---------|
+| Full docs | [docs/README.md](docs/README.md) |
+| Remote SSH deploy | [docs/deployment/deploy-remote.md](docs/deployment/deploy-remote.md) |
+| GuestKit wiring | [docs/architecture/GUESTKIT.md](docs/architecture/GUESTKIT.md) |
+| Examples | [examples/](examples/) |
+| CE vs Enterprise | [docs/ce-vs-enterprise.md](docs/ce-vs-enterprise.md) |
+
+---
+
+## GuestKit
+
+Offline inspect and repair run through **[GuestKit](https://github.com/hypersdk/guestkit)** — fstab, GRUB, initramfs, and hypervisor-aware fixes via `guestkit.run_migrate_repair()`. h2kvm does not re-implement that engine in pure Python.
 
 ```python
 from h2kvm.core import guestkit_client
@@ -90,35 +139,37 @@ report = guestkit_client.doctor("ubuntu.qcow2", target="kvm", explain=True)
 result = guestkit_client.migrate_repair("ubuntu.qcow2", target="kvm", apply=True)
 ```
 
-| Doc | Description |
-|-----|-------------|
-| [GuestKit architecture](docs/architecture/GUESTKIT.md) | Backend wiring, permissions, libvirt ownership |
-| [GuestKit API](docs/reference/api/guestkit.md) | Python facade + assurance APIs |
-| [GuestKit repo](https://github.com/hypersdk/guestkit) | Doctor, Passport, fleet tools |
+```bash
+# Pre-flight with the GuestKit CLI
+guestkit doctor ubuntu.vmdk --target kvm --explain
+```
 
-**libvirt note (Debian/Ubuntu):** after convert, `chown libvirt-qemu:kvm` on output qcow2 before `virsh start`. See [troubleshooting](docs/guides/troubleshooting.md#permissions-and-ownership).
+**Debian/Ubuntu libvirt:** after convert, `chown libvirt-qemu:kvm` on the output qcow2 before `virsh start`. See [troubleshooting](docs/guides/troubleshooting.md#permissions-and-ownership).
+
+More: [GUESTKIT.md](docs/architecture/GUESTKIT.md) · [API](docs/reference/api/guestkit.md) · [GuestKit repo](https://github.com/hypersdk/guestkit)
 
 ---
 
 ## Remote lab deploy
 
-Deploy h2kvm + system deps + h2kweb to a Linux host over SSH:
+One SSH command installs system deps, h2kvm, GuestKit (from PyPI), and optionally h2kweb:
 
 ```bash
 ./scripts/deploy-remote.sh 175.110.122.71 sus --keep-sources
 
-# GuestKit CLI (separate repo)
+# GuestKit CLI binary (separate repo)
 cd /path/to/guestkit
 GUESTKIT_ZYVOR_ACCEPT=1 ./scripts/deploy-remote.sh 175.110.122.71 sus --quick --key
 ```
 
-GuestKit **1.1.0** installs from PyPI during deploy. Full guide: **[docs/deployment/deploy-remote.md](docs/deployment/deploy-remote.md)**.
+End-to-end demo on the target (osboxes Ubuntu VMDK):
 
 ```bash
-# End-to-end demo on target (osboxes Ubuntu VMDK)
 sudo bash ~/.deployments/h2kvm/scripts/demo-libvirt.sh \
   ~/demo/ubuntu2404.vmdk ubuntu-test --memory 4096 --vcpus 2
 ```
+
+Full guide: **[docs/deployment/deploy-remote.md](docs/deployment/deploy-remote.md)**
 
 ---
 
@@ -168,50 +219,13 @@ sudo bash ~/.deployments/h2kvm/scripts/demo-libvirt.sh \
 ## Why teams switch
 
 | Before h2kvm | With h2kvm |
-|------------------|----------------|
+|--------------|------------|
 | 18-month “migration project” | One pipeline: browse → migrate → deploy |
 | Guest drivers break on first KVM boot | **GuestKit** offline fix for 35+ OS versions |
 | Windows needs a war room of tribal scripts | Automated VirtIO / hivex / RDP path |
 | No visibility mid-conversion | **h2kweb** progress · webhooks · email |
 | K8s teams stuck on libvirt YAML | Libvirt → **KubeVirt** one-click path |
 | Cutover outcomes unowned | Enterprise: **96.8%** automated first-boot + PS |
-
----
-
-## 60-second quick start
-
-```bash
-pip install "hypersdk-guestkit>=1.1.0"
-pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
-
-# CLI migration
-h2kvmctl migrate --source vmware --vm web-prod-01 --target kvm
-
-# Web dashboard
-h2kweb
-# → https://localhost:5070
-
-# Kubernetes operator
-kubectl apply -f operator/deploy/
-```
-
-| Surface | What you get |
-|---------|----------------|
-| **CLI** | `h2kvmctl` / `h2k` — `bin/`, `h2kvm/` |
-| **Web** | h2kweb dashboard — `web/` |
-| **TUI** | zkvm terminal UI |
-| **Operator** | K8s / OpenShift — `operator/`, `olm/` |
-| **Helm** | Production charts — `helm/` |
-| **Fix engine** | Offline guest OS repairs — **GuestKit** (`run_migrate_repair`) + h2kvm injectors |
-
-| You want… | Go here |
-|-----------|---------|
-| Full command reference | [docs/README.md](docs/README.md) |
-| Remote SSH deploy | [docs/deployment/deploy-remote.md](docs/deployment/deploy-remote.md) |
-| GuestKit integration | [docs/architecture/GUESTKIT.md](docs/architecture/GUESTKIT.md) |
-| Examples | [examples/](examples/) |
-| CE vs Enterprise matrix | [docs/ce-vs-enterprise.md](docs/ce-vs-enterprise.md) |
-| User stories | [docs/USER_STORIES.md](docs/USER_STORIES.md) |
 
 ---
 
@@ -284,14 +298,12 @@ flowchart LR
 
 ---
 
-## Support the project
-
-If h2kvm saved a cutover weekend, a ⭐ helps more teams find it.
+## Support
 
 | | |
 |---|---|
 | **Enterprise / PoC** | [Book a demo](https://zyvor.dev/contact?intent=demo) · [sales@zyvor.dev](mailto:sales@zyvor.dev) |
-| **Community** | [GitHub Issues](https://github.com/hypersdk/h2kvm/issues) |
+| **Community** | [GitHub Issues](https://github.com/zyvorai/h2kvm/issues) |
 | **Product** | [zyvor.dev/h2kvm](https://zyvor.dev/h2kvm) |
 
 ## License
