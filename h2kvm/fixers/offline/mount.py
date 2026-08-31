@@ -263,6 +263,9 @@ class OfflineMountEngine:
                 continue
             name = f"{self.luks_mapper_prefix}{idx}"
             try:
+                key_str = (
+                    key_bytes.decode("utf-8", errors="strict") if isinstance(key_bytes, bytes) else key_bytes
+                )
                 g.cryptsetup_open(dev, key_str, name)
                 mapped = f"/dev/mapper/{name}"
                 self._luks_opened[dev] = mapped

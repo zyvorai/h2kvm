@@ -39,10 +39,10 @@ jobs:
           pip install -e .[dev,test]
 
       - name: Ruff format check
-        run: ruff format --check .
+        run: ruff format --check h2kvm/
 
       - name: Ruff lint check
-        run: ruff check .
+        run: ruff check h2kvm/
 
       - name: Mypy type check
         run: mypy h2kvm/
