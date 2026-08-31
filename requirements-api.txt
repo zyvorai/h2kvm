@@ -2,7 +2,7 @@
 # Install with: pip install -r requirements-api.txt
 
 # FastAPI framework
-fastapi>=0.136.1
+fastapi>=0.141.1
 
 # ASGI server
 uvicorn[standard]>=0.24.0
