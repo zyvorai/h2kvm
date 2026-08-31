@@ -160,11 +160,22 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=3.0.0",
     "pytest-asyncio>=0.21.0",
+    "pytest-xdist>=3.3.0",
+    "pytest-mock>=3.11.0",
     "black>=22.0.0",
     "flake8>=4.0.0",
     "mypy>=0.950",
     "autoflake>=1.4",
     "argcomplete>=2.0.0",
+    "ruff>=0.1.0",
+    "bandit>=1.7.5",
+]
+
+# Test dependencies (used by CI: pip install -e .[dev,test])
+test = [
+    "boto3>=1.26.0",
+    "moto[ec2]>=5.0.0",
+    "types-PyYAML>=6.0.0",
 ]
 
 [project.urls]
@@ -226,10 +237,12 @@ dependencies = [
     "bandit>=1.7.5",
     "safety>=2.3.0",
     "pylint>=3.0.0",
+    "boto3>=1.26.0",
+    "moto[ec2]>=5.0.0",
 ]
 
 [tool.hatch.envs.default.scripts]
-pylint = "pylint h2kvm/"
+run-pylint = "python -m pylint h2kvm/"
 # Testing
 test = "pytest tests/unit/ -v --tb=short"
 test-unit = "pytest tests/unit/ -v"

@@ -35,7 +35,7 @@ func BuildKubeVirtVMSpec(validation *h2kvmv1.Validation) (*kubevirtv1.VirtualMac
 		Template: &kubevirtv1.VirtualMachineInstanceTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
 				Labels: map[string]string{
-					"app":                     "h2kvm",
+					"app":                 "h2kvm",
 					"h2kvm.io/validation": validation.Name,
 				},
 			},

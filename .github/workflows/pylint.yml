@@ -27,4 +27,4 @@ jobs:
 
     - name: Run pylint via hatch
       run: |
-        hatch run pylint
+        hatch run run-pylint

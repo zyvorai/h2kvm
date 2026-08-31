@@ -145,7 +145,7 @@ def kubevirt_os_variant(
 def kubevirt_os_variant_from_name(name: str) -> str | None:
     """Best-effort variant from VM / image filename (rhel88 → rhel8.8, etc.)."""
     n = (name or "").lower()
-    m = re.search(r"rhel[\-_]?(\d)(\d+)", n)
+    m = re.search(r"rhel[\-_]?(\d)[\._]?(\d+)", n)
     if m:
         return f"rhel{m.group(1)}.{m.group(2)}"
     m = re.search(r"rocky[\-_]?(\d+)", n)

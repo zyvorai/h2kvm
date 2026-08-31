@@ -558,7 +558,7 @@ func (r *HyperConversionReconciler) createFixerJob(ctx context.Context, hc *h2kv
 			Name:      jobName,
 			Namespace: hc.Namespace,
 			Labels: map[string]string{
-				"app":                          "h2kvm",
+				"app":                      "h2kvm",
 				"h2kvm.io/hyperconversion": hc.Name,
 				"h2kvm.io/component":       "fixer",
 			},
@@ -569,7 +569,7 @@ func (r *HyperConversionReconciler) createFixerJob(ctx context.Context, hc *h2kv
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app":                          "h2kvm",
+						"app":                      "h2kvm",
 						"h2kvm.io/hyperconversion": hc.Name,
 						"h2kvm.io/component":       "fixer",
 					},
@@ -819,7 +819,7 @@ func (r *HyperConversionReconciler) createDataVolume(ctx context.Context, hc *h2
 				"name":      dvName,
 				"namespace": hc.Namespace,
 				"labels": map[string]interface{}{
-					"app":                              "h2kvm",
+					"app":                          "h2kvm",
 					"h2kvm.io/hyperconversion":     hc.Name,
 					"h2kvm.io/hyperconversion-uid": string(hc.UID),
 				},
@@ -1080,17 +1080,17 @@ func (r *HyperConversionReconciler) createVirtualMachine(ctx context.Context, hc
 	templateSpec := map[string]interface{}{
 		"metadata": map[string]interface{}{
 			"labels": map[string]interface{}{
-				"app":                              "h2kvm",
+				"app":                          "h2kvm",
 				"h2kvm.io/hyperconversion":     hc.Name,
 				"h2kvm.io/hyperconversion-uid": string(hc.UID),
-				"kubevirt.io/vm":                   vmName,
+				"kubevirt.io/vm":               vmName,
 			},
 		},
 		"spec": map[string]interface{}{
-			"domain":            domainSpec,
-			"volumes":           volumes,
-			"networks":          networks,
-			"evictionStrategy":  vmSpec.EvictionStrategy,
+			"domain":                        domainSpec,
+			"volumes":                       volumes,
+			"networks":                      networks,
+			"evictionStrategy":              vmSpec.EvictionStrategy,
 			"terminationGracePeriodSeconds": int64(30),
 		},
 	}
@@ -1104,7 +1104,7 @@ func (r *HyperConversionReconciler) createVirtualMachine(ctx context.Context, hc
 				"name":      vmName,
 				"namespace": vmNamespace,
 				"labels": map[string]interface{}{
-					"app":                              "h2kvm",
+					"app":                          "h2kvm",
 					"h2kvm.io/hyperconversion":     hc.Name,
 					"h2kvm.io/hyperconversion-uid": string(hc.UID),
 				},

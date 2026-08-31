@@ -328,7 +328,7 @@ func (r *ValidationReconciler) createValidationPod(ctx context.Context, validati
 			Name:      fmt.Sprintf("%s-validation", validation.Name),
 			Namespace: validation.Namespace,
 			Labels: map[string]string{
-				"app":                         "h2kvm-validation",
+				"app":                     "h2kvm-validation",
 				"h2kvm.io/validation":     validation.Name,
 				"h2kvm.io/validation-uid": string(validation.UID),
 			},
@@ -369,7 +369,7 @@ func (r *ValidationReconciler) createKubeVirtVM(ctx context.Context, validation 
 			Name:      fmt.Sprintf("%s-vm", validation.Name),
 			Namespace: validation.Namespace,
 			Labels: map[string]string{
-				"app":                     "h2kvm",
+				"app":                 "h2kvm",
 				"h2kvm.io/validation": validation.Name,
 			},
 		},

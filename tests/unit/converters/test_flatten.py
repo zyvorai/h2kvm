@@ -155,7 +155,7 @@ class TestFlattenCmdAttempts:
             fmt="qcow2",
             in_fmt="vmdk",
         )
-        assert len(attempts) == 2
+        assert len(attempts) == 3
 
     def test_first_attempt_has_cache_bypass(self):
         attempts = Flatten._flatten_cmd_attempts(

@@ -302,8 +302,10 @@ class TestValidate:
 
         Convert.validate(mock_logger, img, strict=False)
         mock_logger.warning.assert_called()
-        img = tmp_path / "disk.qcow2"
-        img.write_bytes(b"\x00" * 64)
+        mock_u.run_cmd.assert_called_once()
+
+        mock_u.reset_mock()
+        mock_logger.reset_mock()
         mock_u.which.return_value = None
 
         Convert.validate(mock_logger, img)

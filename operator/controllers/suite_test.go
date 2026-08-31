@@ -77,7 +77,7 @@ var _ = BeforeSuite(func() {
 
 	// Start controller manager (disable metrics to avoid port conflicts in tests)
 	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme: scheme.Scheme,
+		Scheme:  scheme.Scheme,
 		Metrics: metricsserver.Options{BindAddress: "0"},
 	})
 	Expect(err).ToNot(HaveOccurred())

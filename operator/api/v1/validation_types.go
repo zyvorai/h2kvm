@@ -65,10 +65,10 @@ type ValidationChecks struct {
 type ValidationPhase string
 
 const (
-	PhasePending        ValidationPhase = "Pending"
-	PhaseRunning        ValidationPhase = "Running"
-	PhaseValidated      ValidationPhase = "Validated"
-	PhaseFailed         ValidationPhase = "Failed"
+	PhasePending         ValidationPhase = "Pending"
+	PhaseRunning         ValidationPhase = "Running"
+	PhaseValidated       ValidationPhase = "Validated"
+	PhaseFailed          ValidationPhase = "Failed"
 	PhaseKubeVirtCreated ValidationPhase = "KubeVirtCreated"
 )
 

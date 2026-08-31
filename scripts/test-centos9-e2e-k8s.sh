@@ -159,17 +159,17 @@ deploy_crds() {
 
     log_info "Applying CRDs..."
 
-    if kubectl apply -f k8s/operator/crds/ 2>&1 | grep -v "ServiceMonitor"; then
+    if kubectl apply -f operator/config/crd/bases/ 2>&1 | grep -v "ServiceMonitor"; then
         log_success "CRDs applied (ignoring ServiceMonitor warnings)"
     else
         log_warning "Some CRDs may have warnings"
     fi
 
     log_info "Verifying CRDs..."
-    if kubectl get crd migrationjobs.h2kvm.io &> /dev/null; then
-        log_success "MigrationJob CRD verified"
+    if kubectl get crd hyperconversions.h2kvm.io &> /dev/null; then
+        log_success "HyperConversion CRD verified"
     else
-        log_error "MigrationJob CRD not found"
+        log_error "HyperConversion CRD not found"
         exit 1
     fi
 }

@@ -19,9 +19,9 @@ import (
 
 // ValidationResult represents the JSON output from the validator
 type ValidationResult struct {
-	Success bool                              `json:"success"`
-	Checks  *h2kvmv1.ValidationChecks     `json:"checks"`
-	Error   string                            `json:"error,omitempty"`
+	Success bool                      `json:"success"`
+	Checks  *h2kvmv1.ValidationChecks `json:"checks"`
+	Error   string                    `json:"error,omitempty"`
 }
 
 // ParseValidationResults fetches pod logs via the clientset and parses
