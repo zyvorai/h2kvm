@@ -14,7 +14,7 @@ sse-starlette>=1.8.2
 gunicorn>=21.2.0
 
 # Prometheus metrics (if not already in main requirements)
-prometheus-client>=0.25.0
+prometheus-client>=0.26.0
 
 # CORS middleware (included in FastAPI but explicit for clarity)
 # starlette>=0.27.0  # Included with FastAPI
