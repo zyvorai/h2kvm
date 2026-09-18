@@ -66,7 +66,6 @@ jobs:
   lint:
     name: Code Quality
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     steps:
     - name: Checkout code
@@ -83,11 +82,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install hatch
 
-      - name: Run lint
-        run: |
-          hatch run ruff check h2kvm/
-          # The tree still has a large mypy backlog. Ruff is the gate.
-          hatch run mypy h2kvm/ --ignore-missing-imports || true
+    - name: Run lint
+      run: |
+        hatch run ruff check h2kvm/
+        # The tree still has a large mypy backlog. Ruff is the gate.
+        hatch run mypy h2kvm/ --ignore-missing-imports || true
 
   integration:
     name: Integration Tests
