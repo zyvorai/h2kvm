@@ -103,8 +103,13 @@ jobs:
 
       - name: Install envtest
         working-directory: operator
+        env:
+          # setup-envtest releases require Go 1.26 to compile. Let the
+          # toolchain download that only for this install; operator tests
+          # stay on the job's Go.
+          GOTOOLCHAIN: auto
         run: |
-          go install sigs.k8s.io/controller-runtime/tools/setup-envtest@v0.22.0
+          go install sigs.k8s.io/controller-runtime/tools/setup-envtest@v0.24.1
           setup-envtest use -p path
 
       - name: Run tests

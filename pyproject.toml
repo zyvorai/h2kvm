@@ -173,6 +173,7 @@ test = [
     "boto3>=1.26.0",
     "moto[ec2]>=5.0.0",
     "types-PyYAML>=6.0.0",
+    "pytest-benchmark>=4.0.0",
 ]
 
 [project.urls]
