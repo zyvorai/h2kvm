@@ -255,13 +255,14 @@ jobs:
 
       - name: Build documentation
         run: |
-          sphinx-build -b html docs/ docs/_build/html
+          # User docs are the Docusaurus site. Sphinx here builds the man pages.
+          make -C man man
 
       - name: Upload documentation
         uses: actions/upload-artifact@v7
         with:
           name: documentation
-          path: docs/_build/html/
+          path: man/build/man/
           retention-days: 7
 
   test-package-build:
