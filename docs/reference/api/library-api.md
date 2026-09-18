@@ -231,7 +231,7 @@ For library developers and specialized workflows:
 
 ```python
 from h2kvm.vmware.clients import VMwareClient
-from h2kvm.vmware.transports import VDDKTransport, HTTPTransport
+from h2kvm.vmware.transports import HTTPTransport
 from h2kvm.fixers.bootloader import GrubFixer
 from h2kvm.fixers.filesystem import FstabFixer
 from h2kvm.fixers.network import NetworkTopology
@@ -300,8 +300,7 @@ print(f"Found {len(vms)} VMs")
 result = client.export_vm(
     vm_name='rhel9-prod',
     output_dir='/export/vms',
-    transport='vddk',
-    vddk_libdir='/opt/vmware-vix-disklib-distrib'
+    transport='ssh',
 )
 
 print(f"Exported {result.vm_name}")
@@ -632,8 +631,7 @@ class VMwareClient:
         self,
         vm_name: str,
         output_dir: str,
-        transport: str = 'vddk',
-        vddk_libdir: str = None
+        transport: str = 'ssh',
     ):
         """Export VM to local disk."""
         ...

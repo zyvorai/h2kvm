@@ -23,10 +23,8 @@ from .errors import (
 )
 from .govc import (
     GovmomiCLI,
-    _arg_any,
     _Emitter,
     _merged_cfg,
-    _p,
     _prefer_govc,
     _require,
 )
@@ -381,7 +379,7 @@ class VsphereCommands:
     def cbt_sync(self) -> Any:
         """
         Scaffold: enable CBT + snapshot + one-shot QueryChangedDiskAreas summary.
-        (Real delta patching requires VDDK/NBD reads + applying extents into the base image.)
+        (Real delta patching requires reading changed extents and applying them to the base image.)
         """
         vm_name = _require(self.args, "vm_name")
         disk_sel = getattr(self.args, "disk", None)
@@ -476,36 +474,6 @@ class VsphereCommands:
         self.emit.emit(out, human_msg=str(res))
         return out
 
-    def vddk_download_disk(self) -> Any:
-        """Download a VM disk via the VDDK transport."""
-        vm_name = _require(self.args, "vm_name")
-        disk_sel = getattr(self.args, "disk", None)
-        local_path = Path(_require(self.args, "local_path")).expanduser()
-
-        # accept both new and legacy flag names
-        vddk_libdir = _p(_arg_any(self.args, "vddk_libdir", "vs_vddk_libdir2"))
-        vddk_thumbprint = _arg_any(self.args, "vddk_thumbprint", "vs_vddk_thumbprint2")
-        vddk_transports = _arg_any(self.args, "vddk_transports", "vs_vddk_transports2")
-        no_verify = bool(_arg_any(self.args, "no_verify", "vs_no_verify2", default=False))
-
-        opt = ExportOptions(
-            vm_name=vm_name,
-            export_mode="vddk_download",
-            output_dir=local_path.parent,
-            vddk_download_disk=disk_sel,
-            vddk_download_output=local_path,
-            vddk_libdir=vddk_libdir,
-            vddk_thumbprint=vddk_thumbprint,
-            vddk_transports=vddk_transports,
-            no_verify=no_verify,
-        )
-
-        res = self.client.export_vm(opt)
-        out = {"ok": True, "vm": vm_name, "disk": disk_sel, "local_path": str(res)}
-        self.emit.emit(out, human_msg=str(res))
-        return out
-
-
 class _ArgsShim:  # pylint: disable=too-few-public-methods  # dynamic attribute bag standing in for an argparse.Namespace
     """Tiny shim so we can reuse action funcs without argparse objects."""
 
@@ -531,7 +499,6 @@ _ACTIONS: dict[str, str] = {
     "download_vm_disk": "download_vm_disk",
     "cbt_sync": "cbt_sync",
     "download_only_vm": "download_only_vm",
-    "vddk_download_disk": "vddk_download_disk",
 }
 
 

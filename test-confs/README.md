@@ -7,7 +7,6 @@ This directory contains production-ready configuration examples for various migr
 - [Local VMDK Conversions (01-05)](#local-vmdk-conversions)
 - [vSphere Download-Only (10-11)](#vsphere-download-only)
 - [vSphere OVFTool Export (30-31)](#vsphere-ovftool-export)
-- [vSphere VDDK Operations (40-41)](#vsphere-vddk-operations)
 - [Photon OS Variations (50-53)](#photon-os-variations)
 - [LibVirt XML Templates (60-66)](#libvirt-xml-templates)
 - [Ubuntu Configurations (70)](#ubuntu-configurations)
@@ -126,22 +125,6 @@ Export VMs using VMware OVF Tool.
 
 ### 31-vsphere-ovftool-rhel-10-ovfdir.yaml
 **OVF Directory Export via OVFTool**
-
----
-
-## 💾 vSphere VDDK Operations
-
-Direct disk operations using VMware VDDK.
-
-### 40-vsphere-vddk-download-disk.yaml
-**Download VM Disks using VDDK**
-- ✅ Fast block-level transfers
-- ✅ Incremental copy support
-
-### 41-vsphere-pyvmomi-vddk.yaml
-**Force pyvmomi with VDDK**
-- ✅ Python-based vSphere access
-- ✅ VDDK library integration
 
 ---
 

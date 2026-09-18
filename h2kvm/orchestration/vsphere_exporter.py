@@ -5,7 +5,7 @@
 # h2kvm/orchestrator/vsphere_exporter.py
 """
 vSphere VM export handler.
-Supports direct export, download-only, and VDDK download modes.
+Supports direct export and download-only modes.
 """
 
 from __future__ import annotations
@@ -45,9 +45,8 @@ class VsphereExporter:
 
     Responsibilities:
     - vSphere VM identification and credential resolution
-    - Direct export based operations (VDDK/SSH transports)
+    - Direct export (govc / HTTPS, or virt-v2v over SSH)
     - download-only mode
-    - VDDK raw download mode
     - Snapshot management
     """
 
@@ -78,8 +77,8 @@ class VsphereExporter:
         Log.trace(self.logger, "🧾 _vsphere_vm_names: %s", out)
         return out
 
-    # resolves many independent CLI/config knobs (transport, VDDK options,
-    # snapshot options, output format) before driving the per-VM export loop;
+    # resolves many independent CLI/config knobs (transport, snapshot options,
+    # output format) before driving the per-VM export loop;
     # splitting it up would obscure how those knobs feed into ExportOptions
     # pylint: disable-next=too-many-locals,too-many-branches,too-many-statements
     def export_many_sync(self, out_root: Path) -> list[Path]:
@@ -87,8 +86,7 @@ class VsphereExporter:
         SYNC vSphere export path.
 
         Policy (download-first):
-          - If vs_download_only:true and vs_transport:vddk => prefer export_mode="vddk_download"
-          - Else if vs_download_only:true => export_mode="download_only"
+          - If vs_download_only:true => export_mode="download_only"
           - Else => export_mode="export" (direct export)
 
         Returns:
@@ -107,8 +105,7 @@ class VsphereExporter:
                 2,
                 "vSphere export not available — the VMwareClient module failed to import.\n"
                 "Install the required dependencies:\n"
-                "  pip install pyvmomi requests\n"
-                "If using VDDK transport, also ensure VDDK is installed.",
+                "  pip install pyvmomi requests\n",
             )
 
         if not PYVMOMI_AVAILABLE:
@@ -155,11 +152,14 @@ class VsphereExporter:
             getattr(self.args, "vs_datacenter", None) or getattr(self.args, "vc_datacenter", None) or "auto"
         )
         compute = str(getattr(self.args, "vs_compute", None) or "auto")
-        transport = str(getattr(self.args, "vs_transport", "vddk")).strip().lower()
-
-        vddk_libdir = getattr(self.args, "vs_vddk_libdir", None)
-        vddk_thumbprint = getattr(self.args, "vs_vddk_thumbprint", None)
-        vddk_transports = getattr(self.args, "vs_vddk_transports", None)
+        transport = str(getattr(self.args, "vs_transport", "ssh") or "ssh").strip().lower()
+        if transport == "vddk":
+            raise Fatal(
+                2,
+                "VDDK transport was removed.\n"
+                "Export with govc (export.ovf / export.ova) or HTTPS /folder, "
+                "or set vs_transport: ssh for virt-v2v.",
+            )
 
         snapshot_moref = getattr(self.args, "vs_snapshot_moref", None)
         create_snapshot = bool(getattr(self.args, "vs_create_snapshot", False))
@@ -168,20 +168,11 @@ class VsphereExporter:
         out_format = str(getattr(self.args, "out_format", "qcow2"))
 
         download_only = bool(getattr(self.args, "vs_download_only", False))
-        prefer_vddk_download = bool(getattr(self.args, "vs_prefer_vddk_download", True))
-
-        # Optional vddk_download extras
-        vddk_download_disk = getattr(self.args, "vs_vddk_download_disk", None) or getattr(
-            self.args, "vddk_download_disk", None
-        )
-        vddk_download_output = getattr(self.args, "vs_vddk_download_output", None) or getattr(
-            self.args, "vddk_download_output", None
-        )
 
         Log.trace(
             self.logger,
             "🧷 vSphere export knobs: host=%s port=%s insecure=%s timeout=%s dc=%s compute=%s "
-            "transport=%s download_only=%s prefer_vddk_download=%s",
+            "transport=%s download_only=%s",
             getattr(creds, "host", None),
             port,
             insecure,
@@ -190,7 +181,6 @@ class VsphereExporter:
             compute,
             transport,
             download_only,
-            prefer_vddk_download,
         )
 
         out_images: list[Path] = []
@@ -232,12 +222,7 @@ class VsphereExporter:
                     job_dir = out_root / "vsphere-export" / vm_name
                     U.ensure_dir(job_dir)
 
-                    export_mode = "export"
-                    if download_only:
-                        if prefer_vddk_download and transport == "vddk":
-                            export_mode = "vddk_download"
-                        else:
-                            export_mode = "download_only"
+                    export_mode = "download_only" if download_only else "export"
 
                     Log.trace(self.logger, "🧭 export_mode=%s job_dir=%s", export_mode, job_dir)
 
@@ -248,19 +233,10 @@ class VsphereExporter:
                         compute=compute,
                         transport=transport,
                         no_verify=bool(getattr(self.args, "vs_no_verify", False)),
-                        vddk_libdir=Path(vddk_libdir).expanduser().resolve() if vddk_libdir else None,
-                        vddk_thumbprint=str(vddk_thumbprint) if vddk_thumbprint else None,
-                        vddk_snapshot_moref=snap_moref,
-                        vddk_transports=str(vddk_transports) if vddk_transports else None,
                         output_dir=job_dir,
                         output_format=out_format,
                         extra_args=extra_args,
-                        vddk_download_disk=str(vddk_download_disk)
-                        if vddk_download_disk is not None
-                        else None,
-                        vddk_download_output=Path(vddk_download_output).expanduser().resolve()
-                        if vddk_download_output
-                        else None,
+                        govc_export_snapshot=snap_moref,
                     )
 
                     # This must be SYNC in VMwareClient implementation
@@ -269,11 +245,6 @@ class VsphereExporter:
 
                     if export_mode == "download_only":
                         self.logger.info("⬇️ vSphere download-only OK: %s -> %s", vm_name, out_path)
-                        continue
-
-                    if export_mode == "vddk_download":
-                        out_images.append(Path(out_path))
-                        self.logger.info("⬇️ vSphere VDDK download OK: %s -> %s", vm_name, out_path)
                         continue
 
                     # export_mode == "export": discover artifacts

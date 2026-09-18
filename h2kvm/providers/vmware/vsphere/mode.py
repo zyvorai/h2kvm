@@ -215,21 +215,13 @@ def _safe_rel_ds_path(ds_path: str) -> str:
 
 # Transport Policy Functions
 def _get_transport_preference(args: argparse.Namespace) -> str:
-    """Get transport preference for datastore file downloads.
-
-    New default: HTTPS (stable).
-    VDDK: EXPERIMENTAL; only if explicitly requested.
-    """
+    """Datastore file downloads use HTTPS. VDDK is not a transport."""
     v = getattr(args, "vs_transport", None) or getattr(args, "vs_download_transport", None)
     if not v:
         v = os.environ.get("VMDK2KVM_VSPHERE_TRANSPORT") or os.environ.get("VSPHERE_TRANSPORT")
     v = str(v).strip().lower() if v else "https"
-    if v in ("https", "http", "folder", "pyvmomi"):
-        return "https"
     if v == "vddk":
-        return "vddk"
-    if v == "auto":
-        return "https"  # auto now means: stable first
+        logging.getLogger(__name__).warning("VDDK transport was removed; using HTTPS /folder instead.")
     return "https"
 
 
@@ -398,7 +390,7 @@ def _get_response_status(e: requests.RequestException) -> int | None:
 
 
 # File Download Policy Functions
-# pylint: disable-next=too-many-arguments  # transport-policy dispatch needs the full download address/config surface it forwards to the VDDK/HTTPS helpers
+# pylint: disable-next=too-many-arguments  # forwards the full HTTPS download address/config surface
 def _download_one_file_with_policy(
     client: VMwareClient,
     args: argparse.Namespace,
@@ -412,29 +404,7 @@ def _download_one_file_with_policy(
     on_bytes: Callable[[int, int], None] | None = None,
     chunk_size: int = _DEFAULT_CHUNK_SIZE,
 ) -> None:
-    """
-    Download a file with transport policy.
-
-    Policy order:
-      - If user explicitly requested VDDK: try VDDK (EXPERIMENTAL), then fall back to HTTPS.
-      - Default: HTTPS /folder.
-    """
-    pref = _get_transport_preference(args)
-
-    if pref == "vddk":
-        ok = _try_vddk_download(
-            client=client,
-            ds_name=ds_name,
-            ds_path=ds_path,
-            local_path=local_path,
-            dc_name=dc_name,
-            chunk_size=chunk_size,
-            on_bytes=on_bytes,
-            _args=args,
-        )
-        if ok:
-            return
-
+    """Download a datastore file over HTTPS /folder."""
     _download_one_folder_file(
         client=client,
         vc_host=vc_host,
@@ -447,54 +417,6 @@ def _download_one_file_with_policy(
         on_bytes=on_bytes,
         chunk_size=chunk_size,
     )
-
-
-# pylint: disable-next=too-many-arguments  # mirrors the sibling HTTPS download helper's full transfer-address/config surface
-def _try_vddk_download(
-    *,
-    client: VMwareClient,
-    ds_name: str,
-    ds_path: str,
-    local_path: Path,
-    dc_name: str,
-    chunk_size: int,
-    on_bytes: Callable[[int, int], None] | None,
-    _args: argparse.Namespace,
-) -> bool:
-    """
-    Try VDDK download (experimental opt-in).
-
-    Returns:
-      True if VDDK download succeeded, False if unavailable/failed (caller should fall back).
-    """
-    logger = logging.getLogger(__name__)
-    logger.warning("VDDK transport requested: EXPERIMENTAL (opt-in). Will fall back on failure.")
-
-    fn = getattr(client, "download_datastore_file_vddk", None)
-    if not callable(fn):
-        logger.warning(
-            "VDDK requested but VMwareClient has no download_datastore_file_vddk(); falling back to HTTPS."
-        )
-        return False
-
-    try:
-        # Prefer keyword form (more stable)
-        fn(
-            datastore=ds_name,
-            ds_path=ds_path,
-            local_path=local_path,
-            dc_name=dc_name,
-            chunk_size=chunk_size,
-            on_bytes=on_bytes,
-        )
-        return True
-    except TypeError:
-        # Back-compat for older signatures
-        fn(ds_name, ds_path, local_path)
-        return True
-    except Exception as e:  # pylint: disable=broad-exception-caught  # VDDK is experimental/optional; any failure must fall back to HTTPS, not crash the export
-        logger.warning("VDDK download failed; falling back to HTTPS folder: %s", _short_exc(e))
-        return False
 
 
 # Progress UI Functions (no-op stubs; Rich progress has been removed)
@@ -847,7 +769,7 @@ class VsphereMode:
     CLI entry for vSphere actions.
 
     Policy:
-      - VDDK is EXPERIMENTAL: never auto-run it. Only attempt if user explicitly sets vs_transport=vddk.
+      - Datastore downloads use HTTPS /folder. VDDK is not a transport.
       - Export priority: OVF -> OVA -> HTTP/HTTPS folder
       - Control-plane: prefer govc (inventory/export). pyvmomi mainly for /folder cookie downloads.
     """
@@ -1516,5 +1438,4 @@ class VsphereMode:
             "govc_bin": getattr(self.govc, "govc_bin", None) if self.govc.available() else None,
             "vs_datastore_dir": str(override) if override else None,
             "transport_pref": _get_transport_preference(self.args),
-            "vddk_experimental": True,
         }

@@ -8,7 +8,6 @@ This guide covers h2kvm's direct export capabilities for VMware vSphere environm
 - [Export Modes](#export-modes)
 - [ExportOptions API](#exportoptions-api)
 - [Export Workflows](#export-workflows)
-- [VDDK vs HTTP Download](#vddk-vs-http-download)
 - [Authentication](#authentication)
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
@@ -19,8 +18,7 @@ h2kvm provides multiple methods to export VMs from vSphere environments:
 
 1. **Direct Export** - Convert VMware disks directly to QCOW2/RAW using internal converters
 2. **HTTP Download** - Download VM folders via vSphere's HTTP API
-3. **VDDK Download** - Pull individual disks using VMware's VDDK library
-4. **OVF/OVA Export** - Export as standard OVF or OVA packages
+3. **OVF/OVA Export** - Export as standard OVF or OVA packages over an HTTP NFC lease
 
 All export modes support:
 - Snapshot management (create, use existing, no snapshot)
@@ -83,37 +81,13 @@ options = ExportOptions(
 await client.export_vm(options)
 ```
 
-### 3. VDDK Single-Disk (`export_mode="vddk_download"`)
-
-Pulls a single disk as raw bytes using VMware VDDK.
-
-**Features:**
-- Fast binary transfer
-- Block-level access
-- Efficient for single disks
-- Requires VDDK library
-
-**Use Case:** Extract specific disks without full VM download
-
-**Example:**
-```python
-options = ExportOptions(
-    vm_name='database-vm',
-    output_dir='/data/disks',
-    export_mode='vddk_download',
-    disk_index=0  # First disk only
-)
-
-await client.export_vm(options)
-```
-
-### 4. OVF Export (`export_mode="ovf_export"`)
+### 3. OVF Export (`export_mode="ovf_export"`)
 
 Exports VM as standard OVF format using VMware APIs.
 
 **Use Case:** Portable VM format for import to other platforms
 
-### 5. OVA Export (`export_mode="ova_export"`)
+### 4. OVA Export (`export_mode="ova_export"`)
 
 Exports VM as single OVA archive file.
 
@@ -132,7 +106,7 @@ options = ExportOptions(
     output_dir='/exports',
 
     # Export mode
-    export_mode='export',  # 'export', 'download_only', 'vddk_download', 'ovf_export', 'ova_export'
+    export_mode='export',  # 'export', 'download_only', 'ovf_export', 'ova_export'
 
     # Snapshot handling
     snapshot_mode='create',  # 'create', 'use_existing', 'none'
@@ -162,7 +136,6 @@ options = ExportOptions(
 #### Export Mode
 - `export` - Full conversion with guest modifications
 - `download_only` - Raw file download via HTTP
-- `vddk_download` - Single disk via VDDK
 - `ovf_export` - Standard OVF format
 - `ova_export` - Single OVA archive
 
@@ -242,30 +215,6 @@ options = ExportOptions(
 
 await client.export_vm(options)
 ```
-
-## VDDK vs HTTP Download
-
-### Use VDDK When:
-- ✅ Exporting single disks
-- ✅ Need block-level access
-- ✅ Want fastest transfer speeds
-- ✅ Have VDDK library installed
-
-### Use HTTP When:
-- ✅ Need complete VM folder
-- ✅ Want all VM metadata
-- ✅ No VDDK library available
-- ✅ Firewall restricts VDDK ports
-
-### Comparison
-
-| Feature | VDDK | HTTP Download |
-|---------|------|---------------|
-| Speed | Fastest | Fast |
-| Files | Single disk | All VM files |
-| Requirements | VDDK library | HTTPS only |
-| Ports | 902 (NBD) | 443 (HTTPS) |
-| Metadata | No | Yes (VMX, NVRAM) |
 
 ## Authentication
 
@@ -401,8 +350,7 @@ export VSPHERE_DEBUG=1
 **Solutions:**
 1. Use `export_mode='download_only'` for raw files
 2. Increase `max_workers` for parallel downloads
-3. Use VDDK instead of HTTP for single disks
-4. Check network bandwidth between h2kvm host and vSphere
+3. Check network bandwidth between h2kvm host and vSphere
 
 ### Snapshot Failures
 
@@ -413,18 +361,6 @@ export VSPHERE_DEBUG=1
 2. Check datastore has sufficient space
 3. Use `snapshot_memory=False` to avoid RAM dump
 4. Try `snapshot_mode='none'` with VM powered off
-
-### VDDK Not Found
-
-**Error:** `VDDK library not found`
-
-**Solution:**
-```bash
-# Install VDDK
-wget https://developer.vmware.com/downloads/.../VMware-vix-disklib-*.tar.gz
-tar xzf VMware-vix-disklib-*.tar.gz
-export LD_LIBRARY_PATH=/path/to/vmware-vix-disklib/lib64:$LD_LIBRARY_PATH
-```
 
 ### Permission Denied
 

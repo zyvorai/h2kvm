@@ -7,8 +7,6 @@
 VMware transport/download mechanisms.
 
 This package provides various transport methods for downloading VM data:
-- vddk_client: VMware VDDK-based transport
-- vddk_loader: VDDK library loader and wrapper
 - http_client: HTTPS download client
 - http_progress: Progress reporters for HTTP downloads
 - ovftool_client: VMware ovftool-based transport

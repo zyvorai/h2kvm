@@ -126,8 +126,6 @@ def _is_transient_vpx_error(stderr_tail: str) -> bool:
         "path does not specify a host system",
         "cannot find datacenter",
         "cannot locate host",
-        "vddk",
-        "libvixdisklib",
         "thumbprint",
     )
     return any(n in s for n in needles)
@@ -160,12 +158,6 @@ def _is_transient_vpx_error(stderr_tail: str) -> bool:
 #     if not self.si:
 #         raise VMwareError("Not connected to vSphere; cannot export. Call connect() first.")
 #
-#     # If using VDDK with verification enabled, compute thumbprint automatically.
-#     if opt.transport.strip().lower() == "vddk" and (not opt.vddk_thumbprint) and (not opt.no_verify):
-#         self.logger.info("Computing TLS thumbprint (SHA1) for %s:%s ...", self.host, self.port)
-#         tp = await asyncio.to_thread(self.compute_server_thumbprint_sha1, self.host, self.port, 10.0)
-#         opt = ExportOptions(**{**opt.__dict__, "vddk_thumbprint": tp})
-#
 #     pwfile = self._write_password_file(opt.output_dir)
 #     try:
 #         argv = await asyncio.to_thread(self._build_export_cmd, opt, password_file=pwfile)
@@ -192,7 +184,7 @@ def _is_transient_vpx_error(stderr_tail: str) -> bool:
 #
 #             msg = _pretty_export_failure(rc, err_tail, argv)
 #             if _is_transient_vpx_error(err_tail):
-#                 msg += "\n(looks like a vpx/vddk connectivity/auth/path issue; stderr tail above is the clue)"
+#                 msg += "\n(looks like a vpx connectivity/auth/path issue; stderr tail above is the clue)"
 #             raise VMwareError(msg)
 #
 #         self.logger.info("export finished OK -> %s", opt.output_dir)

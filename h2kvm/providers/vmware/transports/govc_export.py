@@ -627,7 +627,7 @@ def _fmt_elapsed(start_time: float) -> tuple[int, int]:
 
 
 def _check_independent_disks(spec: GovcExportSpec, logger: Any) -> None:
-    """Warn about disks with 'independent' mode that may fail with VDDK >= 7.0."""
+    """Warn about disks in independent mode, which cannot be snapshotted for export."""
     try:
         full_env = dict(os.environ)
         if spec.env:
@@ -657,8 +657,8 @@ def _check_independent_disks(spec: GovcExportSpec, logger: Any) -> None:
                 _warn(logger, f"  - {d}")
             _warn(
                 logger,
-                "Independent disks may fail with VDDK >= 7.0. "
-                "Consider changing disk mode to 'dependent' in vSphere before migration.",
+                "Independent disks cannot be included in a snapshot-based export. "
+                "Change the disk mode to persistent in vSphere before migration.",
             )
     except Exception as exc:  # pylint: disable=broad-exception-caught  # best-effort advisory check; govc/JSON errors must not abort the export
         _debug(logger, f"Independent disk check skipped: {exc}")

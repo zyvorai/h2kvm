@@ -186,8 +186,7 @@ vsphere mode
 
     # Export method
     vs_action: export_vm
-    vs_transport: vddk
-    vs_vddk_libdir: /opt/vmware-vix-disklib-distrib
+    vs_transport: ssh
 
 hyperv mode
 -----------
@@ -293,8 +292,7 @@ vSphere Migration with virt-v2v
     dc_name: production-dc
     vm_name: app-server-prod
     vs_action: export_vm
-    vs_transport: vddk
-    vs_vddk_libdir: /opt/vmware-vix-disklib-distrib
+    vs_transport: ssh
     vs_v2v: true
     output_dir: ./migrated-vms
     out_format: qcow2

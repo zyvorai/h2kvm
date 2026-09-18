@@ -22,6 +22,7 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 [![30-day PoC](https://img.shields.io/badge/30--day_PoC-111827?style=for-the-badge)](https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)
 [![Watch the demo](https://img.shields.io/badge/Watch_the_demo-22C55E?style=for-the-badge)](https://www.youtube.com/watch?v=lQP1sd5Ftkc)
 
+**[No VDDK](#no-vddk)** ·
 **[Install](#install)** ·
 **[Quick start](#quick-start)** ·
 **[GuestKit](#guestkit)** ·
@@ -62,6 +63,43 @@ Hypervisor exit fails when VirtIO is missing, GRUB is wrong, or Windows still po
 |:---:|:---:|:---:|:---:|
 
 **Suite path:** [HyperSDK](https://github.com/hypersdk/hypersdk) export → [GuestKit](https://github.com/hypersdk/guestkit) assure → **h2kvm** convert & deploy → [Zeus OS](https://zyvor.dev/zeus-os) day-2.
+
+---
+
+## No VDDK
+
+Public downloads of VMware’s Virtual Disk Development Kit [ended on 10 September 2026](https://www.theregister.com/virtualization/2026/09/10/vmware-defends-ending-downloads-of-sdk-that-helps-vm-backups-or-migrations-to-rivals/5295421). That SDK is what Nutanix Move, virt-v2v, and most VMware-to-KVM tools used to open disks. The use VMware still defends is backup and recovery for select partners — not migration, and not a customer entitlement.
+
+**h2kvm** and **[Transiva](https://github.com/zyvorai/transiva)** do not take that path. Disks leave through the vSphere API and NFS, then convert offline.
+
+```text
+  vSphere                          Nutanix AHV
+     │                                  │
+     ▼                                  ▼
+  NFC lease (HTTPS)                 NFS pickup
+  govc export.ovf / .ova            storage containers
+  datastore /folder
+     │                                  │
+     └──────────────┬───────────────────┘
+                    ▼
+              h2kvm + GuestKit
+           convert · repair · deploy
+                    │
+                    ▼
+         libvirt · KubeVirt · Zeus OS
+
+  VDDK  —  not on this path
+```
+
+| Path | How disks move | VDDK |
+|------|----------------|:----:|
+| **[Transiva](https://github.com/zyvorai/transiva) NFC** | govmomi HTTP NFC lease writes OVF plus disks | No |
+| **h2kvm `govc`** | `export.ovf`, then `export.ova` — the same NFC lease | No |
+| **Datastore HTTPS** | `/folder` download of datastore files | No |
+| **Nutanix** | Transiva NFS pickup of storage containers | No |
+| **Disk already on disk** | `h2kvmctl local` converts VMDK, VHDX, raw, and the other formats | No |
+
+Copying the disk was never the hard part. GuestKit still has to fix VirtIO, GRUB, and Windows before power-on.
 
 ---
 
@@ -274,7 +312,7 @@ CE is for labs and single-cluster PoC. Moving a Windows estate, SAN-backed waves
 
 ```mermaid
 flowchart LR
-    H["HyperSDK<br/>export"] --> G["GuestKit<br/>assure"]
+    H["Transiva<br/>export"] --> G["GuestKit<br/>assure"]
     G --> K["<b>h2kvm</b><br/>convert · fix · deploy"]
     K --> T["KVM · KubeVirt"]
     T --> Z["Zeus OS<br/>day-2"]
@@ -287,7 +325,7 @@ flowchart LR
 
 | Product | Role |
 |---------|------|
-| [HyperSDK](https://github.com/hypersdk/hypersdk) | Multi-cloud / vSphere · Nutanix export |
+| [Transiva](https://github.com/zyvorai/transiva) | vSphere · Nutanix export · HyperSDK-compatible `hyper*` aliases |
 | [GuestKit](https://github.com/hypersdk/guestkit) | Offline disk doctor + Passport + `run_migrate_repair` |
 | **h2kvm** *(this repo)* | Convert + GuestKit offline fix + libvirt/KubeVirt deploy |
 | [Zeus OS](https://zyvor.dev/zeus-os) | Day-2 KubeVirt / cloud control plane |

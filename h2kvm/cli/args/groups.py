@@ -1281,12 +1281,12 @@ def _add_ovftool_knobs(p: argparse.ArgumentParser) -> None:
 
 
 def _add_vsphere_export_and_download_knobs(p: argparse.ArgumentParser) -> None:
-    # vSphere export knobs, download-only knobs, VDDK knobs...
+    # vSphere export knobs and download-only knobs.
     p.add_argument(
         "--vs-export",
         dest="vs_export",
         action="store_true",
-        help="EXPERIMENTAL: export VM(s) directly from vSphere (VDDK/SSH) and then run normal pipeline.",
+        help="Export VM(s) from vSphere (govc or HTTPS) and then run the normal pipeline.",
     )
     p.add_argument(
         "--vs-vm", dest="vs_vm", default=None, help="VM name to export (alternative to --vm-name)."
@@ -1299,26 +1299,13 @@ def _add_vsphere_export_and_download_knobs(p: argparse.ArgumentParser) -> None:
         help="Datacenter name (default: ha-datacenter)",
     )
 
-    # IMPORTANT: no default here (avoids silently selecting VDDK)
+    # virt-v2v input transport. Disk export itself uses govc or HTTPS, not VDDK.
     p.add_argument(
         "--vs-transport",
         dest="vs_transport",
         default=None,
-        choices=["vddk", "ssh"],
-        help="EXPERIMENTAL export transport method (set explicitly).",
-    )
-
-    p.add_argument(
-        "--vs-vddk-libdir",
-        dest="vs_vddk_libdir",
-        default=None,
-        help="Path to VDDK libdir (if using vddk transport)",
-    )
-    p.add_argument(
-        "--vs-vddk-thumbprint",
-        dest="vs_vddk_thumbprint",
-        default=None,
-        help="vCenter TLS thumbprint for VDDK verification",
+        choices=["ssh"],
+        help="virt-v2v input transport (ssh). Datastore downloads always use HTTPS.",
     )
     p.add_argument(
         "--vs-snapshot-moref",
@@ -1411,32 +1398,6 @@ def _add_vsphere_export_and_download_knobs(p: argparse.ArgumentParser) -> None:
         help="download-only VM folder: treat any failed/missing download as fatal.",
     )
 
-    # NOTE: These remain for any separate raw-VDDK download actions you may have.
-    p.add_argument(
-        "--vddk-libdir",
-        dest="vs_vddk_libdir2",
-        default=None,
-        help="EXPERIMENTAL: VDDK raw download: directory containing libvixDiskLib.so (or a parent that contains it).",
-    )
-    p.add_argument(
-        "--vddk-thumbprint",
-        dest="vs_vddk_thumbprint2",
-        default=None,
-        help="EXPERIMENTAL: VDDK raw download: ESXi/vCenter thumbprint (SHA1 AA:BB:..).",
-    )
-    p.add_argument(
-        "--no-verify",
-        dest="vs_no_verify2",
-        action="store_true",
-        help="EXPERIMENTAL: VDDK raw download: disable TLS verification (insecure).",
-    )
-    p.add_argument(
-        "--vddk-transports",
-        dest="vs_vddk_transports2",
-        default=None,
-        help="EXPERIMENTAL: VDDK raw download: transport modes string (e.g. 'nbdssl:nbd').",
-    )
-
     # vSphere action-scoped params (now global)
     p.add_argument(
         "--json", dest="json", action="store_true", help="Output in JSON format (where supported)."
@@ -1505,7 +1466,7 @@ def _add_vsphere_export_and_download_knobs(p: argparse.ArgumentParser) -> None:
         "--disk",
         dest="disk",
         default=None,
-        help="Disk index/label (query_changed_disk_areas/download_vm_disk/cbt_sync/vddk_download_disk)",
+        help="Disk index/label (query_changed_disk_areas/download_vm_disk/cbt_sync)",
     )
     p.add_argument(
         "--start_offset",

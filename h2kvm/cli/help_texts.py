@@ -625,8 +625,7 @@ YAML_EXAMPLE = r"""# h2kvm configuration examples (YAML)
 # out_format: qcow2
 # compress: true
 # vs_datacenter: ha-datacenter
-# vs_transport: vddk
-# vs_vddk_libdir: /opt/vmware-vix-disklib-distrib
+# vs_transport: ssh
 # vs_download_only: true
 # vs_export_concurrency: 1
 #
@@ -662,7 +661,6 @@ live SSH fix, vSphere\n
  • vSphere export (recommended): govc OVF/OVA export (control+data plane)\n
  • vSphere export (optional): OVF Tool (ovftool) export/deploy (control+data plane)\n
  • vSphere download-only: VM folder file pull via /folder (no inspection)\n
- • vSphere VDDK raw: single disk direct pull via VDDK client (no inspection)\n
  • vSphere NFC: pyvmomi NFC lease streaming (useful when /folder is blocked)\n
  • vSphere -> direct export: experimental export hook\n
 """

@@ -84,8 +84,7 @@ def migrate_from_vsphere(
         result = client.export_vm(
             vm_name=vm_name,
             output_dir=output_dir,
-            transport="vddk",  # or 'ssh'
-            vddk_libdir="/opt/vmware-vix-disklib-distrib",  # if using VDDK
+            transport="ssh",
         )
 
         logger.info("Export complete!")

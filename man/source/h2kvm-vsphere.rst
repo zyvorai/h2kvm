@@ -24,10 +24,9 @@ environments to KVM/QEMU.
 
 Supports multiple methods:
 
-* **virt-v2v + VDDK** - Fast, production-ready (recommended)
-* **govc CLI** - VMware CLI tool integration
+* **govc CLI** - NFC export of OVF/OVA (recommended)
 * **HTTP download** - Direct VMDK download via /folder API
-* **SSH/SCP** - Copy from ESXi host filesystem
+* **SSH** - virt-v2v input transport, or copy from the ESXi host
 * **OVF Tool** - Export via VMware OVF Tool
 
 OPTIONS
@@ -76,14 +75,9 @@ Export Method
     * **download_only_vm** - Download VMDK files only
 
 **--vs-transport** *METHOD*
-    Transport method:
+    virt-v2v input transport. Datastore downloads always use HTTPS.
 
-    * **vddk** - VMware VDDK (fastest, requires library)
-    * **ssh** - SSH/SCP transfer
-    * **nbd** - NBD protocol
-
-**--vs-vddk-libdir** *DIR*
-    Path to VDDK library (e.g., /opt/vmware-vix-disklib-distrib).
+    * **ssh** - SSH transfer
 
 **--vs-v2v**
     Use virt-v2v for conversion.
@@ -112,10 +106,10 @@ Download Options
 EXAMPLES
 ========
 
-Export using virt-v2v with VDDK
---------------------------------
+Export with govc
+----------------
 
-Fastest method for production::
+Recommended path. Disks leave over an HTTP NFC lease, not VDDK::
 
     export VC_PASSWORD='your-password'
 
@@ -125,8 +119,7 @@ Fastest method for production::
       --vc-password-env VC_PASSWORD \
       --dc-name production-dc \
       --vm-name webserver-01 \
-      --vs-transport vddk \
-      --vs-vddk-libdir /opt/vmware-vix-disklib-distrib \
+      --vs-action export_vm \
       --output-dir ./migrated-vms
 
 Download-only mode with govc
@@ -162,9 +155,7 @@ Configuration file example
 
     # Export method
     vs_action: export_vm
-    vs_transport: vddk
-    vs_vddk_libdir: /opt/vmware-vix-disklib-distrib
-    vs_v2v: true
+    vs_transport: ssh
 
     # Output
     output_dir: ./migrated-vms
@@ -187,16 +178,14 @@ Configuration file example
 PREREQUISITES
 =============
 
-For virt-v2v + VDDK (recommended):
-
-* Install virt-v2v: ``dnf install virt-v2v``
-* Download VMware VDDK from VMware website
-* Extract VDDK to /opt/vmware-vix-disklib-distrib
-
-For govc method:
+For govc (recommended):
 
 * Install govc: ``curl -L https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x86_64.tar.gz | sudo tar xzf - -C /usr/local/bin govc``
 * Install pyvmomi: ``pip install pyvmomi``
+
+For virt-v2v over SSH:
+
+* Install virt-v2v: ``dnf install virt-v2v``
 
 For OVF Tool method:
 
@@ -292,9 +281,6 @@ ENVIRONMENT
 
 **VC_PASSWORD**
     vCenter password (recommended over command-line).
-
-**VDDK_THUMBPRINT**
-    ESXi SSL thumbprint (optional, for secure VDDK).
 
 FILES
 =====

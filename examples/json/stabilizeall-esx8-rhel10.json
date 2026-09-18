@@ -11,8 +11,7 @@
   "vs_export": true,
   "vs_vm": "esx8.0-rhel10.0beta-x86_64-efi",
   "vs_datacenter": "ha-datacenter",
-  "vs_transport": "vddk",
-  "vs_vddk_libdir": "/opt/vmware-vix-disklib-distrib",
+  "vs_transport": "ssh",
   "vs_create_snapshot": false,
   "vs_export_concurrency": 1,
   "vs_export_extra_args": [

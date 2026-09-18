@@ -258,7 +258,6 @@ def _validate_vsphere_action_requirements(  # pylint: disable=too-many-locals,to
         "enable_cbt",
         "query_changed_disk_areas",
         "download_only_vm",
-        "vddk_download_disk",
         "export_vm",
         "ovftool_export",
     }
@@ -284,7 +283,7 @@ def _validate_vsphere_action_requirements(  # pylint: disable=too-many-locals,to
                     f"cmd=vsphere vs_action=download_datastore_file: missing required `{k}:` (YAML) or CLI --{k}"
                 )
 
-    if act in ("download_vm_disk", "vddk_download_disk", "cbt_sync") and not _require(local_path):
+    if act in ("download_vm_disk", "cbt_sync") and not _require(local_path):
         raise SystemExit(
             f"cmd=vsphere vs_action={act}: missing required `local_path:` (YAML) or CLI --local_path"
         )

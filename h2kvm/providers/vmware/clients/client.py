@@ -3,7 +3,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 # h2kvm/vmware/clients/client.py
-# pylint: disable=too-many-lines  # cohesive vSphere/vCenter client covering connect/inventory/export/download/vddk/ovftool
+# pylint: disable=too-many-lines  # cohesive vSphere/vCenter client covering connect/inventory/export/download/ovftool
 """
 vSphere / vCenter client for h2kvm.
 """
@@ -27,7 +27,7 @@ from urllib.parse import quote
 # Optional: non-blocking pump
 # (shared availability probe, centralized in utils/compat.py to avoid
 # duplicating this try/except stub across vmware provider modules)
-from h2kvm.providers.vmware.utils.compat import SELECT_AVAILABLE, select
+from h2kvm.providers.vmware.utils.compat import SELECT_AVAILABLE, select, vim
 
 # govc helpers (single source of truth)
 try:
@@ -93,23 +93,8 @@ try:  # pragma: no cover
 except ImportError:  # pragma: no cover
     pass
 
-# VDDK client (availability probe only; heavy logic lives in vddk_loader.py / vddk_client.py)
-try:
-    # pylint: disable=unused-import,ungrouped-imports  # this optional-dependency probe is intentionally interleaved
-    # with the other try/except ImportError blocks above/below, in the order they're actually needed
-    from h2kvm.providers.vmware.transports.vddk_client import (  # type: ignore  # noqa: F401
-        VDDKConnectionSpec,
-        VDDKESXClient,
-    )
-
-    VDDK_CLIENT_AVAILABLE = True
-except ImportError:  # pragma: no cover
-    VDDK_CLIENT_AVAILABLE = False
-
-
 from h2kvm.core.retry_decorator import api_retry
 from h2kvm.core.structured_log import log_event
-from h2kvm.providers.vmware.utils.utils import safe_vm_name as _safe_vm_name
 
 _BACKING_RE = re.compile(r"\[(.+?)\]\s+(.*)")
 
@@ -137,12 +122,8 @@ class ExportOptions:  # pylint: disable=too-many-instance-attributes  # models e
     compute: str = "auto"
 
     # export options
-    transport: str = "vddk"  # export transport: vddk|ssh
+    transport: str = "ssh"  # virt-v2v input transport; disks themselves leave via govc or HTTPS
     no_verify: bool = False
-    vddk_libdir: Path | None = None  # passed to export -io vddk-libdir
-    vddk_thumbprint: str | None = None  # passed to export vddk-thumbprint (if provided)
-    vddk_snapshot_moref: str | None = None
-    vddk_transports: str | None = None
     output_dir: Path = Path("./out")
     output_format: str = "qcow2"  # qcow2|raw
     extra_args: tuple[str, ...] = ()
@@ -185,21 +166,7 @@ class ExportOptions:  # pylint: disable=too-many-instance-attributes  # models e
     govc_export_power_off: bool = False
     govc_export_disk_mode: str | None = None  # "thin"|"thick" etc.
 
-    # vddk_download options (experimental)
-    vddk_download_disk: str | None = None
-    vddk_download_output: Path | None = None
-    vddk_download_sectors_per_read: int = 2048  # 1 MiB (2048 * 512)
-    vddk_download_log_every_bytes: int = 256 * 1024 * 1024
 
-
-# Import all functions from split modules
-#
-# These must come *after* the ExportOptions/GovmomiCLI definitions above: vddk_loader.py
-# does `from h2kvm.providers.vmware.clients.client import ExportOptions, _safe_vm_name`,
-# so this module has a circular import with vddk_loader.py and must define ExportOptions
-# before importing it back.
-
-# Import datastore operations
 # Import ovftool operations
 from h2kvm.providers.vmware.transports.ovftool_loader import (  # pylint: disable=wrong-import-position
     _build_ovftool_source_url as _ovftool_build_ovftool_source_url,
@@ -212,12 +179,6 @@ from h2kvm.providers.vmware.transports.ovftool_loader import (  # pylint: disabl
     ovftool_export_vm as _ovftool_ovftool_export_vm,
 )
 
-# Import vddk operations (circular import: vddk_loader imports ExportOptions back from this module)
-from h2kvm.providers.vmware.transports.vddk_loader import (  # pylint: disable=wrong-import-position,cyclic-import
-    select_disk as _vddk_select_disk,
-    vddk_download_disk as _vddk_download_disk,
-    vm_disks as _vddk_vm_disks,
-)
 from h2kvm.providers.vmware.utils.datastore import (  # pylint: disable=wrong-import-position
     _download_only_vm_force_https as _datastore_download_only_vm_force_https,
     _download_selected_files as _datastore_download_selected_files,
@@ -282,7 +243,7 @@ class VMwareConnectionOptions:  # pylint: disable=too-many-instance-attributes  
 # Client
 
 
-class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-public-methods  # single client covering connect/inventory/export/download/vddk/ovftool surfaces
+class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-public-methods  # single client covering connect/inventory/export/download/ovftool surfaces
     """
     vSphere/vCenter client for VM operations and export.
     """
@@ -980,9 +941,13 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         resolved_dc = self.resolve_datacenter_for_vm(opt.vm_name, opt.datacenter)
         resolved_compute = self.resolve_compute_for_vm(opt.vm_name, opt.compute)
 
-        transport = (opt.transport or "").strip().lower()
-        if transport not in ("vddk", "ssh"):
-            raise VMwareError(f"Unsupported export transport: {transport!r} (expected 'vddk' or 'ssh')")
+        transport = (opt.transport or "ssh").strip().lower()
+        if transport == "vddk":
+            raise VMwareError(
+                "VDDK transport was removed. Export with govc (export.ovf / export.ova) or HTTPS /folder."
+            )
+        if transport != "ssh":
+            raise VMwareError(f"Unsupported export transport: {transport!r} (expected 'ssh')")
 
         argv: list[str] = [
             "export",
@@ -995,16 +960,6 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
             "-ip",
             str(password_file),
         ]
-
-        if transport == "vddk":
-            if opt.vddk_libdir:
-                argv += ["-io", f"vddk-libdir={Path(opt.vddk_libdir)!s}"]
-            if opt.vddk_thumbprint:
-                argv += ["-io", f"vddk-thumbprint={opt.vddk_thumbprint!s}"]
-            if opt.vddk_snapshot_moref:
-                argv += ["-io", f"vddk-snapshot={opt.vddk_snapshot_moref}"]
-            if opt.vddk_transports:
-                argv += ["-io", f"vddk-transports={opt.vddk_transports}"]
 
         argv.append(opt.vm_name)
         self._ensure_output_dir(opt.output_dir)
@@ -1114,57 +1069,54 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
     # NOTE: export functionality uses pure h2kvm architecture
     # Legacy method removed
 
-    # VDDK raw disk download (experimental orchestration only) - Delegate to vmware_vddk
-
-    def _require_vddk_client(self) -> None:
-        if not VDDK_CLIENT_AVAILABLE:
-            raise VMwareError(
-                "VDDK raw download requested but vddk_client is not importable. "
-                "Ensure h2kvm/vsphere/vddk_client.py exists and imports cleanly."
-            )
-
     def vm_disks(self, vm_obj: Any) -> list[Any]:
         """Return the list of VirtualDisk devices attached to a VM."""
-        return _vddk_vm_disks(self, vm_obj)
+        disks: list[Any] = []
+        devices = getattr(getattr(getattr(vm_obj, "config", None), "hardware", None), "device", []) or []
+        virtual_disk = getattr(getattr(getattr(vim, "vm", None), "device", None), "VirtualDisk", None)
+        for dev in devices:
+            if virtual_disk is not None and isinstance(dev, virtual_disk):
+                disks.append(dev)
+        return disks
 
     def select_disk(self, vm_obj: Any, label_or_index: str | None) -> Any:
         """Select a VM disk by index or by (case-insensitive substring) label."""
-        return _vddk_select_disk(self, vm_obj, label_or_index)
-
-    def _vm_disk_backing_filename(self, disk_obj: Any) -> str:
-        backing = getattr(disk_obj, "backing", None)
-        fn = getattr(backing, "fileName", None) if backing else None
-        if not fn:
-            raise VMwareError("Selected disk has no backing.fileName (unexpected)")
-        return str(fn)
-
-    def _resolve_esx_host_for_vm(self, vm_obj: Any) -> str:
-        host_obj = self._vm_runtime_host(vm_obj)
-        if host_obj is None:
-            raise VMwareError("VM has no runtime.host; cannot determine ESXi host for VDDK download")
-        name = str(getattr(host_obj, "name", "") or "").strip()
-        if not name:
-            raise VMwareError("Could not resolve ESXi host name for VM runtime.host")
-        return name
-
-    def _default_vddk_download_path(self, opt: ExportOptions, *, disk_index: int) -> Path:
-        out_dir = self._ensure_output_dir(opt.output_dir)
-        return out_dir / f"{_safe_vm_name(opt.vm_name)}-disk{disk_index}.vmdk"
-
-    def vddk_download_disk(self, opt: ExportOptions) -> Path:
-        """Download a VM disk directly via VDDK (experimental raw download path)."""
-        return _vddk_download_disk(self, opt)
+        disks = self.vm_disks(vm_obj)
+        if not disks:
+            raise VMwareError(
+                "No virtual disks found on VM. The VM may have no hard disks attached, "
+                "or the disk configuration is not accessible. Check the VM's hardware "
+                "settings in vSphere to verify it has virtual disks."
+            )
+        if label_or_index is None:
+            return disks[0]
+        s = str(label_or_index).strip()
+        if s.isdigit():
+            idx = int(s)
+            if idx < 0 or idx >= len(disks):
+                raise VMwareError(f"Disk index out of range: {idx} (found {len(disks)})")
+            return disks[idx]
+        sl = s.lower()
+        for d in disks:
+            label = getattr(getattr(d, "deviceInfo", None), "label", "") or ""
+            if sl in str(label).lower():
+                return d
+        available = []
+        for d in disks:
+            label = getattr(getattr(d, "deviceInfo", None), "label", "") or ""
+            if label:
+                available.append(label)
+        available_str = ", ".join(available) if available else "none detected"
+        raise VMwareError(
+            f"No disk matching label '{s}'. Available disks: {available_str}\n"
+            "Specify a disk by label (e.g., 'Hard disk 1') or index (e.g., 0, 1)."
+        )
 
     # Unified entrypoint (policy) - refactored into smaller handlers
 
     @staticmethod
     def _normalize_export_mode(mode: str | None) -> str:
         return (mode or "ovf_export").strip().lower()
-
-    def _handle_mode_vddk(self, mode: str, opt: ExportOptions) -> Path | None:
-        if mode in ("vddk_download", "vddk-download", "vddkdownload"):
-            return self.vddk_download_disk(opt)
-        return None
 
     def _handle_mode_export(self, mode: str, _opt: ExportOptions) -> Path | None:
         """Handle 'export'/'virt_export' modes (no dedicated implementation; falls through)."""
@@ -1222,7 +1174,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         mode = self._normalize_export_mode(opt.export_mode)
 
         # Explicit/special modes first (no fallback unless explicitly coded)
-        for handler in (self._handle_mode_vddk, self._handle_mode_export):
+        for handler in (self._handle_mode_export,):
             out = handler(mode, opt)
             if out is not None:
                 return out
