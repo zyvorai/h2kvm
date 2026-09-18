@@ -1,37 +1,36 @@
 # h2kvm: vSphere Control-Plane + Data-Plane Design
 
-> **VMware API Integration**: h2kvm leverages **hypersdk** (VMware's modern Python SDK, formerly known as pyvmomi/pyVmomi) for enterprise-grade, type-safe vCenter/vSphere API access.
+> **VMware API Integration**: h2kvm uses **pyvmomi** (VMware's Python SDK for the vSphere API, imported as `pyVmomi` / `pyVim`) for vCenter/ESXi inventory access, and `govc`, OVF Tool and HTTPS `/folder` for moving bytes.
 
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [Overview](#overview)
 - [Design Principles](#design-principles)
-  - [Control-Plane ≠ Data-Plane (Don’t Mix Them)](#control-plane-data-plane-dont-mix-them)
+  - [Control-Plane ≠ Data-Plane (Don’t Mix Them)](#control-plane--data-plane-dont-mix-them)
   - [Don’t Scan the Universe Unless Asked](#dont-scan-the-universe-unless-asked)
-  - [Correct Compute Paths for Libvirt ESX (Host-System Path)](#correct-compute-paths-for-libvirt-esx-host-system-path)
-  - [Bytes Should Be Explicit (Download ≠ Convert)](#bytes-should-be-explicit-download-convert)
-  - [Async Where It Matters, Sync Where It’s Safe](#async-where-it-matters-sync-where-its-safe)
+  - [Correct Compute Paths (Host-System Path)](#correct-compute-paths-host-system-path)
+  - [Bytes Should Be Explicit (Download ≠ Convert)](#bytes-should-be-explicit-download--convert)
+  - [Synchronous Client, Threads Only Where Used](#synchronous-client-threads-only-where-used)
   - [Never Hide the Real Failure](#never-hide-the-real-failure)
 - [Architecture Diagram](#architecture-diagram)
-  - [Philosophy & Design Principles](#philosophy-design-principles)
+  - [Philosophy & Design Principles](#philosophy--design-principles)
   - [Main Architecture Components](#main-architecture-components)
   - [Export Modes](#export-modes)
   - [Export Flow](#export-flow)
 - [Detailed Architecture Breakdown](#detailed-architecture-breakdown)
   - [Where pyvmomi Ends and Data-Plane Begins](#where-pyvmomi-ends-and-data-plane-begins)
-    - [Control-Plane: pyvmomi / pyVim in `h2kvm`](#control-plane-pyvmomi-pyvim-in-h2kvm)
+    - [Control-Plane: pyvmomi / pyVim and govc in `h2kvm`](#control-plane-pyvmomi--pyvim-and-govc-in-h2kvm)
     - [Data-Plane Options in `h2kvm`](#data-plane-options-in-h2kvm)
-  - [Why There Are *Two* Download-Only Implementations (Engine + CLI)](#why-there-are-two-download-only-implementations-engine-cli)
-- [CBT Sync in `h2kvm` (Control-Plane + Data-Plane Hybrid)](#cbt-sync-in-h2kvm-control-plane-data-plane-hybrid)
-- [Encoding + Typing Choices Used Across `h2kvm`](#encoding-typing-choices-used-across-h2kvm)
+  - [Why There Are *Two* Download-Only Implementations (Engine + CLI)](#why-there-are-two-download-only-implementations-engine--cli)
+- [Supported vSphere Actions](#supported-vsphere-actions)
+- [Typing Choices Used in the vSphere Modules](#typing-choices-used-in-the-vsphere-modules)
 - [Mode Selection Cheatsheet (for `h2kvm`)](#mode-selection-cheatsheet-for-h2kvm)
 - [Usage Examples](#usage-examples)
   - [Example 1: Basic VM Export](#example-1-basic-vm-export)
   - [Example 2: Download-Only Mode](#example-2-download-only-mode)
-  - [Example 3: VDDK Fast Transfer](#example-3-vddk-fast-transfer)
-  - [Example 4: Programmatic Usage](#example-4-programmatic-usage)
-- [Enhancements & Best Practices](#enhancements-best-practices)
+  - [Example 3: Programmatic Usage](#example-3-programmatic-usage)
+- [Enhancements & Best Practices](#enhancements--best-practices)
 - [Next Steps](#next-steps)
 - [Getting Help](#getting-help)
 
@@ -41,55 +40,66 @@
 
 Before following this guide, you should have:
 
-- ✓ Completed the [Installation](02-Installation.md)
+- ✓ Completed the [Installation](../getting-started/01-Installation.md)
 - ✓ Familiarity with basic h2kvm concepts
 - ✓ Root/sudo access to your system
-- ✓ Source VM files ready for migration
+- ✓ `pyvmomi` installed (`pip install pyvmomi`) and, for the `list_vm_names`, `export_vm` and `download_only_vm` actions, `govc` on `PATH`
+- ✓ Network access and credentials for the vCenter/ESXi host you are migrating from
 
 ## Overview
-`h2kvm` is a specialized tool for integrating with VMware vSphere, treating it in a realistic manner: **inventory and orchestration exist in one domain**, while **disk byte movement operates in another**. This intentional separation ensures the vSphere integration remains fast, predictable, and highly debuggable. By avoiding the mixing of control-plane and data-plane operations, the tool prevents common pitfalls like performance bottlenecks in large inventories or hidden failures during exports.
+`h2kvm` integrates with VMware vSphere by keeping two concerns apart: **inventory and orchestration exist in one domain**, while **disk byte movement operates in another**. This intentional separation keeps the vSphere integration fast, predictable, and debuggable. By avoiding the mixing of control-plane and data-plane operations, the tool prevents common pitfalls like slow lookups in large inventories or hidden failures during exports.
 
-The philosophy is embodied in two key files:
-- **`h2kvm/vsphere/vmware_client.py`**: The reusable engine, designed async-first for multi-mode exports (e.g., conversion, downloads).
-- **`h2kvm/vsphere/<vsphere_cli_entry>.py` (VsphereMode)**: The action-driven CLI entrypoint, which orchestrates user commands and delegates to the engine.
+The integration lives in three places:
+- **`h2kvm/providers/vmware/clients/client.py`**: `VMwareClient`, the reusable synchronous engine (connect, inventory lookups, export chain, download-only), and the `ExportOptions` dataclass that configures it.
+- **`h2kvm/providers/vmware/vsphere/mode.py`**: `VsphereMode`, the action-driven CLI entrypoint for `--cmd vsphere`. It orchestrates user commands and delegates to `VMwareClient`, `govc` and the transports.
+- **`h2kvm/orchestration/vsphere_exporter.py`**: `VsphereExporter`, the multi-VM `--vs-export` path that drives `VMwareClient.export_vm(ExportOptions(...))`, plus `find_exported_disks()`, which locates the disk images an export left behind.
 
-This structure allows for modular reuse: the engine can be imported independently for scripting, while the CLI provides a user-friendly interface.
+The data-plane transports live in `h2kvm/providers/vmware/transports/`:
+- `govc_export.py` (with `govc_common.py`): `govc export.ovf` / `export.ova` workflow.
+- `ovftool_loader.py` (with `ovftool_client.py`): OVF Tool export/deploy.
+- `http_client.py`: HTTPS `/folder` downloads (`HTTPDownloadClient`).
+
+Datastore and inventory helpers used by `VMwareClient` are in `h2kvm/providers/vmware/utils/datastore.py`.
+
+This structure allows for modular reuse: the client can be imported independently for scripting, while the CLI provides a user-friendly interface.
 
 ## Design Principles
 The core principles guide the tool's behavior to address real-world vSphere challenges:
 
 ### Control-Plane ≠ Data-Plane (Don't Mix Them)
-- **Control-Plane** (powered by **hypersdk**, VMware's modern Python SDK - `pyvmomi` / `pyVim` / `pyVmomi`): Handles resolution of inventory objects, datacenters, hosts, snapshots, Changed Block Tracking (CBT), and datastore browsing with enterprise-grade, type-safe API access.
-- **Data-Plane** (using HTTPS `/folder` / VDDK): Focuses solely on moving bytes, such as exporting/converting disks or downloading VM folders.
-In `h2kvm`, **hypersdk** is strictly used to *find and describe* resources (e.g., locating a VM or disk), after which a dedicated data-plane mechanism takes over for efficient byte transfer. This prevents overhead from blending discovery with heavy I/O operations.
+- **Control-Plane** (`pyvmomi` / `pyVim`, plus `govc` for inventory listing): Handles resolution of inventory objects (datacenters, hosts, VMs), disk lookup, and datastore browsing.
+- **Data-Plane** (HTTPS `/folder`, `govc export`, or `ovftool`): Focuses solely on moving bytes, such as exporting a VM as OVF/OVA or downloading VM folders.
+In `h2kvm`, **pyvmomi** and **govc** are used to *find and describe* resources (e.g., locating a VM or listing its datastore folder), after which a dedicated data-plane mechanism takes over for byte transfer. This prevents overhead from blending discovery with heavy I/O operations.
 
 ### Don’t Scan the Universe Unless Asked
 vCenter inventories can be massive, and naive "list everything" approaches lead to sluggish tools. To counter this:
-- `VMwareClient` makes inventory printing **opt-in** via `print_vm_names`.
-- Caching is applied to small, stable lists like datacenters and hosts for quick access.
-- Targeted lookups (e.g., `get_vm_by_name`) are prioritized over repeated `CreateContainerView` traversals, ensuring operations scale well in enterprise environments.
+- `VMwareClient` does not enumerate the inventory on connect; listing VMs is an explicit action (`--vs-action list_vm_names`).
+- Datacenter and host name lists are cached on the client (`list_datacenters`, `list_host_names`), and `get_vm_by_name` caches each VM object it resolves, so repeated lookups of the same VM do not re-walk the inventory.
+- `list_vm_names` switches to a names-only listing when the inventory exceeds `--govc-max-detail` VMs, instead of fetching per-VM details.
 
-### Correct Compute Paths for Libvirt ESX (Host-System Path)
-`h2kvm` resolves a common failure where libvirt rejects cluster-only paths:
-- Avoid: `host/<cluster>`  (frequently rejected).
-- Resolve to: `host/<cluster-or-compute>/<esx-host>` , or fallback to `host/<esx-host>` .
-This fix prevents errors like **"Path … does not specify a host system"** when constructing `vpx://...` URIs.
+### Correct Compute Paths (Host-System Path)
+`h2kvm` resolves the compute path for a VM instead of relying on a cluster-only path:
+- Avoid: `host/<cluster>`.
+- Resolve to: `host/<cluster-or-compute>/<esx-host>`, or fall back to `host/<esx-host>` when the host has no distinct parent name.
+`VMwareClient.resolve_host_system_for_vm()` builds this from the VM's runtime host, and `resolve_compute_for_vm()` honors an explicit `ExportOptions.compute` value (`"auto"` by default).
 
 ### Bytes Should Be Explicit (Download ≠ Convert)
 Operators need control over operations to avoid surprises. `h2kvm` exposes distinct data-plane modes:
-- **Direct Export**: Converts to local `qcow2/raw` formats, potentially inspecting/modifying the guest.
+- **Export (OVF/OVA)**: `govc export.ovf` / `export.ova` writes an OVF directory or OVA into the output directory, falling back to an HTTPS `/folder` download if both fail. Conversion to qcow2/raw happens later in the pipeline, not in the download step.
+- **OVF Tool export**: `ovftool` pulls the VM from a `vi://` source URL.
 - **HTTP Download-Only**: Pulls exact byte-for-byte VM folder files (e.g., VMDKs, VMX).
-- **VDDK Single-Disk Pull**: Raw extraction of one disk via VDDK, without conversion.
 No "download" mode accidentally mutates guests—transparency is key.
 
-### Async Where It Matters, Sync Where It's Safe
-- `VMwareClient` is async-first, leveraging `asyncio` for benefits in downloads and subprocess log streaming.
-- `VsphereMode` remains synchronous but incorporates concurrency via `ThreadPoolExecutor` for parallel tasks like file downloads.
+### Synchronous Client, Threads Only Where Used
+- `VMwareClient` and `VsphereMode` are synchronous: pyvmomi calls, `govc`/`ovftool` subprocesses and `requests`-based HTTP downloads all block the caller.
+- The shared HTTP layer (`HTTPDownloadManager` in `transports/http_client.py`) can fan downloads out over a `ThreadPoolExecutor` when `max_workers` is greater than 1.
+- The `VsphereMode` `download_only_vm` action currently downloads its files one at a time; the `--concurrency` and `--use-async-http` options are parsed but not consumed by that action.
 
 ### Never Hide the Real Failure
-vSphere failures often involve cryptic issues (e.g., TLS mismatches, invalid thumbprints, path errors, or verbose stderr). `vmware_client.py` addresses this with:
-- Stderr tail capture to expose the *actual* root cause in logs/errors.
-- Chunk-based stream pumping to prevent `asyncio LimitOverrunError` from tools emitting excessively long lines without newlines.
+vSphere failures often involve cryptic issues (e.g., TLS mismatches, path errors, or verbose stderr). h2kvm addresses this with:
+- `govc_export.py` streams govc output live, splitting on both `\n` and `\r` so progress lines are visible, and on a non-zero exit it includes the last 40 output lines in the error along with hints for common causes (expired export lease, missing object, etc.).
+- `VsphereMode.run()` adds targeted hints to connection failures (TLS/certificate errors suggest `--vc-insecure`; refused/timeout errors suggest checking host and port 443; auth errors suggest checking the vCenter credentials).
+- `VMwareClient.connect()` retries transient connection errors with exponential backoff before giving up.
 
 ## Architecture Diagram
 
@@ -98,19 +108,19 @@ vSphere failures often involve cryptic issues (e.g., TLS mismatches, invalid thu
 The vSphere integration follows these core principles:
 - **Control-Plane ≠ Data-Plane**: Inventory/orchestration separate from byte movement
 - **Fast, Predictable, Debuggable**: No performance bottlenecks
-- **No Universe Scans Unless Opt-In**: Targeted lookups, not full inventory traversals
-- **Correct Paths for libvirt ESX**: `host/<cluster>/<esx-host>` format
+- **No Universe Scans Unless Asked**: Targeted lookups and cached name lists, not repeated full inventory traversals
+- **Correct Compute Paths**: `host/<cluster>/<esx-host>` format
 - **Explicit Modes**: Download ≠ Convert (transparency)
-- **Async-First Engine + Sync CLI**: Concurrency where it matters
-- **Never Hide Failures**: Stderr tail capture, chunked stream pumping
+- **Synchronous Client + CLI**: Simple control flow, threads only inside the HTTP download manager
+- **Never Hide Failures**: Live govc output, error tail capture, connection hints
 
 ### Main Architecture Components
 
 ```mermaid
 graph TB
     subgraph HV["h2kvm vSphere Integration"]
-        CLI[VsphereMode.py<br/>CLI Entrypoint<br/>Sync w/ Threads]
-        Engine[VMwareClient.py<br/>Reusable Engine<br/>Async-First]
+        CLI[VsphereMode<br/>vsphere/mode.py<br/>CLI Entrypoint]
+        Engine[VMwareClient<br/>clients/client.py<br/>Sync Engine]
         DataPlane[Data-Plane<br/>Bytes Movement]
 
         CLI <--> Engine
@@ -122,8 +132,8 @@ graph TB
             CP3[DC/Host Cache]
             CP4[VM Lookup]
             CP5[Disk Enum]
-            CP6[Snapshot/CBT]
-            CP7[DS Browsing]
+            CP6[DS Browsing]
+            CP7[govc Inventory]
         end
 
         subgraph AF["Actions/Flags"]
@@ -132,17 +142,9 @@ graph TB
         end
 
         subgraph DP["Data-Plane Modes"]
-            DP1[Direct Export]
-            DP2[HTTP Download]
-            DP3[VDDK Disk Pull]
-        end
-
-        subgraph CBT["CBT Sync Workflow"]
-            CBT1[1. Enable CBT]
-            CBT2[2. Quiesced Snap]
-            CBT3[3. Query Changes]
-            CBT4[4. Range HTTP Pull]
-            CBT1 --> CBT2 --> CBT3 --> CBT4
+            DP1[govc OVF/OVA Export]
+            DP2[OVF Tool]
+            DP3[HTTPS /folder Download]
         end
 
         Engine --> CP1
@@ -151,7 +153,7 @@ graph TB
         Engine --> CP4
         Engine --> CP5
         Engine --> CP6
-        Engine --> CP7
+        CLI --> CP7
 
         CLI --> AF1
         CLI --> AF2
@@ -166,7 +168,6 @@ graph TB
     style DataPlane fill:#4CAF50,stroke:#2E7D32,color:#fff
     style CP fill:#9C27B0,stroke:#6A1B9A,color:#fff
     style DP fill:#00BCD4,stroke:#006064,color:#fff
-    style CBT fill:#F44336,stroke:#C62828,color:#fff
 ```
 
 ### Export Modes
@@ -174,132 +175,142 @@ graph TB
 ```mermaid
 graph LR
     subgraph Modes["Export Mode Options via ExportOptions.export_mode"]
-        Export["export Default<br/>━━━━━━━<br/>✓ Converted Output<br/>✓ qcow2/raw Local<br/>✓ Direct Export<br/>✓ VDDK/SSH Transport"]
+        Export["ovf_export Default<br/>━━━━━━━<br/>✓ govc export.ovf<br/>✓ Falls back to export.ova<br/>✓ Then HTTPS /folder"]
 
-        Download["download_only<br/>━━━━━━━<br/>✓ Exact VM Folder<br/>✓ Byte-for-Byte<br/>✓ HTTPS /folder<br/>✓ Globs/Concurrency"]
+        Ova["ova_export<br/>━━━━━━━<br/>✓ govc export.ova<br/>✓ Falls back to HTTPS /folder"]
 
-        VDDK["vddk_download<br/>━━━━━━━<br/>✓ Single Disk Raw<br/>✓ Fast VDDK Pull<br/>✓ No Conversion<br/>✓ Sector Reads"]
+        OvfTool["ovftool_export<br/>━━━━━━━<br/>✓ OVF Tool from vi:// URL<br/>✓ Falls back to the OVF chain"]
+
+        Download["download_only<br/>━━━━━━━<br/>✓ Exact VM Folder<br/>✓ Byte-for-Byte<br/>✓ HTTPS /folder<br/>✓ Include/Exclude Globs"]
     end
 
     style Export fill:#4CAF50,stroke:#2E7D32,color:#fff
+    style Ova fill:#8BC34A,stroke:#558B2F,color:#fff
+    style OvfTool fill:#FF9800,stroke:#E65100,color:#fff
     style Download fill:#2196F3,stroke:#1565C0,color:#fff
-    style VDDK fill:#FF9800,stroke:#E65100,color:#fff
 ```
 
 ### Export Flow
 
 ```mermaid
 flowchart TD
-    User[User/CLI] --> VsphereMode[VsphereMode]
-    VsphereMode --> AsyncExport[VMwareClient.async_export_vm]
-    AsyncExport --> ModeCheck{Export Mode?}
+    User[User/CLI<br/>--cmd vsphere] --> VsphereMode[VsphereMode]
+    VsphereMode --> ActionCheck{--vs-action?}
 
-    ModeCheck -->|export| ExportMode[Direct Export<br/>Convert]
-    ModeCheck -->|download_only| DownloadOnly[Download Only<br/>Exact Copy]
-    ModeCheck -->|vddk_download| VDDKDownload[VDDK Disk<br/>Download]
+    ActionCheck -->|export_vm| ExportChain[govc export.ovf]
+    ExportChain -->|failure| OvaChain[govc export.ova]
+    OvaChain -->|failure| HttpsFallback[HTTPS /folder download]
+    ActionCheck -->|ovftool_export| OvfTool[OVF Tool export]
+    ActionCheck -->|download_only_vm| DownloadOnly[Download Only<br/>Exact Copy]
 
-    ExportMode --> Output1[Local qcow2/raw]
-    DownloadOnly --> Output2[VM Folder Files]
-    VDDKDownload --> Output3[Raw Disk Image]
+    ExportChain --> Output1[OVF dir under --output-dir]
+    OvaChain --> Output2[OVA under --output-dir]
+    HttpsFallback --> Output3[VM Folder Files]
+    OvfTool --> Output4[OVF/OVA from OVF Tool]
+    DownloadOnly --> Output3
 
     style User fill:#9C27B0,stroke:#6A1B9A,color:#fff
     style VsphereMode fill:#FF9800,stroke:#E65100,color:#fff
-    style AsyncExport fill:#2196F3,stroke:#1565C0,color:#fff
-    style ModeCheck fill:#FFC107,stroke:#F57C00,color:#000
-    style ExportMode fill:#4CAF50,stroke:#2E7D32,color:#fff
+    style ActionCheck fill:#FFC107,stroke:#F57C00,color:#000
+    style ExportChain fill:#4CAF50,stroke:#2E7D32,color:#fff
+    style OvaChain fill:#8BC34A,stroke:#558B2F,color:#fff
+    style HttpsFallback fill:#00BCD4,stroke:#006064,color:#fff
+    style OvfTool fill:#FF9800,stroke:#E65100,color:#fff
     style DownloadOnly fill:#00BCD4,stroke:#006064,color:#fff
-    style VDDKDownload fill:#F44336,stroke:#C62828,color:#fff
     style Output1 fill:#8BC34A,stroke:#558B2F,color:#fff
     style Output2 fill:#8BC34A,stroke:#558B2F,color:#fff
     style Output3 fill:#8BC34A,stroke:#558B2F,color:#fff
+    style Output4 fill:#8BC34A,stroke:#558B2F,color:#fff
 ```
+
+The `--vs-export` flag takes a different entry: `VsphereExporter.export_many_sync()` opens a `VMwareClient`, calls `VMwareClient.export_vm(ExportOptions(...))` for each VM (`export_mode="ovf_export"`, or `"download_only"` with `--vs-download-only`), then uses `find_exported_disks()` to hand the resulting disk images to the rest of the pipeline.
 
 ## Detailed Architecture Breakdown
 ### Where pyvmomi Ends and Data-Plane Begins
-#### Control-Plane: pyvmomi / pyVim in `h2kvm`
-The control-plane leverages `pyvmomi` for non-I/O tasks:
-- **Connection + Session Management**: Utilizes `SmartConnect` for establishing connections and retrieving session cookies.
-- **Datacenter + Host Discovery**: Caches lists via container views.
-- **VM Lookup (by Name)**: Efficient targeted searches.
-- **Disk Enumeration + Selection**: Lists virtual disks and selects by index or label.
-- **Snapshot + CBT Orchestration**: Creates snapshots, enables CBT, and queries changes.
-- **Datastore Browsing**: Lists files in VM folders using browser tasks.
+#### Control-Plane: pyvmomi / pyVim and govc in `h2kvm`
+The control-plane leverages `pyvmomi` (and `govc` for listing) for non-I/O tasks:
+- **Connection + Session Management**: `VMwareClient.connect()` uses `SmartConnect` and retries transient failures with backoff.
+- **Datacenter + Host Discovery**: Caches lists via container views (`list_datacenters`, `list_host_names`).
+- **VM Lookup (by Name)**: `get_vm_by_name`, with a per-client result cache.
+- **Disk Enumeration + Selection**: `vm_disks` lists virtual disks and `select_disk` picks one by index or label. These are client methods; there is no CLI action for them.
+- **Datastore Browsing**: Lists files in VM folders using datastore browser tasks.
 
 Key Patterns:
 - `si.RetrieveContent()` → `content` for root access.
 - `CreateContainerView` for scoped views of VMs/hosts/datacenters.
-- Property collector in CLI for bulk reads in `list_vm_names`.
-- Datastore browser tasks like `SearchDatastore_Task` and `SearchDatastoreSubFolders_Task` for directory listings.
+- `govc find -type m` and `govc vm.info` (JSON) for `list_vm_names`, in `VsphereMode`.
+- `SearchDatastoreSubFolders_Task` on the VM's datastore browser for directory listings (`VMwareClient.download_only_vm`).
 
 #### Data-Plane Options in `h2kvm`
-1. **Direct Export Mode (`export_mode="export"`)**:
-   - Implemented in `VMwareClient`.
-   - Builds correct paths for disk access.
-   - Validates/resolves `vddk-libdir` for VDDK transport.
-   - Streams subprocess output safely with chunking.
-   - Emits local output to `output_dir`.
-   - This is the primary "conversion/export" path, supporting transports like `vddk` or `ssh`.
+1. **govc OVF/OVA Export (`export_mode="ovf_export"` / `"ova_export"`, or `--vs-action export_vm`)**:
+   - Implemented in `transports/govc_export.py`, reached through `VMwareClient.govc_export_ovf()` / `govc_export_ova()` or `GovcRunner` in `VsphereMode`.
+   - Can remove CD/DVDs and shut down or power off the VM first (`--govc-export-remove-cdroms`, `--govc-export-shutdown`, `--govc-export-power-off`), and reports progress.
+   - Emits an OVF directory or `<vm>.ova` into the output directory.
+   - Chain: OVF, then OVA, then HTTPS `/folder` download if both govc exports fail.
 
-2. **HTTP `/folder` Download-Only Mode (`export_mode="download_only"`)**:
-   - Used in both engine and CLI.
-   - Mechanics: vCenter exposes `https://<vc>/folder/<ds_path>?dcPath=<dc>&dsName=<ds>`.
-   - Authentication via session cookie from `pyvmomi` (`si._stub.cookie`).
-   - `ds_path` is URL-encoded with slashes preserved (`quote(..., safe="/")`).
-   - In `VMwareClient`: Async downloads with `aiohttp + aiofiles` (if available), controlled concurrency via `download_only_concurrency`, and globs/max files for safety.
-   - In `VsphereMode`: File listing via datastore browser, parallel downloads with `ThreadPoolExecutor`, mirrors layout under `--output-dir`.
+2. **OVF Tool (`export_mode="ovftool_export"`, `--vs-action ovftool_export` / `ovftool_deploy`)**:
+   - Implemented in `transports/ovftool_loader.py` and `transports/ovftool_client.py`.
+   - Source URL form: `vi://user:pass@host/<Datacenter>/vm/<folder...>/<vm>`; credentials are masked in logs.
+   - `VMwareClient.export_vm()` falls back to the stable OVF chain if OVF Tool fails.
+
+3. **HTTP `/folder` Download-Only Mode (`export_mode="download_only"`, or `--vs-action download_only_vm`)**:
+   - Mechanics: vCenter exposes `https://<vc>:<port>/folder/<ds_path>?dcPath=<dc>&dsName=<ds>`; each component is percent-encoded in `HTTPDownloadClient._build_download_url`.
+   - Authentication via the session cookie from the pyvmomi connection (`si._stub.cookie`, read in `VsphereMode._get_session_cookie`).
+   - `HTTPDownloadClient` (`transports/http_client.py`) is `requests`-based, with retries and `Range`-based resume.
+   - In `VMwareClient.download_only_vm()`: lists the VM folder via the datastore browser, filters with `ExportOptions.download_only_include_globs` / `download_only_exclude_globs` / `download_only_max_files` / `download_only_fail_on_missing`, and downloads each file (govc `datastore.download` first, HTTPS `/folder` as fallback).
+   - In `VsphereMode`: file listing via govc, HTTPS download per file, mirrors layout under `--output-dir`.
    - This provides a "byte-for-byte VM directory pull" without guest inspection.
 
-3. **VDDK Single-Disk Pull (`export_mode="vddk_download"`)**:
-   - Implemented in `VMwareClient`.
-   - Control-plane resolves runtime ESXi host and disk backing filename (`[ds] folder/disk.vmdk`).
-   - Data-plane uses `VDDKESXClient` for sector downloads to local files.
-   - Handles: `vddk-libdir` validation (must contain `libvixDiskLib.so`), thumbprint normalization/auto-computation (unless `no_verify`), rate-limited progress logging.
-   - This is the "get one disk fast, don’t convert" path.
-
 ### Why There Are *Two* Download-Only Implementations (Engine + CLI)
-Currently, `h2kvm` features dual implementations for download-only:
-- `VMwareClient.async_download_only_vm()`: Async, with globs, concurrency, and reuse focus.
-- `VsphereMode` action `download_only_vm`: Sync with thread pool, CLI-oriented.
-This duplication is temporary for behavior stabilization. Long-term plan:
-- CLI (`VsphereMode`) becomes a thin layer.
-- Delegates to `VMwareClient.export_vm(ExportOptions(export_mode="download_only", ...))`.
-- Engine owns correctness, retries, and async HTTP; CLI handles flag mapping.
+Currently, `h2kvm` has two implementations of download-only:
+- `VMwareClient.download_only_vm()` (delegating to `providers/vmware/utils/datastore.py`): lists via the datastore browser and is configured through `ExportOptions`. It is what `VMwareClient.export_vm(ExportOptions(export_mode="download_only", ...))` and the `--vs-export --vs-download-only` path use.
+- `VsphereMode` action `download_only_vm`: lists via govc and is configured through CLI flags (`--include-glob`, `--exclude-glob`, `--max-files`, `--fail-on-missing`, `--json`).
+The two are not consolidated, so a behavior change in one should be checked against the other.
 
-## CBT Sync in `h2kvm` (Control-Plane + Data-Plane Hybrid)
-`cbt_sync` exemplifies the split's value for incremental workflows:
-**Control-Plane Steps:**
-1. Optionally enable CBT.
-2. Create a quiesced snapshot.
-3. Query changed disk areas via `QueryChangedDiskAreas(...)`.
+## Supported vSphere Actions
+`VsphereMode` implements exactly these values of `--vs-action`:
 
-**Data-Plane Step:**
-4. For each changed extent, fetch byte ranges using HTTP Range requests (`Range: bytes=<start>-<end>`) and write to local disk at the offset.
-This transforms vSphere into an efficient incremental block source, avoiding full disk re-downloads.
+| Action | What it does | Notes |
+|--------|--------------|-------|
+| `list_vm_names` | Lists VMs via `govc find` / `govc vm.info` | Requires `govc`; `--json` for JSON output |
+| `export_vm` | OVF, then OVA, then HTTPS `/folder` fallback | Requires `govc`; select with `--export-mode` |
+| `ovftool_export` | Exports one VM with OVF Tool | Requires `ovftool` |
+| `ovftool_deploy` | Deploys an OVF/OVA with OVF Tool | Requires `--source-path` |
+| `download_datastore_file` | Downloads one datastore file over HTTPS `/folder` | Requires `--datastore`, `--ds_path`, `--local_path` |
+| `download_only_vm` | Downloads a VM's folder over HTTPS `/folder` | Requires `govc`; filter with `--include-glob`, `--exclude-glob`, `--max-files` |
 
-## Encoding + Typing Choices Used Across `h2kvm`
-- `# -*- coding: utf-8 -*-`: Ensures safe handling of logs and VM names in diverse environments.
+Any other value fails with an "unknown action" error listing these six. Snapshot creation, CBT and incremental disk sync are not implemented as actions.
+
+## Typing Choices Used in the vSphere Modules
 - `from __future__ import annotations`: Mitigates runtime type-evaluation issues and simplifies optional imports.
+- Optional dependencies (`pyVmomi`, `requests`) are imported under `try`/`except ImportError`, so the modules import without them and fail with an install hint only when a vSphere action needs them.
 
 ## Mode Selection Cheatsheet (for `h2kvm`)
-| Need | Mode | Transport/Details |
-|------|------|-------------------|
-| **Converted qcow2/raw** | `export_mode="export"` | `vddk` or `ssh` |
-| **Exact VM folder contents from datastore** | `export_mode="download_only"` | HTTP `/folder` |
-| **One disk as raw bytes via VDDK** | `export_mode="vddk_download"` | VDDK client |
-| **Incremental updates on local disk** | `cbt_sync` | CBT + ranged HTTP reads |
+| Need | Mode / Action | Transport/Details |
+|------|---------------|-------------------|
+| **OVF directory or OVA of a VM** | `export_mode="ovf_export"` / `"ova_export"`, or `--vs-action export_vm` | `govc export.ovf` / `export.ova`, HTTPS `/folder` fallback |
+| **Export with VMware's own tool** | `export_mode="ovftool_export"`, or `--vs-action ovftool_export` | OVF Tool over `vi://` |
+| **Exact VM folder contents from datastore** | `export_mode="download_only"`, or `--vs-action download_only_vm` | HTTPS `/folder` |
+| **One datastore file** | `--vs-action download_datastore_file` | HTTPS `/folder` |
+| **List VMs** | `--vs-action list_vm_names` | `govc` |
 
 ## Usage Examples
+
+The vSphere command is selected with `--cmd vsphere` and an action with `--vs-action`; there are no subcommands.
+
+Passing the VM name: the argument validator looks for `--vm_name` (or `--vs-vm`, or `vm_name:` in YAML), while the action handlers read the value of `--vm-name`. Given only CLI flags, pass both spellings as below; with a YAML config, `vm_name:` alone is enough.
 
 ### Example 1: Basic VM Export
 
 ```bash
-# Export VM
-h2kvmctl vsphere \
+# Export VM (govc OVF -> OVA -> HTTPS fallback)
+export VC_PASSWORD='...'
+h2kvmctl --cmd vsphere \
   --vcenter vcenter.example.com \
-  --username admin@vsphere.local \
-  --password-file ~/.vcenter_pass \
-  --vs-action export-vm \
-  --vs-vm-name production-web \
+  --vc-user admin@vsphere.local \
+  --vc-password-env VC_PASSWORD \
+  --vs-action export_vm \
+  --vm_name production-web --vm-name production-web \
   --output-dir /data/exports
 ```
 
@@ -307,71 +318,66 @@ h2kvmctl vsphere \
 
 ```bash
 # Download exact VM folder contents
-h2kvmctl vsphere \
+h2kvmctl --cmd vsphere \
   --vcenter vcenter.example.com \
-  --username admin \
-  --vs-action download-vm \
-  --vs-vm-name backup-server \
+  --vc-user admin@vsphere.local \
+  --vc-password-env VC_PASSWORD \
+  --dc-name Datacenter1 \
+  --vs-action download_only_vm \
+  --vm_name backup-server --vm-name backup-server \
+  --exclude-glob '*.vmss' \
   --output-dir /backups
 ```
 
-### Example 3: VDDK Fast Transfer
+`--dc-name` is used to build the `/folder` URL and defaults to `ha-datacenter` (the standalone-ESXi datacenter name), so set it when connecting to vCenter.
 
-```bash
-# Use VDDK for high-speed transfer
-h2kvmctl vsphere \
-  --vcenter vcenter.example.com \
-  --username admin \
-  --vs-action vddk-export \
-  --vs-vm-name database-01 \
-  --vddk-libdir /usr/lib/vmware-vix-disklib \
-  --output-dir /data/vms
-```
-
-### Example 4: Programmatic Usage
+### Example 3: Programmatic Usage
 
 ```python
-from h2kvm.vmware.clients.client import VMwareClient
-from h2kvm.vmware.vsphere.mode import ExportOptions
+import logging
+from pathlib import Path
 
-# Initialize client
-client = VMwareClient(
-    host='vcenter.example.com',
-    user='admin@vsphere.local',
-    pwd='password'
-)
+from h2kvm.providers.vmware.clients.client import ExportOptions, VMwareClient
 
-# Configure export
-options = ExportOptions(
-    vm_name='web-server',
-    output_dir='/data/exports',
-    export_mode='export',
-    transport='vddk',
-    vddk_libdir='/usr/lib/vmware-vix-disklib'
-)
+logger = logging.getLogger("h2kvm.vsphere")
 
-# Execute export
-await client.async_export_vm(options)
+# The client is a synchronous context manager: it connects on entry
+# and disconnects on exit.
+with VMwareClient(
+    logger,
+    "vcenter.example.com",
+    "admin@vsphere.local",
+    "password",
+    insecure=False,
+) as client:
+    # Configure export
+    options = ExportOptions(
+        vm_name="web-server",
+        output_dir=Path("/data/exports"),
+        export_mode="ovf_export",  # or "ova_export", "ovftool_export", "download_only"
+    )
+
+    # Execute export; returns the output path
+    out_path = client.export_vm(options)
 ```
 
 
 ## Enhancements & Best Practices
-- **Error Handling**: Integrates stderr tails for diagnostics; detects transient issues (e.g., connection resets, auth failures).
-- **Performance Tips**: Enable `prefer_cached_vm_lookup` for repetitive tasks; tune `download_only_concurrency` to balance load.
-- **Security**: Supports `no_verify` but auto-computes thumbprints; passwords use secure temp files.
-- **Extensibility**: `ExportOptions` dataclass for easy customization; add `extra_args` for export processing.
-- **Future Directions**: Full consolidation of download logic; multi-disk CBT expansions; enhanced retry mechanisms.
+- **Error Handling**: `VMwareClient.connect()` retries transient connection errors with exponential backoff (`VMwareConnectionOptions`); govc failures include the last 40 lines of output; `VsphereMode` adds hints for TLS, connectivity and authentication errors.
+- **Performance Tips**: Reuse one `VMwareClient` for repeated lookups so the datacenter/host/VM caches are hit; narrow downloads with `--include-glob` / `--exclude-glob` / `--max-files`; tune `--chunk_size` for downloads.
+- **Security**: `--vc-insecure` and `--vs-no-verify` disable TLS verification, so use them only when needed. Prefer `--vc-password-env` over `--vc-password` to keep the password out of the process list, and pass `--ovftool-thumbprint` to pin the vCenter certificate for OVF Tool. OVF Tool credentials are masked in logs.
+- **Extensibility**: `ExportOptions` is a dataclass whose fields cover export, OVF Tool, download-only and govc knobs (`govc_export_snapshot`, `govc_export_power_off`, `ovftool_extra_args`, and others).
 
-For code-level details, see `vmware_client.py`. If further expansions or examples are needed, provide specifics!
+For code-level details, see `h2kvm/providers/vmware/clients/client.py` and `h2kvm/providers/vmware/vsphere/mode.py`.
 
 ## Next Steps
 
 Continue your migration journey:
 
-- **[CLI Reference](04-CLI-Reference.md)** - Complete command options
-- **[YAML Examples](05-YAML-Examples.md)** - Configuration templates
-- **[Cookbook](06-Cookbook.md)** - Common scenarios
-- **[Troubleshooting](90-Failure-Modes.md)** - When things go wrong
+- **[CLI Reference](../guides/cli/reference.md)** - Complete command options
+- **[YAML Examples](../guides/cli/yaml-examples.md)** - Configuration templates
+- **[Cookbook](../guides/cookbook.md)** - Common scenarios
+- **[Troubleshooting](../reference/failure-modes.md)** - When things go wrong
 
 ## Getting Help
 

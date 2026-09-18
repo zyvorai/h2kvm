@@ -760,9 +760,9 @@ h2kvmctl --help
 Examples:
 
 ```bash
-sudo h2kvmctl local --vmdk ./mtv-ubuntu22-4.vmdk --flatten --to-output ubuntu.qcow2 --compress
-sudo h2kvmctl fetch-and-fix --host esxi.example.com --remote /vmfs/volumes/ds/vm/vm.vmdk --fetch-all --flatten --to-output vm.qcow2
-sudo h2kvmctl live-fix --host 192.168.1.50 --sudo --print-fstab
+sudo h2kvmctl --cmd local --vmdk ./mtv-ubuntu22-4.vmdk --flatten --to-output ubuntu.qcow2 --compress
+sudo h2kvmctl --cmd fetch-and-fix --host esxi.example.com --remote /vmfs/volumes/ds/vm/vm.vmdk --fetch-all --flatten --to-output vm.qcow2
+sudo h2kvmctl --cmd live-fix --host 192.168.1.50 --sudo --print-fstab
 ```bash
 
 ---

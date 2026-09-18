@@ -97,7 +97,7 @@ EXAMPLES
 Export with govc
 ----------------
 
-Recommended path. Disks leave over an HTTP NFC lease, not VDDK::
+Recommended path. govc handles the HTTP NFC lease itself::
 
     export VC_PASSWORD='your-password'
 

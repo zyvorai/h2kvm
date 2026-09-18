@@ -27,17 +27,15 @@
     - [Implementation 2: pyvmomi / pyVim (Fallback)](#implementation-2-pyvmomi-pyvim-fallback)
     - [CLI Glue Layer](#cli-glue-layer)
   - [Data-Plane: Byte Movement](#data-plane-byte-movement)
-    - [Transport 1: VDDK (Highest Performance)](#transport-1-vddk-highest-performance)
-    - [Transport 2: ovftool (Official VMware Export)](#transport-2-ovftool-official-vmware-export)
-    - [Transport 3: HTTP `/folder` (Datastore Downloads)](#transport-3-http-folder-datastore-downloads)
-    - [Transport 4: SSH/SCP (Universal Fallback)](#transport-4-sshscp-universal-fallback)
-    - [Transport 5: govc export (CLI-Based)](#transport-5-govc-export-cli-based)
+    - [Transport 1: ovftool (Official VMware Export)](#transport-1-ovftool-official-vmware-export)
+    - [Transport 2: HTTP `/folder` (Datastore Downloads)](#transport-2-http-folder-datastore-downloads)
+    - [Transport 3: SSH/SCP (Universal Fallback)](#transport-3-sshscp-universal-fallback)
+    - [Transport 4: govc export (CLI-Based)](#transport-4-govc-export-cli-based)
 - [Fixer Subsystems (Deep Dive)](#fixer-subsystems-deep-dive)
   - [Offline Fixing (Default Strategy)](#offline-fixing-default-strategy)
     - [1. Filesystem Fixing (`fixers/filesystem/`)](#1-filesystem-fixing-fixersfilesystem)
     - [2. Bootloader Fixing (`fixers/bootloader/`)](#2-bootloader-fixing-fixersbootloader)
     - [3. Config Rewriting (`fixers/offline/config_rewriter.py`)](#3-config-rewriting-fixersofflineconfig_rewriterpy)
-    - [4. VMware Tools Removal (`fixers/offline/vmware_tools_remover.py`)](#4-vmware-tools-removal-fixersofflinevmware_tools_removerpy)
   - [Live Fixing (Opt-In Strategy)](#live-fixing-opt-in-strategy)
   - [Windows Fixing (Hermetically Sealed)](#windows-fixing-hermetically-sealed)
     - [Registry Subsystem (`fixers/windows/registry/`)](#registry-subsystem-fixerswindowsregistry)
@@ -98,7 +96,6 @@
   - [Parallel Processing](#parallel-processing)
     - [Disk Processing](#disk-processing)
   - [I/O Optimization](#io-optimization)
-    - [VDDK (VMware)](#vddk-vmware)
     - [Compression](#compression)
 - [Testing Strategy](#testing-strategy)
   - [Unit Tests](#unit-tests)
@@ -149,7 +146,6 @@ Acquire source disks and metadata from any source:
 - ESXi hosts via SSH/SCP
 - Local filesystem paths
 - HTTP datastore downloads
-- VDDK high-speed transfers
 - OVA/OVF archives
 
 **Key principle:** Source-agnostic acquisition with unified interface.
@@ -312,8 +308,7 @@ h2kvm/
 │   │
 │   ├── bootloader/                   # Bootloader fixing subsystem
 │   │   ├── __init__.py
-│   │   ├── fixer.py                  # Bootloader fixer orchestration
-│   │   └── grub.py                   # GRUB/GRUB2 specific fixes
+│   │   └── fixer.py                  # Bootloader fixer orchestration
 │   │
 │   ├── filesystem/                   # Filesystem fixing subsystem
 │   │   ├── __init__.py
@@ -339,12 +334,10 @@ h2kvm/
 │   │   ├── config_rewriter.py        # System config file rewriting
 │   │   ├── mount.py                  # Guest filesystem mounting
 │   │   ├── spec_converter.py         # Spec file format conversions
-│   │   ├── validation.py             # Offline fix validation
-│   │   └── vmware_tools_remover.py   # Offline VMware Tools purge
+│   │   └── validation.py             # Offline fix validation
 │   │
 │   └── windows/                      # Windows-specific fixing subsystem
 │       ├── __init__.py
-│       ├── fixer.py                  # Main Windows fixer orchestrator
 │       ├── network_fixer.py          # Windows network fixing
 │       ├── registry_core.py          # Registry manipulation core
 │       ├── registry/                 # Windows Registry subsystem
@@ -399,8 +392,7 @@ h2kvm/
     ├── clients/                      # VMware API clients
     │   ├── __init__.py
     │   ├── client.py                 # pyvmomi SmartConnect wrapper
-    │   ├── extensions.py             # vSphere API extensions
-    │   └── nfc_lease.py              # NFC lease management for exports
+    │   └── extensions.py             # vSphere API extensions
     │
     ├── transports/                   # Data-plane transport implementations
     │   ├── __init__.py
@@ -409,9 +401,7 @@ h2kvm/
     │   ├── http_client.py            # HTTP datastore download client
     │   ├── http_progress.py          # HTTP download progress tracking
     │   ├── ovftool_client.py         # VMware ovftool wrapper
-    │   ├── ovftool_loader.py         # ovftool dynamic loader
-    │   ├── vddk_client.py            # VDDK high-speed transfer client
-    │   └── vddk_loader.py            # VDDK dynamic library loader
+    │   └── ovftool_loader.py         # ovftool dynamic loader
     │
     ├── utils/                        # VMware utilities
     │   ├── __init__.py
@@ -484,7 +474,6 @@ The orchestrator was refactored from a single 1,197-line monolithic class into *
 **Export Modes:**
 - Direct export
 - Download-only (no conversion)
-- VDDK high-speed transfer
 
 **Features:**
 - Snapshot management (create/delete)
@@ -563,20 +552,7 @@ VMware integration enforces strict separation between **what to do** (control) a
 
 **No inventory logic** - pure transport layer.
 
-#### Transport 1: VDDK (Highest Performance)
-**Library:** VMware Virtual Disk Development Kit
-
-**Module:** `vmware/transports/vddk_client.py`
-
-**Features:**
-- Direct disk access over NBD or SAN
-- Multi-threaded I/O
-- CBT support for incremental transfers
-- Throughput-optimized
-
-**When to Use:** Large VMs, bandwidth-constrained environments
-
-#### Transport 2: ovftool (Official VMware Export)
+#### Transport 1: ovftool (Official VMware Export)
 **Tool:** VMware OVF Tool
 
 **Module:** `vmware/transports/ovftool_client.py`
@@ -589,7 +565,7 @@ VMware integration enforces strict separation between **what to do** (control) a
 
 **When to Use:** Need OVF compatibility, vendor-specific flags
 
-#### Transport 3: HTTP `/folder` (Datastore Downloads)
+#### Transport 2: HTTP `/folder` (Datastore Downloads)
 **Protocol:** HTTPS datastore browsing
 
 **Module:** `vmware/transports/http_client.py`
@@ -599,9 +575,9 @@ VMware integration enforces strict separation between **what to do** (control) a
 - CBT incremental downloads
 - Stateless (no session management)
 
-**When to Use:** Simple downloads, no VDDK available
+**When to Use:** Simple downloads
 
-#### Transport 4: SSH/SCP (Universal Fallback)
+#### Transport 3: SSH/SCP (Universal Fallback)
 **Protocol:** SSH with SCP/SFTP
 
 **Module:** `ssh/ssh_client.py`
@@ -613,8 +589,8 @@ VMware integration enforces strict separation between **what to do** (control) a
 
 **When to Use:** API access unavailable, ESXi direct access
 
-#### Transport 5: govc export (CLI-Based)
-**Tool:** govc export.ovf / export.ova
+#### Transport 4: govc export (CLI-Based)
+**Tool:** govc export.ovf
 
 **Module:** `vmware/transports/govc_export.py`
 
@@ -660,11 +636,6 @@ VMware integration enforces strict separation between **what to do** (control) a
 - Systemd unit modifications
 - Network configuration updates
 - Service enablement/disablement
-
-#### 4. VMware Tools Removal (`fixers/offline/vmware_tools_remover.py`)
-- Package removal (offline dpkg/rpm manipulation)
-- Service cleanup
-- Artifact deletion
 
 ---
 
@@ -1026,7 +997,7 @@ Fixers should:
 **Does NOT own:** Migration itself.
 
 ### `vmware/`
-**Owns:** VMware-specific integrations (vSphere API, VDDK, govc).
+**Owns:** VMware-specific integrations (vSphere API, govc).
 **Does NOT own:** Generic disk operations (that's `converters/`).
 
 ---
@@ -1109,10 +1080,6 @@ Fixers should:
 **When to Use:** Multi-disk VMs (e.g., VM with OS disk + data disks)
 
 ### I/O Optimization
-
-#### VDDK (VMware)
-**Benefit:** 3-5x faster than HTTP downloads
-**Trade-off:** Requires VDDK installation, complex setup
 
 #### Compression
 **Benefit:** Smaller output files, faster network transfers
@@ -1199,8 +1166,6 @@ Real-time progress tracking and performance metrics.
 ## Glossary
 
 **guestfs backend:** Abstraction for accessing and modifying virtual machine disk images offline. GuestKit is the default backend via `hypersdk-guestkit`.
-
-**VDDK:** VMware Virtual Disk Development Kit - high-performance API for disk access.
 
 **govc:** VMware's official CLI for vSphere operations.
 

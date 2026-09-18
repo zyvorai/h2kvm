@@ -45,13 +45,13 @@ Before following this guide, you should have:
 Run a config by selecting a command (mode):
 
 ```bash
-sudo h2kvmctl --config example.yaml local
+sudo h2kvmctl --config example.yaml --cmd local
 ````
 
 Merge multiple configs (later overrides earlier):
 
 ```bash
-sudo h2kvmctl --config base.yaml --config overrides.yaml local
+sudo h2kvmctl --config base.yaml --config overrides.yaml --cmd local
 ```yaml
 
 ### Multi-VM configs
@@ -88,14 +88,12 @@ out_format: qcow2
 * **Data-plane**:
 
   * **HTTP `/folder`**: byte-for-byte download of datastore files using vCenter session cookie
-  * **VDDK client**: single-disk raw pull through VDDK (when available)
   * **Internal converters**: OVA/VHD/AMI/VMDK extraction and conversion to qcow2/raw
 
 **Rule of thumb**: use the **least invasive** data-plane that solves your goal:
 
 * Need qcow2 + conversion? → h2kvm internal converters
 * Need raw datastore bytes? → HTTP `/folder` download-only
-* Need one disk fast via ESXi? → VDDK pull
 * Need incremental sync? → CBT + HTTP Range reads
 
 ---
@@ -673,7 +671,7 @@ dry_run: false
 Run:
 
 ```bash
-sudo h2kvmctl --config base.yaml --config overrides.yaml local
+sudo h2kvmctl --config base.yaml --config overrides.yaml --cmd local
 ```yaml
 
 ---
@@ -966,7 +964,7 @@ sudo h2kvmctl --config vm-manifest.json \
 **Libvirt XML import**:
 ```bash
 # Parse libvirt domain XML and convert
-sudo h2kvmctl libvirt-xml \
+sudo h2kvmctl --cmd libvirt-xml \
   --xml-path /etc/libvirt/qemu/myvm.xml \
   --output-dir /converted
 ```

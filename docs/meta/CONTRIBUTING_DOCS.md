@@ -492,7 +492,7 @@ regen_initramfs: true      # Another helpful comment
 
 ```bash
 # Description of what this command does
-h2kvmctl migrate local /path/to/vm.vmdk --output /output/vm.qcow2
+h2kvmctl --cmd local --vmdk /path/to/vm.vmdk --to-output /output/vm.qcow2
 
 # Multi-line command with explanation
 h2kvmctl --config << EOF

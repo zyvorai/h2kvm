@@ -160,7 +160,7 @@ When running h2kvm as a non-root operator:
 
 ```bash
 export H2KVM_USE_SUDO=1
-h2kvmctl local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
+h2kvmctl --cmd local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
 ```
 
 ## Backends

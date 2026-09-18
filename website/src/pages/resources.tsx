@@ -34,19 +34,6 @@ const ASSETS: Asset[] = [
     ],
   },
   {
-    title: 'VDDK was never the exit',
-    blurb:
-      'The counter to The Register, 10 September 2026. The disk leaves through the vSphere API. The guest is fixed before power-on.',
-    meta: 'Article',
-    links: [
-      {
-        label: 'Read on GitHub',
-        href: 'https://github.com/zyvorai/h2kvm/blob/main/docs/marketing/vddk-was-never-the-exit.md',
-      },
-      {label: 'How it works', href: '/docs/how-it-works'},
-    ],
-  },
-  {
     title: 'Product',
     blurb:
       'GuestKit, h2kvm, Zorvia, Zeus OS, and Machina on zyvor.dev. Book a demo or start a 30-day proof of concept.',

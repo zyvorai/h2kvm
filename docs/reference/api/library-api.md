@@ -995,7 +995,7 @@ If you're using the CLI and want to migrate to the library, here's how:
 ### CLI Command
 
 ```bash
-sudo h2kvmctl vsphere \
+sudo h2kvmctl --cmd vsphere \
     --vcenter vcenter.example.com \
     --user administrator@vsphere.local \
     --password-env VC_PASSWORD \
@@ -1039,7 +1039,7 @@ CLI:
 
 ```bash
 for vm in vm1 vm2 vm3; do
-    sudo h2kvmctl vsphere --vm $vm ...
+    sudo h2kvmctl --cmd vsphere --vm $vm ...
 done
 ```
 

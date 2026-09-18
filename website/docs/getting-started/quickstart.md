@@ -16,7 +16,7 @@ The host needs Linux with `qemu-img`. Repair and disk mounts often need root, or
 ## A disk you already have
 
 ```bash
-h2kvmctl local --vmdk ubuntu.vmdk --to-output ubuntu.qcow2 --backend guestkit
+h2kvmctl --cmd local --vmdk ubuntu.vmdk --to-output ubuntu.qcow2 --backend guestkit
 ```
 
 That converts the disk and runs GuestKit repair. On Debian or Ubuntu, `chown libvirt-qemu:kvm` the qcow2 before `virsh start`.
@@ -33,7 +33,7 @@ pip install -e ".[full]"
 
 | You want | Go here |
 |---|---|
-| Why the disk does not need VDDK | [How it works](../how-it-works) |
+| Where disks come from, and where the VM lands | [How it works](../how-it-works) |
 | Product page | [zyvor.dev/h2kvm](https://zyvor.dev/h2kvm) |
 | Source | [github.com/zyvorai/h2kvm](https://github.com/zyvorai/h2kvm) |
 | Package | [PyPI](https://pypi.org/project/h2kvm/1.3.0/) |

@@ -508,7 +508,7 @@ Deployment Problems?
    └─ Job submission fails?
       └─→ Check daemon status
          ```bash
-         h2kvmctl daemon status
+         python3 -m h2kvm.cli.daemon_ctl status
          curl http://localhost:8080/api/v1/health
          ```
 ```

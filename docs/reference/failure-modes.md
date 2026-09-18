@@ -30,7 +30,7 @@ This document covers common failure scenarios in VM migration and how h2kvm addr
 
 **Solution:**
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --fix-fstab \
@@ -66,7 +66,7 @@ blkid
 
 **Solution:**
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --regen-initramfs \
@@ -95,7 +95,7 @@ dracut --force --add-drivers "virtio_blk virtio_net virtio_pci" /boot/initramfs-
 
 **Solution:**
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --fix-bootloader \
@@ -121,7 +121,7 @@ sudo h2kvmctl local \
 **Solution:**
 ```bash
 # Always flatten snapshots
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --flatten \
   --to-output vm.qcow2 \
@@ -158,7 +158,7 @@ qemu-img check vm.qcow2
 df -h /output/directory
 
 # Use compression to save space
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --compress \
@@ -182,7 +182,7 @@ sudo h2kvmctl local \
 **Solution:**
 ```bash
 # Fetch all related files
-sudo h2kvmctl fetch-and-fix \
+sudo h2kvmctl --cmd fetch-and-fix \
   --host esxi.example.com \
   --remote /vmfs/volumes/ds1/vm/vm.vmdk \
   --fetch-all \
@@ -207,7 +207,7 @@ sudo h2kvmctl fetch-and-fix \
 
 **Solution:**
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --fix-network \
@@ -241,7 +241,7 @@ sudo nmcli connection add type ethernet ifname ens3
 
 **Solution:**
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --clean-udev-rules \
@@ -270,7 +270,7 @@ sudo h2kvmctl local \
 wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso
 
 # Inject drivers offline
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk windows.vmdk \
   --to-output windows.qcow2 \
   --windows \
@@ -297,7 +297,7 @@ sudo h2kvmctl local \
 **Solution:**
 ```bash
 # Use two-phase Windows boot
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk windows.vmdk \
   --to-output windows.qcow2 \
   --windows \
@@ -346,14 +346,14 @@ sudo h2kvmctl local \
 **Solution:**
 ```bash
 # Try alternative converter
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --use-export
 
 # Or increase resources
 ulimit -v unlimited
-sudo h2kvmctl local --vmdk vm.vmdk --to-output vm.qcow2
+sudo h2kvmctl --cmd local --vmdk vm.vmdk --to-output vm.qcow2
 ```
 
 ---
@@ -376,7 +376,7 @@ sudo h2kvmctl local --vmdk vm.vmdk --to-output vm.qcow2
 sudo dnf install xfsprogs e2fsprogs
 
 # Skip inspection if needed
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --no-guest-inspection
@@ -399,14 +399,14 @@ sudo h2kvmctl local \
 **Solution:**
 ```bash
 # Use fast mode
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --no-compress \
   --fast
 
 # Or use multiple threads
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --threads 4
@@ -430,7 +430,7 @@ sudo h2kvmctl local \
 
 **Solution:**
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --qemu-test \
@@ -454,14 +454,14 @@ sudo h2kvmctl local \
 **Solution:**
 ```bash
 # Increase timeout
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --qemu-test \
   --boot-timeout 600
 
 # Or disable boot test
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --no-test
@@ -484,7 +484,7 @@ sudo h2kvmctl --log-level DEBUG local \
 
 ```bash
 # Preview what will happen
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --dry-run
@@ -493,7 +493,7 @@ sudo h2kvmctl local \
 ### Generate Detailed Report
 
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --report migration-report.md

@@ -216,7 +216,7 @@ Write-Log "=== License Reactivation Complete ==="
 
 **Integration Point**:
 ```python
-# In h2kvm/fixers/windows/fixer.py
+# Proposed integration point in the Windows fix stage
 
 def fix_windows(self, guestfs, root):
     # ... existing driver injection ...

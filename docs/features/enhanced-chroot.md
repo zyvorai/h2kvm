@@ -83,20 +83,6 @@ The enhanced chroot implementation (`command_with_mounts()` method) follows this
 
 **Performance Overhead**: ~510ms per command (1.2% of total migration time)
 
-### Auto-Detection in GRUB Fixer
-
-The GRUB fixer automatically detects bootloader commands and uses enhanced chroot:
-
-**Location**: `h2kvm/fixers/bootloader/grub.py:132-169`
-
-**Detected Commands** (8 total):
-- `grub2-mkconfig`, `grub-mkconfig`
-- `update-grub`, `update-grub2`
-- `grub2-install`, `grub-install`
-- `grub2-probe`, `grub-probe`
-
-When any of these commands are detected, the fixer automatically uses `command_with_mounts()` instead of the simple `command()`.
-
 ### Backward Compatibility
 
 The implementation is fully backward compatible:

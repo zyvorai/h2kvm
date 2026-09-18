@@ -11,9 +11,9 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'No VDDK',
+    title: 'Pick it up where it lives',
     description:
-      'The disk leaves through the vSphere API and NFS. The Virtual Disk Development Kit is not on this path.',
+      'vSphere over HTTPS, ESXi over SSH, Azure, or a disk file you already have.',
     to: '/docs/how-it-works',
   },
   {
@@ -29,9 +29,9 @@ const FeatureList: FeatureItem[] = [
     to: '/docs/getting-started/quickstart',
   },
   {
-    title: 'Watch the boot',
+    title: 'Land it where you run VMs',
     description:
-      'Zorvia is the console. Zeus OS and Machina are where the VM keeps running after cutover.',
+      'KubeVirt clusters (Zorvia, Zeus OS), libvirt hosts (Machina), or OpenStack. One target per run.',
     to: '/docs/how-it-works',
   },
   {

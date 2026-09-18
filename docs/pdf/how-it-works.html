@@ -167,7 +167,7 @@ type CarbonScheduler interface {
 
   <table>
     <tr><th>Provider</th><th>Discovery</th><th>Export Method</th><th>Auth</th></tr>
-    <tr><td><strong>VMware vSphere</strong></td><td>govc / pyvmomi / SOAP API</td><td>OVF export, OVA, HTTPS /folder, VDDK, CBT delta</td><td>SSO, user/pass</td></tr>
+    <tr><td><strong>VMware vSphere</strong></td><td>govc / pyvmomi / SOAP API</td><td>OVF export, OVA, HTTPS /folder, CBT delta</td><td>SSO, user/pass</td></tr>
     <tr><td><strong>AWS EC2</strong></td><td>EC2 DescribeInstances</td><td>EBS snapshot → S3 → download, AMI export</td><td>IAM, access keys</td></tr>
     <tr><td><strong>Microsoft Azure</strong></td><td>Compute client</td><td>Managed disk snapshot → blob → download</td><td>Service principal, MSI</td></tr>
     <tr><td><strong>Google Cloud</strong></td><td>Compute API</td><td>Disk snapshot → GCS → download</td><td>Service account JSON</td></tr>

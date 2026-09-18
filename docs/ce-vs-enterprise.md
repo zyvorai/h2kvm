@@ -28,7 +28,7 @@ Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **
 
 | Capability | Community | Enterprise |
 | --- | --- | --- |
-| vSphere (govc / ovftool / VDDK) | ✅ | ✅ |
+| vSphere (govc / ovftool) | ✅ | ✅ |
 | Hyper-V VHD/VHDX | ✅ | ✅ |
 | AWS · Azure disk export paths | ✅ | ✅ |
 | Proxmox / Veeam backup vaults | ✅ / limited | ✅ Hardened playbooks |

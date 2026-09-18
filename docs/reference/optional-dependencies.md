@@ -47,7 +47,6 @@ pip install h2kvm[vsphere]
 
 **Additional features:**
 - ✅ Direct vSphere VM export
-- ✅ VDDK disk downloads
 - ✅ CBT (Changed Block Tracking)
 - ✅ Snapshot management
 
@@ -536,7 +535,6 @@ pip install --user h2kvm[vsphere]
 
 # Adds:
 # ✅ Direct vSphere VM export (via pyvmomi)
-# ✅ VDDK support
 # ✅ Snapshot management
 # ✅ CBT (Changed Block Tracking)
 ```
