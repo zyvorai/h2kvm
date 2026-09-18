@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "h2kvm"
-version = "1.2.0"
+version = "1.2.1"
 description = "Production-Grade Hypervisor to KVM/QEMU Migration Toolkit"
 readme = "README.md"
 authors = [
@@ -175,11 +175,11 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ssahani/h2kvm"
-Documentation = "https://github.com/ssahani/h2kvm/tree/main/docs"
-Repository = "https://github.com/ssahani/h2kvm"
-"Bug Tracker" = "https://github.com/ssahani/h2kvm/issues"
-Changelog = "https://github.com/ssahani/h2kvm/releases"
+Homepage = "https://zyvor.dev/h2kvm"
+Documentation = "https://github.com/zyvorai/h2kvm/tree/main/docs"
+Repository = "https://github.com/zyvorai/h2kvm"
+"Bug Tracker" = "https://github.com/zyvorai/h2kvm/issues"
+Changelog = "https://github.com/zyvorai/h2kvm/releases"
 
 [project.scripts]
 # Primary CLI command

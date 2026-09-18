@@ -188,7 +188,7 @@ users:
 
 2. **Or Use OLM Bundle**
    ```bash
-   operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
+   operator-sdk run bundle ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0
    ```
 
 3. **SecurityContextConstraints**

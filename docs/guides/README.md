@@ -365,7 +365,7 @@ sudo h2kvmctl --config fetch.yaml
 
 Help improve the guides:
 
-1. **Found an issue?** [Open an issue](https://github.com/ssahani/h2kvm/issues)
+1. **Found an issue?** [Open an issue](https://github.com/zyvorai/h2kvm/issues)
 2. **Have a recipe?** Share it in the [Cookbook](cookbook.md)
 3. **Found a workaround?** Add to [Troubleshooting](troubleshooting.md)
 

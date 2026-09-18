@@ -257,7 +257,7 @@ h2kvmctl wizard
 
 h2kvm is **Proprietary (Zyvor AI Labs) licensed** and built for the enterprise Linux ecosystem.
 
-**GitHub**: [ssahani/h2kvm](https://github.com/ssahani/h2kvm)
+**GitHub**: [zyvorai/h2kvm](https://github.com/zyvorai/h2kvm)
 **PyPI**: `pip install h2kvm[full]`
 **Platform**: Linux (Fedora, RHEL, CentOS, Ubuntu, Debian)
 
@@ -335,8 +335,8 @@ h2kvmctl wizard
 ```
 
 **Get involved**:
-- ⭐ Star on GitHub: [github.com/ssahani/h2kvm](https://github.com/ssahani/h2kvm)
-- 📖 Read the docs: [Full documentation](https://github.com/ssahani/h2kvm/tree/main/docs)
+- ⭐ Star on GitHub: [github.com/zyvorai/h2kvm](https://github.com/zyvorai/h2kvm)
+- 📖 Read the docs: [Full documentation](https://github.com/zyvorai/h2kvm/tree/main/docs)
 - 🐛 Report issues: We're responsive to feedback
 - 🤝 Contribute: PRs welcome, especially for new fixers and integrations
 

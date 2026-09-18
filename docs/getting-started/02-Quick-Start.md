@@ -108,7 +108,7 @@ qemu-img --version
 
 ```bash
 # Clone the repository
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 
 # Create virtual environment
@@ -124,15 +124,14 @@ pip install -e .
 h2kvmctl --help
 ```
 
-### Option B: Install from GitHub Release (v1.1.0)
+### Option B: Install from PyPI (v1.2.1)
 
 ```bash
-pip install "hypersdk-guestkit>=1.1.0"
-pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
+pip install "h2kvm==1.2.1"
 h2kvmctl --help
 ```
 
-> **Note:** The `h2kvm` PyPI project is not published yet. Use the release wheel or install from source (Option A). Legacy package name [`hyper2kvm`](https://pypi.org/project/hyper2kvm/) is unrelated to this 1.1.0 line.
+> **Note:** [`hyper2kvm`](https://pypi.org/project/hyper2kvm/) is a different package. Install `h2kvm`.
 
 ---
 
@@ -437,7 +436,7 @@ sudo h2kvmctl local \
 
 ### Get Help
 
-- **GitHub Issues:** https://github.com/ssahani/h2kvm/issues
+- **GitHub Issues:** https://github.com/zyvorai/h2kvm/issues
 - **Documentation:** `docs/` directory
 - **Examples:** `examples/` directory
 
@@ -569,7 +568,7 @@ Now that you've completed your first migration:
 
 ## Getting Help
 
-- **Issues:** [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+- **Issues:** [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
 - **Troubleshooting:** [Failure Modes Guide](90-Failure-Modes.md)
 - **Documentation:** All docs in `docs/` directory
 

@@ -19,7 +19,7 @@ This guide will help you get started with contributing to h2kvm.
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 
 # Create virtual environment
@@ -430,9 +430,9 @@ We follow [Semantic Versioning](https://semver.org/):
 
 ### Community
 
-- **GitHub Issues**: <https://github.com/ssahani/h2kvm/issues>
-- **GitHub Discussions**: <https://github.com/ssahani/h2kvm/discussions>
-- **Pull Requests**: <https://github.com/ssahani/h2kvm/pulls>
+- **GitHub Issues**: <https://github.com/zyvorai/h2kvm/issues>
+- **GitHub Discussions**: <https://github.com/zyvorai/h2kvm/discussions>
+- **Pull Requests**: <https://github.com/zyvorai/h2kvm/pulls>
 
 ### Asking Questions
 

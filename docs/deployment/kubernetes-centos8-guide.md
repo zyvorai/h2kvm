@@ -176,7 +176,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: h2kvm
-        image: ghcr.io/ssahani/h2kvm:latest
+        image: ghcr.io/zyvorai/h2kvm:latest
         imagePullPolicy: Always
         command:
           - h2kvmctl
@@ -569,7 +569,7 @@ spec:
 
       containers:
       - name: h2kvm
-        image: ghcr.io/ssahani/h2kvm:latest
+        image: ghcr.io/zyvorai/h2kvm:latest
         imagePullPolicy: Always
 
         command:
@@ -721,7 +721,7 @@ spec:
 
       containers:
       - name: api
-        image: ghcr.io/ssahani/h2kvm:latest
+        image: ghcr.io/zyvorai/h2kvm:latest
         imagePullPolicy: Always
 
         command:
@@ -875,7 +875,7 @@ spec:
 
       containers:
       - name: h2kvm
-        image: ghcr.io/ssahani/h2kvm:latest
+        image: ghcr.io/zyvorai/h2kvm:latest
 
         command:
           - h2kvmctl

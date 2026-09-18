@@ -217,7 +217,7 @@ make check       # test + lint + security (without coverage)
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 
 # Install in development mode

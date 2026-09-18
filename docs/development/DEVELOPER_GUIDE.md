@@ -291,7 +291,7 @@ error.user_message(include_context=True)
 #   2. Insufficient permissions
 #   3. Incorrect datacenter specified
 #
-# Documentation: https://github.com/ssahani/h2kvm/blob/main/docs/30-vSphere-Export.md#troubleshooting
+# Documentation: https://github.com/zyvorai/h2kvm/blob/main/docs/30-vSphere-Export.md#troubleshooting
 
 # With cause
 error.user_message(include_cause=True)

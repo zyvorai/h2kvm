@@ -726,7 +726,7 @@ spec:
     spec:
       containers:
       - name: h2kvm
-        image: ghcr.io/ssahani/h2kvm:latest
+        image: ghcr.io/zyvorai/h2kvm:latest
         command:
           - h2kvmctl
           - --config
@@ -869,7 +869,7 @@ Use this as a starting point for any migration:
 ```yaml
 # H2KVM Migration Configuration Template
 # Version: 0.3.0
-# Documentation: https://github.com/ssahani/h2kvm
+# Documentation: https://github.com/zyvorai/h2kvm
 
 # ============================================
 # BASIC CONFIGURATION (Required)
@@ -942,11 +942,11 @@ log_file: /var/log/h2kvm/migration.log
 
 ```bash
 # Download examples directory
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm/examples
 
 # Or copy individual examples
-curl -O https://raw.githubusercontent.com/ssahani/h2kvm/main/examples/simple-linux.yaml
+curl -O https://raw.githubusercontent.com/zyvorai/h2kvm/main/examples/simple-linux.yaml
 ```
 
 ---

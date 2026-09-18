@@ -175,7 +175,7 @@ pip install "h2kvm[full]"
 pip install h2kvm
 
 # From source
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 pip install -e ".[full]"
 ```
@@ -262,7 +262,7 @@ h2kvmctl --config migration.yaml
 1. **Docker/Podman**
    ```bash
    podman run -d -v /data:/data \
-     ghcr.io/ssahani/h2kvm:2.1.0-worker
+     ghcr.io/zyvorai/h2kvm:2.1.0-worker
    ```
 
 2. **Kubernetes**
@@ -606,7 +606,7 @@ def effective_cpu_count() -> int:
 
 ```bash
 # Inside container
-docker run --cpus=2 ghcr.io/ssahani/h2kvm:latest python3 -c \
+docker run --cpus=2 ghcr.io/zyvorai/h2kvm:latest python3 -c \
   "from h2kvm.utils import effective_cpu_count; print(effective_cpu_count())"
 # Output: 2 (not 16+)
 ```
@@ -916,8 +916,8 @@ cp /vmware/original.vmdk /backup/original.vmdk.backup
 - **[Troubleshooting](guides/troubleshooting.md)** - Fix common issues
 
 ### Support
-- **GitHub Issues**: [Report bugs](https://github.com/ssahani/h2kvm/issues)
-- **GitHub Discussions**: [Ask questions](https://github.com/ssahani/h2kvm/discussions)
+- **GitHub Issues**: [Report bugs](https://github.com/zyvorai/h2kvm/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/zyvorai/h2kvm/discussions)
 
 ### Examples
 - **[Migration Recipes](recipes/)** - Real-world examples
@@ -925,7 +925,7 @@ cp /vmware/original.vmdk /backup/original.vmdk.backup
 
 ---
 
-**Can't find your question?** [Ask on GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
+**Can't find your question?** [Ask on GitHub Discussions](https://github.com/zyvorai/h2kvm/discussions)
 
 ---
 

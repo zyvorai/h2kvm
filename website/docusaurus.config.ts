@@ -4,7 +4,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'h2kvm',
-  tagline: 'Any hypervisor → KVM. Convert offline. Fix the guest. Deploy with confidence.',
+  tagline: 'Any hypervisor to KVM. The guest is fixed before power-on.',
   favicon: 'img/favicon.svg',
 
   future: {
@@ -17,10 +17,9 @@ const config: Config = {
   organizationName: 'zyvorai',
   projectName: 'h2kvm',
 
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'throw',
 
   markdown: {
-    format: 'md',
     hooks: {
       onBrokenMarkdownLinks: 'warn',
     },
@@ -31,17 +30,21 @@ const config: Config = {
     locales: ['en'],
   },
 
-  staticDirectories: ['static', '../docs/client-presentations/screenshots'],
+  // Screenshots and share cards stay in the repo root. README and this site
+  // both use the same files.
+  staticDirectories: [
+    'static',
+    '../docs/client-presentations/screenshots',
+    '../docs/social',
+  ],
 
   presets: [
     [
       'classic',
       {
         docs: {
-          path: '../docs',
-          routeBasePath: 'docs',
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/zyvorai/h2kvm/tree/main/docs/',
+          editUrl: 'https://github.com/zyvorai/h2kvm/tree/main/website/',
         },
         blog: false,
         theme: {
@@ -52,11 +55,11 @@ const config: Config = {
   ],
 
   themeConfig: {
+    image: 'h2kvm-share-card.png',
     colorMode: {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      hideOnScroll: false,
       title: 'h2kvm',
       logo: {
         alt: 'h2kvm',
@@ -66,12 +69,22 @@ const config: Config = {
         {
           type: 'docSidebar',
           sidebarId: 'docsSidebar',
-          position: 'right',
+          position: 'left',
           label: 'Docs',
+        },
+        {
+          to: '/resources',
+          label: 'Resources',
+          position: 'left',
         },
         {
           href: 'https://github.com/zyvorai/h2kvm',
           label: 'GitHub',
+          position: 'right',
+        },
+        {
+          href: 'https://zyvor.dev/h2kvm',
+          label: 'Enterprise',
           position: 'right',
         },
       ],
@@ -82,24 +95,34 @@ const config: Config = {
         {
           title: 'Docs',
           items: [
-            {label: 'Full docs', to: '/docs/README'},
-            {label: 'Remote deploy', to: '/docs/deployment/deploy-remote'},
-            {label: 'CE vs Enterprise', to: '/docs/ce-vs-enterprise'},
+            {label: 'Quickstart', to: '/docs/getting-started/quickstart'},
+            {label: 'How it works', to: '/docs/how-it-works'},
+            {label: 'Resources', to: '/resources'},
           ],
         },
         {
           title: 'Project',
           items: [
             {label: 'GitHub', href: 'https://github.com/zyvorai/h2kvm'},
-            {label: 'Releases', href: 'https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0'},
-            {label: 'License', href: 'https://github.com/zyvorai/h2kvm/blob/main/LICENSE'},
+            {label: 'PyPI', href: 'https://pypi.org/project/h2kvm/'},
+            {
+              label: 'Changelog',
+              href: 'https://github.com/zyvorai/h2kvm/blob/main/CHANGELOG.md',
+            },
           ],
         },
         {
           title: 'Zyvor Enterprise',
           items: [
-            {label: 'Book an Enterprise demo', href: 'https://zyvor.dev/contact?intent=demo&utm_source=github&utm_medium=h2kvm'},
-            {label: '30-day PoC', href: 'https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm'},
+            {label: 'zyvor.dev/h2kvm', href: 'https://zyvor.dev/h2kvm'},
+            {
+              label: 'Book a demo',
+              href: 'https://zyvor.dev/contact?intent=demo&utm_source=github&utm_medium=h2kvm&utm_campaign=docs_site',
+            },
+            {
+              label: '30-day PoC',
+              href: 'https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=docs_site',
+            },
           ],
         },
       ],

@@ -725,11 +725,11 @@ For deprecated features:
 
 - Check [Documentation Index](index.md)
 - Review [Existing Examples](tutorials/)
-- Ask in [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
+- Ask in [GitHub Discussions](https://github.com/zyvorai/h2kvm/discussions)
 
 ### Suggesting Improvements
 
-- Open an issue: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+- Open an issue: [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
 - Describe what's unclear
 - Suggest improvements
 - Submit a PR if you can

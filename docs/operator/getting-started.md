@@ -40,14 +40,14 @@ cd h2kvm/operator
 make install
 
 # Deploy operator with pre-built image
-make deploy IMG=ghcr.io/ssahani/h2kvm-operator:latest
+make deploy IMG=ghcr.io/zyvorai/h2kvm-operator:latest
 ```
 
 ### Option 2: Build and Install from Source
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm/operator
 
 # Download Go dependencies
@@ -300,5 +300,5 @@ make uninstall
 ## Getting Help
 
 - **Documentation**: See [docs/operator/](.)
-- **Issues**: https://github.com/ssahani/h2kvm/issues
+- **Issues**: https://github.com/zyvorai/h2kvm/issues
 - **Examples**: [operator/config/samples/](../../operator/config/samples/)

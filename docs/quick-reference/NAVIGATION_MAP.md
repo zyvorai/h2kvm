@@ -189,7 +189,7 @@ Troubleshooting Path:
     └─→ [FAQ](FAQ.md) - Search for your error
         └─→ [Troubleshooting Guide](guides/troubleshooting.md)
             └─→ [Failure Modes](reference/failure-modes.md)
-                └─→ Still stuck? [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+                └─→ Still stuck? [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
 ```
 
 ---

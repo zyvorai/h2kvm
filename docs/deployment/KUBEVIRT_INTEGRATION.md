@@ -97,7 +97,7 @@ kubectl create -f https://github.com/kubevirt/containerized-data-importer/releas
 
 ```bash
 # Install CRDs
-kubectl apply -f https://raw.githubusercontent.com/ssahani/h2kvm/main/k8s/operator/crds/
+kubectl apply -f https://raw.githubusercontent.com/zyvorai/h2kvm/main/k8s/operator/crds/
 
 # Deploy operator (see DEPLOYMENT.md)
 kubectl apply -f k8s/operator/manifests/
@@ -823,7 +823,7 @@ After activation, all KubeVirt VM management in the dashboard targets the produc
 
 - [KubeVirt Documentation](https://kubevirt.io/user-guide/)
 - [CDI Documentation](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/datavolumes.md)
-- [H2KVM Repository](https://github.com/ssahani/h2kvm)
+- [H2KVM Repository](https://github.com/zyvorai/h2kvm)
 - [Virtctl CLI Guide](https://kubevirt.io/user-guide/operations/virtctl_client_tool/)
 
 ---

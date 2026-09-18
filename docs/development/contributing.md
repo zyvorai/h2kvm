@@ -6,7 +6,7 @@ Thank you for your interest in contributing to h2kvm!
 
 h2kvm is available on multiple platforms:
 
-- **GitHub (Primary)**: https://github.com/ssahani/h2kvm
+- **GitHub (Primary)**: https://github.com/zyvorai/h2kvm
 - **GitLab (Mirror)**: https://gitlab.com/ssahani/h2kvm - Auto-synced from GitHub
 - **PyPI**: https://pypi.org/project/h2kvm/
 
@@ -17,7 +17,7 @@ h2kvm is available on multiple platforms:
 The GitLab repository automatically syncs from GitHub using:
 - **Method**: GitLab Pull Mirroring
 - **Frequency**: Every 5 minutes
-- **Source**: https://github.com/ssahani/h2kvm
+- **Source**: https://github.com/zyvorai/h2kvm
 - **Target**: https://gitlab.com/ssahani/h2kvm
 
 ### For Maintainers: Mirror Configuration
@@ -26,7 +26,7 @@ If you need to set up mirroring on a new repository:
 
 1. Go to GitLab: Settings → Repository → Mirroring repositories
 2. Add mirror:
-   - **Git repository URL**: `https://github.com/ssahani/h2kvm.git`
+   - **Git repository URL**: `https://github.com/zyvorai/h2kvm.git`
    - **Mirror direction**: Pull
    - **Authentication**: Use GitHub Personal Access Token with `repo` scope
 3. Enable: "Mirror only protected branches" (optional)
@@ -48,7 +48,7 @@ The mirror will automatically pull changes every 5 minutes.
 
 ```bash
 # Clone the repository
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 
 # Install system dependencies (Fedora/RHEL)
@@ -191,8 +191,8 @@ ruff check --fix h2kvm/
 
 ## 🤝 Community
 
-- **GitHub Issues**: https://github.com/ssahani/h2kvm/issues
-- **Discussions**: https://github.com/ssahani/h2kvm/discussions
+- **GitHub Issues**: https://github.com/zyvorai/h2kvm/issues
+- **Discussions**: https://github.com/zyvorai/h2kvm/discussions
 - **Maintainer**: ZyvorAI Labs Private Limited (ssahani@zyvor.dev)
 
 ## 📜 License

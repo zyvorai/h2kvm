@@ -761,7 +761,7 @@ After choosing your approach:
 4. **Get help if needed**
    - [FAQ](FAQ.md)
    - [Troubleshooting Flowchart](TROUBLESHOOTING_FLOWCHART.md)
-   - [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+   - [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
 
 ---
 

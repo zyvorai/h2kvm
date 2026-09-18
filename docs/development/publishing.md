@@ -288,7 +288,7 @@ rm -rf /tmp/test-pypi-h2kvm
 
 ### 1. Create GitHub Release
 
-Go to: https://github.com/ssahani/h2kvm/releases/new
+Go to: https://github.com/zyvorai/h2kvm/releases/new
 
 - **Tag:** `v0.0.1`
 - **Title:** `v0.0.1 - Initial Release`
@@ -309,8 +309,8 @@ Go to: https://github.com/ssahani/h2kvm/releases/new
 
   ## Documentation
 
-  - [Library API](https://github.com/ssahani/h2kvm/blob/main/docs/08-Library-API.md)
-  - [Quick Start](https://github.com/ssahani/h2kvm/blob/main/docs/03-Quick-Start.md)
+  - [Library API](https://github.com/zyvorai/h2kvm/blob/main/docs/08-Library-API.md)
+  - [Quick Start](https://github.com/zyvorai/h2kvm/blob/main/docs/03-Quick-Start.md)
   ```
 
 - **Attach Files:** Upload `dist/` files
@@ -373,7 +373,7 @@ jobs:
 
 ### Configure Secrets
 
-1. Go to: https://github.com/ssahani/h2kvm/settings/secrets/actions
+1. Go to: https://github.com/zyvorai/h2kvm/settings/secrets/actions
 2. Click "New repository secret"
 3. Name: `PYPI_API_TOKEN`
 4. Value: Your PyPI API token
@@ -556,4 +556,4 @@ h2kvm --version
 
 ---
 
-**Status:** Ready for PyPI publication
+**Status:** Published. `h2kvm` 1.2.1 is on [PyPI](https://pypi.org/project/h2kvm/1.2.1/).

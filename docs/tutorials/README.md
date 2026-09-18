@@ -239,7 +239,7 @@ If you get stuck:
 2. **Review error messages** carefully
 3. **Consult the troubleshooting guide**: [Troubleshooting Guide](../guides/troubleshooting.md)
 4. **Check migration recipes**: [Migration Recipes](../recipes/01-common-scenarios.md)
-5. **Ask for help**: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
+5. **Ask for help**: [GitHub Discussions](https://github.com/zyvorai/h2kvm/discussions)
 
 ### Additional Resources
 
@@ -318,8 +318,8 @@ If you get stuck:
 
 Help us improve these tutorials:
 
-- **Found an error?** [Open an issue](https://github.com/ssahani/h2kvm/issues)
-- **Have a suggestion?** [Start a discussion](https://github.com/ssahani/h2kvm/discussions)
+- **Found an error?** [Open an issue](https://github.com/zyvorai/h2kvm/issues)
+- **Have a suggestion?** [Start a discussion](https://github.com/zyvorai/h2kvm/discussions)
 - **Want to contribute?** [See contributing guide](../development/contributing.md)
 
 ## What's Next?

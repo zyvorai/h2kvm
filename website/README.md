@@ -1,8 +1,8 @@
 # h2kvm docs site
 
-Built with [Docusaurus](https://docusaurus.io/). Serves the live docs at https://zyvorai.github.io/h2kvm/.
+Built with [Docusaurus](https://docusaurus.io/). Same shape as the Netra docs site. Serves the live docs at https://zyvorai.github.io/h2kvm/.
 
-Points directly at the repo's existing `docs/` folder (`docusaurus.config.ts`'s `docs.path: '../docs'`) rather than a hand-curated copy.
+Curated pages live in `website/docs/`. The repo's longer `docs/` tree stays in GitHub. Screenshots and share cards are not copied into `website/static/` — `staticDirectories` serves `docs/client-presentations/screenshots` and `docs/social` in place.
 
 ## Local development
 
@@ -15,13 +15,13 @@ npm start
 
 ```bash
 npm run build
-npm run serve   # preview the production build locally
+npm run serve
 ```
-
-## Images
-
-The hero dashboard screenshot is served in place from `docs/client-presentations/screenshots/` via `staticDirectories` — not duplicated into `website/static/`.
 
 ## Deployment
 
-Deployment is automatic: `.github/workflows/pages.yml` builds and publishes this site to GitHub Pages on every push to `main` that touches `website/`, `docs/`, or the workflow file itself.
+`.github/workflows/pages.yml` builds and publishes this site to GitHub Pages on every push to `main` that touches `website/`, the screenshots, or the share cards. Pages must be enabled once, with Source set to GitHub Actions:
+
+```bash
+gh api repos/zyvorai/h2kvm/pages -X POST -f build_type=workflow
+```

@@ -102,7 +102,7 @@ oc get routes -n h2kvm-system
 ### Step 1: Clone Repository
 
 ```bash
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 ```
 
@@ -270,8 +270,8 @@ helm upgrade h2kvm-operator h2kvm/h2kvm-operator \
 ```bash
 # Mirror images to internal registry
 oc image mirror \
-  ghcr.io/ssahani/h2kvm:2.1.0-operator=internal-registry.example.com/h2kvm/operator:2.1.0 \
-  ghcr.io/ssahani/h2kvm:2.1.0-worker=internal-registry.example.com/h2kvm/worker:2.1.0
+  ghcr.io/zyvorai/h2kvm:2.1.0-operator=internal-registry.example.com/h2kvm/operator:2.1.0 \
+  ghcr.io/zyvorai/h2kvm:2.1.0-worker=internal-registry.example.com/h2kvm/worker:2.1.0
 
 # Create ImageContentSourcePolicy
 oc apply -f - <<EOF
@@ -368,11 +368,11 @@ oc delete crd jobtemplates.h2kvm.io
 - **[Full Documentation](docs/deployment/openshift-deployment-guide.md)** - Complete deployment guide
 - **[OLM Bundle Guide](olm/README.md)** - OperatorHub publishing
 - **[Feature Summary](docs/deployment/OPENSHIFT_FEATURES_SUMMARY.md)** - All OpenShift features
-- **[GitHub Repository](https://github.com/ssahani/h2kvm)** - Source code and issues
+- **[GitHub Repository](https://github.com/zyvorai/h2kvm)** - Source code and issues
 
 ---
 
 **Need Help?**
 
-- GitHub Issues: https://github.com/ssahani/h2kvm/issues
-- Documentation: https://github.com/ssahani/h2kvm/tree/main/docs
+- GitHub Issues: https://github.com/zyvorai/h2kvm/issues
+- Documentation: https://github.com/zyvorai/h2kvm/tree/main/docs

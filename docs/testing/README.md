@@ -114,7 +114,7 @@ STORAGE_CLASS=local-path ./scripts/test-k8s-centos8.sh all
 **Interactive Debug**:
 ```bash
 # Create debug pod
-kubectl run -it debug --image=ghcr.io/ssahani/h2kvm:latest \
+kubectl run -it debug --image=ghcr.io/zyvorai/h2kvm:latest \
   --rm --restart=Never -- /bin/bash
 
 # Test commands

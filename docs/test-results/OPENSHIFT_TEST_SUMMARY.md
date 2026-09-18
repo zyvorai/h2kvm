@@ -363,4 +363,4 @@ All components are ready for production deployment on OpenShift Container Platfo
 **Status:** ✅ Code Ready, ⚠️ Environment Constrained
 **Recommendation:** Deploy to fresh/production cluster OR test locally with CLI
 **Release Version:** v0.3.1
-**Images:** ghcr.io/ssahani/h2kvm:2.1.0-operator (and others)
+**Images:** ghcr.io/zyvorai/h2kvm:2.1.0-operator (and others)

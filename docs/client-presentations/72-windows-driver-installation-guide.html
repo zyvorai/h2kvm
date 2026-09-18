@@ -71,7 +71,7 @@
   <h1>Windows VM Migration<br>Driver Installation Guide</h1>
   <h2>SATA Bootstrap &rarr; VirtIO CD-ROM Install &rarr; Production Ready</h2>
   <div class="badge">Win10 | Win11 | Server 2019/2022 | SATA Boot | VirtIO Network | Guest Agent | Proprietary (Zyvor AI Labs)</div>
-  <div class="url">github.com/ssahani/h2kvm</div>
+  <div class="url">github.com/zyvorai/h2kvm</div>
   <div class="date">April 2026 &mdash; v0.3.0</div>
 </div>
 
@@ -108,7 +108,7 @@
     <span style="color: #94a3b8;"> If pre-install is not possible (e.g., VM already shut down), use the post-migration workflow on the following pages.</span>
   </div>
 
-  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; 1</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/zyvorai/h2kvm &mdash; 1</div>
 </div>
 
 <!-- PAGE 2: Migration Pipeline Overview -->
@@ -178,7 +178,7 @@
   <div class="highlight">
     <p style="margin-bottom:0;"><strong>Key principle:</strong> Boot reliability first. SATA disk bus guarantees Windows boots on KVM. VirtIO drivers for network, balloon, and guest agent are installed post-boot via the CD-ROM installer. The disk stays on SATA &mdash; this is the production configuration.</p>
   </div>
-  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 1</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/zyvorai/h2kvm &mdash; Page 1</div>
 </div>
 
 <!-- PAGE 2: What's Auto-Staged -->
@@ -252,7 +252,7 @@
   <div class="highlight-green highlight">
     <p style="margin-bottom:0;"><strong>Important:</strong> For migrated VMs, the staged registry entries and driver files establish the foundation, but the <strong>CD-ROM installer</strong> is what reliably activates all drivers. The offline staging ensures the .sys files are present on disk, while the installer handles PnP binding and service registration.</p>
   </div>
-  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 2</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/zyvorai/h2kvm &mdash; Page 2</div>
 </div>
 
 <!-- PAGE 3: First Boot — What You'll See -->
@@ -318,7 +318,7 @@
   <div class="highlight">
     <p style="margin-bottom:0;"><strong>Tip:</strong> If using h2kweb, the VM list will show the VM as "running" but without an IP address. The IP will appear after you install VirtIO drivers and the QEMU Guest Agent starts.</p>
   </div>
-  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 3</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/zyvorai/h2kvm &mdash; Page 3</div>
 </div>
 
 <!-- PAGE 4: Installing Drivers — Step by Step -->
@@ -385,7 +385,7 @@
   <div class="highlight-green highlight">
     <p style="margin-bottom:0;"><strong>No reboot needed</strong> for network, balloon, or guest agent. The VirtIO network driver activates immediately after installation. RDP and SSH access become available as soon as the network is up.</p>
   </div>
-  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 4</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/zyvorai/h2kvm &mdash; Page 4</div>
 </div>
 
 <!-- PAGE 5: After Installation — What Works -->
@@ -465,7 +465,7 @@
       <strong>Network works immediately. Guest agent reports IP. Memory is dynamic. No reboot required.</strong>
     </p>
   </div>
-  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 5</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/zyvorai/h2kvm &mdash; Page 5</div>
 </div>
 
 <!-- PAGE 6: Verification -->
@@ -546,7 +546,7 @@ xfreerdp /v:&lt;ip&gt; /u:Administrator</pre>
     <span class="feat">Device Manager: no warnings</span>
     <span class="feat">h2kweb: green health checks</span>
   </div>
-  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 6</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/zyvorai/h2kvm &mdash; Page 6</div>
 </div>
 
 <!-- PAGE 7: Troubleshooting -->
@@ -620,7 +620,7 @@ xfreerdp /v:&lt;ip&gt; /u:Administrator</pre>
       </ul>
     </div>
   </div>
-  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/ssahani/h2kvm &mdash; Page 7</div>
+  <div class="footer">h2kvm &mdash; Proprietary (Zyvor AI Labs) | github.com/zyvorai/h2kvm &mdash; Page 7</div>
 </div>
 
 </body>

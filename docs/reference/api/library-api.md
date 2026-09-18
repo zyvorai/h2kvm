@@ -56,14 +56,13 @@ h2kvm can be used both as a **command-line tool** and as a **Python library**. T
 
 ## Installation
 
-### From GitHub Release (Recommended for v1.1.0)
+### From PyPI (v1.2.1)
 
 ```bash
-pip install "hypersdk-guestkit>=1.1.0"
-pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
+pip install "h2kvm==1.2.1"
 ```
 
-**Release:** https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0
+**Release:** https://pypi.org/project/h2kvm/1.2.1/
 
 ### From Source
 

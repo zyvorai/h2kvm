@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/ssahani/h2kvm/schemas/artifact-manifest-v1.0.json",
+  "$id": "https://github.com/zyvorai/h2kvm/schemas/artifact-manifest-v1.0.json",
   "title": "Artifact Manifest v1.0",
   "description": "Schema for hypersdk-to-h2kvm integration contract. Defines VM disk artifacts and conversion pipeline configuration.",
   "type": "object",

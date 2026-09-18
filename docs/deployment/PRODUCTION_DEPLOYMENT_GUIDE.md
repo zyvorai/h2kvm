@@ -58,7 +58,7 @@ helm install h2kvm-operator h2kvm/h2kvm-operator \
   --set openshift.enabled=true \
   --set openshift.route.enabled=true \
   --set openshift.scc.create=true \
-  --set image.repository=ghcr.io/ssahani/h2kvm \
+  --set image.repository=ghcr.io/zyvorai/h2kvm \
   --set image.tag=2.1.0-operator
 
 # Or install on Kubernetes
@@ -92,7 +92,7 @@ helm install h2kvm-operator h2kvm/h2kvm-operator \
 
 ```bash
 # Install via operator-sdk
-operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
+operator-sdk run bundle ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0 \
   --namespace h2kvm-system
 
 # Or install via OLM catalog
@@ -104,7 +104,7 @@ metadata:
   namespace: openshift-marketplace
 spec:
   sourceType: grpc
-  image: ghcr.io/ssahani/h2kvm-operator-index:v2.1.0
+  image: ghcr.io/zyvorai/h2kvm-operator-index:v2.1.0
   displayName: H2KVM Operator
   updateStrategy:
     registryPoll:
@@ -148,7 +148,7 @@ EOF
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 
 # Deploy using automation script
@@ -199,8 +199,8 @@ Ensure access to container images:
 
 ```bash
 # Test image pull
-docker pull ghcr.io/ssahani/h2kvm:2.1.0-operator
-docker pull ghcr.io/ssahani/h2kvm:2.1.0-worker
+docker pull ghcr.io/zyvorai/h2kvm:2.1.0-operator
+docker pull ghcr.io/zyvorai/h2kvm:2.1.0-worker
 
 # For private registry, create image pull secret
 kubectl create secret docker-registry ghcr-secret \
@@ -480,7 +480,7 @@ openshift:
 
 # Image configuration
 image:
-  repository: ghcr.io/ssahani/h2kvm
+  repository: ghcr.io/zyvorai/h2kvm
   tag: 2.1.0-operator
   pullPolicy: IfNotPresent
 
@@ -676,7 +676,7 @@ kubectl apply -f k8s/operator/crds/
 
 # Update deployment
 kubectl set image deployment/h2kvm-operator \
-  operator=ghcr.io/ssahani/h2kvm:2.2.0-operator \
+  operator=ghcr.io/zyvorai/h2kvm:2.2.0-operator \
   -n h2kvm-system
 
 # Verify rollout
@@ -702,8 +702,8 @@ oc version
 **2. Image Preparation**
 ```bash
 # Pull images to verify access
-docker pull ghcr.io/ssahani/h2kvm:2.1.0-operator
-docker pull ghcr.io/ssahani/h2kvm:2.1.0-worker
+docker pull ghcr.io/zyvorai/h2kvm:2.1.0-operator
+docker pull ghcr.io/zyvorai/h2kvm:2.1.0-worker
 
 # Or build from source
 ./scripts/build-operator-images.sh 2.1.0
@@ -758,7 +758,7 @@ spec:
       serviceAccountName: h2kvm-worker
       containers:
         - name: worker
-          image: ghcr.io/ssahani/h2kvm:2.1.0-worker
+          image: ghcr.io/zyvorai/h2kvm:2.1.0-worker
           securityContext:
             privileged: true
           volumeMounts:
@@ -824,8 +824,8 @@ Located in `k8s/operator/examples/`:
 
 ### Support and Community
 
-- **GitHub Issues:** https://github.com/ssahani/h2kvm/issues
-- **Discussions:** https://github.com/ssahani/h2kvm/discussions
+- **GitHub Issues:** https://github.com/zyvorai/h2kvm/issues
+- **Discussions:** https://github.com/zyvorai/h2kvm/discussions
 - **Documentation:** https://ssahani.github.io/h2kvm
 
 ---

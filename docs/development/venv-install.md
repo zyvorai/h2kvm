@@ -6,7 +6,7 @@ Install h2kvm in an isolated Python virtual environment on any Linux distributio
 
 ```bash
 # Clone the repo
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 
 # Install to /opt/h2kvm (recommended)

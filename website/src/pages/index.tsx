@@ -5,6 +5,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import Heading from '@theme/Heading';
 import FeatureHighlights from '@site/src/components/FeatureHighlights';
+import ScreenshotStrip from '@site/src/components/ScreenshotStrip';
 import Reveal from '@site/src/components/Reveal';
 
 import styles from './index.module.css';
@@ -14,41 +15,45 @@ function HomepageHeader() {
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
-        <div className={clsx(styles.heroText, 'text--center')}>
-          <Heading as="h1" className="hero__title">
-            Any hypervisor
-            <br />
-            to KVM.
-          </Heading>
-          <p className="hero__subtitle">
-            Export, convert, and deploy VMs from VMware, Hyper-V, Nutanix,
-            AWS, Azure, and GCP — with offline guest fixes via GuestKit, a
-            web control plane, and a Kubernetes-native operator. First-boot
-            science for hypervisor exit.
-          </p>
-          <div className={styles.buttons}>
-            <Link
-              className="button button--secondary button--lg"
-              to="/docs/README">
-              Get Started
-            </Link>
-            <Link
-              className="button button--outline button--lg button--secondary"
-              to="https://github.com/zyvorai/h2kvm">
-              View on GitHub
-            </Link>
+        <div className={styles.heroGrid}>
+          <div>
+            <Heading as="h1" className="hero__title">
+              Any hypervisor
+              <br />
+              to KVM.
+            </Heading>
+            <p className="hero__subtitle">
+              Convert the disk offline. Fix the guest before power-on. No
+              VDDK. Then watch it boot.
+            </p>
+            <div className={styles.buttons}>
+              <Link
+                className="button button--secondary button--lg"
+                to="/docs/getting-started/quickstart">
+                Get Started
+              </Link>
+              <Link
+                className="button button--outline button--lg button--secondary"
+                to="/resources">
+                Resources
+              </Link>
+              <Link
+                className="button button--outline button--lg button--secondary"
+                to="https://github.com/zyvorai/h2kvm">
+                View on GitHub
+              </Link>
+            </div>
+          </div>
+          <div className={styles.heroMedia}>
+            <img
+              src={dashboard}
+              alt="h2kweb dashboard — migration jobs, providers, and status"
+            />
+            <p className={styles.heroMediaCaption}>
+              Captured against a live lab deployment, not a mockup.
+            </p>
           </div>
         </div>
-      </div>
-      <div className={styles.heroMediaWrap}>
-        <img
-          className={styles.heroMedia}
-          src={dashboard}
-          alt="h2kweb dashboard — migration jobs, providers, and status"
-        />
-        <p className={styles.heroMediaCaption}>
-          The h2kweb dashboard — a real deployment, not a mockup.
-        </p>
       </div>
     </header>
   );
@@ -61,19 +66,18 @@ function ProblemStatement() {
         <Reveal className="row">
           <div className="col col--8 col--offset-2 text--center">
             <Heading as="h2" className={styles.sectionHeading}>
-              The cutover problem — fixed before power-on
+              The disk leaves. The guest has to boot.
             </Heading>
             <p>
-              Hypervisor exit fails when VirtIO is missing, GRUB is wrong,
-              or Windows still points at the old hypervisor — after you
-              cut over. h2kvm converts the disk offline, runs{' '}
-              <Link to="https://github.com/zyvorai/guestkit">GuestKit</Link>{' '}
-              repair, and deploys to libvirt / KubeVirt / OpenStack so
-              first boot is planned, not guessed.
+              On 10 September 2026 VMware told The Register the Virtual Disk
+              Development Kit was never a license to move VMs. Most
+              VMware-to-KVM tools still open disks with that kit. h2kvm does
+              not. The disk leaves through the vSphere API and NFS.
             </p>
             <p>
-              Suite path: HyperSDK export → GuestKit assure →{' '}
-              <strong>h2kvm</strong> convert &amp; deploy → Zeus OS day-2.
+              Copying the disk was never the hard part. First boot fails when
+              the bootloader, VirtIO, or Windows still points at the old
+              hypervisor. GuestKit repairs that before power-on.
             </p>
           </div>
         </Reveal>
@@ -89,26 +93,23 @@ function TrustBand() {
         <Reveal className={styles.trustGrid}>
           <div>
             <Heading as="h3" className={styles.sectionHeading}>
-              Real, recorded demos
+              Install it. Then read the license.
             </Heading>
             <p>
-              8+ disk formats, 35+ guest OS supported, across CLI, web, and
-              a Kubernetes operator. Terms are set out in this repository's{' '}
-              <Link to="https://github.com/zyvorai/h2kvm/blob/main/LICENSE">
-                LICENSE
-              </Link>{' '}
-              file — read it before deploying.
+              h2kvm 1.2.1 is on PyPI. GuestKit is installed with it. Terms
+              are in this repository&apos;s LICENSE — read it before a
+              production cutover.
             </p>
-            <Link to="/docs/README">Read the full docs →</Link>
+            <Link to="/docs/how-it-works">How the path works →</Link>
           </div>
           <div className={styles.trustBadges}>
             <img
-              src="https://img.shields.io/github/v/release/zyvorai/h2kvm?color=F97316"
-              alt="Latest release"
+              src="https://img.shields.io/pypi/v/h2kvm.svg"
+              alt="h2kvm on PyPI"
             />
             <img
-              src="https://img.shields.io/pypi/v/hypersdk-guestkit.svg"
-              alt="GuestKit on PyPI"
+              src="https://img.shields.io/github/v/release/zyvorai/h2kvm?color=0071e3"
+              alt="Latest GitHub release"
             />
           </div>
         </Reveal>
@@ -123,16 +124,16 @@ function EnterpriseCTA() {
       <div className="container text--center">
         <Reveal>
           <Heading as="h2" className={styles.sectionHeading}>
-            Community, or Enterprise for scale
+            Need a cutover, not a lab?
           </Heading>
           <p className={styles.enterpriseCopy}>
-            See the CE vs Enterprise breakdown for what's included at each
-            tier, or book a demo / start a 30-day PoC to evaluate h2kvm
-            against your own hypervisor exit.
+            Community proves convert. Enterprise owns the wave: HA, storage
+            pipelines, and a support contract. Start with a 30-day proof of
+            concept on your estate.
           </p>
           <Link
             className="button button--primary button--lg"
-            to="https://zyvor.dev/contact?intent=demo&utm_source=github&utm_medium=h2kvm">
+            to="https://zyvor.dev/contact?intent=demo&utm_source=github&utm_medium=h2kvm&utm_campaign=docs_site">
             Book an Enterprise demo
           </Link>
         </Reveal>
@@ -145,12 +146,15 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="h2kvm — any hypervisor to KVM"
-      description="Export, convert, and deploy VMs from VMware, Hyper-V, Nutanix, AWS, Azure and GCP to KVM — with offline guest fixes, a web control plane, and a Kubernetes-native operator.">
+      description="Convert VMs from VMware, Hyper-V, Nutanix, AWS, Azure, and GCP to KVM. The guest is fixed before power-on. No VDDK.">
       <HomepageHeader />
       <main>
         <ProblemStatement />
         <Reveal>
           <FeatureHighlights />
+        </Reveal>
+        <Reveal>
+          <ScreenshotStrip />
         </Reveal>
         <TrustBand />
         <EnterpriseCTA />

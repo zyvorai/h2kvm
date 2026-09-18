@@ -342,5 +342,5 @@ For Windows migrations:
 ## Getting Help
 
 - [Troubleshooting Guide](90-Failure-Modes.md)
-- [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+- [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
 

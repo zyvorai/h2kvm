@@ -586,7 +586,7 @@ Congratulations! You've completed your first VM migration. Here's what to explor
 - **Documentation Hub**: [docs/index.md](../index.md)
 - **Troubleshooting**: [guides/troubleshooting.md](../guides/troubleshooting.md)
 - **Migration Recipes**: [recipes/01-common-scenarios.md](../recipes/01-common-scenarios.md)
-- **GitHub Issues**: https://github.com/ssahani/h2kvm/issues
+- **GitHub Issues**: https://github.com/zyvorai/h2kvm/issues
 
 **Time to completion**: 30-45 minutes ✅
 

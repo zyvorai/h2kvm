@@ -325,11 +325,11 @@ bash scripts/build-and-push-images.sh
 ```bash
 # Update deployment to use GHCR images
 kubectl set image deployment/h2kvm-operator \
-  operator=ghcr.io/ssahani/h2kvm-operator:latest \
+  operator=ghcr.io/zyvorai/h2kvm-operator:latest \
   -n h2kvm-system
 
 kubectl set image daemonset/h2kvm-worker \
-  worker=ghcr.io/ssahani/h2kvm-worker:latest \
+  worker=ghcr.io/zyvorai/h2kvm-worker:latest \
   -n h2kvm-workers
 ```
 
@@ -445,10 +445,10 @@ kubectl patch daemonset h2kvm-worker -n h2kvm-workers --type='json' \
 - 📖 Read [LIVE_MIGRATION.md](LIVE_MIGRATION.md) for live migration features
 - 🔧 Check [UPGRADE_GUIDE.md](UPGRADE_GUIDE.md) for version migration
 - 📋 See [QUICK_REFERENCE.md](QUICK_REFERENCE.md) for command reference
-- 🐛 Report issues at https://github.com/ssahani/h2kvm/issues
+- 🐛 Report issues at https://github.com/zyvorai/h2kvm/issues
 
 ## Support
 
 For questions and support:
-- GitHub Issues: https://github.com/ssahani/h2kvm/issues
-- Documentation: https://github.com/ssahani/h2kvm/docs
+- GitHub Issues: https://github.com/zyvorai/h2kvm/issues
+- Documentation: https://github.com/zyvorai/h2kvm/docs

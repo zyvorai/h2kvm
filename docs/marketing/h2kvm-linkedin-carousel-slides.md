@@ -174,7 +174,7 @@ pip install h2kvm[full]
 h2kvmctl wizard
 
 Open Source (Proprietary (Zyvor AI Labs))
-⭐ github.com/ssahani/h2kvm
+⭐ github.com/zyvorai/h2kvm
 
 What's your migration
 pain point?

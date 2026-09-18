@@ -427,7 +427,7 @@ Use internal OpenShift registry for operator images.
 
 ```bash
 # Tag and push to internal registry
-oc tag ghcr.io/ssahani/h2kvm:2.0.0-operator \
+oc tag ghcr.io/zyvorai/h2kvm:2.0.0-operator \
   h2kvm-operator:2.0.0 \
   --reference-policy=local
 
@@ -445,8 +445,8 @@ Full support for disconnected OpenShift clusters.
 ```bash
 # Mirror operator images
 oc image mirror \
-  ghcr.io/ssahani/h2kvm:2.0.0-operator=internal-registry.example.com/h2kvm/operator:2.0.0 \
-  ghcr.io/ssahani/h2kvm:2.0.0-worker=internal-registry.example.com/h2kvm/worker:2.0.0
+  ghcr.io/zyvorai/h2kvm:2.0.0-operator=internal-registry.example.com/h2kvm/operator:2.0.0 \
+  ghcr.io/zyvorai/h2kvm:2.0.0-worker=internal-registry.example.com/h2kvm/worker:2.0.0
 ```
 
 **Step 2: Create ImageContentSourcePolicy**
@@ -840,9 +840,9 @@ oc delete project h2kvm-system
 - [OLM Bundle Guide](../../olm/README.md)
 - [Worker Protocol Spec](../worker/PROTOCOL_SPEC.md)
 - [Comprehensive v2.0 Features](v2.0.0-comprehensive-features.md)
-- [GitHub Repository](https://github.com/ssahani/h2kvm)
+- [GitHub Repository](https://github.com/zyvorai/h2kvm)
 
 ---
 
-**Support**: https://github.com/ssahani/h2kvm/issues
+**Support**: https://github.com/zyvorai/h2kvm/issues
 **License**: MIT

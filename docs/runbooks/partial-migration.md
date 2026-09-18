@@ -459,5 +459,5 @@ kubectl set env deployment/hyperconversion-operator -n h2kvm-system LOG_LEVEL=de
    tar czf migration-debug.tar.gz <output-dir>/ /tmp/h2kvm-*/
    ```
 3. Document completed vs failed stages
-4. Check for known issues: https://github.com/ssahani/h2kvm/issues
+4. Check for known issues: https://github.com/zyvorai/h2kvm/issues
 5. Contact platform team with debug bundle and migration log

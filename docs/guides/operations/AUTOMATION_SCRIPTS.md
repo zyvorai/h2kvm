@@ -830,11 +830,11 @@ cd scripts
 2. **Download all scripts**:
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm/scripts
 
 # Or download individually
-curl -O https://raw.githubusercontent.com/ssahani/h2kvm/main/scripts/bulk-vmdk-inspect.sh
+curl -O https://raw.githubusercontent.com/zyvorai/h2kvm/main/scripts/bulk-vmdk-inspect.sh
 # ... etc
 ```
 

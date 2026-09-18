@@ -13,7 +13,7 @@ pip install h2kvm
 ### From Source
 
 ```bash
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 pip install -e .
 ```
@@ -92,10 +92,10 @@ asyncio.run(validate_batch())
 
 ```bash
 # Install CRDs
-kubectl apply -f https://github.com/ssahani/h2kvm/releases/latest/download/crd.yaml
+kubectl apply -f https://github.com/zyvorai/h2kvm/releases/latest/download/crd.yaml
 
 # Install operator
-kubectl apply -f https://github.com/ssahani/h2kvm/releases/latest/download/operator.yaml
+kubectl apply -f https://github.com/zyvorai/h2kvm/releases/latest/download/operator.yaml
 ```
 
 ### Create Validation
@@ -274,6 +274,6 @@ If empty, nodes need KVM device plugin.
 
 ## Getting Help
 
-- Issues: https://github.com/ssahani/h2kvm/issues
-- Discussions: https://github.com/ssahani/h2kvm/discussions
+- Issues: https://github.com/zyvorai/h2kvm/issues
+- Discussions: https://github.com/zyvorai/h2kvm/discussions
 - Email: contact@h2kvm.io

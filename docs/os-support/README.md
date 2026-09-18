@@ -326,8 +326,8 @@ EOF
 - **[FAQ](../FAQ.md)** - Frequently asked questions
 
 ### Support
-- **GitHub Issues**: [Report OS-specific bugs](https://github.com/ssahani/h2kvm/issues)
-- **GitHub Discussions**: [Ask questions](https://github.com/ssahani/h2kvm/discussions)
+- **GitHub Issues**: [Report OS-specific bugs](https://github.com/zyvorai/h2kvm/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/zyvorai/h2kvm/discussions)
 
 ### Testing
 - **[Test Results](../test-results/)** - Detailed test results by OS

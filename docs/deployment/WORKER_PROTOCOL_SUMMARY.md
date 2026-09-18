@@ -481,7 +481,7 @@ alerting:
 
 - **Documentation:** Start with `docs/worker/QUICKSTART.md`
 - **Examples:** See `k8s/worker/examples/`
-- **Issues:** https://github.com/ssahani/h2kvm/issues
+- **Issues:** https://github.com/zyvorai/h2kvm/issues
 - **Discussions:** GitHub Discussions
 
 ### Contributing

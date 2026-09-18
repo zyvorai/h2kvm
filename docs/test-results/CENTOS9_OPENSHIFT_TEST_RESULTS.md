@@ -310,7 +310,7 @@ total 2.4G
   - Disk: No disk pressure taints
 
 **Image Registry:**
-- Container images pushed to: `ghcr.io/ssahani/h2kvm:2.1.0-*`
+- Container images pushed to: `ghcr.io/zyvorai/h2kvm:2.1.0-*`
 - Authentication: Image pull secret required (ghcr.io)
 
 ### Step 1: Install CRDs
@@ -368,7 +368,7 @@ spec:
         - name: ghcr-secret
       containers:
         - name: operator
-          image: ghcr.io/ssahani/h2kvm:2.1.0-operator
+          image: ghcr.io/zyvorai/h2kvm:2.1.0-operator
           imagePullPolicy: IfNotPresent
           resources:
             requests:
@@ -379,7 +379,7 @@ spec:
               memory: 512Mi
           env:
             - name: WORKER_IMAGE
-              value: ghcr.io/ssahani/h2kvm:2.1.0-worker
+              value: ghcr.io/zyvorai/h2kvm:2.1.0-worker
 ```
 
 ### Step 5: Create Storage for VMDK

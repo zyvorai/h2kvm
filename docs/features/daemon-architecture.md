@@ -224,7 +224,7 @@ set-priority    - Change job priority
 ```ini
 [Unit]
 Description=H2KVM Conversion Daemon
-Documentation=https://github.com/ssahani/h2kvm
+Documentation=https://github.com/zyvorai/h2kvm
 After=network.target libvirtd.service
 Wants=libvirtd.service
 
@@ -272,7 +272,7 @@ WantedBy=multi-user.target
 ```ini
 [Unit]
 Description=H2KVM Export Daemon (Go)
-Documentation=https://github.com/ssahani/h2kvm
+Documentation=https://github.com/zyvorai/h2kvm
 After=network-online.target
 Wants=network-online.target h2kvm-daemon.service
 

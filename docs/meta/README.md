@@ -241,9 +241,9 @@ See [CONTRIBUTING_DOCS.md](CONTRIBUTING_DOCS.md) for complete guidelines.
 
 ### Documentation Questions
 
-- **Missing documentation?** File an issue: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+- **Missing documentation?** File an issue: [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
 - **Found an error?** Submit a PR with fix
-- **Have suggestions?** Discuss in [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
+- **Have suggestions?** Discuss in [GitHub Discussions](https://github.com/zyvorai/h2kvm/discussions)
 
 ### Contributing
 

@@ -11,11 +11,11 @@ One-page reference for common commands, workflows, and configurations.
 pip install h2kvm
 
 # From source
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm && pip install -e .
 
 # Container
-docker pull ghcr.io/ssahani/h2kvm:latest
+docker pull ghcr.io/zyvorai/h2kvm:latest
 
 # System dependencies + libguestfs (recommended for LVM/LUKS)
 sudo ./scripts/install-deps.sh --all
@@ -636,9 +636,9 @@ sudo systemctl enable --now h2kvm
 
 ## Support
 
-- **Issues**: https://github.com/ssahani/h2kvm/issues
-- **Discussions**: https://github.com/ssahani/h2kvm/discussions
-- **Documentation**: https://github.com/ssahani/h2kvm/tree/main/docs
+- **Issues**: https://github.com/zyvorai/h2kvm/issues
+- **Discussions**: https://github.com/zyvorai/h2kvm/discussions
+- **Documentation**: https://github.com/zyvorai/h2kvm/tree/main/docs
 
 ---
 

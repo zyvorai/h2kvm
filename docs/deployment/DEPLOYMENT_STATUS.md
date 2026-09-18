@@ -55,8 +55,8 @@
 ### 📦 Local Images Built
 
 ```
-ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0    54.8kB
-ghcr.io/ssahani/h2kvm-operator-bundle:latest    54.8kB
+ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0    54.8kB
+ghcr.io/zyvorai/h2kvm-operator-bundle:latest    54.8kB
 h2kvm-operator:test                              2.08GB
 h2kvm:worker                                     2.03GB
 ```
@@ -83,9 +83,9 @@ h2kvm:worker                                     2.03GB
 ./scripts/build-olm-bundle.sh 2.1.0 ghcr.io/ssahani
 
 # Verify images
-docker pull ghcr.io/ssahani/h2kvm:2.1.0-operator
-docker pull ghcr.io/ssahani/h2kvm:2.1.0-worker
-docker pull ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
+docker pull ghcr.io/zyvorai/h2kvm:2.1.0-operator
+docker pull ghcr.io/zyvorai/h2kvm:2.1.0-worker
+docker pull ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0
 ```
 
 **Prerequisites:**
@@ -133,7 +133,7 @@ git push origin v2.1.0
 3. Attach Helm chart artifacts
 
 **Steps:**
-1. Navigate to https://github.com/ssahani/h2kvm/releases/new
+1. Navigate to https://github.com/zyvorai/h2kvm/releases/new
 2. Select tag: v2.1.0
 3. Title: "v2.1.0 - OpenShift Container Platform Support"
 4. Copy release notes template from RELEASE_CHECKLIST_v2.1.0.md

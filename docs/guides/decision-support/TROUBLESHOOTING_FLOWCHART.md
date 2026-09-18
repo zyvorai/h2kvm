@@ -643,7 +643,7 @@ h2kvmctl --config minimal-test.yaml
 - [Failure Modes](reference/failure-modes.md) - Known issues
 
 ### 2. Search GitHub Issues
-- [Existing Issues](https://github.com/ssahani/h2kvm/issues)
+- [Existing Issues](https://github.com/zyvorai/h2kvm/issues)
 - Search for your error message
 
 ### 3. Create Detailed Issue
@@ -676,7 +676,7 @@ Include:
 ```
 
 ### 4. Community Support
-- [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
+- [GitHub Discussions](https://github.com/zyvorai/h2kvm/discussions)
 - Stack Overflow (tag: h2kvm)
 
 ---

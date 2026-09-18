@@ -499,9 +499,9 @@ spec:
 
 ### Community
 
-- **GitHub Issues**: [Report bugs](https://github.com/ssahani/h2kvm/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
-- **Repository**: [https://github.com/ssahani/h2kvm](https://github.com/ssahani/h2kvm)
+- **GitHub Issues**: [Report bugs](https://github.com/zyvorai/h2kvm/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/zyvorai/h2kvm/discussions)
+- **Repository**: [https://github.com/zyvorai/h2kvm](https://github.com/zyvorai/h2kvm)
 
 ---
 
@@ -536,5 +536,5 @@ See [Release Documentation](../scripts/README.md) for details.
 ---
 
 **Repository**: https://ssahani.github.io/h2kvm
-**Source Code**: https://github.com/ssahani/h2kvm
+**Source Code**: https://github.com/zyvorai/h2kvm
 **License**: Apache-2.0

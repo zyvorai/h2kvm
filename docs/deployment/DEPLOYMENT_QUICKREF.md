@@ -26,7 +26,7 @@ helm install h2kvm-operator ./helm/h2kvm-operator \
 
 ```bash
 # Via operator-sdk
-operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
+operator-sdk run bundle ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0 \
   --namespace h2kvm-system
 
 # Via OLM catalog
@@ -67,9 +67,9 @@ kubectl get migrationjobs -w
 ## 📦 Image Registry
 
 **Public Images:**
-- `ghcr.io/ssahani/h2kvm:2.1.0-operator`
-- `ghcr.io/ssahani/h2kvm:2.1.0-worker`
-- `ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0`
+- `ghcr.io/zyvorai/h2kvm:2.1.0-operator`
+- `ghcr.io/zyvorai/h2kvm:2.1.0-worker`
+- `ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0`
 
 **Build Local:**
 ```bash

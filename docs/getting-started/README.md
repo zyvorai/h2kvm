@@ -71,7 +71,7 @@ h2kvmctl --version
 
 ```bash
 # Clone repository
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 
 # Install in development mode
@@ -283,8 +283,8 @@ ERROR: h2kvm requires Python >=3.10
 - **[FAQ](../FAQ.md)** - Frequently asked questions
 
 ### Community Support
-- **GitHub Issues**: [Report bugs](https://github.com/ssahani/h2kvm/issues)
-- **GitHub Discussions**: [Ask questions](https://github.com/ssahani/h2kvm/discussions)
+- **GitHub Issues**: [Report bugs](https://github.com/zyvorai/h2kvm/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/zyvorai/h2kvm/discussions)
 
 ### Examples
 - **[Migration Recipes](../recipes/)** - Real-world examples

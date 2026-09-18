@@ -187,7 +187,7 @@ spec:
         h2kvm: enabled
       containers:
       - name: h2kvm
-        image: ghcr.io/ssahani/h2kvm:latest
+        image: ghcr.io/zyvorai/h2kvm:latest
         command:
           - h2kvmctl
           - --cmd
@@ -333,7 +333,7 @@ spec:
         h2kvm: enabled
       containers:
       - name: h2kvm
-        image: ghcr.io/ssahani/h2kvm:latest
+        image: ghcr.io/zyvorai/h2kvm:latest
         command:
           - h2kvmctl
           - --cmd
@@ -502,9 +502,9 @@ kubectl delete namespace h2kvm-system
 
 ## Support
 
-- **Documentation**: [https://github.com/ssahani/h2kvm/docs](https://github.com/ssahani/h2kvm/docs)
-- **Issues**: [https://github.com/ssahani/h2kvm/issues](https://github.com/ssahani/h2kvm/issues)
-- **Discussions**: [https://github.com/ssahani/h2kvm/discussions](https://github.com/ssahani/h2kvm/discussions)
+- **Documentation**: [https://github.com/zyvorai/h2kvm/docs](https://github.com/zyvorai/h2kvm/docs)
+- **Issues**: [https://github.com/zyvorai/h2kvm/issues](https://github.com/zyvorai/h2kvm/issues)
+- **Discussions**: [https://github.com/zyvorai/h2kvm/discussions](https://github.com/zyvorai/h2kvm/discussions)
 
 ---
 

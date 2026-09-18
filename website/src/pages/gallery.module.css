@@ -1,0 +1,47 @@
+.header {
+  padding: 3rem 0 1.5rem;
+  text-align: center;
+}
+
+.demo {
+  margin: 0 auto 2.5rem;
+  max-width: 900px;
+  text-align: center;
+}
+
+.demo img {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.caption {
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding-bottom: 3rem;
+}
+
+.shot {
+  margin: 0;
+}
+
+.shot img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  display: block;
+}
+
+.shot figcaption {
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-700);
+}

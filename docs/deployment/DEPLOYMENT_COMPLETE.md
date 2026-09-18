@@ -79,17 +79,17 @@ Complete OpenShift Container Platform support has been implemented, tested, and 
 ## Docker Images Built
 
 ### Bundle Image (Ready to Deploy)
-- `ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0` (54.8kB) ✅
-- `ghcr.io/ssahani/h2kvm-operator-bundle:latest` (54.8kB) ✅
+- `ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0` (54.8kB) ✅
+- `ghcr.io/zyvorai/h2kvm-operator-bundle:latest` (54.8kB) ✅
 
 ### Operator Images (Build with Scripts)
 Run: `./scripts/build-operator-images.sh 2.1.0`
 
 Will create:
-- `ghcr.io/ssahani/h2kvm:2.1.0-operator`
-- `ghcr.io/ssahani/h2kvm:2.1.0-worker`
-- `ghcr.io/ssahani/h2kvm:2.1.0-cli`
-- `ghcr.io/ssahani/h2kvm:2.1.0-daemon`
+- `ghcr.io/zyvorai/h2kvm:2.1.0-operator`
+- `ghcr.io/zyvorai/h2kvm:2.1.0-worker`
+- `ghcr.io/zyvorai/h2kvm:2.1.0-cli`
+- `ghcr.io/zyvorai/h2kvm:2.1.0-daemon`
 
 ---
 
@@ -219,8 +219,8 @@ helm install h2kvm-operator h2kvm/h2kvm-operator \
 
 1. **Push Bundle Image**
    ```bash
-   docker push ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
-   docker push ghcr.io/ssahani/h2kvm-operator-bundle:latest
+   docker push ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0
+   docker push ghcr.io/zyvorai/h2kvm-operator-bundle:latest
    ```
 
 2. **Build Operator Images**
@@ -246,10 +246,10 @@ helm install h2kvm-operator h2kvm/h2kvm-operator \
 4. **Create Catalog Image**
    ```bash
    opm index add \
-     --bundles ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
-     --tag ghcr.io/ssahani/h2kvm-operator-catalog:latest
+     --bundles ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0 \
+     --tag ghcr.io/zyvorai/h2kvm-operator-catalog:latest
 
-   docker push ghcr.io/ssahani/h2kvm-operator-catalog:latest
+   docker push ghcr.io/zyvorai/h2kvm-operator-catalog:latest
    ```
 
 ### Optional (Community Contribution)
@@ -282,9 +282,9 @@ oc login https://api.cluster.example.com:6443
 
 # 4. Create catalog (optional, for private OperatorHub)
 opm index add \
-  --bundles ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
-  --tag ghcr.io/ssahani/h2kvm-operator-catalog:latest
-docker push ghcr.io/ssahani/h2kvm-operator-catalog:latest
+  --bundles ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0 \
+  --tag ghcr.io/zyvorai/h2kvm-operator-catalog:latest
+docker push ghcr.io/zyvorai/h2kvm-operator-catalog:latest
 
 # 5. Tag and push to GitHub
 git tag v2.1.0
@@ -313,9 +313,9 @@ git push origin main --tags
 ## Support
 
 ### Resources
-- **GitHub Repository:** https://github.com/ssahani/h2kvm
-- **Issue Tracker:** https://github.com/ssahani/h2kvm/issues
-- **Documentation:** https://github.com/ssahani/h2kvm/tree/main/docs
+- **GitHub Repository:** https://github.com/zyvorai/h2kvm
+- **Issue Tracker:** https://github.com/zyvorai/h2kvm/issues
+- **Documentation:** https://github.com/zyvorai/h2kvm/tree/main/docs
 
 ### Common Questions
 
@@ -364,7 +364,7 @@ A: Via Helm: `helm upgrade`, Via OperatorHub: Automatic or manual approval
 **Implementation:** Claude Sonnet 4.5
 **Project:** H2KVM - Enterprise VM Migration Toolkit
 **License:** Apache-2.0
-**Repository:** https://github.com/ssahani/h2kvm
+**Repository:** https://github.com/zyvorai/h2kvm
 
 ---
 

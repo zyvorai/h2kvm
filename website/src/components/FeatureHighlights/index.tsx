@@ -11,40 +11,40 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Any hypervisor, one pipeline',
+    title: 'No VDDK',
     description:
-      'Export and convert from VMware, Hyper-V, Nutanix, AWS, Azure, and GCP to qcow2/raw — browse, migrate, deploy as one pipeline instead of an 18-month migration project.',
-    to: '/docs/README',
+      'The disk leaves through the vSphere API and NFS. The Virtual Disk Development Kit is not on this path.',
+    to: '/docs/how-it-works',
   },
   {
-    title: 'GuestKit offline fix',
+    title: 'GuestKit, before power-on',
     description:
-      'Guest drivers that break on first KVM boot get fixed offline via GuestKit — VirtIO, GRUB, hivex/registry for Windows — across 35+ guest OS versions.',
-    to: '/docs/architecture/GUESTKIT',
+      'Bootloader, VirtIO, and Windows are repaired on the disk while it is still offline.',
+    to: '/docs/how-it-works',
   },
   {
-    title: 'h2kweb control plane',
+    title: 'One convert command',
     description:
-      'A real web dashboard for migration progress, providers, and jobs — plus webhooks and email, so conversion isn\'t a black box.',
-    to: '/docs/README',
+      'A VMDK, VHDX, or raw file you already have becomes qcow2, then the same repair step runs.',
+    to: '/docs/getting-started/quickstart',
   },
   {
-    title: 'Kubernetes-native operator',
+    title: 'Watch the boot',
     description:
-      'A K8s/OLM operator and Helm charts take libvirt → KubeVirt from YAML tribal knowledge to a one-click, declarative path.',
-    to: '/docs/operator/getting-started',
+      'Zorvia is the console. Zeus OS and Machina are where the VM keeps running after cutover.',
+    to: '/docs/how-it-works',
   },
   {
-    title: 'CLI and web',
+    title: 'Web and CLI',
     description:
-      'h2kvmctl / h2k for scripting, h2kweb for the dashboard — pick the surface that fits the job.',
-    to: '/docs/deployment/deploy-remote',
+      'h2kvmctl for the pipeline. h2kweb for jobs, providers, and status on a real deployment.',
+    to: '/gallery',
   },
   {
-    title: 'Community vs Enterprise',
+    title: 'Community, then Enterprise',
     description:
-      'CE proves convert for labs and single-cluster PoC. Enterprise adds HA, multi-wave cutover fabric, SAN/Ceph storage pipelines, and an SLA/LTS/CVE support contract.',
-    to: '/docs/ce-vs-enterprise',
+      'Install from PyPI for a lab. Book a demo when the wave needs a named owner.',
+    to: '/resources',
   },
 ];
 

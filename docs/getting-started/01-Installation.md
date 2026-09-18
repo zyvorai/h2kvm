@@ -18,10 +18,18 @@
 
 ### One-Command Quickstart
 
-Install h2kvm and **all** dependencies on a fresh Fedora, RHEL, Ubuntu, Debian, or openSUSE machine:
+Install h2kvm and **all** dependencies on a fresh Fedora, RHEL, Ubuntu, Debian, or openSUSE machine.
+
+From PyPI:
 
 ```bash
-git clone https://github.com/ssahani/h2kvm.git
+pip install "h2kvm==1.2.1"
+```
+
+Or from source:
+
+```bash
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 sudo ./scripts/quickstart.sh
 ```
@@ -174,7 +182,7 @@ ls /dev/kvm     # Should exist if KVM is available
 ### Quick start (recommended: editable install)
 
 ```bash
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 
 python3 -m venv .venv
@@ -568,7 +576,7 @@ sudo apt-get install -y \
   libvirt-clients libvirt-daemon-system
 
 # Clone and install h2kvm
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 
 python3 -m venv .venv

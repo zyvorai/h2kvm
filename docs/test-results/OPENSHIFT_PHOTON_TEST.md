@@ -33,7 +33,7 @@ Status:          ⚠️ Disk Pressure (blocking pod scheduling)
 
 **Operator Deployment:**
 - ⚠️ **Status:** Pending (blocked by disk pressure)
-- **Image:** `ghcr.io/ssahani/h2kvm:2.1.0-operator`
+- **Image:** `ghcr.io/zyvorai/h2kvm:2.1.0-operator`
 - **Namespace:** `h2kvm-test`
 - **Issue:** `0/1 nodes available: 1 node(s) had untolerated taint {node.kubernetes.io/disk-pressure}`
 
@@ -265,7 +265,7 @@ Deploy to a production OpenShift cluster with adequate resources (40GB+ disk per
 
 **Symptom:**
 ```
-Failed to pull image "ghcr.io/ssahani/h2kvm:2.1.0-operator"
+Failed to pull image "ghcr.io/zyvorai/h2kvm:2.1.0-operator"
 ```
 
 **Solution:**
@@ -274,8 +274,8 @@ Failed to pull image "ghcr.io/ssahani/h2kvm:2.1.0-operator"
 # Visit: https://github.com/ssahani?tab=packages
 
 # Or load image locally
-docker pull ghcr.io/ssahani/h2kvm:2.1.0-operator
-crc podman load -i <(docker save ghcr.io/ssahani/h2kvm:2.1.0-operator)
+docker pull ghcr.io/zyvorai/h2kvm:2.1.0-operator
+crc podman load -i <(docker save ghcr.io/zyvorai/h2kvm:2.1.0-operator)
 ```
 
 ### Issue 3: SecurityContextConstraints Violations
@@ -423,7 +423,7 @@ h2kvmctl offline-fix \
 
 **Test Status:** ⚠️ Ready (waiting for cluster disk space)
 **Operator Version:** v0.3.1
-**Images Available:** ✅ ghcr.io/ssahani/h2kvm:2.1.0-operator
+**Images Available:** ✅ ghcr.io/zyvorai/h2kvm:2.1.0-operator
 **CRDs Installed:** ✅ migrationjobs.h2kvm.io, jobtemplates.h2kvm.io
 
 When disk space is available, run:

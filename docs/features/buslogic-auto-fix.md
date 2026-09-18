@@ -517,7 +517,7 @@ For issues with BusLogic auto-fix:
 2. Verify `workdir` has sufficient space
 3. Ensure `regen_initramfs: true` in config
 4. Check VM console logs for boot errors
-5. Report issues: https://github.com/ssahani/h2kvm/issues
+5. Report issues: https://github.com/zyvorai/h2kvm/issues
 
 ## Author
 

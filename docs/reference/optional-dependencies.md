@@ -583,7 +583,7 @@ For air-gapped or strictly controlled RHEL environments, build an RPM with bundl
 
 ```bash
 # On build system (with internet)
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 make rpm  # or rpmbuild -ba h2kvm.spec
 

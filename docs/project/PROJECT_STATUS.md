@@ -252,7 +252,7 @@ See [IMPROVEMENTS_ROADMAP.md](IMPROVEMENTS_ROADMAP.md) for detailed plan.
 ### For Developers
 ```bash
 # Quick setup
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 make quickstart  # Installs everything
 

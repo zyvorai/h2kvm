@@ -96,7 +96,7 @@ helm install h2kvm-operator ./helm/h2kvm-operator \
 
 ```bash
 # Install via operator-sdk
-operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
+operator-sdk run bundle ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0 \
   --namespace h2kvm-system
 
 # Or install from OperatorHub UI
@@ -109,12 +109,12 @@ operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
 ```bash
 # Run operator container
 podman run -d --name h2kvm-operator \
-  ghcr.io/ssahani/h2kvm:2.1.0-operator
+  ghcr.io/zyvorai/h2kvm:2.1.0-operator
 
 # Run worker container
 podman run -d --name h2kvm-worker \
   -v /data:/data \
-  ghcr.io/ssahani/h2kvm:2.1.0-worker
+  ghcr.io/zyvorai/h2kvm:2.1.0-worker
 ```
 
 **Documentation**: [Container Deployment Guide](container-deployment-guide.md)
@@ -183,7 +183,7 @@ h2kvm --config migration.yaml
 
 ## Getting Help
 
-- **Issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+- **Issues**: [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
 - **Documentation**: [Main Index](../index.md)
 - **Troubleshooting**: [Troubleshooting Guide](../guides/troubleshooting.md)
 

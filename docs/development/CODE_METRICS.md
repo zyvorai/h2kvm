@@ -532,8 +532,8 @@ pytest --cov=h2kvm --cov-report=html
 - `cmd/h2kctl/commands/*.go` - 1,200+ lines (CLI tool)
 
 **Container Images**:
-- Operator: ghcr.io/ssahani/h2kvm-operator:v1.2.0
-- Bundle: ghcr.io/ssahani/h2kvm-operator-bundle:v1.2.0
+- Operator: ghcr.io/zyvorai/h2kvm-operator:v1.2.0
+- Bundle: ghcr.io/zyvorai/h2kvm-operator-bundle:v1.2.0
 - Size: ~50MB (operator), ~2MB (bundle)
 - Architectures: amd64, arm64, s390x, ppc64le
 

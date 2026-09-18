@@ -112,7 +112,7 @@ oc adm policy add-scc-to-user h2kvm-worker-scc \
 3. Click Install
 
 # Via CLI
-operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.0.0
+operator-sdk run bundle ghcr.io/zyvorai/h2kvm-operator-bundle:v2.0.0
 ```
 
 **CSV Features:**
@@ -220,7 +220,7 @@ openshift:
     annotations:
       openshift.io/display-name: "H2KVM Operator"
       openshift.io/provider-display-name: "H2KVM Project"
-      openshift.io/documentation-url: "https://github.com/ssahani/h2kvm"
+      openshift.io/documentation-url: "https://github.com/zyvorai/h2kvm"
       description: "Kubernetes operator for automated VM migration"
       iconClass: "icon-openshift"
       tags: "migration,vmware,kvm,virtualization"
@@ -248,8 +248,8 @@ openshift:
 ```bash
 # Mirror operator images
 oc image mirror \
-  ghcr.io/ssahani/h2kvm:2.0.0-operator=internal-registry.example.com/h2kvm/operator:2.0.0 \
-  ghcr.io/ssahani/h2kvm:2.0.0-worker=internal-registry.example.com/h2kvm/worker:2.0.0
+  ghcr.io/zyvorai/h2kvm:2.0.0-operator=internal-registry.example.com/h2kvm/operator:2.0.0 \
+  ghcr.io/zyvorai/h2kvm:2.0.0-worker=internal-registry.example.com/h2kvm/worker:2.0.0
 ```
 
 **ImageContentSourcePolicy:**
@@ -477,20 +477,20 @@ Operator requires:
 
 1. **Build bundle image**:
    ```bash
-   docker build -f olm/bundle.Dockerfile -t ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 olm/
-   docker push ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
+   docker build -f olm/bundle.Dockerfile -t ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0 olm/
+   docker push ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0
    ```
 
 2. **Create catalog**:
    ```bash
    opm index add \
-     --bundles ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 \
-     --tag ghcr.io/ssahani/h2kvm-operator-catalog:latest
+     --bundles ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0 \
+     --tag ghcr.io/zyvorai/h2kvm-operator-catalog:latest
    ```
 
 3. **Test on OpenShift cluster**:
    ```bash
-   operator-sdk run bundle ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
+   operator-sdk run bundle ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0
    ```
 
 4. **Submit to OperatorHub**:
@@ -505,7 +505,7 @@ Operator requires:
 - [OpenShift Operators Documentation](https://docs.openshift.com/container-platform/latest/operators/index.html)
 - [OLM Documentation](https://olm.operatorframework.io/)
 - [Operator SDK](https://sdk.operatorframework.io/)
-- [H2KVM GitHub](https://github.com/ssahani/h2kvm)
+- [H2KVM GitHub](https://github.com/zyvorai/h2kvm)
 
 ---
 

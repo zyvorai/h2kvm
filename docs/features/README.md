@@ -428,9 +428,9 @@ EOF
 Have an idea for a new feature?
 
 1. **Check existing features**: Review this documentation
-2. **Search issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
-3. **Create feature request**: [New Feature Request](https://github.com/ssahani/h2kvm/issues/new)
-4. **Discuss**: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
+2. **Search issues**: [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
+3. **Create feature request**: [New Feature Request](https://github.com/zyvorai/h2kvm/issues/new)
+4. **Discuss**: [GitHub Discussions](https://github.com/zyvorai/h2kvm/discussions)
 
 ---
 

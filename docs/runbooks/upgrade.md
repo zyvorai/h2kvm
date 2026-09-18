@@ -17,7 +17,7 @@ Upgrading h2kvm operator, worker images, or dependencies (KubeVirt, CDI) to new 
 cat CHANGELOG.md
 
 # Review GitHub release notes
-# https://github.com/ssahani/h2kvm/releases
+# https://github.com/zyvorai/h2kvm/releases
 
 # Check for breaking changes
 grep -i "breaking" CHANGELOG.md
@@ -223,9 +223,8 @@ pip uninstall -y h2kvm
 # Install new version (editable mode for development)
 pip install -e ".[full]"
 
-# Or from GitHub Release wheel
-pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
-pip install -U "hypersdk-guestkit>=1.1.0"
+# Or from PyPI
+pip install "h2kvm==1.2.1"
 
 # Verify version
 h2kvmctl --version
@@ -521,7 +520,7 @@ groups:
 1. Collect debug bundle: `./scripts/collect-debug-bundle.sh`
 2. Save upgrade timeline and steps taken
 3. Document current state vs expected state
-4. Check GitHub issues: https://github.com/ssahani/h2kvm/issues
+4. Check GitHub issues: https://github.com/zyvorai/h2kvm/issues
 5. Contact platform team or file GitHub issue with:
    - Old version → new version
    - Kubernetes version

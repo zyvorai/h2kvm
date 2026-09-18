@@ -22,7 +22,7 @@ brew install qemu
 docker run --rm --privileged \
   -v $(pwd)/input:/input \
   -v $(pwd)/output:/output \
-  ghcr.io/ssahani/h2kvm:latest \
+  ghcr.io/zyvorai/h2kvm:latest \
   --cmd local \
   --vmdk /input/vm.vmdk \
   --to-output /output/vm.qcow2 \
@@ -36,7 +36,7 @@ docker run --rm --privileged \
 
 ```bash
 # Clone repo
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 
 # Build container

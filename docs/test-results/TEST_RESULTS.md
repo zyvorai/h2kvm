@@ -180,7 +180,7 @@ Result: ✅ PASSED
 
 #### ✅ Test 2: OLM Bundle Image Build
 ```bash
-Image: ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0
+Image: ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0
 Size: 54.8kB
 Result: ✅ PASSED
 ```
@@ -265,7 +265,7 @@ Validation: Script structure correct, all functions defined
 ```bash
 Test: Bundle build execution
 Result: ✅ PASSED
-Output: ghcr.io/ssahani/h2kvm-operator-bundle:v2.1.0 (54.8kB)
+Output: ghcr.io/zyvorai/h2kvm-operator-bundle:v2.1.0 (54.8kB)
 ```
 
 #### ✅ Test 3: deploy-to-openshift.sh

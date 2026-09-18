@@ -323,8 +323,8 @@ helm install h2kvm-worker ./helm/h2kvm-worker
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
+- **Issues**: [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/zyvorai/h2kvm/discussions)
 - **Documentation**: [Main Index](../index.md)
 
 ## Contributing

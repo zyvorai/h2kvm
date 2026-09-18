@@ -338,9 +338,9 @@ RELEASE_NOTES_v1.3.0.md         Latest release notes
 
 Found a documentation issue?
 
-1. Check if it's already reported: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
-2. Submit improvement: [GitHub Pull Request](https://github.com/ssahani/h2kvm/pulls)
-3. Discuss ideas: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
+1. Check if it's already reported: [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
+2. Submit improvement: [GitHub Pull Request](https://github.com/zyvorai/h2kvm/pulls)
+3. Discuss ideas: [GitHub Discussions](https://github.com/zyvorai/h2kvm/discussions)
 
 **Documentation Standards:**
 - Use markdown (.md files)
@@ -362,8 +362,8 @@ Found a documentation issue?
 
 ### Community Support
 
-- **GitHub Issues:** [Report bugs](https://github.com/ssahani/h2kvm/issues)
-- **Discussions:** [Ask questions](https://github.com/ssahani/h2kvm/discussions)
+- **GitHub Issues:** [Report bugs](https://github.com/zyvorai/h2kvm/issues)
+- **Discussions:** [Ask questions](https://github.com/zyvorai/h2kvm/discussions)
 - **Examples:** [k8s/worker/examples/](../../k8s/worker/examples/)
 
 ### Enterprise Support

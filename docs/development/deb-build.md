@@ -76,7 +76,7 @@ Depends: python3, python3-yaml (>= 6.0), qemu-utils
 Recommends: libguestfs-tools, python3-pyvmomi, python3-requests, libvirt-clients, libvirt-daemon-system, qemu-kvm, ovmf, virtinst
 Suggests: podman | docker.io
 Maintainer: ZyvorAI Labs Private Limited <ssahani@zyvor.dev>
-Homepage: https://github.com/ssahani/h2kvm
+Homepage: https://github.com/zyvorai/h2kvm
 Description: Production-grade hypervisor to KVM/QEMU migration toolkit
  h2kvm migrates virtual machines from VMware vSphere, Hyper-V, Azure,
  AWS, and local disks into reliable, bootable KVM/QEMU systems.

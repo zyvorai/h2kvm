@@ -425,6 +425,6 @@ After successful migration:
 
 ## Getting Help
 
-- Issues: https://github.com/ssahani/h2kvm/issues
-- Discussions: https://github.com/ssahani/h2kvm/discussions
+- Issues: https://github.com/zyvorai/h2kvm/issues
+- Discussions: https://github.com/zyvorai/h2kvm/discussions
 - Docs: https://h2kvm.io/docs

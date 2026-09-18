@@ -282,9 +282,9 @@ SEE ALSO
 BUGS
 ====
 
-Report bugs to: https://github.com/ssahani/h2kvm/issues
+Report bugs to: https://github.com/zyvorai/h2kvm/issues
 
-Project documentation: https://github.com/ssahani/h2kvm
+Project documentation: https://github.com/zyvorai/h2kvm
 
 AUTHOR
 ======

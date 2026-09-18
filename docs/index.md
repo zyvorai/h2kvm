@@ -383,9 +383,9 @@ Welcome to the comprehensive documentation for H2KVM, a production-ready VM migr
 
 ## 📚 External Resources
 
-- **GitHub Repository**: https://github.com/ssahani/h2kvm
+- **GitHub Repository**: https://github.com/zyvorai/h2kvm
 - **PyPI Package**: https://pypi.org/project/h2kvm/
-- **Issue Tracker**: https://github.com/ssahani/h2kvm/issues
+- **Issue Tracker**: https://github.com/zyvorai/h2kvm/issues
 
 ---
 

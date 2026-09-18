@@ -43,7 +43,7 @@ uvicorn h2kvm.worker.api:app --reload --host 0.0.0.0 --port 8000
 gunicorn h2kvm.worker.api:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 
 # Using Docker
-docker run -p 8000:8000 ghcr.io/ssahani/h2kvm-worker-api:latest
+docker run -p 8000:8000 ghcr.io/zyvorai/h2kvm-worker-api:latest
 ```
 
 ### Access Documentation
@@ -755,7 +755,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: ghcr.io/ssahani/h2kvm-worker-api:latest
+        image: ghcr.io/zyvorai/h2kvm-worker-api:latest
         ports:
         - containerPort: 8000
         livenessProbe:

@@ -8,11 +8,11 @@
 [![PyPI version](https://badge.fury.io/py/h2kvm.svg)](https://pypi.org/project/h2kvm/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/h2kvm)](https://pypi.org/project/h2kvm/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![GitHub stars](https://img.shields.io/github/stars/ssahani/h2kvm.svg?style=social&label=Star&maxAge=2592000)](https://github.com/ssahani/h2kvm/stargazers/)
+[![GitHub stars](https://img.shields.io/github/stars/zyvorai/h2kvm.svg?style=social&label=Star&maxAge=2592000)](https://github.com/zyvorai/h2kvm/stargazers/)
 
-[![Tests](https://github.com/ssahani/h2kvm/actions/workflows/tests.yml/badge.svg)](https://github.com/ssahani/h2kvm/actions/workflows/tests.yml)
-[![CI](https://github.com/ssahani/h2kvm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssahani/h2kvm/actions/workflows/ci.yml)
-[![Security](https://github.com/ssahani/h2kvm/actions/workflows/security.yml/badge.svg)](https://github.com/ssahani/h2kvm/actions/workflows/security.yml)
+[![Tests](https://github.com/zyvorai/h2kvm/actions/workflows/tests.yml/badge.svg)](https://github.com/zyvorai/h2kvm/actions/workflows/tests.yml)
+[![CI](https://github.com/zyvorai/h2kvm/actions/workflows/ci.yml/badge.svg)](https://github.com/zyvorai/h2kvm/actions/workflows/ci.yml)
+[![Security](https://github.com/zyvorai/h2kvm/actions/workflows/security.yml/badge.svg)](https://github.com/zyvorai/h2kvm/actions/workflows/security.yml)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 [Quick Start](#quick-start-) •
@@ -228,7 +228,7 @@ Production-tested with Windows 10 Pro (20H2) and Windows 11 Pro (22H2).
 
 ```bash
 # From source (recommended — installs everything on a fresh machine)
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 sudo ./scripts/quickstart.sh
 ```
@@ -250,7 +250,7 @@ Or do everything in one shot (fresh Ubuntu or Fedora machine):
 
 ```bash
 # Zero to running VM — installs all deps, pip packages, h2kvm, runs demo
-git clone https://github.com/ssahani/h2kvm.git && cd h2kvm
+git clone https://github.com/zyvorai/h2kvm.git && cd h2kvm
 sudo ./scripts/zero-to-demo.sh                # libvirt only
 sudo ./scripts/zero-to-demo.sh --with-k3s     # libvirt + K3s + KubeVirt
 ```
@@ -1020,7 +1020,7 @@ h2kvmctl --config batch.yaml
 ### Virtual Environment (Recommended — All Distros)
 
 ```bash
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 sudo ./scripts/install-venv.sh                # /opt/h2kvm (Fedora, RHEL, Ubuntu, Debian, SUSE)
 sudo ./scripts/install-venv.sh /custom/path   # custom location
@@ -1060,7 +1060,7 @@ pip install h2kvm             # minimal
 ### From Source (make install)
 
 ```bash
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 sudo make install
 make selftest
@@ -1546,7 +1546,7 @@ We welcome contributions! See [Contributing Guide](docs/development/contributing
 
 ```bash
 # Setup
-git clone https://github.com/ssahani/h2kvm.git
+git clone https://github.com/zyvorai/h2kvm.git
 cd h2kvm
 pip install -e ".[full,dev]"
 
@@ -1590,7 +1590,7 @@ Built with:
 - **HyperSDK** - Multi-cloud provider daemon (optional)
 - **libvirt** - Virtualization management
 
-Special thanks to all [contributors](https://github.com/ssahani/h2kvm/graphs/contributors).
+Special thanks to all [contributors](https://github.com/zyvorai/h2kvm/graphs/contributors).
 
 ---
 

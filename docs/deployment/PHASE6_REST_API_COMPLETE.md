@@ -177,8 +177,8 @@ FROM python:3.11-slim
 
 ```bash
 # Pull and run
-docker pull ghcr.io/ssahani/h2kvm-worker-api:latest
-docker run -p 8000:8000 ghcr.io/ssahani/h2kvm-worker-api:latest
+docker pull ghcr.io/zyvorai/h2kvm-worker-api:latest
+docker run -p 8000:8000 ghcr.io/zyvorai/h2kvm-worker-api:latest
 
 # Access API
 curl http://localhost:8000/docs
@@ -189,7 +189,7 @@ curl http://localhost:8000/docs
 ```bash
 docker run -p 8000:8000 \
   -v /var/lib/h2kvm:/var/lib/h2kvm \
-  ghcr.io/ssahani/h2kvm-worker-api:latest
+  ghcr.io/zyvorai/h2kvm-worker-api:latest
 ```
 
 Mounted directories:
@@ -226,7 +226,7 @@ gunicorn h2kvm.worker.api:app \
 version: '3.8'
 services:
   api:
-    image: ghcr.io/ssahani/h2kvm-worker-api:latest
+    image: ghcr.io/zyvorai/h2kvm-worker-api:latest
     ports:
       - "8000:8000"
     volumes:
@@ -247,7 +247,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: ghcr.io/ssahani/h2kvm-worker-api:latest
+        image: ghcr.io/zyvorai/h2kvm-worker-api:latest
         ports:
         - containerPort: 8000
         livenessProbe:

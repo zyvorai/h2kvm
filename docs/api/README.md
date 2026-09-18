@@ -315,7 +315,7 @@ See the [examples directory](../../examples/) for complete, runnable examples:
 - **Documentation**: This directory
 - **Tutorials**: [docs/tutorials/](../tutorials/)
 - **Recipes**: [docs/recipes/](../recipes/)
-- **Issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
+- **Issues**: [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
 
 ---
 
@@ -323,8 +323,8 @@ See the [examples directory](../../examples/) for complete, runnable examples:
 
 Help improve H2KVM APIs:
 
-- **Report Issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues)
-- **Suggest Features**: [Feature Requests](https://github.com/ssahani/h2kvm/issues/new?labels=enhancement)
+- **Report Issues**: [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
+- **Suggest Features**: [Feature Requests](https://github.com/zyvorai/h2kvm/issues/new?labels=enhancement)
 - **Submit PRs**: [Contributing Guide](../development/contributing.md)
 
 ---

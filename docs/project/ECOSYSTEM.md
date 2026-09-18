@@ -24,8 +24,8 @@
 The **h2kvm ecosystem** is a comprehensive VM migration solution consisting of three main projects:
 
 ### 1. **h2kvm** (Python)
-**Repository:** https://github.com/ssahani/h2kvm
-**Release:** https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0
+**Repository:** https://github.com/zyvorai/h2kvm
+**Release:** https://pypi.org/project/h2kvm/1.2.1/
 **Language:** Python 3.10+
 
 Production-grade VM migration toolkit that converts hypervisor disks (VMware, Hyper-V, AWS AMI, etc.) to KVM-compatible formats with automatic guest OS fixes.
@@ -318,18 +318,14 @@ Features:
 
 ### Install h2kvm (Python)
 
-#### Method 1: From GitHub Release (v1.1.0)
+#### Method 1: From PyPI (v1.2.1)
 
 ```bash
 # Install system dependencies
 sudo dnf install -y qemu-img qemu-system-x86  # Fedora/RHEL
 sudo apt install -y qemu-utils               # Ubuntu/Debian
 
-# GuestKit Python bindings (PyPI)
-pip install "hypersdk-guestkit>=1.1.0"
-
-# h2kvm wheel from GitHub Release (PyPI project pending)
-pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
+pip install "h2kvm==1.2.1"
 
 # Or from a clone with extras
 # pip install '.[full]'
@@ -878,14 +874,14 @@ systemctl restart hypervisord
 
 ### Report Issues
 
-- **h2kvm:** https://github.com/ssahani/h2kvm/issues
+- **h2kvm:** https://github.com/zyvorai/h2kvm/issues
 - **hypersdk:** https://github.com/ssahani/hypersdk/issues
 
 ### Development Setup
 
 **Python (h2kvm):**
 ```bash
-git clone https://github.com/ssahani/h2kvm
+git clone https://github.com/zyvorai/h2kvm
 cd h2kvm
 pip install -e '.[dev]'
 pytest tests/

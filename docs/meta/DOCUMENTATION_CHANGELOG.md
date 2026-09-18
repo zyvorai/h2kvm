@@ -387,8 +387,8 @@ Thanks to all users who provided feedback, reported issues, and suggested improv
 
 Found an issue or have a suggestion?
 
-1. **Documentation Issues**: [GitHub Issues](https://github.com/ssahani/h2kvm/issues) - Tag with `documentation`
-2. **Suggestions**: [GitHub Discussions](https://github.com/ssahani/h2kvm/discussions)
+1. **Documentation Issues**: [GitHub Issues](https://github.com/zyvorai/h2kvm/issues) - Tag with `documentation`
+2. **Suggestions**: [GitHub Discussions](https://github.com/zyvorai/h2kvm/discussions)
 3. **Quick Fixes**: Submit a PR directly
 4. **Questions**: Check [FAQ](FAQ.md) first, then ask in Discussions
 

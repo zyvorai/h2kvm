@@ -236,10 +236,10 @@ Deploy validation as Kubernetes CRDs.
 
 ```bash
 # Install CRDs
-kubectl apply -f https://github.com/ssahani/h2kvm/releases/latest/download/crd.yaml
+kubectl apply -f https://github.com/zyvorai/h2kvm/releases/latest/download/crd.yaml
 
 # Install operator
-kubectl apply -f https://github.com/ssahani/h2kvm/releases/latest/download/operator.yaml
+kubectl apply -f https://github.com/zyvorai/h2kvm/releases/latest/download/operator.yaml
 
 # Verify installation
 kubectl get pods -n h2kvm-system
@@ -502,4 +502,4 @@ jobs:
 - Explore [API Reference](API_REFERENCE.md) for detailed API docs
 - Check [Performance Guide](performance/BENCHMARKS.md) for optimization
 - Review [Examples](../examples/) for more code samples
-- Join [Discussions](https://github.com/ssahani/h2kvm/discussions) for help
+- Join [Discussions](https://github.com/zyvorai/h2kvm/discussions) for help

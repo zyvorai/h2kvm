@@ -126,7 +126,7 @@ h2kvmctl --config migration.yaml
 ```
 
 **Open Source**: Proprietary (Zyvor AI Labs)
-**GitHub**: github.com/ssahani/h2kvm
+**GitHub**: github.com/zyvorai/h2kvm
 **Docs**: Comprehensive guides & examples
 
 ---
@@ -166,4 +166,4 @@ Drop a comment—we might build a solution for it.
 
 *P.S. If you've ever spent hours debugging why a migrated VM won't boot, you'll appreciate what h2kvm does. And if you haven't, consider yourself lucky—but you might want it in your toolkit anyway.* 😉
 
-**Star on GitHub** ⭐: github.com/ssahani/h2kvm
+**Star on GitHub** ⭐: github.com/zyvorai/h2kvm
