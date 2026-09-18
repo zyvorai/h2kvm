@@ -24,6 +24,7 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 [![30-day PoC](https://img.shields.io/badge/30--day_PoC-111827?style=for-the-badge)](https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)
 [![Watch the demo](https://img.shields.io/badge/Watch_the_demo-22C55E?style=for-the-badge)](https://www.youtube.com/watch?v=lQP1sd5Ftkc)
 
+**[How it works](#how-it-works)** ·
 **[No VDDK](#no-vddk)** ·
 **[Install](#install)** ·
 **[Quick start](#quick-start)** ·
@@ -38,33 +39,41 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 
 ---
 
-## The cutover problem — fixed before power-on
+## How it works
 
-Hypervisor exit fails when VirtIO is missing, GRUB is wrong, or Windows still points at the old hypervisor — **after** you cut over.
+The disk is fixed before it is powered on. Then you watch it boot, and you can run it on [Zeus OS](https://zyvor.dev/zeus-os) or [Machina](https://zyvor.dev/machina). The public pages are on [zyvor.dev](https://zyvor.dev).
 
-**h2kvm** converts the disk offline, runs GuestKit repair, and deploys to libvirt / KubeVirt / OpenStack so first boot is planned, not guessed.
+![GuestKit repairs the disk, h2kvm lands the VM, Zorvia shows the boot, Zeus OS and Machina run it.](docs/social/h2kvm-suite-card.png)
 
 ```text
-  VMware · Hyper-V · cloud disks · …
-              │
-              ▼
-     ┌──────────────────────────┐
-     │  h2kvm                   │──►  convert → qcow2 / raw
-     │  h2kvmctl · h2kweb       │──►  GuestKit inspect + repair
-     │  K8s / OLM operator      │──►  deploy · validate · rollback
-     └──────────────────────────┘
-              │
-              ▼
-       libvirt · KubeVirt · Glance/Nova
-              │
-              ▼
-            Zeus OS (day-2)
+  source disk
+      →  GuestKit     inspect the disk before power-on     zyvor.dev/guestkit
+      →  h2kvm        any hypervisor to KVM                zyvor.dev/h2kvm
+      →  Zorvia       KubeVirt VMs, no hand-written CRDs   zyvor.dev/zorvia
+      →  Zeus OS      visual OS for KubeVirt               zyvor.dev/zeus-os
+      →  Machina      control plane for libvirt hosts      zyvor.dev/machina
+
+  First boot is planned, and you can see it.
 ```
 
-| GuestKit offline fix | 8+ disk formats | 35+ guest OS | CLI · web · operator |
-|:---:|:---:|:---:|:---:|
+```mermaid
+flowchart LR
+  Disk["Source disk"] --> GK["GuestKit"]
+  GK --> H["h2kvm"]
+  H --> Z["Zorvia"]
+  Z --> Zeus["Zeus OS"]
+  Z --> Machina["Machina"]
+```
 
-**Suite path:** [HyperSDK](https://github.com/hypersdk/hypersdk) export → [GuestKit](https://github.com/hypersdk/guestkit) assure → **h2kvm** convert & deploy → [Zeus OS](https://zyvor.dev/zeus-os) day-2.
+| Product | What zyvor.dev says | Site | Repo |
+|---------|---------------------|------|------|
+| [GuestKit](https://zyvor.dev/guestkit) | Inspects the disk offline so you know it is safe before power-on | [zyvor.dev/guestkit](https://zyvor.dev/guestkit) | [zyvorai/guestkit](https://github.com/zyvorai/guestkit) |
+| [h2kvm](https://zyvor.dev/h2kvm) | Any hypervisor to KVM. The guest is fixed so the VM boots the first time | [zyvor.dev/h2kvm](https://zyvor.dev/h2kvm) | [zyvorai/h2kvm](https://github.com/zyvorai/h2kvm) |
+| [Zorvia](https://zyvor.dev/zorvia) | Craft and run KubeVirt VMs without hand-written CRDs | [zyvor.dev/zorvia](https://zyvor.dev/zorvia) | [zyvorai/zorvia](https://github.com/zyvorai/zorvia) |
+| [Zeus OS](https://zyvor.dev/zeus-os) | The visual infrastructure OS for KubeVirt | [zyvor.dev/zeus-os](https://zyvor.dev/zeus-os) | [zyvorai/zeus-os](https://github.com/zyvorai/zeus-os) |
+| [Machina](https://zyvor.dev/machina) | One control plane for the libvirt hosts you already run | [zyvor.dev/machina](https://zyvor.dev/machina) | [zyvorai/machina](https://github.com/zyvorai/machina) |
+
+Hypervisor exit fails when the bootloader is wrong, or Windows still points at the old hypervisor, **after** you cut over. GuestKit and h2kvm do that work before power-on. Zorvia is where you watch the VM. Zeus OS and Machina are where you keep running it.
 
 ---
 
@@ -169,7 +178,7 @@ kubectl apply -f operator/deploy/
 
 ## GuestKit
 
-Offline inspect and repair run through **[GuestKit](https://github.com/hypersdk/guestkit)** — fstab, GRUB, initramfs, and hypervisor-aware fixes via `guestkit.run_migrate_repair()`. h2kvm does not re-implement that engine in pure Python.
+Offline inspect and repair run through **[GuestKit](https://github.com/zyvorai/guestkit)** — fstab, bootloader, initramfs, and hypervisor-aware fixes via `guestkit.run_migrate_repair()`. h2kvm does not re-implement that engine in pure Python.
 
 ```python
 from h2kvm.core import guestkit_client
@@ -185,7 +194,7 @@ guestkit doctor ubuntu.vmdk --target kvm --explain
 
 **Debian/Ubuntu libvirt:** after convert, `chown libvirt-qemu:kvm` on the output qcow2 before `virsh start`. See [troubleshooting](docs/guides/troubleshooting.md#permissions-and-ownership).
 
-More: [GUESTKIT.md](docs/architecture/GUESTKIT.md) · [API](docs/reference/api/guestkit.md) · [GuestKit repo](https://github.com/hypersdk/guestkit)
+More: [GUESTKIT.md](docs/architecture/GUESTKIT.md) · [API](docs/reference/api/guestkit.md) · [GuestKit repo](https://github.com/zyvorai/guestkit) · [Zorvia](https://github.com/zyvorai/zorvia)
 
 ---
 
@@ -311,26 +320,16 @@ CE is for labs and single-cluster PoC. Moving a Windows estate, SAN-backed waves
 
 ## Where this fits: the Zyvor suite
 
-```mermaid
-flowchart LR
-    H["Transiva<br/>export"] --> G["GuestKit<br/>assure"]
-    G --> K["<b>h2kvm</b><br/>convert · fix · deploy"]
-    K --> T["KVM · KubeVirt"]
-    T --> Z["Zeus OS<br/>day-2"]
-
-    classDef accent fill:#F97316,stroke:#EA580C,color:#fff;
-    classDef muted fill:#F3F4F6,stroke:#D1D5DB,color:#111827;
-    class K accent;
-    class Z muted;
-```
+The buyer path matches [zyvor.dev](https://zyvor.dev): [GuestKit](https://zyvor.dev/guestkit) → [h2kvm](https://zyvor.dev/h2kvm) → [Zorvia](https://zyvor.dev/zorvia), then [Zeus OS](https://zyvor.dev/zeus-os) or [Machina](https://zyvor.dev/machina). See [How it works](#how-it-works).
 
 | Product | Role |
 |---------|------|
-| [Transiva](https://github.com/zyvorai/transiva) | vSphere · Nutanix export · HyperSDK-compatible `hyper*` aliases |
-| [GuestKit](https://github.com/hypersdk/guestkit) | Offline disk doctor + Passport + `run_migrate_repair` |
-| **h2kvm** *(this repo)* | Convert + GuestKit offline fix + libvirt/KubeVirt deploy |
-| [Zeus OS](https://zyvor.dev/zeus-os) | Day-2 KubeVirt / cloud control plane |
-| [Machina](https://zyvor.dev/machina) | Physical hypervisor OS (libvirt/KVM) |
+| [GuestKit](https://github.com/zyvorai/guestkit) | Offline disk repair before power-on |
+| **h2kvm** *(this repo)* | Convert and land the VM on KVM and KubeVirt |
+| [Zorvia](https://github.com/zyvorai/zorvia) | Console where you watch the VM boot |
+| [Transiva](https://github.com/zyvorai/transiva) | vSphere · Nutanix export |
+| [Zeus OS](https://zyvor.dev/zeus-os) | Visual infrastructure OS for KubeVirt |
+| [Machina](https://zyvor.dev/machina) | Control plane for the libvirt hosts you already run |
 | [PacketWolf](https://zyvor.dev/packetwolf) | Kernel-native network intelligence |
 
 → [zyvor.dev](https://zyvor.dev) · [hypervisor exit program](https://zyvor.dev/hypervisor-exit)
