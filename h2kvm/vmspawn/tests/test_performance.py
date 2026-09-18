@@ -327,7 +327,11 @@ class TestPerformanceRegression:
         time_10 = await measure_time(10, max_parallel=10)
         time_20 = await measure_time(20, max_parallel=10)
 
-        # Should scale roughly linearly (allow 30% variance for overhead)
+        # Should scale roughly linearly (allow 30% variance for overhead).
+        # A fast runner finishes both samples inside timer noise, so the
+        # ratio is not meaningful there.
+        if time_10 < 0.05:
+            pytest.skip(f"sample too short to measure scaling ({time_10:.4f}s)")
         ratio = time_20 / time_10
         assert 1.7 <= ratio <= 2.3, f"Scaling ratio {ratio:.2f} outside expected range"
 
