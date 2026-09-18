@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-18
+
+### Added
+
+- Apple console: chapter login, dark ink on the light theme, Apple blue, and colored terminal logs.
+- Automatic UEFI firmware install when a boot test needs it.
+- Buyer README for GuestKit, h2kvm, Zorvia, Zeus OS, and Machina, plus a suite card.
+
+### Changed
+
+- Offline guest repair is GuestKit only.
+- Light-theme chips and actions use solid dark fills.
+
+### Removed
+
+- The text UI.
+- The old external conversion path. Conversion stays inside h2kvm.
+- VDDK. Disks leave through the vSphere API and NFS.
+
+## [1.1.0] - 2026-08-31
+
 ### Removed
 
 - **VMCraft** — entire `h2kvm/vmcraft/` package (~96 modules), examples, API docs, and unit tests. Disk I/O, inspection, and offline repair now delegate to **GuestKit** (`hypersdk-guestkit>=1.1.0`) via `h2kvm/core/guestkit_client.py`.

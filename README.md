@@ -13,7 +13,7 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 
 <br/>
 
-[![Release](https://img.shields.io/github/v/release/zyvorai/h2kvm?color=F97316)](https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0)
+[![Release](https://img.shields.io/github/v/release/zyvorai/h2kvm?color=F97316)](https://github.com/zyvorai/h2kvm/releases/tag/v1.2.0)
 [![GuestKit](https://img.shields.io/pypi/v/hypersdk-guestkit.svg)](https://pypi.org/project/hypersdk-guestkit/)
 [![Python](https://img.shields.io/badge/python-3.10+-3776AB.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-see_LICENSE-111827.svg)](LICENSE)
@@ -116,11 +116,11 @@ Copying the disk was never the hard part. GuestKit still has to fix VirtIO, GRUB
 
 ## Install
 
-**v1.1.0** — GuestKit from PyPI; h2kvm from the GitHub Release wheel.
+**v1.2.0** — GuestKit from PyPI; h2kvm from the GitHub Release wheel.
 
 ```bash
 pip install "hypersdk-guestkit>=1.1.0"
-pip install https://github.com/zyvorai/h2kvm/releases/download/v1.1.0/h2kvm-1.1.0-py3-none-any.whl
+pip install https://github.com/zyvorai/h2kvm/releases/download/v1.2.0/h2kvm-1.2.0-py3-none-any.whl
 ```
 
 From source (extras / development):
@@ -135,9 +135,9 @@ Host needs Linux with `qemu-img`, `qemu-nbd`, and `losetup`. Repair and NBD moun
 
 | Artifact | Where |
 |----------|--------|
-| **h2kvm 1.1.0** | [GitHub Release](https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0) (wheel + sdist) |
+| **h2kvm 1.2.0** | [GitHub Release](https://github.com/zyvorai/h2kvm/releases/tag/v1.2.0) (wheel + sdist) |
 | **hypersdk-guestkit ≥ 1.1.0** | [PyPI](https://pypi.org/project/hypersdk-guestkit/) |
-| **Operator image** | `ghcr.io/zyvorai/h2kvm/operator:v1.1.0` |
+| **Operator image** | `ghcr.io/zyvorai/h2kvm/operator:v1.2.0` |
 
 ---
 
