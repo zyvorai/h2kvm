@@ -277,7 +277,6 @@ SEE ALSO
 **h2kvm-azure**\(1),
 **h2kvm.conf**\(5),
 **qemu-img**\(1),
-**virt-v2v**\(1),
 **guestfs**\(3)
 
 BUGS

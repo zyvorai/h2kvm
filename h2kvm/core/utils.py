@@ -414,41 +414,10 @@ class U:
         *,
         timeout: int | None = 120,
     ) -> dict[str, Any]:
-        """Optional disk introspection via ``virt-filesystems`` from libguestfs-tools."""
-        vff = U.which_virt_filesystems()
-        if not vff:
-            logger.warning(
-                "virt-filesystems not found — install libguestfs-tools "
-                "(e.g. dnf install -y libguestfs-tools; apt install libguestfs-tools). "
-                "If the package is installed, ensure PATH includes /usr/sbin "
-                "(e.g. export PATH=/usr/local/bin:/usr/bin:/usr/sbin). "
-                "skipping optional introspection for %s",
-                image,
-            )
-            return {
-                "ok": False,
-                "missing_binary": True,
-                "cmd": ["virt-filesystems", "-a", str(image), "--all", "--long", "-h"],
-            }
-
-        cmd = [vff, "-a", str(image), "--all", "--long", "-h"]
-        ret: dict[str, Any]
-        try:
-            cp = U.run_cmd(logger, cmd, capture=True, check=False, timeout=timeout)
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            # Introspection is optional/best-effort; any failure degrades to a warning + error record.
-            logger.warning("virt-filesystems failed for %s: %s", image, e)
-            ret = {"ok": False, "error": str(e), "cmd": cmd}
-        else:
-            out = (cp.stdout or "").strip()
-            if out:
-                logger.info("virt-filesystems -a %s --all --long -h\n%s", image, out)
-            else:
-                logger.info("virt-filesystems -a %s: (empty)", image)
-            ret = {"ok": True, "stdout": out, "cmd": cmd, "rc": getattr(cp, "returncode", 0)}
-
-        U.post_disk_tool_barrier(logger, Path(image))
-        return ret
+        """Disk layout is read by GuestKit."""
+        del timeout
+        logger.info("Guest inspection for %s is GuestKit", image)
+        return {"ok": False, "skipped": "guestkit-only", "image": str(image)}
 
     @staticmethod
     def require_root_if_needed(logger: logging.Logger, write_actions: bool) -> None:

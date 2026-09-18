@@ -48,7 +48,7 @@ func (r *Runner) BinaryPath() string {
 }
 
 // Run starts h2kvmctl with the given migration config, returning a channel
-// of runner events. Adapted from zkvm/internal/ui/standalone/runner.go.
+// of runner events.
 func (r *Runner) Run(ctx context.Context, jobID string, config domain.MigrationConfig) (<-chan ports.RunnerEvent, error) {
 	// Marshal config to YAML.
 	yamlBytes, err := yaml.Marshal(&config)
@@ -77,7 +77,7 @@ func (r *Runner) Run(ctx context.Context, jobID string, config domain.MigrationC
 		}
 	}
 
-	// Build command — use sudo if not root (same as zkvm runner).
+	// Build command — use sudo if not root.
 	procCtx, procCancel := context.WithCancel(ctx)
 	var cmd *exec.Cmd
 	if os.Getuid() != 0 {
@@ -248,7 +248,6 @@ func findBinary(override string) string {
 
 // scanLinesOrCR is a bufio.SplitFunc that splits on \n, \r\n, or bare \r.
 // This captures govc progress output which uses \r for in-place updates.
-// Copied from zkvm/internal/ui/standalone/runner.go.
 func scanLinesOrCR(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil

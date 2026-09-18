@@ -116,12 +116,6 @@ except ImportError:
     FileCreatedEvent = None  # type: ignore
     WATCHDOG_AVAILABLE = False
 
-# Textual (Terminal User Interface framework)
-# NOTE: Textual is no longer used by h2kvm. The TUI is now a standalone
-# Go binary (zkvm) using Bubble Tea. This flag is kept for backward
-# compatibility with any code that checks TEXTUAL_AVAILABLE.
-TEXTUAL_AVAILABLE = False
-
 # Helper functions
 
 
@@ -180,17 +174,6 @@ def require_watchdog() -> None:
         )
 
 
-def require_textual() -> None:
-    """Raise ImportError — Textual is no longer used.
-
-    The TUI is now a standalone Go binary (zkvm). This function is kept
-    for backward compatibility.
-    """
-    raise ImportError(
-        "Textual is no longer used. The TUI is now a Go binary (zkvm). Launch with: h2kvmctl --zkvm"
-    )
-
-
 # This module is a centralized barrel for optional third-party dependencies;
 # callers import the re-exported names directly (e.g. `from
 # h2kvm.core.optional_imports import BaseModel`), so pylint's
@@ -202,7 +185,6 @@ __all__ = [
     "PYVMOMI_AVAILABLE",
     "REQUESTS_AVAILABLE",
     "TENACITY_AVAILABLE",
-    "TEXTUAL_AVAILABLE",
     "URLLIB3_AVAILABLE",
     "WATCHDOG_AVAILABLE",
     "AsyncClient",
@@ -230,7 +212,6 @@ __all__ = [
     "require_pyvmomi",
     "require_requests",
     "require_tenacity",
-    "require_textual",
     "require_watchdog",
     "retry",
     "retry_if_exception_type",

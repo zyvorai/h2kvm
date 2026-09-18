@@ -45,7 +45,7 @@ class VsphereExporter:
 
     Responsibilities:
     - vSphere VM identification and credential resolution
-    - Direct export (govc / HTTPS, or virt-v2v over SSH)
+    - Direct export (govc export.ovf / export.ova, or HTTPS /folder)
     - download-only mode
     - Snapshot management
     """
@@ -152,13 +152,12 @@ class VsphereExporter:
             getattr(self.args, "vs_datacenter", None) or getattr(self.args, "vc_datacenter", None) or "auto"
         )
         compute = str(getattr(self.args, "vs_compute", None) or "auto")
-        transport = str(getattr(self.args, "vs_transport", "ssh") or "ssh").strip().lower()
-        if transport == "vddk":
+        requested = str(getattr(self.args, "vs_transport", "") or "").strip().lower()
+        if requested == "vddk":
             raise Fatal(
                 2,
                 "VDDK transport was removed.\n"
-                "Export with govc (export.ovf / export.ova) or HTTPS /folder, "
-                "or set vs_transport: ssh for virt-v2v.",
+                "Export with govc (export.ovf / export.ova) or HTTPS /folder.",
             )
 
         snapshot_moref = getattr(self.args, "vs_snapshot_moref", None)
@@ -172,14 +171,13 @@ class VsphereExporter:
         Log.trace(
             self.logger,
             "🧷 vSphere export knobs: host=%s port=%s insecure=%s timeout=%s dc=%s compute=%s "
-            "transport=%s download_only=%s",
+            "download_only=%s",
             getattr(creds, "host", None),
             port,
             insecure,
             timeout_f,
             datacenter,
             compute,
-            transport,
             download_only,
         )
 
@@ -231,7 +229,6 @@ class VsphereExporter:
                         export_mode=export_mode,
                         datacenter=datacenter,
                         compute=compute,
-                        transport=transport,
                         no_verify=bool(getattr(self.args, "vs_no_verify", False)),
                         output_dir=job_dir,
                         output_format=out_format,

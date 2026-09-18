@@ -195,8 +195,7 @@ SEE ALSO
 
 **h2kvm**\(1),
 **h2kvm.conf**\(5),
-**qemu-img**\(1),
-**virt-v2v**\(1)
+**qemu-img**\(1)
 
 AUTHOR
 ======

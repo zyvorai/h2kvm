@@ -6,7 +6,7 @@
 
 ## Overview
 
-**Enterprise-grade systemd-firstboot integration** that provides comprehensive **journal-visible initialization** after H2KVM conversion, matching Azure Migrate, AWS VM Import, and virt-v2v standards.
+**Enterprise-grade systemd-firstboot integration** that provides comprehensive **journal-visible initialization** after H2KVM conversion, matching Azure Migrate and AWS VM Import.
 
 The VM's first boot performs 18+ production-level initialization steps with clear, structured journal logging:
 - ✅ Hardware adaptation (virtio drivers)

@@ -174,8 +174,7 @@ def _add_fixing_behavior(p: argparse.ArgumentParser) -> None:
         default="guestkit",
         choices=["guestkit", "guestfs", "auto"],
         help=(
-            "Offline guest fix backend: guestkit (default, GuestKit PyO3 Guestfs), "
-            "guestfs (libguestfs), auto (guestkit then guestfs)."
+            "Offline guest fix backend: guestkit only."
         ),
     )
     p.add_argument(
@@ -844,7 +843,7 @@ def _add_ovf_ova_knobs(p: argparse.ArgumentParser) -> None:
         "--log-virt-filesystems",
         dest="log_virt_filesystems",
         action="store_true",
-        help="For OVA/OVF inputs, log `virt-filesystems --all --long -h` for each disk.",
+        help="For OVA/OVF inputs, log GuestKit disk layout for each disk.",
     )
     p.add_argument(
         "--ova-convert-to-qcow2",
@@ -1299,14 +1298,6 @@ def _add_vsphere_export_and_download_knobs(p: argparse.ArgumentParser) -> None:
         help="Datacenter name (default: ha-datacenter)",
     )
 
-    # virt-v2v input transport. Disk export itself uses govc or HTTPS, not VDDK.
-    p.add_argument(
-        "--vs-transport",
-        dest="vs_transport",
-        default=None,
-        choices=["ssh"],
-        help="virt-v2v input transport (ssh). Datastore downloads always use HTTPS.",
-    )
     p.add_argument(
         "--vs-snapshot-moref",
         dest="vs_snapshot_moref",
@@ -1972,33 +1963,6 @@ def _add_openstack_deployment(p: argparse.ArgumentParser) -> None:
         action=argparse.BooleanOptionalAction,
         default=True,
         help="Continue migration if OpenStack deploy fails (default: true).",
-    )
-
-
-def _add_zkvm_flags(p: argparse.ArgumentParser) -> None:
-    """zkvm (Terminal User Interface) flags."""
-    g = p.add_argument_group("zkvm (Terminal User Interface)")
-    g.add_argument(
-        "--zkvm",
-        dest="zkvm",
-        action="store_true",
-        default=False,
-        help="Launch the Go-based TUI (zkvm). Starts the socket server and the TUI binary.",
-    )
-    g.add_argument(
-        "--zkvm-server",
-        dest="zkvm_server",
-        action="store_true",
-        default=False,
-        help="Start zkvm socket server only (for external TUI clients).",
-    )
-    g.add_argument(
-        "--zkvm-socket",
-        dest="zkvm_socket",
-        default=None,
-        help="Custom Unix socket path for zkvm communication "
-        "(default: /run/h2kvm/zkvm.sock for root, "
-        "$XDG_RUNTIME_DIR/h2kvm/zkvm.sock for users).",
     )
 
 

@@ -44,7 +44,6 @@ from .groups import (
     _add_vsphere_export_and_download_knobs,
     _add_windows_network_override,
     _add_windows_virtio_definitions,
-    _add_zkvm_flags,
 )
 from .helpers import (
     _materialize_virtio_config_json_if_needed,
@@ -101,9 +100,6 @@ def build_parser() -> argparse.ArgumentParser:
 
     # OpenStack Glance / Nova
     _add_openstack_deployment(p)
-
-    # zkvm (Terminal User Interface)
-    _add_zkvm_flags(p)
 
     # AI migration intelligence
     _add_ai_flags(p)

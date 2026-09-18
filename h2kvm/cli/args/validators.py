@@ -217,7 +217,10 @@ def _validate_vsphere_download_transport(args: argparse.Namespace, conf: dict[st
 
     legacy = conf.get("vs_transport")
     if not _require(dl) and _require(legacy):
-        dl = str(legacy).strip().lower()
+        legacy_s = str(legacy).strip().lower()
+        # ssh was the old virt-v2v knob. Only https/http still mean a download transport.
+        if legacy_s in ("https", "http", "auto"):
+            dl = legacy_s
 
     dl = str(dl).strip().lower() if _require(dl) else "https"
     if dl == "auto":

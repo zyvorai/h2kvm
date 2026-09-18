@@ -15,7 +15,7 @@ How it works:
   4. Copy .sys/.inf/.cat files into Windows driver locations
   5. Register drivers in SYSTEM hive (Services + CriticalDeviceDatabase)
 
-This is the approach used by virt-v2v and enterprise cloud platforms.
+This is the approach used by enterprise cloud platforms.
 No guest execution. No UI prompts. Fully deterministic. Idempotent.
 
 Usage:

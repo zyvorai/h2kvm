@@ -412,20 +412,9 @@ def _render_minimal_bios_gui_xml(spec: LinuxDomainSpec) -> str:
 
 
 def _default_ovmf_vars_template() -> Path | None:
-    candidates = [
-        "/usr/share/edk2/ovmf/OVMF_VARS.fd",
-        "/usr/share/OVMF/OVMF_VARS.fd",
-        "/usr/share/edk2/ovmf/OVMF_VARS.secboot.fd",
-        "/usr/share/qemu/OVMF_VARS.fd",
-        # Some distros place these under /usr/share/edk2/ovmf/x64/...
-        "/usr/share/edk2/ovmf/x64/OVMF_VARS.fd",
-        "/usr/share/edk2/ovmf/x64/OVMF_VARS.secboot.fd",
-    ]
-    for p in candidates:
-        pp = Path(p)
-        if pp.exists():
-            return pp
-    return None
+    from .firmware import resolve_ovmf_vars
+
+    return resolve_ovmf_vars()
 
 
 # pylint: disable-next=too-many-locals,too-many-branches,too-many-statements  # renders every optional XML section (firmware, disk, graphics, console, cpu, ...) for the "default" domain profile
@@ -901,6 +890,16 @@ def emit_linux_domain(config: LinuxDomainConfig) -> LinuxDomainPaths:
     ovmf_vars_template = config.ovmf_vars_template
 
     if config.firmware == "uefi":
+        from .firmware import resolve_ovmf_code
+
+        resolved_code = resolve_ovmf_code(config.ovmf_code)
+        if resolved_code is None:
+            raise FileNotFoundError(
+                "UEFI firmware (OVMF) was not found and could not be installed. "
+                "Install it with: sudo apt install ovmf  or  sudo dnf install edk2-ovmf"
+            )
+        config.ovmf_code = str(resolved_code)
+
         if ovmf_vars_template is None:
             tpl = _default_ovmf_vars_template()
             if tpl is not None:

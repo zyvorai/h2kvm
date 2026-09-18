@@ -315,19 +315,19 @@ kubectl apply -f migrationjob.yaml
 
 ### H2KVM vs Alternatives
 
-| Feature | H2KVM | virt-v2v | qemu-img only | Custom Scripts |
-|---------|-----------|----------|---------------|----------------|
-| **Ease of Use** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐ |
-| **Automation** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐ | ⭐⭐⭐ |
-| **Boot Fixes** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐ | ⭐⭐ |
-| **Windows Support** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐ | ⭐⭐ |
-| **Batch Processing** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐⭐ |
-| **Kubernetes** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐ | ⭐⭐ |
-| **Network Resilience** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐ | ⭐⭐ |
-| **API Access** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐⭐ |
-| **Cost** | Free | Free | Free | Time |
-| **Dependencies** | Minimal | Heavy (C libs) | None | Varies |
-| **Learning Curve** | Low | Medium | Low | High |
+| Feature | H2KVM | qemu-img only | Custom Scripts |
+|---------|-------|---------------|----------------|
+| **Ease of Use** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ |
+| **Automation** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐⭐ |
+| **Boot Fixes** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐ |
+| **Windows Support** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐ |
+| **Batch Processing** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐⭐ |
+| **Kubernetes** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐ |
+| **Network Resilience** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐ |
+| **API Access** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐⭐ |
+| **Cost** | Free | Free | Time |
+| **Dependencies** | Minimal | None | Varies |
+| **Learning Curve** | Low | Low | High |
 
 ### Detailed Tool Comparison
 
@@ -340,15 +340,6 @@ kubectl apply -f migrationjob.yaml
 - ✅ REST API
 - ✅ Batch processing
 - ❌ Younger project
-
-**virt-v2v**:
-- ✅ Red Hat backed
-- ✅ Mature project
-- ✅ Good boot fixes
-- ⚠️ Heavy C dependencies
-- ⚠️ Limited Windows support
-- ❌ No native K8s integration
-- ❌ Limited API
 
 **qemu-img only**:
 - ✅ Simple conversion

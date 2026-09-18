@@ -3,8 +3,9 @@
 // https://zyvor.dev · info@zyvor.dev
 
 import { Link } from 'react-router-dom';
-import { ExternalLink, HelpCircle, Info, Mail, FileText, BookOpen } from 'lucide-react';
+import { ExternalLink, HelpCircle, Mail, FileText, BookOpen } from 'lucide-react';
 import { t } from '../i18n';
+import { ConsolePageHeader } from '../components/console/ConsolePageHeader';
 import {
   ZYVOR_URL,
   ZYVOR_COPYRIGHT_FULL,
@@ -62,13 +63,7 @@ export function AboutPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gradient-green mb-2 flex items-center gap-2">
-          <Info className="w-7 h-7 text-emerald-400" />
-          {t('about.title')}
-        </h2>
-        <p className="text-sm text-white/55">{t('about.subtitle')}</p>
-      </div>
+      <ConsolePageHeader eyebrow="h2kvm" title={t('about.title')} subtitle={t('about.subtitle')} />
 
       <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-5 py-4">
         <p className="text-sm text-white/75 leading-relaxed mb-3">

@@ -86,7 +86,6 @@ Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **
 | Capability | Community | Enterprise |
 | --- | --- | --- |
 | `h2kvmctl` CLI · YAML · daemon / watch-dir | ✅ | ✅ |
-| zkvm TUI | ✅ | ✅ |
 | h2kweb dashboard | ✅ | ✅ Production themes · RBAC |
 | K8s / OLM operator | ✅ Single-cluster | ✅ HA · tenancy · webhooks |
 | Manifest batch · rollback · DB-aware migrate | ✅ | ✅ |

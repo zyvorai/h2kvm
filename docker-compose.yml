@@ -133,35 +133,6 @@ services:
     networks:
       - h2kvm-net
 
-  # zkvm - Interactive terminal UI
-  zkvm:
-    build:
-      context: .
-      target: zkvm
-    image: h2kvm:zkvm
-    container_name: h2kvm-zkvm
-    privileged: true
-    stdin_open: true
-    tty: true
-    devices:
-      - /dev/nbd0:/dev/nbd0
-      - /dev/nbd1:/dev/nbd1
-      - /dev/nbd2:/dev/nbd2
-      - /dev/nbd3:/dev/nbd3
-      - /dev/kvm:/dev/kvm
-    volumes:
-      - ${VMDK_DIR:-./test-data}:/data/vmware:ro
-      - ${OUTPUT_DIR:-./output}:/data/kvm:rw
-      # zkvm config persistence
-      - ${ZKVM_CONFIG:-~/.config/h2kvm}:/home/h2kvm/.config/h2kvm:rw
-    environment:
-      - H2KVM_MODE=zkvm
-      - TERM=xterm-256color
-      - PYTHONUNBUFFERED=1
-    networks:
-      - h2kvm-net
-    # Run with: docker-compose run --rm zkvm
-
   # ========================================
   # Development and Testing Services
   # ========================================

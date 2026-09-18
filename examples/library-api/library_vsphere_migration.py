@@ -84,7 +84,6 @@ def migrate_from_vsphere(
         result = client.export_vm(
             vm_name=vm_name,
             output_dir=output_dir,
-            transport="ssh",
         )
 
         logger.info("Export complete!")

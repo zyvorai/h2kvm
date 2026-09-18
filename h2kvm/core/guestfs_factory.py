@@ -144,7 +144,6 @@ def _create_guestkit() -> Any:
             "    Or from PyPI:\n"
             "      pip install hypersdk-guestkit\n"
             "    Host tools required: qemu-nbd, qemu-img.\n"
-            "    Or switch to libguestfs: backend: guestfs / --backend guestfs"
         ) from e
     return Guestfs()
 
@@ -221,41 +220,14 @@ def create_guestfs(
         backend = "guestkit"
 
     backend = _normalize_backend(backend.lower())
+    if backend in ("guestfs", "auto"):
+        _log.warning("backend '%s' is ignored; h2kvm uses GuestKit only", backend)
+        backend = "guestkit"
 
-    # Validate backend
-    if backend not in ("auto", "guestfs", "guestkit"):
+    if backend != "guestkit":
         raise ValueError(
-            f"Invalid backend '{backend}'. Must be 'auto', 'guestfs', or 'guestkit'.\n"
-            f"    Set via: backend: guestkit (in YAML) or --backend guestkit (CLI)\n"
-            f"    Or set environment variable: H2KVM_GUESTFS_BACKEND=guestkit"
+            f"Invalid backend '{backend}'. h2kvm uses GuestKit only.\n"
+            "    Set via: backend: guestkit (in YAML) or --backend guestkit (CLI)"
         )
 
-    if backend == "guestfs":
-        if not GUESTFS_AVAILABLE:
-            raise ImportError(
-                "Native guestfs backend requested but python3-guestfs is not installed.\n"
-                "    Install: dnf install python3-libguestfs  (Fedora/RHEL)\n"
-                "             apt install python3-guestfs     (Debian/Ubuntu)\n"
-                "    Or switch to GuestKit: backend: guestkit"
-            )
-        return guestfs.GuestFS(python_return_dict=python_return_dict)
-
-    if backend == "auto":
-        if GUESTKIT_AVAILABLE or _guestkit_available():
-            return _create_guestkit()
-        if _guestfs_appliance_available():
-            return guestfs.GuestFS(python_return_dict=python_return_dict)
-        raise RuntimeError(
-            "No guest disk backend available.\n"
-            "    Install GuestKit: pip install hypersdk-guestkit  (or pip install -e ~/tt/guestkit)\n"
-            "    Or install libguestfs: dnf install python3-libguestfs"
-        )
-
-    if backend == "guestkit":
-        return _create_guestkit()
-
-    raise RuntimeError(
-        f"Unknown disk inspection backend '{backend}'. "
-        f"Supported backends: 'guestkit' (default), 'guestfs', 'auto'. "
-        f"Set via --backend or the 'backend:' YAML key."
-    )
+    return _create_guestkit()

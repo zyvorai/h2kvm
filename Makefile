@@ -1,13 +1,12 @@
 .PHONY: help install install-dev install-deps \
-       test test-unit test-integration test-operator test-zkvm test-all test-coverage \
+       test test-unit test-integration test-operator test-all test-coverage \
        lint lint-fix lint-all format \
-       build build-zkvm build-operator build-operator-image build-k8s-image build-all \
-       zkvm-install zkvm-clean \
+       build build-operator build-operator-image build-k8s-image build-all \
        k8s-deploy k8s-deploy-k3d k8s-status k8s-cleanup \
        operator-install-crds operator-uninstall-crds operator-deploy operator-undeploy operator-run \
        clean clean-state clean-all \
        package-deb package-rpm package-all \
-       ci-python ci-operator ci-zkvm ci-all \
+       ci-python ci-operator ci-all \
        release-check docs docs-serve \
        go-tidy go-update go-vet \
        security-scan sbom license-check changelog version validate-examples \
@@ -27,12 +26,10 @@ GO := go
 
 # Directories
 OPERATOR_DIR  := operator
-ZKVM_DIR      := zkvm
 K8S_DIR       := k8s
 H2KVM_DIR := h2kvm
 
 # Binary names
-ZKVM_BINARY := zkvm
 OPERATOR_BINARY := h2kvm-operator
 
 # Install prefix
@@ -47,14 +44,13 @@ help: ## Show this help message
 
 ##@ Installation
 
-install: build-all clean-state ## Build and install everything (Python h2kvmctl + zkvm + operator + h2k) to $(BINDIR)
+install: build-all clean-state ## Build and install everything (Python h2kvmctl + operator + h2k) to $(BINDIR)
 	@# Remove any user-level pip install so $(BINDIR) copy takes precedence in PATH
 	-$(PIP) uninstall -y h2kvm 2>/dev/null || true
 	$(PIP) install --prefix=$(PREFIX) --no-warn-script-location .
-	install -Dm755 $(ZKVM_DIR)/$(ZKVM_BINARY) $(BINDIR)/$(ZKVM_BINARY)
 	install -Dm755 $(OPERATOR_DIR)/bin/manager $(BINDIR)/$(OPERATOR_BINARY)
 	install -Dm755 scripts/h2k $(BINDIR)/h2k
-	@echo "Installed h2kvmctl, $(ZKVM_BINARY), $(OPERATOR_BINARY), h2k to $(BINDIR)"
+	@echo "Installed h2kvmctl, $(OPERATOR_BINARY), h2k to $(BINDIR)"
 
 install-dev: ## Install Python package in editable mode with dev deps
 	$(PIP) install -e ".[dev,ui,vsphere,validation,retry,daemon,async]"
@@ -63,7 +59,6 @@ install-dev: ## Install Python package in editable mode with dev deps
 install-deps: ## Download all dependencies (Python + Go modules)
 	$(PIP) install -e ".[dev]"
 	cd $(OPERATOR_DIR) && $(GO) mod download
-	cd $(ZKVM_DIR) && $(GO) mod download
 	@echo "All dependencies installed"
 
 ##@ Testing
@@ -85,10 +80,7 @@ test-integration: ## Run integration tests
 test-operator: ## Run operator Go tests
 	cd $(OPERATOR_DIR) && $(GO) test ./... -v
 
-test-zkvm: ## Run zkvm Go tests
-	cd $(ZKVM_DIR) && $(GO) test ./...
-
-test-all: test-unit test-operator test-zkvm ## Run all tests (Python + Go)
+test-all: test-unit test-operator ## Run all tests (Python + Go)
 
 test-coverage: ## Run Python tests with coverage report
 	pytest tests/unit/ -v --cov=$(H2KVM_DIR) --cov-report=html --cov-report=term
@@ -97,7 +89,6 @@ test-coverage: ## Run Python tests with coverage report
 
 lint: ## Run linters (ruff + mypy + go vet)
 	ruff check $(H2KVM_DIR)/
-	cd $(ZKVM_DIR) && $(GO) vet ./...
 	cd $(OPERATOR_DIR) && $(GO) vet ./...
 
 lint-fix: ## Run linters and auto-fix issues
@@ -105,17 +96,12 @@ lint-fix: ## Run linters and auto-fix issues
 
 format: ## Format all code (Python + Go)
 	ruff format $(H2KVM_DIR)/
-	cd $(ZKVM_DIR) && gofmt -s -w .
 	cd $(OPERATOR_DIR) && $(GO) fmt ./...
 
 ##@ Building
 
-build: build-zkvm build-h2kweb build-operator ## Build everything (Python + zkvm + h2kweb + operator)
+build: build-h2kweb build-operator ## Build everything (Python + h2kweb + operator)
 	$(PYTHON) -m build
-
-build-zkvm: ## Build Go zkvm binary
-	cd $(ZKVM_DIR) && $(GO) build -ldflags "-s -w -X main.version=$$(git describe --tags --always --dirty 2>/dev/null || echo dev)" -o $(ZKVM_BINARY) .
-	@echo "Built $(ZKVM_DIR)/$(ZKVM_BINARY)"
 
 build-operator: ## Build operator binary
 	cd $(OPERATOR_DIR) && $(GO) build -ldflags "-s -w" -o bin/manager cmd/main.go
@@ -129,7 +115,7 @@ build-k8s-image: ## Build k8s worker container image
 build-h2kweb: ## Build h2kweb web dashboard (Go + React)
 	@if [ -f web/Makefile ]; then cd web && $(MAKE) build; else echo "web/ not found — skipping h2kweb"; fi
 
-build-all: build ## Build everything (Python + zkvm + h2kweb + operator)
+build-all: build ## Build everything (Python + h2kweb + operator)
 
 ##@ h2kweb
 
@@ -138,15 +124,6 @@ h2kweb-install: build-h2kweb ## Build and install h2kweb (web dashboard) with sy
 
 h2kweb-clean: ## Clean h2kweb build artifacts
 	@if [ -f web/Makefile ]; then cd web && $(MAKE) clean; fi
-
-##@ zkvm
-
-zkvm-install: build-zkvm ## Build and install zkvm binary to $(BINDIR)
-	install -Dm755 $(ZKVM_DIR)/$(ZKVM_BINARY) $(BINDIR)/$(ZKVM_BINARY)
-	@echo "Installed $(BINDIR)/$(ZKVM_BINARY)"
-
-zkvm-clean: ## Clean zkvm build artifacts
-	rm -f $(ZKVM_DIR)/$(ZKVM_BINARY)
 
 ##@ Kubernetes / k3d
 
@@ -233,7 +210,7 @@ operator-webhook-certs: ## Generate webhook certs (cert-manager preferred, fallb
 	fi
 
 # All Go module directories
-GO_MODULES := $(OPERATOR_DIR) $(ZKVM_DIR)
+GO_MODULES := $(OPERATOR_DIR)
 
 ##@ Go Modules
 
@@ -260,7 +237,7 @@ go-vet: ## Run go vet across all Go modules
 
 ##@ Cleanup
 
-clean: zkvm-clean h2kweb-clean ## Clean build artifacts
+clean: h2kweb-clean ## Clean build artifacts
 	rm -rf build/ dist/ *.egg-info
 	rm -rf .pytest_cache .coverage htmlcov/
 	rm -rf $(OPERATOR_DIR)/bin/
@@ -276,7 +253,6 @@ clean-state: ## Clean runtime state (workflow dirs, conversions, locks, caches)
 
 clean-all: clean ## Clean everything including Go caches
 	cd $(OPERATOR_DIR) && $(GO) clean -cache -modcache
-	cd $(ZKVM_DIR) && $(GO) clean -cache -modcache
 
 ##@ Packaging
 
@@ -297,11 +273,7 @@ ci-operator: ## Run operator CI checks
 	cd $(OPERATOR_DIR) && $(GO) vet ./...
 	cd $(OPERATOR_DIR) && $(GO) test ./... -v
 
-ci-zkvm: ## Run zkvm CI checks
-	cd $(ZKVM_DIR) && $(GO) vet ./...
-	cd $(ZKVM_DIR) && $(GO) test ./...
-
-ci-all: ci-python ci-operator ci-zkvm ## Run all CI checks
+ci-all: ci-python ci-operator ## Run all CI checks
 
 ##@ Release
 
@@ -357,7 +329,6 @@ lint-all: lint ## Run all linters (ruff + mypy + go vet + shellcheck)
 
 version: ## Show all component versions
 	@echo "h2kvm: $$($(PYTHON) -c 'import h2kvm; print(h2kvm.__version__)' 2>/dev/null || echo 'not installed')"
-	@echo "zkvm:      $$(cd $(ZKVM_DIR) && git describe --tags --always --dirty 2>/dev/null || echo 'dev')"
 	@echo "operator:  $$(cd $(OPERATOR_DIR) && git describe --tags --always --dirty 2>/dev/null || echo 'dev')"
 	@echo "python:    $$($(PYTHON) --version)"
 	@echo "go:        $$($(GO) version 2>/dev/null || echo 'not installed')"

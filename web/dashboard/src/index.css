@@ -1,7 +1,4 @@
 @import './zyvor-premium-login.css';
-@import './zyvor-macos-login.css';
-@import './liquid-glass.css';
-@import './platform-tahoe.css';
 
 @tailwind base;
 @tailwind components;
@@ -547,26 +544,11 @@ html.theme-metal-zinc body::before {
   color: rgba(228, 228, 231, 0.75);
 }
 
-/* Tahoe token bridge — retrofit legacy metal/zinc cards inside liquid-glass shell */
-.stat-card-blue,
-.stat-card-purple,
-.stat-card-orange,
-.stat-card-green,
-.stat-card-cyan,
-.stat-card-red {
-  @apply tahoe-glass-card;
-}
-
 .vm-card {
-  @apply transition-all duration-200 tahoe-glass-card;
+  @apply transition-all duration-200;
 }
 .vm-card:hover {
   border-color: rgba(56, 189, 248, 0.2);
-}
-
-.liquid-glass-app .bg-slate-800\/50,
-.liquid-glass-app .bg-slate-900\/50 {
-  @apply tahoe-glass-card;
 }
 
 .text-gradient-blue {

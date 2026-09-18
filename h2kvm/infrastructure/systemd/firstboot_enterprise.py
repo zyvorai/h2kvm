@@ -6,7 +6,7 @@
 Enterprise-Grade Firstboot Script Generator
 ============================================
 
-Generates production-level firstboot scripts matching Azure/AWS/virt-v2v standards.
+Generates production-level firstboot scripts matching Azure Migrate and AWS VM Import.
 
 Features:
 - Hardware adaptation (virtio drivers)
@@ -30,7 +30,7 @@ class FirstbootConfig:
     """
     Firstboot configuration - Enterprise-grade options.
 
-    Matches Azure Migrate, AWS VM Import, and virt-v2v production standards.
+    Matches Azure Migrate and AWS VM Import.
     """
 
     # Critical repairs (Tier 1)
@@ -88,7 +88,7 @@ def generate_enterprise_firstboot_script(config: Optional[FirstbootConfig] = Non
         "#" + "=" * 78,
         "# H2KVM Enterprise First Boot Initialization",
         "# Production-grade post-conversion self-healing and adaptation",
-        "# Matches Azure Migrate, AWS VM Import, and virt-v2v standards",
+        "# Matches Azure Migrate and AWS VM Import",
         "#" + "=" * 78,
         "",
         "# Structured logging function",

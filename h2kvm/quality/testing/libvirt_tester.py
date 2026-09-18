@@ -148,6 +148,7 @@ class LibvirtTest:
 
     # Prefer these common distro paths, but be generous.
     _OVMF_CODE_CANDIDATES: Sequence[str] = (
+        "/usr/share/OVMF/OVMF_CODE_4M.fd",
         "/usr/share/OVMF/OVMF_CODE.fd",
         "/usr/share/edk2/ovmf/OVMF_CODE.fd",
         "/usr/share/qemu/OVMF_CODE.fd",
@@ -156,6 +157,7 @@ class LibvirtTest:
         "/usr/share/edk2/x64/OVMF_CODE.secboot.fd",
     )
     _OVMF_VARS_CANDIDATES: Sequence[str] = (
+        "/usr/share/OVMF/OVMF_VARS_4M.fd",
         "/usr/share/OVMF/OVMF_VARS.fd",
         "/usr/share/edk2/ovmf/OVMF_VARS.fd",
         "/usr/share/qemu/OVMF_VARS.fd",

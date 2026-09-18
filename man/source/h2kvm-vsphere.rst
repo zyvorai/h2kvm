@@ -26,7 +26,6 @@ Supports multiple methods:
 
 * **govc CLI** - NFC export of OVF/OVA (recommended)
 * **HTTP download** - Direct VMDK download via /folder API
-* **SSH** - virt-v2v input transport, or copy from the ESXi host
 * **OVF Tool** - Export via VMware OVF Tool
 
 OPTIONS
@@ -71,19 +70,8 @@ Export Method
 **--vs-action** *ACTION*
     Export action:
 
-    * **export_vm** - Export using virt-v2v
+    * **export_vm** - Export with govc (OVF/OVA) or HTTPS /folder
     * **download_only_vm** - Download VMDK files only
-
-**--vs-transport** *METHOD*
-    virt-v2v input transport. Datastore downloads always use HTTPS.
-
-    * **ssh** - SSH transfer
-
-**--vs-v2v**
-    Use virt-v2v for conversion.
-
-**--vs-v2v-extra-args** *ARGS*
-    Additional virt-v2v arguments.
 
 Download Options
 ----------------
@@ -155,7 +143,6 @@ Configuration file example
 
     # Export method
     vs_action: export_vm
-    vs_transport: ssh
 
     # Output
     output_dir: ./migrated-vms
@@ -182,10 +169,6 @@ For govc (recommended):
 
 * Install govc: ``curl -L https://github.com/vmware/govmomi/releases/latest/download/govc_Linux_x86_64.tar.gz | sudo tar xzf - -C /usr/local/bin govc``
 * Install pyvmomi: ``pip install pyvmomi``
-
-For virt-v2v over SSH:
-
-* Install virt-v2v: ``dnf install virt-v2v``
 
 For OVF Tool method:
 
@@ -291,7 +274,7 @@ SEE ALSO
 ========
 
 **h2kvm**\(1),
-**virt-v2v**\(1),
+**h2kvm.conf**\(5),
 **govc**\(1)
 
 AUTHOR

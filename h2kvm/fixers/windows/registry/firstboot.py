@@ -216,7 +216,7 @@ def _add_firstboot_service_system_hive(  # pylint: disable=too-many-arguments,to
             _set_dword(h, svc, "ErrorControl", 1)
 
             if use_rhsrvany:
-                # Match virt-v2v: REG_SZ ImagePath, Parameters\CommandLine + PWD
+                # rhsrvany: REG_SZ ImagePath, Parameters\CommandLine + PWD
                 image_path_val = _service_imagepath_rhsrvany(service_name)
                 logger.debug("Using rhsrvany ImagePath: %s", image_path_val)
                 _set_sz(h, svc, "ImagePath", image_path_val)

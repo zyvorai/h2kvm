@@ -1541,7 +1541,7 @@ def regen(self, g: guestfs.GuestFS) -> dict[str, Any]:
     initramfs_ran: list[dict[str, Any]] = []
     did_initramfs = False
 
-    # Skip initramfs rebuild for LUKS disks (same as virt-v2v).
+    # Skip initramfs rebuild for LUKS disks.
     # The guest's existing initramfs already has cryptsetup support.
     # Rebuilding inside libguestfs breaks LUKS UUID references because
     # the device mapper paths differ inside the supermin appliance.

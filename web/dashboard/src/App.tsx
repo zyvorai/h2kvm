@@ -40,7 +40,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center dashboard-liquid-glass">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--zy-canvas)', color: 'var(--zy-slate)' }}>
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <div className="text-sm text-zinc-500">Loading...</div>

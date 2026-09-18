@@ -42,7 +42,6 @@ from .groups import (
     _add_vsphere_export_and_download_knobs,
     _add_windows_network_override,
     _add_windows_virtio_definitions,
-    _add_zkvm_flags,
 )
 
 # Re-export helper functions
@@ -113,7 +112,6 @@ __all__ = [
     "_add_vsphere_export_and_download_knobs",
     "_add_windows_network_override",
     "_add_windows_virtio_definitions",
-    "_add_zkvm_flags",
     "_build_epilog",
     # Parser
     "_build_preparser",

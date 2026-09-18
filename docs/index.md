@@ -117,9 +117,6 @@ Welcome to the comprehensive documentation for H2KVM, a production-ready VM migr
 - [Enhanced Features](guides/enhanced-features.md) - Advanced capabilities
 - [Troubleshooting](guides/troubleshooting.md) - Diagnose and fix issues
 
-#### TUI (Terminal UI)
-- See [zkvm/README.md](../zkvm/README.md) - Interactive terminal UI guide
-
 #### Decision Support
 - [Decision Support Hub](guides/decision-support/) - All decision tools
 - [Migration Decision Tree](guides/decision-support/MIGRATION_DECISION_TREE.md) - Choose approach
@@ -262,7 +259,6 @@ Welcome to the comprehensive documentation for H2KVM, a production-ready VM migr
 | [Code Metrics](development/CODE_METRICS.md) | Quality metrics |
 | [Refactoring Summary](development/REFACTORING_SESSION_SUMMARY.md) | Refactoring notes |
 | [Exception Review](development/EXCEPTION_HANDLING_REVIEW.md) | Error review |
-| [TUI (zkvm)](../zkvm/README.md) | TUI development and architecture |
 | [Feature Suggestions](development/feature-suggestions.md) | New features |
 
 ### 🔧 Operator & CRDs

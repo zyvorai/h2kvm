@@ -73,7 +73,7 @@ python3 scripts/guestkit_inspect.py guest.qcow2 --boot
 - libguestfs supermin appliance on the host
 
 **Pros:**
-- Long track record in virt-v2v-style workflows
+- Long track record for offline guest inspection
 - Broad filesystem and guest format support
 
 **Cons:**

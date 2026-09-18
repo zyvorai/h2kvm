@@ -487,7 +487,6 @@ spec:
 # Run test suite before upgrade
 cd /path/to/h2kvm
 python3 -m pytest tests/unit/ -x -q
-cd zkvm && go test ./...
 
 # Integration test
 ./scripts/run-demo.sh  # ensure full workflow works

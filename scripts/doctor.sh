@@ -179,13 +179,6 @@ else
     warn "h2kweb not found (optional — web dashboard, install: cd web && make install)"
 fi
 
-# zkvm (terminal UI)
-if command -v zkvm &>/dev/null; then
-    pass "zkvm (terminal UI)"
-else
-    warn "zkvm not found (optional — terminal UI, build: cd zkvm && go build)"
-fi
-
 if command -v kubectl &>/dev/null; then
     ver=$(timeout 5 kubectl version --client 2>/dev/null | grep -oE '[0-9]+\.[0-9]+[.0-9]*' | head -1)
     pass "kubectl ${ver:+($ver)}"
@@ -347,22 +340,14 @@ else
     info "Set: export GOVC_URL=https://vcenter/sdk"
 fi
 
-# --- SECTION 9: zkvm TUI ---
-header "zkvm TUI"
-
-if [ -f "zkvm/zkvm" ]; then
-    pass "zkvm binary found: zkvm/zkvm"
-elif command -v zkvm &>/dev/null; then
-    pass "zkvm installed: $(which zkvm)"
-else
-    warn "zkvm not built — run: cd zkvm && go build -o zkvm ."
-fi
+# --- SECTION 9: Operator build tools ---
+header "Operator"
 
 if command -v go &>/dev/null; then
     ver=$(go version | grep -oE '[0-9]+\.[0-9]+[.0-9]*' | head -1)
     pass "Go compiler ($ver)"
 else
-    warn "Go not installed — needed to build zkvm TUI"
+    warn "Go not installed — needed to build the operator"
 fi
 
 # --- SUMMARY ---

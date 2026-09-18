@@ -145,21 +145,7 @@ HEALTHCHECK --interval=60s --timeout=5s --start-period=30s --retries=3 \
 ENV H2KVM_MODE=batch
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
-# Stage 8: TUI Container (interactive terminal UI)
-FROM base-runtime AS tui
-
-# Install TUI-specific dependencies
-RUN pip install --no-cache-dir \
-    textual[dev]
-
-USER h2kvm
-
-# No health check for TUI (interactive mode)
-ENV H2KVM_MODE=tui
-ENV TERM=xterm-256color
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-
-# Stage 9: Worker Container (Worker Job Protocol daemon)
+# Stage 8: Worker Container (Worker Job Protocol daemon)
 FROM base-runtime AS worker
 
 # Install worker-specific system tools for offline fixes

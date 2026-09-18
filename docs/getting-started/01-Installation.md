@@ -31,13 +31,17 @@ This single command installs:
 | Component | What |
 |-----------|------|
 | Python 3, pip | Runtime |
-| qemu-img, qemu-nbd | Disk conversion and GuestKit backend |
-| libguestfs, python3-libguestfs | LVM/LUKS support (supermin appliance) |
-| libvirt, KVM, virt-install | VM management and hypervisor |
-| OVMF/edk2 | UEFI firmware |
+| qemu-img, qemu-nbd | Disk conversion for GuestKit |
+| GuestKit (`hypersdk-guestkit`) | Offline disk repair |
+| libvirt, KVM | VM management and the automatic boot test |
+| OVMF | UEFI firmware. Installed automatically when a UEFI boot test needs it |
 | govc | vSphere VM export (NFC) |
 | pyvmomi | vSphere Python SDK |
 | nbd, kvm, vhost_net | Kernel modules (loaded + persisted) |
+
+Guest repair is **GuestKit only**. If OVMF is missing when a UEFI guest is defined, h2kvm installs `ovmf` (Debian/Ubuntu) or `edk2-ovmf` (Fedora/RHEL) itself, then writes the domain and runs the boot test. You do not pick firmware paths by hand.
+
+Host tools GuestKit needs, and that quickstart installs up front: `qemu-img`, `qemu-nbd`, and KVM. Python package: `pip install hypersdk-guestkit`.
 | h2kvm | Installed from source |
 | User permissions | libvirt, kvm, qemu, disk groups |
 
@@ -76,7 +80,6 @@ pre-flight checks for RAM, disk space, tools, KVM, and SELinux.
 | `scripts/setup-user.sh` | User permissions | `sudo ./scripts/setup-user.sh username` |
 | `scripts/setup-k3s-demo.sh` | K3s + KubeVirt demo | `sudo ./scripts/setup-k3s-demo.sh --demo` |
 | `scripts/run-demo.sh` | Download + convert + boot a VM | `sudo ./scripts/run-demo.sh` |
-| `zkvm` (Go TUI) | Interactive terminal UI | `cd zkvm && make build && ./zkvm -s` |
 
 Individual install flags for `install-deps.sh`:
 

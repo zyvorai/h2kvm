@@ -186,7 +186,6 @@ vsphere mode
 
     # Export method
     vs_action: export_vm
-    vs_transport: ssh
 
 hyperv mode
 -----------
@@ -279,8 +278,8 @@ Windows VM Migration
     timeout: 180
     verbose: 2
 
-vSphere Migration with virt-v2v
--------------------------------
+vSphere Migration
+----------------
 
 ::
 
@@ -292,8 +291,6 @@ vSphere Migration with virt-v2v
     dc_name: production-dc
     vm_name: app-server-prod
     vs_action: export_vm
-    vs_transport: ssh
-    vs_v2v: true
     output_dir: ./migrated-vms
     out_format: qcow2
     compress: true

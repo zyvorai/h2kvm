@@ -70,7 +70,7 @@ Hypervisor exit fails when VirtIO is missing, GRUB is wrong, or Windows still po
 
 ## No VDDK
 
-Public downloads of VMware’s Virtual Disk Development Kit [ended on 10 September 2026](https://www.theregister.com/virtualization/2026/09/10/vmware-defends-ending-downloads-of-sdk-that-helps-vm-backups-or-migrations-to-rivals/5295421). That SDK is what Nutanix Move, virt-v2v, and most VMware-to-KVM tools used to open disks. The use VMware still defends is backup and recovery for select partners — not migration, and not a customer entitlement.
+Public downloads of VMware’s Virtual Disk Development Kit [ended on 10 September 2026](https://www.theregister.com/virtualization/2026/09/10/vmware-defends-ending-downloads-of-sdk-that-helps-vm-backups-or-migrations-to-rivals/5295421). That SDK is what most VMware-to-KVM tools used to open disks. The use VMware still defends is backup and recovery for select partners — not migration, and not a customer entitlement.
 
 **h2kvm** and **[Transiva](https://github.com/zyvorai/transiva)** do not take that path. Disks leave through the vSphere API and NFS, then convert offline.
 
@@ -153,7 +153,6 @@ kubectl apply -f operator/deploy/
 |---------|----------------|
 | **CLI** | `h2kvmctl` / `h2k` |
 | **Web** | h2kweb dashboard — `web/` |
-| **TUI** | zkvm terminal UI |
 | **Operator** | K8s / OpenShift — `operator/`, `olm/` |
 | **Helm** | Production charts — `helm/` |
 | **Fix engine** | GuestKit `run_migrate_repair` + h2kvm injectors |
@@ -279,7 +278,7 @@ CE is for labs and single-cluster PoC. Moving a Windows estate, SAN-backed waves
 |---|---|---|
 | **Who it is for** | Labs · DIY pipelines | Migration leads · **multi-wave cutovers** |
 | **Convert + GuestKit offline fix** | ✅ | ✅ + validated fleet playbooks |
-| **CLI · h2kweb · zkvm · operator** | ✅ Eval / single-cluster | ✅ **HA** · multi-namespace tenancy |
+| **CLI · h2kweb · operator** | ✅ Eval / single-cluster | ✅ **HA** · multi-namespace tenancy |
 | **Windows path** | Automated VirtIO / registry | ✅ + **war-room / PS runbooks** |
 | **Storage pipelines** | Local / libvirt / KubeVirt / Glance | ✅ + **SAN / Ceph / NetApp** |
 | **Pre-flight** | GuestKit planner | ✅ + **GuestKit fleet risk scoring** |

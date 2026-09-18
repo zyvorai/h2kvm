@@ -17,6 +17,7 @@ import { VNCConsoleModal } from '../components/VNCConsole';
 import { showToast } from '../components/Toast';
 import { HardwareEditor } from '../components/HardwareEditor';
 import { TahoeHero } from '../components/ui/TahoeHero';
+import { MacTerminal } from '../components/MacTerminal';
 
 interface LibvirtVM {
   name: string;
@@ -1220,9 +1221,7 @@ function DomainXMLCard({ vmName }: { vmName: string }) {
             </button>
           </div>
           {xmlData?.xml ? (
-            <pre className="text-[11px] text-white/75 font-mono tahoe-glass-card border border-white/[0.06] rounded-lg p-3 overflow-x-auto max-h-80 overflow-y-auto whitespace-pre">
-              {xmlData.xml}
-            </pre>
+            <MacTerminal title="h2kvm — domain xml" lines={xmlData.xml.split('\n')} maxHeight={320} />
           ) : (
             <div className="flex items-center justify-center py-4">
               <Loader2 className="h-4 w-4 animate-spin text-white/55" />
@@ -1585,9 +1584,7 @@ function StorageDetailCard({ vmName }: { vmName: string }) {
       {data.snapshot_tree && (
         <div className="mb-4">
           <div className="text-xs text-white/55 mb-1.5">Snapshot Tree</div>
-          <pre className="text-[11px] text-white/75 font-mono tahoe-glass-card border border-white/[0.06] rounded-lg p-3 overflow-x-auto max-h-40 overflow-y-auto whitespace-pre">
-            {data.snapshot_tree}
-          </pre>
+          <MacTerminal title="h2kvm — snapshots" lines={data.snapshot_tree.split('\n')} maxHeight={220} />
         </div>
       )}
 

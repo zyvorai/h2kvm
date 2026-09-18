@@ -17,6 +17,7 @@ import { useSubmitMigration, usePreviewConfig } from '../hooks/useJobs';
 import { VMBrowser } from '../components/VMBrowser';
 import { MigrationPipelineBanner } from '../components/MigrationPipelineBanner';
 import { TahoeHero } from '../components/ui/TahoeHero';
+import { MacTerminal } from '../components/MacTerminal';
 import { useAppStore } from '../stores/app';
 import { browsePath } from '../api/browse';
 import type { MigrationConfig } from '../types/job';
@@ -508,13 +509,11 @@ export function MigrationWizardPage() {
       {/* === STEP: REVIEW === */}
       {step === 'review' && (
         <div>
-          <div className="tahoe-glass-card rounded-xl border border-white/[0.08] overflow-hidden">
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-white/[0.06]">
-              <FileText className="h-4 w-4 text-blue-400" />
-              <span className="text-sm font-medium text-white/75">h2kvmctl YAML Configuration</span>
-            </div>
-            <pre className="p-5 text-xs leading-relaxed overflow-auto max-h-96 text-cyan-300 font-mono">{yamlPreview || '# Loading...'}</pre>
-          </div>
+          <MacTerminal
+            title="h2kvm — yaml"
+            lines={(yamlPreview || '# Loading...').split('\n')}
+            maxHeight={384}
+          />
 
           {submitMigration.isSuccess && (
             <div className="mt-4 bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-sm text-green-400">

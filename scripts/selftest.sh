@@ -41,7 +41,7 @@ for bin in h2kvmctl h2kvm; do
     fi
 done
 
-for bin in zkvm h2k h2kvm-operator; do
+for bin in h2k h2kvm-operator; do
     if command -v "$bin" &>/dev/null; then
         pass "$bin found: $(command -v "$bin")"
     else
@@ -232,11 +232,7 @@ section "Go Components"
 if command -v go &>/dev/null; then
     pass "Go installed: $(go version | awk '{print $3}')"
 else
-    warn "Go not installed (needed for zkvm/operator development)"
-fi
-
-if command -v zkvm &>/dev/null; then
-    pass "zkvm binary available"
+    warn "Go not installed (needed for operator development)"
 fi
 
 if command -v h2kvm-operator &>/dev/null; then

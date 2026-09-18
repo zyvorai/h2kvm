@@ -30,6 +30,11 @@ function walk(dir, out = []) {
 
 const violations = [];
 for (const dir of GUARDED_DIRS) {
+  try {
+    statSync(dir);
+  } catch {
+    continue;
+  }
   for (const file of walk(dir)) {
     const content = readFileSync(file, 'utf8');
     const rel = relative(uiRoot, file);

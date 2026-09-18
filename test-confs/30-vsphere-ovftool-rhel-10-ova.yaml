@@ -1,5 +1,5 @@
 # ovftool-rhel10-ova-export.yaml
-# Goal: Export VM as an OVA using OVF Tool (ovftool) (stable exporter; NO virt-v2v, NO inspection)
+# Goal: Export VM as an OVA using OVF Tool (ovftool) (stable exporter; no inspection)
 #
 # Notes:
 # - This uses your VsphereMode action: ovftool_export

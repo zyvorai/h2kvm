@@ -625,7 +625,6 @@ YAML_EXAMPLE = r"""# h2kvm configuration examples (YAML)
 # out_format: qcow2
 # compress: true
 # vs_datacenter: ha-datacenter
-# vs_transport: ssh
 # vs_download_only: true
 # vs_export_concurrency: 1
 #

@@ -2,12 +2,12 @@
 // Proprietary software — see LICENSE in the repository root.
 // https://zyvor.dev · info@zyvor.dev
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  XCircle, Clock, CheckCircle, AlertCircle, Loader2, Terminal,
+  XCircle, Clock, CheckCircle, AlertCircle, Loader2,
   Server, Cloud, Network, Copy, ExternalLink, RefreshCw, FileText,
-  FileDown, ArrowDown, Download, HardDrive, ArrowRight, ListChecks,
+  FileDown, Download, HardDrive, ArrowRight, ListChecks,
 } from 'lucide-react';
 import { useJobs, useCancelJob } from '../hooks/useJobs';
 import { useWebSocketSubscription, type WSMessage } from '../contexts/WebSocketContext';
@@ -17,6 +17,7 @@ import type { Job, JobProgress } from '../types/job';
 import { MigrationPipelineBanner } from '../components/MigrationPipelineBanner';
 import { EmptyState } from '../components/EmptyState';
 import { TahoeHero } from '../components/ui/TahoeHero';
+import { MacTerminal } from '../components/MacTerminal';
 import {
   MIGRATION_PIPELINE_STAGES,
   jobPhaseLabel,
@@ -262,25 +263,11 @@ export function JobMonitorPage() {
               )}
 
               {/* Live logs */}
-              <div className="tahoe-glass-card rounded-xl border border-white/[0.08] overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06]">
-                  <Terminal className="h-4 w-4 text-green-400" />
-                  <span className="text-sm font-semibold text-white">Live Logs</span>
-                  {selectedJob.status === 'running' && (
-                    <span className="flex items-center gap-1.5 text-xs text-green-400">
-                      <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse-dot" />
-                      streaming
-                    </span>
-                  )}
-                  <span className="text-xs text-white/45 ml-auto">
-                    {(liveLogs[selectedJob.id] || selectedJob.log_lines || []).length} lines
-                  </span>
-                </div>
-                <LiveLogViewer
-                  lines={liveLogs[selectedJob.id] || selectedJob.log_lines || []}
-                  isRunning={selectedJob.status === 'running'}
-                />
-              </div>
+              <LiveLogViewer
+                title={`h2kvm — ${selectedJob.id}`}
+                lines={liveLogs[selectedJob.id] || selectedJob.log_lines || []}
+                isRunning={selectedJob.status === 'running'}
+              />
             </>
           ) : (
             <div className="tahoe-glass-card rounded-xl border border-white/[0.08] p-5 text-center py-16 text-sm text-white/45">
@@ -798,94 +785,18 @@ function MigrationSummary({ config }: { config: Job['config'] }) {
 
 // --- Full-height live log viewer ---
 
-function LiveLogViewer({ lines, isRunning }: { lines: string[]; isRunning: boolean }) {
+function LiveLogViewer({ lines, isRunning, title }: { lines: string[]; isRunning: boolean; title: string }) {
   const [autoScroll, setAutoScroll] = useState(true);
-  const logRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (autoScroll && logRef.current) {
-      logRef.current.scrollTop = logRef.current.scrollHeight;
-    }
-  }, [lines, autoScroll]);
-
   return (
-    <div className="relative">
-      {/* Auto-scroll toggle bar */}
-      <div className="flex items-center justify-between px-4 py-1.5 bg-[#0a0f1a] border-b border-white/[0.08]">
-        <div className="flex items-center gap-2">
-          {autoScroll && isRunning && (
-            <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-medium">
-              <ArrowDown className="h-3 w-3" />
-              Following
-            </span>
-          )}
-          {!autoScroll && isRunning && (
-            <span className="text-[10px] text-white/45 font-medium">Paused — scroll stopped</span>
-          )}
-        </div>
-        <button
-          onClick={() => {
-            const next = !autoScroll;
-            setAutoScroll(next);
-            if (next && logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
-          }}
-          className={`flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-medium transition-colors ${
-            autoScroll
-              ? 'bg-green-500/10 text-green-400 hover:bg-green-500/20'
-              : 'bg-white/[0.08]/50 text-white/55 hover:bg-white/[0.04]'
-          }`}
-        >
-          <ArrowDown className="h-3 w-3" />
-          {autoScroll ? 'Auto-scroll on' : 'Auto-scroll off'}
-        </button>
-      </div>
-
-      <div
-        ref={logRef}
-        className="bg-[#020617] p-4 overflow-auto font-mono text-xs leading-6 max-h-[500px] min-h-[200px]"
-        style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace" }}
-        onScroll={() => {
-          if (!logRef.current) return;
-          const el = logRef.current;
-          const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 50;
-          setAutoScroll(atBottom);
-        }}
-      >
-        {lines.length === 0 ? (
-          <div className="text-white/40 flex items-center gap-2">
-            {isRunning && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-            {isRunning ? 'Waiting for output...' : 'No output captured'}
-          </div>
-        ) : (
-          lines.map((line, i) => (
-            <div key={i} className={`${getLineClass(line)} hover:tahoe-glass-card rounded px-1 -mx-1`}>
-              <span className="text-white/20 select-none mr-3 inline-block w-8 text-right tabular-nums">{i + 1}</span>
-              {line}
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* Jump to bottom button when scrolled up */}
-      {!autoScroll && lines.length > 20 && (
-        <button
-          onClick={() => { setAutoScroll(true); if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }}
-          className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/90 text-white text-xs font-medium shadow-lg hover:bg-blue-500 transition-colors"
-        >
-          <ArrowDown className="h-3 w-3" /> Scroll to bottom
-        </button>
-      )}
-    </div>
+    <MacTerminal
+      lines={lines}
+      title={title}
+      isRunning={isRunning}
+      autoScroll={autoScroll}
+      onToggleFollow={() => setAutoScroll((v) => !v)}
+      maxHeight={500}
+    />
   );
-}
-
-function getLineClass(line: string): string {
-  if (line.includes('ERROR') || line.includes('error') || line.includes('Traceback')) return 'text-red-400';
-  if (line.includes('WARNING') || line.includes('warning')) return 'text-yellow-400';
-  if (line.includes('SUCCESS') || line.includes('completed') || line.includes('✓')) return 'text-green-400';
-  if (line.includes('[PROGRESS]') || line.includes('progress')) return 'text-blue-400';
-  if (line.includes('INFO') || line.includes('>>>')) return 'text-white/75';
-  return 'text-white/55';
 }
 
 function formatDuration(start: Date, end: Date): string {

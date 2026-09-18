@@ -81,7 +81,6 @@ All presentations available as HTML (viewable in browser) and PDF (printable).
 | # | Title | Pages | Compared To |
 |---|-------|-------|-------------|
 | 07 | Competitive Analysis | 8 | Overview |
-| 13 | h2kvm vs virt-v2v | 6 | Red Hat virt-v2v |
 | 14 | h2kvm vs MTV | 6 | Red Hat Migration Toolkit |
 
 ### Operations & Day 2

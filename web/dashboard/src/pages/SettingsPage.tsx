@@ -4,10 +4,8 @@
 
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Settings, Terminal, Globe, Key, HardDrive, FolderOpen, AlertCircle, CheckCircle, Loader2, ArrowRight, Shield, Users, UserPlus, Lock, ShieldCheck, Mail, Download, Upload, Send, Trash2, Clock, Zap, ToggleLeft, ToggleRight, LayoutGrid } from 'lucide-react';
+import { Settings, Terminal, Globe, Key, HardDrive, FolderOpen, AlertCircle, CheckCircle, Loader2, ArrowRight, Shield, Users, UserPlus, Lock, ShieldCheck, Mail, Download, Upload, Send, Trash2, Clock, Zap, ToggleLeft, ToggleRight } from 'lucide-react';
 import { fetchAPI } from '../api/client';
-import { useDesktopTier } from '../hooks/useDesktopTier';
-import { DesktopTierPicker } from '../desktop/DesktopTierPicker';
 import { TahoeHero } from '../components/ui/TahoeHero';
 
 interface StorageConfig {
@@ -27,23 +25,12 @@ interface StorageConfig {
 }
 
 export function SettingsPage() {
-  const [tier, setTier] = useDesktopTier();
-
   return (
     <div className="space-y-6">
       <TahoeHero
-        icon={<Settings className="w-5 h-5 text-blue-300" />}
         title="Settings"
-        subtitle="Storage, users, desktop tier, and system configuration"
+        subtitle="Storage, users, and system configuration"
       />
-
-      <div className="tahoe-glass-card border border-white/[0.08] rounded-xl p-5">
-        <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
-          <LayoutGrid className="w-5 h-5 text-blue-400" />
-          Desktop tier
-        </h3>
-        <DesktopTierPicker tier={tier} onChange={setTier} />
-      </div>
 
       {/* Storage Management */}
       <StorageSection />

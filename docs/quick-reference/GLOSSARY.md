@@ -183,9 +183,6 @@ Agent running inside VMs for advanced management operations and better integrati
 ### vCenter
 VMware's centralized management platform for vSphere environments.
 
-### virt-v2v
-Red Hat's V2V (Virtual-to-Virtual) conversion tool. H2KVM is an alternative with additional features.
-
 ### VMDK (Virtual Machine Disk)
 VMware's disk image format. The typical source format for migrations.
 

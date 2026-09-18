@@ -87,15 +87,6 @@ ai:
   # Sampling rate for telemetry events (0.0 - 1.0)
   telemetry_sampling_rate: 1.0
 
-# zkvm (Terminal User Interface) settings
-zkvm:
-  # Custom Unix socket path for zkvm ↔ backend communication
-  # Default: /run/h2kvm/zkvm.sock (root) or $XDG_RUNTIME_DIR/h2kvm/zkvm.sock (user)
-  # socket_path: /run/h2kvm/zkvm.sock
-
-  # Path to the zkvm binary (auto-detected if on $PATH)
-  # binary_path: /usr/local/bin/zkvm
-
 # Daemon mode settings (for future use)
 daemon:
   enabled: false

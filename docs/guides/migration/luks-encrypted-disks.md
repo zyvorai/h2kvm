@@ -10,7 +10,7 @@ When h2kvm detects a LUKS-encrypted partition on the guest disk, it automaticall
 2. **Unlocks the LUKS partition** — `g.cryptsetup_open()` inside the appliance
 3. **Activates LVM** — `g.lvm_scan(True)` discovers volumes inside LUKS
 4. **Fixes fstab, network, grub** — same as non-encrypted disks
-5. **Preserves the existing initramfs** — does NOT rebuild it (same as virt-v2v)
+5. **Preserves the existing initramfs** — does NOT rebuild it
 6. **Writes virtio driver configs** — `/etc/dracut.conf.d/` or `/etc/initramfs-tools/`
 
 The VM boots and **prompts for the LUKS passphrase** at console — exactly like the original VM.
@@ -83,7 +83,7 @@ VM boots → "Please unlock disk dm_crypt-0:" → enter passphrase → login
 
 ## Why initramfs Is NOT Rebuilt
 
-This matches virt-v2v behavior. The guest's existing initramfs already contains:
+The guest's existing initramfs already contains:
 - `cryptsetup` for LUKS unlock
 - Correct LUKS UUID references from `/etc/crypttab`
 - Correct `root=UUID=...` in kernel cmdline

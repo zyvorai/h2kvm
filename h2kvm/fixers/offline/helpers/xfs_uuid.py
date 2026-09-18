@@ -21,7 +21,7 @@ Supported filesystems:
     - XFS (via xfs_admin -U generate or g.set_uuid)
     - ext4/ext3/ext2 (via g.set_uuid)
 
-This matches the safety level of virt-v2v, osbuild, and image-builder.
+This matches the safety level of osbuild and image-builder.
 """
 
 from __future__ import annotations

@@ -111,7 +111,7 @@ run_demo() {
     sleep 3
 
     # --- SECTION 1: Version & Help ---
-    banner "1/6  Quick Overview"
+    banner "1/5  Quick Overview"
 
     pause "Check version and available commands"
     type_cmd "h2kvmctl --version"
@@ -123,7 +123,7 @@ run_demo() {
     sleep 2
 
     # --- SECTION 2: VMDK Inspection ---
-    banner "2/6  Inspect Source Disk"
+    banner "2/5  Inspect Source Disk"
 
     if [ -f photon.vmdk ]; then
         pause "Inspect a VMDK file — detect format, boot mode, risks"
@@ -139,7 +139,7 @@ run_demo() {
     fi
 
     # --- SECTION 3: YAML Config ---
-    banner "3/6  YAML-Driven Migration"
+    banner "3/5  YAML-Driven Migration"
 
     pause "Create a migration config — one file defines everything"
     cat <<'YAML'
@@ -170,7 +170,7 @@ YAML
     sleep 2
 
     # --- SECTION 4: vSphere Discovery ---
-    banner "4/6  vSphere VM Discovery"
+    banner "4/5  vSphere VM Discovery"
 
     if [ -n "${GOVC_URL:-}" ]; then
         pause "Connect to vCenter and discover VMs"
@@ -205,7 +205,7 @@ print(f'  Power: {vm[\"runtime\"][\"powerState\"]}')
     fi
 
     # --- SECTION 5: KubeVirt Check ---
-    banner "5/6  Kubernetes / KubeVirt"
+    banner "5/5  Kubernetes / KubeVirt"
 
     if command -v kubectl &>/dev/null; then
         pause "Check KubeVirt VMs running on Kubernetes"
@@ -219,24 +219,6 @@ print(f'  Power: {vm[\"runtime\"][\"powerState\"]}')
     else
         pause "kubectl not found — skipping K8s demo"
     fi
-
-    # --- SECTION 6: TUI Preview ---
-    banner "6/6  Interactive TUI (zkvm)"
-
-    pause "The zkvm TUI provides guided migration with live progress"
-    echo
-    echo -e "${C}  Features:${R}"
-    echo "    • Step-by-step form with input boxes"
-    echo "    • vSphere VM discovery + batch selection"
-    echo "    • Built-in file browser with fuzzy search"
-    echo "    • Deploy targets: Libvirt + Kubernetes toggles"
-    echo "    • Live execution plan updates"
-    echo "    • Real-time progress streaming"
-    echo
-    echo -e "${C}  Launch:${R}"
-    echo "    ./zkvm/zkvm"
-    echo
-    sleep 3
 
     # --- CLOSING ---
     echo
@@ -284,7 +266,6 @@ else
     echo "  5. sudo h2kvmctl --config migration.yaml --dry-run"
     echo "  6. govc ls /datacenter/vm/ | head -10"
     echo "  7. kubectl get vm -A"
-    echo "  8. ./zkvm/zkvm  (show TUI, press Tab for vSphere, quit)"
     echo
     asciinema rec "$CAST_FILE" \
         --title "h2kvm — VM Migration Demo" \

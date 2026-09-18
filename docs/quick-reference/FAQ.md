@@ -65,16 +65,16 @@ H2KVM is an enterprise-grade VM migration toolkit that converts virtual machines
 
 Unlike traditional migration tools that "boot and hope," H2KVM applies **deterministic offline fixes** to ensure **first-boot success**:
 
-| Feature | virt-v2v | Other Tools | H2KVM |
-|---------|----------|-------------|-----------|
-| **Offline Fixes** | Limited | None | Comprehensive |
-| **Windows VirtIO** | Manual | Manual | Automatic |
-| **fstab Repair** | Basic | None | Advanced |
-| **Initramfs Rebuild** | No | No | Yes |
-| **XFS UUID Fix** | No | No | Yes |
-| **Batch Migration** | Limited | Limited | Full |
-| **Native Python** | No (C) | Varies | Yes |
-| **Kubernetes** | No | No | Yes |
+| Feature | Other Tools | H2KVM |
+|---------|-------------|-------|
+| **Offline Fixes** | None | Comprehensive |
+| **Windows VirtIO** | Manual | Automatic |
+| **fstab Repair** | None | Advanced |
+| **Initramfs Rebuild** | No | Yes |
+| **XFS UUID Fix** | No | Yes |
+| **Batch Migration** | Limited | Full |
+| **Native Python** | Varies | Yes |
+| **Kubernetes** | No | Yes |
 
 **Key Differentiator**: **GuestKit** — offline bootability scoring and repair (`run_doctor`, `run_migrate_repair`) integrated into the h2kvm pipeline.
 
@@ -220,7 +220,7 @@ h2kvm --version
 1. Auto-switch to libguestfs backend (supermin appliance)
 2. Unlock LUKS with `cryptsetup_open()` inside the appliance
 3. Fix fstab/grub on the decrypted filesystem
-4. Preserve the existing initramfs (same as virt-v2v)
+4. Preserve the existing initramfs
 5. The migrated VM prompts for the LUKS passphrase at boot
 
 For TPM-sealed LUKS, add a passphrase keyslot before migration (the KVM vTPM has different seeds).

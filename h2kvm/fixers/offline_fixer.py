@@ -3863,15 +3863,13 @@ WantedBy=multi-user.target
             self.recovery_manager.save_checkpoint("start", {"image": str(self.image)})
 
         if self._uses_guestkit_repair():
-            try:
-                self._run_guestkit_pipeline()
-                return
-            except ImportError as exc:
-                self.logger.warning("GuestKit unavailable (%s); falling back to legacy offline fixer", exc)
-            except Exception as exc:  # pylint: disable=broad-exception-caught
-                if self.backend == "guestkit":
-                    raise
-                self.logger.exception("GuestKit repair failed (%s); falling back to legacy offline fixer", exc)
+            self._run_guestkit_pipeline()
+            return
+
+        raise RuntimeError(
+            "Offline guest repair requires GuestKit. "
+            "Install it with: pip install hypersdk-guestkit"
+        )
 
         if self.resize:
             self.report["analysis"]["image_resize"] = self._run_stage(

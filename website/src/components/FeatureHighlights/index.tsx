@@ -35,9 +35,9 @@ const FeatureList: FeatureItem[] = [
     to: '/docs/operator/getting-started',
   },
   {
-    title: 'CLI, web, and TUI',
+    title: 'CLI and web',
     description:
-      'h2kvmctl / h2k for scripting, h2kweb for the dashboard, and the zkvm terminal UI — pick the surface that fits the job.',
+      'h2kvmctl / h2k for scripting, h2kweb for the dashboard — pick the surface that fits the job.',
     to: '/docs/deployment/deploy-remote',
   },
   {

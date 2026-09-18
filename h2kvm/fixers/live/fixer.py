@@ -451,9 +451,9 @@ class LiveFixer:  # pylint: disable=too-few-public-methods
     # pylint: disable-next=too-many-locals,too-many-branches,too-many-statements
     def _prepare_luks_tpm(self) -> dict[str, Any]:
         """
-        Prepare LUKS+TPM volumes for v2v migration.
+        Prepare LUKS+TPM volumes before migration.
 
-        Problem: LUKS sealed to TPM only — after v2v the KVM vTPM has different
+        Problem: LUKS sealed to TPM only — after migration the KVM vTPM has different
         seeds so TPM unlock fails (BSOD / initramfs prompt).
 
         Solution: While the VM is running on VMware (TPM is valid), detect
@@ -491,7 +491,7 @@ class LiveFixer:  # pylint: disable=too-few-public-methods
             result: dict[str, Any] = {"device": dev, "success": False}
 
             if self.opts.dry_run:
-                self.logger.info("  DRY-RUN: would prepare %s for v2v", dev)
+                self.logger.info("  DRY-RUN: would prepare %s for migration", dev)
                 result["dry_run"] = True
                 results.append(result)
                 continue

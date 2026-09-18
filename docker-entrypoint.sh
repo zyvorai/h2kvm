@@ -37,11 +37,6 @@ case "${H2KVM_MODE:-cli}" in
     exec h2kvmctl --config /etc/h2kvm/batch.yaml
     ;;
 
-  tui)
-    log "Starting h2kvm in TUI mode"
-    exec zkvm
-    ;;
-
   worker)
     log "Starting h2kvm in Worker mode"
     # Create health check PID file

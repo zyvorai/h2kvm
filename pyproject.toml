@@ -96,10 +96,6 @@ daemon = [
     "watchdog>=3.0.0",
 ]
 
-# TUI is now a standalone Go binary (zkvm).
-# No Python TUI dependencies required.
-tui = []
-
 # GuestKit guest-disk engine (required for offline fix / inspect)
 guestkit = [
     "hypersdk-guestkit>=1.1.0",
@@ -188,10 +184,6 @@ Changelog = "https://github.com/ssahani/h2kvm/releases"
 [project.scripts]
 # Primary CLI command
 h2kvmctl = "h2kvm.__main__:main"
-
-# TUI is now a standalone Go binary (zkvm), built from zkvm/ directory.
-# Build with: make build-zkvm
-# Install with: make zkvm-install
 
 # LUKS encryption tools (require [encryption] optional dependencies)
 h2kvm-luks = "h2kvm.luks.cli:main"

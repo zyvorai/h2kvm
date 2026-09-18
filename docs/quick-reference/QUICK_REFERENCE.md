@@ -269,7 +269,7 @@ windows_version: 2019        # 2012, 2016, 2019, 2022, 10, 11
 #   /var/lib/libvirt/images/virtio-win.iso
 ```
 
-**Auto-detection**: Both zkvm TUI and h2kweb wizard auto-detect Windows from the filename
+**Auto-detection**: The h2kweb wizard auto-detects Windows from the filename
 (e.g., `win10.vmdk`). When detected, `regen_initramfs` and `fstab_mode` are automatically
 disabled — no manual configuration needed.
 

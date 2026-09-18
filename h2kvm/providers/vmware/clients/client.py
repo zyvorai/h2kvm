@@ -10,24 +10,17 @@ vSphere / vCenter client for h2kvm.
 
 from __future__ import annotations
 
-import atexit
 import os
 import random
 import re
-import shlex
 import socket
 import ssl
-import subprocess
 import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
-from urllib.parse import quote
 
-# Optional: non-blocking pump
-# (shared availability probe, centralized in utils/compat.py to avoid
-# duplicating this try/except stub across vmware provider modules)
-from h2kvm.providers.vmware.utils.compat import SELECT_AVAILABLE, select, vim
+from h2kvm.providers.vmware.utils.compat import vim
 
 # govc helpers (single source of truth)
 try:
@@ -122,7 +115,6 @@ class ExportOptions:  # pylint: disable=too-many-instance-attributes  # models e
     compute: str = "auto"
 
     # export options
-    transport: str = "ssh"  # virt-v2v input transport; disks themselves leave via govc or HTTPS
     no_verify: bool = False
     output_dir: Path = Path("./out")
     output_format: str = "qcow2"  # qcow2|raw
@@ -897,178 +889,6 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         """
         return _datastore_download_only_vm_force_https(self, opt)
 
-    # export (power user path) - Delegate to vmware_export
-
-    def _vpx_uri(self, *, datacenter: str, compute: str, no_verify: bool) -> str:
-        q = "?no_verify=1" if no_verify else ""
-        user_enc = quote(self.user or "", safe="")
-        host = (self.host or "").strip()
-        dc_enc = quote((datacenter or "").strip(), safe="")
-        compute_norm = (compute or "").strip().lstrip("/")
-        compute_enc = quote(compute_norm, safe="/-_.")
-        return f"vpx://{user_enc}@{host}/{dc_enc}/{compute_enc}{q}"
-
-    def _write_password_file(self, base_dir: Path) -> Path:
-        pw = (self.password or "").strip()
-        if not pw:
-            raise VMwareError(
-                "Missing vSphere password for export (-ip). "
-                "Set vs_password or vs_password_env (or vc_password/vc_password_env as fallback)."
-            )
-        base_dir = self._ensure_output_dir(base_dir)
-        pwfile = base_dir / f".export-pass-{os.getpid()}.txt"
-        # Create file atomically with secure permissions to avoid race condition (CWE-377)
-        try:
-            fd = os.open(str(pwfile), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-        except FileExistsError:
-            # Stale file from crashed run (extremely rare - requires PID reuse after reboot)
-            # Remove it and retry once
-            pwfile.unlink(missing_ok=True)
-            fd = os.open(str(pwfile), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-        try:
-            os.write(fd, (pw + "\n").encode("utf-8"))
-        finally:
-            os.close(fd)
-        atexit.register(lambda p=pwfile: p.unlink(missing_ok=True))
-        return pwfile
-
-    def _build_virt_export_cmd(self, opt: ExportOptions, *, password_file: Path) -> list[str]:
-        if not opt.vm_name:
-            raise VMwareError("ExportOptions.vm_name is required")
-        if not self.si:
-            raise VMwareError("Not connected to vSphere; cannot export. Call connect() first.")
-
-        resolved_dc = self.resolve_datacenter_for_vm(opt.vm_name, opt.datacenter)
-        resolved_compute = self.resolve_compute_for_vm(opt.vm_name, opt.compute)
-
-        transport = (opt.transport or "ssh").strip().lower()
-        if transport == "vddk":
-            raise VMwareError(
-                "VDDK transport was removed. Export with govc (export.ovf / export.ova) or HTTPS /folder."
-            )
-        if transport != "ssh":
-            raise VMwareError(f"Unsupported export transport: {transport!r} (expected 'ssh')")
-
-        argv: list[str] = [
-            "export",
-            "-i",
-            "libvirt",
-            "-ic",
-            self._vpx_uri(datacenter=resolved_dc, compute=resolved_compute, no_verify=opt.no_verify),
-            "-it",
-            transport,
-            "-ip",
-            str(password_file),
-        ]
-
-        argv.append(opt.vm_name)
-        self._ensure_output_dir(opt.output_dir)
-        argv += ["-o", "local", "-os", str(opt.output_dir), "-of", opt.output_format]
-        argv += list(opt.extra_args)
-        return argv
-
-    def _popen_text(self, argv: Sequence[str], *, env: dict[str, str] | None = None) -> Any:
-        """Start a govc subprocess with pipes, returning the Popen for the pump helpers below."""
-        self.logger.info("Running: %s", " ".join(shlex.quote(a) for a in argv))
-        # pylint: disable-next=consider-using-with  # process outlives this method; consumed by the _pump_lines_* helpers and reaped by the caller
-        proc = subprocess.Popen(
-            list(argv),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            env=env,
-            bufsize=1,
-        )
-        if proc.stdout is None or proc.stderr is None:
-            raise RuntimeError(
-                "Failed to capture govc command output. "
-                "Check system resources (open file limits, available memory)."
-            )
-        if SELECT_AVAILABLE:
-            try:
-                os.set_blocking(proc.stdout.fileno(), False)  # type: ignore[attr-defined]
-                os.set_blocking(proc.stderr.fileno(), False)  # type: ignore[attr-defined]
-            except OSError:
-                pass
-        return proc
-
-    def _pump_lines_blocking(self, proc: Any) -> list[str]:
-        if proc.stdout is None or proc.stderr is None:
-            raise RuntimeError(
-                "Failed to capture govc command output. "
-                "Check system resources (open file limits, available memory)."
-            )
-        lines: list[str] = []
-        out_line = proc.stdout.readline()
-        err_line = proc.stderr.readline()
-        if out_line:
-            lines.append(out_line.rstrip("\n"))
-        if err_line:
-            lines.append(err_line.rstrip("\n"))
-        return lines
-
-    def _pump_lines_select(self, proc: Any, *, timeout_s: float = 0.20) -> list[str]:
-        if proc.stdout is None or proc.stderr is None:
-            raise RuntimeError(
-                "Failed to capture govc command output. "
-                "Check system resources (open file limits, available memory)."
-            )
-        rlist = [proc.stdout, proc.stderr]
-        try:
-            ready, _, _ = select.select(rlist, [], [], timeout_s)  # type: ignore[union-attr]
-        except OSError:
-            ready = rlist
-
-        lines: list[str] = []
-        for s in ready:
-            try:
-                chunk = s.read()
-            except OSError:
-                chunk = ""
-            if not chunk:
-                continue
-            for ln in chunk.splitlines():
-                lines.append(ln.rstrip("\n"))
-        return lines
-
-    def _drain_remaining_output(self, proc: Any, *, max_rounds: int = 10) -> None:
-        for _ in range(max_rounds):
-            lines = (
-                self._pump_lines_select(proc, timeout_s=0.05)
-                if SELECT_AVAILABLE
-                else self._pump_lines_blocking(proc)
-            )
-            if not lines:
-                break
-            for ln in lines:
-                s = ln.strip()
-                if s:
-                    self.logger.info("%s", s)
-
-    def _run_logged_subprocess(self, argv: Sequence[str], *, env: dict[str, str] | None = None) -> int:
-        proc = self._popen_text(argv, env=env)
-
-        def pump() -> list[str]:
-            if SELECT_AVAILABLE:
-                return self._pump_lines_select(proc)
-            return self._pump_lines_blocking(proc)
-
-        # Plain logger loop
-        while True:
-            lines = pump()
-            for ln in lines:
-                s = ln.strip()
-                if s:
-                    self.logger.info("%s", s)
-            if (not lines) and (proc.poll() is not None):
-                break
-
-        self._drain_remaining_output(proc, max_rounds=10)
-        return int(proc.wait())
-
-    # NOTE: export functionality uses pure h2kvm architecture
-    # Legacy method removed
-
     def vm_disks(self, vm_obj: Any) -> list[Any]:
         """Return the list of VirtualDisk devices attached to a VM."""
         disks: list[Any] = []
@@ -1118,14 +938,6 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
     def _normalize_export_mode(mode: str | None) -> str:
         return (mode or "ovf_export").strip().lower()
 
-    def _handle_mode_export(self, mode: str, _opt: ExportOptions) -> Path | None:
-        """Handle 'export'/'virt_export' modes (no dedicated implementation; falls through)."""
-        # NOTE: these modes have no dedicated implementation (this used to call a nonexistent
-        # self.export_export_vm()); fall through to the stable OVF->OVA->HTTPS chain via the
-        # "Unknown export_mode" handling at the end of export_vm().
-        if mode in ("export", "virt_export"):
-            self.logger.debug("Export mode=%r has no dedicated handler; falling through to stable chain", mode)
-
     def _handle_mode_ovftool(self, mode: str, opt: ExportOptions) -> Path | None:
         if mode in ("ovftool_export", "ovftool", "ovftool-export"):
             self.logger.info("Export mode=OVF Tool: attempting OVF Tool export for VM=%s", opt.vm_name)
@@ -1169,15 +981,9 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         Export VM using specified export mode.
         """
         log_event(
-            "vm_export_start", vm_name=opt.vm_name, export_mode=opt.export_mode, transport=opt.transport
+            "vm_export_start", vm_name=opt.vm_name, export_mode=opt.export_mode
         )
         mode = self._normalize_export_mode(opt.export_mode)
-
-        # Explicit/special modes first (no fallback unless explicitly coded)
-        for handler in (self._handle_mode_export,):
-            out = handler(mode, opt)
-            if out is not None:
-                return out
 
         # OVF Tool requested: if it fails, fall through to stable chain
         try:

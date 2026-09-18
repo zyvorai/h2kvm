@@ -30,7 +30,7 @@ Technical reference materials including API documentation, architecture, install
 
 ### 🌐 Network & Resilience
 - **[Network Resilience](network-resilience.md)** - Network failure handling
-- **[Quick Reference](quick-reference.md)** - Command quick reference
+- **[Quick Reference](../guides/migration/quick-reference.md)** - Command quick reference
 
 ---
 
@@ -324,7 +324,7 @@ jsonschema -i manifest.json artifact-manifest-v1.0.schema.json
 
 ### Command Quick Reference
 
-**[Quick Reference](quick-reference.md)** - Essential command patterns:
+**[Quick Reference](../guides/migration/quick-reference.md)** - Essential command patterns:
 - Common CLI commands
 - YAML configurations
 - Troubleshooting commands
@@ -340,9 +340,8 @@ jsonschema -i manifest.json artifact-manifest-v1.0.schema.json
 ### For New Developers
 
 **Start Here**:
-1. [Quick Reference](quick-reference.md) - Learn basic patterns
-2. [Library API](api/library-api.md) - Python library usage
-3. [Architecture](architecture.md) - Understand design
+1. [Library API](api/library-api.md) - Python library usage
+2. [Architecture](architecture.md) - Understand design
 
 ### For Integration Work
 
@@ -486,7 +485,7 @@ Choose your reference area:
 → Review [Manifest Workflow](manifest-workflow.md)
 
 ### 🔍 I need quick reference
-→ Use [Quick Reference](quick-reference.md)
+→ Use [Quick Reference](../guides/migration/quick-reference.md)
 
 ---
 
