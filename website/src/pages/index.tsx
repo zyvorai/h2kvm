@@ -59,6 +59,33 @@ function HomepageHeader() {
   );
 }
 
+function ArchitectureDiagram() {
+  const diagram = useBaseUrl('/h2kvm-vsphere-path.jpg');
+  return (
+    <section className={styles.diagram}>
+      <div className="container">
+        <Reveal>
+          <p className={styles.eyebrow}>How it talks to vSphere</p>
+          <Heading as="h2" className={styles.sectionHeading}>
+            HTTPS in. Disk out. No VDDK.
+          </Heading>
+          <Link to="/docs/how-it-works" className={styles.diagramFrame}>
+            <img
+              src={diagram}
+              alt="h2kvm talks to vCenter over SOAP, then ESXi over an NFC lease. Fallback is HTTPS /folder."
+            />
+          </Link>
+          <p className={styles.diagramLinks}>
+            <Link to="/docs/how-it-works">Read how it works</Link>
+            <a href="https://zyvor.dev/h2kvm">zyvor.dev/h2kvm</a>
+            <a href="https://github.com/zyvorai/h2kvm">github.com/zyvorai/h2kvm</a>
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 function ProblemStatement() {
   return (
     <section className={styles.problem}>
@@ -108,7 +135,7 @@ function TrustBand() {
               alt="h2kvm on PyPI"
             />
             <img
-              src="https://img.shields.io/github/v/release/zyvorai/h2kvm?color=0071e3"
+              src="https://img.shields.io/github/v/release/zyvorai/h2kvm?color=f97316"
               alt="Latest GitHub release"
             />
           </div>
@@ -149,6 +176,7 @@ export default function Home(): ReactNode {
       description="Convert VMs from VMware, Hyper-V, Nutanix, AWS, Azure, and GCP to KVM. The guest is fixed before power-on. No VDDK.">
       <HomepageHeader />
       <main>
+        <ArchitectureDiagram />
         <ProblemStatement />
         <Reveal>
           <FeatureHighlights />

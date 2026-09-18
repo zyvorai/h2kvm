@@ -4,6 +4,8 @@ sidebar_position: 2
 
 # How it works
 
+![h2kvm talks to vSphere over HTTPS. vCenter SOAP, ESXi NFC lease, then the disk. No VDDK.](/h2kvm-vsphere-path.jpg)
+
 The disk is fixed before it is powered on. Then you watch it boot, and you can run it on Zeus OS or Machina.
 
 ```text

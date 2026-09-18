@@ -55,7 +55,7 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'h2kvm-share-card.png',
+    image: 'h2kvm-vsphere-path.jpg',
     colorMode: {
       respectPrefersColorScheme: true,
     },

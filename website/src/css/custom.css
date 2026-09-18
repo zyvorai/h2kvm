@@ -10,17 +10,15 @@
  * of this file.
  */
 
-/* Apple-blue palette — matches the MkDocs-based Zyvor docs sites'
-   apple-glass.css (--primary: #0071e3 light / #0a84ff dark).
-   Shared across the whole Zyvor docs-site family. */
+/* Zyvor orange. Dark enough to read on white; the hero stays black. */
 :root {
-  --ifm-color-primary: #0071e3;
-  --ifm-color-primary-dark: #0064cc;
-  --ifm-color-primary-darker: #005bbf;
-  --ifm-color-primary-darkest: #004a99;
-  --ifm-color-primary-light: #1a7fe6;
-  --ifm-color-primary-lighter: #338ce9;
-  --ifm-color-primary-lightest: #66a8ef;
+  --ifm-color-primary: #c2410c;
+  --ifm-color-primary-dark: #9a3412;
+  --ifm-color-primary-darker: #7c2d12;
+  --ifm-color-primary-darkest: #431407;
+  --ifm-color-primary-light: #ea580c;
+  --ifm-color-primary-lighter: #f97316;
+  --ifm-color-primary-lightest: #fdba74;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 
@@ -37,13 +35,13 @@
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #0a84ff;
-  --ifm-color-primary-dark: #0074e6;
-  --ifm-color-primary-darker: #0068cc;
-  --ifm-color-primary-darkest: #0055a8;
-  --ifm-color-primary-light: #3399ff;
-  --ifm-color-primary-lighter: #52a6ff;
-  --ifm-color-primary-lightest: #85c0ff;
+  --ifm-color-primary: #f97316;
+  --ifm-color-primary-dark: #ea580c;
+  --ifm-color-primary-darker: #c2410c;
+  --ifm-color-primary-darkest: #9a3412;
+  --ifm-color-primary-light: #fb923c;
+  --ifm-color-primary-lighter: #fdba74;
+  --ifm-color-primary-lightest: #ffedd5;
   --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
 }
 

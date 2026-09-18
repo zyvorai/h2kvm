@@ -100,3 +100,39 @@
   margin: 0 auto 2rem;
   color: var(--ifm-color-emphasis-700);
 }
+
+.diagram {
+  padding: var(--zv-section-space) 0 0;
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c2410c;
+}
+
+.diagramFrame {
+  display: block;
+  margin-top: 1.5rem;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-top: 3px solid #f97316;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
+}
+
+.diagramFrame img {
+  display: block;
+  width: 100%;
+}
+
+.diagramLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+  font-weight: 600;
+}
