@@ -9,6 +9,8 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 
 **First-boot science for hypervisor exit** · day-2 on **[Zeus OS](https://zyvor.dev/zeus-os)** · part of the [Zyvor](https://zyvor.dev/?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero) suite
 
+![h2kvm — any hypervisor to KVM. Convert offline. No VDDK.](docs/social/h2kvm-share-card.png)
+
 <br/>
 
 [![Release](https://img.shields.io/github/v/release/zyvorai/h2kvm?color=F97316)](https://github.com/zyvorai/h2kvm/releases/tag/v1.1.0)
