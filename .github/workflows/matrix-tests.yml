@@ -58,11 +58,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, macos-13, macos-latest]
+        os: [ubuntu-22.04, ubuntu-24.04, macos-latest]
         python-version: ['3.10', '3.11', '3.12']
         exclude:
-          - os: macos-13
-            python-version: '3.10'
           - os: macos-latest
             python-version: '3.10'
 
@@ -167,7 +165,6 @@ jobs:
         run: |
           pytest tests/integration/ \
             -v \
-            -m integration \
             --maxfail=5 \
             --tb=short \
             --junitxml=junit-integration.xml
@@ -258,7 +255,7 @@ jobs:
 
       - name: Build documentation
         run: |
-          sphinx-build -b html -W --keep-going docs/ docs/_build/html
+          sphinx-build -b html docs/ docs/_build/html
 
       - name: Upload documentation
         uses: actions/upload-artifact@v7

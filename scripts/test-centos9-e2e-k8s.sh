@@ -276,7 +276,7 @@ create_migration_job() {
     sleep 3
 
     log_info "Verifying MigrationJob status..."
-    kubectl get migrationjob -n "${NAMESPACE_TEST}" centos9-e2e-test -o wide
+    kubectl get hyperconversion -n "${NAMESPACE_TEST}" centos9-e2e-test -o wide
 }
 
 # Step 10: Monitor job progress
@@ -284,7 +284,7 @@ monitor_job() {
     log_section "Step 10: Monitor Job Progress"
 
     log_info "MigrationJob Status:"
-    kubectl describe migrationjob -n "${NAMESPACE_TEST}" centos9-e2e-test | grep -A 20 "Status:"
+    kubectl describe hyperconversion -n "${NAMESPACE_TEST}" centos9-e2e-test | grep -A 20 "Status:" || true
 
     echo ""
     log_info "Operator Logs (last 20 lines):"
@@ -318,7 +318,7 @@ generate_report() {
 
     echo ""
     echo "🔄 MigrationJob Status:"
-    JOB_STATE=$(kubectl get migrationjob -n "${NAMESPACE_TEST}" centos9-e2e-test -o jsonpath='{.status.state}' 2>/dev/null || echo 'Not Found')
+    JOB_STATE=$(kubectl get hyperconversion -n "${NAMESPACE_TEST}" centos9-e2e-test -o jsonpath='{.status.state}' 2>/dev/null || echo 'Not Found')
     echo "  • State: ${JOB_STATE}"
 
     echo ""
@@ -328,14 +328,14 @@ generate_report() {
         echo "  📌 To execute migration:"
         echo "     1. Ensure worker pods are Running with correct image"
         echo "     2. Upload CentOS 9 VMDK to /data/input/centos9.vmdk in worker pod"
-        echo "     3. Monitor: kubectl get migrationjobs -n ${NAMESPACE_TEST} -w"
+        echo "     3. Monitor: kubectl get hyperconversions -n ${NAMESPACE_TEST} -w"
     elif [ "${JOB_STATE}" = "Running" ]; then
         echo "  🔄 Migration in progress..."
         echo "  📌 Monitor logs: kubectl logs -n ${NAMESPACE_WORKERS} -l app=h2kvm-worker -f"
     elif [ "${JOB_STATE}" = "Completed" ]; then
         echo "  🎉 Migration completed successfully!"
     else
-        echo "  ⚠️  Check job status: kubectl describe migrationjob -n ${NAMESPACE_TEST} centos9-e2e-test"
+        echo "  ⚠️  Check job status: kubectl describe hyperconversion -n ${NAMESPACE_TEST} centos9-e2e-test"
     fi
 
     echo ""
@@ -354,7 +354,7 @@ cleanup_test() {
     fi
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log_info "Deleting test resources..."
-        kubectl delete migrationjob -n "${NAMESPACE_TEST}" centos9-e2e-test --timeout=30s 2>/dev/null || true
+        kubectl delete hyperconversion -n "${NAMESPACE_TEST}" centos9-e2e-test --timeout=30s 2>/dev/null || true
         kubectl delete namespace "${NAMESPACE_TEST}" --timeout=30s 2>/dev/null || true
         log_success "Cleanup completed"
     else
