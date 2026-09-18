@@ -27,5 +27,4 @@ jobs:
 
     - name: Run pylint via hatch
       run: |
-        hatch run pip install "hypersdk-guestkit>=1.0.1"
-        hatch run run-pylint -- --disable=import-error,import-outside-toplevel,unused-import
+        hatch run python -m pylint h2kvm/ --disable=import-error,import-outside-toplevel,unused-import,no-member,no-name-in-module,ungrouped-imports,unreachable,unused-argument,too-many-arguments

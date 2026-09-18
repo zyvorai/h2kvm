@@ -132,7 +132,7 @@ pip install -e ".[full]"
 
 Host needs Linux with `qemu-img`, `qemu-nbd`, and `losetup`. Repair and NBD mounts often need root or `H2KVM_USE_SUDO=1`.
 
-Shell completion is optional. Install argcomplete, then see [docs/getting-started/01-Installation.md](docs/getting-started/01-Installation.md#shell-completion-optional).
+Shell Completion is optional. Install argcomplete, then see [docs/getting-started/01-Installation.md](docs/getting-started/01-Installation.md#shell-completion-optional).
 
 | Artifact | Where |
 |----------|--------|
