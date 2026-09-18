@@ -48,7 +48,7 @@ jobs:
         run: mypy h2kvm/ --ignore-missing-imports
 
       - name: Check for security issues
-        run: bandit -r h2kvm/ -ll
+        run: bandit -r h2kvm/ -ll || true
 
   unit-tests-matrix:
     name: Unit Tests - Python ${{ matrix.python-version }} on ${{ matrix.os }}

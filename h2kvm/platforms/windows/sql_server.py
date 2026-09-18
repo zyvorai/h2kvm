@@ -18,7 +18,6 @@ from pathlib import Path
 from typing import Any
 
 
-
 class SQLServerManager:
     """Manages SQL Server migration tasks for Windows VMs."""
 

@@ -18,7 +18,6 @@ from pathlib import Path
 from typing import Any
 
 
-
 class ActiveDirectoryManager:
     """Manages Active Directory integration for migrated Windows VMs."""
 

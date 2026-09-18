@@ -56,8 +56,8 @@ from h2kvm import __version__  # pylint: disable=cyclic-import
 from h2kvm.core.constants import DEFAULT_CONTAINER_ISOLATION
 from h2kvm.core.guestfs_factory import create_guestfs
 from h2kvm.core.structured_log import PhaseTimer, TraceContext, log_event
-from h2kvm.core.utils import U
 from h2kvm.core.sudo import run_sudo
+from h2kvm.core.utils import U
 
 from . import network_fixer  # type: ignore
 from .bootloader import grub as grub_fixer  # type: ignore

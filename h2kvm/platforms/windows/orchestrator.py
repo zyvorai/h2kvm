@@ -17,7 +17,6 @@ import logging
 from pathlib import Path
 from typing import Any
 
-
 from .active_directory import ActiveDirectoryManager
 from .license import WindowsLicenseManager
 from .sql_server import SQLServerManager

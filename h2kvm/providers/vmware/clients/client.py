@@ -170,7 +170,6 @@ from h2kvm.providers.vmware.transports.ovftool_loader import (  # pylint: disabl
     ovftool_deploy_ova as _ovftool_ovftool_deploy_ova,
     ovftool_export_vm as _ovftool_ovftool_export_vm,
 )
-
 from h2kvm.providers.vmware.utils.datastore import (  # pylint: disable=wrong-import-position
     _download_only_vm_force_https as _datastore_download_only_vm_force_https,
     _download_selected_files as _datastore_download_selected_files,

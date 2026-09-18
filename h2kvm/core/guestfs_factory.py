@@ -107,7 +107,7 @@ except ImportError:
 def _guestkit_available() -> bool:
     """Return True if the GuestKit Python module is importable."""
     try:
-        import guestkit  # type: ignore  # pylint: disable=import-outside-toplevel,unused-import
+        import guestkit  # type: ignore  # noqa: F401  # pylint: disable=import-outside-toplevel,unused-import
 
         return True
     except ImportError:

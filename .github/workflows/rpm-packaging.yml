@@ -1,17 +1,22 @@
 name: RPM Packaging
 
 on:
+  # No h2kvm.spec in this repo. Run only when one is added, so a missing
+  # spec does not fail every push. hashFiles() is not valid on the job if.
   push:
     branches: [ main, develop ]
+    paths:
+      - 'h2kvm.spec'
   pull_request:
     branches: [ main, develop ]
+    paths:
+      - 'h2kvm.spec'
   workflow_dispatch:
 
 jobs:
   build-rpm:
     name: Build and Test RPM on Fedora ${{ matrix.fedora-version }}
     runs-on: ubuntu-latest
-    if: hashFiles('h2kvm.spec') != ''
 
     strategy:
       fail-fast: false

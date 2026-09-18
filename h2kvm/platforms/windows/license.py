@@ -18,7 +18,6 @@ from pathlib import Path
 from typing import Any
 
 
-
 class WindowsLicenseManager:
     """Manages Windows license detection and reactivation for migrated VMs."""
 

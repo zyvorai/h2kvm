@@ -8,7 +8,7 @@ on:
 
 env:
   PYTHON_VERSION: "3.11"
-  GO_VERSION: "1.23"
+  GO_VERSION: "1.25"
 
 jobs:
   # Python tests for CLI and vmspawn SDK
@@ -217,6 +217,9 @@ jobs:
         uses: actions/setup-go@v7
         with:
           go-version: ${{ env.GO_VERSION }}
+
+      - name: Install PAM headers
+        run: sudo apt-get update && sudo apt-get install -y libpam0g-dev
 
       - name: Build web server
         working-directory: web

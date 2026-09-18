@@ -17,7 +17,6 @@ from pathlib import Path
 from typing import Any
 
 
-
 class WindowsUpdateManager:
     """Manages Windows Update integration for VirtIO driver installation."""
 

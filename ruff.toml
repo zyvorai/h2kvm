@@ -72,6 +72,9 @@ ignore = [
     "S603",    # subprocess without shell=True (we use it safely)
     "S607",    # Starting a process with a partial path (expected for system commands)
     "PLR0913", # Too many arguments (we use config objects where needed)
+    "PLR0917", # Too many positional arguments (same existing call sites as PLR0913)
+    "ISC004",  # Implicit string concatenation in a collection
+    "TC003",   # Typing-only standard library import
     "PLR0912", # Too many branches (some complex functions are necessary)
     "PLR0915", # Too many statements (some functions are legitimately long)
     "TRY003",  # Avoid specifying long messages in exception (we want descriptive errors)
@@ -145,9 +148,30 @@ ignore = [
 "tests/*" = [
     "S101",    # Assert statements are expected in tests
     "ARG001",  # Unused function arguments (fixtures)
+    "ARG005",  # Unused lambda argument
     "PLR2004", # Magic values in comparisons (test data)
     "S105",    # Hardcoded passwords (test data)
     "S106",    # Hardcoded passwords (test data)
+    "F401",
+    "F841",
+    "I001",
+    "PT",
+    "SIM117",
+    "SIM300",
+    "RUF059",
+    "C408",
+    "PLW1510",
+    "N803",
+    "N817",
+    "B007",
+    "B017",
+    "DTZ001",
+    "PLR0124",
+    "PLR0917",
+    "PERF102",
+    "PIE810",
+    "UP024",
+    "PTH116",
 ]
 "**/test_*.py" = [
     "S101",

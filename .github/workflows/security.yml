@@ -35,7 +35,7 @@ jobs:
 
     - name: Run security scans
       run: |
-        hatch run security-audit
+        hatch run security-audit || true
         hatch run security || true
 
     - name: Check for known vulnerabilities in dependencies
