@@ -1,5 +1,5 @@
-# Copyright (c) 2026 ZyvorAI Labs Private Limited. All rights reserved.
-# Proprietary software — see LICENSE in the repository root.
+# Copyright (c) 2026 ZyvorAI Labs Private Limited.
+# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial
 # https://zyvor.dev · info@zyvor.dev
 
 # h2kvm/vmware/utils/__init__.py

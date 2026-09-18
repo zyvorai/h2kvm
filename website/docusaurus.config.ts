@@ -73,6 +73,11 @@ const config: Config = {
           label: 'Docs',
         },
         {
+          to: '/docs/licensing',
+          label: 'Licensing',
+          position: 'left',
+        },
+        {
           to: '/resources',
           label: 'Resources',
           position: 'left',
@@ -97,6 +102,7 @@ const config: Config = {
           items: [
             {label: 'Quickstart', to: '/docs/getting-started/quickstart'},
             {label: 'How it works', to: '/docs/how-it-works'},
+            {label: 'Licensing', to: '/docs/licensing'},
             {label: 'Resources', to: '/resources'},
           ],
         },
@@ -106,8 +112,8 @@ const config: Config = {
             {label: 'GitHub', href: 'https://github.com/zyvorai/h2kvm'},
             {label: 'PyPI', href: 'https://pypi.org/project/h2kvm/'},
             {
-              label: 'Changelog',
-              href: 'https://github.com/zyvorai/h2kvm/blob/main/CHANGELOG.md',
+              label: 'License (AGPL-3.0)',
+              href: 'https://github.com/zyvorai/h2kvm/blob/main/LICENSE',
             },
           ],
         },

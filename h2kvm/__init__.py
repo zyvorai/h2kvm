@@ -1,5 +1,5 @@
-# Copyright (c) 2026 ZyvorAI Labs Private Limited. All rights reserved.
-# Proprietary software — see LICENSE in the repository root.
+# Copyright (c) 2026 ZyvorAI Labs Private Limited.
+# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial
 # https://zyvor.dev · info@zyvor.dev
 
 # h2kvm/__init__.py
@@ -25,7 +25,7 @@ Usage as a library:
 See docs/08-Library-API.md for detailed usage examples.
 """
 
-__version__ = "1.2.1"
+__version__ = "1.3.0"
 
 
 # Use lazy imports to avoid initialization errors

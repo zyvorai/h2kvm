@@ -120,16 +120,20 @@ function TrustBand() {
         <Reveal className={styles.trustGrid}>
           <div>
             <Heading as="h3" className={styles.sectionHeading}>
-              Install it. Then read the license.
+              AGPL-3.0. Free to self-host.
             </Heading>
             <p>
-              h2kvm 1.2.1 is on PyPI. GuestKit is installed with it. Terms
-              are in this repository&apos;s LICENSE — read it before a
-              production cutover.
+              Home and internal use are free under AGPL. A commercial license
+              is $100 per VM, one-time, or Enterprise at a fixed price from
+              $2,500/month.
             </p>
-            <Link to="/docs/how-it-works">How the path works →</Link>
+            <Link to="/docs/licensing">Read the licensing guide →</Link>
           </div>
           <div className={styles.trustBadges}>
+            <img
+              src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg"
+              alt="AGPL v3 license"
+            />
             <img
               src="https://img.shields.io/pypi/v/h2kvm.svg"
               alt="h2kvm on PyPI"
@@ -146,22 +150,30 @@ function TrustBand() {
 }
 
 function EnterpriseCTA() {
+  const pricing = useBaseUrl('/h2kvm-pricing.jpg');
   return (
     <section className={styles.enterprise}>
       <div className="container text--center">
         <Reveal>
           <Heading as="h2" className={styles.sectionHeading}>
-            Need a cutover, not a lab?
+            $100 per VM, or Enterprise at a fixed price
           </Heading>
           <p className={styles.enterpriseCopy}>
-            Community proves convert. Enterprise owns the wave: HA, storage
-            pipelines, and a support contract. Start with a 30-day proof of
-            concept on your estate.
+            Convert N VMs for $100 each, one-time. Enterprise is not metered:
+            $25,000/year, $2,500/month, $25,000 for one major version, or
+            $15,000 for one minor version. Contact sales@zyvor.dev for custom
+            pricing.
           </p>
+          <div className={styles.diagramFrame}>
+            <img
+              src={pricing}
+              alt="h2kvm pricing: $100 times N VMs, or Enterprise at a fixed price. Custom pricing: sales@zyvor.dev."
+            />
+          </div>
           <Link
-            className="button button--primary button--lg"
-            to="https://zyvor.dev/contact?intent=demo&utm_source=github&utm_medium=h2kvm&utm_campaign=docs_site">
-            Book an Enterprise demo
+            className={clsx('button button--primary button--lg', styles.pricingAction)}
+            to="/docs/licensing">
+            See licensing
           </Link>
         </Reveal>
       </div>

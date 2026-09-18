@@ -1,0 +1,18 @@
+SPDX-FileCopyrightText: Copyright (c) 2026 ZyvorAI Labs Private Limited.
+SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial
+
+h2kvm
+Copyright (c) 2026 ZyvorAI Labs Private Limited.
+
+This product is dual-licensed:
+
+  - GNU Affero General Public License v3.0 only (AGPL-3.0-only)
+    See LICENSE and LICENSES/AGPL-3.0-only.txt
+
+  - h2kvm Commercial License — SPDX: LicenseRef-H2KVM-Commercial
+    See COMMERCIAL_LICENSE.md and LICENSES/LicenseRef-H2KVM-Commercial.txt
+
+Contact: sales@zyvor.dev · https://zyvor.dev
+
+Third-party open-source components bundled or linked by h2kvm retain their
+own copyright notices and license terms.

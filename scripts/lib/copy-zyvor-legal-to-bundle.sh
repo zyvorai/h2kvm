@@ -12,7 +12,7 @@ fi
 
 mkdir -p "${STAGE}/docs/legal" "${STAGE}/legal/templates"
 
-# Code license (LGPL, Apache, or proprietary LICENSE)
+# Code license (AGPL-3.0-only, or the h2kvm Commercial License)
 if [[ -f "${ROOT}/LICENSE" ]]; then
   cp "${ROOT}/LICENSE" "${STAGE}/LICENSE"
 fi
@@ -51,19 +51,12 @@ if $WITH_ACCEPT && [[ -f "${ROOT}/scripts/lib/zyvor-company-accept.sh" ]]; then
   chmod +x "${STAGE}/.package-lib/zyvor-company-accept.sh"
 fi
 
-# Proprietary deploy acceptance (PacketWolf)
-if [[ -f "${ROOT}/scripts/lib/license-accept.sh" ]]; then
-  mkdir -p "${STAGE}/.package-lib"
-  cp "${ROOT}/scripts/lib/license-accept.sh" "${STAGE}/.package-lib/"
-  chmod +x "${STAGE}/.package-lib/license-accept.sh"
-fi
-
 {
   echo "ZyvorAI Labs — legal pack"
   echo "https://zyvor.dev · sales@zyvor.dev · info@zyvor.dev · legal@zyvor.dev"
   echo ""
   echo "FILES:"
-  [[ -f "${STAGE}/LICENSE" ]] && echo "  LICENSE              — software license"
+  [[ -f "${STAGE}/LICENSE" ]] && echo "  LICENSE              — AGPL-3.0-only, or h2kvm Commercial License"
   [[ -f "${STAGE}/LICENSE.txt" ]] && echo "  LICENSE.txt          — software license"
   [[ -f "${STAGE}/ZYVOR-COMPANY-TERMS.md" ]] && echo "  ZYVOR-COMPANY-TERMS.md — Zyvor distribution (accept before install)"
   echo "  legal/ docs/legal/   — company reference"

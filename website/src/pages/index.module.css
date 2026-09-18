@@ -101,6 +101,10 @@
   color: var(--ifm-color-emphasis-700);
 }
 
+.pricingAction {
+  margin-top: 2rem;
+}
+
 .diagram {
   padding: var(--zv-section-space) 0 0;
 }

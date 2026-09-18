@@ -16,7 +16,7 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 [![Release](https://img.shields.io/github/v/release/zyvorai/h2kvm?color=F97316)](https://github.com/zyvorai/h2kvm/releases/tag/v1.2.0)
 [![GuestKit](https://img.shields.io/pypi/v/hypersdk-guestkit.svg)](https://pypi.org/project/hypersdk-guestkit/)
 [![Python](https://img.shields.io/badge/python-3.10+-3776AB.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/license-see_LICENSE-111827.svg)](LICENSE)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
 
 <br/>
 
@@ -116,10 +116,10 @@ Copying the disk was never the hard part. GuestKit still has to fix VirtIO, GRUB
 
 ## Install
 
-**v1.2.1** — on PyPI. GuestKit is installed with it.
+**v1.3.0** — on PyPI. GuestKit is installed with it.
 
 ```bash
-pip install "h2kvm==1.2.1"
+pip install "h2kvm==1.3.0"
 ```
 
 From source (extras / development):
@@ -134,7 +134,7 @@ Host needs Linux with `qemu-img`, `qemu-nbd`, and `losetup`. Repair and NBD moun
 
 | Artifact | Where |
 |----------|--------|
-| **h2kvm 1.2.1** | [PyPI](https://pypi.org/project/h2kvm/1.2.1/) |
+| **h2kvm 1.3.0** | [PyPI](https://pypi.org/project/h2kvm/1.3.0/) |
 | **hypersdk-guestkit ≥ 1.1.0** | [PyPI](https://pypi.org/project/hypersdk-guestkit/) |
 | **Operator image** | `ghcr.io/zyvorai/h2kvm/operator:v1.2.0` |
 
@@ -345,7 +345,16 @@ The buyer path matches [zyvor.dev](https://zyvor.dev): [GuestKit](https://zyvor.
 
 ## License
 
-See [LICENSE](LICENSE) and `docs/legal/` for terms. Community / eval builds are for labs and integration — production fleets and SLAs are **Enterprise**.
+Dual-licensed:
+
+- **[AGPL-3.0](LICENSE)** — open source; free for home users and self-host under AGPL terms
+- **[h2kvm Commercial License](COMMERCIAL_LICENSE.md)** — $100 per VM, one-time (N × $100), or Enterprise at a fixed price
+
+Enterprise (fixed, not metered by VM count): **$25,000/year**, **$2,500/month**, **$25,000** for one major version, or **$15,000** for one minor version. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing.
+
+![h2kvm commercial pricing](docs/social/h2kvm-pricing.jpg)
+
+See [docs/LICENSING.md](docs/LICENSING.md). Contributions: [CLA.md](CLA.md) + [DCO.md](DCO.md) (`git commit -s`).
 
 <div align="center">
 <sub>Built by <a href="https://zyvor.dev?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_colophon">Zyvor AI Labs</a> · Hypervisor exit without the 2 a.m. surprise</sub>

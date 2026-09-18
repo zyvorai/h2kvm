@@ -1,5 +1,7 @@
 # Proprietary software policy (draft)
 
+**Exception:** h2kvm in this repository is dual-licensed AGPL-3.0-only or LicenseRef-H2KVM-Commercial. See [LICENSING.md](../LICENSING.md). The policy below applies to other Zyvor products that are still proprietary.
+
 ## Position
 
 ZyvorAI Labs does **not** distribute product source or binaries under Apache 2.0, MIT, LGPL, or other open-source licenses. This applies to **PacketWolf**, **Ragnarok**, **Aether**, **GuestKit**, **HyperSDK**, and related commercial extensions.

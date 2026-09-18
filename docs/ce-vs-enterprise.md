@@ -22,7 +22,7 @@ Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **
 | Success metric | One VM converts and boots in a lab | Wave first-boot % · HA uptime · attributable cutovers |
 | Cost of staying on CE | No war-room · no SAN contracts · Issues | Avoided: failed Windows nights, storage tickets, unowned bridges |
 | Support | Community / self-serve | **SLA** · LTS · CVE response · war-room |
-| License | Eval / proprietary CE terms | Commercial |
+| License | AGPL-3.0, free self-host | $100 × N VMs, or Enterprise fixed |
 
 ### Source connectors
 
@@ -111,5 +111,7 @@ Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **
 5. **You want Zyvor accountable for cutover night** — LTS, CVE trains, and hypervisor-exit programs  
 
 **CE proves the science. Buy Enterprise when the estate must move.**
+
+Commercial prices: **$100 per VM, one-time** (N × $100), or Enterprise at a fixed price — **$25,000/year**, **$2,500/month**, **$25,000** for one major version, or **$15,000** for one minor version. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing. See [COMMERCIAL_LICENSE.md](../COMMERCIAL_LICENSE.md) and [LICENSING.md](LICENSING.md).
 
 **→ [Book an Enterprise demo](https://zyvor.dev/contact?intent=demo)** · **[30-day PoC](https://zyvor.dev/poc)** · **[Pricing](https://zyvor.dev/pricing)** · **[h2kvm product](https://zyvor.dev/h2kvm)**

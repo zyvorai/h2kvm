@@ -197,9 +197,9 @@ ruff check --fix h2kvm/
 
 ## 📜 License
 
-h2kvm is licensed under **Proprietary (Zyvor AI Labs)**. By contributing, you agree that your contributions will be licensed under the same license.
+h2kvm is dual-licensed under **AGPL-3.0-only** and the **h2kvm Commercial License**. By contributing, you agree to the [CLA](../../CLA.md) and certify the [DCO](../../DCO.md) (`git commit -s`).
 
-See [LICENSE](../LICENSE) for the full license text.
+See [LICENSE](../../LICENSE) and [LICENSING.md](../LICENSING.md).
 
 ---
 

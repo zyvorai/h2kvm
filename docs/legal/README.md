@@ -17,7 +17,9 @@ ZyvorAI Labs Private Limited
     └── HyperSDK Platform (SDKs, tooling, integrations)
 ```
 
-- **All product code is proprietary** — no Apache, MIT, or other OSS distribution (PacketWolf, Ragnarok, Aether, HyperSDK, netctl, netevd, etc.). **GuestKit** remains **LGPL-3.0-or-later** (open-source guest layer).
+**h2kvm (this repository) is dual-licensed** — [AGPL-3.0](../../LICENSE) or the [h2kvm Commercial License](../../COMMERCIAL_LICENSE.md). Prices: $100 per VM, one-time (N × $100), or Enterprise at a fixed price ($25,000/year, $2,500/month, $25,000 major version, $15,000 minor version). See [LICENSING.md](../LICENSING.md).
+
+- **Other product code shipped from sibling repositories may still be proprietary** — no Apache, MIT, or other OSS distribution is implied here for PacketWolf, Ragnarok, Aether, HyperSDK, netctl, or netevd. **GuestKit** remains **LGPL-3.0-or-later** where that repository says so.
 - **Hosted SaaS**, AI rules, and sovereign features are **commercial** under MSA/ELA.
 - **Trademarks** are **not** granted by the software license—see [TRADEMARK-NOTICE.md](TRADEMARK-NOTICE.md).
 
@@ -37,7 +39,7 @@ Customer
    → Acceptable Use Policy (AUP) + Export Compliance (incorporated by reference)
 ```
 
-Quick deploy / self-hosted tarball: [LICENSE](../../LICENSE) + install acceptance (`scripts/lib/license-accept.sh`). Enterprise deals should still execute the full stack above.
+Quick deploy / self-hosted: [LICENSE](../../LICENSE) (AGPL-3.0). Commercial deals use [COMMERCIAL_LICENSE.md](../../COMMERCIAL_LICENSE.md) and the agreement stack above.
 
 ---
 
@@ -47,7 +49,7 @@ Quick deploy / self-hosted tarball: [LICENSE](../../LICENSE) + install acceptanc
 |----------|------|---------|
 | Corporate facts | [CORPORATE.md](CORPORATE.md) | MCA, directors, filing references |
 | Source PDF manifest | [SOURCE-DOCUMENTS.md](SOURCE-DOCUMENTS.md) | Incorporation & board docs on file |
-| Licensing model | [LICENSING-MODEL.md](LICENSING-MODEL.md) | Proprietary tiers, metrics |
+| Licensing model | [LICENSING-MODEL.md](LICENSING-MODEL.md) | h2kvm dual license; commercial tiers for other products |
 | Product matrix | [PRODUCT-MATRIX.md](PRODUCT-MATRIX.md) | License per product |
 | Trademark | [TRADEMARK-NOTICE.md](TRADEMARK-NOTICE.md) | Brand rights |
 | Proprietary policy | [PROPRIETARY-POLICY.md](PROPRIETARY-POLICY.md) | No OSS; third-party NOTICE |
@@ -58,7 +60,7 @@ Quick deploy / self-hosted tarball: [LICENSE](../../LICENSE) + install acceptanc
 | Order Form | [templates/ORDER-FORM.md](templates/ORDER-FORM.md) | Commercial terms |
 | AUP | [templates/ACCEPTABLE-USE.md](templates/ACCEPTABLE-USE.md) | Abuse, lawful use |
 | Export | [templates/EXPORT-COMPLIANCE.md](templates/EXPORT-COMPLIANCE.md) | Sanctions, export control |
-| Deploy EULA | [../../LICENSE](../../LICENSE) | Self-hosted / deploy acceptance |
+| Deploy license | [../../LICENSE](../../LICENSE) | AGPL-3.0-only (commercial alternative in COMMERCIAL_LICENSE.md) |
 
 ---
 

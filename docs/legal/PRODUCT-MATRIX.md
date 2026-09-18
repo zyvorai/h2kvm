@@ -1,9 +1,10 @@
 # Product license matrix (draft)
 
-**All products below are proprietary** to ZyvorAI Labs Private Limited. No Apache, MIT, LGPL, or other open-source license applies to Zyvor-shipped source or binaries.
+**h2kvm, this repository, is dual-licensed** AGPL-3.0 or the h2kvm Commercial License. Other products below stay on their own terms.
 
 | Product | License | Hosted SaaS | Trademark |
 |---------|---------|-------------|-----------|
+| **h2kvm** | AGPL-3.0 or commercial ($100/VM or Enterprise fixed) | N/A | h2kvm |
 | **PacketWolf / NetPredator** | Proprietary EULA / ELA | Optional | PacketWolf, NetPredator |
 | **Ragnarok** | Proprietary EULA / ELA | Optional | Ragnarok |
 | **Aether** | Proprietary EULA / ELA | Optional | Aether |
