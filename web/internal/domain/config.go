@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial
 // https://zyvor.dev · info@zyvor.dev
 
-
 package domain
 
 // MigrationConfig mirrors the h2kvmctl YAML configuration keys.
@@ -18,18 +17,19 @@ type MigrationConfig struct {
 	Raw     string `yaml:"raw,omitempty" json:"raw,omitempty"`
 
 	// vSphere
-	VSphereHost     string `yaml:"vsphere_host,omitempty" json:"vsphere_host,omitempty"`
-	VSphereUsername string `yaml:"vsphere_username,omitempty" json:"vsphere_username,omitempty"`
-	VSpherePassword string `yaml:"vsphere_password,omitempty" json:"-"`
-	VSphereInsecure bool   `yaml:"vsphere_insecure,omitempty" json:"vsphere_insecure,omitempty"`
-	VMPath          string `yaml:"vm_path,omitempty" json:"vm_path,omitempty"`
-	Datacenter      string `yaml:"datacenter,omitempty" json:"datacenter,omitempty"`
+	VSphereHost     string `yaml:"vcenter,omitempty" json:"vsphere_host,omitempty"`
+	VSphereUsername string `yaml:"vc_user,omitempty" json:"vsphere_username,omitempty"`
+	VSpherePassword string `yaml:"vc_password,omitempty" json:"-"`
+	VSphereInsecure bool   `yaml:"vc_insecure,omitempty" json:"vsphere_insecure,omitempty"`
+	VMPath          string `yaml:"vs_vm,omitempty" json:"vm_path,omitempty"`
+	Datacenter      string `yaml:"vs_datacenter,omitempty" json:"datacenter,omitempty"`
 	VSAction        string `yaml:"vs_action,omitempty" json:"vs_action,omitempty"`
 
 	// Azure
-	AzureSubscriptionID string `yaml:"azure_subscription_id,omitempty" json:"azure_subscription_id,omitempty"`
-	AzureResourceGroup  string `yaml:"azure_resource_group,omitempty" json:"azure_resource_group,omitempty"`
-	AzureVMName         string `yaml:"azure_vm_name,omitempty" json:"azure_vm_name,omitempty"`
+	AzureSubscriptionID string   `yaml:"azure_subscription,omitempty" json:"azure_subscription_id,omitempty"`
+	AzureResourceGroup  string   `yaml:"azure_resource_group,omitempty" json:"azure_resource_group,omitempty"`
+	AzureVMName         string   `yaml:"-" json:"azure_vm_name,omitempty"` // emitted as azure_vm_names, see MarshalYAML
+	AzureVMNames        []string `yaml:"azure_vm_names,omitempty" json:"-"`
 
 	// Output
 	OutputDir string `yaml:"output_dir,omitempty" json:"output_dir,omitempty"`
@@ -44,7 +44,7 @@ type MigrationConfig struct {
 	// Guest fixes
 	FstabMode         string `yaml:"fstab_mode,omitempty" json:"fstab_mode,omitempty"`
 	RegenInitramfs    bool   `yaml:"regen_initramfs,omitempty" json:"regen_initramfs,omitempty"`
-	UpdateGrub        bool   `yaml:"update_grub,omitempty" json:"update_grub,omitempty"`
+	UpdateGrub        bool   `yaml:"-" json:"update_grub,omitempty"` // h2kvmctl only has --no-grub; false cannot be told from unset
 	RemoveVMwareTools bool   `yaml:"remove_vmware_tools,omitempty" json:"remove_vmware_tools,omitempty"`
 	EnableRDP         bool   `yaml:"enable_rdp,omitempty" json:"enable_rdp,omitempty"`
 	GuestOS           string `yaml:"guest_os,omitempty" json:"guest_os,omitempty"`
@@ -63,7 +63,7 @@ type MigrationConfig struct {
 
 	// Kubernetes
 	DeployK8s bool   `yaml:"deploy_k8s,omitempty" json:"deploy_k8s,omitempty"`
-	Namespace string `yaml:"namespace,omitempty" json:"namespace,omitempty"`
+	Namespace string `yaml:"k8s_namespace,omitempty" json:"namespace,omitempty"`
 
 	// OpenStack (Glance upload + optional Nova boot)
 	DeployOpenStack           bool   `yaml:"deploy_openstack,omitempty" json:"deploy_openstack,omitempty"`
@@ -85,10 +85,10 @@ type MigrationConfig struct {
 	OpenStackWait             bool   `yaml:"openstack_wait,omitempty" json:"openstack_wait,omitempty"`
 
 	// Encryption
-	LUKSPassphrase string `yaml:"luks_passphrase,omitempty" json:"-"`                      // LUKS disk passphrase
-	LUKSKeyfile    string `yaml:"luks_keyfile,omitempty" json:"luks_keyfile,omitempty"`     // Path to LUKS keyfile
-	ClevisUnlock   bool   `yaml:"clevis_unlock,omitempty" json:"clevis_unlock,omitempty"`  // Clevis/NBDE auto-unlock
-	WinTPM         bool   `yaml:"win_tpm,omitempty" json:"win_tpm,omitempty"`              // Windows TPM 2.0
+	LUKSPassphrase string `yaml:"luks_passphrase,omitempty" json:"-"`                         // LUKS disk passphrase
+	LUKSKeyfile    string `yaml:"luks_keyfile,omitempty" json:"luks_keyfile,omitempty"`       // Path to LUKS keyfile
+	ClevisUnlock   bool   `yaml:"luks_clevis,omitempty" json:"clevis_unlock,omitempty"`       // Clevis/NBDE auto-unlock
+	WinTPM         bool   `yaml:"-" json:"win_tpm,omitempty"`                                 // Windows TPM 2.0; no h2kvmctl option yet
 	WinSecureBoot  *bool  `yaml:"win_secure_boot,omitempty" json:"win_secure_boot,omitempty"` // UEFI Secure Boot (KubeVirt: implies SMM)
 
 	// Security
@@ -98,4 +98,15 @@ type MigrationConfig struct {
 	DryRun  bool   `yaml:"dry_run,omitempty" json:"dry_run,omitempty"`
 	Verbose int    `yaml:"verbose,omitempty" json:"verbose,omitempty"`
 	Report  string `yaml:"report,omitempty" json:"report,omitempty"`
+}
+
+// MarshalYAML emits azure_vm_names, the list h2kvmctl reads, from the single
+// VM name the dashboard sends. Every other YAML key is a struct tag above.
+func (c MigrationConfig) MarshalYAML() (interface{}, error) {
+	type plain MigrationConfig // no methods, so marshalling does not recurse
+	out := plain(c)
+	if len(out.AzureVMNames) == 0 && c.AzureVMName != "" {
+		out.AzureVMNames = []string{c.AzureVMName}
+	}
+	return out, nil
 }

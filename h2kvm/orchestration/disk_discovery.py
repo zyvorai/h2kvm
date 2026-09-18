@@ -132,9 +132,9 @@ class DiskDiscovery:  # pylint: disable=too-few-public-methods
                 f"Unknown command: '{cmd}'.\n"
                 f"Supported input sources: {', '.join(valid_cmds)}\n\n"
                 "Examples:\n"
-                "  h2kvmctl local --vmdk /path/to/disk.vmdk\n"
-                "  h2kvmctl ova --ova /path/to/vm.ova\n"
-                "  h2kvmctl vhd --vhd /path/to/disk.vhdx",
+                "  h2kvmctl --cmd local --vmdk /path/to/disk.vmdk\n"
+                "  h2kvmctl --cmd ova --ova /path/to/vm.ova\n"
+                "  h2kvmctl --cmd vhd --vhd /path/to/disk.vhdx",
                 1,
             )
 

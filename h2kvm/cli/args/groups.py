@@ -197,25 +197,29 @@ def _add_fixing_behavior(p: argparse.ArgumentParser) -> None:
         dest="fstab_mode",
         default=FstabMode.STABILIZE_ALL.value,
         choices=[m.value for m in FstabMode],
-        help="fstab rewrite mode: stabilize-all (recommended), bypath-only, noop",
+        help="fstab rewrite mode: stabilize-all (recommended), bypath-only, noop."
+        " Ignored: GuestKit decides fstab changes itself.",
     )
     p.add_argument(
         "--no-grub",
         dest="no_grub",
         action="store_true",
-        help="Skip GRUB root= update and device.map cleanup.",
+        help="Skip GRUB root= update and device.map cleanup."
+        " Ignored by offline repair (GuestKit decides this itself); still honored by --cmd live-fix.",
     )
     p.add_argument(
         "--regen-initramfs",
         dest="regen_initramfs",
         action="store_true",
-        help="Regenerate initramfs + grub config (best-effort).",
+        help="Regenerate initramfs + grub config (best-effort)."
+        " Ignored by offline repair (GuestKit decides this itself); still honored by --cmd live-fix.",
     )
     p.add_argument(
         "--no-regen-initramfs",
         dest="regen_initramfs",
         action="store_false",
-        help="Disable initramfs/grub regen.",
+        help="Disable initramfs/grub regen."
+        " Ignored by offline repair (GuestKit decides this itself); still honored by --cmd live-fix.",
     )
     p.set_defaults(regen_initramfs=True)
     p.add_argument(
