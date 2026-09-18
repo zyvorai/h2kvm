@@ -161,6 +161,7 @@ jobs:
     needs: python-tests
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
@@ -191,6 +192,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y debhelper dh-python
           dpkg-buildpackage -us -uc
+          mkdir -p dist
+          cp ../*.deb dist/
 
       - name: Build RPM package
         if: matrix.package == 'rpm'
@@ -206,8 +209,8 @@ jobs:
           path: |
             dist/*.whl
             dist/*.tar.gz
-            ../*.deb
-            dist/*.rpm
+            dist/*.deb
+          if-no-files-found: warn
           retention-days: 7
 
   # Go web server tests
