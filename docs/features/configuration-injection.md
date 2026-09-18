@@ -779,7 +779,7 @@ firstboot_config:
 Always test configuration injection with `--dry-run` first:
 
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk /path/to/vm.vmdk \
   --manifest /path/to/config.yaml \
   --dry-run

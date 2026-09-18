@@ -29,7 +29,7 @@ function ShotCard({shot}: {shot: Shot}) {
 }
 
 export default function Gallery(): ReactNode {
-  const card = useBaseUrl('/h2kvm-suite-card.png');
+  const card = useBaseUrl('/h2kvm-flow.svg');
   return (
     <Layout
       title="Gallery"
@@ -45,11 +45,11 @@ export default function Gallery(): ReactNode {
       </header>
       <main className="container">
         <div className={styles.demo}>
-          <img src={card} alt="GuestKit, h2kvm, Zorvia, Zeus OS, and Machina" />
+          <img src={card} alt="h2kvm picks up disks from vSphere, ESXi, Azure and local files, repairs them offline with GuestKit, converts to qcow2, then deploys to a KubeVirt cluster (Zorvia, Zeus OS), a libvirt host (Machina) or OpenStack." />
           <p className={styles.caption}>
-            GuestKit inspects the disk. h2kvm lands the VM. Zorvia is where
-            you watch the boot. Zeus OS and Machina are where you keep
-            running it.
+            GuestKit repairs the disk and h2kvm lands the VM on one target.
+            KubeVirt is Zorvia and Zeus OS, libvirt hosts are Machina, and
+            OpenStack is Glance and Nova.
           </p>
         </div>
         <div className={styles.grid}>

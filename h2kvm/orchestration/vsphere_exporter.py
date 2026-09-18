@@ -39,6 +39,42 @@ except ImportError:
     PYVMOMI_AVAILABLE = False
 
 
+_DISK_SUFFIXES = (".vmdk", ".qcow2", ".raw", ".img", ".vdi", ".vhd", ".vhdx")
+# Extents that a VMDK descriptor points at; the descriptor is the disk, not these.
+_VMDK_EXTENT_SUFFIXES = ("-flat.vmdk", "-delta.vmdk", "-sesparse.vmdk", "-ctk.vmdk")
+
+
+def find_exported_disks(logger: logging.Logger, root: Path) -> list[Path]:
+    """Find the disk images an export left under ``root``.
+
+    ``govc export.ovf`` writes ``<vm>.ovfdir/<vm>/*.vmdk``, so the search is
+    recursive. When the export is only an OVA there is no plain disk to find,
+    so the OVA is extracted and its disks are returned instead of the archive.
+    """
+    root = Path(root)
+    disks = sorted(
+        p
+        for p in root.rglob("*")
+        if p.is_file()
+        and p.suffix.lower() in _DISK_SUFFIXES
+        and not p.name.lower().endswith(_VMDK_EXTENT_SUFFIXES)
+        and p.stat().st_size > 0
+    )
+    if disks:
+        return disks
+
+    # pylint: disable-next=import-outside-toplevel  # lazy import: keeps the exporter import light
+    from h2kvm.converters.extractors.ovf import OVF
+
+    for ova in sorted(root.rglob("*.ova")):
+        try:
+            disks.extend(OVF.extract_ova(logger, ova, ova.with_suffix(".extracted")))
+        # pylint: disable-next=broad-exception-caught  # one bad archive must not hide the other exports
+        except Exception as e:
+            logger.warning("Could not extract disks from %s: %s", ova, e)
+    return disks
+
+
 class VsphereExporter:
     """
     Handles vSphere VM export operations.
@@ -113,7 +149,7 @@ class VsphereExporter:
                 2,
                 "pyvmomi is not installed. It is required for vSphere VM export.\n"
                 "Install with: pip install pyvmomi\n"
-                "Or if using govc-only mode: h2kvmctl vsphere --vs-action export_vm",
+                "Or if using govc-only mode: h2kvmctl --cmd vsphere --vs-action export_vm",
             )
 
         vms = self.get_vm_names()
@@ -152,13 +188,6 @@ class VsphereExporter:
             getattr(self.args, "vs_datacenter", None) or getattr(self.args, "vc_datacenter", None) or "auto"
         )
         compute = str(getattr(self.args, "vs_compute", None) or "auto")
-        requested = str(getattr(self.args, "vs_transport", "") or "").strip().lower()
-        if requested == "vddk":
-            raise Fatal(
-                2,
-                "VDDK transport was removed.\n"
-                "Export with govc (export.ovf / export.ova) or HTTPS /folder.",
-            )
 
         snapshot_moref = getattr(self.args, "vs_snapshot_moref", None)
         create_snapshot = bool(getattr(self.args, "vs_create_snapshot", False))
@@ -220,7 +249,7 @@ class VsphereExporter:
                     job_dir = out_root / "vsphere-export" / vm_name
                     U.ensure_dir(job_dir)
 
-                    export_mode = "download_only" if download_only else "export"
+                    export_mode = "download_only" if download_only else "ovf_export"
 
                     Log.trace(self.logger, "🧭 export_mode=%s job_dir=%s", export_mode, job_dir)
 
@@ -244,13 +273,9 @@ class VsphereExporter:
                         self.logger.info("⬇️ vSphere download-only OK: %s -> %s", vm_name, out_path)
                         continue
 
-                    # export_mode == "export": discover artifacts
-                    pats = ["*.qcow2", "*.raw", "*.img", "*.vmdk", "*.vdi"]
-                    imgs: list[Path] = []
-                    for pat in pats:
-                        found = sorted(job_dir.glob(pat))
-                        Log.trace(self.logger, "🔎 vSphere discover: %s/%s -> %d", job_dir, pat, len(found))
-                        imgs.extend(found)
+                    # export_mode == "ovf_export": discover artifacts
+                    imgs = find_exported_disks(self.logger, job_dir)
+                    Log.trace(self.logger, "🔎 vSphere discover: %s -> %d", job_dir, len(imgs))
                     if not imgs:
                         self.logger.warning(
                             "vSphere export produced no outputs for %s in %s", vm_name, job_dir

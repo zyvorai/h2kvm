@@ -31,7 +31,6 @@ Common questions and answers about using H2KVM for VM migration.
 - [What about thin-provisioned disks?](#thin-provisioning)
 - [Why does my OVA conversion use BIOS when the VM is UEFI?](#why-does-my-ova-conversion-use-bios-when-the-vm-is-uefi)
 - [Why is h2kvm using all host CPUs inside my container?](#why-is-h2kvm-using-all-host-cpus-inside-my-container)
-- [Why can't I export VMs with independent disks via VDDK?](#why-cant-i-export-vms-with-independent-disks-via-vddk)
 - [How do I enable offline fixes in the Kubernetes operator?](#how-do-i-enable-offline-fixes-in-the-kubernetes-operator)
 - [Does h2kvm support VDS (vSphere Distributed Switch)?](#does-h2kvm-support-vds-vsphere-distributed-switch)
 
@@ -612,54 +611,6 @@ docker run --cpus=2 ghcr.io/zyvorai/h2kvm:latest python3 -c \
 ```
 
 **See**: [CPU Detector](../../h2kvm/utils/cpu.py)
-
----
-
-### Why can't I export VMs with independent disks via VDDK?
-
-**Problem**: VMware's VDDK library fails when VMs have disks in "independent" mode.
-
-**Root Cause:**
-- Independent disks (persistent/nonpersistent) are excluded from snapshots
-- VDDK export relies on Change Block Tracking (CBT), which requires snapshot support
-- govc and VDDK both fail with: `Cannot open the disk ... or one of the snapshot disks it depends on`
-
-**Detection:**
-
-```bash
-# Check disk mode via govc
-govc vm.info -json my-vm | jq '.VirtualMachines[].Config.Hardware.Device[] | select(.Backing.DiskMode)'
-# Look for: "independent_persistent" or "independent_nonpersistent"
-```
-
-**Workarounds:**
-
-1. **Change Disk Mode** (Requires VM downtime):
-   ```bash
-   # In vSphere UI:
-   # Edit VM Settings → Hard Disk → Mode → Change to "Dependent"
-   # Then export normally
-   ```
-
-2. **Use OVA Export** (No VDDK required):
-   ```yaml
-   command: vsphere
-   vcenter_host: vcenter.example.com
-   vm_name: my-vm
-   vs_action: export_ova      # Uses OVF export, not VDDK
-   output_dir: /kvm/vms
-   ```
-
-3. **Direct Datastore Access** (ESXi only):
-   ```bash
-   # SSH to ESXi host
-   scp /vmfs/volumes/datastore1/my-vm/*.vmdk user@migration-host:/vmware/
-
-   # Then migrate locally
-   h2kvmctl --cmd local --vmdk /vmware/my-vm.vmdk -o /kvm/vms
-   ```
-
-**See**: [govc Export Implementation](../../h2kvm/converters/importers/govc_export.py)
 
 ---
 

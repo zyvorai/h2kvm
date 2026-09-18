@@ -150,7 +150,7 @@ ls -lh /path/to/your-vm.vmdk
 #### Step 2: Run the Conversion
 
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk /path/to/your-vm.vmdk \
   --flatten \
   --to-output /var/lib/libvirt/images/your-vm.qcow2 \
@@ -177,7 +177,7 @@ qemu-img info /var/lib/libvirt/images/your-vm.qcow2
 ### Linux VM with Network/Bootloader Fixes
 
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk linux-vm.vmdk \
   --flatten \
   --to-output linux-vm.qcow2 \
@@ -196,7 +196,7 @@ sudo ./scripts/install-deps.sh --virtio-win
 
 # Convert with driver injection
 # (virtio-win.iso is auto-discovered at /var/lib/h2kvm/virtio-win.iso — no flag needed)
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk windows-vm.vmdk \
   --flatten \
   --to-output windows-vm.qcow2 \
@@ -205,7 +205,7 @@ sudo h2kvmctl local \
   --compress
 
 # Or specify a custom ISO path as an override:
-# sudo h2kvmctl local \
+# sudo h2kvmctl --cmd local \
 #   --vmdk windows-vm.vmdk \
 #   --flatten \
 #   --to-output windows-vm.qcow2 \
@@ -218,7 +218,7 @@ sudo h2kvmctl local \
 ### Fetch VMDK from ESXi and Convert
 
 ```bash
-sudo h2kvmctl fetch-and-fix \
+sudo h2kvmctl --cmd fetch-and-fix \
   --host esxi.example.com \
   --user root \
   --remote /vmfs/volumes/datastore1/vm/vm.vmdk \
@@ -230,7 +230,7 @@ sudo h2kvmctl fetch-and-fix \
 ### Fix Running VM Over SSH (No Conversion)
 
 ```bash
-sudo h2kvmctl live-fix \
+sudo h2kvmctl --cmd live-fix \
   --host 192.168.1.100 \
   --user root \
   --sudo \
@@ -282,7 +282,7 @@ sudo h2kvmctl --config examples/json/10-local/local-linux-basic.json
 ### Test with QEMU (No LibVirt Required)
 
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk test.vmdk \
   --to-output test.qcow2 \
   --qemu-test \
@@ -292,7 +292,7 @@ sudo h2kvmctl local \
 ### Test with LibVirt
 
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk test.vmdk \
   --to-output test.qcow2 \
   --libvirt-test
@@ -361,7 +361,7 @@ sudo modprobe kvm_intel  # or kvm_amd
 ```bash
 # NBD / loop operations — use sudo or wrapper
 export H2KVM_USE_SUDO=1
-sudo h2kvmctl local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
+sudo h2kvmctl --cmd local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
 
 # Output directory must be readable by QEMU (mode 755)
 sudo chmod 755 /var/lib/h2kvm
@@ -384,7 +384,7 @@ See [GUESTKIT.md](../architecture/GUESTKIT.md#permissions-and-ownership) and [tr
 **Solution:**
 ```bash
 # Use absolute paths
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk "$(pwd)/vm.vmdk" \
   --to-output "$(pwd)/output.qcow2"
 ```
@@ -394,7 +394,7 @@ sudo h2kvmctl local \
 **Solution:**
 ```bash
 # Use network fixing
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk vm.vmdk \
   --to-output vm.qcow2 \
   --fix-network
@@ -408,7 +408,7 @@ sudo h2kvmctl local \
 sudo ./scripts/install-deps.sh --virtio-win
 
 # Inject VirtIO drivers (auto-discovered at /var/lib/h2kvm/virtio-win.iso)
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk windows.vmdk \
   --to-output windows.qcow2 \
   --windows \
@@ -446,31 +446,31 @@ sudo h2kvmctl local \
 
 ```bash
 # Basic conversion
-sudo h2kvmctl local --vmdk INPUT.vmdk --to-output OUTPUT.qcow2
+sudo h2kvmctl --cmd local --vmdk INPUT.vmdk --to-output OUTPUT.qcow2
 
 # With compression and flattening
-sudo h2kvmctl local --vmdk INPUT.vmdk --flatten --compress --to-output OUTPUT.qcow2
+sudo h2kvmctl --cmd local --vmdk INPUT.vmdk --flatten --compress --to-output OUTPUT.qcow2
 
 # Linux with fixes
-sudo h2kvmctl local --vmdk INPUT.vmdk --fix-network --fix-bootloader --to-output OUTPUT.qcow2
+sudo h2kvmctl --cmd local --vmdk INPUT.vmdk --fix-network --fix-bootloader --to-output OUTPUT.qcow2
 
 # Windows with VirtIO (auto-discovers /var/lib/h2kvm/virtio-win.iso)
-sudo h2kvmctl local --vmdk INPUT.vmdk --windows --inject-virtio --to-output OUTPUT.qcow2
+sudo h2kvmctl --cmd local --vmdk INPUT.vmdk --windows --inject-virtio --to-output OUTPUT.qcow2
 
 # Fetch from ESXi
-sudo h2kvmctl fetch-and-fix --host ESXI_HOST --remote VMDK_PATH --to-output OUTPUT.qcow2
+sudo h2kvmctl --cmd fetch-and-fix --host ESXI_HOST --remote VMDK_PATH --to-output OUTPUT.qcow2
 
 # Using config file
 sudo h2kvmctl --config CONFIG.json
 
 # Test conversion
-sudo h2kvmctl local --vmdk INPUT.vmdk --to-output OUTPUT.qcow2 --qemu-test
+sudo h2kvmctl --cmd local --vmdk INPUT.vmdk --to-output OUTPUT.qcow2 --qemu-test
 
 # Dry run (preview)
-sudo h2kvmctl local --vmdk INPUT.vmdk --to-output OUTPUT.qcow2 --dry-run
+sudo h2kvmctl --cmd local --vmdk INPUT.vmdk --to-output OUTPUT.qcow2 --dry-run
 
 # Generate report
-sudo h2kvmctl local --vmdk INPUT.vmdk --to-output OUTPUT.qcow2 --report REPORT.md
+sudo h2kvmctl --cmd local --vmdk INPUT.vmdk --to-output OUTPUT.qcow2 --report REPORT.md
 
 # Debug mode
 sudo h2kvmctl --log-level DEBUG local --vmdk INPUT.vmdk --to-output OUTPUT.qcow2
@@ -497,7 +497,7 @@ VMLIST
 # Migrate all VMs
 while read vmdk; do
   name=$(basename "$vmdk" .vmdk)
-  sudo h2kvmctl local \
+  sudo h2kvmctl --cmd local \
     --vmdk "$vmdk" \
     --flatten \
     --to-output "/var/lib/libvirt/images/${name}.qcow2" \
@@ -508,7 +508,7 @@ done < vms.txt
 #### Example: Cloud-Init Injection
 
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk ubuntu-template.vmdk \
   --to-output cloud-ubuntu.qcow2 \
   --inject-cloud-init \

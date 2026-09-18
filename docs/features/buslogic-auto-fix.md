@@ -496,7 +496,6 @@ VM may not boot, but you'll get a migration report with details.
 
 ### External Resources
 
-- [VMware VMDK Specification](https://www.vmware.com/support/developer/vddk/)
 - [KVM Supported Devices](https://www.linux-kvm.org/page/Devices)
 - [Virtio Specification](https://docs.oasis-open.org/virtio/virtio/v1.1/virtio-v1.1.html)
 

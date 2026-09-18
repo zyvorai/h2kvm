@@ -31,7 +31,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pylint: disable=duplicate-code
     # reason: this TYPE_CHECKING-only guestfs stub block is intentionally duplicated
-    # verbatim across fixer modules (see also fixers/bootloader/post_conversion.py) --
+    # verbatim across fixer modules --
     # it's boilerplate, not shared logic worth extracting into a helper import.
     try:
         import guestfs

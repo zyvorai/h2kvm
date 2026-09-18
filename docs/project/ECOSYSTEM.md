@@ -173,13 +173,13 @@ Entry point for all migration operations.
 
 ```bash
 # Local VMDK conversion
-h2kvmctl local --vmdk disk.vmdk --to-output /output/
+h2kvmctl --cmd local --vmdk disk.vmdk --to-output /output/
 
 # vSphere export and convert
-h2kvmctl vsphere --vm-name "Production-VM" --vs-action export
+h2kvmctl --cmd vsphere --vm-name "Production-VM" --vs-action export
 
 # Live SSH fixes
-h2kvmctl live-fix --host 192.168.1.100 --fix-all
+h2kvmctl --cmd live-fix --host 192.168.1.100 --fix-all
 
 # Daemon mode (automated processing)
 h2kvmctl --config daemon.yaml
@@ -505,7 +505,7 @@ pkill hypervisord
 Convert a local VMDK to qcow2 with automatic fixes:
 
 ```bash
-sudo h2kvmctl local \
+sudo h2kvmctl --cmd local \
   --vmdk /vms/windows-server.vmdk \
   --to-output /output/windows-server.qcow2 \
   --win-virtio \
@@ -523,7 +523,7 @@ export GOVC_USERNAME='admin@vsphere.local'
 export GOVC_PASSWORD='password'
 export GOVC_INSECURE=1
 
-sudo h2kvmctl vsphere \
+sudo h2kvmctl --cmd vsphere \
   --vm-name "Production-DB" \
   --vs-action export \
   --to-output /output/production-db/ \

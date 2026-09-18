@@ -1,16 +1,11 @@
 #  Installation Guide (Fedora)
 
-This document describes a **clean, RPM-first installation** on Fedora for VMware → KVM workflows, covering both:
+This document describes a **clean, RPM-first installation** on Fedora for VMware → KVM workflows, covering:
 
  **Control plane**
 
 * vSphere APIs, inventory, orchestration
 * `pyvmomi`, `govc`, optional `ovftool`
-
- **Data plane**
-
-* High-performance disk access via **VMware VDDK**
-* `libvixDiskLib.so`
 
 ---
 
@@ -256,93 +251,21 @@ Because compatibility libraries were installed first,
 
 ---
 
-##  7. Data Plane: VMware VDDK (libvixDiskLib)
-
-For **high-performance VMDK access** (snapshots, block-level reads),
-install **VMware VDDK**.
-
-> Fedora does not ship VDDK. This is expected.
-
-### 📥 Download
-
-👉 [https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest)
-(Tested with **VDDK 9.0.0.0**)
-
----
-
-### 🗂️ Install Layout
-
-```bash
-sudo mkdir -p /opt/vmware
-sudo tar -xzf VMware-vix-disklib-*.tar.gz -C /opt/vmware
-```
-
-Result:
-
-```text
-/opt/vmware/vmware-vix-disklib/
-  ├── bin/
-  ├── lib64/
-  │   ├── libvixDiskLib.so
-  │   ├── libvixDiskLib.so.7
-  │   ├── libvixDiskLib.so.6
-  │   └── libvixDiskLib.so.5
-```
-
----
-
-### 🔗 Register Libraries
-
-```bash
-echo "/opt/vmware/vmware-vix-disklib/lib64" | sudo tee /etc/ld.so.conf.d/vmware-vddk.conf
-sudo ldconfig
-```
-
-Verify:
-
-```bash
-ldconfig -p | grep vixDiskLib
-```
-
----
-
-## 🌍 8. Environment Variables (When Required)
-
-Some workflows require explicit paths:
-
-```bash
-export VIXDISKLIB_DIR=/opt/vmware/vmware-vix-disklib
-export LD_LIBRARY_PATH=/opt/vmware/vmware-vix-disklib/lib64:$LD_LIBRARY_PATH
-```
-
-Persist if needed:
-
-```bash
-sudo tee /etc/profile.d/vddk.sh <<'EOF'
-export VIXDISKLIB_DIR=/opt/vmware/vmware-vix-disklib
-export LD_LIBRARY_PATH=/opt/vmware/vmware-vix-disklib/lib64:$LD_LIBRARY_PATH
-EOF
-```
-
----
-
-##  9. Design Rationale
+##  7. Design Rationale
 
 *  **RPMs for Python** – ABI-safe, reproducible, SELinux-friendly
 * 🧭 **govc** – open-source, fast, default control plane
 *  **ovftool** – optional, proprietary, isolated under `/opt`
-*  **VDDK** – explicit data-plane dependency
 *  **compat libs first** – no runtime failures, no guesswork
 
 This mirrors **real production VMware tooling layouts**.
 
 ---
 
-## 🎉 10. Summary
+## 🎉 8. Summary
 
 ✔ System compatibility libraries installed **first**
 ✔ Fedora RPMs for all Python dependencies
 ✔ `pyvmomi` verified on system Python
 ✔ `govc` installed for control-plane operations
 ✔ `ovftool` ZIP installed cleanly under `/opt`
-✔ VDDK installed and registered for data-plane access

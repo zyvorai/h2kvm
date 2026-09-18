@@ -140,42 +140,6 @@ info = converter.get_info("/path/to/image.qcow2")
 
 Bootloader configuration fixers.
 
-#### `GRUBFixer`
-
-```python
-from h2kvm.fixers.bootloader.grub import GRUBFixer
-import guestfs
-
-g = guestfs.GuestFS(python_return_dict=True)
-g.add_drive("/path/to/image.qcow2")
-g.launch()
-
-fixer = GRUBFixer(root="/dev/sda1", g=g)
-result = fixer.regenerate()
-```
-
-**Methods:**
-
-##### `regenerate()`
-
-Regenerate GRUB configuration for KVM compatibility.
-
-**Returns:**
-```python
-{
-    "success": True,
-    "grub_config": "/boot/grub2/grub.cfg",
-    "initramfs_regenerated": True,
-    "drivers_added": ["virtio_blk", "virtio_scsi"],
-}
-```
-
-##### `detect_grub_version()`
-
-Detect installed GRUB version.
-
-**Returns:** `str` - GRUB version ("grub2", "grub-legacy")
-
 #### `SystemdBootFixer`
 
 For systemd-boot systems.
@@ -668,7 +632,6 @@ print(f"Migrated {successful}/{len(results)} VMs successfully")
 
 ```python
 import guestfs
-from h2kvm.fixers.bootloader.grub import GRUBFixer
 from h2kvm.fixers.network import NetworkFixer
 
 # Open image
@@ -681,9 +644,6 @@ roots = g.inspect_os()
 root = roots[0]
 
 # Apply fixers
-grub_fixer = GRUBFixer(root=root, g=g)
-grub_result = grub_fixer.regenerate()
-
 network_fixer = NetworkFixer(root=root, g=g, distro="rhel")
 network_result = network_fixer.fix_network_config()
 
@@ -692,7 +652,6 @@ g.sync()
 g.umount_all()
 g.close()
 
-print(f"GRUB: {grub_result['success']}")
 print(f"Network: {network_result['interfaces_updated']}")
 ```
 

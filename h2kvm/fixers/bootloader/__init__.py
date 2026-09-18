@@ -8,7 +8,6 @@ Bootloader fixing modules for VMware -> KVM migration.
 
 This package provides bootloader fixes for guest systems:
 - fixer: Bootloader detection and fixing
-- grub: GRUB-specific fixes and configuration
 """
 
 __all__ = []

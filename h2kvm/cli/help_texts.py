@@ -660,7 +660,6 @@ live SSH fix, vSphere\n
  • vSphere export (recommended): govc OVF/OVA export (control+data plane)\n
  • vSphere export (optional): OVF Tool (ovftool) export/deploy (control+data plane)\n
  • vSphere download-only: VM folder file pull via /folder (no inspection)\n
- • vSphere NFC: pyvmomi NFC lease streaming (useful when /folder is blocked)\n
  • vSphere -> direct export: experimental export hook\n
 """
 

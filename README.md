@@ -4,12 +4,12 @@
 
 ### Any hypervisor → KVM. Convert offline. Fix the guest. Deploy with confidence.
 
-Export, convert, and deploy VMs from **VMware, Hyper-V, Nutanix, AWS, Azure, GCP** and more —  
-with offline guest fixes, a web control plane, and a Kubernetes-native operator.
+Pick up VMs from **vSphere, ESXi, Azure**, or any disk you already have (**VMDK, VHDX, VDI, raw, OVA/OVF**) —  
+fix the guest offline, then land it on **KubeVirt, libvirt, or OpenStack**. Web control plane and Kubernetes operator included.
 
-**First-boot science for hypervisor exit** · day-2 on **[Zeus OS](https://zyvor.dev/zeus-os)** · part of the [Zyvor](https://zyvor.dev/?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero) suite
+**First-boot science for hypervisor exit** · lands on KubeVirt (**[Zorvia](https://zyvor.dev/zorvia)** · **[Zeus OS](https://zyvor.dev/zeus-os)**), libvirt (**[Machina](https://zyvor.dev/machina)**) or OpenStack · part of the [Zyvor](https://zyvor.dev/?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero) suite
 
-![h2kvm — any hypervisor to KVM. Convert offline. No VDDK.](docs/social/h2kvm-share-card.png)
+![h2kvm — any hypervisor to KVM. Convert offline.](docs/social/h2kvm-share-card.png)
 
 <br/>
 
@@ -25,7 +25,6 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 [![Watch the demo](https://img.shields.io/badge/Watch_the_demo-22C55E?style=for-the-badge)](https://www.youtube.com/watch?v=lQP1sd5Ftkc)
 
 **[How it works](#how-it-works)** ·
-**[No VDDK](#no-vddk)** ·
 **[Install](#install)** ·
 **[Quick start](#quick-start)** ·
 **[GuestKit](#guestkit)** ·
@@ -41,29 +40,75 @@ with offline guest fixes, a web control plane, and a Kubernetes-native operator.
 
 ## How it works
 
-The disk is fixed before it is powered on. Then you watch it boot, and you can run it on [Zeus OS](https://zyvor.dev/zeus-os) or [Machina](https://zyvor.dev/machina). The public pages are on [zyvor.dev](https://zyvor.dev).
+h2kvm picks up a disk from wherever the VM lives today, repairs the guest **offline** so it boots on KVM the first time, converts it to qcow2, and hands it to **one** deploy target. Nothing is powered on until the disk is fixed.
 
-![GuestKit repairs the disk, h2kvm lands the VM, Zorvia shows the boot, Zeus OS and Machina run it.](docs/social/h2kvm-suite-card.png)
-
-```text
-  source disk
-      →  GuestKit     inspect the disk before power-on     zyvor.dev/guestkit
-      →  h2kvm        any hypervisor to KVM                zyvor.dev/h2kvm
-      →  Zorvia       KubeVirt VMs, no hand-written CRDs   zyvor.dev/zorvia
-      →  Zeus OS      visual OS for KubeVirt               zyvor.dev/zeus-os
-      →  Machina      control plane for libvirt hosts      zyvor.dev/machina
-
-  First boot is planned, and you can see it.
-```
+![h2kvm picks up disks from vSphere, ESXi, Azure and local files, repairs them offline with GuestKit, converts to qcow2, then deploys to a KubeVirt cluster (Zorvia, Zeus OS), a libvirt host (Machina) or OpenStack.](docs/social/h2kvm-flow.svg)
 
 ```mermaid
 flowchart LR
-  Disk["Source disk"] --> GK["GuestKit"]
-  GK --> H["h2kvm"]
-  H --> Z["Zorvia"]
-  Z --> Zeus["Zeus OS"]
-  Z --> Machina["Machina"]
+  subgraph SRC["Sources · pick up"]
+    VS["vSphere<br/>govc · datastore HTTPS"]
+    ESX["ESXi host<br/>ssh stream"]
+    AZ["Azure<br/>az snapshot"]
+    FILES["Files<br/>VMDK · VHD(X) · OVA/OVF · raw"]
+    NTX["Nutanix AHV<br/>via Transiva"]
+  end
+  P["h2kvm<br/>pick up → inspect, flatten → GuestKit repair → qemu-img convert + check"]
+  subgraph KV["KubeVirt cluster · --deploy-k8s"]
+    ZV["Zorvia · Zeus OS"]
+  end
+  subgraph LV["libvirt host · --emit-domain-xml"]
+    MA["Machina"]
+  end
+  subgraph OS["OpenStack · --deploy-openstack"]
+    GN["Glance · Nova"]
+  end
+  VS --> P
+  ESX --> P
+  AZ --> P
+  FILES --> P
+  NTX -.->|"exported file"| P
+  P -->|"k8s API"| KV
+  P -->|"virsh"| LV
+  P -->|"Glance, Nova"| OS
 ```
+
+### Where disks come from
+
+There are no subcommands and no `--source` flag. Pick the mode with `--cmd` (or `cmd:` in a YAML config passed with `--config`).
+
+| Source | How h2kvm picks it up | Entry point | Status |
+|--------|-----------------------|-------------|--------|
+| **vSphere** (govc) | `govc export.ovf` pulls the OVF and disks over an HTTPS NFC lease. h2kvm packs the OVA itself | `--cmd vsphere --vcenter … --vs-vm …` | Implemented |
+| **vSphere** (datastore) | `GET /folder/…` over HTTPS with the vCenter session, resumable | `--cmd vsphere --vs-download-only` | Implemented |
+| **vSphere** (ovftool) | VMware's `ovftool`, if you have it installed | `--cmd vsphere --ovftool-path …` | Implemented, external binary |
+| **ESXi over SSH** | Streams the disk with `ssh … cat`, with progress | `--cmd fetch-and-fix --host … --remote …` | Implemented |
+| **Azure** | `az` CLI: snapshot, SAS URL, ranged HTTPS download | `--cmd azure --azure-resource-group …` | Implemented |
+| **Files you already have** | Disk on the machine running h2kvm. The qemu-img format comes from the suffix | `--cmd local --vmdk FILE` (any format), or `ova`, `ovf`, `vhd`, `raw`, `ami` | Implemented |
+| **Folder or manifest** | The daemon watches a folder. `--manifest` runs a declarative 8-stage pipeline | `--cmd daemon`, `--manifest FILE` | Implemented |
+| **Nutanix AHV** | Not in this repo. [Transiva](https://github.com/zyvorai/transiva) does the NFS pickup, then you feed the file to `--cmd local` | — | Via Transiva |
+| **AWS, Proxmox Backup Server** | Library modules only, not reachable from the CLI | — | Not exposed |
+| **GCP, Xen, VirtualBox, remote Hyper-V** | No pickup code. Their disk files (VDI, VHDX) work as local files | — | Not implemented |
+
+### What happens to the disk
+
+1. **Pick up.** Extract an OVA or VHD, or download the disk, then discover the disk files.
+2. **Inspect and flatten.** VMDKs are inspected first. `--flatten` merges a snapshot chain into one working image.
+3. **Repair offline.** [GuestKit](#guestkit) runs `run_migrate_repair` on the disk image, then h2kvm injects cloud-init, first-boot, network, user, service and hostname config.
+4. **Convert and check.** `qemu-img convert` to qcow2, then `qemu-img check` on the result.
+5. **Deploy, or stop.** Hand the qcow2 to one target below, or keep the file.
+
+### Where the VM lands
+
+| Target | What h2kvm does | Enable with | Zyvor product on top |
+|--------|-----------------|-------------|----------------------|
+| **KubeVirt cluster** | Uploads the disk (containerDisk, CDI `virtctl image-upload`, or a PVC copy), then creates a `kubevirt.io/v1` VirtualMachine on whatever cluster your kubeconfig points at | `--deploy-k8s` | [Zorvia](https://zyvor.dev/zorvia) crafts and watches KubeVirt VMs. [Zeus OS](https://zyvor.dev/zeus-os) is the visual OS for the cluster |
+| **libvirt host** | Emits the domain XML and runs `virsh define`, optionally start, on the host h2kvm runs on | `--emit-domain-xml` | [Machina](https://zyvor.dev/machina) is the control plane for libvirt hosts |
+| **OpenStack** | openstacksdk uploads the qcow2 to Glance and can boot a Nova server. Endpoints come from the Keystone catalog | `--deploy-openstack` | None. Third-party cloud |
+
+- **One target per run.** The CLI and web API reject combining them. See [OpenStack deployment](docs/guides/openstack-deployment.md).
+- **h2kvm has no API link to Zorvia, Zeus OS or Machina.** It deploys to the cluster or host. Those products are what run or manage that endpoint afterwards.
+- **OpenStack failures are non-fatal by default.** A failed Glance or Nova step is logged, and the run still succeeds.
 
 | Product | What zyvor.dev says | Site | Repo |
 |---------|---------------------|------|------|
@@ -73,53 +118,16 @@ flowchart LR
 | [Zeus OS](https://zyvor.dev/zeus-os) | The visual infrastructure OS for KubeVirt | [zyvor.dev/zeus-os](https://zyvor.dev/zeus-os) | [zyvorai/zeus-os](https://github.com/zyvorai/zeus-os) |
 | [Machina](https://zyvor.dev/machina) | One control plane for the libvirt hosts you already run | [zyvor.dev/machina](https://zyvor.dev/machina) | [zyvorai/machina](https://github.com/zyvorai/machina) |
 
-Hypervisor exit fails when the bootloader is wrong, or Windows still points at the old hypervisor, **after** you cut over. GuestKit and h2kvm do that work before power-on. Zorvia is where you watch the VM. Zeus OS and Machina are where you keep running it.
-
----
-
-## No VDDK
-
-Public downloads of VMware’s Virtual Disk Development Kit [ended on 10 September 2026](https://www.theregister.com/virtualization/2026/09/10/vmware-defends-ending-downloads-of-sdk-that-helps-vm-backups-or-migrations-to-rivals/5295421). That SDK is what most VMware-to-KVM tools used to open disks. The use VMware still defends is backup and recovery for select partners — not migration, and not a customer entitlement.
-
-**h2kvm** and **[Transiva](https://github.com/zyvorai/transiva)** do not take that path. Disks leave through the vSphere API and NFS, then convert offline.
-
-```text
-  vSphere                          Nutanix AHV
-     │                                  │
-     ▼                                  ▼
-  NFC lease (HTTPS)                 NFS pickup
-  govc export.ovf / .ova            storage containers
-  datastore /folder
-     │                                  │
-     └──────────────┬───────────────────┘
-                    ▼
-              h2kvm + GuestKit
-           convert · repair · deploy
-                    │
-                    ▼
-         libvirt · KubeVirt · Zeus OS
-
-  VDDK  —  not on this path
-```
-
-| Path | How disks move | VDDK |
-|------|----------------|:----:|
-| **[Transiva](https://github.com/zyvorai/transiva) NFC** | govmomi HTTP NFC lease writes OVF plus disks | No |
-| **h2kvm `govc`** | `export.ovf`, then `export.ova` — the same NFC lease | No |
-| **Datastore HTTPS** | `/folder` download of datastore files | No |
-| **Nutanix** | Transiva NFS pickup of storage containers | No |
-| **Disk already on disk** | `h2kvmctl local` converts VMDK, VHDX, raw, and the other formats | No |
-
-Copying the disk was never the hard part. GuestKit still has to fix VirtIO, GRUB, and Windows before power-on.
+Hypervisor exit fails when the bootloader is wrong, or Windows still points at the old hypervisor, **after** you cut over. GuestKit and h2kvm do that work before power-on. Zorvia and Zeus OS are where you keep running the VM on KubeVirt, and Machina is where you keep running it on libvirt hosts.
 
 ---
 
 ## Install
 
-**v1.3.0** — on PyPI. GuestKit is installed with it.
+**v1.3.0** — on PyPI. GuestKit, the offline repair engine, is the `guestkit` extra.
 
 ```bash
-pip install "h2kvm==1.3.0"
+pip install "h2kvm[guestkit]==1.3.0"
 ```
 
 From source (extras / development):
@@ -146,10 +154,13 @@ Shell Completion is optional. Install argcomplete, then see [docs/getting-starte
 
 ```bash
 # Local VMDK → qcow2 (GuestKit repair is the default backend)
-h2kvmctl local --vmdk ubuntu.vmdk --to-output ubuntu.qcow2 --backend guestkit
+h2kvmctl --cmd local --vmdk ubuntu.vmdk --to-output ubuntu.qcow2 --backend guestkit
 
-# Live migration from vSphere
-h2kvmctl migrate --source vmware --vm web-prod-01 --target kvm
+# vSphere → repair → KubeVirt (there are no subcommands; --cmd picks the mode)
+h2kvmctl --cmd vsphere --vcenter vc.example.com --vc-user admin \
+  --vc-password-env VC_PASSWORD --vs-vm web-prod-01 \
+  --output-dir ./out --to-output web-prod-01.qcow2 --flatten \
+  --deploy-k8s --k8s-namespace vms
 
 # Web dashboard
 h2kweb
@@ -294,7 +305,7 @@ CE is for labs and single-cluster PoC. Moving a Windows estate, SAN-backed waves
 | **Pre-flight** | GuestKit planner | ✅ + **GuestKit fleet risk scoring** |
 | **First-boot** | Strong offline fix | **96.8%** automated path + PS |
 | **Support** | Community | **SLA · LTS · CVE** · hypervisor-exit programs |
-| **Day-2** | Hand off to **Zeus OS** | ✅ Licensed suite path |
+| **Day-2** | Hand off to **Zorvia · Zeus OS** (KubeVirt) or **Machina** (libvirt) | ✅ Licensed suite path |
 
 ### Why teams upgrade
 
@@ -321,16 +332,16 @@ CE is for labs and single-cluster PoC. Moving a Windows estate, SAN-backed waves
 
 ## Where this fits: the Zyvor suite
 
-The buyer path matches [zyvor.dev](https://zyvor.dev): [GuestKit](https://zyvor.dev/guestkit) → [h2kvm](https://zyvor.dev/h2kvm) → [Zorvia](https://zyvor.dev/zorvia), then [Zeus OS](https://zyvor.dev/zeus-os) or [Machina](https://zyvor.dev/machina). See [How it works](#how-it-works).
+[GuestKit](https://zyvor.dev/guestkit) and [h2kvm](https://zyvor.dev/h2kvm) fix the disk and land the VM. Where it lands decides the Zyvor product you run it on: KubeVirt is [Zorvia](https://zyvor.dev/zorvia) and [Zeus OS](https://zyvor.dev/zeus-os), libvirt hosts are [Machina](https://zyvor.dev/machina). See [How it works](#how-it-works).
 
 | Product | Role |
 |---------|------|
 | [GuestKit](https://github.com/zyvorai/guestkit) | Offline disk repair before power-on |
-| **h2kvm** *(this repo)* | Convert and land the VM on KVM and KubeVirt |
-| [Zorvia](https://github.com/zyvorai/zorvia) | Console where you watch the VM boot |
-| [Transiva](https://github.com/zyvorai/transiva) | vSphere · Nutanix export |
-| [Zeus OS](https://zyvor.dev/zeus-os) | Visual infrastructure OS for KubeVirt |
-| [Machina](https://zyvor.dev/machina) | Control plane for the libvirt hosts you already run |
+| **h2kvm** *(this repo)* | Pick up, repair, convert, and land the VM on KubeVirt, libvirt or OpenStack |
+| [Zorvia](https://github.com/zyvorai/zorvia) | KubeVirt endpoint: craft and watch VMs |
+| [Transiva](https://github.com/zyvorai/transiva) | vSphere · Nutanix export (separate repo) |
+| [Zeus OS](https://zyvor.dev/zeus-os) | KubeVirt endpoint: visual infrastructure OS |
+| [Machina](https://zyvor.dev/machina) | libvirt endpoint: control plane for the hosts you already run |
 | [PacketWolf](https://zyvor.dev/packetwolf) | Kernel-native network intelligence |
 
 → [zyvor.dev](https://zyvor.dev) · [hypervisor exit program](https://zyvor.dev/hypervisor-exit)

@@ -206,7 +206,7 @@ sudo du -sh /var/lib/libvirt/images/* | sort -h
 sudo rm -f /var/lib/libvirt/images/*.old
 
 # Or use different output location
-h2kvmctl local --vmdk input.vmdk --to-output /mnt/storage/output.qcow2
+h2kvmctl --cmd local --vmdk input.vmdk --to-output /mnt/storage/output.qcow2
 ```
 
 ### Problem: Image Inspection Fails
@@ -240,7 +240,7 @@ export LIBGUESTFS_BACKEND=direct
 export LIBGUESTFS_HV=/usr/bin/qemu-system-x86_64
 
 # Retry
-h2kvmctl local --vmdk input.vmdk --to-output output.qcow2
+h2kvmctl --cmd local --vmdk input.vmdk --to-output output.qcow2
 ```
 
 ### Problem: Out of Memory
@@ -299,7 +299,7 @@ top
 
 **Use compression:**
 ```bash
-h2kvmctl local --vmdk input.vmdk --to-output output.qcow2 --compress
+h2kvmctl --cmd local --vmdk input.vmdk --to-output output.qcow2 --compress
 ```
 
 **Increase parallelism:**
@@ -310,7 +310,7 @@ h2kvmctl --config batch.yaml  # with parallel_processing: true
 **Use faster storage:**
 ```bash
 # Use SSD/NVMe instead of HDD
-h2kvmctl local --vmdk input.vmdk --to-output /mnt/nvme/output.qcow2
+h2kvmctl --cmd local --vmdk input.vmdk --to-output /mnt/nvme/output.qcow2
 ```
 
 **Tune qemu-img:**
@@ -389,7 +389,7 @@ guestfish -a output.qcow2 -i
 
 **Use auto-detection:**
 ```bash
-h2kvmctl local --vmdk input.vmdk --to-output output.qcow2 --regen-initramfs
+h2kvmctl --cmd local --vmdk input.vmdk --to-output output.qcow2 --regen-initramfs
 ```
 
 ### Problem: GRUB Configuration Broken
@@ -648,7 +648,7 @@ export LIBGUESTFS_TRACE=1
 export H2KVM_DEBUG=1
 
 # Run with verbose output
-h2kvmctl local --vmdk input.vmdk --to-output output.qcow2 -v
+h2kvmctl --cmd local --vmdk input.vmdk --to-output output.qcow2 -v
 ```
 
 ### Capture Detailed Logs
@@ -697,11 +697,11 @@ GuestKit and h2kvm attach disk images via NBD or loop devices. Most hosts requir
 
 ```bash
 # Option A: run migration as root
-sudo h2kvmctl local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
+sudo h2kvmctl --cmd local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
 
 # Option B: sudo wrapper for non-root operators
 export H2KVM_USE_SUDO=1
-h2kvmctl local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
+h2kvmctl --cmd local --vmdk vm.vmdk --to-output /var/lib/h2kvm/out.qcow2
 ```
 
 Ensure `/var/lib/h2kvm` exists and is mode **755** so QEMU can read output images after conversion.
@@ -761,19 +761,19 @@ If you cannot resolve the issue:
 
 ```bash
 # Basic conversion
-h2kvmctl local --vmdk vm.vmdk --to-output vm.qcow2
+h2kvmctl --cmd local --vmdk vm.vmdk --to-output vm.qcow2
 
 # With initramfs regeneration
-h2kvmctl local --vmdk vm.vmdk --to-output vm.qcow2 --regen-initramfs
+h2kvmctl --cmd local --vmdk vm.vmdk --to-output vm.qcow2 --regen-initramfs
 
 # Batch conversion (via config)
 h2kvmctl --config batch.yaml  # with parallel_processing: true
 
 # From vSphere
-h2kvmctl vsphere --vcenter vcenter.example.com --vm-name web-server-01 --to-output web-server-01.qcow2
+h2kvmctl --cmd vsphere --vcenter vcenter.example.com --vm-name web-server-01 --to-output web-server-01.qcow2
 
 # Dry run
-h2kvmctl local --vmdk vm.vmdk --to-output vm.qcow2 --dry-run
+h2kvmctl --cmd local --vmdk vm.vmdk --to-output vm.qcow2 --dry-run
 
 # With manifest
 h2kvmctl --manifest manifest.json --output-dir /var/lib/libvirt/images

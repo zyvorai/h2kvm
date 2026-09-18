@@ -53,7 +53,7 @@ class TestOfflineFixConfigDefaults:
 
     def test_fstab_mode_default(self):
         cfg = OfflineFixConfig(image=Path("/x"))
-        assert cfg.fstab_mode == "by-uuid"
+        assert cfg.fstab_mode == "stabilize-all"
 
     def test_report_path_default(self):
         cfg = OfflineFixConfig(image=Path("/x"))
@@ -230,16 +230,9 @@ try:
 except ImportError:
     _HAS_OFFLINE_FS_FIX = False
 
-# The OfflineFSFix.__init__ converts fstab_mode to the FstabMode enum.
-# The valid enum values are "stabilize-all", "bypath-only", "noop".
-# The OfflineFixConfig default of "by-uuid" is accepted by the dataclass
-# but will fail in OfflineFSFix.__init__. Use a valid value in these tests.
-_VALID_FSTAB_MODE = "stabilize-all"
-
-
 def _make_config(**overrides):
-    """Helper: create OfflineFixConfig with a valid fstab_mode for OfflineFSFix."""
-    defaults = dict(image=Path("/disk.qcow2"), fstab_mode=_VALID_FSTAB_MODE)
+    """Helper: create an OfflineFixConfig for OfflineFSFix."""
+    defaults = dict(image=Path("/disk.qcow2"))
     defaults.update(overrides)
     return OfflineFixConfig(**defaults)
 
@@ -321,3 +314,81 @@ class TestOfflineFSFixInit:
         cfg = _make_config(conversion_dir="/tmp/conv")
         fixer = OfflineFSFix(mock_logger, cfg)
         assert fixer.conversion_dir == "/tmp/conv"
+
+
+# ---------------------------------------------------------------------------
+# GuestKit routing: what run() does with backend / ignored options / resize
+# ---------------------------------------------------------------------------
+
+_GK_RESULT = {"applied": True, "dry_run": False, "assessment_score": 0.9, "message": "ok", "notes": []}
+
+
+@pytest.mark.skipif(not _HAS_OFFLINE_FS_FIX, reason="OfflineFSFix import failed (missing deps)")
+class TestGuestKitPipelineOptions:
+    """GuestKit owns fstab/GRUB/initramfs, so options it cannot honor must be reported."""
+
+    @pytest.mark.parametrize("backend", ["guestkit", "guestfs", "auto", None])
+    def test_backends_route_to_guestkit(self, mock_logger, backend):
+        fixer = OfflineFSFix(mock_logger, _make_config(backend=backend))
+        assert fixer._uses_guestkit_repair() is True
+
+    def test_bare_config_builds_a_fixer(self, mock_logger):
+        """The default fstab_mode must be a real FstabMode, or __init__ raises ValueError."""
+        fixer = OfflineFSFix(mock_logger, OfflineFixConfig(image=Path("/disk.qcow2")))
+        assert fixer.fstab_mode.value == "stabilize-all"
+
+    def test_defaults_ignore_nothing(self, mock_logger):
+        fixer = OfflineFSFix(mock_logger, _make_config())
+        assert fixer._guestkit_ignored_options() == {}
+
+    def test_non_default_options_are_listed(self, mock_logger):
+        cfg = _make_config(fstab_mode="noop", update_grub=False, regen_initramfs=False)
+        fixer = OfflineFSFix(mock_logger, cfg)
+        assert fixer._guestkit_ignored_options() == {
+            "fstab_mode": "noop",
+            "no_grub": True,
+            "regen_initramfs": False,
+        }
+
+    def test_run_warns_and_reports_ignored_options(self, mock_logger):
+        fixer = OfflineFSFix(mock_logger, _make_config(fstab_mode="noop", update_grub=False))
+        fixer.write_report = MagicMock()
+        with patch("h2kvm.core.guestkit_client.migrate_repair", return_value=_GK_RESULT):
+            fixer.run()
+        warned = " ".join(str(c) for c in mock_logger.warning.call_args_list)
+        assert "fstab_mode=noop" in warned
+        assert "no_grub=True" in warned
+        assert fixer.report["analysis"]["guestkit"]["ignored_options"] == {
+            "fstab_mode": "noop",
+            "no_grub": True,
+        }
+
+    def test_run_is_quiet_with_defaults(self, mock_logger):
+        fixer = OfflineFSFix(mock_logger, _make_config())
+        fixer.write_report = MagicMock()
+        with patch("h2kvm.core.guestkit_client.migrate_repair", return_value=_GK_RESULT):
+            fixer.run()
+        assert not any("had no effect" in str(c) for c in mock_logger.warning.call_args_list)
+        assert fixer.report["analysis"]["guestkit"]["ignored_options"] == {}
+
+    def test_resize_runs_before_repair(self, mock_logger):
+        fixer = OfflineFSFix(mock_logger, _make_config(resize="+10G"))
+        fixer.write_report = MagicMock()
+        order = MagicMock()
+        fixer._utilities.resize_image_container = order.resize
+        order.resize.return_value = {"image_resize": "ok"}
+        with patch("h2kvm.core.guestkit_client.migrate_repair", order.repair):
+            order.repair.return_value = _GK_RESULT
+            fixer.run()
+        assert [c[0] for c in order.mock_calls] == ["resize", "repair"]
+        order.resize.assert_called_once_with(Path("/disk.qcow2"), "+10G", False)
+        assert fixer.report["analysis"]["image_resize"] == {"image_resize": "ok"}
+
+    def test_no_resize_when_unset(self, mock_logger):
+        fixer = OfflineFSFix(mock_logger, _make_config())
+        fixer.write_report = MagicMock()
+        fixer._utilities.resize_image_container = MagicMock()
+        with patch("h2kvm.core.guestkit_client.migrate_repair", return_value=_GK_RESULT):
+            fixer.run()
+        fixer._utilities.resize_image_container.assert_not_called()
+        assert "image_resize" not in fixer.report["analysis"]

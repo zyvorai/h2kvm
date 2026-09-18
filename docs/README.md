@@ -30,8 +30,9 @@ Part of the [Zyvor / HyperSDK platform stack](https://zyvor.dev):
 | Product | Role |
 |---------|------|
 | **hypercluster** | Kubernetes bootstrap |
-| **machina** | Bare-metal hypervisor OS |
-| **zeus-os (v9s)** | Cloud / KubeVirt control plane |
+| **machina** | Control plane for libvirt hosts |
+| **zeus-os (v9s)** | Visual infrastructure OS for KubeVirt |
+| **zorvia** | Craft and run KubeVirt VMs without hand-written CRDs |
 | **forge** | AI infrastructure on K8s |
 | **h2kvm** | VM conversion + deploy (this repo's pipeline partner) |
 | **guestkit** | Offline VM assurance (`hypersdk-guestkit`) |

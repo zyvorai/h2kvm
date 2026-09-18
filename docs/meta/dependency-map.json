@@ -1,6 +1,6 @@
 {
-  "module_count": 519,
-  "edge_count": 818,
+  "module_count": 517,
+  "edge_count": 812,
   "modules": [
     "h2kvm",
     "h2kvm.__main__",
@@ -490,8 +490,6 @@
     "h2kvm.vmware.transports.hyperctl_common",
     "h2kvm.vmware.transports.ovftool_client",
     "h2kvm.vmware.transports.ovftool_loader",
-    "h2kvm.vmware.transports.vddk_client",
-    "h2kvm.vmware.transports.vddk_loader",
     "h2kvm.vmware.utils.datastore",
     "h2kvm.vmware.utils.utils",
     "h2kvm.vmware.utils.vmdk_parser",
@@ -3441,14 +3439,6 @@
     },
     {
       "from": "h2kvm.vmware.clients.client",
-      "to": "h2kvm.vmware.transports.vddk_client"
-    },
-    {
-      "from": "h2kvm.vmware.clients.client",
-      "to": "h2kvm.vmware.transports.vddk_loader"
-    },
-    {
-      "from": "h2kvm.vmware.clients.client",
       "to": "h2kvm.vmware.utils.datastore"
     },
     {
@@ -3530,22 +3520,6 @@
     {
       "from": "h2kvm.vmware.transports.ovftool_loader",
       "to": "h2kvm.vmware.utils.utils"
-    },
-    {
-      "from": "h2kvm.vmware.transports.vddk_loader",
-      "to": "h2kvm.core.exceptions"
-    },
-    {
-      "from": "h2kvm.vmware.transports.vddk_loader",
-      "to": "h2kvm.vmware.clients.client"
-    },
-    {
-      "from": "h2kvm.vmware.transports.vddk_loader",
-      "to": "h2kvm.vmware.transports.http_client"
-    },
-    {
-      "from": "h2kvm.vmware.transports.vddk_loader",
-      "to": "h2kvm.vmware.transports.vddk_client"
     },
     {
       "from": "h2kvm.vmware.utils.datastore",
@@ -3808,14 +3782,14 @@
       "count": 143
     },
     {
-      "from": "vmware",
-      "to": "vmware",
-      "count": 38
-    },
-    {
       "from": "fixers",
       "to": "core",
       "count": 35
+    },
+    {
+      "from": "vmware",
+      "to": "vmware",
+      "count": 33
     },
     {
       "from": "worker",
@@ -3825,7 +3799,7 @@
     {
       "from": "vmware",
       "to": "core",
-      "count": 20
+      "count": 19
     },
     {
       "from": "orchestrator",
@@ -4722,7 +4696,7 @@
     {
       "package": "core",
       "imports_out": 170,
-      "imports_in": 306
+      "imports_in": 305
     },
     {
       "package": "daemon",
@@ -5126,8 +5100,8 @@
     },
     {
       "package": "vmware",
-      "imports_out": 59,
-      "imports_in": 48
+      "imports_out": 53,
+      "imports_in": 43
     },
     {
       "package": "vsphere_exporter",

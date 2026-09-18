@@ -390,7 +390,7 @@ vault kv put secret/h2kvm/vsphere \
 export VSPHERE_USERNAME=$(vault kv get -field=username secret/h2kvm/vsphere)
 export VSPHERE_PASSWORD=$(vault kv get -field=password secret/h2kvm/vsphere)
 
-h2kvmctl vsphere --vc-user "$VSPHERE_USERNAME" --vc-password "$VSPHERE_PASSWORD" ...
+h2kvmctl --cmd vsphere --vc-user "$VSPHERE_USERNAME" --vc-password "$VSPHERE_PASSWORD" ...
 ```
 
 ### Use Kubernetes Secrets

@@ -538,7 +538,6 @@ Supported `vs_action` values in your parser:
 * `query_changed_disk_areas`
 * `cbt_sync`
 * `download_only_vm`
-* `vddk_download_disk`
 
 ### Action-scoped flags (available globally)
 
@@ -571,7 +570,7 @@ Download-only:
 
 * Actions requiring a VM name:
   `vm_disks`, `select_disk`, `download_vm_disk`, `cbt_sync`, `create_snapshot`,
-  `enable_cbt`, `query_changed_disk_areas`, `download_only_vm`, `vddk_download_disk`
+  `enable_cbt`, `query_changed_disk_areas`, `download_only_vm`
 
   * require `vm_name` (config or CLI `--vm_name`)
 
@@ -587,7 +586,7 @@ Download-only:
 
   * requires `datastore`, `ds_path`, `local_path`
 
-* `download_vm_disk` / `vddk_download_disk` / `cbt_sync`
+* `download_vm_disk` / `cbt_sync`
 
   * requires `local_path`
 

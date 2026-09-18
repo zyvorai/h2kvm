@@ -5,52 +5,49 @@ Completed comprehensive exception handling improvements across the h2kvm codebas
 
 ## Commits
 
-### Commit 1: `4242c65` - User-Friendly Exception Handling (28 files)
+### Commit 1: `4242c65` - User-Friendly Exception Handling
 **Message:** "improve: make exception handling user-friendly across entire codebase"
 
 **Scope:**
-- 28 files changed
-- 680 insertions, 53 deletions
+- Codebase-wide exception handling cleanup
 - Comprehensive documentation created
 
 **Changes:**
-1. **Fixed Critical Bare Except** (1 file)
-   - `h2kvm/core/storage_enhanced.py:539`
+1. **Fixed Critical Bare Except**
+   - `h2kvm/core/storage_enhanced.py`
    - Replaced dangerous bare `except:` with specific exception types
 
-2. **Updated Systemd Wrappers** (19 files)
+2. **Updated Systemd Wrappers**
    - Replaced `RuntimeError` with `SystemdError`
    - Added installation instructions for each systemd tool
    - Proper exit codes (127 for command not found)
 
-3. **Configuration Errors** (3 files)
+3. **Configuration Errors**
    - `h2kvm/cli/config.py`
    - `h2kvm/infrastructure/ssh/ssh_config.py`
    - Replaced `ValueError` with `ConfigurationError`
    - Added helpful context and solutions
 
-4. **Infrastructure Improvements** (3 files)
+4. **Infrastructure Improvements**
    - `h2kvm/infrastructure/deployers/kubernetes.py`
    - `h2kvm/infrastructure/rollback/snapshot_manager.py`
    - Added kubectl troubleshooting commands
    - Proper exception types for disk operations
 
-5. **Windows Drivers** (2 files)
+5. **Windows Drivers**
    - `h2kvm/fixers/windows/network_fixer.py`
    - `h2kvm/fixers/windows/virtio/detection.py`
    - Replaced cryptic `AttributeError(fn_name)` with descriptive messages
 
-6. **CLI Error Output** (1 file)
+6. **CLI Error Output**
    - `h2kvm/__main__.py`
    - Verbosity-aware error formatting
    - Progressive detail levels: normal, `-v`, `-vv`
 
-### Commit 2: `db1d1ec` - Critical Path Error Messages (4 files)
+### Commit 2: `db1d1ec` - Critical Path Error Messages
 **Message:** "fix: improve error messages in critical migration paths"
 
 **Scope:**
-- 4 files changed
-- 78 insertions, 11 deletions
 - Focus on core conversion and VMware provider paths
 
 **Changes:**
@@ -60,52 +57,42 @@ Completed comprehensive exception handling improvements across the h2kvm codebas
    - Added `DiskConversionError` with troubleshooting steps
    - Covers: flatten_via_convert_retry, flatten_fast, SCP downloads
 
-2. **VMware VDDK Transport** (1 file)
-   - `h2kvm/providers/vmware/transports/vddk_client.py`
-   - Fixed 7 instances of "VDDK library not loaded"
-   - Added download URL and installation guidance
-   - Proper `VDDKError` usage throughout
-
-3. **VMware govc Export** (1 file)
+2. **VMware govc Export** (1 file)
    - `h2kvm/providers/vmware/transports/govc_export.py`
    - Fixed "Process stdout unexpectedly None"
    - Added govc installation instructions with GitHub URL
 
-4. **VMware OVF Tool** (1 file)
+3. **VMware OVF Tool** (1 file)
    - `h2kvm/providers/vmware/transports/ovftool_client.py`
    - Fixed "Process stdout/stderr unexpectedly None"
    - Added ovftool installation guidance
 
 ## Impact Summary
 
-### Total Files Modified: 32 files
-### Total Lines Changed:
-- **Added:** 758 lines
-- **Removed:** 64 lines
-- **Net:** +694 lines
+The change sets above cover the subsystems below. Exact file and line totals are not recorded here because the original commits are not present in this repository's history.
 
 ### Coverage by Subsystem
 
-| Subsystem | Files | Impact | Status |
-|-----------|-------|--------|--------|
-| Systemd Wrappers | 19 | All RuntimeError → SystemdError | ✅ Complete |
-| Core Infrastructure | 3 | Kubernetes, SSH, Snapshots | ✅ Complete |
-| Configuration | 3 | YAML/JSON, CLI args, SSH config | ✅ Complete |
-| Windows Fixers | 2 | Registry access errors | ✅ Complete |
-| Disk Conversion | 1 | Critical path flatten operations | ✅ Complete |
-| VMware Providers | 3 | VDDK, govc, ovftool | ✅ Complete |
-| CLI Entry Point | 1 | Verbosity-aware formatting | ✅ Complete |
+| Subsystem | Impact | Status |
+|-----------|--------|--------|
+| Systemd Wrappers | All RuntimeError → SystemdError | ✅ Complete |
+| Core Infrastructure | Kubernetes, SSH, Snapshots | ✅ Complete |
+| Configuration | YAML/JSON, CLI args, SSH config | ✅ Complete |
+| Windows Fixers | Registry access errors | ✅ Complete |
+| Disk Conversion | Critical path flatten operations | ✅ Complete |
+| VMware Providers | govc, ovftool | ✅ Complete |
+| CLI Entry Point | Verbosity-aware formatting | ✅ Complete |
 
 ### Remaining Opportunities (Non-Critical)
 
 Based on comprehensive review, these areas have improvement opportunities but are **not blocking**:
 
 #### HIGH Priority (Should address in next iteration)
-1. **`guestkit/augeas_mgr.py`** - 15 RuntimeError instances
+1. **`guestkit/augeas_mgr.py`** - RuntimeError usage
    - Low-level Augeas config editing errors
    - Could benefit from user-facing guidance
 
-2. **`guestkit/nbd.py`** - 20 RuntimeError instances
+2. **`guestkit/nbd.py`** - RuntimeError usage
    - NBD disk mounting errors
    - Add context about what operation failed
 
@@ -114,7 +101,7 @@ Based on comprehensive review, these areas have improvement opportunities but ar
    - Use WindowsFixerError with helpful context
 
 #### MEDIUM Priority (Enhancement)
-4. **Diagnostic logging** - Add `logger.debug()` before `contextlib.suppress()` calls (97 instances)
+4. **Diagnostic logging** - Add `logger.debug()` before `contextlib.suppress()` calls
 5. **Documentation** - Create exception handling guide for library users
 6. **Testing** - Add tests verifying helpful error messages
 
@@ -122,13 +109,10 @@ Based on comprehensive review, these areas have improvement opportunities but ar
 
 ### Exception Handling Assessment
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Bare excepts (main code) | 1 | 0 | ✅ 100% |
-| User-friendly messages | ~40% | ~85% | ✅ 45% gain |
-| Specific exception types | ~60% | ~90% | ✅ 30% gain |
-| Installation guidance | ~10% | ~70% | ✅ 60% gain |
-| Verbosity support | ❌ None | ✅ Full | ✅ New feature |
+| Metric | Before | After |
+|--------|--------|-------|
+| Bare excepts (main code) | 1 | 0 |
+| Verbosity support | ❌ None | ✅ Full |
 
 ### Error Message Quality
 
@@ -197,7 +181,6 @@ All missing dependency errors now include:
 
 **Examples:**
 - Systemd tools: `apt install systemd-container`
-- VDDK: https://developer.vmware.com/web/sdk/8.0/vddk
 - govc: https://github.com/vmware/govmomi/releases
 - PyYAML: `pip install pyyaml`
 
@@ -211,7 +194,7 @@ h2kvmctl --config test.yaml -v     # With solutions
 h2kvmctl --config test.yaml -vv    # Full traceback
 
 # Test missing dependencies
-# (without systemd-vmspawn, kubernetes, VDDK, etc.)
+# (without systemd-vmspawn, kubernetes, etc.)
 
 # Test critical paths
 # - Disk flattening with corrupted image
@@ -250,6 +233,4 @@ Remaining improvements are enhancements rather than fixes. The core migration pa
 ---
 
 **Last Updated:** 2026-03-29
-**Review Scope:** 100% of main codebase (excluding tests/examples)
 **Commits:** 2 (`4242c65`, `db1d1ec`)
-**Total Impact:** 32 files, ~700 lines improved

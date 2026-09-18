@@ -47,7 +47,7 @@ graph LR
 **Purpose:** Acquire source VM disks
 
 **Sources:**
-- vSphere (VDDK, HTTP, SSH)
+- vSphere (HTTP, SSH)
 - Azure (Managed Disk download)
 - Hyper-V (VHD/VHDX files)
 - Local filesystem
@@ -350,7 +350,7 @@ graph TD
 
 **3. VsphereExporter** (optional)
 - vSphere-specific export logic
-- VDDK/HTTP transport
+- HTTP transport
 
 ---
 

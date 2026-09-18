@@ -234,7 +234,7 @@ h2kvmctl convert --vhd FILE --output FILE [OPTIONS]
 **Remote Operations**:
 ```bash
 h2kvmctl fetch --host HOST --remote PATH [OPTIONS]
-h2kvmctl live-fix --host HOST [OPTIONS]
+h2kvmctl --cmd live-fix --host HOST [OPTIONS]
 ```
 
 **Inspection**:

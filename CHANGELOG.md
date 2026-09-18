@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The web console wrote YAML keys h2kvmctl ignores (`vsphere_host`, `vm_path`, `azure_subscription_id`, and others), so vSphere and Azure jobs never received their host, credentials, or VM name.
+- `--vs-export` found no disks because govc writes them under `<vm>.ovfdir/<vm>/`. It now searches recursively and extracts OVA-only exports.
+- `--backend guestfs` failed with a misleading "install GuestKit" error. It now routes to GuestKit like `auto`.
+- `--resize` did nothing. It runs `qemu-img resize` before repair again.
+- The container's daemon mode ran `h2kvmctl daemon`, which is not a valid invocation.
+- `OfflineFixConfig.fstab_mode` defaulted to a value that is not a valid `FstabMode`.
+- Help text and error messages showed the invalid `h2kvmctl local ...` form. There are no subcommands; use `--cmd`.
+
+### Changed
+
+- Offline repair ignores `--fstab-mode`, `--no-grub`, and `--regen-initramfs`, because GuestKit decides those changes itself. The run now logs a warning and records the ignored options in the report. `--cmd live-fix` still honors `--no-grub` and `--regen-initramfs`.
+- README: the flow diagram now shows sources, the pipeline, and the three deploy targets (KubeVirt, libvirt, OpenStack), with Zorvia and Zeus OS on KubeVirt and Machina on libvirt hosts.
+
+### Removed
+
+- The unreachable in-process fixer path in `OfflineFSFix` (about 2,000 lines) and the modules only it used: `fixers/bootloader/grub.py` (`GRUBFixer`), `fixers/bootloader/post_conversion.py`, `fixers/offline/models.py`, `fixers/offline/vmware_tools_remover.py`, and `fixers/windows/fixer.py`.
+
 ## [1.3.0] - 2026-09-18
 
 ### Changed
@@ -38,7 +57,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The text UI.
 - The old external conversion path. Conversion stays inside h2kvm.
-- VDDK. Disks leave through the vSphere API and NFS.
 
 ## [1.1.0] - 2026-08-31
 
@@ -127,7 +145,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - OVF firmware detection: auto-detect UEFI from vmw:Config, ExtraConfig, ResourceSubType, BootType in OVF XML
 - Cgroup-aware CPU detection: respect container CPU limits (cgroup v2 cpu.max, cgroup v1 cfs_quota, sched_getaffinity)
-- VMware independent disk mode detection with clear error messages for VDDK >= 7.0
+- VMware independent disk mode detection with clear error messages
 - SELinux autorelabel (/.autorelabel) after offline filesystem modifications
 - OVA manifest checksum validation (SHA256/SHA1/SHA512/MD5)
 - VDS (vSphere Distributed Switch) network interface parsing
@@ -3198,7 +3216,7 @@ Comprehensive Windows-specific migration support with automated license reactiva
 - **CRITICAL**: Replaced 43 assert statements across 11 files with proper runtime validation
   - h2kvm/vmware/clients/client.py (13 asserts)
   - h2kvm/vmware/utils/v2v.py (10 asserts)
-  - h2kvm/vmware/transports/vddk_client.py (6 asserts)
+  - h2kvm/vmware/transports (6 asserts)
   - h2kvm/converters/flatten.py (4 asserts)
   - h2kvm/converters/qemu/converter.py (2 asserts)
   - h2kvm/vmware/transports/ovftool_client.py (2 asserts)

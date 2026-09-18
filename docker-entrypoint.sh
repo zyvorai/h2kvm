@@ -24,7 +24,7 @@ case "${H2KVM_MODE:-cli}" in
         log "ERROR: Daemon config not found at $DAEMON_CONFIG"
         exit 1
     fi
-    exec h2kvmctl daemon --config "$DAEMON_CONFIG"
+    exec h2kvmctl --cmd daemon --config "$DAEMON_CONFIG"
     ;;
 
   batch)

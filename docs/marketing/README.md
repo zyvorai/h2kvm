@@ -2,8 +2,6 @@
 
 This directory contains professionally crafted LinkedIn content to promote h2kvm and engage with the DevOps/Infrastructure community.
 
-**VDDK counter (10 Sep 2026):** [article](vddk-was-never-the-exit.md) · [LinkedIn post](vddk-linkedin-post.md) · [share image](../social/h2kvm-no-vddk-card.png)
-
 ## 📦 What's Included
 
 ### 1. Full Article (`h2kvm-linkedin-article.md`)

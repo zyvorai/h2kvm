@@ -47,11 +47,10 @@
 ### Original Problem
 Module-level `import guestfs` and `import hivex` statements failed when libraries weren't installed in container.
 
-### Files Fixed (12 total)
+### Files Fixed (11 total)
 Made imports conditional using try/except pattern:
 
-**guestfs imports (8 files):**
-- `h2kvm/fixers/windows/fixer.py`
+**guestfs imports (7 files):**
 - `h2kvm/fixers/windows/virtio/core.py`
 - `h2kvm/fixers/windows/virtio/install.py`
 - `h2kvm/fixers/windows/virtio/windows_virtio_utils.py`

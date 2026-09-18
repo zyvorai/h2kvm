@@ -215,13 +215,13 @@ def _safe_rel_ds_path(ds_path: str) -> str:
 
 # Transport Policy Functions
 def _get_transport_preference(args: argparse.Namespace) -> str:
-    """Datastore file downloads use HTTPS. VDDK is not a transport."""
+    """Datastore file downloads use HTTPS."""
     v = getattr(args, "vs_transport", None) or getattr(args, "vs_download_transport", None)
     if not v:
         v = os.environ.get("VMDK2KVM_VSPHERE_TRANSPORT") or os.environ.get("VSPHERE_TRANSPORT")
     v = str(v).strip().lower() if v else "https"
-    if v == "vddk":
-        logging.getLogger(__name__).warning("VDDK transport was removed; using HTTPS /folder instead.")
+    if v not in ("https", "http", "auto"):
+        logging.getLogger(__name__).warning("Unsupported vSphere transport %r; using HTTPS /folder instead.", v)
     return "https"
 
 
@@ -769,7 +769,7 @@ class VsphereMode:
     CLI entry for vSphere actions.
 
     Policy:
-      - Datastore downloads use HTTPS /folder. VDDK is not a transport.
+      - Datastore downloads use HTTPS /folder.
       - Export priority: OVF -> OVA -> HTTP/HTTPS folder
       - Control-plane: prefer govc (inventory/export). pyvmomi mainly for /folder cookie downloads.
     """
@@ -1100,7 +1100,7 @@ class VsphereMode:
             2,
             f"vsphere: unknown action '{action}'.\n"
             f"Valid actions: {', '.join(valid_actions)}\n"
-            "Example: h2kvmctl vsphere --vs-action export_vm --vm-name MyVM",
+            "Example: h2kvmctl --cmd vsphere --vs-action export_vm --vm-name MyVM",
         )
 
     def _handle_list_vm_names(self) -> int:

@@ -7,7 +7,6 @@
 Windows guest fixing modules.
 
 This package provides Windows-specific guest modifications for VMware -> KVM migration:
-- fixer: Main Windows fixer
 - network_fixer: Windows network configuration fixes
 - registry_core: High-level registry manipulation
 - registry/: Low-level registry modules

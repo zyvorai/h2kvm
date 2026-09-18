@@ -57,7 +57,7 @@ sudo h2kvmctl --cmd local \
 ### 3. Quick Migration (Default Settings)
 
 ```bash
-h2kvmctl migrate local /vmware/myvm.vmdk --output /kvm/vms/myvm.qcow2
+h2kvmctl --cmd local --vmdk /vmware/myvm.vmdk --to-output /kvm/vms/myvm.qcow2
 ```
 
 ### 3. Interactive TUI Mode
@@ -188,8 +188,8 @@ h2kvmctl fix ssh 192.168.1.100 --user root --key ~/.ssh/id_rsa
 # View logs
 journalctl -u h2kvm -f
 
-# Check daemon jobs
-h2kvmctl daemon list
+# Check the daemon (control socket)
+python3 -m h2kvm.cli.daemon_ctl status
 
 # Validate QCOW2
 qemu-img check /kvm/vms/myvm.qcow2

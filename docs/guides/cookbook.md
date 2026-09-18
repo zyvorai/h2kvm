@@ -318,7 +318,7 @@ verbose: 1
 ### CLI
 
 ```bash
-h2kvmctl vsphere \
+h2kvmctl --cmd vsphere \
   --vcenter vcenter.example.com \
   --vc-user administrator@vsphere.local \
   --vc-password-env VC_PASSWORD \
@@ -348,7 +348,7 @@ json: true
 ### CLI
 
 ```bash
-h2kvmctl vsphere \
+h2kvmctl --cmd vsphere \
   --vcenter vcenter.example.com \
   --vc-user administrator@vsphere.local \
   --vc-password-env VC_PASSWORD \
@@ -382,7 +382,7 @@ local_path: ./downloads/myVM-disk0.vmdk
 ### CLI
 
 ```bash
-h2kvmctl vsphere \
+h2kvmctl --cmd vsphere \
   --vcenter vcenter.example.com \
   --vc-user administrator@vsphere.local \
   --vc-password-env VC_PASSWORD \
@@ -424,7 +424,7 @@ This uses:
 ### CLI
 
 ```bash
-h2kvmctl vsphere \
+h2kvmctl --cmd vsphere \
   --vcenter vcenter.example.com \
   --vc-user administrator@vsphere.local \
   --vc-password-env VC_PASSWORD \

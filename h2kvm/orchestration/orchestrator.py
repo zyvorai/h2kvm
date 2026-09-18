@@ -40,7 +40,7 @@ from h2kvm.quality.testing.qemu_tester import QemuTest
 from .azure_exporter import AzureExporter
 from .disk_discovery import DiskDiscovery
 from .disk_processor import DiskProcessor
-from .vsphere_exporter import VsphereExporter
+from .vsphere_exporter import VsphereExporter, find_exported_disks
 
 if TYPE_CHECKING:
     import argparse
@@ -299,12 +299,7 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
 
     def _discover_exported_disks(self, out_root: Path) -> list[Path]:
         """Discover VMDK/qcow2/raw disk images in output directory after vSphere export."""
-        pats = ["**/*.vmdk", "**/*.qcow2", "**/*.raw", "**/*.img", "**/*.ova", "**/*.vhd", "**/*.vhdx"]
-        disks: list[Path] = []
-        for pat in pats:
-            for p in sorted(out_root.glob(pat)):
-                if p.is_file() and p.stat().st_size > 0:
-                    disks.append(p)
+        disks = find_exported_disks(self.logger, out_root)
         if disks:
             self.logger.info(
                 "📦 Discovered %d exported disk(s) for pipeline: %s", len(disks), [str(d) for d in disks]

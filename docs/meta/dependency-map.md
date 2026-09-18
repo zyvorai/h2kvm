@@ -1,6 +1,6 @@
 # Dependency Map
 
-Generated from static imports in `h2kvm/` (modules: 519, edges: 818).
+Generated from static imports in `h2kvm/` (modules: 517, edges: 812).
 
 ## Top Package Edges
 
@@ -8,10 +8,10 @@ Generated from static imports in `h2kvm/` (modules: 519, edges: 818).
 |---|---:|---:|
 | `core` | `core` | 167 |
 | `fixers` | `fixers` | 143 |
-| `vmware` | `vmware` | 38 |
 | `fixers` | `core` | 35 |
+| `vmware` | `vmware` | 33 |
 | `worker` | `worker` | 22 |
-| `vmware` | `core` | 20 |
+| `vmware` | `core` | 19 |
 | `orchestrator` | `core` | 18 |
 | `tui` | `tui` | 17 |
 | `database_migration` | `database_migration` | 13 |
@@ -128,7 +128,7 @@ Generated from static imports in `h2kvm/` (modules: 519, edges: 818).
 | `containers` | 14 | 9 |
 | `control` | 0 | 1 |
 | `converters` | 25 | 20 |
-| `core` | 170 | 306 |
+| `core` | 170 | 305 |
 | `daemon` | 28 | 10 |
 | `daemon_watcher` | 0 | 1 |
 | `dashboard` | 0 | 1 |
@@ -209,7 +209,7 @@ Generated from static imports in `h2kvm/` (modules: 519, edges: 818).
 | `validation_framework` | 0 | 1 |
 | `veeam` | 0 | 1 |
 | `vmdk_inspector` | 0 | 1 |
-| `vmware` | 59 | 48 |
+| `vmware` | 53 | 43 |
 | `vsphere_exporter` | 0 | 1 |
 | `widgets` | 0 | 1 |
 | `windows` | 13 | 8 |

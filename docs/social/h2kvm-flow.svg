@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-labelledby="t d">
+  <title id="t">h2kvm: sources, pipeline and deploy targets</title>
+  <desc id="d">h2kvm picks up a disk from vSphere, ESXi over SSH, Azure, local files or a Nutanix export made by Transiva. It inspects and flattens it, repairs it offline with GuestKit, converts it to qcow2 and checks it. It then deploys to one of three targets per run: a KubeVirt cluster (Zorvia and Zeus OS), a libvirt host (Machina) or OpenStack Glance and Nova.</desc>
+  <style>
+    text { font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    .box { stroke-width: 1.2; }
+    .hot { stroke-width: 2; }
+    .ext { fill: none; stroke-width: 1.2; stroke-dasharray: 5 4; }
+    .ln { stroke-width: 1.5; fill: none; }
+    .lnd { stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+    .div { stroke-width: 1; }
+    .t { font-size: 13px; font-weight: 700; }
+    .d { font-size: 11px; }
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10.5px; }
+    .lbl { font-size: 11px; }
+    .hdr { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; }
+    .chip { fill: #f97316; }
+    .chipt { font-size: 11px; font-weight: 700; fill: #111111; text-anchor: middle; }
+    .chipx { fill: none; stroke-width: 1.2; stroke-dasharray: 4 3; }
+    .chipxt { font-size: 11px; text-anchor: middle; }
+    text { fill: #1f2328; }
+    .bg { fill: #ffffff; stroke: #afb8c1; }
+    .box { fill: #f6f8fa; stroke: #afb8c1; }
+    .hot { fill: #fff1e6; stroke: #c2410c; }
+    .ext { stroke: #afb8c1; }
+    .ln, .lnd { stroke: #6e7781; }
+    .div { stroke: #afb8c1; }
+    .ah { fill: #6e7781; }
+    .d, .m, .lbl, .hdr, .chipxt { fill: #57606a; }
+    .chipx { stroke: #57606a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e6edf3; }
+      .bg { fill: #0d1117; stroke: #484f58; }
+      .box { fill: #161b22; stroke: #484f58; }
+      .hot { fill: #2a1a0d; stroke: #fb923c; }
+      .ext { stroke: #484f58; }
+      .ln, .lnd { stroke: #8b949e; }
+      .div { stroke: #484f58; }
+      .ah { fill: #8b949e; }
+      .d, .m, .lbl, .hdr, .chipxt { fill: #9198a1; }
+      .chipx { stroke: #9198a1; }
+    }
+  </style>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="959" height="599" rx="12"/>
+
+  <!-- column headers -->
+  <text class="hdr" x="20" y="34">SOURCES · PICK UP</text>
+  <text class="hdr" x="310" y="34">H2KVM PIPELINE</text>
+  <text class="hdr" x="690" y="34">DEPLOY TARGETS · ONE PER RUN</text>
+
+  <!-- sources -->
+  <rect class="box" x="20" y="50" width="230" height="62" rx="8"/>
+  <text class="t" x="34" y="68">vSphere / vCenter</text>
+  <text class="d" x="34" y="85">govc export.ovf (NFC lease)</text>
+  <text class="d" x="34" y="101">datastore /folder over HTTPS</text>
+
+  <rect class="box" x="20" y="124" width="230" height="50" rx="8"/>
+  <text class="t" x="34" y="142">ESXi host</text>
+  <text class="d" x="34" y="160">ssh stream (fetch-and-fix)</text>
+
+  <rect class="box" x="20" y="186" width="230" height="50" rx="8"/>
+  <text class="t" x="34" y="204">Azure VM disk</text>
+  <text class="d" x="34" y="222">az snapshot → SAS download</text>
+
+  <rect class="box" x="20" y="248" width="230" height="62" rx="8"/>
+  <text class="t" x="34" y="266">Files you already have</text>
+  <text class="d" x="34" y="283">VMDK · VHD(X) · VDI · raw · qcow2</text>
+  <text class="d" x="34" y="299">OVA / OVF · AMI tarball</text>
+
+  <rect class="ext" x="20" y="322" width="230" height="50" rx="8"/>
+  <text class="t" x="34" y="340">Nutanix AHV</text>
+  <text class="d" x="34" y="358">via Transiva, a separate repo</text>
+
+  <!-- source bus -->
+  <line class="ln" x1="250" y1="149" x2="275" y2="149"/>
+  <line class="ln" x1="250" y1="211" x2="275" y2="211"/>
+  <line class="ln" x1="250" y1="279" x2="275" y2="279"/>
+  <line class="lnd" x1="250" y1="347" x2="275" y2="347"/>
+  <line class="ln" x1="275" y1="81" x2="275" y2="347"/>
+  <line class="ln" x1="250" y1="81" x2="308" y2="81" marker-end="url(#ah)"/>
+
+  <!-- pipeline -->
+  <rect class="box" x="310" y="50" width="260" height="62" rx="8"/>
+  <text class="t" x="324" y="68">1 · Pick up</text>
+  <text class="d" x="324" y="85">extract OVA / VHD, find the disks</text>
+  <text class="m" x="324" y="101">--cmd local|ova|ovf|vhd|vsphere</text>
+
+  <line class="ln" x1="440" y1="112" x2="440" y2="142" marker-end="url(#ah)"/>
+  <text class="lbl" x="450" y="132">disk file(s)</text>
+
+  <rect class="box" x="310" y="144" width="260" height="62" rx="8"/>
+  <text class="t" x="324" y="162">2 · Inspect, flatten</text>
+  <text class="d" x="324" y="179">inspect (VMDK) · optional --flatten</text>
+  <text class="d" x="324" y="195">snapshot chain → one working image</text>
+
+  <line class="ln" x1="440" y1="206" x2="440" y2="236" marker-end="url(#ah)"/>
+  <text class="lbl" x="450" y="226">working image</text>
+
+  <rect class="hot" x="310" y="238" width="260" height="62" rx="8"/>
+  <text class="t" x="324" y="256">3 · Repair offline (GuestKit)</text>
+  <text class="d" x="324" y="273">run_migrate_repair on the disk image</text>
+  <text class="d" x="324" y="289">injectors: cloud-init · firstboot</text>
+
+  <line class="ln" x1="440" y1="300" x2="440" y2="330" marker-end="url(#ah)"/>
+  <text class="lbl" x="450" y="320">repaired disk</text>
+
+  <rect class="box" x="310" y="332" width="260" height="62" rx="8"/>
+  <text class="t" x="324" y="350">4 · Convert and check</text>
+  <text class="d" x="324" y="367">qemu-img convert → qcow2</text>
+  <text class="d" x="324" y="383">qemu-img check on the result</text>
+
+  <line class="ln" x1="440" y1="394" x2="440" y2="425" marker-end="url(#ah)"/>
+  <text class="lbl" x="450" y="414">validated qcow2</text>
+
+  <rect class="box" x="310" y="427" width="260" height="62" rx="8"/>
+  <text class="t" x="324" y="445">5 · Deploy</text>
+  <text class="d" x="324" y="462">hand the qcow2 to a target →</text>
+  <text class="d" x="324" y="478">or stop here with the file</text>
+
+  <!-- deploy bus -->
+  <line class="ln" x1="570" y1="458" x2="688" y2="458" marker-end="url(#ah)"/>
+  <line class="ln" x1="606" y1="120" x2="606" y2="458"/>
+  <line class="ln" x1="606" y1="120" x2="688" y2="120" marker-end="url(#ah)"/>
+  <line class="ln" x1="606" y1="289" x2="688" y2="289" marker-end="url(#ah)"/>
+  <text class="lbl" x="648" y="113" text-anchor="middle">k8s API</text>
+  <text class="lbl" x="648" y="282" text-anchor="middle">virsh</text>
+  <text class="lbl" x="648" y="451" text-anchor="middle">Glance, Nova</text>
+  <text class="lbl" x="614" y="204" font-style="italic">one per run</text>
+
+  <!-- lane 1: KubeVirt -->
+  <rect class="box" x="690" y="50" width="250" height="140" rx="8"/>
+  <text class="t" x="704" y="76">KubeVirt cluster</text>
+  <text class="d" x="704" y="96">CDI upload (virtctl) or PVC copy,</text>
+  <text class="d" x="704" y="112">then a kubevirt.io/v1 VirtualMachine</text>
+  <text class="m" x="704" y="132">--deploy-k8s</text>
+  <line class="div" x1="704" y1="146" x2="926" y2="146"/>
+  <rect class="chip" x="704" y="158" width="58" height="20" rx="10"/>
+  <text class="chipt" x="733" y="172">Zorvia</text>
+  <rect class="chip" x="770" y="158" width="66" height="20" rx="10"/>
+  <text class="chipt" x="803" y="172">Zeus OS</text>
+
+  <!-- lane 2: libvirt -->
+  <rect class="box" x="690" y="219" width="250" height="140" rx="8"/>
+  <text class="t" x="704" y="245">libvirt host</text>
+  <text class="d" x="704" y="265">virsh define, optional start</text>
+  <text class="d" x="704" y="281">on the host h2kvmctl runs on</text>
+  <text class="m" x="704" y="301">--emit-domain-xml</text>
+  <line class="div" x1="704" y1="315" x2="926" y2="315"/>
+  <rect class="chip" x="704" y="327" width="66" height="20" rx="10"/>
+  <text class="chipt" x="737" y="341">Machina</text>
+
+  <!-- lane 3: OpenStack -->
+  <rect class="box" x="690" y="388" width="250" height="140" rx="8"/>
+  <text class="t" x="704" y="414">OpenStack</text>
+  <text class="d" x="704" y="434">openstacksdk: qcow2 → Glance image,</text>
+  <text class="d" x="704" y="450">optional Nova server boot</text>
+  <text class="m" x="704" y="470">--deploy-openstack</text>
+  <line class="div" x1="704" y1="484" x2="926" y2="484"/>
+  <rect class="chipx" x="704" y="496" width="118" height="20" rx="10"/>
+  <text class="chipxt" x="763" y="510">third-party cloud</text>
+
+  <!-- left-bottom notes -->
+  <rect class="box" x="20" y="427" width="230" height="66" rx="8"/>
+  <text class="d" x="34" y="447">Driven by h2kvmctl, the folder</text>
+  <text class="d" x="34" y="463">daemon, a manifest, h2kweb or</text>
+  <text class="d" x="34" y="479">the Kubernetes operator</text>
+
+  <!-- legend -->
+  <rect class="chip" x="20" y="546" width="40" height="14" rx="7"/>
+  <text class="d" x="72" y="557">Zyvor product that runs or manages that endpoint. h2kvm deploys to the cluster or host, and has no API link to the product.</text>
+  <rect class="chipx" x="20" y="570" width="40" height="14" rx="7"/>
+  <text class="d" x="72" y="581">Dashed: not a Zyvor product, or not part of this repo.</text>
+</svg>

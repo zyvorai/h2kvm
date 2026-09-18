@@ -23,8 +23,8 @@ function HomepageHeader() {
               to KVM.
             </Heading>
             <p className="hero__subtitle">
-              Convert the disk offline. Fix the guest before power-on. No
-              VDDK. Then watch it boot.
+              Convert the disk offline. Fix the guest before power-on. Then
+              land it on KubeVirt, libvirt, or OpenStack.
             </p>
             <div className={styles.buttons}>
               <Link
@@ -67,7 +67,7 @@ function ArchitectureDiagram() {
         <Reveal>
           <p className={styles.eyebrow}>How it talks to vSphere</p>
           <Heading as="h2" className={styles.sectionHeading}>
-            HTTPS in. Disk out. No VDDK.
+            HTTPS in. Disk out.
           </Heading>
           <Link to="/docs/how-it-works" className={styles.diagramFrame}>
             <img
@@ -185,7 +185,7 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="h2kvm — any hypervisor to KVM"
-      description="Convert VMs from VMware, Hyper-V, Nutanix, AWS, Azure, and GCP to KVM. The guest is fixed before power-on. No VDDK.">
+      description="Convert VMs from vSphere, Azure, and any disk image to KVM. The guest is fixed before power-on, then lands on KubeVirt, libvirt, or OpenStack.">
       <HomepageHeader />
       <main>
         <ArchitectureDiagram />
