@@ -941,3 +941,95 @@ html:not([data-theme="dark"]) .text-purple-300,
 html:not([data-theme="dark"]) .text-purple-400,
 html:not([data-theme="dark"]) .text-pink-400,
 html:not([data-theme="dark"]) .text-fuchsia-400 { color: #1d1d1f !important; }
+
+/* Light theme: no pastel chips. Fills are solid and dark; labels are white. */
+html:not([data-theme="dark"]) button[class*="bg-blue-"],
+html:not([data-theme="dark"]) a[class*="bg-blue-"] {
+  background: #0071e3 !important;
+  color: #fff !important;
+  border-color: #0071e3 !important;
+}
+html:not([data-theme="dark"]) button[class*="bg-yellow-"],
+html:not([data-theme="dark"]) button[class*="bg-amber-"],
+html:not([data-theme="dark"]) button[class*="bg-orange-"] {
+  background: #9a3412 !important;
+  color: #fff !important;
+  border-color: #9a3412 !important;
+}
+html:not([data-theme="dark"]) button[class*="bg-red-"],
+html:not([data-theme="dark"]) button[class*="bg-rose-"] {
+  background: #b42318 !important;
+  color: #fff !important;
+  border-color: #b42318 !important;
+}
+html:not([data-theme="dark"]) button[class*="bg-green-"],
+html:not([data-theme="dark"]) button[class*="bg-emerald-"] {
+  background: #1b7f3a !important;
+  color: #fff !important;
+  border-color: #1b7f3a !important;
+}
+html:not([data-theme="dark"]) span[class*="bg-green-"],
+html:not([data-theme="dark"]) span[class*="bg-emerald-"] {
+  background: #1b7f3a !important;
+  color: #fff !important;
+  border-color: #1b7f3a !important;
+}
+html:not([data-theme="dark"]) span[class*="bg-yellow-"],
+html:not([data-theme="dark"]) span[class*="bg-amber-"],
+html:not([data-theme="dark"]) span[class*="bg-orange-"] {
+  background: #9a3412 !important;
+  color: #fff !important;
+  border-color: #9a3412 !important;
+}
+html:not([data-theme="dark"]) span[class*="bg-red-"],
+html:not([data-theme="dark"]) span[class*="bg-rose-"] {
+  background: #b42318 !important;
+  color: #fff !important;
+  border-color: #b42318 !important;
+}
+html:not([data-theme="dark"]) span[class*="bg-blue-"] {
+  background: #0071e3 !important;
+  color: #fff !important;
+  border-color: #0071e3 !important;
+}
+html:not([data-theme="dark"]) .bg-green-400,
+html:not([data-theme="dark"]) .bg-emerald-400 { background-color: #1b7f3a !important; }
+html:not([data-theme="dark"]) .bg-yellow-400,
+html:not([data-theme="dark"]) .bg-amber-400,
+html:not([data-theme="dark"]) .bg-orange-400 { background-color: #9a3412 !important; }
+html:not([data-theme="dark"]) .bg-red-400 { background-color: #b42318 !important; }
+html:not([data-theme="dark"]) .bg-blue-600\/10,
+html:not([data-theme="dark"]) .bg-blue-500\/10 {
+  background-color: #1d1d1f !important;
+  color: #f5f5f7 !important;
+}
+html:not([data-theme="dark"]) .bg-blue-600\/10 .text-white,
+html:not([data-theme="dark"]) .bg-blue-600\/10 [class*="text-white"],
+html:not([data-theme="dark"]) .bg-blue-500\/10 .text-white,
+html:not([data-theme="dark"]) .bg-blue-500\/10 [class*="text-white"] {
+  color: #f5f5f7 !important;
+}
+html:not([data-theme="dark"]) button[class*="bg-yellow-"] svg,
+html:not([data-theme="dark"]) button[class*="bg-amber-"] svg,
+html:not([data-theme="dark"]) button[class*="bg-orange-"] svg,
+html:not([data-theme="dark"]) button[class*="bg-red-"] svg,
+html:not([data-theme="dark"]) button[class*="bg-green-"] svg,
+html:not([data-theme="dark"]) button[class*="bg-blue-"] svg,
+html:not([data-theme="dark"]) span[class*="bg-green-"] svg,
+html:not([data-theme="dark"]) span[class*="bg-yellow-"] svg,
+html:not([data-theme="dark"]) span[class*="bg-orange-"] svg,
+html:not([data-theme="dark"]) span[class*="bg-red-"] svg,
+html:not([data-theme="dark"]) span[class*="bg-blue-"] svg,
+html:not([data-theme="dark"]) .bg-blue-600\/10 svg {
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) button[class*="bg-blue-"],
+html:not([data-theme="dark"]) a[class*="bg-blue-"] {
+  background: #0071e3 !important;
+  color: #fff !important;
+  border-color: #0071e3 !important;
+}
+html:not([data-theme="dark"]) button[class*="bg-blue-"] svg,
+html:not([data-theme="dark"]) a[class*="bg-blue-"] svg {
+  color: #fff !important;
+}
