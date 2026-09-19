@@ -24,4 +24,4 @@ myst-parser>=2.0.0
 
 # Type stubs
 types-PyYAML>=6.0.12.20260815
-types-requests>=2.33.0.20260408
+types-requests>=2.33.0.20260906
