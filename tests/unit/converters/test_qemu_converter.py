@@ -1,5 +1,5 @@
 # Copyright (c) 2026 ZyvorAI Labs Private Limited.
-# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 # https://zyvor.dev · info@zyvor.dev
 
 """Tests for h2kvm/converters/qemu/converter.py (ConvertOptions, _build_convert_cmd, _fallback_plan, validate)."""

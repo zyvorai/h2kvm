@@ -5,28 +5,28 @@ title: Licensing
 
 # Licensing
 
-h2kvm is **dual-licensed**.
+h2kvm is licensed under the **[Zyvor Production License v1.0](https://github.com/zyvorai/h2kvm/blob/main/LICENSE)**.
+
+- **Free** for development, testing, evaluation, research, education, and non-production labs
+- **Paid commercial license required** for production, customer workloads, SaaS, managed services, OEM, redistribution, and other revenue-generating use
 
 | Track | License | Cost |
 | --- | --- | --- |
-| Open source / community | [AGPL-3.0](https://github.com/zyvorai/h2kvm/blob/main/LICENSE) | Free |
-| Per VM | [h2kvm Commercial License](https://github.com/zyvorai/h2kvm/blob/main/COMMERCIAL_LICENSE.md) | $100 per VM, one-time |
-| Enterprise | [h2kvm Commercial License](https://github.com/zyvorai/h2kvm/blob/main/COMMERCIAL_LICENSE.md) | Fixed price; see below |
+| Non-production | [Zyvor Production License v1.0](https://github.com/zyvorai/h2kvm/blob/main/LICENSE) | Free |
+| Per VM | [Commercial license](https://github.com/zyvorai/h2kvm/blob/main/COMMERCIAL_LICENSE.md) | $100 per VM, one-time |
+| Enterprise | [Commercial license](https://github.com/zyvorai/h2kvm/blob/main/COMMERCIAL_LICENSE.md) | Fixed price; see below |
 
-Self-host for home or your own operations is free under AGPL, including internal modifications. If you modify h2kvm and offer it over a network, you must offer the corresponding source under AGPL-3.0, or buy a commercial license.
-
-| Use case | Allowed under AGPL? |
+| Use case | Allowed without a commercial license? |
 | --- | --- |
-| Self-host for home or your own operations | Yes, free |
-| Modify for internal use | Yes, free |
-| Build and publish your own AGPL extensions | Yes, free |
-| Deploy modified h2kvm as public SaaS without releasing changes | No — needs a commercial license |
-| Embed h2kvm in a closed-source product | No — needs a commercial license |
-| White-label proprietary customizations without AGPL | No — needs a commercial license |
+| Development, testing, evaluation, research, education | Yes, free |
+| Non-production laboratory environments | Yes, free |
+| Production environments and customer workloads | No |
+| SaaS, managed services, OEM, redistribution | No |
+| Embed h2kvm in a commercial product | No |
 
 ## Prices
 
-Pay for the number of VMs you convert, or buy Enterprise at a fixed price (not metered by VM count). For anything else, contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing.
+Production use requires a paid commercial license. Pay for the number of VMs you convert, or buy Enterprise at a fixed price (not metered by VM count). For anything else, contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing.
 
 ![h2kvm commercial pricing. $100 times N VMs, or Enterprise at a fixed price. Custom pricing: sales@zyvor.dev.](/h2kvm-pricing.jpg)
 

@@ -13,7 +13,7 @@ authors = [
 maintainers = [
     {name = "ZyvorAI Labs Private Limited", email = "ssahani@zyvor.dev"}
 ]
-license = {text = "AGPL-3.0-only OR LicenseRef-H2KVM-Commercial"}
+license = {text = "LicenseRef-Zyvor-Production-1.0"}
 keywords = [
     "kvm",
     "qemu",
@@ -40,7 +40,6 @@ classifiers = [
     "Topic :: System :: Installation/Setup",
     "Topic :: Utilities",
     "Environment :: Console",
-    "License :: OSI Approved :: GNU Affero General Public License v3",
 ]
 requires-python = ">=3.10"
 dependencies = [

@@ -5,17 +5,14 @@ Source: https://github.com/zyvorai/h2kvm
 
 Files: *
 Copyright: 2025-2026 ZyvorAI Labs Private Limited <ssahani@zyvor.dev>
-License: AGPL-3.0-only
+License: LicenseRef-Zyvor-Production-1.0
 
-License: AGPL-3.0-only
- h2kvm is dual-licensed. The open-source grant is the GNU Affero General
- Public License, version 3 only. The full text is in the upstream LICENSE
- file. On Debian systems it is also at /usr/share/common-licenses/AGPL-3
- when that file is installed.
- .
- A commercial alternative (SPDX LicenseRef-H2KVM-Commercial) is available
- from ZyvorAI Labs Private Limited. Published prices: 100 USD per VM,
- one-time, or a fixed Enterprise license (25,000 USD/year, 2,500 USD/month,
- 25,000 USD for one major version, or 15,000 USD for one minor version).
- Binding terms are provided at purchase. See COMMERCIAL_LICENSE.md.
+License: LicenseRef-Zyvor-Production-1.0
+ Zyvor Production License v1.0. Non-production use is free. Production,
+ SaaS, managed services, OEM, and redistribution require a separate paid
+ commercial license. The full text is in the upstream LICENSE file.
+ Published prices: 100 USD per VM, one-time, or a fixed Enterprise license
+ (25,000 USD/year, 2,500 USD/month, 25,000 USD for one major version, or
+ 15,000 USD for one minor version). Binding commercial terms are provided
+ at purchase. See COMMERCIAL_LICENSE.md.
  Contact: sales@zyvor.dev

@@ -12,7 +12,7 @@ fi
 
 mkdir -p "${STAGE}/docs/legal" "${STAGE}/legal/templates"
 
-# Code license (AGPL-3.0-only, or the h2kvm Commercial License)
+# Code license (Zyvor Production License v1.0)
 if [[ -f "${ROOT}/LICENSE" ]]; then
   cp "${ROOT}/LICENSE" "${STAGE}/LICENSE"
 fi
@@ -56,7 +56,7 @@ fi
   echo "https://zyvor.dev · sales@zyvor.dev · info@zyvor.dev · legal@zyvor.dev"
   echo ""
   echo "FILES:"
-  [[ -f "${STAGE}/LICENSE" ]] && echo "  LICENSE              — AGPL-3.0-only, or h2kvm Commercial License"
+  [[ -f "${STAGE}/LICENSE" ]] && echo "  LICENSE              — Zyvor Production License v1.0"
   [[ -f "${STAGE}/LICENSE.txt" ]] && echo "  LICENSE.txt          — software license"
   [[ -f "${STAGE}/ZYVOR-COMPANY-TERMS.md" ]] && echo "  ZYVOR-COMPANY-TERMS.md — Zyvor distribution (accept before install)"
   echo "  legal/ docs/legal/   — company reference"

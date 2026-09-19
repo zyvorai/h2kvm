@@ -22,7 +22,7 @@ Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **
 | Success metric | One VM converts and boots in a lab | Wave first-boot % · HA uptime · attributable cutovers |
 | Cost of staying on CE | No war-room · no SAN contracts · Issues | Avoided: failed Windows nights, storage tickets, unowned bridges |
 | Support | Community / self-serve | **SLA** · LTS · CVE response · war-room |
-| License | AGPL-3.0, free self-host | $100 × N VMs, or Enterprise fixed |
+| License | Zyvor Production License; free for non-production | $100 × N VMs, or Enterprise fixed |
 
 ### Source connectors
 

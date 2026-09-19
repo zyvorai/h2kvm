@@ -1,6 +1,6 @@
 # Licensing model (draft)
 
-**This repository (h2kvm) is dual-licensed:** [AGPL-3.0](../../LICENSE) for open-source self-host, or the [h2kvm Commercial License](../../COMMERCIAL_LICENSE.md) ($100 per VM, one-time, or Enterprise at a fixed price). See [LICENSING.md](../LICENSING.md). The notes below describe the commercial track and other Zyvor products that remain under a proprietary EULA.
+**This repository (h2kvm) is licensed under the [Zyvor Production License v1.0](../../LICENSE).** Non-production use is free. Production requires a paid [commercial license](../../COMMERCIAL_LICENSE.md) ($100 per VM, one-time, or Enterprise at a fixed price). See [LICENSING.md](../LICENSING.md). The notes below describe the commercial track and other Zyvor products that remain under a proprietary EULA.
 
 **Other Zyvor product code listed here may still be proprietary.** There is no open-source (Apache, MIT, LGPL, or similar) distribution of PacketWolf, Ragnarok, Aether, HyperSDK, or GuestKit except where that product's own repository says otherwise. Access to those products is by written agreement or that product's deploy EULA.
 

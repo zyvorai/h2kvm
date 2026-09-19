@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2026 ZyvorAI Labs Private Limited.
-# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 # https://zyvor.dev · info@zyvor.dev
 
 """Apply Zyvor proprietary license metadata and source headers across tt/ repos."""
@@ -83,37 +83,37 @@ CONTACT_MARK = "info@zyvor.dev"
 HEADERS = {
     ".rs": (
         "// Copyright (c) 2026 ZyvorAI Labs Private Limited.\n"
-        "// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial\n"
+        "// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0\n"
         "// https://zyvor.dev · info@zyvor.dev\n\n"
     ),
     ".go": (
         "// Copyright (c) 2026 ZyvorAI Labs Private Limited.\n"
-        "// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial\n"
+        "// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0\n"
         "// https://zyvor.dev · info@zyvor.dev\n\n"
     ),
     ".py": (
         "# Copyright (c) 2026 ZyvorAI Labs Private Limited.\n"
-        "# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial\n"
+        "# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0\n"
         "# https://zyvor.dev · info@zyvor.dev\n\n"
     ),
     ".ts": (
         "// Copyright (c) 2026 ZyvorAI Labs Private Limited.\n"
-        "// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial\n"
+        "// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0\n"
         "// https://zyvor.dev · info@zyvor.dev\n\n"
     ),
     ".tsx": (
         "// Copyright (c) 2026 ZyvorAI Labs Private Limited.\n"
-        "// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial\n"
+        "// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0\n"
         "// https://zyvor.dev · info@zyvor.dev\n\n"
     ),
     ".js": (
         "// Copyright (c) 2026 ZyvorAI Labs Private Limited.\n"
-        "// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial\n"
+        "// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0\n"
         "// https://zyvor.dev · info@zyvor.dev\n\n"
     ),
     ".jsx": (
         "// Copyright (c) 2026 ZyvorAI Labs Private Limited.\n"
-        "// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial\n"
+        "// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0\n"
         "// https://zyvor.dev · info@zyvor.dev\n\n"
     ),
 }

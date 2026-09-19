@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Offline repair ignores `--fstab-mode`, `--no-grub`, and `--regen-initramfs`, because GuestKit decides those changes itself. The run now logs a warning and records the ignored options in the report. `--cmd live-fix` still honors `--no-grub` and `--regen-initramfs`.
 - README: the flow diagram now shows sources, the pipeline, and the three deploy targets (KubeVirt, libvirt, OpenStack), with Zorvia and Zeus OS on KubeVirt and Machina on libvirt hosts.
+- **Zyvor Production License v1.0.** Replaced the AGPL-3.0 dual license. Non-production use is free. Production, SaaS, managed services, OEM, and redistribution require a separate paid commercial license (https://zyvor.dev). Source headers use `LicenseRef-Zyvor-Production-1.0`.
 
 ### Removed
 

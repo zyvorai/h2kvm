@@ -120,19 +120,19 @@ function TrustBand() {
         <Reveal className={styles.trustGrid}>
           <div>
             <Heading as="h3" className={styles.sectionHeading}>
-              AGPL-3.0. Free to self-host.
+              Free for non-production. Paid for production.
             </Heading>
             <p>
-              Home and internal use are free under AGPL. A commercial license
-              is $100 per VM, one-time, or Enterprise at a fixed price from
-              $2,500/month.
+              Development, testing, evaluation, and labs are free under the
+              Zyvor Production License. Production use is $100 per VM,
+              one-time, or Enterprise at a fixed price from $2,500/month.
             </p>
             <Link to="/docs/licensing">Read the licensing guide →</Link>
           </div>
           <div className={styles.trustBadges}>
             <img
-              src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg"
-              alt="AGPL v3 license"
+              src="https://img.shields.io/badge/License-Zyvor%20Production%20v1.0-blue.svg"
+              alt="Zyvor Production License v1.0"
             />
             <img
               src="https://img.shields.io/pypi/v/h2kvm.svg"

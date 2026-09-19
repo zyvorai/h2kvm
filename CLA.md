@@ -1,15 +1,14 @@
 <!-- Copyright (c) 2026 ZyvorAI Labs Private Limited. -->
-<!-- SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial -->
+<!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0 -->
 
 # Contributor License Agreement (CLA)
 
 Thank you for your interest in contributing to h2kvm, developed by
 **ZyvorAI Labs Private Limited** ("Zyvor", "we", "us").
 
-h2kvm is dual-licensed under the [GNU Affero General Public License v3.0
-only](LICENSE) (AGPL-3.0-only) and the [h2kvm Commercial
-License](COMMERCIAL_LICENSE.md). To accept your contribution and keep both
-tracks viable, we need you to agree to the terms below.
+h2kvm is licensed under the [Zyvor Production License v1.0](LICENSE)
+(`LicenseRef-Zyvor-Production-1.0`). To accept your contribution, we need you
+to agree to the terms below.
 
 This CLA is a short grant of rights. It does **not** transfer copyright
 ownership of your contribution away from you.
@@ -31,11 +30,9 @@ irrevocable license to:
 1. Use, reproduce, modify, prepare derivative works of, publicly display,
    publicly perform, sublicense, and distribute your Contribution and such
    derivative works; and
-2. Relicense your Contribution (and derivative works thereof) under
-   **AGPL-3.0-only**, under the **h2kvm Commercial License**, and/or
-   under any other open-source or proprietary license Zyvor offers for h2kvm,
-   including dual-licensing the same Contribution under both AGPL and the
-   commercial license.
+2. Relicense your Contribution (and derivative works thereof) under the
+   **Zyvor Production License v1.0**, under a commercial license, and/or
+   under any other license Zyvor offers for h2kvm.
 
 You also grant Zyvor a perpetual, worldwide, non-exclusive, royalty-free,
 irrevocable patent license to make, have made, use, sell, offer to sell,
@@ -55,12 +52,12 @@ You represent that:
    other restriction of which you are personally aware and which are associated
    with any part of your Contribution.
 
-## 4. Dual-license purpose
+## 4. License purpose
 
-You acknowledge that Zyvor offers h2kvm under AGPL-3.0-only and under a
-commercial license, and that the grants in §2 exist specifically so Zyvor can
-continue that dual-license model for Contributions without requiring a
-separate negotiation for each Contribution.
+You acknowledge that Zyvor offers h2kvm under the Zyvor Production License
+v1.0, and that production use requires a separate commercial license. The
+grants in §2 exist so Zyvor can accept Contributions under that model without
+requiring a separate negotiation for each Contribution.
 
 ## 5. How to accept
 

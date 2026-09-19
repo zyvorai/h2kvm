@@ -1,5 +1,5 @@
 # Copyright (c) 2026 ZyvorAI Labs Private Limited.
-# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-H2KVM-Commercial
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 # https://zyvor.dev · info@zyvor.dev
 
 """Tests for log processors: _add_log_level, _format_exc_info, _UnicodeDecoder,

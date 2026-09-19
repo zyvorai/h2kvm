@@ -112,7 +112,7 @@ const config: Config = {
             {label: 'GitHub', href: 'https://github.com/zyvorai/h2kvm'},
             {label: 'PyPI', href: 'https://pypi.org/project/h2kvm/'},
             {
-              label: 'License (AGPL-3.0)',
+              label: 'License',
               href: 'https://github.com/zyvorai/h2kvm/blob/main/LICENSE',
             },
           ],

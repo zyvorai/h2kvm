@@ -13,10 +13,10 @@ fix the guest offline, then land it on **KubeVirt, libvirt, or OpenStack**. Web 
 
 <br/>
 
-[![Release](https://img.shields.io/github/v/release/zyvorai/h2kvm?color=F97316)](https://github.com/zyvorai/h2kvm/releases/tag/v1.2.0)
+[![Release](https://img.shields.io/github/v/release/zyvorai/h2kvm?color=F97316)](https://github.com/zyvorai/h2kvm/releases/latest)
 [![GuestKit](https://img.shields.io/pypi/v/hypersdk-guestkit.svg)](https://pypi.org/project/hypersdk-guestkit/)
 [![Python](https://img.shields.io/badge/python-3.10+-3776AB.svg)](https://www.python.org/)
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
+[![License: Zyvor Production v1.0](https://img.shields.io/badge/License-Zyvor%20Production%20v1.0-blue.svg)](LICENSE)
 
 <br/>
 
@@ -358,16 +358,14 @@ CE is for labs and single-cluster PoC. Moving a Windows estate, SAN-backed waves
 
 ## License
 
-Dual-licensed:
+Licensed under the **[Zyvor Production License v1.0](LICENSE)**.
 
-- **[AGPL-3.0](LICENSE)** — open source; free for home users and self-host under AGPL terms
-- **[h2kvm Commercial License](COMMERCIAL_LICENSE.md)** — $100 per VM, one-time (N × $100), or Enterprise at a fixed price
+- **Free** for development, testing, evaluation, research, education, and non-production labs
+- **Paid commercial license required** for production, customer workloads, SaaS, managed services, OEM, redistribution, and other revenue-generating use
 
-Enterprise (fixed, not metered by VM count): **$25,000/year**, **$2,500/month**, **$25,000** for one major version, or **$15,000** for one minor version. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing.
+Commercial terms are issued separately: [https://zyvor.dev](https://zyvor.dev). Published prices: **$100 per VM, one-time** (N × $100), or Enterprise at a fixed price — **$25,000/year**, **$2,500/month**, **$25,000** for one major version, or **$15,000** for one minor version. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing. See [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) and [docs/LICENSING.md](docs/LICENSING.md).
 
-![h2kvm commercial pricing](docs/social/h2kvm-pricing.jpg)
-
-See [docs/LICENSING.md](docs/LICENSING.md). Contributions: [CLA.md](CLA.md) + [DCO.md](DCO.md) (`git commit -s`).
+Contributions: [CLA.md](CLA.md) + [DCO.md](DCO.md) (`git commit -s`). New source files need the `LicenseRef-Zyvor-Production-1.0` SPDX header.
 
 <div align="center">
 <sub>Built by <a href="https://zyvor.dev?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_colophon">Zyvor AI Labs</a> · Hypervisor exit without the 2 a.m. surprise</sub>
