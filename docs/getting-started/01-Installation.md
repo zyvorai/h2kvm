@@ -23,7 +23,7 @@ Install h2kvm and **all** dependencies on a fresh Fedora, RHEL, Ubuntu, Debian, 
 From PyPI:
 
 ```bash
-pip install "h2kvm==1.2.1"
+pip install "h2kvm==1.4.0"
 ```
 
 Or from source:

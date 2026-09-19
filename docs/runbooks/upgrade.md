@@ -224,7 +224,7 @@ pip uninstall -y h2kvm
 pip install -e ".[full]"
 
 # Or from PyPI
-pip install "h2kvm==1.2.1"
+pip install "h2kvm==1.4.0"
 
 # Verify version
 h2kvmctl --version

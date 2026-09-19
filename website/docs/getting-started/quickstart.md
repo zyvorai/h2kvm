@@ -7,7 +7,7 @@ sidebar_position: 1
 h2kvm converts a VM from another hypervisor onto KVM. GuestKit is installed with it and repairs the guest before the VM is powered on.
 
 ```bash
-pip install "h2kvm==1.3.0"
+pip install "h2kvm==1.4.0"
 h2kvmctl --help
 ```
 
@@ -36,4 +36,4 @@ pip install -e ".[full]"
 | Where disks come from, and where the VM lands | [How it works](../how-it-works) |
 | Product page | [zyvor.dev/h2kvm](https://zyvor.dev/h2kvm) |
 | Source | [github.com/zyvorai/h2kvm](https://github.com/zyvorai/h2kvm) |
-| Package | [PyPI](https://pypi.org/project/h2kvm/1.3.0/) |
+| Package | [PyPI](https://pypi.org/project/h2kvm/1.4.0/) |

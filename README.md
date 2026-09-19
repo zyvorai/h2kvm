@@ -124,10 +124,10 @@ Hypervisor exit fails when the bootloader is wrong, or Windows still points at t
 
 ## Install
 
-**v1.3.0** — on PyPI. GuestKit, the offline repair engine, is the `guestkit` extra.
+**v1.4.0** — on PyPI. GuestKit, the offline repair engine, is the `guestkit` extra.
 
 ```bash
-pip install "h2kvm[guestkit]==1.3.0"
+pip install "h2kvm[guestkit]==1.4.0"
 ```
 
 From source (extras / development):
@@ -144,9 +144,9 @@ Shell Completion is optional. Install argcomplete, then see [docs/getting-starte
 
 | Artifact | Where |
 |----------|--------|
-| **h2kvm 1.3.0** | [PyPI](https://pypi.org/project/h2kvm/1.3.0/) |
+| **h2kvm 1.4.0** | [PyPI](https://pypi.org/project/h2kvm/1.4.0/) |
 | **hypersdk-guestkit ≥ 1.1.0** | [PyPI](https://pypi.org/project/hypersdk-guestkit/) |
-| **Operator image** | `ghcr.io/zyvorai/h2kvm/operator:v1.2.0` |
+| **Operator image** | `ghcr.io/zyvorai/h2kvm/operator:v1.4.0` |
 
 ---
 

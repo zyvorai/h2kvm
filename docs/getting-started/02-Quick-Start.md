@@ -124,10 +124,10 @@ pip install -e .
 h2kvmctl --help
 ```
 
-### Option B: Install from PyPI (v1.2.1)
+### Option B: Install from PyPI (v1.4.0)
 
 ```bash
-pip install "h2kvm==1.2.1"
+pip install "h2kvm==1.4.0"
 h2kvmctl --help
 ```
 

@@ -296,10 +296,10 @@ Both commands are functionally identical.
 
 ### Links
 
-- **Release:** https://pypi.org/project/h2kvm/1.2.1/
+- **Release:** https://pypi.org/project/h2kvm/1.4.0/
 - **GuestKit:** https://pypi.org/project/hypersdk-guestkit/
 - **GitHub:** https://github.com/zyvorai/h2kvm
-- **License:** Proprietary (Zyvor AI Labs)
+- **License:** Zyvor Production License v1.0
 
 ---
 

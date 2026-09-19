@@ -25,7 +25,7 @@ The **h2kvm ecosystem** is a comprehensive VM migration solution consisting of t
 
 ### 1. **h2kvm** (Python)
 **Repository:** https://github.com/zyvorai/h2kvm
-**Release:** https://pypi.org/project/h2kvm/1.2.1/
+**Release:** https://pypi.org/project/h2kvm/1.4.0/
 **Language:** Python 3.10+
 
 Production-grade VM migration toolkit that converts hypervisor disks (VMware, Hyper-V, AWS AMI, etc.) to KVM-compatible formats with automatic guest OS fixes.
@@ -318,14 +318,14 @@ Features:
 
 ### Install h2kvm (Python)
 
-#### Method 1: From PyPI (v1.2.1)
+#### Method 1: From PyPI (v1.4.0)
 
 ```bash
 # Install system dependencies
 sudo dnf install -y qemu-img qemu-system-x86  # Fedora/RHEL
 sudo apt install -y qemu-utils               # Ubuntu/Debian
 
-pip install "h2kvm==1.2.1"
+pip install "h2kvm==1.4.0"
 
 # Or from a clone with extras
 # pip install '.[full]'

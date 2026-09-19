@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-09-19
+
 ### Fixed
 
 - The web console wrote YAML keys h2kvmctl ignores (`vsphere_host`, `vm_path`, `azure_subscription_id`, and others), so vSphere and Azure jobs never received their host, credentials, or VM name.

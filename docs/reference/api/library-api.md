@@ -56,13 +56,13 @@ h2kvm can be used both as a **command-line tool** and as a **Python library**. T
 
 ## Installation
 
-### From PyPI (v1.2.1)
+### From PyPI (v1.4.0)
 
 ```bash
-pip install "h2kvm==1.2.1"
+pip install "h2kvm==1.4.0"
 ```
 
-**Release:** https://pypi.org/project/h2kvm/1.2.1/
+**Release:** https://pypi.org/project/h2kvm/1.4.0/
 
 ### From Source
 

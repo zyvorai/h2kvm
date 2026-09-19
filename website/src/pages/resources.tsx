@@ -14,10 +14,10 @@ type Asset = {
 const ASSETS: Asset[] = [
   {
     title: 'Install',
-    blurb: 'h2kvm 1.2.1 on PyPI. GuestKit is installed with it.',
-    meta: 'pip install "h2kvm==1.2.1"',
+    blurb: 'h2kvm 1.4.0 on PyPI. GuestKit is the guestkit extra.',
+    meta: 'pip install "h2kvm==1.4.0"',
     links: [
-      {label: 'PyPI', href: 'https://pypi.org/project/h2kvm/1.2.1/'},
+      {label: 'PyPI', href: 'https://pypi.org/project/h2kvm/1.4.0/'},
       {label: 'Quickstart', href: '/docs/getting-started/quickstart'},
     ],
   },

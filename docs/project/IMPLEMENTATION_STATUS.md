@@ -60,7 +60,7 @@
 
 - **Script:** `scripts/deploy-remote.sh` — rsync checkout, pip install, h2kweb, systemd daemon
 - **GuestKit dependency:** `hypersdk-guestkit>=1.1.0` on [PyPI](https://pypi.org/project/hypersdk-guestkit/1.1.0/)
-- **h2kvm 1.2.1:** [PyPI](https://pypi.org/project/h2kvm/1.2.1/)
+- **h2kvm 1.4.0:** [PyPI](https://pypi.org/project/h2kvm/1.4.0/)
 - **Docs:** [deploy-remote.md](../deployment/deploy-remote.md), [GUESTKIT.md](../architecture/GUESTKIT.md)
 - **Validated:** Ubuntu 24.04 lab host — osboxes VMDK → qcow2 → libvirt (`ubuntu-test`)
 

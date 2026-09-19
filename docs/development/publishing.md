@@ -556,4 +556,4 @@ h2kvm --version
 
 ---
 
-**Status:** Published. `h2kvm` 1.2.1 is on [PyPI](https://pypi.org/project/h2kvm/1.2.1/).
+**Status:** Published. `h2kvm` 1.4.0 is on [PyPI](https://pypi.org/project/h2kvm/1.4.0/).
