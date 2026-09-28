@@ -1,0 +1,118 @@
+<!-- Copyright (c) 2026 ZyvorAI Labs Private Limited. -->
+<!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="h2kvm — Any hypervisor to KVM. Convert offline, fix the guest, deploy with confidence. vSphere, ESXi, Azure and files in; KubeVirt, libvirt and OpenStack out.">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#000000"/>
+      <stop offset="1" stop-color="#0b0b0f"/>
+    </linearGradient>
+    <radialGradient id="wash" cx="860" cy="300" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0071e3" stop-opacity="0.20"/>
+      <stop offset="0.6" stop-color="#0071e3" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#0071e3" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a84ff"/>
+      <stop offset="1" stop-color="#5eb0ff"/>
+    </linearGradient>
+    <linearGradient id="blueText" x1="72" y1="0" x2="470" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0a84ff"/>
+      <stop offset="1" stop-color="#5eb0ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-30%" width="140%" height="190%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dy="7" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0" result="s"/>
+      <feMerge><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow" x="-30%" y="-40%" width="160%" height="200%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="13"/>
+      <feOffset dy="11" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0.0  0 0 0 0 0.35  0 0 0 0 0.9  0 0 0 0.30 0" result="s"/>
+      <feMerge><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#wash)"/>
+
+  <!-- Zyvor mark (blue) -->
+  <rect x="72" y="56" width="56" height="56" rx="13" fill="url(#blue)"/>
+  <path d="M86.5 70 113.5 70 86.5 98 113.5 98" fill="none" stroke="#ffffff" stroke-width="7"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- eyebrow, wordmark, tagline -->
+  <text x="72" y="176" font-family="'Menlo','JetBrains Mono',monospace" font-size="20" font-weight="700" letter-spacing="4" fill="#2997ff">HYPERVISOR EXIT</text>
+  <text x="68" y="296" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="132" font-weight="700" letter-spacing="-4" fill="#f5f5f7">h2kvm</text>
+  <text x="72" y="352" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="42" font-weight="600" letter-spacing="-0.8" fill="url(#blueText)">Any hypervisor to KVM.</text>
+  <g font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="26" fill="#a1a1a6">
+    <text x="72" y="404">Convert offline. Fix the guest.</text>
+    <text x="72" y="440">Deploy with confidence.</text>
+  </g>
+
+  <!-- chips -->
+  <g>
+    <rect x="72" y="486" width="122" height="40" rx="20" fill="#0b2340" stroke="#1d4f8a"/>
+    <text x="133.0" y="511" text-anchor="middle" font-family="'Menlo','JetBrains Mono',monospace" font-size="14" font-weight="700" letter-spacing="1" fill="#2997ff">GUESTKIT</text>
+    <rect x="206" y="486" width="142" height="40" rx="20" fill="#0b2340" stroke="#1d4f8a"/>
+    <text x="277.0" y="511" text-anchor="middle" font-family="'Menlo','JetBrains Mono',monospace" font-size="14" font-weight="700" letter-spacing="1" fill="#2997ff">KUBERNETES</text>
+    <rect x="360" y="486" width="108" height="40" rx="20" fill="#0b2340" stroke="#1d4f8a"/>
+    <text x="414.0" y="511" text-anchor="middle" font-family="'Menlo','JetBrains Mono',monospace" font-size="14" font-weight="700" letter-spacing="1" fill="#2997ff">OFFLINE</text>
+  </g>
+
+  <!-- sources -> h2kvm -> targets -->
+  <text x="572" y="140" font-family="'Menlo','JetBrains Mono',monospace" font-size="13" font-weight="700" letter-spacing="3" fill="#a1a1a6">SOURCES</text>
+  <text x="984" y="140" font-family="'Menlo','JetBrains Mono',monospace" font-size="13" font-weight="700" letter-spacing="3" fill="#a1a1a6">TARGETS</text>
+  <g fill="none" stroke="#2997ff" stroke-opacity="0.55" stroke-width="2.5" stroke-linecap="round">
+    <path d="M724 195 C 754 195, 750 315, 780 315"/>
+    <path d="M724 275 C 754 275, 750 315, 780 315"/>
+    <path d="M724 355 C 754 355, 750 315, 780 315"/>
+    <path d="M724 435 C 754 435, 750 315, 780 315"/>
+    <path d="M920 315 C 952 315, 952 215, 984 215"/>
+    <path d="M920 315 C 952 315, 952 315, 984 315"/>
+    <path d="M920 315 C 952 315, 952 415, 984 415"/>
+  </g>
+  <g fill="#2997ff">
+    <circle cx="724" cy="195" r="4.5"/>
+    <circle cx="724" cy="275" r="4.5"/>
+    <circle cx="724" cy="355" r="4.5"/>
+    <circle cx="724" cy="435" r="4.5"/>
+    <circle cx="984" cy="215" r="4.5"/>
+    <circle cx="984" cy="315" r="4.5"/>
+    <circle cx="984" cy="415" r="4.5"/>
+  </g>
+  <g>
+    <rect x="572" y="167" width="152" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
+    <text x="590" y="192" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">vSphere</text>
+    <text x="590" y="211" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">govc · datastore</text>
+    <rect x="572" y="247" width="152" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
+    <text x="590" y="272" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">ESXi</text>
+    <text x="590" y="291" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">ssh stream</text>
+    <rect x="572" y="327" width="152" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
+    <text x="590" y="352" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">Azure</text>
+    <text x="590" y="371" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">az snapshot</text>
+    <rect x="572" y="407" width="152" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
+    <text x="590" y="432" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">Files</text>
+    <text x="590" y="451" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">VMDK · VHDX · OVA</text>
+    <rect x="984" y="187" width="144" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
+    <text x="1002" y="212" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">KubeVirt</text>
+    <text x="1002" y="231" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">Zorvia · Zeus OS</text>
+    <rect x="984" y="287" width="144" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
+    <text x="1002" y="312" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">libvirt</text>
+    <text x="1002" y="331" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">Machina</text>
+    <rect x="984" y="387" width="144" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
+    <text x="1002" y="412" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">OpenStack</text>
+    <text x="1002" y="431" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">Glance · Nova</text>
+  </g>
+  <rect x="780" y="259" width="140" height="112" rx="26" fill="url(#blue)" filter="url(#glow)"/>
+  <rect x="780" y="259" width="140" height="112" rx="26" fill="none" stroke="#ffffff" stroke-opacity="0.25"/>
+  <text x="850.0" y="313" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="32" font-weight="700" fill="#ffffff">h2kvm</text>
+  <text x="850.0" y="339" text-anchor="middle" font-family="'Menlo','JetBrains Mono',monospace" font-size="14" fill="#d6e9ff">offline repair</text>
+  <!-- the single orange accent -->
+  <circle cx="900" cy="279" r="6" fill="#ff6a2a"/>
+
+  <!-- footer -->
+  <line x1="72" y1="552" x2="1128" y2="552" stroke="#2c2c2e"/>
+  <text x="72" y="592" font-family="'Menlo','JetBrains Mono',monospace" font-size="18" fill="#a1a1a6">github.com/zyvorai/h2kvm</text>
+  <text x="1128" y="592" text-anchor="end" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="16" fill="#a1a1a6">Zyvor Production License</text>
+</svg>
