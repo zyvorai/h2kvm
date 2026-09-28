@@ -17,32 +17,18 @@
     .chipt { font-size: 11px; font-weight: 700; text-anchor: middle; }
     .chipx { fill: none; stroke-width: 1.2; stroke-dasharray: 4 3; }
     .chipxt { font-size: 11px; text-anchor: middle; }
-    text { fill: #1d1d1f; }
-    .bg { fill: #ffffff; stroke: #d2d2d7; }
-    .box { fill: #f5f5f7; stroke: #d2d2d7; }
-    .hot { fill: #eaf3ff; stroke: #0071e3; }
-    .ext { stroke: #b0b0b5; }
-    .ln, .lnd { stroke: #86868b; }
-    .div { stroke: #d2d2d7; }
-    .ah { fill: #86868b; }
-    .chip { fill: #0071e3; }
+    text { fill: #f5f5f7; }
+    .bg { fill: #000000; stroke: #3a3a3c; }
+    .box { fill: #1c1c1e; stroke: #3a3a3c; }
+    .hot { fill: #0b2340; stroke: #2997ff; }
+    .ext { stroke: #48484a; }
+    .ln, .lnd { stroke: #8e8e93; }
+    .div { stroke: #3a3a3c; }
+    .ah { fill: #8e8e93; }
+    .chip { fill: #0a84ff; }
     .chipt { fill: #ffffff; }
-    .d, .m, .lbl, .hdr, .chipxt { fill: #6e6e73; }
-    .chipx { stroke: #6e6e73; }
-    @media (prefers-color-scheme: dark) {
-      text { fill: #f5f5f7; }
-      .bg { fill: #000000; stroke: #3a3a3c; }
-      .box { fill: #1c1c1e; stroke: #3a3a3c; }
-      .hot { fill: #0b2340; stroke: #2997ff; }
-      .ext { stroke: #48484a; }
-      .ln, .lnd { stroke: #8e8e93; }
-      .div { stroke: #3a3a3c; }
-      .ah { fill: #8e8e93; }
-      .chip { fill: #0a84ff; }
-      .chipt { fill: #ffffff; }
-      .d, .m, .lbl, .hdr, .chipxt { fill: #a1a1a6; }
-      .chipx { stroke: #a1a1a6; }
-    }
+    .d, .m, .lbl, .hdr, .chipxt { fill: #a1a1a6; }
+    .chipx { stroke: #a1a1a6; }
   </style>
   <defs>
     <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
