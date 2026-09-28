@@ -10,6 +10,13 @@ Enterprise VM migration — any hypervisor to KVM
 | **Remote lab deploy** | [deployment/deploy-remote.md](deployment/deploy-remote.md) |
 | **GuestKit integration** | [architecture/GUESTKIT.md](architecture/GUESTKIT.md) |
 | Kubernetes deploy | [deployment/README.md](deployment/README.md) |
+| Sources, disk pipeline and targets | [how-it-works.md](how-it-works.md) |
+| Install, artifacts and surfaces | [install-and-quick-start.md](install-and-quick-start.md) |
+| GuestKit in h2kvm | [guestkit-integration.md](guestkit-integration.md) |
+| Remote lab deploy (commands) | [remote-lab-deploy.md](remote-lab-deploy.md) |
+| Demos | [demos.md](demos.md) |
+| Community vs Enterprise summary | [community-vs-enterprise.md](community-vs-enterprise.md) |
+| The Zyvor suite | [zyvor-suite.md](zyvor-suite.md) |
 | Examples | [../examples/](../examples/) |
 | **User journeys & acceptance criteria** | [User Stories](USER_STORIES.md) |
 
