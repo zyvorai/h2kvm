@@ -161,6 +161,15 @@ The comparison table and **why teams upgrade** are in [docs/community-vs-enterpr
 
 GuestKit and h2kvm fix the disk and land the VM. Where it lands decides the Zyvor product you run it on: KubeVirt is [Zorvia](https://zyvor.dev/zorvia) and [Zeus OS](https://zyvor.dev/zeus-os), libvirt hosts are [Machina](https://zyvor.dev/machina). The full role table is in [docs/zyvor-suite.md](docs/zyvor-suite.md).
 
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/social/migration-1200x630-dark.png">
+  <img src="docs/social/migration-1200x630.png" alt="VMware to KubeVirt, four tools one path: Transiva exports, h2kvm converts and deploys, GuestKit assures, Zorvia operates, each with Community and Enterprise tiers." width="820">
+</picture>
+
+</div>
+
 **VMware to KubeVirt on Zorvia:** Transiva (export) → h2kvm → GuestKit → [Zorvia](https://github.com/zyvorai/zorvia/blob/main/docs/leave-openshift.md) to operate. Each is a separate tool with its own licence; h2kvm needs a paid licence for production use. Zorvia's own importer is Experimental, so use this suite.
 
 ## Documentation
