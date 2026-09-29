@@ -12,16 +12,18 @@
 Pick up VMs from **vSphere, ESXi, Azure**, or any disk you already have (**VMDK, VHDX, VDI, raw, OVA/OVF**) —  
 fix the guest offline, then land it on **KubeVirt, libvirt, or OpenStack**. Web control plane and Kubernetes operator included.
 
-**First-boot science for hypervisor exit** · lands on KubeVirt (**[Zorvia](https://zyvor.dev/zorvia)** · **[Zeus OS](https://zyvor.dev/zeus-os)**), libvirt (**[Machina](https://zyvor.dev/machina)**) or OpenStack · part of the [Zyvor](https://zyvor.dev/?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero) suite
+**First-boot science for hypervisor exit** · lands on KubeVirt (**[Zorvia](https://zyvor.dev/zorvia?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)** · **[Zeus OS](https://zyvor.dev/zeus-os?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)**), libvirt (**[Machina](https://zyvor.dev/machina?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)**) or OpenStack · part of the [Zyvor](https://zyvor.dev/?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero) suite
+
+**Production use needs a paid licence, and [pricing is public](https://zyvor.dev/pricing?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero).** Free for evaluation, development and labs.
 
 <br/>
 
 [![Release](https://img.shields.io/github/v/release/zyvorai/h2kvm?style=flat-square&color=0071e3&labelColor=1d1d1f)](https://github.com/zyvorai/h2kvm/releases/latest)
-[![GuestKit](https://img.shields.io/pypi/v/hypersdk-guestkit.svg?style=flat-square&color=0071e3&labelColor=1d1d1f&label=guestkit)](https://pypi.org/project/hypersdk-guestkit/)
+[![GuestKit](https://img.shields.io/pypi/v/zyvor-guestkit.svg?style=flat-square&color=0071e3&labelColor=1d1d1f&label=guestkit)](https://pypi.org/project/zyvor-guestkit/)
 [![Python](https://img.shields.io/badge/python-3.10+-0071e3.svg?style=flat-square&labelColor=1d1d1f)](https://www.python.org/)
 [![License: Zyvor Production License v1.0](https://img.shields.io/badge/license-Zyvor%20Production%20License%20v1.0-0071e3.svg?style=flat-square&labelColor=1d1d1f)](LICENSE)
 
-[![Book an Enterprise demo](https://img.shields.io/badge/Book_an_Enterprise_demo-0071e3?style=for-the-badge)](https://zyvor.dev/contact?intent=demo&utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)
+[![Book a demo](https://img.shields.io/badge/Book_a_demo-0071e3?style=for-the-badge)](https://zyvor.dev/schedule?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)
 [![30-day PoC](https://img.shields.io/badge/30--day_PoC-1d1d1f?style=for-the-badge)](https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)
 [![Watch the demo](https://img.shields.io/badge/Watch_the_demo-1d1d1f?style=for-the-badge)](https://www.youtube.com/watch?v=lQP1sd5Ftkc)
 
@@ -32,7 +34,7 @@ fix the guest offline, then land it on **KubeVirt, libvirt, or OpenStack**. Web 
 **[Demos](docs/demos.md)** ·
 **[CE vs Enterprise](#community-vs-enterprise)** ·
 **[Docs](docs/README.md)** ·
-**[Product](https://zyvor.dev/h2kvm?utm_source=github&utm_medium=h2kvm)**
+**[Product](https://zyvor.dev/h2kvm?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)**
 
 </div>
 
@@ -130,7 +132,7 @@ Host needs Linux with `qemu-img`, `qemu-nbd`, and `losetup`. More: [install, art
 | Windows needs a war room of tribal scripts | Automated VirtIO / hivex / RDP path |
 | No visibility mid-conversion | **h2kweb** progress · webhooks · email |
 | K8s teams stuck on libvirt YAML | Libvirt → **KubeVirt** one-click path |
-| Cutover outcomes unowned | Enterprise: **96.8%** automated first-boot + PS |
+| Cutover outcomes unowned | Enterprise: SLA, LTS and CVE under contract, plus PowerShell runbooks |
 
 ---
 
@@ -142,14 +144,14 @@ Host needs Linux with `qemu-img`, `qemu-nbd`, and `losetup`. More: [install, art
 
 CE is for labs and single-cluster PoC. Moving a Windows estate, SAN-backed waves, or multi-site fleets? No war-room, no HA fabric, no LTS/CVE contract on CE. **Buy Enterprise.**
 
-The comparison table and **why teams upgrade** are in [docs/community-vs-enterprise.md](docs/community-vs-enterprise.md); the full feature matrix is [docs/ce-vs-enterprise.md](docs/ce-vs-enterprise.md).
+The comparison table, **why teams upgrade** and the full feature matrix are in [docs/ce-vs-enterprise.md](docs/ce-vs-enterprise.md).
 
 <div align="center">
 
 **Bring us your worst wave.** 30-day PoC on your estate.
 
 [![Start a proof of concept](https://img.shields.io/badge/Start_a_proof_of_concept-0071e3?style=for-the-badge)](https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer)
-[![Book an Enterprise demo](https://img.shields.io/badge/Book_an_Enterprise_demo-1d1d1f?style=for-the-badge)](https://zyvor.dev/contact?intent=demo&utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer)
+[![Book a demo](https://img.shields.io/badge/Book_a_demo-1d1d1f?style=for-the-badge)](https://zyvor.dev/schedule?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer)
 [![Pricing](https://img.shields.io/badge/Pricing-1d1d1f?style=for-the-badge)](https://zyvor.dev/pricing?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer)
 
 </div>
@@ -159,7 +161,7 @@ The comparison table and **why teams upgrade** are in [docs/community-vs-enterpr
 
 ## The Zyvor suite
 
-GuestKit and h2kvm fix the disk and land the VM. Where it lands decides the Zyvor product you run it on: KubeVirt is [Zorvia](https://zyvor.dev/zorvia) and [Zeus OS](https://zyvor.dev/zeus-os), libvirt hosts are [Machina](https://zyvor.dev/machina). The full role table is in [docs/zyvor-suite.md](docs/zyvor-suite.md).
+GuestKit and h2kvm fix the disk and land the VM. Where it lands decides the Zyvor product you run it on: KubeVirt is [Zorvia](https://zyvor.dev/zorvia?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_suite) and [Zeus OS](https://zyvor.dev/zeus-os?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_suite), libvirt hosts are [Machina](https://zyvor.dev/machina?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_suite). The full role table is in [docs/zyvor-suite.md](docs/zyvor-suite.md).
 
 <div align="center">
 
@@ -170,7 +172,7 @@ GuestKit and h2kvm fix the disk and land the VM. Where it lands decides the Zyvo
 
 </div>
 
-**VMware to KubeVirt on Zorvia:** Transiva (export) → h2kvm → GuestKit → [Zorvia](https://github.com/zyvorai/zorvia/blob/main/docs/leave-openshift.md) to operate. Each is a separate tool with its own licence; h2kvm needs a paid licence for production use. Zorvia's own importer is Experimental, so use this suite.
+**VMware to KubeVirt on Zorvia:** [Transiva](https://github.com/zyvorai/transiva) (export, Apache-2.0) → h2kvm (convert and deploy, Zyvor Production License) → GuestKit (assure, Apache-2.0) → [Zorvia](https://github.com/zyvorai/zorvia/blob/main/docs/leave-openshift.md) to operate. Each is a separate tool with its own licence; h2kvm needs a paid licence for production use. Zorvia's own importer is Experimental, so use this suite.
 
 ## Documentation
 
@@ -188,9 +190,9 @@ GuestKit and h2kvm fix the disk and land the VM. Where it lands decides the Zyvo
 
 | | |
 |---|---|
-| **Enterprise / PoC** | [Book a demo](https://zyvor.dev/contact?intent=demo) · [sales@zyvor.dev](mailto:sales@zyvor.dev) |
+| **Enterprise / PoC** | [Book a demo](https://zyvor.dev/schedule?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer) · [30-day PoC](https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer) · [sales@zyvor.dev](mailto:sales@zyvor.dev) |
 | **Community** | [GitHub Issues](https://github.com/zyvorai/h2kvm/issues) |
-| **Product** | [zyvor.dev/h2kvm](https://zyvor.dev/h2kvm) |
+| **Product** | [zyvor.dev/h2kvm](https://zyvor.dev/h2kvm?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer) |
 
 ## License
 
@@ -199,7 +201,7 @@ Licensed under the **[Zyvor Production License v1.0](LICENSE)**.
 - **Free** for development, testing, evaluation, research, education, and non-production labs
 - **Paid commercial license required** for production, customer workloads, SaaS, managed services, OEM, redistribution, and other revenue-generating use
 
-Commercial terms are issued separately: [https://zyvor.dev](https://zyvor.dev). Published prices: **$100 per VM, one-time** (N × $100), or Enterprise at a fixed price — **$25,000/year**, **$2,500/month**, **$25,000** for one major version, or **$15,000** for one minor version. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing. See [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) and [docs/LICENSING.md](docs/LICENSING.md).
+Commercial terms are issued separately: [https://zyvor.dev](https://zyvor.dev?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer). Published prices: **$100 per VM, one-time** (N × $100), or Enterprise at a fixed price — **$25,000/year**, **$2,500/month**, **$25,000** for one major version, or **$15,000** for one minor version. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing. See [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) and [docs/LICENSING.md](docs/LICENSING.md).
 
 Contributions: [CLA.md](CLA.md) + [DCO.md](DCO.md) (`git commit -s`). New source files need the `LicenseRef-Zyvor-Production-1.0` SPDX header.
 
