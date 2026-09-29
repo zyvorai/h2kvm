@@ -5,9 +5,9 @@
 
 CE is for labs. The moment you need HA operators, Windows war-room runbooks, SAN/Ceph pipelines, GuestKit fleet risk scoring, or LTS/CVE under contract — that is Enterprise. Day-2 lands on **Zeus OS**. One failed first-boot wave usually costs more than the license.
 
-Enterprise tree: commercial h2kvm builds. Product: [zyvor.dev/h2kvm](https://zyvor.dev/h2kvm?utm_source=github&utm_medium=h2kvm) · [Book an Enterprise demo](https://zyvor.dev/contact?intent=demo) · [30-day PoC](https://zyvor.dev/poc) · [sales@zyvor.dev](mailto:sales@zyvor.dev)
+Enterprise tree: commercial h2kvm builds. Product: [zyvor.dev/h2kvm](https://zyvor.dev/h2kvm?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition) · [Book a demo](https://zyvor.dev/schedule?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition) · [30-day PoC](https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition) · [sales@zyvor.dev](mailto:sales@zyvor.dev)
 
-Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **h2kvm** (convert) → **[GuestKit](https://github.com/hypersdk/guestkit)** (assure) → **[Zeus OS](https://zyvor.dev/zeus-os)** (operate)
+Pairs with: **[Transiva](https://github.com/zyvorai/transiva)** (export) → **h2kvm** (convert and deploy) → **[GuestKit](https://github.com/zyvorai/guestkit)** (assure) → **[Zorvia](https://github.com/zyvorai/zorvia)** or **[Zeus OS](https://zyvor.dev/zeus-os?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition)** (operate)
 
 ---
 
@@ -32,7 +32,7 @@ Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **
 | Hyper-V VHD/VHDX | ✅ | ✅ |
 | AWS · Azure disk export paths | ✅ | ✅ |
 | Proxmox / Veeam backup vaults | ✅ / limited | ✅ Hardened playbooks |
-| HyperSDK-driven multi-provider orchestration | DIY glue | ✅ Integrated |
+| Transiva-driven multi-provider orchestration | DIY glue | ✅ Integrated |
 
 ### Disk conversion engine
 
@@ -97,8 +97,8 @@ Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **
 | Capability | Community | Enterprise |
 | --- | --- | --- |
 | Hand off to **Zeus OS** day-2 | ✅ | ✅ Licensed path |
-| HyperSDK export upstream | Pair | ✅ Orchestrated |
-| First-boot success (published) | Strong offline fix | **96.8%** automated path + PS |
+| Transiva export upstream | Pair | ✅ Orchestrated |
+| First-boot ownership | Strong offline fix | Automated path + PS runbooks, named owner |
 
 ---
 
@@ -107,11 +107,11 @@ Pairs with: **[HyperSDK](https://github.com/hypersdk/hypersdk)** (export) → **
 1. **A lab operator is not a multi-wave cutover fabric** — Enterprise is HA, tenancy, and production hardening  
 2. **Windows estates need war-room playbooks** — VirtIO injection alone does not survive AD/SQL cutovers  
 3. **Storage teams need SAN/Ceph pipelines under contract** — DIY glue fails when the ticket is already late  
-4. **Published first-boot outcomes + PS** — 96.8% automated path; the rest is a named owner, not Issues  
+4. **First-boot ownership + PS** — automated path plus runbooks; the rest is a named owner, not Issues  
 5. **You want Zyvor accountable for cutover night** — LTS, CVE trains, and hypervisor-exit programs  
 
 **CE proves the science. Buy Enterprise when the estate must move.**
 
 Commercial prices: **$100 per VM, one-time** (N × $100), or Enterprise at a fixed price — **$25,000/year**, **$2,500/month**, **$25,000** for one major version, or **$15,000** for one minor version. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing. See [COMMERCIAL_LICENSE.md](../COMMERCIAL_LICENSE.md) and [LICENSING.md](LICENSING.md).
 
-**→ [Book an Enterprise demo](https://zyvor.dev/contact?intent=demo)** · **[30-day PoC](https://zyvor.dev/poc)** · **[Pricing](https://zyvor.dev/pricing)** · **[h2kvm product](https://zyvor.dev/h2kvm)**
+**→ [Book a demo](https://zyvor.dev/schedule?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition)** · **[30-day PoC](https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition)** · **[Pricing](https://zyvor.dev/pricing?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition)** · **[h2kvm product](https://zyvor.dev/h2kvm?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition)**
