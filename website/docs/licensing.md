@@ -2,8 +2,10 @@
 sidebar_position: 3
 title: Licensing
 ---
-
 # Licensing
+
+> **Note:** Zyvor is moving to an enterprise subscription model for new quotes: an annual subscription that includes updates and the stated support level, with open-source and non-production terms unchanged. See `docs/SUBSCRIPTION-MODEL.md` in this repository. Rates below apply to existing agreements; contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for current rates.
+
 
 h2kvm is licensed under the **[Zyvor Production License v1.0](https://github.com/zyvorai/h2kvm/blob/main/LICENSE)**.
 
