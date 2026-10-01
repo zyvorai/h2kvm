@@ -1,5 +1,8 @@
 # Community vs Enterprise — h2kvm
 
+> **Note:** Zyvor is moving to an enterprise subscription model for new quotes: an annual subscription that includes updates and the stated support level, with open-source and non-production terms unchanged. See `docs/SUBSCRIPTION-MODEL.md` in this repository. Rates below apply to existing agreements; contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for current rates.
+
+
 **Community / public eval (this repo) proves convert + offline guest fix.**  
 **Enterprise is what you buy for cutover night.**
 
