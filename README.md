@@ -196,6 +196,8 @@ GuestKit and h2kvm fix the disk and land the VM. Where it lands decides the Zyvo
 
 ## License
 
+Commercial subscriptions and support: see [docs/SUBSCRIPTION-MODEL.md](docs/SUBSCRIPTION-MODEL.md).
+
 Licensed under the **[Zyvor Production License v1.0](LICENSE)**.
 
 - **Free** for development, testing, evaluation, research, education, and non-production labs
